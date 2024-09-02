@@ -3,7 +3,7 @@
 #include "game/ClientInventory.h"
 #include "ui/gtk/DragSource.h"
 #include "packet/MoveSlotsPacket.h"
-#include "ui/gtk/ItemSlot.h"
+#include "ui/gtk/GTKItemSlot.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/tab/GTKInventoryTab.h"
@@ -155,7 +155,7 @@ namespace Game3 {
 		itemSlots.clear();
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
-			auto item_slot = std::make_unique<ItemSlot>(game, slot, inventory, this);
+			auto item_slot = std::make_unique<GTKItemSlot>(game, slot, inventory, this);
 
 			ItemStackPtr stack = (*inventory)[slot];
 
@@ -192,7 +192,7 @@ namespace Game3 {
 
 		for (Slot slot = 0; slot < lastSlotCount; ++slot) {
 			ItemStackPtr stack = (*inventory)[slot];
-			ItemSlot &item_slot = *itemSlots.at(slot);
+			GTKItemSlot &item_slot = *itemSlots.at(slot);
 
 			if (gmenuFunction) {
 				auto gmenu = Gio::Menu::create();

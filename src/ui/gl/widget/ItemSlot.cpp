@@ -9,12 +9,12 @@
 #include "graphics/TextRenderer.h"
 #include "item/Item.h"
 #include "packet/SetActiveSlotPacket.h"
-#include "ui/gl/widget/ItemSlotWidget.h"
-#include "ui/gl/widget/TooltipWidget.h"
+#include "ui/gl/widget/ItemSlot.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	ItemSlotWidget::ItemSlotWidget(InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
+	ItemSlot::ItemSlot(InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
 		Widget(scale),
 		inventory(std::move(inventory)),
 		stack(std::move(stack)),
@@ -22,10 +22,10 @@ namespace Game3 {
 		size(size),
 		active(active) {}
 
-	ItemSlotWidget::ItemSlotWidget(Slot slot, float size, float scale, bool active):
-		ItemSlotWidget(nullptr, nullptr, slot, size, scale, active) {}
+	ItemSlot::ItemSlot(Slot slot, float size, float scale, bool active):
+		ItemSlot(nullptr, nullptr, slot, size, scale, active) {}
 
-	void ItemSlotWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void ItemSlot::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
 		lastRectangle.width = 16 * scale;
@@ -39,7 +39,7 @@ namespace Game3 {
 		if (!stack)
 			return;
 
-		std::shared_ptr<TooltipWidget> tooltip = ui.getTooltip();
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
 		if (ui.checkMouseAbsolute(lastRectangle)) {
 			if (!tooltip->wasUpdatedBy(*this)) {
@@ -75,46 +75,46 @@ namespace Game3 {
 		});
 	}
 
-	std::shared_ptr<Widget> ItemSlotWidget::getDragStartWidget() {
+	std::shared_ptr<Widget> ItemSlot::getDragStartWidget() {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlotWidget::click(UIContext &ui, int, int, int) {
+	bool ItemSlot::click(UIContext &ui, int, int, int) {
 		if (inventory && inventory->getOwner() == ui.getPlayer())
 			ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
 		return true;
 	}
 
-	SizeRequestMode ItemSlotWidget::getRequestMode() const {
+	SizeRequestMode ItemSlot::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void ItemSlotWidget::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
+	void ItemSlot::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
 		minimum = natural = 16 * scale;
 	}
 
-	void ItemSlotWidget::setStack(std::shared_ptr<ItemStack> new_stack) {
+	void ItemSlot::setStack(std::shared_ptr<ItemStack> new_stack) {
 		stack = std::move(new_stack);
 		texture = {};
 	}
 
-	void ItemSlotWidget::setActive(bool new_active) {
+	void ItemSlot::setActive(bool new_active) {
 		active = new_active;
 	}
 
-	Slot ItemSlotWidget::getSlot() const {
+	Slot ItemSlot::getSlot() const {
 		return slot;
 	}
 
-	std::shared_ptr<Inventory> ItemSlotWidget::getInventory() const {
+	std::shared_ptr<Inventory> ItemSlot::getInventory() const {
 		return inventory;
 	}
 
-	void ItemSlotWidget::setInventory(std::shared_ptr<Inventory> new_inventory) {
+	void ItemSlot::setInventory(std::shared_ptr<Inventory> new_inventory) {
 		inventory = std::move(new_inventory);
 	}
 
-	GlobalID ItemSlotWidget::getOwnerGID() const {
+	GlobalID ItemSlot::getOwnerGID() const {
 		assert(inventory);
 		AgentPtr owner = inventory->getOwner();
 		assert(owner);

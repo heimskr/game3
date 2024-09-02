@@ -5,8 +5,8 @@
 #include <memory>
 
 namespace Game3 {
-	class GridWidget;
-	class ScrollerWidget;
+	class Grid;
+	class Scroller;
 
 	class SettingsTab: public Tab {
 		public:
@@ -17,7 +17,7 @@ namespace Game3 {
 			void renderIcon(const RendererContext &) final;
 
 		private:
-			std::shared_ptr<ScrollerWidget> scroller;
-			std::shared_ptr<GridWidget> grid;
+			std::shared_ptr<Scroller> scroller;
+			std::shared_ptr<Grid> grid;
 	};
 }

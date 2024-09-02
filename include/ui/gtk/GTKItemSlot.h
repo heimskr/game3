@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types/Types.h"
 #include "ui/Modifiers.h"
 
 #include <gtkmm.h>
@@ -13,16 +14,16 @@ namespace Game3 {
 	class ItemStack;
 	struct ItemSlotParent;
 
-	class ItemSlot: public Gtk::Fixed {
+	class GTKItemSlot: public Gtk::Fixed {
 		public:
 			using ClickFn = std::function<void(Modifiers, int, double, double)>;
 
 			std::function<bool(const ItemStackPtr &)> onDrop;
 
-			ItemSlot() = delete;
-			ItemSlot(const std::shared_ptr<ClientGame> &, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
+			GTKItemSlot() = delete;
+			GTKItemSlot(const std::shared_ptr<ClientGame> &, Slot, std::shared_ptr<ClientInventory>, ItemSlotParent * = nullptr);
 
-			~ItemSlot() override;
+			~GTKItemSlot() override;
 
 			void reset();
 			bool empty() const;

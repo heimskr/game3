@@ -10,14 +10,14 @@
 #include <functional>
 
 namespace Game3 {
-	class TextInputWidget: public Widget, public HasFixedSize {
+	class TextInput: public Widget, public HasFixedSize {
 		public:
-			std::function<void(TextInputWidget &, UIContext &)> onSubmit;
+			std::function<void(TextInput &, UIContext &)> onSubmit;
 
-			TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
-			TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
-			TextInputWidget(float scale, float thickness);
-			TextInputWidget(float scale);
+			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
+			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
+			TextInput(float scale, float thickness);
+			TextInput(float scale);
 
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 			bool click(UIContext &, int button, int x, int y) final;

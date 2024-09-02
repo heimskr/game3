@@ -5,12 +5,12 @@
 #include <memory>
 
 namespace Game3 {
-	class BoxWidget;
-	class ButtonWidget;
-	class IconButtonWidget;
-	class IconWidget;
-	class ProgressBarWidget;
-	class TextInputWidget;
+	class Box;
+	class Button;
+	class IconButton;
+	class Icon;
+	class ProgressBar;
+	class TextInput;
 
 	class CraftingTab: public Tab {
 		public:
@@ -21,11 +21,11 @@ namespace Game3 {
 			void renderIcon(const RendererContext &) final;
 
 		private:
-			std::shared_ptr<BoxWidget> box;
-			std::shared_ptr<ProgressBarWidget> bar;
-			std::shared_ptr<TextInputWidget> input;
-			std::shared_ptr<ButtonWidget> button;
-			std::shared_ptr<IconButtonWidget> iconButton;
-			std::shared_ptr<IconWidget> icon;
+			std::shared_ptr<Box> box;
+			std::shared_ptr<ProgressBar> bar;
+			std::shared_ptr<TextInput> input;
+			std::shared_ptr<Button> button;
+			std::shared_ptr<IconButton> iconButton;
+			std::shared_ptr<Icon> icon;
 	};
 }

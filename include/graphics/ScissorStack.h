@@ -29,11 +29,15 @@ namespace Game3 {
 		public:
 			struct Item {
 				Rectangle rectangle;
+				std::optional<Rectangle> intersection;
 				bool doViewport;
 				bool doScissor;
 
+				Item(const Rectangle &rectangle, const std::optional<Rectangle> &intersection, bool do_viewport = false, bool do_scissor = true):
+					rectangle(rectangle), intersection(intersection), doViewport(do_viewport), doScissor(do_scissor) {}
+
 				Item(const Rectangle &rectangle, bool do_viewport = false, bool do_scissor = true):
-					rectangle(rectangle), doViewport(do_viewport), doScissor(do_scissor) {}
+					Item(rectangle, std::nullopt, do_viewport, do_scissor) {}
 
 				void apply(int base_height) const;
 			};

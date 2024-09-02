@@ -1,6 +1,6 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
-#include "ui/gl/widget/BoxWidget.h"
+#include "ui/gl/widget/Box.h"
 
 namespace {
 	constexpr float DEFAULT_SEPARATOR_THICKNESS = 1;
@@ -9,16 +9,16 @@ namespace {
 }
 
 namespace Game3 {
-	BoxWidget::BoxWidget(float scale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
+	Box::Box(float scale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
 		Widget(scale), orientation(orientation), padding(padding), separatorThickness(separator_thickness), separatorColor(separator_color) {
 			if (orientation != Orientation::Vertical)
 				throw std::invalid_argument("Non-vertical boxes are currently unsupported");
 		}
 
-	BoxWidget::BoxWidget(float scale, Orientation orientation):
-		BoxWidget(scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
+	Box::Box(float scale, Orientation orientation):
+		Box(scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
 
-	void BoxWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Box::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
 		// TODO: push to scissor stack, perhaps?
@@ -51,11 +51,11 @@ namespace Game3 {
 		}
 	}
 
-	SizeRequestMode BoxWidget::getRequestMode() const {
+	SizeRequestMode Box::getRequestMode() const {
 		return orientation == Orientation::Horizontal? SizeRequestMode::WidthForHeight : SizeRequestMode::HeightForWidth;
 	}
 
-	void BoxWidget::measure(const RendererContext &renderers, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Box::measure(const RendererContext &renderers, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (childCount == 0) {
 			minimum = natural = 0;
 			return;

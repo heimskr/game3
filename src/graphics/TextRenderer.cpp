@@ -59,7 +59,7 @@ namespace Game3 {
 		characters.clear();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); CHECKGL
 
-		for (gunichar ch = 32; ch < 127; ++ch) {
+		auto register_glyph = [&](gunichar ch) {
 			// Load character glyph
 			if (FT_Load_Char(face, ch, FT_LOAD_RENDER))
 				throw std::runtime_error("Failed to load glyph " + std::to_string(static_cast<uint32_t>(ch)));
@@ -76,13 +76,18 @@ namespace Game3 {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
 
 			// Store character for later use
-			characters.emplace(ch, Character {
+			characters.try_emplace(ch,
 				texture,
 				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-				face->glyph->advance.x
-			});
+				face->glyph->advance.x);
+		};
+
+		for (gunichar ch = 32; ch < 127; ++ch) {
+			register_glyph(ch);
 		}
+
+		register_glyph(U'🗸');
 
 		glGenVertexArrays(1, &vao); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL

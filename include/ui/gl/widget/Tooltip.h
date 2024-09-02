@@ -9,9 +9,9 @@
 #include <optional>
 
 namespace Game3 {
-	class TooltipWidget: public Widget {
+	class Tooltip: public Widget {
 		public:
-			TooltipWidget(float scale);
+			Tooltip(float scale);
 
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
 
@@ -59,7 +59,7 @@ namespace Game3 {
 
 			/** Returns whether the update took place. */
 			template <typename T>
-			bool updateField(T &&new_value, std::decay_t<T> TooltipWidget::*field, const Widget &updater) {
+			bool updateField(T &&new_value, std::decay_t<T> Tooltip::*field, const Widget &updater) {
 				auto weak = updater.weak_from_this();
 				if (lastUpdater.lock() == weak.lock())
 					return false;

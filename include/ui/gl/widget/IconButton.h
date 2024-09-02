@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ui/gl/widget/ButtonWidget.h"
+#include "ui/gl/widget/Button.h"
 
 namespace Game3 {
-	class IconButtonWidget: public ButtonWidget {
+	class IconButton: public Button {
 		public:
-			using ButtonWidget::ButtonWidget;
+			using Button::Button;
 
 			void setIconTexture(TexturePtr);
 

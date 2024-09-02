@@ -16,9 +16,9 @@ namespace Game3 {
 	class Canvas;
 	class ClientGame;
 	class ClientPlayer;
-	class HotbarWidget;
+	class Hotbar;
 	class Texture;
-	class TooltipWidget;
+	class Tooltip;
 	struct RendererContext;
 
 	class UIContext {
@@ -54,7 +54,7 @@ namespace Game3 {
 			std::pair<double, double> getRelativeMouseCoordinates() const;
 			bool checkMouseRelative(const Rectangle &) const;
 			bool checkMouseAbsolute(const Rectangle &) const;
-			std::shared_ptr<TooltipWidget> getTooltip() const;
+			std::shared_ptr<Tooltip> getTooltip() const;
 			void addDragUpdater(WidgetPtr);
 
 			template <typename T>
@@ -78,8 +78,8 @@ namespace Game3 {
 			WidgetPtr draggedWidget;
 			bool draggedWidgetActive = false;
 			std::optional<std::pair<int, int>> dragOrigin;
-			std::shared_ptr<HotbarWidget> hotbar;
-			std::shared_ptr<TooltipWidget> tooltip;
+			std::shared_ptr<Hotbar> hotbar;
+			std::shared_ptr<Tooltip> tooltip;
 			WeakWidgetPtr focusedWidget;
 			WeakWidgetPtr pressedWidget;
 			std::set<WidgetPtr> extraDragUpdaters;

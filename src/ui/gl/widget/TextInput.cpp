@@ -2,8 +2,8 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
-#include "ui/gl/widget/TextInputWidget.h"
-#include "ui/gl/widget/TooltipWidget.h"
+#include "ui/gl/widget/TextInput.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
@@ -37,7 +37,7 @@ namespace {
 }
 
 namespace Game3 {
-	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
+	TextInput::TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
 		Widget(scale),
 		HasFixedSize(-1, scale * TEXT_INPUT_HEIGHT_FACTOR),
 		thickness(thickness),
@@ -46,16 +46,16 @@ namespace Game3 {
 		textColor(text_color),
 		cursorColor(cursor_color) {}
 
-	TextInputWidget::TextInputWidget(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
-		TextInputWidget(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
+		TextInput(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
-	TextInputWidget::TextInputWidget(float scale, float thickness):
-		TextInputWidget(scale, DEFAULT_BORDER_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
+	TextInput::TextInput(float scale, float thickness):
+		TextInput(scale, DEFAULT_BORDER_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
-	TextInputWidget::TextInputWidget(float scale):
-		TextInputWidget(scale, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(float scale):
+		TextInput(scale, DEFAULT_THICKNESS) {}
 
-	void TextInputWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void TextInput::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (0 < fixedHeight)
 			height = fixedHeight;
 
@@ -91,7 +91,7 @@ namespace Game3 {
 		});
 	}
 
-	bool TextInputWidget::click(UIContext &ui, int button, int, int) {
+	bool TextInput::click(UIContext &ui, int button, int, int) {
 		if (button == 1) {
 			ui.focusWidget(weak_from_this());
 			return true;
@@ -100,7 +100,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool TextInputWidget::keyPressed(UIContext &ui, uint32_t character, Modifiers modifiers) {
+	bool TextInput::keyPressed(UIContext &ui, uint32_t character, Modifiers modifiers) {
 		if (modifiers.ctrl) {
 			switch (character) {
 				case GDK_KEY_BackSpace:
@@ -171,11 +171,11 @@ namespace Game3 {
 		return true;
 	}
 
-	SizeRequestMode TextInputWidget::getRequestMode() const {
+	SizeRequestMode TextInput::getRequestMode() const {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void TextInputWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
+	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		const float border = 2 * thickness * scale;
 
 		if (orientation == Orientation::Horizontal) {
@@ -195,16 +195,16 @@ namespace Game3 {
 		}
 	}
 
-	const Glib::ustring & TextInputWidget::getText() const {
+	const Glib::ustring & TextInput::getText() const {
 		return text;
 	}
 
-	void TextInputWidget::setText(UIContext &ui, Glib::ustring new_text) {
+	void TextInput::setText(UIContext &ui, Glib::ustring new_text) {
 		text = std::move(new_text);
 		goEnd(ui);
 	}
 
-	Glib::ustring TextInputWidget::clear() {
+	Glib::ustring TextInput::clear() {
 		Glib::ustring out = std::move(text);
 		cursor = 0;
 		cursorIterator = text.begin();
@@ -213,14 +213,14 @@ namespace Game3 {
 		return out;
 	}
 
-	void TextInputWidget::insert(UIContext &ui, gunichar character) {
+	void TextInput::insert(UIContext &ui, gunichar character) {
 		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
 		++cursor;
 		adjustCursorOffset(ui.getRenderers().text.textWidth(Glib::ustring(1, character)));
 	}
 
-	void TextInputWidget::eraseWord(UIContext &ui) {
+	void TextInput::eraseWord(UIContext &ui) {
 		if (cursor == 0)
 			return;
 
@@ -253,7 +253,7 @@ namespace Game3 {
 			eraseCharacter(ui);
 	}
 
-	void TextInputWidget::eraseCharacter(UIContext &ui) {
+	void TextInput::eraseCharacter(UIContext &ui) {
 		if (cursor == 0)
 			return;
 
@@ -261,12 +261,12 @@ namespace Game3 {
 		cursorIterator = text.erase(--cursorIterator);
 	}
 
-	void TextInputWidget::eraseForward(UIContext &) {
+	void TextInput::eraseForward(UIContext &) {
 		if (!text.empty() && cursorIterator != text.end())
 			cursorIterator = text.erase(cursorIterator);
 	}
 
-	void TextInputWidget::goLeft(UIContext &ui, size_t count) {
+	void TextInput::goLeft(UIContext &ui, size_t count) {
 		RendererContext renderers = ui.getRenderers();
 		Glib::ustring piece;
 
@@ -277,7 +277,7 @@ namespace Game3 {
 		}
 	}
 
-	void TextInputWidget::goRight(UIContext &ui, size_t count) {
+	void TextInput::goRight(UIContext &ui, size_t count) {
 		RendererContext renderers = ui.getRenderers();
 		Glib::ustring piece;
 
@@ -288,47 +288,47 @@ namespace Game3 {
 		}
 	}
 
-	void TextInputWidget::goStart(UIContext &) {
+	void TextInput::goStart(UIContext &) {
 		cursor = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
 		setCursorOffset(0);
 	}
 
-	void TextInputWidget::goEnd(UIContext &ui) {
+	void TextInput::goEnd(UIContext &ui) {
 		cursor = text.length();
 		cursorIterator = text.end();
 		xOffset = 0;
 		setCursorOffset(ui.getRenderers().text.textWidth(text));
 	}
 
-	float TextInputWidget::getTextScale() const {
+	float TextInput::getTextScale() const {
 		return scale / 16;
 	}
 
-	float TextInputWidget::getXPadding() const {
+	float TextInput::getXPadding() const {
 		return thickness * scale;
 	}
 
-	float TextInputWidget::getBoundary() const {
+	float TextInput::getBoundary() const {
 		return lastRectangle.width - getXPadding();
 	}
 
-	float TextInputWidget::getCursorPosition() const {
+	float TextInput::getCursorPosition() const {
 		return getXPadding() - xOffset * scale + cursorXOffset * getTextScale();
 	}
 
-	void TextInputWidget::adjustCursorOffset(float offset) {
+	void TextInput::adjustCursorOffset(float offset) {
 		cursorXOffset += offset;
 		fixCursorOffset();
 	}
 
-	void TextInputWidget::setCursorOffset(float new_offset) {
+	void TextInput::setCursorOffset(float new_offset) {
 		cursorXOffset = new_offset;
 		fixCursorOffset();
 	}
 
-	void TextInputWidget::fixCursorOffset() {
+	void TextInput::fixCursorOffset() {
 		if (lastRectangle.width < 0) {
 			cursorFixQueued = true;
 			return;

@@ -1,13 +1,13 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
-#include "ui/gl/widget/IconWidget.h"
+#include "ui/gl/widget/Icon.h"
 
 namespace Game3 {
-	IconWidget::IconWidget(float scale):
+	Icon::Icon(float scale):
 		Widget(scale) {}
 
-	void IconWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Icon::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (fixedHeight > 0)
 			height = fixedHeight;
 
@@ -33,11 +33,11 @@ namespace Game3 {
 		});
 	}
 
-	SizeRequestMode IconWidget::getRequestMode() const {
+	SizeRequestMode Icon::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void IconWidget::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
+	void Icon::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
 		float size{};
 
 		if (orientation == Orientation::Horizontal) {
@@ -59,7 +59,7 @@ namespace Game3 {
 		minimum = natural = size;
 	}
 
-	void IconWidget::setIconTexture(TexturePtr new_icon_texture) {
+	void Icon::setIconTexture(TexturePtr new_icon_texture) {
 		iconTexture = std::move(new_icon_texture);
 		if (iconTexture)
 			iconTexture->init();

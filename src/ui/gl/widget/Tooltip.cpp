@@ -1,7 +1,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
-#include "ui/gl/widget/TooltipWidget.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
@@ -14,13 +14,13 @@ namespace {
 }
 
 namespace Game3 {
-	TooltipWidget::TooltipWidget(float scale):
+	Tooltip::Tooltip(float scale):
 		Widget(scale),
 		maxWidth(DEFAULT_MAX_WIDTH),
 		backgroundColor(DEFAULT_BACKGROUND_COLOR),
 		textColor(DEFAULT_TEXT_COLOR) {}
 
-	void TooltipWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Tooltip::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (!visible)
 			return;
 
@@ -66,11 +66,11 @@ namespace Game3 {
 		});
 	}
 
-	SizeRequestMode TooltipWidget::getRequestMode() const {
+	SizeRequestMode Tooltip::getRequestMode() const {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void TooltipWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Tooltip::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		minimum = getPadding() * 2;
 
 		if (orientation == Orientation::Horizontal) {
@@ -80,75 +80,75 @@ namespace Game3 {
 		}
 	}
 
-	void TooltipWidget::hide() {
+	void Tooltip::hide() {
 		visible = false;
 		region.reset();
 	}
 
-	void TooltipWidget::hide(const Widget &updater) {
+	void Tooltip::hide(const Widget &updater) {
 		if (lastUpdater.lock().get() == &updater) {
 			hide();
 		}
 	}
 
-	void TooltipWidget::show() {
+	void Tooltip::show() {
 		visible = true;
 	}
 
-	void TooltipWidget::show(const Widget &updater) {
+	void Tooltip::show(const Widget &updater) {
 		show();
 		lastUpdater = updater.weak_from_this();
 	}
 
-	bool TooltipWidget::wasUpdatedBy(const Widget &widget) const {
+	bool Tooltip::wasUpdatedBy(const Widget &widget) const {
 		return lastUpdater.lock().get() == &widget;
 	}
 
-	void TooltipWidget::setText(Glib::ustring new_text) {
+	void Tooltip::setText(Glib::ustring new_text) {
 		text = std::move(new_text);
 	}
 
-	bool TooltipWidget::setText(Glib::ustring new_text, const Widget &updater) {
-		return updateField(std::move(new_text), &TooltipWidget::text, updater);
+	bool Tooltip::setText(Glib::ustring new_text, const Widget &updater) {
+		return updateField(std::move(new_text), &Tooltip::text, updater);
 	}
 
-	void TooltipWidget::setMaxWidth(float new_max_width) {
+	void Tooltip::setMaxWidth(float new_max_width) {
 		maxWidth = new_max_width;
 	}
 
-	bool TooltipWidget::setMaxWidth(float new_max_width, const Widget &updater) {
-		return updateField(new_max_width, &TooltipWidget::maxWidth, updater);
+	bool Tooltip::setMaxWidth(float new_max_width, const Widget &updater) {
+		return updateField(new_max_width, &Tooltip::maxWidth, updater);
 	}
 
-	void TooltipWidget::setBackgroundColor(const Color &new_color) {
+	void Tooltip::setBackgroundColor(const Color &new_color) {
 		backgroundColor = new_color;
 	}
 
-	bool TooltipWidget::setBackgroundColor(const Color &new_color, const Widget &updater) {
-		return updateField(new_color, &TooltipWidget::backgroundColor, updater);
+	bool Tooltip::setBackgroundColor(const Color &new_color, const Widget &updater) {
+		return updateField(new_color, &Tooltip::backgroundColor, updater);
 	}
 
-	void TooltipWidget::setTextColor(const Color &new_color) {
+	void Tooltip::setTextColor(const Color &new_color) {
 		textColor = new_color;
 	}
 
-	bool TooltipWidget::setTextColor(const Color &new_color, const Widget &updater) {
-		return updateField(new_color, &TooltipWidget::textColor, updater);
+	bool Tooltip::setTextColor(const Color &new_color, const Widget &updater) {
+		return updateField(new_color, &Tooltip::textColor, updater);
 	}
 
-	void TooltipWidget::setRegion(std::optional<Rectangle> new_region) {
+	void Tooltip::setRegion(std::optional<Rectangle> new_region) {
 		region = std::move(new_region);
 	}
 
-	bool TooltipWidget::setRegion(std::optional<Rectangle> new_region, const Widget &updater) {
-		return updateField(std::move(new_region), &TooltipWidget::region, updater);
+	bool Tooltip::setRegion(std::optional<Rectangle> new_region, const Widget &updater) {
+		return updateField(std::move(new_region), &Tooltip::region, updater);
 	}
 
-	float TooltipWidget::getTextScale() const {
+	float Tooltip::getTextScale() const {
 		return scale / 16;
 	}
 
-	float TooltipWidget::getPadding() const {
+	float Tooltip::getPadding() const {
 		return scale * 2;
 	}
 }

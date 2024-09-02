@@ -2,12 +2,12 @@
 #include "graphics/Texture.h"
 #include "threading/ThreadContext.h"
 #include "ui/gl/tab/CraftingTab.h"
-#include "ui/gl/widget/BoxWidget.h"
-#include "ui/gl/widget/ButtonWidget.h"
-#include "ui/gl/widget/IconButtonWidget.h"
-#include "ui/gl/widget/IconWidget.h"
-#include "ui/gl/widget/ProgressBarWidget.h"
-#include "ui/gl/widget/TextInputWidget.h"
+#include "ui/gl/widget/Box.h"
+#include "ui/gl/widget/Button.h"
+#include "ui/gl/widget/IconButton.h"
+#include "ui/gl/widget/Icon.h"
+#include "ui/gl/widget/ProgressBar.h"
+#include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Util.h"
@@ -20,12 +20,12 @@ namespace Game3 {
 
 		auto tab = shared_from_this();
 
-		box = std::make_shared<BoxWidget>(scale);
+		box = std::make_shared<Box>(scale);
 
-		input = std::make_shared<TextInputWidget>(scale);
+		input = std::make_shared<TextInput>(scale);
 		input->setFixedHeight(scale * TEXT_INPUT_HEIGHT_FACTOR);
 		input->setText(ui, "Hello from the crafting tab! This is some example text.");
-		input->onSubmit = [&](TextInputWidget &input, UIContext &ui) {
+		input->onSubmit = [&](TextInput &input, UIContext &ui) {
 			Glib::ustring text = input.clear();
 			if (text.empty())
 				return;
@@ -47,7 +47,7 @@ namespace Game3 {
 			bar->setProgress(number);
 		};
 
-		bar = std::make_shared<ProgressBarWidget>(scale, Color(1, 0, 0, 1), 0.5);
+		bar = std::make_shared<ProgressBar>(scale, Color(1, 0, 0, 1), 0.5);
 		bar->setFixedHeight(10 * scale);
 		bar->setOnDragStart([this](Widget &, UIContext &ui, int, int) {
 			ui.addDragUpdater(bar);
@@ -71,7 +71,7 @@ namespace Game3 {
 			return true;
 		});
 
-		iconButton = std::make_shared<IconButtonWidget>(scale);
+		iconButton = std::make_shared<IconButton>(scale);
 		iconButton->setFixedHeight(scale * 12);
 		iconButton->setIconTexture(cacheTexture("resources/gui/randomize.png"));
 		iconButton->setOnClick([this](Widget &, UIContext &ui, int, int, int) {
@@ -81,7 +81,7 @@ namespace Game3 {
 			return true;
 		});
 
-		button = std::make_shared<ButtonWidget>(scale);
+		button = std::make_shared<Button>(scale);
 		button->setFixedHeight(scale * 10);
 		button->setText("Randomize");
 		button->setOnClick([&](Widget &, UIContext &, int, int, int) {
@@ -91,7 +91,7 @@ namespace Game3 {
 			return true;
 		});
 
-		icon = std::make_shared<IconWidget>(scale);
+		icon = std::make_shared<Icon>(scale);
 		icon->setIconTexture(cacheTexture("resources/gui/settings.png"));
 		icon->setFixedSize(scale * 6);
 		icon->setOnClick([](Widget &, UIContext &, int, int, int) {

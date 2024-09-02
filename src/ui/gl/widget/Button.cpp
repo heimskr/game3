@@ -5,7 +5,7 @@
 #include "graphics/Texture.h"
 #include "graphics/TextRenderer.h"
 #include "threading/ThreadContext.h"
-#include "ui/gl/widget/ButtonWidget.h"
+#include "ui/gl/widget/Button.h"
 #include "ui/gl/UIContext.h"
 
 #include <cassert>
@@ -16,19 +16,19 @@ namespace {
 }
 
 namespace Game3 {
-	ButtonWidget::ButtonWidget(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
+	Button::Button(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
 		Widget(scale),
 		texture(std::move(texture)) {
 			setColors(top_border_color, bottom_border_color, text_color);
 		}
 
-	ButtonWidget::ButtonWidget(float scale, Color border_color, Color text_color, TexturePtr texture):
-		ButtonWidget(scale, border_color, border_color.darken(), text_color, std::move(texture)) {}
+	Button::Button(float scale, Color border_color, Color text_color, TexturePtr texture):
+		Button(scale, border_color, border_color.darken(), text_color, std::move(texture)) {}
 
-	ButtonWidget::ButtonWidget(float scale, TexturePtr texture):
-		ButtonWidget(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
+	Button::Button(float scale, TexturePtr texture):
+		Button(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
 
-	void ButtonWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Button::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		float dummy{};
 
 		if (fixedHeight > 0) {
@@ -98,18 +98,18 @@ namespace Game3 {
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
-	bool ButtonWidget::click(UIContext &, int, int, int) {
+	bool Button::click(UIContext &, int, int, int) {
 		return false;
 	}
 
-	bool ButtonWidget::dragStart(UIContext &ui, int, int) {
+	bool Button::dragStart(UIContext &ui, int, int) {
 		pressed = true;
 		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
 		ui.setPressedWidget(weak_from_this());
 		return true;
 	}
 
-	bool ButtonWidget::dragEnd(UIContext &ui, int x, int y) {
+	bool Button::dragEnd(UIContext &ui, int x, int y) {
 		if (pressed) {
 			pressed = false;
 			ui.unpress();
@@ -122,11 +122,11 @@ namespace Game3 {
 		return true;
 	}
 
-	SizeRequestMode ButtonWidget::getRequestMode() const {
+	SizeRequestMode Button::getRequestMode() const {
 		return SizeRequestMode::WidthForHeight;
 	}
 
-	void ButtonWidget::measure(const RendererContext &renderers, Orientation orientation, float, float for_height, float &minimum, float &natural) {
+	void Button::measure(const RendererContext &renderers, Orientation orientation, float, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			if (for_height < 0)
 				for_height = std::max(fixedHeight, getMinimumPreferredHeight());
@@ -137,15 +137,15 @@ namespace Game3 {
 		}
 	}
 
-	const UString & ButtonWidget::getText() const {
+	const UString & Button::getText() const {
 		return text;
 	}
 
-	void ButtonWidget::setText(UString new_text) {
+	void Button::setText(UString new_text) {
 		text = std::move(new_text);
 	}
 
-	void ButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
+	void Button::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
 		if (text.empty())
 			return;
 
@@ -160,7 +160,7 @@ namespace Game3 {
 		});
 	}
 
-	float ButtonWidget::getWidth(const RendererContext &renderers, float height) const {
+	float Button::getWidth(const RendererContext &renderers, float height) const {
 		if (!text.empty()) {
 			const float text_scale = getTextScale(renderers, height - 6 * scale);
 			return scale * 6 + renderers.text.textWidth(text, text_scale);
@@ -169,11 +169,11 @@ namespace Game3 {
 		return -1;
 	}
 
-	float ButtonWidget::getTextScale(const RendererContext &renderers, float height) const {
+	float Button::getTextScale(const RendererContext &renderers, float height) const {
 		return height / renderers.text.getIHeight(scale / 8);
 	}
 
-	void ButtonWidget::setColors(Color top, Color bottom, Color text_color) {
+	void Button::setColors(Color top, Color bottom, Color text_color) {
 		topBorderColor = top;
 		bottomBorderColor = bottom;
 		textColor = text_color;
@@ -185,11 +185,11 @@ namespace Game3 {
 		// textureMultiplierPressed = {1.5, 1.5, 1.5, 1};
 	}
 
-	TexturePtr ButtonWidget::getDefaultTexture() {
+	TexturePtr Button::getDefaultTexture() {
 		return cacheTexture("resources/gui/stone.png");
 	}
 
-	float ButtonWidget::getMinimumPreferredHeight() const {
+	float Button::getMinimumPreferredHeight() const {
 		return scale * 12;
 	}
 }

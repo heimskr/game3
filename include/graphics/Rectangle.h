@@ -17,11 +17,13 @@ namespace Game3 {
 		Rectangle(int x, int y):
 			Rectangle(x, y, 0, 0) {}
 
+		int area() const;
 		void scissor(int outer_height) const;
 		void viewport(int outer_height) const;
 		bool contains(int x, int y) const;
 		void reposition(int x, int y) &;
 		Rectangle && reposition(int x, int y) &&;
+		Rectangle intersection(const Rectangle &) const;
 
 		auto operator<=>(const Rectangle &) const = default;
 

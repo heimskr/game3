@@ -6,10 +6,10 @@
 #include <optional>
 
 namespace Game3 {
-	class ScrollerWidget: public Widget {
+	class Scroller: public Widget {
 		public:
-			ScrollerWidget(float scale, Color scrollbar_color);
-			ScrollerWidget(float scale);
+			Scroller(float scale, Color scrollbar_color);
+			Scroller(float scale);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;

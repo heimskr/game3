@@ -9,7 +9,7 @@ namespace Game3 {
 	class ItemStack;
 	class ItemTexture;
 
-	class ItemSlotWidget: public Widget {
+	class ItemSlot: public Widget {
 		private:
 			std::shared_ptr<Inventory> inventory;
 			std::shared_ptr<ItemStack> stack;
@@ -19,8 +19,8 @@ namespace Game3 {
 			std::shared_ptr<ItemTexture> texture;
 
 		public:
-			ItemSlotWidget(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
-			ItemSlotWidget(Slot, float size, float scale, bool active = false);
+			ItemSlot(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
+			ItemSlot(Slot, float size, float scale, bool active = false);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;

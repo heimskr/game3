@@ -37,7 +37,7 @@ namespace Game3 {
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>(inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlot>(inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
@@ -63,7 +63,7 @@ namespace Game3 {
 		float slot_x = x_pad;
 		float slot_y = SLOT_PADDING * SLOT_SCALE;
 
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			widget->render(ui, renderers, x + slot_x, y + slot_y, -1, -1);
 
 			slot_x += OUTER_SLOT_SIZE * SLOT_SCALE;
@@ -77,7 +77,7 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::click(UIContext &ui, int button, int x, int y) {
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets)
+		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
 			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
 				return true;
 
@@ -85,7 +85,7 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::dragStart(UIContext &ui, int x, int y) {
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget->getLastRectangle().contains(x, y)) {
 				WidgetPtr dragged_widget = widget->getDragStartWidget();
 				const bool out = dragged_widget != nullptr;
@@ -98,12 +98,12 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::dragEnd(UIContext &ui, int x, int y) {
-		auto dragged = std::dynamic_pointer_cast<ItemSlotWidget>(ui.getDraggedWidget());
+		auto dragged = std::dynamic_pointer_cast<ItemSlot>(ui.getDraggedWidget());
 
 		if (!dragged)
 			return false;
 
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets) {
+		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget->getLastRectangle().contains(x, y)) {
 				ClientPlayerPtr player = ui.getPlayer();
 				player->send(SwapSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));

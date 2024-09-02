@@ -1,16 +1,16 @@
 #include "graphics/Texture.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
-#include "ui/gl/widget/IconButtonWidget.h"
+#include "ui/gl/widget/IconButton.h"
 
 namespace Game3 {
-	void IconButtonWidget::setIconTexture(TexturePtr new_icon_texture) {
+	void IconButton::setIconTexture(TexturePtr new_icon_texture) {
 		iconTexture = std::move(new_icon_texture);
 		if (iconTexture)
 			iconTexture->init();
 	}
 
-	void IconButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
+	void IconButton::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
 		if (!iconTexture)
 			return;
 
@@ -28,7 +28,7 @@ namespace Game3 {
 		});
 	}
 
-	float IconButtonWidget::getWidth(const RendererContext &, float height) const {
+	float IconButton::getWidth(const RendererContext &, float height) const {
 		if (!iconTexture)
 			return -1;
 

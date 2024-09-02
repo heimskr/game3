@@ -7,11 +7,11 @@
 #include "ui/gl/HasFixedSize.h"
 
 namespace Game3 {
-	class ButtonWidget: public Widget, public HasFixedSize {
+	class Button: public Widget, public HasFixedSize {
 		public:
-			ButtonWidget(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			ButtonWidget(float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			ButtonWidget(float scale, TexturePtr texture = getDefaultTexture());
+			Button(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(float scale, TexturePtr texture = getDefaultTexture());
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;

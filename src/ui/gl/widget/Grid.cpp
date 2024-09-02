@@ -1,7 +1,7 @@
-#include "ui/gl/widget/GridWidget.h"
+#include "ui/gl/widget/Grid.h"
 
 namespace Game3 {
-	void GridWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Grid::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (sizesDirty) {
 			float dummy{};
 			measure(renderers, Orientation::Horizontal, width, height, dummy, dummy);
@@ -29,7 +29,7 @@ namespace Game3 {
 		}
 	}
 
-	SizeRequestMode GridWidget::getRequestMode() const {
+	SizeRequestMode Grid::getRequestMode() const {
 		// Basically stolen from Gtk4.
 
 		if (lastMode)
@@ -65,7 +65,7 @@ namespace Game3 {
 		return *lastMode;
 	}
 
-	void GridWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Grid::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (widgetContainer.columns() == 0 || widgetContainer.rows() == 0) {
 			minimum = natural = 0;
 			return;
@@ -121,7 +121,7 @@ namespace Game3 {
 		natural = spacing + accumulated_natural;
 	}
 
-	void GridWidget::remove(WidgetPtr child) {
+	void Grid::remove(WidgetPtr child) {
 		if (child->getParent().get() != this)
 			return;
 
@@ -144,7 +144,7 @@ namespace Game3 {
 			}
 		}
 
-		throw std::runtime_error("Couldn't find child in GridWidget's widgetContainer");
+		throw std::runtime_error("Couldn't find child in Grid's widgetContainer");
 
 	done:
 		bool can_erase_row = true;
@@ -170,14 +170,14 @@ namespace Game3 {
 			widgetContainer.eraseColumn(column);
 	}
 
-	void GridWidget::attach(WidgetPtr child, std::size_t row, std::size_t column) {
+	void Grid::attach(WidgetPtr child, std::size_t row, std::size_t column) {
 		child->insertAtEnd(shared_from_this());
 		detach(row, column);
 		widgetContainer[row, column] = child.get();
 		markDirty();
 	}
 
-	void GridWidget::detach(std::size_t row, std::size_t column) {
+	void Grid::detach(std::size_t row, std::size_t column) {
 		if (widgetContainer.rows() <= row || widgetContainer.columns() <= column)
 			return;
 
@@ -189,32 +189,32 @@ namespace Game3 {
 		}
 	}
 
-	float GridWidget::getRowSpacing() const {
+	float Grid::getRowSpacing() const {
 		return rowSpacing;
 	}
 
-	float GridWidget::getColumnSpacing() const {
+	float Grid::getColumnSpacing() const {
 		return columnSpacing;
 	}
 
-	void GridWidget::setRowSpacing(float new_spacing) {
+	void Grid::setRowSpacing(float new_spacing) {
 		rowSpacing = new_spacing;
 	}
 
-	void GridWidget::setColumnSpacing(float new_spacing) {
+	void Grid::setColumnSpacing(float new_spacing) {
 		columnSpacing = new_spacing;
 	}
 
-	void GridWidget::setSpacing(float row_spacing, float column_spacing) {
+	void Grid::setSpacing(float row_spacing, float column_spacing) {
 		setRowSpacing(row_spacing);
 		setColumnSpacing(column_spacing);
 	}
 
-	void GridWidget::setSpacing(float spacing) {
+	void Grid::setSpacing(float spacing) {
 		setSpacing(spacing, spacing);
 	}
 
-	WidgetPtr GridWidget::operator[](std::size_t row, std::size_t column) const {
+	WidgetPtr Grid::operator[](std::size_t row, std::size_t column) const {
 		if (widgetContainer.rows() <= row || widgetContainer.columns() < column)
 			return {};
 
@@ -224,7 +224,7 @@ namespace Game3 {
 		return {};
 	}
 
-	void GridWidget::markDirty() {
+	void Grid::markDirty() {
 		sizesDirty = true;
 		lastMode.reset();
 	}

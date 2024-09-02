@@ -4,7 +4,7 @@
 #include "threading/LockableSharedPtr.h"
 #include "types/Types.h"
 #include "ui/Modifiers.h"
-#include "ui/gtk/ItemSlot.h"
+#include "ui/gtk/GTKItemSlot.h"
 #include "ui/module/GTKModule.h"
 
 #include <any>
@@ -52,7 +52,7 @@ namespace Game3 {
 			LockableSharedPtr<ClientInventory> inventory;
 			Glib::RefPtr<Gtk::DragSource> source;
 			Glib::ustring name;
-			std::vector<std::unique_ptr<ItemSlot>> itemSlots;
+			std::vector<std::unique_ptr<GTKItemSlot>> itemSlots;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::PopoverMenu popoverMenu;
 			Gtk::FlowBox flowBox;

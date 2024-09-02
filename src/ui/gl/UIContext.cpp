@@ -3,8 +3,8 @@
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "types/Types.h"
-#include "ui/gl/widget/HotbarWidget.h"
-#include "ui/gl/widget/TooltipWidget.h"
+#include "ui/gl/widget/Hotbar.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/Dialog.h"
 #include "ui/gl/UIContext.h"
@@ -15,8 +15,8 @@
 namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
 		canvas(canvas),
-		hotbar(std::make_shared<HotbarWidget>(HOTBAR_SCALE)),
-		tooltip(std::make_shared<TooltipWidget>(UI_SCALE)) {}
+		hotbar(std::make_shared<Hotbar>(HOTBAR_SCALE)),
+		tooltip(std::make_shared<Tooltip>(UI_SCALE)) {}
 
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = canvas.getRendererContext();
@@ -202,7 +202,7 @@ namespace Game3 {
 		return rectangle.contains(static_cast<int>(x), static_cast<int>(y));
 	}
 
-	std::shared_ptr<TooltipWidget> UIContext::getTooltip() const {
+	std::shared_ptr<Tooltip> UIContext::getTooltip() const {
 		return tooltip;
 	}
 

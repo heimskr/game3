@@ -5,10 +5,10 @@
 #include "ui/gl/Types.h"
 
 namespace Game3 {
-	class BoxWidget: public Widget {
+	class Box: public Widget {
 		public:
-			BoxWidget(float scale, Orientation, float padding, float separator_thickness, Color separator_color);
-			BoxWidget(float scale, Orientation = Orientation::Vertical);
+			Box(float scale, Orientation, float padding, float separator_thickness, Color separator_color);
+			Box(float scale, Orientation = Orientation::Vertical);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;

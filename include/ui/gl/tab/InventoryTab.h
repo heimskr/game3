@@ -6,7 +6,7 @@
 
 namespace Game3 {
 	class Module;
-	class ScrollerWidget;
+	class Scroller;
 
 	class InventoryTab: public Tab {
 		public:
@@ -28,10 +28,10 @@ namespace Game3 {
 		private:
 			LockableSharedPtr<Module> activeModule;
 			std::shared_ptr<Module> playerInventoryModule;
-			std::shared_ptr<ScrollerWidget> playerScroller;
-			std::shared_ptr<ScrollerWidget> moduleScroller;
+			std::shared_ptr<Scroller> playerScroller;
+			std::shared_ptr<Scroller> moduleScroller;
 
-			std::shared_ptr<ScrollerWidget> makePlayerScroller();
-			std::shared_ptr<ScrollerWidget> makeModuleScroller();
+			std::shared_ptr<Scroller> makePlayerScroller();
+			std::shared_ptr<Scroller> makeModuleScroller();
 	};
 }

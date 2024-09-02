@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/gtk/ItemSlot.h"
+#include "ui/gtk/GTKItemSlot.h"
 #include "ui/module/GTKModule.h"
 
 #include <any>
@@ -11,6 +11,7 @@
 
 namespace Game3 {
 	class Agent;
+	class Item;
 	class Village;
 
 	class VillageTradeModule: public GTKModule {
@@ -38,7 +39,7 @@ namespace Game3 {
 				private:
 					VillageID villageID{};
 					Identifier resource;
-					ItemSlot itemSlot;
+					GTKItemSlot itemSlot;
 					double basePrice{};
 					double amount{};
 					Gtk::Label quantityLabel;
@@ -60,7 +61,7 @@ namespace Game3 {
 
 			Gtk::Box sellRow{Gtk::Orientation::HORIZONTAL};
 			bool sellRowShown = false;
-			ItemSlot sellSlot;
+			GTKItemSlot sellSlot;
 			Gtk::SpinButton sellCount;
 			Gtk::Button sellButton{"Sell"};
 			Gtk::Box sellLabelBox{Gtk::Orientation::VERTICAL};

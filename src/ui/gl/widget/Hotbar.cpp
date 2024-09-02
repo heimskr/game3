@@ -4,19 +4,19 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
-#include "ui/gl/widget/HotbarWidget.h"
-#include "ui/gl/widget/ItemSlotWidget.h"
+#include "ui/gl/widget/Hotbar.h"
+#include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	HotbarWidget::HotbarWidget(float scale): Widget(scale) {
+	Hotbar::Hotbar(float scale): Widget(scale) {
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-			slotWidgets.emplace_back(std::make_shared<ItemSlotWidget>(slot, INNER_SLOT_SIZE, scale, false));
+			slotWidgets.emplace_back(std::make_shared<ItemSlot>(slot, INNER_SLOT_SIZE, scale, false));
 		}
 	}
 
-	void HotbarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Hotbar::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		const float original_width = width;
 		const float original_height = height;
 		float dummy{};
@@ -42,7 +42,7 @@ namespace Game3 {
 			Slot active_slot = inventory->activeSlot;
 
 			for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-				const std::shared_ptr<ItemSlotWidget> &widget = slotWidgets.at(slot);
+				const std::shared_ptr<ItemSlot> &widget = slotWidgets.at(slot);
 				widget->setInventory(inventory);
 				widget->setStack((*inventory)[slot]);
 				widget->setActive(slot == active_slot);
@@ -51,23 +51,23 @@ namespace Game3 {
 		}
 	}
 
-	bool HotbarWidget::click(UIContext &ui, int button, int x, int y) {
-		for (const std::shared_ptr<ItemSlotWidget> &widget: slotWidgets)
+	bool Hotbar::click(UIContext &ui, int button, int x, int y) {
+		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
 			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
 				break;
 
 		return true;
 	}
 
-	bool HotbarWidget::dragStart(UIContext &, int, int) {
+	bool Hotbar::dragStart(UIContext &, int, int) {
 		return true;
 	}
 
-	SizeRequestMode HotbarWidget::getRequestMode() const {
+	SizeRequestMode Hotbar::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void HotbarWidget::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
+	void Hotbar::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
 		} else {

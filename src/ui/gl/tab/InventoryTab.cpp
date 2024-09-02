@@ -6,7 +6,7 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/Module.h"
 #include "ui/gl/tab/InventoryTab.h"
-#include "ui/gl/widget/ScrollerWidget.h"
+#include "ui/gl/widget/Scroller.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Canvas.h"
@@ -140,15 +140,15 @@ namespace Game3 {
 		activeModule.reset();
 	}
 
-	std::shared_ptr<ScrollerWidget> InventoryTab::makePlayerScroller() {
-		auto scroller = std::make_shared<ScrollerWidget>(scale);
+	std::shared_ptr<Scroller> InventoryTab::makePlayerScroller() {
+		auto scroller = std::make_shared<Scroller>(scale);
 		scroller->setChild(playerInventoryModule);
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 
-	std::shared_ptr<ScrollerWidget> InventoryTab::makeModuleScroller() {
-		auto scroller = std::make_shared<ScrollerWidget>(scale);
+	std::shared_ptr<Scroller> InventoryTab::makeModuleScroller() {
+		auto scroller = std::make_shared<Scroller>(scale);
 		scroller->setChild(activeModule.copyBase());
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;

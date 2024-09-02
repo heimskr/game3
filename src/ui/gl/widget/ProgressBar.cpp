@@ -1,8 +1,8 @@
 #include "graphics/Color.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
-#include "ui/gl/widget/ProgressBarWidget.h"
-#include "ui/gl/widget/TooltipWidget.h"
+#include "ui/gl/widget/ProgressBar.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
@@ -15,7 +15,7 @@ namespace {
 }
 
 namespace Game3 {
-	ProgressBarWidget::ProgressBarWidget(float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
+	ProgressBar::ProgressBar(float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
 		Widget(scale),
 		topInteriorColor(interior_color),
 		bottomInteriorColor(topInteriorColor.darken()),
@@ -24,17 +24,17 @@ namespace Game3 {
 		bottomExteriorColor(topExteriorColor.darken()),
 		progress(progress) {}
 
-	ProgressBarWidget::ProgressBarWidget(float scale, Color interior_color, float progress):
-		ProgressBarWidget(scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
+	ProgressBar::ProgressBar(float scale, Color interior_color, float progress):
+		ProgressBar(scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
-	void ProgressBarWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void ProgressBar::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (fixedHeight > 0)
 			height = fixedHeight;
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		Widget::render(ui, renderers, x, y, width, height);
 
-		std::shared_ptr<TooltipWidget> tooltip = ui.getTooltip();
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
 		if (ui.checkMouseAbsolute(lastRectangle)) {
 			if (progress != lastReportedProgress || !tooltip->wasUpdatedBy(*this)) {
@@ -89,11 +89,11 @@ namespace Game3 {
 		rectangler(bottomExteriorColor, x + width - scale, y + scale  + top_height, scale, bottom_height);
 	}
 
-	SizeRequestMode ProgressBarWidget::getRequestMode() const {
+	SizeRequestMode ProgressBar::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void ProgressBarWidget::measure(const RendererContext &, Orientation measure_orientation, float, float, float &minimum, float &natural) {
+	void ProgressBar::measure(const RendererContext &, Orientation measure_orientation, float, float, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth)
 				minimum = natural = fixedWidth;
@@ -107,7 +107,7 @@ namespace Game3 {
 		}
 	}
 
-	void ProgressBarWidget::setProgress(float new_progress) {
+	void ProgressBar::setProgress(float new_progress) {
 		if (std::abs(new_progress - progress) < 0.0001f)
 			return;
 
@@ -116,11 +116,11 @@ namespace Game3 {
 		progressUpdatePoint.emplace(std::chrono::system_clock::now());
 	}
 
-	float ProgressBarWidget::getDefaultWidth() const {
+	float ProgressBar::getDefaultWidth() const {
 		return 30 * scale;
 	}
 
-	float ProgressBarWidget::getDefaultHeight() const {
+	float ProgressBar::getDefaultHeight() const {
 		return 10 * scale;
 	}
 }

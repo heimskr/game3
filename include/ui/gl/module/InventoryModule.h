@@ -4,7 +4,7 @@
 #include "graphics/Rectangle.h"
 #include "types/Types.h"
 #include "ui/gl/module/Module.h"
-#include "ui/gl/widget/ItemSlotWidget.h"
+#include "ui/gl/widget/ItemSlot.h"
 
 #include <any>
 #include <memory>
@@ -39,7 +39,7 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 		private:
-			std::vector<std::shared_ptr<ItemSlotWidget>> slotWidgets;
+			std::vector<std::shared_ptr<ItemSlot>> slotWidgets;
 			std::unique_ptr<InventoryGetter> inventoryGetter;
 			Slot previousActive = -1;
 

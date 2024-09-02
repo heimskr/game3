@@ -6,14 +6,14 @@
 #include "item/Item.h"
 #include "packet/MoveSlotsPacket.h"
 #include "ui/gtk/DragSource.h"
-#include "ui/gtk/ItemSlot.h"
+#include "ui/gtk/GTKItemSlot.h"
 
 namespace Game3 {
 	namespace {
 		constexpr int TILE_SIZE = 64;
 	}
 
-	ItemSlot::ItemSlot(const ClientGamePtr &game, Slot slot_, ClientInventoryPtr inventory_, ItemSlotParent *parent_):
+	GTKItemSlot::GTKItemSlot(const ClientGamePtr &game, Slot slot_, ClientInventoryPtr inventory_, ItemSlotParent *parent_):
 	weakGame(game), slot(slot_), inventory(std::move(inventory_)), parent(parent_) {
 		set_hexpand(false);
 		set_halign(Gtk::Align::START);
@@ -99,11 +99,11 @@ namespace Game3 {
 		add_controller(rightGesture);
 	}
 
-	ItemSlot::~ItemSlot() {
+	GTKItemSlot::~GTKItemSlot() {
 		popoverMenu.unparent();
 	}
 
-	void ItemSlot::setStack(const ItemStackPtr &stack) {
+	void GTKItemSlot::setStack(const ItemStackPtr &stack) {
 		image.set(stack->getImage());
 
 		if (stack->count == ItemCount(-1))
@@ -131,7 +131,7 @@ namespace Game3 {
 		storedStack = std::move(stack); // TODO!: copy?
 	}
 
-	void ItemSlot::reset() {
+	void GTKItemSlot::reset() {
 		set_tooltip_text({});
 		label.set_text({});
 		image.clear();
@@ -142,23 +142,23 @@ namespace Game3 {
 		storedStack.reset();
 	}
 
-	bool ItemSlot::empty() const {
+	bool GTKItemSlot::empty() const {
 		return !storedStack;
 	}
 
-	void ItemSlot::setLeftClick(ClickFn click) {
+	void GTKItemSlot::setLeftClick(ClickFn click) {
 		leftClick = std::move(click);
 	}
 
-	void ItemSlot::setGmenu(Glib::RefPtr<Gio::Menu> new_gmenu) {
+	void GTKItemSlot::setGmenu(Glib::RefPtr<Gio::Menu> new_gmenu) {
 		gmenu = std::move(new_gmenu);
 	}
 
-	void ItemSlot::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
+	void GTKItemSlot::setInventory(std::shared_ptr<ClientInventory> new_inventory) {
 		inventory = new_inventory;
 	}
 
-	void ItemSlot::addDurabilityBar(double fraction) {
+	void GTKItemSlot::addDurabilityBar(double fraction) {
 		durabilityBar.set_fraction(fraction);
 		durabilityBar.set_size_request(TILE_SIZE, -1);
 		if (!durabilityVisible) {

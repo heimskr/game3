@@ -11,10 +11,10 @@
 namespace Game3 {
 	// TODO: vertical progress bars
 
-	class ProgressBarWidget: public Widget, public HasFixedSize {
+	class ProgressBar: public Widget, public HasFixedSize {
 		public:
-			ProgressBarWidget(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
-			ProgressBarWidget(float scale, Color interior_color, float progress = 0);
+			ProgressBar(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
+			ProgressBar(float scale, Color interior_color, float progress = 0);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;

@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace Game3 {
-	class GridWidget: public Widget {
+	class Grid: public Widget {
 		public:
 			using Widget::Widget;
 

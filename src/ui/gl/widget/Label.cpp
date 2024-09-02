@@ -2,15 +2,15 @@
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Texture.h"
-#include "ui/gl/widget/LabelWidget.h"
+#include "ui/gl/widget/Label.h"
 #include "ui/gl/Types.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	LabelWidget::LabelWidget(float scale):
+	Label::Label(float scale):
 		Widget(scale) {}
 
-	void LabelWidget::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Label::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (lastRectangle.width != width)
 			wrapped.reset();
 
@@ -49,11 +49,11 @@ namespace Game3 {
 		});
 	}
 
-	SizeRequestMode LabelWidget::getRequestMode() const {
+	SizeRequestMode Label::getRequestMode() const {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void LabelWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Label::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
 			natural = std::max(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
@@ -85,7 +85,7 @@ namespace Game3 {
 		minimum = natural = (lastTextHeight = renderers.text.textHeight(wrapped.value(), getTextScale(), for_width)) + addend;
 	}
 
-	void LabelWidget::setText(UIContext &ui, UString new_text) {
+	void Label::setText(UIContext &ui, UString new_text) {
 		if (text == new_text)
 			return;
 
@@ -93,23 +93,23 @@ namespace Game3 {
 		wrapped.reset();
 	}
 
-	const UString & LabelWidget::getText() const {
+	const UString & Label::getText() const {
 		return text;
 	}
 
-	float LabelWidget::getTextScale() const {
+	float Label::getTextScale() const {
 		return scale / 16;
 	}
 
-	float LabelWidget::getPadding() const {
+	float Label::getPadding() const {
 		return scale * 2;
 	}
 
-	float LabelWidget::getWrapWidth(float width) const {
+	float Label::getWrapWidth(float width) const {
 		return width;
 	}
 
-	void LabelWidget::tryWrap(const TextRenderer &texter, float width) {
+	void Label::tryWrap(const TextRenderer &texter, float width) {
 		if (width <= 0) {
 			wrapped.reset();
 			return;

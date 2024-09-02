@@ -6,9 +6,9 @@
 #include "ui/gl/HasFixedSize.h"
 
 namespace Game3 {
-	class LabelWidget: public Widget, public HasAlignment, public HasFixedSize {
+	class Label: public Widget, public HasAlignment, public HasFixedSize {
 		public:
-			LabelWidget(float scale);
+			Label(float scale);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
