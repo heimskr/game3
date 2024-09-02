@@ -74,32 +74,27 @@ namespace Game3 {
 		float accumulated_minimum = 0;
 		float accumulated_natural = 0;
 
-		using getter = std::size_t(decltype(widgetContainer)::*)() const;
-
-		getter outer_size{}, inner_size{};
+		std::size_t outer_size{}, inner_size{};
 		std::size_t outer{}, inner{};
 		std::size_t *row{}, *column{};
-		float for_size{};
 
 		if (orientation == Orientation::Horizontal) {
-			outer_size = &decltype(widgetContainer)::columns;
-			inner_size = &decltype(widgetContainer)::rows;
+			outer_size = widgetContainer.columns();
+			inner_size = widgetContainer.rows();
 			column = &outer;
 			row = &inner;
-			for_size = for_width;
 		} else {
-			outer_size = &decltype(widgetContainer)::rows;
-			inner_size = &decltype(widgetContainer)::columns;
+			outer_size = widgetContainer.rows();
+			inner_size = widgetContainer.columns();
 			row = &outer;
 			column = &inner;
-			for_size = for_height;
 		}
 
-		for (outer = 0; outer < (widgetContainer.*outer_size)(); ++outer) {
+		for (outer = 0; outer < outer_size; ++outer) {
 			float max_minimum = 0;
 			float max_natural = 0;
 
-			for (inner = 0; inner < (widgetContainer.*inner_size)(); ++inner) {
+			for (inner = 0; inner < inner_size; ++inner) {
 				float child_minimum{};
 				float child_natural{};
 
@@ -110,7 +105,7 @@ namespace Game3 {
 				}
 			}
 
-			for (inner = 0; inner < (widgetContainer.*inner_size)(); ++inner) {
+			for (inner = 0; inner < inner_size; ++inner) {
 				if (orientation == Orientation::Horizontal)
 					sizeContainer[*row, *column].first = max_natural;
 				else
@@ -121,7 +116,7 @@ namespace Game3 {
 			accumulated_natural += max_natural;
 		}
 
-		float spacing = (orientation == Orientation::Horizontal? columnSpacing : rowSpacing) * ((widgetContainer.*inner_size)() - 1);
+		const float spacing = (orientation == Orientation::Horizontal? columnSpacing : rowSpacing) * (inner_size - 1);
 		minimum = spacing + accumulated_minimum;
 		natural = spacing + accumulated_natural;
 	}

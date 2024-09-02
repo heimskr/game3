@@ -37,9 +37,6 @@ namespace Game3 {
 
 	UString UString::wrap(const TextRenderer &texter, float max_width, float text_scale) const {
 		// Credit for this algorithm: Fayabella
-		// TODO: cache line width
-
-		INFO("wrap(\"{}\", {})", raw(), max_width);
 
 		std::map<UString, float> width_map;
 
@@ -121,7 +118,6 @@ namespace Game3 {
 		}
 
 		output += line;
-		INFO("wrap -> \"{}\"", output.raw());
 		return output;
 	}
 }

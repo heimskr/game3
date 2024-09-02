@@ -39,32 +39,27 @@ namespace Game3 {
 	}
 
 	void LabelWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
-		INFO("LabelWidget::measure(..., orientation={}, width={}, height={}, ..., ...) text={{{}}}", orientation == Orientation::Horizontal? "Horizontal" : "Vertical", for_width, for_height, text);
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
-			if (for_width < 0) {
+			if (for_width < 0)
 				natural = renderers.text.textWidth(text, getTextScale());
-			} else {
+			else
 				natural = for_width;
-			}
-			INFO(" -> {}", natural);
 			return;
 		}
 
 		// Add a little bit to account for descenders.
 		const float addend = 2 * scale;
 
-		if (lastTextHeight > 0 && (for_width < 0 || for_width == lastRectangle.width)) {
+		if (lastTextHeight > 0 && for_width == lastRectangle.width) {
 			minimum = natural = lastTextHeight + addend;
-			INFO(" -> {}", natural);
 			return;
 		}
 
 		if (for_width < 0) {
 			minimum = 0;
 			wrapped = text;
-			natural = renderers.text.textWidth(text, getTextScale());
-			INFO(" -> {}", natural);
+			natural = (lastTextHeight = renderers.text.textHeight(text, getTextScale())) + addend;
 			return;
 		}
 
@@ -72,12 +67,10 @@ namespace Game3 {
 
 		if (!wrapped) {
 			minimum = natural = 0;
-			INFO(" -> {}", natural);
 			return;
 		}
 
 		minimum = natural = (lastTextHeight = renderers.text.textHeight(wrapped.value(), getTextScale(), for_width)) + addend;
-		INFO(" -> {}", natural);
 	}
 
 	void LabelWidget::setText(UIContext &ui, UString new_text) {

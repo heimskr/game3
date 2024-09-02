@@ -40,9 +40,6 @@ namespace Game3 {
 					auto button = std::make_shared<ButtonWidget>(scale);
 					button->setText(label);
 					button->setOnClick([this, row, column](Widget &widget, UIContext &ui, int, int, int) {
-						// auto icon = std::make_shared<IconWidget>(scale);
-						// icon->setIconTexture(cacheTexture("resources/gui/randomize.png"));
-						// icon->setFixedSize(8 * scale);
 						auto label = std::make_shared<LabelWidget>(scale);
 						label->setFixedHeight(8 * scale);
 						label->setText(ui, static_cast<ButtonWidget &>(widget).getText());
