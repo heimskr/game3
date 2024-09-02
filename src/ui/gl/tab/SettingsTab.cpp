@@ -29,14 +29,40 @@ namespace Game3 {
 		grid->setSpacing(2 * scale);
 		grid->insertAtEnd(scroller);
 
+		std::size_t row = 0;
+
 		auto hostname_label = std::make_shared<LabelWidget>(scale);
 		hostname_label->setText(ui, "Default Hostname");
 		hostname_label->setVerticalAlignment(Alignment::Middle);
-		grid->attach(hostname_label, 0, 0);
+		grid->attach(hostname_label, row, 0);
 
 		auto hostname_input = std::make_shared<TextInputWidget>(scale);
 		hostname_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
-		grid->attach(hostname_input, 0, 1);
+		grid->attach(hostname_input, row, 1);
+
+		++row;
+
+		auto port_label = std::make_shared<LabelWidget>(scale);
+		port_label->setText(ui, "Default Port");
+		port_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(port_label, row, 0);
+
+		auto port_input = std::make_shared<TextInputWidget>(scale);
+		port_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		grid->attach(port_input, row, 1);
+
+		++row;
+
+		auto username_label = std::make_shared<LabelWidget>(scale);
+		username_label->setText(ui, "Default Username");
+		username_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(username_label, row, 0);
+
+		auto username_input = std::make_shared<TextInputWidget>(scale);
+		username_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		grid->attach(username_input, row, 1);
+
+		++row;
 	}
 
 	void SettingsTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {

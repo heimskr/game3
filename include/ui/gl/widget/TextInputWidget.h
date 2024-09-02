@@ -32,22 +32,22 @@ namespace Game3 {
 			void eraseWord(UIContext &);
 			void eraseCharacter(UIContext &);
 			void eraseForward(UIContext &);
-			void goLeft(UIContext &, size_t = 1);
-			void goRight(UIContext &, size_t = 1);
+			void goLeft(UIContext &, std::size_t = 1);
+			void goRight(UIContext &, std::size_t = 1);
 			void goStart(UIContext &);
 			void goEnd(UIContext &);
 
 		private:
 			float xOffset = 0;
 			float thickness{};
-			float cursorXOffset;
+			float cursorXOffset{};
 			Color borderColor;
 			Color interiorColor;
 			Color textColor;
 			Color cursorColor;
 			Glib::ustring text; // TODO: replace with non-Glib alternative
 			Glib::ustring::iterator cursorIterator = text.begin();
-			size_t cursor = 0;
+			std::size_t cursor = 0;
 			bool cursorFixQueued = false;
 
 			float getTextScale() const;
