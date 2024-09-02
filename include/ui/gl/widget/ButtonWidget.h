@@ -2,10 +2,9 @@
 
 #include "graphics/Color.h"
 #include "types/Types.h"
+#include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasFixedSize.h"
-
-#include <glibmm/ustring.h>
 
 namespace Game3 {
 	class ButtonWidget: public Widget, public HasFixedSize {
@@ -24,8 +23,8 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
-			const Glib::ustring & getText() const;
-			void setText(Glib::ustring);
+			const UString & getText() const;
+			void setText(UString);
 
 		protected:
 			virtual void renderLabel(UIContext &, const RendererContext &, const Rectangle &);
@@ -40,7 +39,7 @@ namespace Game3 {
 			Color bottomBorderColorPressed;
 			Color textColorPressed;
 			Color textureMultiplierPressed{1, 1, 1, 1};
-			Glib::ustring text;
+			UString text;
 			TexturePtr texture;
 
 			float getTextScale(const RendererContext &, float height) const;

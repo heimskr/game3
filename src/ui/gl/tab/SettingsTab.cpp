@@ -7,6 +7,7 @@
 #include "ui/gl/widget/GridWidget.h"
 #include "ui/gl/widget/IconButtonWidget.h"
 #include "ui/gl/widget/IconWidget.h"
+#include "ui/gl/widget/LabelWidget.h"
 #include "ui/gl/widget/ProgressBarWidget.h"
 #include "ui/gl/widget/ScrollerWidget.h"
 #include "ui/gl/widget/TextInputWidget.h"
@@ -38,11 +39,14 @@ namespace Game3 {
 				if (const auto &label = labels[row][column]) {
 					auto button = std::make_shared<ButtonWidget>(scale);
 					button->setText(label);
-					button->setOnClick([this, row, column](Game3::Widget &, Game3::UIContext &, int, int, int) {
-						auto icon = std::make_shared<IconWidget>(scale);
-						icon->setIconTexture(cacheTexture("resources/gui/randomize.png"));
-						icon->setFixedSize(8 * scale);
-						grid->attach(icon, row, column);
+					button->setOnClick([this, row, column](Widget &widget, UIContext &ui, int, int, int) {
+						// auto icon = std::make_shared<IconWidget>(scale);
+						// icon->setIconTexture(cacheTexture("resources/gui/randomize.png"));
+						// icon->setFixedSize(8 * scale);
+						auto label = std::make_shared<LabelWidget>(scale);
+						label->setFixedHeight(8 * scale);
+						label->setText(ui, static_cast<ButtonWidget &>(widget).getText());
+						grid->attach(label, row, column);
 						return true;
 					});
 					grid->attach(button, row, column);

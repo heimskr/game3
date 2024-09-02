@@ -137,15 +137,15 @@ namespace Game3 {
 		}
 	}
 
-	const Glib::ustring & ButtonWidget::getText() const {
+	const UString & ButtonWidget::getText() const {
 		return text;
 	}
 
-	void ButtonWidget::setText(Glib::ustring new_text) {
+	void ButtonWidget::setText(UString new_text) {
 		text = std::move(new_text);
 	}
 
-	void ButtonWidget::renderLabel(UIContext &ui, const RendererContext &renderers, const Rectangle &rectangle) {
+	void ButtonWidget::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
 		if (text.empty())
 			return;
 

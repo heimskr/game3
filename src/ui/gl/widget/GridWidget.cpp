@@ -74,33 +74,54 @@ namespace Game3 {
 		float accumulated_minimum = 0;
 		float accumulated_natural = 0;
 
-		for (std::size_t column = 0; column < widgetContainer.columns(); ++column) {
+		using getter = std::size_t(decltype(widgetContainer)::*)() const;
+
+		getter outer_size{}, inner_size{};
+		std::size_t outer{}, inner{};
+		std::size_t *row{}, *column{};
+		float for_size{};
+
+		if (orientation == Orientation::Vertical) {
+			outer_size = &decltype(widgetContainer)::columns;
+			inner_size = &decltype(widgetContainer)::rows;
+			column = &outer;
+			row = &inner;
+			for_size = for_width;
+		} else {
+			outer_size = &decltype(widgetContainer)::rows;
+			inner_size = &decltype(widgetContainer)::columns;
+			row = &outer;
+			column = &inner;
+			for_size = for_height;
+		}
+
+		for (outer = 0; outer < (widgetContainer.*outer_size)(); ++outer) {
 			float max_minimum = 0;
 			float max_natural = 0;
 
-			for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {
+			for (inner = 0; inner < (widgetContainer.*inner_size)(); ++inner) {
 				float child_minimum{};
 				float child_natural{};
 
-				if (Widget *child = widgetContainer[row, column]) {
+				if (Widget *child = widgetContainer[*row, *column]) {
 					child->measure(renderers, orientation, -1, -1, child_minimum, child_natural);
 					max_minimum = std::max(max_minimum, child_minimum);
 					max_natural = std::max(max_natural, child_natural);
 				}
 			}
 
-			for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {
+			for (inner = 0; inner < (widgetContainer.*inner_size)(); ++inner) {
 				if (orientation == Orientation::Horizontal)
-					sizeContainer[row, column].first = max_natural;
+					sizeContainer[*row, *column].first = max_natural;
 				else
-					sizeContainer[row, column].second = max_natural;
+					sizeContainer[*row, *column].second = max_natural;
 			}
 
 			accumulated_minimum += max_minimum;
 			accumulated_natural += max_natural;
 		}
 
-		float spacing = orientation == Orientation::Horizontal? columnSpacing * (widgetContainer.columns() - 1) : rowSpacing * (widgetContainer.rows() - 1);
+		float spacing = (orientation == Orientation::Horizontal? columnSpacing : rowSpacing) * ((widgetContainer.*inner_size)() - 1);
 		minimum = spacing + accumulated_minimum;
 		natural = spacing + accumulated_natural;
 	}

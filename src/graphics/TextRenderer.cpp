@@ -340,14 +340,14 @@ namespace Game3 {
 
 	float TextRenderer::textWidth(const Glib::ustring &text, float scale) const {
 		float out = 0.f;
-		for (const char ch: text)
+		for (const auto ch: text)
 			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
 	float TextRenderer::textHeight(const Glib::ustring &text, float scale) const {
 		float out = 0.f;
-		for (const char ch: text)
+		for (const auto ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;
 	}

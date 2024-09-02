@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "graphics/TextRenderer.h"
 #include "types/UString.h"
 
@@ -38,57 +39,89 @@ namespace Game3 {
 		// Credit for this algorithm: Fayabella
 		// TODO: cache line width
 
-		auto get_width = [&](const auto &text) {
-			return texter.textWidth(text, text_scale);
+		INFO("wrap(\"{}\", {})", raw(), max_width);
+
+		std::map<UString, float> width_map;
+
+		auto text_width = [&, text_scale](const UString &text) {
+			if (auto iter = width_map.find(text); iter != width_map.end())
+				return iter->second;
+			return width_map[text] = texter.textWidth(text, text_scale);
 		};
 
-		const float hyphen_width = get_width('-');
-		const float space_width = get_width(' ');
+		auto char_width = [&texter, text_scale](gunichar character) {
+			return texter.textWidth(character, text_scale);
+		};
+
+		const float hyphen_width = char_width('-');
+		const float space_width = char_width(' ');
 
 		UString line;
 		UString output;
 		std::vector<UString> pieces = split(" ");
 
+		if (pieces.empty())
+			return {};
+
+		std::optional<float> line_width = 0;
+
+		auto get_line_width = [&] {
+			if (line_width)
+				return *line_width;
+			return *(line_width = text_width(line));
+		};
+
+		std::optional<UString> word = pieces.front();
+
 		for (auto iter = pieces.begin(); iter != pieces.end();) {
-			const Glib::ustring word = *iter;
+			if (!word)
+				word = pieces.front();
 
-			if (get_width(line) + get_width(word) + space_width <= max_width) {
-				line += word;
+			if (get_line_width() + text_width(*word) + space_width <= max_width) {
+				line += *word;
 				line += ' ';
+				line_width.reset();
+				word.reset();
 				++iter;
+				continue;
+			}
 
-				if (get_width(line) >= max_width) {
-					output += line;
-					output += '\n';
-					line.clear();
-				}
-			} else if (word.length() >= 5) {
-				if (get_width(line) + get_width(word.substr(0, 2)) < max_width - hyphen_width) {
-					for (size_t i = 0; i < word.length(); ++i) {
-						if (get_width(line) + get_width(word.at(i)) >= max_width - hyphen_width || word.length() <= 3 + i) {
+			if (word->length() >= 5 || line.empty()) {
+				if (get_line_width() + text_width(word->substr(0, 2)) + hyphen_width < max_width) {
+					for (std::size_t i = 0; i < word->length(); ++i) {
+						const auto character = word->at(i);
+						const auto width = char_width(character);
+
+						if (get_line_width() + width + hyphen_width >= max_width || word->length() <= 3 + i) {
 							output += line;
 							output += '-';
 							output += '\n';
 							line.clear();
-							*iter = word.substr(i);
+							line_width = 0;
+							word->erase(0, i);
 							break;
-						} else {
-							line += word.at(i);
 						}
+
+						line += character;
+						if (line_width)
+							*line_width += width;
 					}
 				} else {
 					output += line;
 					output += '\n';
 					line.clear();
+					line_width = 0;
 				}
 			} else {
 				output += line;
 				output += '\n';
 				line.clear();
+				line_width = 0;
 			}
 		}
 
 		output += line;
+		INFO("wrap -> \"{}\"", output.raw());
 		return output;
 	}
 }
