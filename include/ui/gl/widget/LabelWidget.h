@@ -2,10 +2,11 @@
 
 #include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasFixedSize.h"
 
 namespace Game3 {
-	class LabelWidget: public Widget, public HasFixedSize {
+	class LabelWidget: public Widget, public HasAlignment, public HasFixedSize {
 		public:
 			LabelWidget(float scale);
 

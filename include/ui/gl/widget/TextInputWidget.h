@@ -46,7 +46,7 @@ namespace Game3 {
 			Color textColor;
 			Color cursorColor;
 			Glib::ustring text; // TODO: replace with non-Glib alternative
-			Glib::ustring::iterator cursorIterator;
+			Glib::ustring::iterator cursorIterator = text.begin();
 			size_t cursor = 0;
 			bool cursorFixQueued = false;
 

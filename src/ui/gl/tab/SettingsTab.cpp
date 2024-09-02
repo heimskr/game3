@@ -29,27 +29,14 @@ namespace Game3 {
 		grid->setSpacing(2 * scale);
 		grid->insertAtEnd(scroller);
 
-		std::array labels{
-			std::array{"Hello", "World",       "!"   },
-			std::array{"Foo",   "Bar and Baz", "Quux"},
-		};
+		auto hostname_label = std::make_shared<LabelWidget>(scale);
+		hostname_label->setText(ui, "Default Hostname");
+		hostname_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(hostname_label, 0, 0);
 
-		for (std::size_t row = 0; row < labels.size(); ++row) {
-			for (std::size_t column = 0; column < labels[row].size(); ++column) {
-				if (const auto &label = labels[row][column]) {
-					auto button = std::make_shared<ButtonWidget>(scale);
-					button->setText(label);
-					button->setOnClick([this, row, column](Widget &widget, UIContext &ui, int, int, int) {
-						auto label = std::make_shared<LabelWidget>(scale);
-						label->setFixedHeight(8 * scale);
-						label->setText(ui, static_cast<ButtonWidget &>(widget).getText());
-						grid->attach(label, row, column);
-						return true;
-					});
-					grid->attach(button, row, column);
-				}
-			}
-		}
+		auto hostname_input = std::make_shared<TextInputWidget>(scale);
+		hostname_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		grid->attach(hostname_input, 0, 1);
 	}
 
 	void SettingsTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {

@@ -3,6 +3,7 @@
 #include "graphics/TextRenderer.h"
 #include "graphics/Texture.h"
 #include "ui/gl/widget/LabelWidget.h"
+#include "ui/gl/Types.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
@@ -19,19 +20,33 @@ namespace Game3 {
 		tryWrap(renderers.text, width);
 		const UString &string = wrapped? wrapped.value() : text;
 
+		float y_pos = y + padding;
+		bool align_top = true;
+
+		if (verticalAlignment == Alignment::End) {
+			align_top = false;
+			y_pos -= padding;
+			if (0 <= height)
+				y_pos += height;
+		} else if (verticalAlignment == Alignment::Middle) {
+			y_pos -= padding;
+			if (0 < lastTextHeight) {
+				align_top = true;
+				y_pos += (height - lastTextHeight) / 2;
+			}
+		}
+
 		renderers.text.drawOnScreen(string, TextRenderOptions{
 			.x = x,
-			.y = y + padding,
+			.y = y_pos,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.wrapWidth = wrapped? 0 : getWrapWidth(width),
 			.color{0, 0, 0, 1},
-			.alignTop = true,
+			.alignTop = align_top,
 			.shadow{0, 0, 0, 0},
 			.heightOut = &lastTextHeight,
 		});
-
-		lastTextHeight += padding;
 	}
 
 	SizeRequestMode LabelWidget::getRequestMode() const {
@@ -41,10 +56,7 @@ namespace Game3 {
 	void LabelWidget::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
-			if (for_width < 0)
-				natural = renderers.text.textWidth(text, getTextScale());
-			else
-				natural = for_width;
+			natural = std::max(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
 			return;
 		}
 
@@ -79,7 +91,6 @@ namespace Game3 {
 
 		text = std::move(new_text);
 		wrapped.reset();
-		tryWrap(ui.canvas.textRenderer, lastRectangle.width);
 	}
 
 	const UString & LabelWidget::getText() const {

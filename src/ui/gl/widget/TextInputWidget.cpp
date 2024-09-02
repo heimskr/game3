@@ -214,7 +214,7 @@ namespace Game3 {
 	}
 
 	void TextInputWidget::insert(UIContext &ui, gunichar character) {
-		cursorIterator = text.insert(cursorIterator, static_cast<gunichar>(character));
+		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
 		++cursor;
 		adjustCursorOffset(ui.getRenderers().text.textWidth(Glib::ustring(1, character)));

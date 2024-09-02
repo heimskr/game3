@@ -74,9 +74,12 @@ namespace Game3 {
 			if (!word)
 				word = *iter;
 
-			if (get_line_width() + text_width(*word) + space_width <= max_width) {
+			const bool at_end = iter + 1 == pieces.end();
+
+			if (get_line_width() + text_width(*word) + (at_end? 0 : space_width) <= max_width) {
 				line += *word;
-				line += ' ';
+				if (!at_end)
+					line += ' ';
 				line_width.reset();
 				word.reset();
 				++iter;
