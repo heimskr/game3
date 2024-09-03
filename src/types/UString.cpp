@@ -107,12 +107,16 @@ namespace Game3 {
 							*line_width += width;
 					}
 				} else {
+					if (line.empty())
+						return *this;
 					output += line;
 					output += '\n';
 					line.clear();
 					line_width = 0;
 				}
 			} else {
+				if (line.empty())
+					return *this;
 				output += line;
 				output += '\n';
 				line.clear();
