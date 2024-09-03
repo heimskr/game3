@@ -30,14 +30,14 @@ namespace Game3 {
 		rectangler.drawOnScreen(bottomColor, x, y + height * top_fraction, width, height * bottom_fraction);
 		rectangler.drawOnScreen(interiorColor, x + scale, y + scale, width - 2 * scale, height - 2 * scale);
 
-		if (checked) {
+		if (getChecked()) {
 			rectangler.drawOnScreen(checkColor, x + width * 0.225, y + height * 0.525, width * 0.3, height / 8, 45);
 			rectangler.drawOnScreen(checkColor, x + width * 0.325, y + height * 0.45,  width * 0.5, height / 8, -45);
 		}
 	}
 
 	bool Checkbox::click(UIContext &, int, int, int) {
-		checked = !checked;
+		setChecked(!getChecked());
 		return true;
 	}
 
@@ -65,6 +65,7 @@ namespace Game3 {
 
 	void Checkbox::setChecked(bool new_checked) {
 		checked = new_checked;
+		onCheck(new_checked);
 	}
 
 	float Checkbox::getTopFraction() const {

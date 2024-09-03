@@ -77,8 +77,11 @@ namespace Game3 {
 		grid->attach(alert_label, row, 0);
 
 		auto alert_checkbox = std::make_shared<Checkbox>(scale);
-		alert_checkbox->setChecked(true);
+		alert_checkbox->setChecked(settings.alertOnConnection);
 		alert_checkbox->setFixedSize(scale * 8);
+		alert_checkbox->onCheck.connect([this](bool checked) {
+			applySetting(&ClientSettings::alertOnConnection, checked);
+		});
 		grid->attach(alert_checkbox, row, 1);
 
 		++row;
@@ -89,20 +92,26 @@ namespace Game3 {
 		grid->attach(lighting_label, row, 0);
 
 		auto lighting_checkbox = std::make_shared<Checkbox>(scale);
-		lighting_checkbox->setChecked(true);
+		lighting_checkbox->setChecked(settings.renderLighting);
 		lighting_checkbox->setFixedSize(scale * 8);
+		lighting_checkbox->onCheck.connect([this](bool checked) {
+			applySetting(&ClientSettings::renderLighting, checked);
+		});
 		grid->attach(lighting_checkbox, row, 1);
 
 		++row;
 
 		auto timer_label = std::make_shared<Label>(scale);
-		timer_label->setText(ui, "Timer Summaries");
+		timer_label->setText(ui, "Enable Timers");
 		timer_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(timer_label, row, 0);
 
 		auto timer_checkbox = std::make_shared<Checkbox>(scale);
-		timer_checkbox->setChecked(true);
+		timer_checkbox->setChecked(!settings.hideTimers);
 		timer_checkbox->setFixedSize(scale * 8);
+		timer_checkbox->onCheck.connect([this](bool checked) {
+			applySetting(&ClientSettings::hideTimers, !checked);
+		});
 		grid->attach(timer_checkbox, row, 1);
 
 		++row;

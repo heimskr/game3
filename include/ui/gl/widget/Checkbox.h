@@ -6,9 +6,13 @@
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasFixedSize.h"
 
+#include <sigc++/sigc++.h>
+
 namespace Game3 {
 	class Checkbox: public Widget, public HasFixedSize {
 		public:
+			sigc::signal<void(bool)> onCheck;
+
 			Checkbox(float scale, Color top_color, Color bottom_color, Color check_color, Color interior_color);
 			Checkbox(float scale, Color primary_color, Color interior_color);
 			Checkbox(float scale);
