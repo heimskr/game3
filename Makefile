@@ -37,7 +37,7 @@ else
 endif
 
 TRIPLET      ?= x64-linux
-DEPS         := glfw3 libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2 eigen3 vte-2.91-gtk4
+DEPS         := libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2 eigen3 vte-2.91-gtk4
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb

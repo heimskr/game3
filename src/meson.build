@@ -20,7 +20,6 @@ game3_deps = [
 	dependency('libzstd'),
 	dependency('sqlite3'),
 	dependency('gl'),
-	dependency('glfw3'),
 	dependency('asio'),
 	dependency('liblz4'),
 	dependency('nlohmann_json'),

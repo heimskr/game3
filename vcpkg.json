@@ -4,7 +4,6 @@
 	"version": "0.40.0",
 	"dependencies": [
 		"glm",
-		"glfw3",
 		"zstd",
 		"openssl",
 		"stb",
