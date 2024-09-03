@@ -20,10 +20,10 @@ namespace Game3 {
 		TextRenderer &text;
 		CircleRenderer &circle;
 		Recolor &recolor;
-		const Lockable<ClientSettings> &settings;
+		Lockable<ClientSettings> &settings;
 		int factor;
 
-		RendererContext(RectangleRenderer &rectangle_, SingleSpriteRenderer &single_sprite, BatchSpriteRenderer &batch_sprite, TextRenderer &text_, CircleRenderer &circle_, Recolor &recolor_, const Lockable<ClientSettings> &settings_, int factor_):
+		RendererContext(RectangleRenderer &rectangle_, SingleSpriteRenderer &single_sprite, BatchSpriteRenderer &batch_sprite, TextRenderer &text_, CircleRenderer &circle_, Recolor &recolor_, Lockable<ClientSettings> &settings_, int factor_):
 			rectangle(rectangle_), singleSprite(single_sprite), batchSprite(batch_sprite), text(text_), circle(circle_), recolor(recolor_), settings(settings_), factor(factor_) {}
 
 		void pushSize() const;

@@ -53,7 +53,7 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void Label::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Label::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
 			natural = std::max(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
@@ -85,7 +85,7 @@ namespace Game3 {
 		minimum = natural = (lastTextHeight = renderers.text.textHeight(wrapped.value(), getTextScale(), for_width)) + addend;
 	}
 
-	void Label::setText(UIContext &ui, UString new_text) {
+	void Label::setText(UIContext &, UString new_text) {
 		if (text == new_text)
 			return;
 

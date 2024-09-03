@@ -45,7 +45,7 @@ namespace Game3 {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void Checkbox::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Checkbox::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth)
 				minimum = natural = fixedWidth;

@@ -10,6 +10,7 @@
 namespace Game3 {
 	void ClientSettings::apply(ClientGame &game) const {
 		game.canvas.sizeDivisor = sizeDivisor;
+		apply();
 	}
 
 	void ClientSettings::apply() const {

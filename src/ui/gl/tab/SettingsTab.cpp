@@ -16,6 +16,7 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Canvas.h"
+#include "ui/MainWindow.h"
 #include "util/Util.h"
 
 #include <array>
@@ -24,6 +25,9 @@
 namespace Game3 {
 	void SettingsTab::init() {
 		auto tab = shared_from_this();
+
+		auto &settings = ui.getRenderers().settings;
+		auto settings_lock = settings.sharedLock();
 
 		scroller = std::make_shared<Scroller>(scale);
 		scroller->insertAtEnd(tab);
@@ -131,12 +135,36 @@ namespace Game3 {
 		level_slider->setRange(0, 3);
 		level_slider->setStep(1);
 		level_slider->setValue(Logger::level);
+		level_slider->onValueUpdate.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::logLevel, value);
+		});
 
 		auto divisor_slider = add_slider("Size Divisor");
 		divisor_slider->setRange(-.5, 4);
 		divisor_slider->setStep(.1);
-		divisor_slider->setValue(ui.canvas.sizeDivisor);
+		divisor_slider->setValue(settings.sizeDivisor);
 		divisor_slider->setDisplayDigits(1);
+		divisor_slider->onValueUpdate.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::sizeDivisor, value);
+		});
+
+		auto frequency_slider = add_slider("Tick Frequency");
+		frequency_slider->setRange(1, 240);
+		frequency_slider->setStep(1);
+		frequency_slider->setDisplayDigits(0);
+		frequency_slider->setValue(settings.tickFrequency);
+		frequency_slider->onValueUpdate.connect([&](Slider &, double value) {
+			applySetting(&ClientSettings::tickFrequency, value);
+		});
+
+		auto save_button = std::make_shared<Button>(scale);
+		save_button->setText("Save");
+		save_button->setFixedHeight(10 * scale);
+		save_button->setOnClick([this](Widget &, UIContext &, int, int, int) {
+			saveSettings();
+			return true;
+		});
+		grid->attach(save_button, row++, 0);
 	}
 
 	void SettingsTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
@@ -145,5 +173,9 @@ namespace Game3 {
 
 	void SettingsTab::renderIcon(const RendererContext &renderers) {
 		renderIconTexture(renderers, cacheTexture("resources/gui/settings.png"));
+	}
+
+	void SettingsTab::saveSettings() {
+		ui.canvas.window.saveSettings();
 	}
 }

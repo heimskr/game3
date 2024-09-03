@@ -45,7 +45,7 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void TextModule::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void TextModule::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
 			natural = for_width;

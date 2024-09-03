@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/gl/tab/Tab.h"
+#include "ui/gl/UIContext.h"
 
 #include <memory>
 
@@ -19,5 +20,14 @@ namespace Game3 {
 		private:
 			std::shared_ptr<Scroller> scroller;
 			std::shared_ptr<Grid> grid;
+
+			inline void applySetting(auto member_ptr, const auto &value) {
+				ui.getRenderers().settings.withUnique([this, member_ptr, &value](ClientSettings &settings) {
+					(settings.*member_ptr) = value;
+					settings.apply(*ui.getGame());
+				});
+			}
+
+			void saveSettings();
 	};
 }

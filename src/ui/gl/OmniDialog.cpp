@@ -10,6 +10,7 @@
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/tab/SettingsTab.h"
 #include "ui/gl/tab/Tab.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/OmniDialog.h"
 #include "ui/gl/UIContext.h"
@@ -126,6 +127,7 @@ namespace Game3 {
 	}
 
 	void OmniDialog::onClose() {
+		ui.getTooltip()->hide();
 		inventoryTab->removeModule();
 	}
 
