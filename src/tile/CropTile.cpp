@@ -29,7 +29,7 @@ namespace Game3 {
 			return;
 
 		const Identifier tilename = tileset[*tile];
-		if (tilename == crop->stages.back())
+		if (tilename && isRipe(tilename))
 			return;
 
 		std::uniform_real_distribution distribution{0., 1.};

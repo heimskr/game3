@@ -30,7 +30,7 @@ namespace Game3 {
 					inventory->erase(inventory->activeSlot);
 
 				// Make sure tree is fully grown before giving any products
-				if (tilename == crop->stages.back())
+				if (tilename && isRipe(*tilename))
 					for (const ItemStackPtr &stack: crop->products.getStacks())
 						if (ItemStackPtr leftover = inventory->add(stack))
 							leftover->spawn(Place{place.position, place.realm});
