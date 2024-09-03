@@ -22,6 +22,17 @@
 #include <array>
 #include <cassert>
 
+namespace {
+	using namespace Game3;
+
+	Color getInvalidColor() {
+		auto hsv = DEFAULT_TEXTINPUT_INTERIOR_COLOR.convert<OKHsv>();
+		hsv.hue = 0;
+		hsv.saturation = 0.2;
+		return hsv.convert<Color>();
+	}
+}
+
 namespace Game3 {
 	void SettingsTab::init() {
 		auto tab = shared_from_this();
@@ -45,6 +56,16 @@ namespace Game3 {
 
 		auto hostname_input = std::make_shared<TextInput>(scale);
 		hostname_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		hostname_input->setText(ui, settings.hostname);
+		hostname_input->onChange.connect([this](TextInput &input, const UString &text) {
+			if (text.empty()) {
+				input.setInteriorColor(getInvalidColor());
+				return;
+			}
+
+			input.setInteriorColor();
+			applySetting(&ClientSettings::hostname, text.raw());
+		});
 		grid->attach(hostname_input, row, 1);
 
 		++row;
@@ -56,6 +77,24 @@ namespace Game3 {
 
 		auto port_input = std::make_shared<TextInput>(scale);
 		port_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		port_input->setText(ui, std::to_string(settings.port));
+		port_input->onChange.connect([this](TextInput &input, const UString &text) {
+			uint16_t port{};
+
+			Color color = DEFAULT_TEXTINPUT_INTERIOR_COLOR;
+
+			try {
+				port = parseNumber<uint16_t>(text.raw());
+				applySetting(&ClientSettings::port, port);
+			} catch (const std::invalid_argument &) {
+				auto hsv = color.convert<OKHsv>();
+				hsv.hue = 0;
+				hsv.saturation = 0.3;
+				color = hsv.convert<Color>();
+			}
+
+			input.setInteriorColor(color);
+		});
 		grid->attach(port_input, row, 1);
 
 		++row;
@@ -67,6 +106,16 @@ namespace Game3 {
 
 		auto username_input = std::make_shared<TextInput>(scale);
 		username_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		username_input->setText(ui, settings.username);
+		username_input->onChange.connect([this](TextInput &input, const UString &text) {
+			if (text.empty()) {
+				input.setInteriorColor(getInvalidColor());
+				return;
+			}
+
+			input.setInteriorColor();
+			applySetting(&ClientSettings::username, text.raw());
+		});
 		grid->attach(username_input, row, 1);
 
 		++row;

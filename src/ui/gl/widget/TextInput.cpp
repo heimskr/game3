@@ -10,12 +10,11 @@
 
 namespace {
 	constexpr Game3::Color DEFAULT_BORDER_COLOR{"#926641"};
-	constexpr Game3::Color DEFAULT_INTERIOR_COLOR{"#fdeed3"};
 	constexpr Game3::Color DEFAULT_TEXT_COLOR{"#341903"};
 	constexpr Game3::Color DEFAULT_CURSOR_COLOR{"#927a66"};
 	constexpr float DEFAULT_THICKNESS = 1;
 
-	bool isStopChar(Glib::ustring::iterator cursor) {
+	bool isStopChar(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
 
 		if (unicharacter > std::numeric_limits<char>::max())
@@ -25,7 +24,7 @@ namespace {
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
 	}
 
-	bool isWhitespace(Glib::ustring::iterator cursor) {
+	bool isWhitespace(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
 
 		if (unicharacter > std::numeric_limits<char>::max())
@@ -50,7 +49,7 @@ namespace Game3 {
 		TextInput(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
 	TextInput::TextInput(float scale, float thickness):
-		TextInput(scale, DEFAULT_BORDER_COLOR, DEFAULT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
+		TextInput(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
 	TextInput::TextInput(float scale):
 		TextInput(scale, DEFAULT_THICKNESS) {}
@@ -105,6 +104,7 @@ namespace Game3 {
 			switch (character) {
 				case GDK_KEY_BackSpace:
 					eraseWord(ui);
+					onChange(*this, text);
 					break;
 
 				default:
@@ -118,10 +118,12 @@ namespace Game3 {
 		switch (character) {
 			case GDK_KEY_BackSpace:
 				eraseCharacter(ui);
+				onChange(*this, text);
 				return true;
 
 			case GDK_KEY_Delete:
 				eraseForward(ui);
+				onChange(*this, text);
 				return true;
 
 			case GDK_KEY_Left:
@@ -159,8 +161,7 @@ namespace Game3 {
 
 			case GDK_KEY_Return:
 			case GDK_KEY_KP_Enter:
-				if (onSubmit)
-					onSubmit(*this, ui);
+				onSubmit(*this, ui);
 				return true;
 
 			default:
@@ -168,6 +169,7 @@ namespace Game3 {
 		}
 
 		insert(ui, static_cast<gunichar>(character));
+		onChange(*this, text);
 		return true;
 	}
 
@@ -195,17 +197,29 @@ namespace Game3 {
 		}
 	}
 
-	const Glib::ustring & TextInput::getText() const {
+	void TextInput::setInteriorColor(Color color) {
+		interiorColor = color;
+	}
+
+	void TextInput::setInteriorColor() {
+		interiorColor = DEFAULT_TEXTINPUT_INTERIOR_COLOR;
+	}
+
+	const UString & TextInput::getText() const {
 		return text;
 	}
 
-	void TextInput::setText(UIContext &ui, Glib::ustring new_text) {
-		text = std::move(new_text);
+	void TextInput::setText(UIContext &ui, UString new_text) {
+		if (text != new_text) {
+			text = std::move(new_text);
+			onChange(*this, text);
+		}
+
 		goEnd(ui);
 	}
 
-	Glib::ustring TextInput::clear() {
-		Glib::ustring out = std::move(text);
+	UString TextInput::clear() {
+		UString out = std::move(text);
 		cursor = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
@@ -217,7 +231,7 @@ namespace Game3 {
 		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
 		++cursor;
-		adjustCursorOffset(ui.getRenderers().text.textWidth(Glib::ustring(1, character)));
+		adjustCursorOffset(ui.getRenderers().text.textWidth(UString(1, character)));
 	}
 
 	void TextInput::eraseWord(UIContext &ui) {
@@ -268,7 +282,7 @@ namespace Game3 {
 
 	void TextInput::goLeft(UIContext &ui, size_t count) {
 		RendererContext renderers = ui.getRenderers();
-		Glib::ustring piece;
+		UString piece;
 
 		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
 			piece = text.substr(--cursor, 1);
@@ -279,7 +293,7 @@ namespace Game3 {
 
 	void TextInput::goRight(UIContext &ui, size_t count) {
 		RendererContext renderers = ui.getRenderers();
-		Glib::ustring piece;
+		UString piece;
 
 		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
 			piece = text.substr(cursor++, 1);

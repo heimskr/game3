@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graphics/Color.h"
 #include "types/Types.h"
 
 namespace Game3 {
@@ -17,4 +18,5 @@ namespace Game3 {
 	constexpr Slot HOTBAR_SIZE = 10;
 	constexpr float HOTBAR_SCALE = 6;
 	constexpr float HOTBAR_BORDER = SLOT_PADDING * HOTBAR_SCALE / 3;
+	constexpr Color DEFAULT_TEXTINPUT_INTERIOR_COLOR{"#fdeed3"};
 }

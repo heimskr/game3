@@ -2,17 +2,19 @@
 
 #include "graphics/Color.h"
 #include "types/Types.h"
+#include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasFixedSize.h"
 
-#include <glibmm/ustring.h>
+#include <sigc++/sigc++.h>
 
 #include <functional>
 
 namespace Game3 {
 	class TextInput: public Widget, public HasFixedSize {
 		public:
-			std::function<void(TextInput &, UIContext &)> onSubmit;
+			sigc::signal<void(TextInput &, UIContext &)> onSubmit;
+			sigc::signal<void(TextInput &, const UString &)> onChange;
 
 			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
 			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
@@ -25,9 +27,12 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
-			const Glib::ustring & getText() const;
-			void setText(UIContext &, Glib::ustring);
-			Glib::ustring clear();
+			void setInteriorColor(Color);
+			void setInteriorColor();
+
+			const UString & getText() const;
+			void setText(UIContext &, UString);
+			UString clear();
 			void insert(UIContext &, gunichar);
 			void eraseWord(UIContext &);
 			void eraseCharacter(UIContext &);
@@ -45,8 +50,8 @@ namespace Game3 {
 			Color interiorColor;
 			Color textColor;
 			Color cursorColor;
-			Glib::ustring text; // TODO: replace with non-Glib alternative
-			Glib::ustring::iterator cursorIterator = text.begin();
+			UString text;
+			UString::iterator cursorIterator = text.begin();
 			std::size_t cursor = 0;
 			bool cursorFixQueued = false;
 

@@ -25,7 +25,7 @@ namespace Game3 {
 		input = std::make_shared<TextInput>(scale);
 		input->setFixedHeight(scale * TEXT_INPUT_HEIGHT_FACTOR);
 		input->setText(ui, "Hello from the crafting tab! This is some example text.");
-		input->onSubmit = [&](TextInput &input, UIContext &ui) {
+		input->onSubmit.connect([&](TextInput &input, UIContext &ui) {
 			Glib::ustring text = input.clear();
 			if (text.empty())
 				return;
@@ -45,7 +45,7 @@ namespace Game3 {
 			}
 
 			bar->setProgress(number);
-		};
+		});
 
 		bar = std::make_shared<ProgressBar>(scale, Color(1, 0, 0, 1), 0.5);
 		bar->setFixedHeight(10 * scale);
