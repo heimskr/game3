@@ -45,6 +45,8 @@ namespace Game3 {
 			void setRegion(std::optional<Rectangle>);
 			bool setRegion(std::optional<Rectangle>, const Widget &updater);
 
+			void setPositionOverride(std::optional<std::pair<float, float>>);
+
 		private:
 			Glib::ustring text;
 			float maxWidth{};
@@ -53,6 +55,8 @@ namespace Game3 {
 			Color textColor;
 			std::weak_ptr<const Widget> lastUpdater;
 			std::optional<Rectangle> region;
+			/** Absolute (x, y) coordinates. */
+			std::optional<std::pair<float, float>> positionOverride;
 
 			float getTextScale() const;
 			float getPadding() const;

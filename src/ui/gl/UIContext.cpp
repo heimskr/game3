@@ -209,4 +209,8 @@ namespace Game3 {
 	void UIContext::addDragUpdater(WidgetPtr widget) {
 		extraDragUpdaters.emplace(std::move(widget));
 	}
+
+	bool UIContext::anyDragUpdaters() const {
+		return !extraDragUpdaters.empty();
+	}
 }

@@ -24,13 +24,18 @@ namespace Game3 {
 		if (!visible)
 			return;
 
-		if (region && !region->contains(x, y)) {
-			hide();
-			return;
-		}
+		if (positionOverride) {
+			x = positionOverride->first;
+			y = positionOverride->second;
+		} else {
+			if (region && !region->contains(x, y)) {
+				hide();
+				return;
+			}
 
-		x += CURSOR_WIDTH;
-		y += CURSOR_HEIGHT;
+			x += CURSOR_WIDTH;
+			y += CURSOR_HEIGHT;
+		}
 
 		Widget::render(ui, renderers, x, y, width, height);
 
@@ -40,7 +45,7 @@ namespace Game3 {
 		const float padding = getPadding();
 		const float text_scale = getTextScale();
 
-		const float text_width = texter.textWidth(text, text_scale) + 2 * padding + 1;
+		const float text_width = texter.textWidth(text, text_scale) + 2 * padding + scale / 2;
 		const float effective_width = std::min(maxWidth, width < 0? text_width : std::min(width, text_width));
 
 		const float text_height = texter.textHeight(text, text_scale, effective_width - 2 * padding) + 2 * padding;
@@ -83,6 +88,7 @@ namespace Game3 {
 	void Tooltip::hide() {
 		visible = false;
 		region.reset();
+		positionOverride.reset();
 	}
 
 	void Tooltip::hide(const Widget &updater) {
@@ -142,6 +148,10 @@ namespace Game3 {
 
 	bool Tooltip::setRegion(std::optional<Rectangle> new_region, const Widget &updater) {
 		return updateField(std::move(new_region), &Tooltip::region, updater);
+	}
+
+	void Tooltip::setPositionOverride(std::optional<std::pair<float, float>> new_position_override) {
+		positionOverride = std::move(new_position_override);
 	}
 
 	float Tooltip::getTextScale() const {

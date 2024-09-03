@@ -56,6 +56,7 @@ namespace Game3 {
 			bool checkMouseAbsolute(const Rectangle &) const;
 			std::shared_ptr<Tooltip> getTooltip() const;
 			void addDragUpdater(WidgetPtr);
+			bool anyDragUpdaters() const;
 
 			template <typename T>
 			size_t removeDialogs() {

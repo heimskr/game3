@@ -34,13 +34,17 @@ namespace Game3 {
 		const float x_pos = minimum == maximum? 0 : width * (value - minimum) / (maximum - minimum);
 
 		rectangler.drawOnScreen(barColor, x, y + (height - bar_height) / 2, width, bar_height);
-		rectangler.drawOnScreen(handleColor, x + x_pos - handle_size / 2, y + (height - handle_size) / 2, handle_size, handle_size);
+
+		Rectangle handle_rectangle(x + x_pos - handle_size / 2, y + (height - handle_size) / 2, handle_size, handle_size);
+		rectangler.drawOnScreen(handleColor, handle_rectangle);
 
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
-		if (isDragging() || ui.checkMouseAbsolute(lastRectangle)) {
+		if (isDragging() || (!ui.anyDragUpdaters() && ui.checkMouseAbsolute(lastRectangle))) {
 			tooltip->setText(getTooltipText());
 			tooltip->setRegion(std::nullopt);
+			handle_rectangle = ui.scissorStack.getTop().rectangle + handle_rectangle;
+			tooltip->setPositionOverride(std::pair<float, float>{handle_rectangle.x + handle_size, handle_rectangle.y + handle_size});
 			tooltip->show(*this);
 		} else {
 			tooltip->hide(*this);
