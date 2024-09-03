@@ -62,7 +62,7 @@ namespace Game3 {
 		const float difference = std::min(lastRectangle.width, x - lastRectangle.x);
 
 		if (difference < 0) {
-			setValue(0);
+			setValue(minimum);
 			return true;
 		}
 
@@ -95,6 +95,25 @@ namespace Game3 {
 				natural = for_height;
 			}
 		}
+	}
+
+	const UString & Slider::getTooltipText() {
+		if (!tooltipText) {
+			UString &text = tooltipText.emplace(std::format("{:f}", value));
+			if (0 <= displayDigits) {
+				if (const std::size_t period = text.find('.'); period != UString::npos) {
+					if (displayDigits == 0) {
+						text.erase(period);
+						if (!text.empty() && text[0] == '-')
+							text.erase(0, 1);
+					} else if (period + 1 + displayDigits < text.length()) {
+						text.erase(period + 1 + displayDigits);
+					}
+				}
+			}
+		}
+
+		return *tooltipText;
 	}
 
 	double Slider::getMinimum() const {
@@ -132,13 +151,12 @@ namespace Game3 {
 
 	void Slider::setValue(double new_value) {
 		if (step > 0)
-			new_value -= std::fmod(new_value - minimum, step);
+			new_value -= std::remainder(new_value - minimum, step);
 
 		if (value != new_value) {
 			tooltipText.reset();
 			value = new_value;
-			if (onValueUpdate)
-				onValueUpdate(*this, value);
+			onValueUpdate(*this, value);
 		}
 	}
 
@@ -150,32 +168,11 @@ namespace Game3 {
 		displayDigits = new_display_digits;
 	}
 
-	void Slider::setOnValueUpdate(decltype(onValueUpdate) new_onvalueupdate) {
-		onValueUpdate = std::move(new_onvalueupdate);
-	}
-
 	float Slider::getBarHeight() const {
 		return scale * 2;
 	}
 
 	float Slider::getHandleSize() const {
 		return scale * 4;
-	}
-
-	const UString & Slider::getTooltipText() {
-		if (!tooltipText) {
-			UString &text = tooltipText.emplace(std::format("{}", value));
-			if (0 <= displayDigits) {
-				if (const std::size_t period = text.find('.'); period != UString::npos) {
-					const std::size_t digit_count = text.length() - period + 1;
-					if (static_cast<std::size_t>(displayDigits) < digit_count) {
-						const std::size_t difference = digit_count - displayDigits;
-						text.erase(text.length() - difference);
-					}
-				}
-			}
-		}
-
-		return *tooltipText;
 	}
 }

@@ -15,6 +15,7 @@
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Canvas.h"
 #include "util/Util.h"
 
 #include <array>
@@ -102,27 +103,40 @@ namespace Game3 {
 
 		++row;
 
-		auto level_label = std::make_shared<Label>(scale);
-		level_label->setText(ui, "Log Level");
-		level_label->setVerticalAlignment(Alignment::Middle);
-		grid->attach(level_label, row, 0);
+		auto add_slider = [&](UString label_text) {
+			auto label = std::make_shared<Label>(scale);
+			label->setText(ui, std::move(label_text));
+			label->setVerticalAlignment(Alignment::Middle);
+			grid->attach(label, row, 0);
 
-		auto level_slider = std::make_shared<Slider>(scale);
-		level_slider->setFixedSize(100 * scale, 8 * scale);
+			auto slider = std::make_shared<Slider>(scale);
+			slider->setFixedSize(100 * scale, 8 * scale);
+			grid->attach(slider, row, 1);
+
+			auto value_label = std::make_shared<Label>(scale);
+			value_label->setVerticalAlignment(Alignment::Middle);
+			grid->attach(value_label, row, 2);
+
+			slider->onValueUpdate.connect([this, weak_label = std::weak_ptr(value_label)](Slider &slider, double) {
+				if (auto label = weak_label.lock())
+					label->setText(ui, slider.getTooltipText());
+			});
+
+			++row;
+
+			return slider;
+		};
+
+		auto level_slider = add_slider("Log Level");
 		level_slider->setRange(0, 3);
 		level_slider->setStep(1);
-		grid->attach(level_slider, row, 1);
+		level_slider->setValue(Logger::level);
 
-		auto level_value_label = std::make_shared<Label>(scale);
-		level_value_label->setVerticalAlignment(Alignment::Middle);
-		grid->attach(level_value_label, row, 2);
-
-		level_slider->setOnValueUpdate([this, weak_label = std::weak_ptr(level_value_label)](Slider &, double value) {
-			if (auto label = weak_label.lock())
-				label->setText(ui, std::format("{}", static_cast<int>(value)));
-		});
-
-		++row;
+		auto divisor_slider = add_slider("Size Divisor");
+		divisor_slider->setRange(-.5, 4);
+		divisor_slider->setStep(.1);
+		divisor_slider->setValue(ui.canvas.sizeDivisor);
+		divisor_slider->setDisplayDigits(1);
 	}
 
 	void SettingsTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {

@@ -6,12 +6,16 @@
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasFixedSize.h"
 
+#include <sigc++/sigc++.h>
+
 #include <functional>
 #include <optional>
 
 namespace Game3 {
 	class Slider: public Widget, public HasFixedSize {
 		public:
+			sigc::signal<void(Slider &, double)> onValueUpdate;
+
 			Slider(float scale);
 
 			using Widget::render;
@@ -22,6 +26,8 @@ namespace Game3 {
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
+
+			const UString & getTooltipText();
 
 			double getMinimum() const;
 			double getMaximum() const;
@@ -35,10 +41,8 @@ namespace Game3 {
 			void setValue(double);
 			void setStep(double);
 			void setDisplayDigits(int);
-			void setOnValueUpdate(std::function<void(Slider &, double)>);
 
 		private:
-			std::function<void(Slider &, double)> onValueUpdate;
 			double minimum{};
 			double maximum{};
 			double value{};
@@ -51,7 +55,5 @@ namespace Game3 {
 
 			float getBarHeight() const;
 			float getHandleSize() const;
-
-			const UString & getTooltipText();
 	};
 }
