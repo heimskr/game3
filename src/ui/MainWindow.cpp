@@ -22,7 +22,6 @@
 #include "ui/gtk/ConnectDialog.h"
 #include "ui/gtk/ConnectionSuccessDialog.h"
 #include "ui/gtk/EntryDialog.h"
-#include "ui/gtk/JSONDialog.h"
 #include "ui/gtk/LoginDialog.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/GTKInventoryModule.h"
@@ -135,17 +134,6 @@ namespace Game3 {
 				debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 			}
 		}, false);
-
-		add_action("settings", Gio::ActionMap::ActivateSlot([this] {
-			auto dialog = settings.makeDialog(*this, [this](const ClientSettings &new_settings) {
-				settings = new_settings;
-				if (game)
-					settings.apply(*game);
-				settings.apply();
-				saveSettings();
-			});
-			queueDialog(std::move(dialog));
-		}));
 
 		glMenu.set_parent(glArea);
 		glArea.set_expand(true);

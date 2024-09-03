@@ -62,10 +62,6 @@
 				<attribute name="label" translatable="yes">T_oggle Log</attribute>
 				<attribute name="action">win.toggle_log</attribute>
 			</item>
-			<item>
-				<attribute name="label" translatable="yes">_Settings</attribute>
-				<attribute name="action">win.settings</attribute>
-			</item>
 		</section>
 	</menu>
 </interface>

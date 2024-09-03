@@ -14,7 +14,6 @@ namespace Gtk {
 
 namespace Game3 {
 	class ClientGame;
-	class JSONDialog;
 
 	struct ClientSettings {
 		std::string hostname = "::1";
@@ -32,8 +31,6 @@ namespace Game3 {
 
 		/** Applies global settings. */
 		void apply() const;
-
-		std::unique_ptr<JSONDialog> makeDialog(Gtk::Window &parent, std::function<void(const ClientSettings &)> submit) const;
 	};
 
 	void from_json(const nlohmann::json &, ClientSettings &);
