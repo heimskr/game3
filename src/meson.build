@@ -28,6 +28,7 @@ game3_deps = [
 	dependency('boost'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('vte-2.91-gtk4'),
+	dependency('sigc++-3.0'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
