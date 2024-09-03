@@ -98,8 +98,11 @@ namespace Game3 {
 		if (auto pressed = getPressedWidget())
 			return pressed->dragEnd(*this, x, y);
 
-		for (const WidgetPtr &widget: extraDragUpdaters)
+		for (const WidgetPtr &widget: extraDragUpdaters) {
 			widget->dragging = false;
+			widget->dragEnd(*this, x, y);
+		}
+
 		extraDragUpdaters.clear();
 
 		bool out = false;
