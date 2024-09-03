@@ -15,10 +15,10 @@ namespace Game3 {
 
 	class EntityFactory: public NamedRegisterable {
 		private:
-			std::function<std::shared_ptr<Entity>(const std::shared_ptr<Game> &)> defaultFunction;
+			std::function<std::shared_ptr<Entity>(const std::shared_ptr<Game> &)> function;
 
 		public:
-			EntityFactory(Identifier, decltype(defaultFunction));
+			EntityFactory(Identifier, decltype(function));
 
 			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &);
 			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &, const nlohmann::json &);
