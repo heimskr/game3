@@ -11,6 +11,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/ProgressBar.h"
 #include "ui/gl/widget/Scroller.h"
+#include "ui/gl/widget/Slider.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -98,6 +99,28 @@ namespace Game3 {
 		timer_checkbox->setChecked(true);
 		timer_checkbox->setFixedSize(scale * 8);
 		grid->attach(timer_checkbox, row, 1);
+
+		++row;
+
+		auto level_label = std::make_shared<Label>(scale);
+		level_label->setText(ui, "Log Level");
+		level_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(level_label, row, 0);
+
+		auto level_slider = std::make_shared<Slider>(scale);
+		level_slider->setFixedSize(100 * scale, 8 * scale);
+		level_slider->setRange(0, 3);
+		level_slider->setStep(1);
+		grid->attach(level_slider, row, 1);
+
+		auto level_value_label = std::make_shared<Label>(scale);
+		level_value_label->setVerticalAlignment(Alignment::Middle);
+		grid->attach(level_value_label, row, 2);
+
+		level_slider->setOnValueUpdate([this, weak_label = std::weak_ptr(level_value_label)](Slider &, double value) {
+			if (auto label = weak_label.lock())
+				label->setText(ui, std::format("{}", static_cast<int>(value)));
+		});
 
 		++row;
 	}

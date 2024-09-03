@@ -182,14 +182,14 @@ namespace Game3 {
 			if (0 < fixedWidth) {
 				minimum = natural = fixedWidth;
 			} else {
-				minimum = 0;
+				minimum = border;
 				natural = border + renderers.text.textWidth(text, getTextScale());
 			}
 		} else {
 			if (0 < fixedHeight) {
 				minimum = natural = fixedHeight;
 			} else {
-				minimum = 0;
+				minimum = border;
 				natural = border + renderers.text.textHeight(text, getTextScale(), for_width - border);
 			}
 		}
