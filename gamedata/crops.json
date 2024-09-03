@@ -167,7 +167,7 @@
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree1_honey_stump", "base:tile/tree1_empty", "base:tile/tree1_full"],
 				"custom": {
-					"honey": {
+					"partialHarvest": {
 						"empty": "base:tile/tree1_empty",
 						"full": "base:tile/tree1_full",
 						"item": "base:item/honey"
@@ -183,7 +183,7 @@
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree2_honey_stump", "base:tile/tree2_empty", "base:tile/tree2_full"],
 				"custom": {
-					"honey": {
+					"partialHarvest": {
 						"empty": "base:tile/tree2_empty",
 						"full": "base:tile/tree2_full",
 						"item": "base:item/honey"
@@ -199,7 +199,7 @@
 				"type": "base:tile/tree",
 				"stages": ["base:tile/tree3_honey_stump", "base:tile/tree3_empty", "base:tile/tree3_full"],
 				"custom": {
-					"honey": {
+					"partialHarvest": {
 						"empty": "base:tile/tree3_empty",
 						"full": "base:tile/tree3_full",
 						"item": "base:item/honey"

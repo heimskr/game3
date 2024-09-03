@@ -40,15 +40,6 @@ namespace Game3 {
 			}
 		}
 
-		if (auto honey = crop->customData.find("honey"); honey != crop->customData.end()) {
-			if (place.getName(layer) == honey->at("full").get<Identifier>()) {
-				if (!inventory->add(ItemStack::create(game, honey->at("item").get<Identifier>()))) {
-					place.set(layer, honey->at("empty").get<Identifier>());
-					return true;
-				}
-			}
-		}
-
-		return Tile::interact(place, layer, used_item, hand);
+		return CropTile::interact(place, layer, used_item, hand);
 	}
 }

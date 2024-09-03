@@ -3,6 +3,7 @@
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Crop.h"
+#include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tile/CropTile.h"
@@ -45,7 +46,18 @@ namespace Game3 {
 	bool CropTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		assert(!crop->stages.empty());
 
-		if (auto tilename = place.getName(layer); tilename && *tilename == crop->stages.back()) {
+		if (auto partial_harvest = crop->customData.find("partialHarvest"); partial_harvest != crop->customData.end()) {
+			if (place.getName(layer) == partial_harvest->at("full").get<Identifier>()) {
+				const InventoryPtr inventory = place.player->getInventory(0);
+				auto inventory_lock = inventory->uniqueLock();
+				if (!inventory->add(ItemStack::create(place.getGame(), partial_harvest->at("item").get<Identifier>()))) {
+					place.set(layer, partial_harvest->at("empty").get<Identifier>());
+					return true;
+				}
+			}
+		}
+
+		if (auto tilename = place.getName(layer); tilename && isRipe(*tilename)) {
 			place.set(layer, 0);
 			for (const ItemStackPtr &stack: crop->products.getStacks())
 				place.player->give(stack);
