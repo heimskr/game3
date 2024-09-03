@@ -44,14 +44,13 @@ namespace Game3 {
 			saveToJSON(selected, stack->data, true);
 			player->getInventory(0)->notifyOwner();
 
-			SUCCESS("Captured {}", selected->type);
 			return true;
 		}
 
 		if (!place.realm->isPathable(place.position))
 			return true;
 
-		Identifier type = stack->data.at("containedEntity");
+		Identifier type = stack->data.at("type");
 		if (type == "base:entity/player") {
 			game->toServer().releasePlayer(stack->data.at("containedUsername"), place);
 		} else {
@@ -60,7 +59,6 @@ namespace Game3 {
 			entity->spawning = true;
 			entity->setRealm(realm);
 			realm->queueEntityInit(std::move(entity), place.position);
-			INFO("Spawned entity of type {}", type);
 		}
 		stack->data.clear();
 		player->getInventory(0)->notifyOwner();
@@ -79,7 +77,7 @@ namespace Game3 {
 
 	EntityPtr ContainmentOrb::makeEntity(const ItemStackPtr &stack) {
 		GamePtr game = stack->getGame();
-		Identifier type = stack->data.at("containedEntity");
+		Identifier type = stack->data.at("type");
 		const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
 		EntityPtr entity = (*factory)(game, stack->data);
 		entity->spawning = true;
@@ -101,7 +99,7 @@ namespace Game3 {
 	}
 
 	void ContainmentOrb::saveToJSON(const EntityPtr &entity, nlohmann::json &json, bool can_modify) {
-		json["containedEntity"] = entity->type;
+		json["type"] = entity->type;
 		json["containedName"] = entity->getName();
 
 		if (entity->isPlayer()) {

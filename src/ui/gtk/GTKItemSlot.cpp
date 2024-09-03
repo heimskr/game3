@@ -103,7 +103,7 @@ namespace Game3 {
 		popoverMenu.unparent();
 	}
 
-	void GTKItemSlot::setStack(const ItemStackPtr &stack) {
+	void GTKItemSlot::setStack(ItemStackPtr stack) {
 		image.set(stack->getImage());
 
 		if (stack->count == ItemCount(-1))
@@ -128,7 +128,7 @@ namespace Game3 {
 		if (get_tooltip_text() != tooltip)
 			set_tooltip_text(tooltip);
 
-		storedStack = std::move(stack); // TODO!: copy?
+		storedStack = std::move(stack);
 	}
 
 	void GTKItemSlot::reset() {

@@ -31,7 +31,7 @@ namespace Game3 {
 			void setGmenu(Glib::RefPtr<Gio::Menu>);
 			void setInventory(std::shared_ptr<ClientInventory>);
 
-			void setStack(const ItemStackPtr &);
+			void setStack(ItemStackPtr);
 			inline auto & getStack() { return storedStack; }
 			inline const auto & getStack() const { return storedStack; }
 

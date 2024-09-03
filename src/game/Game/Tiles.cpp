@@ -48,7 +48,7 @@ namespace Game3 {
 		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
 
-		static std::vector<std::string> rares {
+		static const std::array rares {
 			"apatite",
 			"asbestos",
 			"bauxite",
