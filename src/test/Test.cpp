@@ -53,7 +53,7 @@ namespace Game3 {
 	}
 
 	void testBuffer() {
-		Buffer buffer;
+		Buffer buffer{Side::Server};
 
 		std::vector<uint8_t> test_vector {0x01, 0x02, 0x03, 0x04};
 
@@ -134,11 +134,11 @@ namespace Game3 {
 	void testBuffer2() {
 		std::vector<std::optional<uint16_t>> u16{100, std::nullopt, 1000, std::nullopt, std::nullopt, 65535, std::nullopt};
 		INFO("list<optional<u16>>:");
-		Buffer{u16}.debug();
+		Buffer{Side::Server, u16}.debug();
 
 		std::vector<std::optional<Position>> pos{Position{10, 20}, std::nullopt};
 		INFO("list<optional<Position>>:");
-		Buffer{pos}.debug();
+		Buffer{Side::Server, pos}.debug();
 	}
 
 	void testIteration() {

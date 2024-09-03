@@ -102,7 +102,7 @@ namespace Game3 {
 			return false;
 		}
 
-		Buffer send_buffer;
+		Buffer send_buffer{Side::Client};
 		packet.encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));

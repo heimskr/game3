@@ -80,7 +80,7 @@ namespace Game3 {
 
 				} else if (name == "GetAgentGID") {
 
-					return Buffer{tileEntity->getGID()};
+					return Buffer{Side::Client, tileEntity->getGID()};
 
 				} else {
 

@@ -363,7 +363,7 @@ namespace Game3 {
 		v8::Local<v8::FunctionTemplate> templ = v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &info) {
 			auto &engine = getExternal<ScriptEngine>(info);
 			v8::Local<v8::Object> this_obj = info.This();
-			auto *wrapper = ObjectWrap<Buffer>::make();
+			auto *wrapper = ObjectWrap<Buffer>::make(Side::Client);
 			wrapper->wrap(engine.getIsolate(), "Buffer", this_obj);
 			wrapper->object->context = engine.game;
 		}, wrap(this));
@@ -644,35 +644,35 @@ namespace Game3 {
 			throw std::invalid_argument("Can't stringify invalid type");
 
 		if (type == "i8")
-			return Buffer{}.getType(int8_t{}, false);
+			return Buffer{Side::Server}.getType(int8_t{}, false);
 		if (type == "i16")
-			return Buffer{}.getType(int16_t{}, false);
+			return Buffer{Side::Server}.getType(int16_t{}, false);
 		if (type == "i32")
-			return Buffer{}.getType(int32_t{}, false);
+			return Buffer{Side::Server}.getType(int32_t{}, false);
 		if (type == "i64")
-			return Buffer{}.getType(int64_t{}, false);
+			return Buffer{Side::Server}.getType(int64_t{}, false);
 		if (type == "u8")
-			return Buffer{}.getType(uint8_t{}, false);
+			return Buffer{Side::Server}.getType(uint8_t{}, false);
 		if (type == "u16")
-			return Buffer{}.getType(uint16_t{}, false);
+			return Buffer{Side::Server}.getType(uint16_t{}, false);
 		if (type == "u32")
-			return Buffer{}.getType(uint32_t{}, false);
+			return Buffer{Side::Server}.getType(uint32_t{}, false);
 		if (type == "u64")
-			return Buffer{}.getType(uint64_t{}, false);
+			return Buffer{Side::Server}.getType(uint64_t{}, false);
 		if (type == "f32")
-			return Buffer{}.getType(float{}, false);
+			return Buffer{Side::Server}.getType(float{}, false);
 		if (type == "f64")
-			return Buffer{}.getType(double{}, false);
+			return Buffer{Side::Server}.getType(double{}, false);
 
 		if (type == "string")
-			return is_subtype? "\x1f" : Buffer{}.getType(string(value), false);
+			return is_subtype? "\x1f" : Buffer{Side::Server}.getType(string(value), false);
 
 		if (type == "list")
 			return '\x20' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
 
 		if (type == "optional") {
 			if (!is_subtype && value->IsNullOrUndefined())
-				return Buffer{}.getType(std::nullopt, false);
+				return Buffer{Side::Server}.getType(std::nullopt, false);
 			return '\x0b' + getBufferType(describeType(primary), value, true); // TODO!: check whether using `value` is valid here
 		}
 

@@ -46,7 +46,7 @@ namespace Game3 {
 		} else if (name == "GetAgentGID") {
 
 			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
-				return Buffer{agent->getGID()};
+				return Buffer{Side::Client, agent->getGID()};
 
 		} else if (name == "UpdateFluids") {
 

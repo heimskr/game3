@@ -116,7 +116,7 @@ namespace Game3 {
 	}
 
 	void LocalClient::send(const Packet &packet) {
-		Buffer send_buffer;
+		Buffer send_buffer{Side::Server};
 		auto game = getGame();
 		send_buffer.context = game;
 		packet.encode(*game, send_buffer);

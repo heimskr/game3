@@ -54,7 +54,7 @@ namespace Game3 {
 		} else if (name == "GetAgentGID") {
 
 			if (auto agent = std::dynamic_pointer_cast<Agent>(energyHaver))
-				return Buffer{agent->getGID()};
+				return Buffer{Side::Client, agent->getGID()};
 
 		} else if (name == "UpdateEnergy") {
 

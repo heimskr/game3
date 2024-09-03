@@ -141,7 +141,7 @@ namespace Game3 {
 	void TileEntity::onRemove() {
 		GamePtr game = getRealm()->getGame();
 		if (game->getSide() == Side::Client)
-			game->toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved");
+			game->toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved", Side::Client);
 	}
 
 	void TileEntity::setRealm(const RealmPtr &realm) {
@@ -215,11 +215,11 @@ namespace Game3 {
 
 	void TileEntity::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
 		if (name == "GetName") {
-			data = Buffer{getName()};
+			data = Buffer{Side::Client, getName()};
 		} else if (name == "GetGID") {
-			data = Buffer{getGID()};
+			data = Buffer{Side::Client, getGID()};
 		} else if (name == "Encode") {
-			Buffer buffer;
+			Buffer buffer{Side::Client};
 			encode(*getGame(), buffer);
 			data = std::move(buffer);
 		}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Log.h"
+#include "types/Types.h"
 #include "util/Concepts.h"
 #include "util/Demangle.h"
 
@@ -22,6 +23,7 @@
 #include <vector>
 
 #include <nlohmann/json_fwd.hpp>
+
 
 namespace Game3 {
 	class Buffer;
@@ -189,9 +191,11 @@ namespace Game3 {
 			static bool typesMatch(std::string_view, std::string_view);
 
 		public:
+			Side target;
 			std::weak_ptr<BufferContext> context;
 
-			Buffer() = default;
+			Buffer() = delete;
+			Buffer(Side target);
 
 			Buffer(const Buffer &) = default;
 			Buffer(Buffer &&) noexcept;
@@ -206,7 +210,7 @@ namespace Game3 {
 				bytes(std::move(bytes_)) {}
 
 			template <typename... Args>
-			explicit Buffer(Args &&...args) {
+			explicit Buffer(Side target, Args &&...args): target(target) {
 				(void) std::initializer_list<int> {
 					((void) (*this << std::forward<Args>(args)), 0)...
 				};

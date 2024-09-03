@@ -31,18 +31,18 @@ namespace Game3 {
 		GlobalID gid = entity? entity->getGID() : GlobalID(0);
 
 		if (newly_down) {
-			DataNetwork::broadcast(getSelf(), "Pulse");
-			DataNetwork::broadcast(getSelf(), "PressurePlatePulse", gid);
+			DataNetwork::broadcast(getSelf(), "Pulse", Side::Client);
+			DataNetwork::broadcast(getSelf(), "PressurePlatePulse", Side::Client, gid);
 		}
 
-		DataNetwork::broadcast(getSelf(), "PressurePlateOverlap", gid);
+		DataNetwork::broadcast(getSelf(), "PressurePlateOverlap", Side::Client, gid);
 	}
 
 	void PressurePlate::onOverlapEnd(const EntityPtr &entity) {
 		if (getSide() == Side::Client) {
 			setDown(isDown());
 		} else {
-			DataNetwork::broadcast(getSelf(), "PressurePlateOverlapEnd", entity? entity->getGID() : GlobalID(0), isDown());
+			DataNetwork::broadcast(getSelf(), "PressurePlateOverlapEnd", Side::Client, entity? entity->getGID() : GlobalID(0), isDown());
 		}
 	}
 

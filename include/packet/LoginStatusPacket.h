@@ -28,6 +28,6 @@ namespace Game3 {
 			void handle(const std::shared_ptr<ClientGame> &) override;
 
 		private:
-			Buffer playerDataBuffer;
+			Buffer playerDataBuffer{Side::Client};
 	};
 }

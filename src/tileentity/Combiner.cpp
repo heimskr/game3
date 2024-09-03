@@ -68,7 +68,7 @@ namespace Game3 {
 
 		} else if (name == "GetInventory") {
 
-			Buffer buffer;
+			Buffer buffer{getSide()};
 			HasInventory::encode(buffer, 0);
 			data = std::any(std::move(buffer));
 

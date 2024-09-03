@@ -26,7 +26,7 @@ namespace Game3 {
 			void handle(const std::shared_ptr<ClientGame> &) override;
 
 		private:
-			Buffer storedBuffer;
+			Buffer storedBuffer{Side::Client};
 			bool wasFound = false;
 	};
 }

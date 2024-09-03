@@ -55,7 +55,7 @@ namespace Game3 {
 			enum class State {Begin, Data};
 			std::array<char, 16'384> array{};
 			State state = State::Begin;
-			Buffer buffer;
+			Buffer buffer{Side::Client};
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
 			std::shared_ptr<Sock> sock;

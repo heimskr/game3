@@ -85,7 +85,7 @@ namespace Game3 {
 
 		} else if (name == "GetAgentGID") {
 
-			return Buffer{reactor->getGID()};
+			return Buffer{Side::Client, reactor->getGID()};
 
 		} else {
 

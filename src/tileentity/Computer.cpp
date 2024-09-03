@@ -348,7 +348,7 @@ namespace Game3 {
 			}
 
 			v8::Local<v8::Context> script_context = engine.getContext();
-			Buffer buffer;
+			Buffer buffer{Side::Client};
 
 			if (info.Length() == 2) {
 				if (info[1]->IsString()) {

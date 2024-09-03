@@ -73,7 +73,7 @@ namespace Game3 {
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
 			std::weak_ptr<ServerPlayer> weakPlayer;
-			Buffer receiveBuffer;
+			Buffer receiveBuffer{Side::Client};
 
 			void mock();
 	};

@@ -30,7 +30,7 @@ namespace Game3 {
 	}
 
 	void ChunkTilesPacket::encode(Game &, Buffer &buffer) const {
-		Buffer secondary;
+		Buffer secondary{buffer.target};
 		secondary << realmID << chunkPosition << updateCounter << tiles << fluids;
 		auto compressed = LZ4::compress(secondary.getSpan());
 #ifdef DEBUG_COMPRESSION
@@ -40,7 +40,7 @@ namespace Game3 {
 	}
 
 	void ChunkTilesPacket::decode(Game &, Buffer &buffer) {
-		Buffer secondary;
+		Buffer secondary{buffer.target};
 		buffer >> secondary.bytes;
 		secondary.bytes = LZ4::decompress(secondary.getSpan());
 		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;

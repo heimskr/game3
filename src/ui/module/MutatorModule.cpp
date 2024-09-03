@@ -68,7 +68,7 @@ namespace Game3 {
 
 	void MutatorModule::mutate() {
 		assert(mutator);
-		std::any buffer = std::make_any<Buffer>();
+		std::any buffer = std::make_any<Buffer>(Side::Client);
 		game->getPlayer()->sendMessage(mutator, "Mutate", buffer);
 	}
 
@@ -82,7 +82,7 @@ namespace Game3 {
 
 		} else if (name == "GetAgentGID") {
 
-			return Buffer{mutator->getGID()};
+			return Buffer{Side::Client, mutator->getGID()};
 
 		} else if (std::optional<Buffer> buffer = inventoryModule->handleMessage(source, name, data)) {
 

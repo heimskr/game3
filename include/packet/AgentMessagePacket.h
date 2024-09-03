@@ -9,7 +9,7 @@ namespace Game3 {
 
 		GlobalID globalID = -1;
 		std::string messageName;
-		Buffer messageData;
+		Buffer messageData{Side::Client};
 
 		AgentMessagePacket() = default;
 		AgentMessagePacket(GlobalID global_id, std::string message_name, Buffer message_data):

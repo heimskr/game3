@@ -124,7 +124,7 @@ namespace Game3 {
 
 		} else if (name == "GetAgentGID") {
 
-			return Buffer{autocrafter->getGID()};
+			return Buffer{Side::Client, autocrafter->getGID()};
 
 		} else if (name == "UpdateEnergy") {
 

@@ -116,7 +116,7 @@ namespace Game3 {
 		} else if (name == "GetAgentGID") {
 
 			if (auto owner = inventory->weakOwner.lock())
-				return Buffer{owner->getGID()};
+				return Buffer{Side::Client, owner->getGID()};
 			return std::nullopt;
 
 		}

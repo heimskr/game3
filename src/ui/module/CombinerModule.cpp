@@ -119,7 +119,7 @@ namespace Game3 {
 
 		} else if (name == "GetAgentGID") {
 
-			return Buffer{combiner->getGID()};
+			return Buffer{Side::Client, combiner->getGID()};
 
 		} else if (name == "UpdateEnergy") {
 

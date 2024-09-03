@@ -659,7 +659,7 @@ namespace Game3 {
 			statement.bind(4, tile_entity->position.column);
 			statement.bind(5, tile_entity->tileID.str());
 			statement.bind(6, tile_entity->tileEntityID.str());
-			Buffer buffer;
+			Buffer buffer{Side::Server};
 			tile_entity->encode(*tile_entity->getGame(), buffer);
 			statement.bind(7, buffer.bytes.data(), buffer.bytes.size());
 			statement.exec();
@@ -715,7 +715,7 @@ namespace Game3 {
 			statement.bind(4, entity->position.column);
 			statement.bind(5, entity->type.str());
 			statement.bind(6, int(entity->direction.load()));
-			Buffer buffer;
+			Buffer buffer{Side::Server};
 			entity->encode(buffer);
 			statement.bind(7, buffer.bytes.data(), buffer.bytes.size());
 			statement.exec();

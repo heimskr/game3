@@ -47,7 +47,7 @@ namespace Game3 {
 
 			template <typename... Args>
 			void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, Args &&...args) {
-				std::any data{Buffer{std::forward<Args>(args)...}};
+				std::any data{Buffer{Side::Server, std::forward<Args>(args)...}};
 				sendMessage(destination, name, data);
 			}
 

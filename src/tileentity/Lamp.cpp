@@ -42,7 +42,7 @@ namespace Game3 {
 	void Lamp::handleMessage(const AgentPtr &source, const std::string &name, std::any &data) {
 		if (getSide() == Side::Server) {
 			if (name == "TurnOn") {
-				data = Buffer{on};
+				data = Buffer{Side::Client, on};
 				if (!on) {
 					setOn(true);
 					queueBroadcast(true);
@@ -51,7 +51,7 @@ namespace Game3 {
 			}
 
 			if (name == "TurnOff") {
-				data = Buffer{on};
+				data = Buffer{Side::Client, on};
 				if (on) {
 					setOn(false);
 					queueBroadcast(true);
@@ -60,7 +60,7 @@ namespace Game3 {
 			}
 
 			if (name == "Toggle") {
-				data = Buffer{on};
+				data = Buffer{Side::Client, on};
 				setOn(!on);
 				queueBroadcast(true);
 				return;
