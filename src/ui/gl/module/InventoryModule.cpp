@@ -20,7 +20,7 @@ namespace Game3 {
 		InventoryModule(std::move(game), getInventory(argument)) {}
 
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &inventory):
-		Module(SLOT_SCALE), inventoryGetter(inventory->getGetter()) {}
+		Module(SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
 
 	void InventoryModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);

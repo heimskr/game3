@@ -458,6 +458,9 @@ namespace Game3 {
 
 		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([this, has_fluids] mutable {
+				if (!omniDialog)
+					return;
+
 				std::unique_lock<DefaultMutex> lock;
 
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
@@ -472,6 +475,9 @@ namespace Game3 {
 
 		game->signalEnergyUpdate().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([this, has_energy] mutable {
+				if (!omniDialog)
+					return;
+
 				std::unique_lock<DefaultMutex> lock;
 
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
@@ -486,9 +492,10 @@ namespace Game3 {
 
 		game->signalVillageUpdate().connect([this](const VillagePtr &village) {
 			queue([this, village] mutable {
-				std::unique_lock<DefaultMutex> lock;
+				if (!omniDialog)
+					return;
 
-				getOmniDialog();
+				std::unique_lock<DefaultMutex> lock;
 
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 					std::any data(std::move(village));

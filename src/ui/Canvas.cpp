@@ -147,7 +147,7 @@ namespace Game3 {
 
 			binder.undo();
 
-			context.updateSize(getWidth(), getHeight());
+			context.updateSize(width, height);
 			glViewport(0, 0, width, height); CHECKGL
 			multiplier(mainTexture, scratchTexture);
 		} else {
