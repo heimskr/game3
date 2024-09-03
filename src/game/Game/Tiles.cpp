@@ -36,7 +36,7 @@ namespace Game3 {
 		for (Identifier id: {"base:tile/gate_horizontal", "base:tile/gate_horizontal_n", "base:tile/gate_horizontal_s", "base:tile/gate_vertical", "base:tile/gate_vertical_e", "base:tile/gate_vertical_w"})
 			reg.add<FenceGateTile>(std::move(id));
 
-		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal"),        "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal", 8),     "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack::create(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_diamond",  std::make_shared<CaveTile>("base:tile/cave_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_gold",     std::make_shared<CaveTile>("base:tile/cave_gold",     ItemStack::create(self, "base:item/gold_ore"),    "base:tile/cave_dirt"));
