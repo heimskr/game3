@@ -6,7 +6,7 @@
 #include "tileentity/InventoriedTileEntity.h"
 #include "types/Types.h"
 #include "ui/module/GTKModule.h"
-#include "ui/module/EnergyLevelModule.h"
+#include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "util/Cast.h"
@@ -21,7 +21,7 @@ namespace Game3 {
 	class GTKInventoryModule;
 
 	template <Substance... S>
-	class MultiModule: public GTKModule {
+	class GTKMultiModule: public GTKModule {
 		public:
 			static Identifier ID() {
 				return {"base", "module/multi_" + getSuffix()};
@@ -40,10 +40,10 @@ namespace Game3 {
 				return suffix;
 			}
 
-			MultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, GTKInventoryModule::GmenuFn gmenu_fn = {}):
-				MultiModule(std::move(game), std::any_cast<AgentPtr>(argument), item_slot_parent, std::move(gmenu_fn)) {}
+			GTKMultiModule(std::shared_ptr<ClientGame> game, const std::any &argument, ItemSlotParent *item_slot_parent = nullptr, GTKInventoryModule::GmenuFn gmenu_fn = {}):
+				GTKMultiModule(std::move(game), std::any_cast<AgentPtr>(argument), item_slot_parent, std::move(gmenu_fn)) {}
 
-			MultiModule(std::shared_ptr<ClientGame> game, const AgentPtr &agent, ItemSlotParent *item_slot_parent = nullptr, GTKInventoryModule::GmenuFn gmenu_fn = {}) {
+			GTKMultiModule(std::shared_ptr<ClientGame> game, const AgentPtr &agent, ItemSlotParent *item_slot_parent = nullptr, GTKInventoryModule::GmenuFn gmenu_fn = {}) {
 				header.set_margin(10);
 				header.set_xalign(0.5);
 				header.set_text(agent->getName());
@@ -71,7 +71,7 @@ namespace Game3 {
 
 						case Substance::Energy: {
 							assert(std::dynamic_pointer_cast<EnergeticTileEntity>(agent));
-							submodules[index] = std::make_shared<EnergyLevelModule>(game, agent, false);
+							submodules[index] = std::make_shared<GTKEnergyLevelModule>(game, agent, false);
 							break;
 						}
 

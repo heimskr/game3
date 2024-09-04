@@ -121,6 +121,7 @@ namespace Game3 {
 		auto lock = activeModule.uniqueLock();
 		(activeModule.getBase() = std::move(new_module))->reset();
 		moduleScroller->setChild(activeModule);
+		activeModule->init(ui);
 	}
 
 	Module * InventoryTab::getModule(std::shared_lock<DefaultMutex> &lock) {

@@ -7,7 +7,7 @@
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/CombinerModule.h"
-#include "ui/module/EnergyLevelModule.h"
+#include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
@@ -20,7 +20,7 @@ namespace Game3 {
 	game(std::move(game_)),
 	combiner(std::move(combiner_)),
 	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))),
-	energyModule(std::make_shared<EnergyLevelModule>(game, std::static_pointer_cast<Agent>(combiner), false)) {
+	energyModule(std::make_shared<GTKEnergyLevelModule>(game, std::static_pointer_cast<Agent>(combiner), false)) {
 		assert(combiner);
 		vbox.set_hexpand();
 

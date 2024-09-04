@@ -53,10 +53,16 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void Label::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
+	void Label::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
-			natural = std::max(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
+
+			if (horizontalExpand) {
+				natural = for_width;
+			} else {
+				natural = std::min(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
+			}
+
 			return;
 		}
 
@@ -65,24 +71,23 @@ namespace Game3 {
 
 		if (lastTextHeight > 0 && for_width == lastRectangle.width) {
 			minimum = natural = lastTextHeight + addend;
-			return;
-		}
-
-		if (for_width < 0) {
+		} else if (for_width < 0) {
 			minimum = 0;
 			wrapped = text;
 			natural = (lastTextHeight = renderers.text.textHeight(text, getTextScale())) + addend;
-			return;
+		} else {
+			tryWrap(renderers.text, for_width);
+
+			if (!wrapped) {
+				minimum = natural = 0;
+			} else {
+				minimum = natural = (lastTextHeight = renderers.text.textHeight(wrapped.value(), getTextScale(), for_width)) + addend;
+			}
 		}
 
-		tryWrap(renderers.text, for_width);
-
-		if (!wrapped) {
-			minimum = natural = 0;
-			return;
+		if (verticalExpand) {
+			natural = std::max(natural, for_height);
 		}
-
-		minimum = natural = (lastTextHeight = renderers.text.textHeight(wrapped.value(), getTextScale(), for_width)) + addend;
 	}
 
 	void Label::setText(UIContext &, UString new_text) {

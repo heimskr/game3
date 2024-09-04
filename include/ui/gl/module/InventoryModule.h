@@ -1,7 +1,6 @@
 #pragma once
 
 #include "game/InventoryGetter.h"
-#include "graphics/Rectangle.h"
 #include "types/Types.h"
 #include "ui/gl/module/Module.h"
 #include "ui/gl/widget/ItemSlot.h"

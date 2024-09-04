@@ -1,7 +1,7 @@
 {
 	"app-id": "gay.heimskr.Game3",
 	"runtime": "org.gnome.Platform",
-	"runtime-version": "45",
+	"runtime-version": "46",
 	"sdk": "org.gnome.Sdk",
 	"command": "game3",
 	"finish-args": [

@@ -15,7 +15,6 @@ namespace {
 }
 
 namespace Game3 {
-
 	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game, const std::any &argument):
 		InventoryModule(std::move(game), getInventory(argument)) {}
 

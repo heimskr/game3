@@ -7,18 +7,19 @@
 #include "game/ServerGame.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
+#include "ui/gl/module/MultiModule.h"
 #include "ui/gl/module/TextModule.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
 #include "ui/module/ComputerModule.h"
 #include "ui/module/GTKInventoryModule.h"
-#include "ui/module/EnergyLevelModule.h"
+#include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
 #include "ui/module/MicroscopeModule.h"
 #include "ui/module/GTKModuleFactory.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/GTKMultiModule.h"
 #include "ui/module/MutatorModule.h"
 #include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
@@ -50,7 +51,7 @@ namespace Game3 {
 		add(GTKModuleFactory::create<GTKInventoryModule>());
 		add(GTKModuleFactory::create<FluidLevelsModule>());
 		add(GTKModuleFactory::create<ChemicalReactorModule>());
-		add(GTKModuleFactory::create<EnergyLevelModule>());
+		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
 		add(GTKModuleFactory::create<ItemFilterModule>());
 		add(GTKModuleFactory::create<CombinerModule>());
 		add(GTKModuleFactory::create<AutocrafterModule>());
@@ -60,11 +61,14 @@ namespace Game3 {
 		add(GTKModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
 		add(GTKModuleFactory::create<MicroscopeModule<2, Substance::Energy>>());
 		add(GTKModuleFactory::create<MutatorModule>());
-		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
-		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
-		add(GTKModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
+		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
+		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Fluid>>());
+		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<InventoryModule>());
 		add(ModuleFactory::create<TextModule>());
+		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
+		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
+		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 #ifdef GAME3_ENABLE_SCRIPTING
 		add(GTKModuleFactory::create<ComputerModule>());
 #endif

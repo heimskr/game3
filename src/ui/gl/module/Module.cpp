@@ -8,6 +8,8 @@ namespace Game3 {
 	Module::Module():
 		Module(UI_SCALE) {}
 
+	void Module::init(UIContext &) {}
+
 	void Module::reset() {}
 
 	void Module::update() {}

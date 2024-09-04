@@ -128,7 +128,7 @@ namespace Game3 {
 		if (parent->lastChild == sibling)
 			parent->lastChild = self;
 
-		++childCount;
+		++parent->childCount;
 	}
 
 	void Widget::insertBefore(WidgetPtr parent, WidgetPtr sibling) {
@@ -152,7 +152,7 @@ namespace Game3 {
 		if (parent->firstChild == sibling)
 			parent->firstChild = self;
 
-		++childCount;
+		++parent->childCount;
 	}
 
 	void Widget::insertAtStart(WidgetPtr parent) {
@@ -174,7 +174,7 @@ namespace Game3 {
 		if (!parent->lastChild)
 			parent->lastChild = self;
 
-		++childCount;
+		++parent->childCount;
 	}
 
 	void Widget::insertAtEnd(WidgetPtr parent) {
@@ -196,7 +196,7 @@ namespace Game3 {
 		if (!parent->firstChild)
 			parent->firstChild = self;
 
-		++childCount;
+		++parent->childCount;
 	}
 
 	void Widget::remove(WidgetPtr child) {

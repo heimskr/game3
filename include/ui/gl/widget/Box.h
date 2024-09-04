@@ -16,11 +16,16 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
+			void setPadding(float);
+			void setSeparatorThickness(float);
+			void setSeparatorColor(Color);
+
 		private:
 			Orientation orientation{};
 			float padding;
 			float separatorThickness;
 			Color separatorColor;
 			std::pair<float, float> lastRenderedSize{-1, -1};
+			std::vector<std::pair<float, float>> childMeasurements;
 	};
 }

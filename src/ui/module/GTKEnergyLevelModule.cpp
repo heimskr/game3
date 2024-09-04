@@ -3,15 +3,15 @@
 #include "game/HasEnergy.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/EnergyLevelModule.h"
+#include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	EnergyLevelModule::EnergyLevelModule(std::shared_ptr<ClientGame> game_, const std::any &argument, bool show_header):
-		EnergyLevelModule(std::move(game_), std::any_cast<AgentPtr>(argument), show_header) {}
+	GTKEnergyLevelModule::GTKEnergyLevelModule(std::shared_ptr<ClientGame> game_, const std::any &argument, bool show_header):
+		GTKEnergyLevelModule(std::move(game_), std::any_cast<AgentPtr>(argument), show_header) {}
 
-	EnergyLevelModule::EnergyLevelModule(std::shared_ptr<ClientGame> game_, const AgentPtr &agent, bool show_header):
+	GTKEnergyLevelModule::GTKEnergyLevelModule(std::shared_ptr<ClientGame> game_, const AgentPtr &agent, bool show_header):
 	game(std::move(game_)),
 	energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)) {
 		vbox.set_hexpand();
@@ -28,19 +28,19 @@ namespace Game3 {
 		vbox.append(hbox);
 	}
 
-	Gtk::Widget & EnergyLevelModule::getWidget() {
+	Gtk::Widget & GTKEnergyLevelModule::getWidget() {
 		return vbox;
 	}
 
-	void EnergyLevelModule::reset() {
+	void GTKEnergyLevelModule::reset() {
 		populate();
 	}
 
-	void EnergyLevelModule::update() {
+	void GTKEnergyLevelModule::update() {
 		reset();
 	}
 
-	std::optional<Buffer> EnergyLevelModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+	std::optional<Buffer> GTKEnergyLevelModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "TileEntityRemoved") {
 
 			if (!source)
@@ -67,12 +67,12 @@ namespace Game3 {
 		return {};
 	}
 
-	void EnergyLevelModule::updateIf(const std::shared_ptr<HasEnergy> &has_energy) {
+	void GTKEnergyLevelModule::updateIf(const std::shared_ptr<HasEnergy> &has_energy) {
 		if (has_energy == energyHaver)
 			update();
 	}
 
-	void EnergyLevelModule::populate() {
+	void GTKEnergyLevelModule::populate() {
 		if (!energyHaver)
 			return;
 

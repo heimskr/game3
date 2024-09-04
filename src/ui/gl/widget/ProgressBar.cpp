@@ -9,6 +9,7 @@
 namespace {
 	using namespace Game3;
 
+	constexpr Color DEFAULT_INTERIOR_COLOR{"#ff0000"};
 	constexpr Color DEFAULT_EXTERIOR_COLOR{0.6, 0.3, 0.0, 1.0};
 	constexpr Color DEFAULT_BACKGROUND_COLOR{0.25, 0.0, 0.0, 1.0};
 	constexpr std::chrono::milliseconds PROGRESS_UPDATE_TIME{100};
@@ -27,13 +28,14 @@ namespace Game3 {
 	ProgressBar::ProgressBar(float scale, Color interior_color, float progress):
 		ProgressBar(scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
-	void ProgressBar::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		if (fixedHeight > 0)
-			height = fixedHeight;
+	ProgressBar::ProgressBar(float scale, float progress):
+		ProgressBar(scale, DEFAULT_INTERIOR_COLOR, progress) {}
 
-		RectangleRenderer &rectangler = renderers.rectangle;
+	void ProgressBar::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		fixSizes(width, height);
 		Widget::render(ui, renderers, x, y, width, height);
 
+		RectangleRenderer &rectangler = renderers.rectangle;
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
 		if (ui.checkMouseAbsolute(lastRectangle)) {
@@ -90,20 +92,14 @@ namespace Game3 {
 	}
 
 	SizeRequestMode ProgressBar::getRequestMode() const {
-		return SizeRequestMode::ConstantSize;
+		return SizeRequestMode::WidthForHeight;
 	}
 
-	void ProgressBar::measure(const RendererContext &, Orientation measure_orientation, float, float, float &minimum, float &natural) {
+	void ProgressBar::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
-			if (0 < fixedWidth)
-				minimum = natural = fixedWidth;
-			else
-				minimum = natural = getDefaultWidth();
+			minimum = natural = 0 < fixedWidth? fixedWidth : (horizontalExpand? for_width : getDefaultWidth());
 		} else {
-			if (0 < fixedHeight)
-				minimum = natural = fixedHeight;
-			else
-				minimum = natural = getDefaultHeight();
+			minimum = natural = 0 < fixedHeight? fixedHeight : (verticalExpand? for_height : getDefaultHeight());
 		}
 	}
 

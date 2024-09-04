@@ -83,7 +83,7 @@ namespace Game3 {
 
 					if (ore.maxUses <= ++uses) {
 						ready = false;
-						game->enqueue(getTickFunction(), std::chrono::microseconds(int64_t(1e6 * ore.cooldown)));
+						game->enqueue(getTickFunction(), std::chrono::microseconds(static_cast<int64_t>(1e6 * ore.cooldown)));
 						uses = 0;
 					}
 
@@ -109,22 +109,23 @@ namespace Game3 {
 		Tileset &tileset = realm->getTileset();
 		GamePtr game = realm->getGame();
 
-		if (tileID != tileset.getEmpty()) {
-			const Ore &ore = getOre(*game);
-			const auto tilesize = tileset.getTileSize();
-			const TileID tile_id = tileset[ready? tileID : ore.regenTilename];
-			const auto texture = tileset.getTexture(*game);
-			const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
-			const auto y = (tile_id / (texture->width / tilesize)) * tilesize;
-			sprite_renderer(texture, {
-				.x       = float(position.column),
-				.y       = float(position.row),
-				.offsetX = float(x / 2.f),
-				.offsetY = float(y / 2.f),
-				.sizeX   = float(tilesize),
-				.sizeY   = float(tilesize),
-			});
-		}
+		if (tileID == tileset.getEmpty())
+			return;
+
+		const Ore &ore = getOre(*game);
+		const auto tilesize = tileset.getTileSize();
+		const TileID tile_id = tileset[ready? tileID : ore.regenTilename];
+		const auto texture = tileset.getTexture(*game);
+		const auto x = (tile_id % (texture->width / tilesize)) * tilesize;
+		const auto y = (tile_id / (texture->width / tilesize)) * tilesize;
+		sprite_renderer(texture, {
+			.x       = float(position.column),
+			.y       = float(position.row),
+			.offsetX = float(x / 2.f),
+			.offsetY = float(y / 2.f),
+			.sizeX   = float(tilesize),
+			.sizeY   = float(tilesize),
+		});
 	}
 
 	const Ore & OreDeposit::getOre(const Game &game) const {

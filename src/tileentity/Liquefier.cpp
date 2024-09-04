@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 #include "recipe/LiquefierRecipe.h"
 #include "tileentity/Liquefier.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/GTKMultiModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -82,7 +82,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(GTKMultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
 		EnergeticTileEntity::addObserver(player, true);
 		FluidHoldingTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);

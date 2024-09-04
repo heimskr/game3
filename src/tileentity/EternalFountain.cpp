@@ -6,7 +6,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/EternalFountain.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/GTKMultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -95,7 +95,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Fluid>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(GTKMultiModule<Substance::Item, Substance::Fluid>::ID(), getGID()));
 		FluidHoldingTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
 

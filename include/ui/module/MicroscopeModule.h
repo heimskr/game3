@@ -3,7 +3,7 @@
 #include "types/Types.h"
 #include "ui/module/GeneticAnalysisModule.h"
 #include "ui/module/GTKModule.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/GTKMultiModule.h"
 #include "ui/MainWindow.h"
 
 #include <any>
@@ -17,7 +17,7 @@ namespace Game3 {
 	template <Slot S, Substance... ExtraSubstances>
 	class MicroscopeModule: public GTKModule {
 		private:
-			using Submodule = MultiModule<Substance::Item, ExtraSubstances...>;
+			using Submodule = GTKMultiModule<Substance::Item, ExtraSubstances...>;
 
 		public:
 			static Identifier ID() { return {"base", std::format("module/microscope_{}{}", S, Submodule::getSuffix())}; }

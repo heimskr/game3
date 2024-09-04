@@ -1,24 +1,29 @@
 #include "ui/gl/HasAlignment.h"
 
 namespace Game3 {
-	HasAlignment::HasAlignment(Alignment vertical, Alignment horizontal):
-		verticalAlignment(vertical), horizontalAlignment(horizontal) {}
+	HasAlignment::HasAlignment(Alignment horizontal, Alignment vertical):
+		horizontalAlignment(horizontal), verticalAlignment(vertical) {}
 
 	HasAlignment::HasAlignment() = default;
+
+	Alignment HasAlignment::getHorizontalAlignment() const {
+		return horizontalAlignment;
+	}
 
 	Alignment HasAlignment::getVerticalAlignment() const {
 		return verticalAlignment;
 	}
 
-	Alignment HasAlignment::getHorizontalAlignment() const {
-		return horizontalAlignment;
+	void HasAlignment::setHorizontalAlignment(Alignment alignment) {
+		horizontalAlignment = alignment;
 	}
 
 	void HasAlignment::setVerticalAlignment(Alignment alignment) {
 		verticalAlignment = alignment;
 	}
 
-	void HasAlignment::setHorizontalAlignment(Alignment alignment) {
-		horizontalAlignment = alignment;
+	void HasAlignment::setAlignment(Alignment horizontal, Alignment vertical) {
+		setHorizontalAlignment(horizontal);
+		setVerticalAlignment(vertical);
 	}
 }

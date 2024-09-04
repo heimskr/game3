@@ -3,6 +3,7 @@
 #include "graphics/Color.h"
 #include "types/Types.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/HasExpand.h"
 #include "ui/gl/HasFixedSize.h"
 
 #include <chrono>
@@ -11,10 +12,11 @@
 namespace Game3 {
 	// TODO: vertical progress bars
 
-	class ProgressBar: public Widget, public HasFixedSize {
+	class ProgressBar: public Widget, public HasFixedSize, public HasExpand {
 		public:
 			ProgressBar(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
 			ProgressBar(float scale, Color interior_color, float progress = 0);
+			ProgressBar(float scale, float progress = 0);
 
 			using Widget::render;
 			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;

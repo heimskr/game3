@@ -18,8 +18,11 @@ namespace Game3 {
 			virtual ~Module() = default;
 
 			virtual Identifier getID() const = 0;
+			virtual void init(UIContext &);
 			virtual void reset();
 			virtual void update();
 			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &);
 	};
+
+	using ModulePtr = std::shared_ptr<Module>;
 }
