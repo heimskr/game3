@@ -34,7 +34,7 @@ namespace Game3 {
 			return tiles[row][column];
 		});
 
-		auto visit = [](const Box &) {
+		auto visit = [](const QuadtreeBox &) {
 			// std::cout << box << '\n';
 			return false;
 		};

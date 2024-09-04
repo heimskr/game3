@@ -10,7 +10,7 @@
 #include "types/Types.h"
 
 namespace Game3 {
-	struct Box {
+	struct QuadtreeBox {
 		public:
 			Index left {};
 			Index top {};
@@ -18,7 +18,7 @@ namespace Game3 {
 			Index height {};
 
 			/** {TL, TR, BL, BR} */
-			std::array<std::unique_ptr<Box>, 4> children {};
+			std::array<std::unique_ptr<QuadtreeBox>, 4> children {};
 			inline bool isLeaf() const { return width <= 1 && height <= 1; }
 			inline bool inBounds(Index row, Index column) const { return top <= row && row < top + height && left <= column && column < left + height; }
 			inline bool full() const { return isLeaf() || (full(0) && full(1) && full(2) && full(3)); }
@@ -30,29 +30,29 @@ namespace Game3 {
 			bool remove(Index row, Index column);
 			void reset();
 
-			inline std::optional<Box> topLeft()     const { if (isLeaf()) return std::nullopt; return Box{left,             top,              half(width), half(height)}; }
-			inline std::optional<Box> topRight()    const { if (isLeaf()) return std::nullopt; return Box{left + width / 2, top,              width / 2,   half(height)}; }
-			inline std::optional<Box> bottomLeft()  const { if (isLeaf()) return std::nullopt; return Box{left,             top + height / 2, half(width), height / 2  }; }
-			inline std::optional<Box> bottomRight() const { if (isLeaf()) return std::nullopt; return Box{left + width / 2, top + height / 2, width / 2,   height / 2  }; }
+			inline std::optional<QuadtreeBox> topLeft()     const { if (isLeaf()) return std::nullopt; return QuadtreeBox{left,             top,              half(width), half(height)}; }
+			inline std::optional<QuadtreeBox> topRight()    const { if (isLeaf()) return std::nullopt; return QuadtreeBox{left + width / 2, top,              width / 2,   half(height)}; }
+			inline std::optional<QuadtreeBox> bottomLeft()  const { if (isLeaf()) return std::nullopt; return QuadtreeBox{left,             top + height / 2, half(width), height / 2  }; }
+			inline std::optional<QuadtreeBox> bottomRight() const { if (isLeaf()) return std::nullopt; return QuadtreeBox{left + width / 2, top + height / 2, width / 2,   height / 2  }; }
 
 			operator std::string() const;
 
 		private:
 			static inline Index half(Index value) { return 1 < value? value / 2 : 1; }
 			inline bool full(size_t index) const { return children[index] && children[index]->full(); }
-			bool remove(std::unique_ptr<Box> &, Index row, Index column);
+			bool remove(std::unique_ptr<QuadtreeBox> &, Index row, Index column);
 
 		friend class Quadtree;
 	};
 
 	class Quadtree {
 		private:
-			Box root;
+			QuadtreeBox root;
 			std::function<bool(Index, Index)> predicate;
 
 		public:
 			/** If this returns true, iteration will end. */
-			using Visitor = std::function<bool(const Box &)>;
+			using Visitor = std::function<bool(const QuadtreeBox &)>;
 
 			Quadtree() = delete;
 			Quadtree(Index width, Index height);
@@ -62,7 +62,7 @@ namespace Game3 {
 			inline bool remove(Index row, Index column) { return root.remove(row, column); }
 			inline void reset() { root.reset(); }
 
-			inline const Box & getRoot() const { return root; }
+			inline const QuadtreeBox & getRoot() const { return root; }
 			bool contains(Index row, Index column) const;
 			/** Iterates over each full box and returns true if iteration was canceled. */
 			bool iterateFull(const Visitor &) const;
