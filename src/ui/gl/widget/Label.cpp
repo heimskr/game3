@@ -57,10 +57,12 @@ namespace Game3 {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
 
-			if (horizontalExpand) {
+			if (horizontalExpand && 0 < for_width) {
 				natural = for_width;
-			} else {
+			} else if (0 < for_width) {
 				natural = std::min(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
+			} else {
+				natural = renderers.text.textWidth(text, getTextScale()) + scale;
 			}
 
 			return;
