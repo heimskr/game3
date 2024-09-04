@@ -2,6 +2,7 @@
 
 #include "graphics/Rectangle.h"
 #include "types/Types.h"
+#include "ui/gl/HasExpand.h"
 #include "ui/gl/Types.h"
 #include "ui/Modifiers.h"
 
@@ -17,7 +18,7 @@ namespace Game3 {
 	using WidgetPtr = std::shared_ptr<Widget>;
 	using WeakWidgetPtr = std::weak_ptr<Widget>;
 
-	class Widget: public std::enable_shared_from_this<Widget> {
+	class Widget: public std::enable_shared_from_this<Widget>, public HasExpand {
 		public:
 			Widget(float scale);
 

@@ -12,7 +12,7 @@
 namespace Game3 {
 	// TODO: vertical progress bars
 
-	class ProgressBar: public Widget, public HasFixedSize, public HasExpand {
+	class ProgressBar: public Widget, public HasFixedSize {
 		public:
 			ProgressBar(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
 			ProgressBar(float scale, Color interior_color, float progress = 0);

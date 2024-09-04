@@ -71,28 +71,47 @@ namespace Game3 {
 			return;
 		}
 
+		const float for_size = orientation == Orientation::Horizontal? for_width : for_height;
 		float accumulated_minimum = 0;
 		float accumulated_natural = 0;
+		float accumulated_nonexpanding_natural = 0;
 
 		std::size_t outer_size{}, inner_size{};
 		std::size_t outer{}, inner{};
 		std::size_t *row{}, *column{};
+		std::optional<std::vector<float>> *sizes{};
 
 		if (orientation == Orientation::Horizontal) {
 			outer_size = widgetContainer.columns();
 			inner_size = widgetContainer.rows();
 			column = &outer;
 			row = &inner;
+			sizes = &columnWidths;
 		} else {
 			outer_size = widgetContainer.rows();
 			inner_size = widgetContainer.columns();
 			row = &outer;
 			column = &inner;
+			sizes = &rowHeights;
 		}
+
+		if (!*sizes)
+			sizes->emplace();
+
+		(*sizes)->resize(outer_size);
+
+		std::size_t expand_count = 0;
+
+		auto get_size_container = [&] -> float & {
+			if (orientation == Orientation::Horizontal)
+				return sizeContainer[*row, *column].first;
+			return sizeContainer[*row, *column].second;
+		};
 
 		for (outer = 0; outer < outer_size; ++outer) {
 			float max_minimum = 0;
 			float max_natural = 0;
+			bool expands = false;
 
 			for (inner = 0; inner < inner_size; ++inner) {
 				float child_minimum{};
@@ -102,18 +121,34 @@ namespace Game3 {
 					child->measure(renderers, orientation, -1, -1, child_minimum, child_natural);
 					max_minimum = std::max(max_minimum, child_minimum);
 					max_natural = std::max(max_natural, child_natural);
+					expands = expands || child->getExpand(orientation);
 				}
 			}
 
-			for (inner = 0; inner < inner_size; ++inner) {
-				if (orientation == Orientation::Horizontal)
-					sizeContainer[*row, *column].first = max_natural;
-				else
-					sizeContainer[*row, *column].second = max_natural;
+			if (expands) {
+				(*sizes)->at(outer) = -1;
+				++expand_count;
+			} else {
+				(*sizes)->at(outer) = max_natural;
+				accumulated_nonexpanding_natural += max_natural;
 			}
+
+			for (inner = 0; inner < inner_size; ++inner)
+				get_size_container() = max_natural;
 
 			accumulated_minimum += max_minimum;
 			accumulated_natural += max_natural;
+		}
+
+		if (expand_count > 0) {
+			for (outer = 0; outer < outer_size; ++outer) {
+				float &size = (*sizes)->at(outer);
+				if (size == -1) {
+					size = (for_size - accumulated_nonexpanding_natural) / expand_count;
+					for (inner = 0; inner < inner_size; ++inner)
+						get_size_container() = size;
+				}
+			}
 		}
 
 		const float spacing = (orientation == Orientation::Horizontal? columnSpacing : rowSpacing) * (inner_size - 1);

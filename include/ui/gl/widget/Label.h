@@ -7,7 +7,7 @@
 #include "ui/gl/HasFixedSize.h"
 
 namespace Game3 {
-	class Label: public Widget, public HasAlignment, public HasExpand, public HasFixedSize {
+	class Label: public Widget, public HasAlignment, public HasFixedSize {
 		public:
 			Label(float scale);
 

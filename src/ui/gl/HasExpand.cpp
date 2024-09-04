@@ -14,6 +14,10 @@ namespace Game3 {
 		return verticalExpand;
 	}
 
+	bool HasExpand::getExpand(Orientation orientation) const {
+		return orientation == Orientation::Horizontal? getHorizontalExpand() : getVerticalExpand();
+	}
+
 	void HasExpand::setHorizontalExpand(bool expand) {
 		horizontalExpand = expand;
 	}

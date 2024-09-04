@@ -35,8 +35,6 @@ namespace Game3 {
 		float &size = vertical? height : width;
 		float &last_size = vertical? lastRenderedSize.second : lastRenderedSize.first;
 
-		size_t i = 0;
-
 		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 			if (child != firstChild && separatorThickness > 0) {
 				coordinate += padding * scale;
@@ -58,8 +56,6 @@ namespace Game3 {
 			coordinate += child_natural;
 			last_size += child_natural;
 			size -= child_natural;
-
-			++i;
 		}
 	}
 
