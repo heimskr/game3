@@ -11,7 +11,7 @@ namespace Game3 {
 			return;
 
 		hasHit = true;
-		applyKnockback(target, 1.5);
+		applyKnockback(target, 3);
 	}
 
 	void Bomb::onExpire() {
