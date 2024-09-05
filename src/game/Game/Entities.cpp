@@ -1,5 +1,6 @@
 #include "game/Game.h"
 #include "entity/Blacksmith.h"
+#include "entity/Bomb.h"
 #include "entity/Chicken.h"
 #include "entity/Crab.h"
 #include "entity/Cyclops.h"
@@ -36,6 +37,7 @@ namespace Game3 {
 		};
 
 		add(EntityFactory::create<Blacksmith>());
+		add(EntityFactory::create<Bomb>());
 		add(EntityFactory::create<Chicken>());
 		add(EntityFactory::create<Crab>());
 		add(EntityFactory::create<Cyclops>());

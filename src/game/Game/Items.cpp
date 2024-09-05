@@ -1,3 +1,4 @@
+#include "entity/Bomb.h"
 #include "entity/Egg.h"
 #include "entity/Snowball.h"
 #include "game/Game.h"
@@ -7,7 +8,6 @@
 #include "item/AutofarmerItem.h"
 #include "item/BasicFood.h"
 #include "item/BiomassLiquefierItem.h"
-#include "item/Bomb.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
 #include "item/ChemicalItem.h"
@@ -88,8 +88,6 @@ namespace Game3 {
 		add(std::make_shared<BasicFood>("base:item/bleach",      "Bleach",         16, -8));
 
 		add(std::make_shared<BiomassLiquefierItem>("base:item/biomass_liquefier", "Biomass Liquefier", 999, 64)); // TODO: cost
-
-		add(std::make_shared<Bomb>("base:item/bomb", "Bomb", 32, 64));
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
@@ -270,6 +268,8 @@ namespace Game3 {
 
 		add(std::make_shared<ProjectileItem<Egg>>("base:item/egg", "Egg", 16, 64));
 		add(std::make_shared<ProjectileItem<Snowball>>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
+		add(std::make_shared<ProjectileItem<Bomb>>("base:item/bomb", "Bomb", 32, 64));
+
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 
