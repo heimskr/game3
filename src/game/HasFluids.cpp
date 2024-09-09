@@ -82,6 +82,10 @@ namespace Game3 {
 		return fluidContainer->levels.empty();
 	}
 
+	void HasFluids::fluidsUpdated() {
+		fluidContainer->increaseUpdateCounter();
+	}
+
 	void HasFluids::encode(Buffer &buffer) {
 		assert(fluidContainer);
 		buffer << fluidContainer->levels;
@@ -90,5 +94,6 @@ namespace Game3 {
 	void HasFluids::decode(Buffer &buffer) {
 		assert(fluidContainer);
 		buffer >> fluidContainer->levels;
+		fluidsUpdated();
 	}
 }

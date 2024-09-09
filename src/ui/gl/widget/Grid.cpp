@@ -108,6 +108,7 @@ namespace Game3 {
 			return sizeContainer[*row, *column].second;
 		};
 
+
 		for (outer = 0; outer < outer_size; ++outer) {
 			float max_minimum = 0;
 			float max_natural = 0;
@@ -203,6 +204,13 @@ namespace Game3 {
 
 		if (can_erase_column)
 			widgetContainer.eraseColumn(column);
+	}
+
+	void Grid::clear() {
+		widgetContainer.clear();
+		while (auto child = firstChild)
+			Widget::remove(child);
+		markDirty();
 	}
 
 	void Grid::attach(WidgetPtr child, std::size_t row, std::size_t column) {

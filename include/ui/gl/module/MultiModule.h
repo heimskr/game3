@@ -6,6 +6,7 @@
 #include "tileentity/InventoriedTileEntity.h"
 #include "types/Types.h"
 #include "ui/gl/module/EnergyModule.h"
+#include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/Module.h"
 #include "ui/gl/widget/Box.h"
@@ -65,7 +66,8 @@ namespace Game3 {
 						}
 
 						case Substance::Fluid: {
-							WARN("Fluids not supported in MultiModule");
+							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
+							submodules.emplace_back(std::make_shared<FluidsModule>(game, agent));
 							break;
 						}
 

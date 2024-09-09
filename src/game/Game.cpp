@@ -6,6 +6,8 @@
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "ui/gl/module/InventoryModule.h"
+#include "ui/gl/module/EnergyModule.h"
+#include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/module/MultiModule.h"
 #include "ui/gl/module/TextModule.h"
@@ -66,6 +68,8 @@ namespace Game3 {
 		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<InventoryModule>());
 		add(ModuleFactory::create<TextModule>());
+		add(ModuleFactory::create<EnergyModule>());
+		add(ModuleFactory::create<FluidsModule>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());

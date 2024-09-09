@@ -8,12 +8,13 @@ namespace Game3 {
 
 // Fluid
 
-	Fluid::Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Identifier flask_name):
+	Fluid::Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Color color, Identifier flask_name):
 		NamedRegisterable(std::move(identifier_)),
 		name(std::move(name_)),
 		tilesetName(std::move(tileset_name)),
 		tilename(std::move(tilename_)),
-		flaskName(std::move(flask_name)) {}
+		flaskName(std::move(flask_name)),
+		color(color) {}
 
 // FluidTile
 

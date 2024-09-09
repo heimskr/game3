@@ -38,7 +38,7 @@ namespace Game3 {
 
 			bool fluidsEmpty();
 
-			virtual void fluidsUpdated() {}
+			virtual void fluidsUpdated();
 
 			void encode(Buffer &);
 			void decode(Buffer &);

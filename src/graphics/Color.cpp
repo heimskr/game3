@@ -3,6 +3,8 @@
 #include "net/Buffer.h"
 #include "util/Util.h"
 
+#include <nlohmann/json.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
@@ -95,5 +97,9 @@ namespace Game3 {
 		popBuffer(buffer, color.blue);
 		popBuffer(buffer, color.alpha);
 		return buffer;
+	}
+
+	void from_json(const nlohmann::json &json, Color &color) {
+		color = Color(json.get<std::string>());
 	}
 }

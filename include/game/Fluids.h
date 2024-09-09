@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Chunk.h"
+#include "graphics/Color.h"
 #include "types/Types.h"
 #include "data/Identifier.h"
 
@@ -17,9 +18,10 @@ namespace Game3 {
 		Identifier tilesetName;
 		Identifier tilename;
 		Identifier flaskName;
+		Color color;
 
 		Fluid() = delete;
-		Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Identifier flask_name = {});
+		Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Color color, Identifier flask_name = {});
 	};
 
 	using FluidInt = uint64_t;

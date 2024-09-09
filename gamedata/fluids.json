@@ -9,49 +9,57 @@
 				"name":     "Lava",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/lava",
-				"flask":    "base:item/lava_flask"
+				"flask":    "base:item/lava_flask",
+				"color":    "#fb490c"
 			}],
 			["base:fluid/mead", {
 				"name":     "Mead",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/mead",
-				"flask":    "base:item/mead"
+				"flask":    "base:item/mead",
+				"color":    "#ffc000"
 			}],
 			["base:fluid/milk", {
 				"name":     "Milk",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/milk",
-				"flask":    "base:item/milk_flask"
+				"flask":    "base:item/milk_flask",
+				"color":    "#ffffff"
 			}],
 			["base:fluid/water", {
 				"name":     "Water",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/deeper_water",
-				"flask":    "base:item/water_flask"
+				"flask":    "base:item/water_flask",
+				"color":    "#0000ff"
 			}],
 			["base:fluid/brine", {
 				"name":     "Brine",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/brine",
-				"flask":    "base:item/brine_flask"
+				"flask":    "base:item/brine_flask",
+				"color":    "#00ff9c"
 			}],
 			["base:fluid/honey", {
 				"name":     "Honey",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/honey",
-				"flask":    "base:item/honey"
+				"flask":    "base:item/honey",
+				"color":    "#ffd600"
 			}],
 			["base:fluid/mutagen", {
 				"name":     "Mutagen",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/mutagen",
-				"flask":    "base:item/mutagen"
+				"flask":    "base:item/mutagen",
+				"color":    "#ff03fe"
 			}],
 			["base:fluid/liquid_biomass", {
 				"name":     "Liquid Biomass",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/liquid_biomass",
-				"flask":    "base:item/liquid_biomass_flask"
+				"flask":    "base:item/liquid_biomass_flask",
+				"color":    "#45a600"
 			}]
 		]]
 	]

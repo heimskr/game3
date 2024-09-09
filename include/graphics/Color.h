@@ -3,6 +3,8 @@
 #include "util/Hex.h"
 #include "util/Math.h"
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <format>
 #include <string_view>
 
@@ -85,6 +87,8 @@ namespace Game3 {
 	Buffer & operator+=(Buffer &, const Color &);
 	Buffer & operator<<(Buffer &, const Color &);
 	Buffer & operator>>(Buffer &, Color &);
+
+	void from_json(const nlohmann::json &, Color &);
 }
 
 template <>

@@ -212,9 +212,9 @@ namespace Game3 {
 				const Identifier fluid_name = pair.at(0);
 				const nlohmann::json value = pair.at(1);
 				if (auto iter = value.find("flask"); iter != value.end())
-					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename"), *iter));
+					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename"), value.at("color"), *iter));
 				else
-					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename")));
+					fluids.add(fluid_name, Fluid(fluid_name, value.at("name"), value.at("tileset"), value.at("tilename"), value.at("color")));
 			}
 
 		} else if (type == "base:production_list") {
