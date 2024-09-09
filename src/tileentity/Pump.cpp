@@ -4,8 +4,10 @@
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Pump.h"
+#include "ui/gl/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -97,24 +99,11 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.shift && modifiers.ctrl)
-			EnergeticTileEntity::addObserver(player, false);
-		else
-			FluidHoldingTileEntity::addObserver(player, false);
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		FluidHoldingTileEntity::addObserver(player, true);
+		EnergeticTileEntity::addObserver(player, true);
 
-		{
-			auto lock = energyContainer->sharedLock();
-			INFO("Energy: {}", energyContainer->energy);
-		}
-
-		{
-			GamePtr game = realm->getGame();
-			auto lock = fluidContainer->levels.sharedLock();
-			for (const auto &[id, amount]: fluidContainer->levels)
-				INFO("{} = {}", game->getFluid(id)->identifier, amount);
-		}
-
-		return false;
+		return true;
 	}
 
 	void Pump::absorbJSON(const GamePtr &game, const nlohmann::json &json) {

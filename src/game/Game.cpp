@@ -73,6 +73,7 @@ namespace Game3 {
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
+		add(ModuleFactory::create<MultiModule<Substance::Energy, Substance::Fluid>>());
 #ifdef GAME3_ENABLE_SCRIPTING
 		add(GTKModuleFactory::create<ComputerModule>());
 #endif
