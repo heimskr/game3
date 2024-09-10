@@ -16,33 +16,33 @@ namespace Game3 {
 		GTKMutatorModule(game_, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
 
 	GTKMutatorModule::GTKMutatorModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Mutator> mutator_):
-	game(std::move(game_)),
-	mutator(std::move(mutator_)),
-	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(mutator->getInventory(0)))),
-	fluidsModule(std::make_shared<FluidLevelsModule>(game, std::make_any<AgentPtr>(mutator), false)),
-	GTKGeneInfoModule(nullptr) {
-		vbox.set_hexpand(true);
+		game(std::move(game_)),
+		mutator(std::move(mutator_)),
+		inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(mutator->getInventory(0)))),
+		fluidsModule(std::make_shared<FluidLevelsModule>(game, std::make_any<AgentPtr>(mutator), false)),
+		geneInfoModule(nullptr) {
+			vbox.set_hexpand(true);
 
-		mutateButton.set_hexpand(true);
-		mutateButton.set_vexpand(false);
-		mutateButton.set_halign(Gtk::Align::CENTER);
-		mutateButton.set_valign(Gtk::Align::CENTER);
-		mutateButton.signal_clicked().connect([this] {
-			mutate();
-		});
+			mutateButton.set_hexpand(true);
+			mutateButton.set_vexpand(false);
+			mutateButton.set_halign(Gtk::Align::CENTER);
+			mutateButton.set_valign(Gtk::Align::CENTER);
+			mutateButton.signal_clicked().connect([this] {
+				mutate();
+			});
 
-		header.set_text(mutator->getName());
-		header.set_margin(10);
-		header.set_xalign(0.5);
-		vbox.append(header);
-		Gtk::Widget &inventory_widget = inventoryModule->getWidget();
-		inventory_widget.set_hexpand(false);
-		hbox.append(inventory_widget);
-		hbox.append(mutateButton);
-		vbox.append(hbox);
-		vbox.append(fluidsModule->getWidget());
-		vbox.append(GTKGeneInfoModule.getWidget());
-	}
+			header.set_text(mutator->getName());
+			header.set_margin(10);
+			header.set_xalign(0.5);
+			vbox.append(header);
+			Gtk::Widget &inventory_widget = inventoryModule->getWidget();
+			inventory_widget.set_hexpand(false);
+			hbox.append(inventory_widget);
+			hbox.append(mutateButton);
+			vbox.append(hbox);
+			vbox.append(fluidsModule->getWidget());
+			vbox.append(geneInfoModule.getWidget());
+		}
 
 	Gtk::Widget & GTKMutatorModule::getWidget() {
 		return vbox;
@@ -51,14 +51,14 @@ namespace Game3 {
 	void GTKMutatorModule::reset() {
 		inventoryModule->reset();
 		fluidsModule->reset();
-		GTKGeneInfoModule.reset();
+		geneInfoModule.reset();
 	}
 
 	void GTKMutatorModule::update() {
 		inventoryModule->update();
 		fluidsModule->update();
 		assert(mutator);
-		GTKGeneInfoModule.update(std::shared_ptr<Gene>(mutator->getGene()));
+		geneInfoModule.update(std::shared_ptr<Gene>(mutator->getGene()));
 	}
 
 	void GTKMutatorModule::onResize(int width) {
@@ -100,8 +100,8 @@ namespace Game3 {
 	void GTKMutatorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
 		inventoryModule->setInventory(std::move(inventory));
 		if (std::unique_ptr<Gene> gene = mutator->getGene())
-			GTKGeneInfoModule.update(std::shared_ptr(std::move(gene)));
+			geneInfoModule.update(std::shared_ptr(std::move(gene)));
 		else
-			GTKGeneInfoModule.update(nullptr);
+			geneInfoModule.update(nullptr);
 	}
 }

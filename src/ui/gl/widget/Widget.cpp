@@ -221,6 +221,10 @@ namespace Game3 {
 			remove(firstChild);
 	}
 
+	std::size_t Widget::getChildCount() const {
+		return childCount;
+	}
+
 	void Widget::setOnClick(decltype(onClick) new_onclick) {
 		onClick = std::move(new_onclick);
 	}

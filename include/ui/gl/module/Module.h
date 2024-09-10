@@ -9,6 +9,7 @@
 
 namespace Game3 {
 	class Agent;
+	class ClientInventory;
 
 	class Module: public Widget {
 		public:
@@ -21,6 +22,7 @@ namespace Game3 {
 			virtual void init(UIContext &);
 			virtual void reset();
 			virtual void update();
+			virtual void setInventory(std::shared_ptr<ClientInventory>);
 			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &);
 	};
 

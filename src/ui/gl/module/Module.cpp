@@ -14,6 +14,8 @@ namespace Game3 {
 
 	void Module::update() {}
 
+	void Module::setInventory(std::shared_ptr<ClientInventory>) {}
+
 	std::optional<Buffer> Module::handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) {
 		return {};
 	}

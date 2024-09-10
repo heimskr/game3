@@ -24,7 +24,7 @@ namespace Game3 {
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
-			void reset()  final;
+			void reset() final;
 			void update() final;
 			void onResize(int) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
@@ -36,7 +36,7 @@ namespace Game3 {
 			std::shared_ptr<Mutator> mutator;
 			std::shared_ptr<GTKInventoryModule> inventoryModule;
 			std::shared_ptr<FluidLevelsModule> fluidsModule;
-			GTKGeneInfoModule GTKGeneInfoModule;
+			GTKGeneInfoModule geneInfoModule;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::Label header;
 			Gtk::Button mutateButton{"Mutate"};

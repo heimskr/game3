@@ -445,8 +445,11 @@ namespace Game3 {
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<DefaultMutex> lock;
-						if (auto *module_ = inventoryTab->getModule(lock))
+						if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 							module_->setInventory(client_inventory);
+						} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
+							module_->setInventory(client_inventory);
+						}
 					}
 				});
 			}
@@ -712,11 +715,19 @@ namespace Game3 {
 	GlobalID MainWindow::getExternalGID() const {
 		std::unique_lock<DefaultMutex> lock;
 
-		if (GTKModule *module_ = inventoryTab->getModule(lock)) {
+		auto query_module = [&](auto *module_) -> GlobalID {
 			std::any empty;
 			if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
 				return response->take<GlobalID>();
-		}
+			return -1;
+		};
+
+		if (omniDialog)
+			if (Module *module_ = omniDialog->inventoryTab->getModule(lock))
+				return query_module(module_);
+
+		if (GTKModule *module_ = inventoryTab->getModule(lock))
+			return query_module(module_);
 
 		return -1;
 	}

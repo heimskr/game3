@@ -207,8 +207,8 @@ namespace Game3 {
 	}
 
 	void Grid::clearChildren() {
-		widgetContainer.clear();
 		Widget::clearChildren();
+		widgetContainer.clear();
 		markDirty();
 	}
 

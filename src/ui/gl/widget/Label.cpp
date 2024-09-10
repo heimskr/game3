@@ -10,12 +10,17 @@ namespace Game3 {
 	Label::Label(float scale):
 		Widget(scale) {}
 
-	void Label::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		if (lastRectangle.width != width)
-			wrapped.reset();
+	extern bool _HACK;
 
-		if (deferredText)
-			setText(ui, *std::move(deferredText));
+	void Label::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		if (lastRectangle.width != width) {
+			wrapped.reset();
+		}
+
+		if (deferredText) {
+			setText(ui, *deferredText);
+			deferredText.reset();
+		}
 
 		Widget::render(ui, renderers, x, y, width, height);
 		const float padding = getPadding();
@@ -104,7 +109,7 @@ namespace Game3 {
 	}
 
 	void Label::setText(UString new_text) {
-		deferredText = new_text;
+		deferredText = std::move(new_text);
 	}
 
 	const UString & Label::getText() const {

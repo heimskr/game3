@@ -8,8 +8,10 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/EnergyModule.h"
 #include "ui/gl/module/FluidsModule.h"
+#include "ui/gl/module/GeneInfoModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/module/MultiModule.h"
+#include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
 #include "ui/module/AutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
@@ -70,6 +72,7 @@ namespace Game3 {
 		add(ModuleFactory::create<TextModule>());
 		add(ModuleFactory::create<EnergyModule>());
 		add(ModuleFactory::create<FluidsModule>());
+		add(ModuleFactory::create<MutatorModule>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());

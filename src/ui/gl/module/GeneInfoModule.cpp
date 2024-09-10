@@ -7,13 +7,13 @@ namespace Game3 {
 	GeneInfoModule::GeneInfoModule(GenePtr gene):
 		gene(std::move(gene)) {}
 
-	void GeneInfoModule::init(UIContext &ui) {
-		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 5, 0, Color{});
+	void GeneInfoModule::init(UIContext &) {
+		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 0, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 	}
 
 	void GeneInfoModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(ui, renderers, x, y, width, height);
+		Module::render(ui, renderers, x, y, width, height);
 		vbox->render(ui, renderers, x, y, width, height);
 	}
 
@@ -22,10 +22,13 @@ namespace Game3 {
 	}
 
 	void GeneInfoModule::measure(const RendererContext &renderers, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
-		return vbox->measure(renderers, measure_orientation, for_width, for_height, minimum, natural);
+		vbox->measure(renderers, measure_orientation, for_width, for_height, minimum, natural);
 	}
 
 	void GeneInfoModule::reset() {
+		if (!vbox)
+			return;
+
 		vbox->clearChildren();
 
 		if (!gene)

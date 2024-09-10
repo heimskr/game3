@@ -250,11 +250,9 @@ namespace Game3 {
 		auto &scale_y = options.scaleY;
 
 		const auto i_height = getCharacter('I').size.y * scale_y;
-		float y_addition = 0;
 
 		if (options.alignTop) {
-			y_addition = i_height;
-			y += y_addition;
+			y += i_height;
 		}
 
 		y = backbufferHeight - y;
@@ -331,7 +329,7 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 
 		if (options.heightOut) {
-			*options.heightOut = y_start - y + highest_on_first_line;
+			*options.heightOut = y_start - y + highest_on_first_line + (options.alignTop? i_height : 0);
 		}
 	}
 

@@ -4,10 +4,11 @@
 #include "types/Types.h"
 #include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasFixedSize.h"
 
 namespace Game3 {
-	class Button: public Widget, public HasFixedSize {
+	class Button: public Widget, public HasFixedSize, public HasAlignment {
 		public:
 			Button(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
 			Button(float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());

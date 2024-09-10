@@ -29,15 +29,20 @@ namespace Game3 {
 		Button(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
 
 	void Button::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		float dummy{};
+		const float original_width = width;
+		const float original_height = height;
 
-		if (fixedHeight > 0) {
-			height = fixedHeight;
-		} else if (height < 0) {
+		fixSizes(width, height);
+		float dummy{};
+		if (fixedHeight <= 0 && height < 0) {
 			measure(renderers, Orientation::Vertical, width, height, dummy, height);
 		}
 
 		measure(renderers, Orientation::Horizontal, width, height, dummy, width);
+
+		adjustCoordinate(Orientation::Horizontal, x, original_width, width);
+		adjustCoordinate(Orientation::Vertical, y, original_height, height);
+
 		Widget::render(ui, renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
@@ -126,10 +131,17 @@ namespace Game3 {
 		return SizeRequestMode::WidthForHeight;
 	}
 
-	void Button::measure(const RendererContext &renderers, Orientation orientation, float, float for_height, float &minimum, float &natural) {
+	void Button::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
+			if (horizontalExpand && 0 <= for_width) {
+				minimum = 0;
+				natural = for_width;
+				return;
+			}
+
 			if (for_height < 0)
 				for_height = std::max(fixedHeight, getMinimumPreferredHeight());
+
 			minimum = natural = getWidth(renderers, for_height);
 		} else {
 			minimum = getMinimumPreferredHeight();

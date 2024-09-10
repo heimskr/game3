@@ -3,6 +3,9 @@
 #include "ui/gl/module/Module.h"
 #include "ui/gl/widget/Box.h"
 
+#include <any>
+#include <memory>
+
 namespace Game3 {
 	class Box;
 	class Gene;

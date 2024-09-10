@@ -22,8 +22,6 @@ namespace Game3 {
 	void Box::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
-		// TODO: push to scissor stack, perhaps?
-
 		const bool vertical = orientation == Orientation::Vertical;
 
 		RectangleRenderer &rectangler = renderers.rectangle;
@@ -35,6 +33,8 @@ namespace Game3 {
 		float &size = vertical? height : width;
 		float &last_size = vertical? lastRenderedSize.second : lastRenderedSize.first;
 
+		size_t i = 0;
+
 		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 			if (child != firstChild && separatorThickness > 0) {
 				coordinate += padding * scale;
@@ -44,18 +44,40 @@ namespace Game3 {
 				size -= (2 * padding + separatorThickness) * scale;
 			}
 
-			float child_minimum{};
-			float child_natural{};
-			child->measure(renderers, orientation, width, height, child_minimum, child_natural);
+			float to_add = -1;
 
-			if (vertical)
-				child->render(ui, renderers, x, y, width, child_natural);
-			else
-				child->render(ui, renderers, x, y, child_natural, height);
+			bool try_measure = true;
 
-			coordinate += child_natural;
-			last_size += child_natural;
-			size -= child_natural;
+			if (i < childMeasurements.size()) {
+				const auto [child_width, child_height] = childMeasurements[i];
+				to_add = vertical? child_height : child_width;
+
+				if (0 <= to_add) {
+					try_measure = false;
+					child->render(ui, renderers, x, y, child_width < 0? width : child_width, child_height < 0? height : child_height);
+				}
+			}
+
+			if (try_measure) {
+				float child_minimum{};
+				float child_natural{};
+				child->measure(renderers, orientation, width, height, child_minimum, child_natural);
+
+				if (vertical)
+					child->render(ui, renderers, x, y, width, child_natural);
+				else
+					child->render(ui, renderers, x, y, child_natural, height);
+
+				to_add = child_natural;
+			}
+
+			assert(0 <= to_add);
+
+			coordinate += to_add;
+			last_size += to_add;
+			size -= to_add;
+
+			++i;
 		}
 	}
 
@@ -70,7 +92,7 @@ namespace Game3 {
 		}
 
 		size_t i = 0;
-		childMeasurements.resize(childCount);
+		childMeasurements.resize(childCount, {-1, -1});
 
 		if (measure_orientation == orientation) {
 			minimum = natural = (childCount - 1) * scale * (2 * padding + separatorThickness);

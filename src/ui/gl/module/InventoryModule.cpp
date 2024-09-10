@@ -9,8 +9,8 @@
 #include "util/Math.h"
 
 namespace {
-	constexpr int getColumnCount(float width) {
-		return std::min(10, std::max<int>(1, width / (Game3::OUTER_SLOT_SIZE * Game3::SLOT_SCALE)));
+	constexpr int getColumnCount(float width, std::size_t slot_count) {
+		return std::min(std::min(10, std::max(1, static_cast<int>(slot_count))), std::max<int>(1, width / (Game3::OUTER_SLOT_SIZE * Game3::SLOT_SCALE)));
 	}
 }
 
@@ -55,7 +55,7 @@ namespace Game3 {
 
 		previousActive = active_slot;
 
-		const int column_count = getColumnCount(width);
+		const int column_count = getColumnCount(width, slotWidgets.size());
 		const float x_pad = (width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
 
 		int column = 0;
@@ -120,10 +120,9 @@ namespace Game3 {
 
 	void InventoryModule::measure(const RendererContext &, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
-			minimum = getColumnCount(for_width) * OUTER_SLOT_SIZE * scale;
-			natural = for_width;
+			minimum = natural = getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE * scale;
 		} else {
-			minimum = natural = updiv(slotWidgets.size(), getColumnCount(for_width)) * OUTER_SLOT_SIZE * scale;
+			minimum = natural = updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE * scale;
 		}
 	}
 
