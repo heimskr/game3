@@ -140,6 +140,17 @@ namespace Game3 {
 		minimum = std::min(minimum, natural);
 	}
 
+	void Scroller::clearChildren() {
+		xOffset = 0;
+		yOffset = 0;
+		lastChildHeight = -1;
+		lastVerticalScrollMouse.reset();
+		lastHorizontalScrollMouse.reset();
+		lastVerticalScrollbarRectangle.reset();
+		lastHorizontalScrollbarRectangle.reset();
+		Widget::clearChildren();
+	}
+
 	void Scroller::setChild(WidgetPtr new_child) {
 		if (new_child)
 			new_child->insertAtStart(shared_from_this());

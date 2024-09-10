@@ -8,6 +8,8 @@
 namespace Game3 {
 	class HasFixedSize: public HasFixedWidth, public HasFixedHeight {
 		public:
+			virtual ~HasFixedSize() = default;
+
 			virtual std::pair<float, float> getFixedSize() const;
 			virtual void setFixedSize(float, float);
 			virtual void setFixedSize(float);

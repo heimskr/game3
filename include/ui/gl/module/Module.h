@@ -19,7 +19,6 @@ namespace Game3 {
 			virtual ~Module() = default;
 
 			virtual Identifier getID() const = 0;
-			virtual void init(UIContext &);
 			virtual void reset();
 			virtual void update();
 			virtual void setInventory(std::shared_ptr<ClientInventory>);

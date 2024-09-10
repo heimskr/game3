@@ -14,18 +14,14 @@
 #include "ui/gl/module/MultiModule.h"
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
-#include "ui/module/AutocrafterModule.h"
+#include "ui/module/GTKAutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
 #include "ui/module/ComputerModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
-#include "ui/module/FluidLevelsModule.h"
 #include "ui/module/ItemFilterModule.h"
-#include "ui/module/GTKMicroscopeModule.h"
 #include "ui/module/GTKModuleFactory.h"
-#include "ui/module/GTKMultiModule.h"
-#include "ui/module/GTKMutatorModule.h"
 #include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
 #include "util/FS.h"
@@ -54,21 +50,12 @@ namespace Game3 {
 
 	void Game::addModuleFactories() {
 		add(GTKModuleFactory::create<GTKInventoryModule>());
-		add(GTKModuleFactory::create<FluidLevelsModule>());
 		add(GTKModuleFactory::create<ChemicalReactorModule>());
 		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
 		add(GTKModuleFactory::create<ItemFilterModule>());
 		add(GTKModuleFactory::create<CombinerModule>());
-		add(GTKModuleFactory::create<AutocrafterModule>());
+		add(GTKModuleFactory::create<GTKAutocrafterModule>());
 		add(GTKModuleFactory::create<VillageTradeModule>());
-		add(GTKModuleFactory::create<GTKMicroscopeModule<0>>());
-		add(GTKModuleFactory::create<GTKMicroscopeModule<1, Substance::Energy>>());
-		add(GTKModuleFactory::create<GTKMicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
-		add(GTKModuleFactory::create<GTKMicroscopeModule<2, Substance::Energy>>());
-		add(GTKModuleFactory::create<GTKMutatorModule>());
-		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
-		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Fluid>>());
-		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<InventoryModule>());
 		add(ModuleFactory::create<TextModule>());
 		add(ModuleFactory::create<EnergyModule>());

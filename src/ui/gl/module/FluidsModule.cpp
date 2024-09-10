@@ -17,7 +17,10 @@ namespace Game3 {
 		FluidsModule(std::move(game), std::any_cast<AgentPtr>(argument), show_header) {}
 
 	FluidsModule::FluidsModule(std::shared_ptr<ClientGame>, const AgentPtr &agent, bool show_header):
-		fluidHaver(std::dynamic_pointer_cast<HasFluids>(agent)), showHeader(show_header) {}
+		FluidsModule(std::dynamic_pointer_cast<HasFluids>(agent), show_header) {}
+
+	FluidsModule::FluidsModule(std::shared_ptr<HasFluids> fluid_haver, bool show_header):
+		fluidHaver(std::move(fluid_haver)), showHeader(show_header) {}
 
 	void FluidsModule::init(UIContext &ui) {
 		auto vbox = std::make_shared<Box>(scale);

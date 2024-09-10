@@ -30,6 +30,7 @@ namespace Game3 {
 			Widget & operator=(const Widget &) = default;
 			Widget & operator=(Widget &&) noexcept = default;
 
+			virtual void init(UIContext &);
 			/** Returns absolute coordinates. */
 			virtual const Rectangle & getLastRectangle() const;
 			/** `x` and `y` are relative to the top of the scissor stack. The implementation is free to ignore the `width` and `height` parameters. */
@@ -48,10 +49,13 @@ namespace Game3 {
 			virtual void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) = 0;
 			virtual float getScale() const;
 			virtual bool isDragging() const;
+			virtual void onFocus(UIContext &);
+			virtual void onBlur(UIContext &);
 
 			WidgetPtr getParent() const;
 			WidgetPtr getPreviousSibling() const;
 			WidgetPtr getNextSibling() const;
+			WidgetPtr getFirstChild() const;
 			void insertAfter(WidgetPtr parent, WidgetPtr sibling);
 			void insertBefore(WidgetPtr parent, WidgetPtr sibling);
 			void insertAtStart(WidgetPtr parent);

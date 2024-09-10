@@ -38,7 +38,7 @@ namespace Game3 {
 		tabRectangles.resize(tabs.size());
 
 		for (const TabPtr &tab: tabs)
-			tab->init();
+			tab->init(ui);
 	}
 
 	void OmniDialog::render(const RendererContext &renderers) {

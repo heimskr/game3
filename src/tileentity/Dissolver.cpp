@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "recipe/DissolverRecipe.h"
 #include "tileentity/Dissolver.h"
-#include "ui/module/GTKMultiModule.h"
+#include "ui/gl/module/MultiModule.h"
 
 #include <cassert>
 #include <numeric>
@@ -89,7 +89,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(GTKMultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
 		EnergeticTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
 

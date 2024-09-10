@@ -16,6 +16,7 @@ namespace Game3 {
 	class Canvas;
 	class ClientGame;
 	class ClientPlayer;
+	class AutocompleteDropdown;
 	class Hotbar;
 	class Texture;
 	class Tooltip;
@@ -45,11 +46,13 @@ namespace Game3 {
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
 			RendererContext getRenderers() const;
-			void focusWidget(WeakWidgetPtr);
+			void focusWidget(const WidgetPtr &);
 			WidgetPtr getFocusedWidget() const;
 			void unfocus();
-			void setPressedWidget(WeakWidgetPtr);
+			void setPressedWidget(const WidgetPtr &);
 			WidgetPtr getPressedWidget() const;
+			void setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown>);
+			std::shared_ptr<AutocompleteDropdown> getAutocompleteDropdown() const;
 			void unpress();
 			std::pair<double, double> getAbsoluteMouseCoordinates() const;
 			std::pair<double, double> getRelativeMouseCoordinates() const;
@@ -82,6 +85,7 @@ namespace Game3 {
 			std::optional<std::pair<int, int>> dragOrigin;
 			std::shared_ptr<Hotbar> hotbar;
 			std::shared_ptr<Tooltip> tooltip;
+			std::shared_ptr<AutocompleteDropdown> autocompleteDropdown;
 			WeakWidgetPtr focusedWidget;
 			WeakWidgetPtr pressedWidget;
 			std::set<WidgetPtr> extraDragUpdaters;

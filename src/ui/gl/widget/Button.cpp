@@ -110,7 +110,7 @@ namespace Game3 {
 	bool Button::dragStart(UIContext &ui, int, int) {
 		pressed = true;
 		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
-		ui.setPressedWidget(weak_from_this());
+		ui.setPressedWidget(shared_from_this());
 		return true;
 	}
 

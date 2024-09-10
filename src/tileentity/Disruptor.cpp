@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "tileentity/Disruptor.h"
 #include "types/SlotRange.h"
-#include "ui/module/GTKMultiModule.h"
+#include "ui/gl/module/MultiModule.h"
 
 #include <cassert>
 
@@ -100,7 +100,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(GTKMultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
 		InventoriedTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 

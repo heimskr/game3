@@ -16,7 +16,7 @@ namespace Game3 {
 
 	GeneticAnalysisModule::GeneticAnalysisModule() = default;
 
-	void GeneticAnalysisModule::init(UIContext &ui) {
+	void GeneticAnalysisModule::init(UIContext &) {
 		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 0, 0, Color{});
 	}
 

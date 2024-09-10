@@ -17,6 +17,7 @@
 #include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
 #include "ui/gl/OmniDialog.h"
+#include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gtk/ConnectDialog.h"
@@ -25,7 +26,6 @@
 #include "ui/gtk/LoginDialog.h"
 #include "ui/gtk/Util.h"
 #include "ui/module/GTKInventoryModule.h"
-#include "ui/module/FluidLevelsModule.h"
 #include "ui/module/GTKModuleFactory.h"
 #include "ui/module/VillageTradeModule.h"
 #include "ui/tab/GTKCraftingTab.h"
@@ -447,7 +447,7 @@ namespace Game3 {
 				queue([this, owner, client_inventory] {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<DefaultMutex> lock;
-						if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
+						if (Module *module_ = getOmniDialog()->inventoryTab->getModule(lock)) {
 							module_->setInventory(client_inventory);
 						} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 							module_->setInventory(client_inventory);
@@ -797,7 +797,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
-		inventoryTab->setModule(std::make_unique<FluidLevelsModule>(game, has_fluids));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(has_fluids));
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {

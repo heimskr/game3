@@ -34,7 +34,7 @@ namespace {
 }
 
 namespace Game3 {
-	void SettingsTab::init() {
+	void SettingsTab::init(UIContext &) {
 		auto tab = shared_from_this();
 
 		auto &settings = ui.getRenderers().settings;

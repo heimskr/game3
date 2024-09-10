@@ -7,17 +7,17 @@
 #include "tileentity/Autocrafter.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/AutocrafterModule.h"
+#include "ui/module/GTKAutocrafterModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
-		AutocrafterModule(game_, std::dynamic_pointer_cast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
+	GTKAutocrafterModule::GTKAutocrafterModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+		GTKAutocrafterModule(game_, std::dynamic_pointer_cast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
 
-	AutocrafterModule::AutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
+	GTKAutocrafterModule::GTKAutocrafterModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Autocrafter> autocrafter_):
 	game(std::move(game_)),
 	autocrafter(std::move(autocrafter_)),
 	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(autocrafter->getInventory(0)))),
@@ -72,31 +72,31 @@ namespace Game3 {
 		vbox.append(energyModule->getWidget());
 	}
 
-	Gtk::Widget & AutocrafterModule::getWidget() {
+	Gtk::Widget & GTKAutocrafterModule::getWidget() {
 		return vbox;
 	}
 
-	void AutocrafterModule::reset() {
+	void GTKAutocrafterModule::reset() {
 		stationInventoryModule->reset();
 		inventoryModule->reset();
 		energyModule->reset();
 		updateEntry();
 	}
 
-	void AutocrafterModule::update() {
+	void GTKAutocrafterModule::update() {
 		stationInventoryModule->update();
 		inventoryModule->update();
 		energyModule->update();
 		updateEntry();
 	}
 
-	void AutocrafterModule::onResize(int width) {
+	void GTKAutocrafterModule::onResize(int width) {
 		stationInventoryModule->onResize(width);
 		inventoryModule->onResize(width);
 		energyModule->onResize(width);
 	}
 
-	std::optional<Buffer> AutocrafterModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+	std::optional<Buffer> GTKAutocrafterModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "TargetSet") {
 
 			auto *buffer = std::any_cast<Buffer>(&data);
@@ -137,17 +137,17 @@ namespace Game3 {
 		return {};
 	}
 
-	void AutocrafterModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
+	void GTKAutocrafterModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
 		if (inventory->index == 0)
 			inventoryModule->setInventory(std::move(inventory));
 		else if (inventory->index == 1)
 			stationInventoryModule->setInventory(std::move(inventory));
 		else
-			throw std::invalid_argument("Can't set AutocrafterModule inventory at index " + std::to_string(inventory->index));
+			throw std::invalid_argument("Can't set GTKAutocrafterModule inventory at index " + std::to_string(inventory->index));
 	}
 
 
-	void AutocrafterModule::updateEntry() {
+	void GTKAutocrafterModule::updateEntry() {
 		const auto &target = autocrafter->getTarget();
 		auto lock = target.sharedLock();
 		if (target.empty())
@@ -156,7 +156,7 @@ namespace Game3 {
 			entry.set_text(target.str());
 	}
 
-	void AutocrafterModule::setTarget(const std::string &target) {
+	void GTKAutocrafterModule::setTarget(const std::string &target) {
 		if (autocrafter)
 			game->getPlayer()->sendMessage(autocrafter, "SetTarget", target);
 	}

@@ -14,7 +14,6 @@ namespace Game3 {
 		public:
 			Tab(UIContext &);
 
-			virtual void init();
 			virtual void renderIcon(const RendererContext &);
 
 			SizeRequestMode getRequestMode() const final;

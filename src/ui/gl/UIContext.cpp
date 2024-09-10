@@ -3,6 +3,7 @@
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "types/Types.h"
+#include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
@@ -34,7 +35,11 @@ namespace Game3 {
 			}
 		}
 
-		tooltip->render(*this, context, mouse_x * factor, mouse_y * factor, -1, -1);
+		if (autocompleteDropdown)
+			autocompleteDropdown->render(*this, context, -1, -1, -1, -1); // The dropdown is responsible for knowing where to render.
+
+		if (tooltip)
+			tooltip->render(*this, context, mouse_x * factor, mouse_y * factor, -1, -1);
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
@@ -61,7 +66,6 @@ namespace Game3 {
 	}
 
 	void UIContext::reset() {
-		INFO("UIContext::reset");
 		draggedWidget = nullptr;
 		draggedWidgetActive = false;
 		for (const DialogPtr &dialog: reverse(dialogs))
@@ -71,6 +75,9 @@ namespace Game3 {
 	}
 
 	bool UIContext::click(int button, int x, int y) {
+		if (autocompleteDropdown && autocompleteDropdown->click(*this, button, x, y))
+			return true;
+
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->click(button, x, y))
 				return true;
@@ -79,6 +86,9 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragStart(int x, int y) {
+		if (autocompleteDropdown && autocompleteDropdown->dragStart(*this, x, y))
+			return true;
+
 		unfocus();
 		dragOrigin.emplace(x, y);
 
@@ -90,6 +100,9 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
+		if (autocompleteDropdown && autocompleteDropdown->dragUpdate(*this, x, y))
+			return true;
+
 		if (draggedWidget && dragOrigin != std::pair{x, y})
 			draggedWidgetActive = true;
 
@@ -105,6 +118,9 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
+		if (autocompleteDropdown && autocompleteDropdown->dragEnd(*this, x, y))
+			return true;
+
 		if (auto pressed = getPressedWidget())
 			return pressed->dragEnd(*this, x, y);
 
@@ -134,6 +150,9 @@ namespace Game3 {
 	}
 
 	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
+		if (autocompleteDropdown && autocompleteDropdown->scroll(*this, x_delta, y_delta, x, y))
+			return true;
+
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->scroll(x_delta, y_delta, x, y))
 				return true;
@@ -169,8 +188,19 @@ namespace Game3 {
 		return canvas.getRendererContext();
 	}
 
-	void UIContext::focusWidget(std::weak_ptr<Widget> to_focus) {
-		focusedWidget = std::move(to_focus);
+	void UIContext::focusWidget(const WidgetPtr &to_focus) {
+		auto locked = focusedWidget.lock();
+
+		if (to_focus == locked)
+			return;
+
+		if (locked)
+			locked->onBlur(*this);
+
+		focusedWidget = to_focus;
+
+		if (to_focus)
+			to_focus->onFocus(*this);
 	}
 
 	WidgetPtr UIContext::getFocusedWidget() const {
@@ -181,12 +211,20 @@ namespace Game3 {
 		focusedWidget.reset();
 	}
 
-	void UIContext::setPressedWidget(std::weak_ptr<Widget> new_pressed) {
-		pressedWidget = std::move(new_pressed);
+	void UIContext::setPressedWidget(const WidgetPtr &new_pressed) {
+		pressedWidget = new_pressed;
 	}
 
 	WidgetPtr UIContext::getPressedWidget() const {
 		return pressedWidget.lock();
+	}
+
+	void UIContext::setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown> new_dropdown) {
+		autocompleteDropdown = std::move(new_dropdown);
+	}
+
+	std::shared_ptr<AutocompleteDropdown> UIContext::getAutocompleteDropdown() const {
+		return autocompleteDropdown;
 	}
 
 	void UIContext::unpress() {

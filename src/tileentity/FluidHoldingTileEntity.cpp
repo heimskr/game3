@@ -3,7 +3,7 @@
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"
-#include "ui/module/FluidLevelsModule.h"
+#include "ui/gl/module/FluidsModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -86,7 +86,7 @@ namespace Game3 {
 		player->send(TileEntityPacket(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(FluidLevelsModule::ID(), getGID(), true));
+			player->send(OpenModuleForAgentPacket(FluidsModule::ID(), getGID(), true));
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())

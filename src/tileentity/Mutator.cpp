@@ -7,7 +7,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Mutator.h"
-#include "ui/module/GTKMutatorModule.h"
+#include "ui/gl/module/MutatorModule.h"
 
 namespace Game3 {
 	namespace {
@@ -128,7 +128,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(GTKMutatorModule::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MutatorModule::ID(), getGID()));
 		FluidHoldingTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
 

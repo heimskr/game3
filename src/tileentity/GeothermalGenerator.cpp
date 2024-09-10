@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 #include "recipe/GeothermalRecipe.h"
 #include "tileentity/GeothermalGenerator.h"
-#include "ui/module/GTKMultiModule.h"
+#include "ui/gl/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -132,7 +132,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(GTKMultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>::ID(), getGID()));
 		EnergeticTileEntity::addObserver(player, true);
 		FluidHoldingTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);

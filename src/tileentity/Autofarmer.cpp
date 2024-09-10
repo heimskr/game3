@@ -12,7 +12,7 @@
 #include "realm/Realm.h"
 #include "tile/CropTile.h"
 #include "tileentity/Autofarmer.h"
-#include "ui/module/GTKMultiModule.h"
+#include "ui/gl/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
@@ -72,7 +72,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(GTKMultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
 		EnergeticTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
 

@@ -9,7 +9,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/Autocrafter.h"
-#include "ui/module/AutocrafterModule.h"
+#include "ui/module/GTKAutocrafterModule.h"
 
 namespace Game3 {
 	namespace {
@@ -105,7 +105,7 @@ namespace Game3 {
 		if (modifiers.onlyShift()) {
 			EnergeticTileEntity::addObserver(player, false);
 		} else {
-			player->send(OpenModuleForAgentPacket(AutocrafterModule::ID(), getGID()));
+			player->send(OpenModuleForAgentPacket(GTKAutocrafterModule::ID(), getGID()));
 			InventoriedTileEntity::addObserver(player, true);
 		}
 
@@ -300,7 +300,7 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 
 			if (source)
-				sendMessage(source, "ModuleMessage", AutocrafterModule::ID(), "TargetSet", success, new_target);
+				sendMessage(source, "ModuleMessage", GTKAutocrafterModule::ID(), "TargetSet", success, new_target);
 
 		} else {
 			TileEntity::handleMessage(source, name, data);

@@ -10,6 +10,8 @@ namespace Game3 {
 	Widget::Widget(float scale):
 		scale(scale) {}
 
+	void Widget::init(UIContext &) {}
+
 	const Rectangle & Widget::getLastRectangle() const {
 		return lastRectangle;
 	}
@@ -95,6 +97,10 @@ namespace Game3 {
 		return dragging;
 	}
 
+	void Widget::onFocus(UIContext &) {}
+
+	void Widget::onBlur(UIContext &) {}
+
 	WidgetPtr Widget::getParent() const {
 		return weakParent.lock();
 	}
@@ -105,6 +111,10 @@ namespace Game3 {
 
 	WidgetPtr Widget::getNextSibling() const {
 		return nextSibling;
+	}
+
+	WidgetPtr Widget::getFirstChild() const {
+		return firstChild;
 	}
 
 	void Widget::insertAfter(WidgetPtr parent, WidgetPtr sibling) {

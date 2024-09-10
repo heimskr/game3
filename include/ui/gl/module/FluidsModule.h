@@ -20,6 +20,7 @@ namespace Game3 {
 		public:
 			FluidsModule(std::shared_ptr<ClientGame>, const std::any &, bool show_header = true);
 			FluidsModule(std::shared_ptr<ClientGame>, const AgentPtr &, bool show_header = true);
+			FluidsModule(std::shared_ptr<HasFluids>, bool show_header = true);
 
 			static Identifier ID() { return {"base", "module/fluid_levels"}; }
 

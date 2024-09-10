@@ -10,8 +10,6 @@ namespace Game3 {
 	Tab::Tab(UIContext &ui):
 		Widget(UI_SCALE), ui(ui) {}
 
-	void Tab::init() {}
-
 	void Tab::renderIcon(const RendererContext &) {}
 
 	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {

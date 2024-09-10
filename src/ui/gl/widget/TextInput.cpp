@@ -2,6 +2,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
+#include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
@@ -55,6 +56,12 @@ namespace Game3 {
 		TextInput(scale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		if (deferredText) {
+			setText(ui, std::move(*deferredText));
+			deferredText.reset();
+			changed(ui);
+		}
+
 		if (0 < fixedHeight)
 			height = fixedHeight;
 
@@ -92,7 +99,7 @@ namespace Game3 {
 
 	bool TextInput::click(UIContext &ui, int button, int, int) {
 		if (button == 1) {
-			ui.focusWidget(weak_from_this());
+			ui.focusWidget(shared_from_this());
 			return true;
 		}
 
@@ -104,7 +111,7 @@ namespace Game3 {
 			switch (character) {
 				case GDK_KEY_BackSpace:
 					eraseWord(ui);
-					onChange(*this, text);
+					changed(ui);
 					break;
 
 				default:
@@ -118,12 +125,12 @@ namespace Game3 {
 		switch (character) {
 			case GDK_KEY_BackSpace:
 				eraseCharacter(ui);
-				onChange(*this, text);
+				changed(ui);
 				return true;
 
 			case GDK_KEY_Delete:
 				eraseForward(ui);
-				onChange(*this, text);
+				changed(ui);
 				return true;
 
 			case GDK_KEY_Left:
@@ -169,7 +176,7 @@ namespace Game3 {
 		}
 
 		insert(ui, static_cast<gunichar>(character));
-		onChange(*this, text);
+		changed(ui);
 		return true;
 	}
 
@@ -197,12 +204,50 @@ namespace Game3 {
 		}
 	}
 
+	void TextInput::onFocus(UIContext &ui) {
+		std::vector<UString> relevant = getRelevantSuggestions();
+		if (relevant.empty())
+			return;
+
+		auto dropdown = std::make_shared<AutocompleteDropdown>(scale);
+		dropdown->init(ui);
+		dropdown->setParent(std::dynamic_pointer_cast<Autocompleter>(shared_from_this()));
+		dropdown->setOrigin({lastRectangle.x, lastRectangle.y + lastRectangle.height});
+		dropdown->setSuggestions(std::move(relevant));
+		dropdown->setFixedSize(lastRectangle.width, scale * 50);
+		ui.setAutocompleteDropdown(std::move(dropdown));
+	}
+
+	void TextInput::onBlur(UIContext &ui) {
+		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
+		if (dropdown || dropdown->checkParent(*this))
+			ui.setAutocompleteDropdown(nullptr);
+	}
+
 	void TextInput::setInteriorColor(Color color) {
 		interiorColor = color;
 	}
 
 	void TextInput::setInteriorColor() {
 		interiorColor = DEFAULT_TEXTINPUT_INTERIOR_COLOR;
+	}
+
+	void TextInput::setSuggestions(std::optional<std::vector<UString>> new_suggestions) {
+		suggestions = std::move(new_suggestions);
+	}
+
+	std::vector<UString> TextInput::getRelevantSuggestions() const {
+		std::vector<UString> relevant;
+
+		if (suggestions) {
+			std::string_view raw = text.raw();
+			for (const UString &suggestion: *suggestions) {
+				if (suggestion.length() > text.length() && suggestion.raw().starts_with(raw))
+					relevant.push_back(suggestion);
+			}
+		}
+
+		return relevant;
 	}
 
 	const UString & TextInput::getText() const {
@@ -216,6 +261,10 @@ namespace Game3 {
 		}
 
 		goEnd(ui);
+	}
+
+	void TextInput::setText(UString new_text) {
+		deferredText = std::move(new_text);
 	}
 
 	UString TextInput::clear() {
@@ -316,6 +365,10 @@ namespace Game3 {
 		setCursorOffset(ui.getRenderers().text.textWidth(text));
 	}
 
+	void TextInput::autocomplete(const UString &completion) {
+		setText(completion);
+	}
+
 	float TextInput::getTextScale() const {
 		return scale / 16;
 	}
@@ -357,5 +410,17 @@ namespace Game3 {
 			xOffset -= (getXPadding() - visual) / scale;
 
 		cursorFixQueued = false;
+	}
+
+	void TextInput::changed(UIContext &ui) {
+		onChange(*this, text);
+		forwardSuggestions(ui);
+	}
+
+	void TextInput::forwardSuggestions(UIContext &ui) {
+		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
+		if (dropdown && dropdown->checkParent(*this)) {
+			dropdown->setSuggestions(getRelevantSuggestions());
+		}
 	}
 }

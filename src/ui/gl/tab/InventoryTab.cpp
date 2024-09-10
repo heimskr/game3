@@ -30,7 +30,7 @@ namespace Game3 {
 	InventoryTab::InventoryTab(UIContext &ui):
 		Tab(ui)  {}
 
-	void InventoryTab::init() {
+	void InventoryTab::init(UIContext &) {
 		assert(!playerInventoryModule);
 		playerInventoryModule = makePlayerInventoryModule(ui);
 
