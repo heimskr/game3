@@ -10,8 +10,6 @@ namespace Game3 {
 	Label::Label(float scale):
 		Widget(scale) {}
 
-	extern bool _HACK;
-
 	void Label::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		if (lastRectangle.width != width) {
 			wrapped.reset();

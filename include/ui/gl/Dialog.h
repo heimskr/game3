@@ -34,4 +34,6 @@ namespace Game3 {
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 	};
+
+	using DialogPtr = std::shared_ptr<Dialog>;
 }

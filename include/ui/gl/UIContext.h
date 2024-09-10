@@ -33,6 +33,7 @@ namespace Game3 {
 			void addDialog(std::shared_ptr<Dialog>);
 			std::shared_ptr<ClientGame> getGame() const;
 			void onResize(int x, int y);
+			void reset();
 			/** Returns true iff the click accomplished something. */
 			bool click(int button, int x, int y);
 			bool dragStart(int x, int y);

@@ -10,7 +10,6 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/Module.h"
 #include "ui/gl/widget/Box.h"
-#include "ui/gl/widget/Scroller.h"
 #include "ui/gl/UIContext.h"
 #include "util/Cast.h"
 

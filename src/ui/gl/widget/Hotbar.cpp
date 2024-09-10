@@ -74,4 +74,9 @@ namespace Game3 {
 			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
 		}
 	}
+
+	void Hotbar::reset() {
+		for (const std::shared_ptr<ItemSlot> &item_slot: slotWidgets)
+			item_slot->setStack(nullptr);
+	}
 }

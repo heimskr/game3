@@ -4,22 +4,20 @@
 #include "item/ContainmentOrb.h"
 #include "net/Buffer.h"
 #include "tileentity/Microscope.h"
-#include "ui/gtk/Util.h"
-#include "ui/module/GTKInventoryModule.h"
-#include "ui/module/GeneticAnalysisModule.h"
-#include "ui/tab/GTKInventoryTab.h"
+#include "ui/gl/module/GeneticAnalysisModule.h"
+#include "ui/gl/module/InventoryModule.h"
+#include "ui/gl/widget/Box.h"
+#include "ui/gl/widget/Label.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
 	GeneticAnalysisModule::GeneticAnalysisModule(ClientGamePtr, const std::any &):
 		GeneticAnalysisModule() {}
 
-	GeneticAnalysisModule::GeneticAnalysisModule() {
-		vbox.set_hexpand();
-	}
+	GeneticAnalysisModule::GeneticAnalysisModule() = default;
 
-	Gtk::Widget & GeneticAnalysisModule::getWidget() {
-		return vbox;
+	void GeneticAnalysisModule::init(UIContext &ui) {
+		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 0, 0, Color{});
 	}
 
 	void GeneticAnalysisModule::reset() {
@@ -41,6 +39,19 @@ namespace Game3 {
 		} else if (stack->getID() == "base:item/genetic_template") {
 			analyzeTemplate(stack);
 		}
+	}
+
+	void GeneticAnalysisModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(ui, renderers, x, y, width, height);
+		vbox->render(ui, renderers, x, y, width, height);
+	}
+
+	SizeRequestMode GeneticAnalysisModule::getRequestMode() const {
+		return vbox->getRequestMode();
+	}
+
+	void GeneticAnalysisModule::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		return vbox->measure(renderers, orientation, for_width, for_height, minimum, natural);
 	}
 
 	void GeneticAnalysisModule::ponderOrb(const ItemStackPtr &stack) {
@@ -67,9 +78,9 @@ namespace Game3 {
 		});
 
 		if (descriptions.empty()) {
-			auto label = std::make_unique<Gtk::Label>("No genes found.");
-			vbox.append(*label);
-			labels.push_back(std::move(label));
+			auto label = std::make_shared<Label>(scale);
+			label->setText("No genes found.");
+			label->insertAtEnd(vbox);
 			return;
 		}
 
@@ -113,10 +124,10 @@ namespace Game3 {
 			if (first) {
 				first = false;
 			} else {
-				Gtk::Separator &separator = separators.emplace_back(Gtk::Orientation::HORIZONTAL);
-				separator.set_margin_top(10);
-				separator.set_margin_bottom(5);
-				vbox.append(separator);
+				// Separator &separator = separators.emplace_back(Orientation::HORIZONTAL);
+				// separator.set_margin_top(10);
+				// separator.set_margin_bottom(5);
+				// vbox.append(separator);
 			}
 
 			for (const std::string &line: gene->describeLong()) {
@@ -126,17 +137,12 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::addLabel(const std::string &text) {
-		auto label = std::make_unique<Gtk::Label>(text);
-		label->set_halign(Gtk::Align::START);
-		label->set_margin_top(5);
-		label->set_margin_start(5);
-		vbox.append(*label);
-		labels.push_back(std::move(label));
+		auto label = std::make_shared<Label>(scale);
+		label->setText(text);
+		label->insertAtEnd(vbox);
 	}
 
 	void GeneticAnalysisModule::clearText() {
-		removeChildren(vbox);
-		labels.clear();
-		separators.clear();
+		vbox->clearChildren();
 	}
 }

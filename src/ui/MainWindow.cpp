@@ -424,6 +424,8 @@ namespace Game3 {
 		richPresence.setActivityStartTime(false);
 		richPresence.setActivityDetails("Playing", true);
 
+		canvas->uiContext.reset();
+
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
 		canvas->game = game;
@@ -649,6 +651,9 @@ namespace Game3 {
 			for (const auto &[widget, tab]: tabMap)
 				tab->reset(nullptr);
 			game = nullptr;
+
+			omniDialog.reset();
+			canvas->uiContext.reset();
 		}
 	}
 

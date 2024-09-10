@@ -60,6 +60,16 @@ namespace Game3 {
 		internalScissorStack.setBase(Rectangle{0, 0, x, y});
 	}
 
+	void UIContext::reset() {
+		INFO("UIContext::reset");
+		draggedWidget = nullptr;
+		draggedWidgetActive = false;
+		for (const DialogPtr &dialog: reverse(dialogs))
+			dialog->onClose();
+		dialogs.clear();
+		hotbar->reset();
+	}
+
 	bool UIContext::click(int button, int x, int y) {
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->click(button, x, y))

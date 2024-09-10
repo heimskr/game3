@@ -2,7 +2,7 @@
 
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
-#include "ui/module/GeneticAnalysisModule.h"
+#include "ui/module/GTKGeneticAnalysisModule.h"
 
 namespace Game3 {
 	class Recombinator: public InventoriedTileEntity, public EnergeticTileEntity {

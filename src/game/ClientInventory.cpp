@@ -103,14 +103,14 @@ namespace Game3 {
 		if (AgentPtr owner = weakOwner.lock()) {
 			owner->inventoryUpdated(index);
 
-			ClientGame &game = owner->getRealm()->getGame()->toClient();
+			ClientGamePtr game = owner->getRealm()->getGame()->toClientPointer();
 
-			game.getWindow().queue([&game, weak = weakOwner, index = index.load()] {
+			game->getWindow().queue([game, weak = weakOwner, index = index.load()] {
 				if (AgentPtr owner = weak.lock()) {
 					if (auto player = std::dynamic_pointer_cast<Player>(owner))
-						game.signalPlayerInventoryUpdate().emit(player);
+						game->signalPlayerInventoryUpdate().emit(player);
 					else
-						game.signalOtherInventoryUpdate().emit(owner, index);
+						game->signalOtherInventoryUpdate().emit(owner, index);
 					return;
 				}
 

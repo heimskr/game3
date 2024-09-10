@@ -8,12 +8,12 @@
 #include <vector>
 
 namespace Game3 {
-	class GeneticAnalysisModule: public GTKModule {
+	class GTKGeneticAnalysisModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/genetic_analysis"}; }
 
-			GeneticAnalysisModule(ClientGamePtr, const std::any &);
-			GeneticAnalysisModule();
+			GTKGeneticAnalysisModule(ClientGamePtr, const std::any &);
+			GTKGeneticAnalysisModule();
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;

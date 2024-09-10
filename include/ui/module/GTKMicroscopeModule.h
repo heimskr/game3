@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
-#include "ui/module/GeneticAnalysisModule.h"
+#include "ui/module/GTKGeneticAnalysisModule.h"
 #include "ui/module/GTKModule.h"
 #include "ui/module/GTKMultiModule.h"
 #include "ui/MainWindow.h"
@@ -15,17 +15,17 @@ namespace Game3 {
 	class GTKInventoryModule;
 
 	template <Slot S, Substance... ExtraSubstances>
-	class MicroscopeModule: public GTKModule {
+	class GTKMicroscopeModule: public GTKModule {
 		private:
 			using Submodule = GTKMultiModule<Substance::Item, ExtraSubstances...>;
 
 		public:
 			static Identifier ID() { return {"base", std::format("module/microscope_{}{}", S, Submodule::getSuffix())}; }
 
-			MicroscopeModule(ClientGamePtr game_, const std::any &argument):
-				MicroscopeModule(game_, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
+			GTKMicroscopeModule(ClientGamePtr game_, const std::any &argument):
+				GTKMicroscopeModule(game_, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
 
-			MicroscopeModule(ClientGamePtr game_, std::shared_ptr<InventoriedTileEntity> tile_entity):
+			GTKMicroscopeModule(ClientGamePtr game_, std::shared_ptr<InventoriedTileEntity> tile_entity):
 			game(std::move(game_)),
 			tileEntity(std::move(tile_entity)),
 			multiModule(std::make_shared<Submodule>(game, std::static_pointer_cast<Agent>(tileEntity))) {
@@ -104,7 +104,7 @@ namespace Game3 {
 			ClientGamePtr game;
 			std::shared_ptr<InventoriedTileEntity> tileEntity;
 			std::shared_ptr<Submodule> multiModule;
-			GeneticAnalysisModule geneticAnalysisModule;
+			GTKGeneticAnalysisModule geneticAnalysisModule;
 			Gtk::Label header;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 
