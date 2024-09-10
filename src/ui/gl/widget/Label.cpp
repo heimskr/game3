@@ -14,6 +14,9 @@ namespace Game3 {
 		if (lastRectangle.width != width)
 			wrapped.reset();
 
+		if (deferredText)
+			setText(ui, *std::move(deferredText));
+
 		Widget::render(ui, renderers, x, y, width, height);
 		const float padding = getPadding();
 
@@ -98,6 +101,10 @@ namespace Game3 {
 
 		text = std::move(new_text);
 		wrapped.reset();
+	}
+
+	void Label::setText(UString new_text) {
+		deferredText = new_text;
 	}
 
 	const UString & Label::getText() const {

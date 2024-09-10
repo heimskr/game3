@@ -57,6 +57,7 @@ namespace Game3 {
 			void insertAtStart(WidgetPtr parent);
 			void insertAtEnd(WidgetPtr parent);
 			virtual void remove(WidgetPtr child);
+			virtual void clearChildren();
 
 		protected:
 			float scale{};

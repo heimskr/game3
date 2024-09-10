@@ -2,7 +2,7 @@
 
 #include "types/Types.h"
 #include "ui/module/GTKModule.h"
-#include "ui/module/GeneInfoModule.h"
+#include "ui/module/GTKGeneInfoModule.h"
 
 #include <any>
 #include <memory>
@@ -15,12 +15,12 @@ namespace Game3 {
 	class GTKInventoryModule;
 	class Mutator;
 
-	class MutatorModule: public GTKModule {
+	class GTKMutatorModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/mutator"}; }
 
-			MutatorModule(std::shared_ptr<ClientGame>, const std::any &);
-			MutatorModule(std::shared_ptr<ClientGame>, std::shared_ptr<Mutator>);
+			GTKMutatorModule(std::shared_ptr<ClientGame>, const std::any &);
+			GTKMutatorModule(std::shared_ptr<ClientGame>, std::shared_ptr<Mutator>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
@@ -36,7 +36,7 @@ namespace Game3 {
 			std::shared_ptr<Mutator> mutator;
 			std::shared_ptr<GTKInventoryModule> inventoryModule;
 			std::shared_ptr<FluidLevelsModule> fluidsModule;
-			GeneInfoModule geneInfoModule;
+			GTKGeneInfoModule GTKGeneInfoModule;
 			Gtk::Box vbox{Gtk::Orientation::VERTICAL};
 			Gtk::Label header;
 			Gtk::Button mutateButton{"Mutate"};

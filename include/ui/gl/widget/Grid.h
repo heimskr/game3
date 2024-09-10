@@ -18,7 +18,7 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			void remove(WidgetPtr child) final;
-			void clear();
+			void clearChildren() final;
 
 			void attach(WidgetPtr, std::size_t row, std::size_t column);
 			void detach(std::size_t row, std::size_t column);

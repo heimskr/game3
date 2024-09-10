@@ -7,20 +7,20 @@
 #include "ui/gtk/Util.h"
 #include "ui/module/FluidLevelsModule.h"
 #include "ui/module/GTKInventoryModule.h"
-#include "ui/module/MutatorModule.h"
+#include "ui/module/GTKMutatorModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	MutatorModule::MutatorModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
-		MutatorModule(game_, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
+	GTKMutatorModule::GTKMutatorModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+		GTKMutatorModule(game_, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
 
-	MutatorModule::MutatorModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Mutator> mutator_):
+	GTKMutatorModule::GTKMutatorModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Mutator> mutator_):
 	game(std::move(game_)),
 	mutator(std::move(mutator_)),
 	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(mutator->getInventory(0)))),
 	fluidsModule(std::make_shared<FluidLevelsModule>(game, std::make_any<AgentPtr>(mutator), false)),
-	geneInfoModule(nullptr) {
+	GTKGeneInfoModule(nullptr) {
 		vbox.set_hexpand(true);
 
 		mutateButton.set_hexpand(true);
@@ -41,38 +41,38 @@ namespace Game3 {
 		hbox.append(mutateButton);
 		vbox.append(hbox);
 		vbox.append(fluidsModule->getWidget());
-		vbox.append(geneInfoModule.getWidget());
+		vbox.append(GTKGeneInfoModule.getWidget());
 	}
 
-	Gtk::Widget & MutatorModule::getWidget() {
+	Gtk::Widget & GTKMutatorModule::getWidget() {
 		return vbox;
 	}
 
-	void MutatorModule::reset() {
+	void GTKMutatorModule::reset() {
 		inventoryModule->reset();
 		fluidsModule->reset();
-		geneInfoModule.reset();
+		GTKGeneInfoModule.reset();
 	}
 
-	void MutatorModule::update() {
+	void GTKMutatorModule::update() {
 		inventoryModule->update();
 		fluidsModule->update();
 		assert(mutator);
-		geneInfoModule.update(std::shared_ptr<Gene>(mutator->getGene()));
+		GTKGeneInfoModule.update(std::shared_ptr<Gene>(mutator->getGene()));
 	}
 
-	void MutatorModule::onResize(int width) {
+	void GTKMutatorModule::onResize(int width) {
 		inventoryModule->onResize(width);
 		fluidsModule->onResize(width);
 	}
 
-	void MutatorModule::mutate() {
+	void GTKMutatorModule::mutate() {
 		assert(mutator);
 		std::any buffer = std::make_any<Buffer>(Side::Client);
 		game->getPlayer()->sendMessage(mutator, "Mutate", buffer);
 	}
 
-	std::optional<Buffer> MutatorModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+	std::optional<Buffer> GTKMutatorModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == mutator->getGID()) {
@@ -97,11 +97,11 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	void MutatorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
+	void GTKMutatorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
 		inventoryModule->setInventory(std::move(inventory));
 		if (std::unique_ptr<Gene> gene = mutator->getGene())
-			geneInfoModule.update(std::shared_ptr(std::move(gene)));
+			GTKGeneInfoModule.update(std::shared_ptr(std::move(gene)));
 		else
-			geneInfoModule.update(nullptr);
+			GTKGeneInfoModule.update(nullptr);
 	}
 }

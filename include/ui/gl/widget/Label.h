@@ -18,11 +18,13 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			void setText(UIContext &, UString);
+			void setText(UString);
 			const UString & getText() const;
 
 		protected:
 			UString text;
 			std::optional<UString> wrapped;
+			std::optional<UString> deferredText;
 			float lastTextHeight = -1;
 
 			float getTextScale() const;

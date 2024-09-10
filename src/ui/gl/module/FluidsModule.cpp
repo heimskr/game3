@@ -111,7 +111,7 @@ namespace Game3 {
 		if (!should_regrid)
 			return;
 
-		grid->clear();
+		grid->clearChildren();
 		std::size_t row = 0;
 
 		for (const auto &[name, pair]: widgetPairs) {

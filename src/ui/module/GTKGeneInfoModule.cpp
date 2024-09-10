@@ -2,19 +2,19 @@
 #include "net/Buffer.h"
 #include "packet/AgentMessagePacket.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/GeneInfoModule.h"
+#include "ui/module/GTKGeneInfoModule.h"
 
 namespace Game3 {
-	GeneInfoModule::GeneInfoModule(GenePtr gene_): gene(std::move(gene_)) {
+	GTKGeneInfoModule::GTKGeneInfoModule(GenePtr gene_): gene(std::move(gene_)) {
 		vbox.set_hexpand(true);
 		reset();
 	}
 
-	Gtk::Widget & GeneInfoModule::getWidget() {
+	Gtk::Widget & GTKGeneInfoModule::getWidget() {
 		return vbox;
 	}
 
-	void GeneInfoModule::reset() {
+	void GTKGeneInfoModule::reset() {
 		removeChildren(vbox);
 		labels.clear();
 
@@ -31,11 +31,11 @@ namespace Game3 {
 		}
 	}
 
-	void GeneInfoModule::update() {
+	void GTKGeneInfoModule::update() {
 		reset();
 	}
 
-	void GeneInfoModule::update(std::shared_ptr<Gene> new_gene) {
+	void GTKGeneInfoModule::update(std::shared_ptr<Gene> new_gene) {
 		gene = std::move(new_gene);
 		reset();
 	}

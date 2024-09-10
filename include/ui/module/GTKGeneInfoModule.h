@@ -9,15 +9,14 @@
 #include <vector>
 
 namespace Game3 {
-	class Agent;
 	class Gene;
 	class Mutator;
 
-	class GeneInfoModule: public GTKModule {
+	class GTKGeneInfoModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/gene_info"}; }
 
-			GeneInfoModule(std::shared_ptr<Gene>);
+			GTKGeneInfoModule(std::shared_ptr<Gene>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;

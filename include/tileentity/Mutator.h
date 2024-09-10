@@ -40,7 +40,7 @@ namespace Game3 {
 
 			void findMutagen();
 
-		friend class MutatorModule;
+		friend class GTKMutatorModule;
 		friend class TileEntity;
 	};
 }

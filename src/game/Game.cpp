@@ -22,7 +22,7 @@
 #include "ui/module/MicroscopeModule.h"
 #include "ui/module/GTKModuleFactory.h"
 #include "ui/module/GTKMultiModule.h"
-#include "ui/module/MutatorModule.h"
+#include "ui/module/GTKMutatorModule.h"
 #include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
 #include "util/FS.h"
@@ -62,7 +62,7 @@ namespace Game3 {
 		add(GTKModuleFactory::create<MicroscopeModule<1, Substance::Energy>>());
 		add(GTKModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
 		add(GTKModuleFactory::create<MicroscopeModule<2, Substance::Energy>>());
-		add(GTKModuleFactory::create<MutatorModule>());
+		add(GTKModuleFactory::create<GTKMutatorModule>());
 		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Fluid>>());
 		add(GTKModuleFactory::create<GTKMultiModule<Substance::Item, Substance::Energy>>());

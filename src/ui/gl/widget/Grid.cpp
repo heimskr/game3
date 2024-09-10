@@ -206,10 +206,9 @@ namespace Game3 {
 			widgetContainer.eraseColumn(column);
 	}
 
-	void Grid::clear() {
+	void Grid::clearChildren() {
 		widgetContainer.clear();
-		while (auto child = firstChild)
-			Widget::remove(child);
+		Widget::clearChildren();
 		markDirty();
 	}
 
