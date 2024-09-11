@@ -1,4 +1,4 @@
-#include "MarchingSquares.h"
+#include "algorithm/MarchingSquares.h"
 
 #include <array>
 #include <unordered_map>

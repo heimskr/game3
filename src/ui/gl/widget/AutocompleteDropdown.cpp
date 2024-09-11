@@ -5,11 +5,12 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/Autocompleter.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	namespace {
 		constexpr Color DEFAULT_EXTERIOR_COLOR{"#604620"};
-		constexpr Color DEFAULT_INTERIOR_COLOR{"#ddbc82a0"};
+		constexpr Color DEFAULT_INTERIOR_COLOR{"#ddbc82d0"};
 	}
 
 	AutocompleteDropdown::AutocompleteDropdown(float scale, Color exterior_color, Color interior_color):
@@ -49,6 +50,11 @@ namespace Game3 {
 		rectangler.drawOnScreen(exteriorColor, x + scale, y + height - 2 * scale, scale, scale);
 		// Bottom right corner
 		rectangler.drawOnScreen(exteriorColor, x + width - 2 * scale, y + height - 2 * scale, scale, scale);
+
+		if (sizeConstrainQueued) {
+			sizeConstrainQueued = false;
+			constrainSize(ui);
+		}
 	}
 
 	SizeRequestMode AutocompleteDropdown::getRequestMode() const {
@@ -93,6 +99,26 @@ namespace Game3 {
 			label->insertAtEnd(vbox);
 		}
 		scroller->setChild(vbox);
+	}
+
+	void AutocompleteDropdown::queueConstrainSize() {
+		sizeConstrainQueued = true;
+	}
+
+	void AutocompleteDropdown::constrainSize(UIContext &ui) {
+		if (!scroller)
+			return;
+
+		WidgetPtr child = scroller->getFirstChild();
+
+		if (!child)
+			return;
+
+		float minimum{}, natural{};
+		child->measure(ui.getRenderers(), Orientation::Vertical, fixedWidth, fixedHeight, minimum, natural);
+		if (0 < natural) {
+			setFixedHeight(natural);
+		}
 	}
 
 	void AutocompleteDropdown::choose(const UString &choice) {

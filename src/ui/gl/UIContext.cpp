@@ -125,7 +125,7 @@ namespace Game3 {
 			return pressed->dragEnd(*this, x, y);
 
 		for (const WidgetPtr &widget: extraDragUpdaters) {
-			widget->dragging = false;
+			widget->dragOrigin.reset();
 			widget->dragEnd(*this, x, y);
 		}
 
@@ -208,6 +208,8 @@ namespace Game3 {
 	}
 
 	void UIContext::unfocus() {
+		if (auto widget = focusedWidget.lock())
+			widget->onBlur(*this);
 		focusedWidget.reset();
 	}
 

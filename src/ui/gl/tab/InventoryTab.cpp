@@ -45,7 +45,7 @@ namespace Game3 {
 		Rectangle rectangle(x, y, width, height);
 
 		std::unique_lock<DefaultMutex> module_lock;
-		if (Module *active_module = getModule(module_lock)) {
+		if (getModule(module_lock)) {
 			auto saver = renderers.getSaver();
 			renderers.rectangle.drawOnScreen(Color{0.6, 0.3, 0, 0.2}, x + (rectangle.width - SEPARATOR_WIDTH) / 2, y, SEPARATOR_WIDTH, rectangle.height);
 			rectangle.width = (rectangle.width - SEPARATION) / 2;

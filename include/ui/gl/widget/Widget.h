@@ -66,7 +66,7 @@ namespace Game3 {
 
 		protected:
 			float scale{};
-			bool dragging = false;
+			std::optional<std::pair<int, int>> dragOrigin;
 			Rectangle lastRectangle{-1, -1, -1, -1};
 			WidgetPtr firstChild;
 			WidgetPtr lastChild;

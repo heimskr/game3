@@ -30,6 +30,9 @@ namespace Game3 {
 
 			void setSuggestions(std::vector<UString>);
 
+			void queueConstrainSize();
+			void constrainSize(UIContext &);
+
 		private:
 			Color exteriorColor;
 			Color interiorColor;
@@ -38,6 +41,7 @@ namespace Game3 {
 			std::shared_ptr<Box> vbox;
 			std::pair<float, float> origin;
 			std::vector<UString> suggestions;
+			bool sizeConstrainQueued = false;
 
 			void choose(const UString &);
 	};

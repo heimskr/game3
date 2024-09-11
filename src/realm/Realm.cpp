@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "MarchingSquares.h"
+#include "algorithm/MarchingSquares.h"
 #include "biome/Biome.h"
 #include "entity/ClientPlayer.h"
 #include "entity/Entity.h"

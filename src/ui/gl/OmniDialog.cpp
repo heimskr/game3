@@ -129,12 +129,17 @@ namespace Game3 {
 	void OmniDialog::onClose() {
 		ui.getTooltip()->hide();
 		inventoryTab->removeModule();
+		activeTab->onBlur(ui);
 	}
 
 	bool OmniDialog::click(int button, int x, int y) {
 		for (size_t i = 0; i < tabRectangles.size(); ++i) {
 			if (tabRectangles[i].contains(x, y)) {
-				activeTab = tabs.at(i);
+				const TabPtr &clicked_tab = tabs.at(i);
+				if (clicked_tab != activeTab) {
+					activeTab->onBlur(ui);
+					activeTab = clicked_tab;
+				}
 				return true;
 			}
 		}

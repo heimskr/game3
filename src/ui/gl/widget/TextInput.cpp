@@ -44,7 +44,8 @@ namespace Game3 {
 		borderColor(border_color),
 		interiorColor(interior_color),
 		textColor(text_color),
-		cursorColor(cursor_color) {}
+		cursorColor(cursor_color),
+		focusedCursorColor(cursorColor.darken(3)) {}
 
 	TextInput::TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
 		TextInput(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
@@ -83,7 +84,7 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		rectangler(cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
+		rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
 
 		texter(text, TextRenderOptions{
 			.x = start - xOffset * scale,
@@ -163,7 +164,10 @@ namespace Game3 {
 				return true;
 
 			case GDK_KEY_Escape:
-				ui.unfocus();
+				if (ownsDropdown(ui))
+					hideDropdown(ui);
+				else
+					ui.unfocus();
 				return true;
 
 			case GDK_KEY_Return:
@@ -205,22 +209,15 @@ namespace Game3 {
 	}
 
 	void TextInput::onFocus(UIContext &ui) {
-		std::vector<UString> relevant = getRelevantSuggestions();
-		if (relevant.empty())
-			return;
-
-		auto dropdown = std::make_shared<AutocompleteDropdown>(scale);
-		dropdown->init(ui);
-		dropdown->setParent(std::dynamic_pointer_cast<Autocompleter>(shared_from_this()));
-		dropdown->setOrigin({lastRectangle.x, lastRectangle.y + lastRectangle.height});
-		dropdown->setSuggestions(std::move(relevant));
-		dropdown->setFixedSize(lastRectangle.width, scale * 50);
-		ui.setAutocompleteDropdown(std::move(dropdown));
+		focused = true;
+		makeDropdown(ui);
 	}
 
 	void TextInput::onBlur(UIContext &ui) {
+		focused = false;
+
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
-		if (dropdown || dropdown->checkParent(*this))
+		if (dropdown && dropdown->checkParent(*this))
 			ui.setAutocompleteDropdown(nullptr);
 	}
 
@@ -419,8 +416,36 @@ namespace Game3 {
 
 	void TextInput::forwardSuggestions(UIContext &ui) {
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
+
 		if (dropdown && dropdown->checkParent(*this)) {
 			dropdown->setSuggestions(getRelevantSuggestions());
+			// dropdown->queueConstrainSize();
+		} else {
+			makeDropdown(ui);
 		}
+	}
+
+	void TextInput::makeDropdown(UIContext &ui) {
+		std::vector<UString> relevant = getRelevantSuggestions();
+		if (relevant.empty())
+			return;
+
+		auto dropdown = std::make_shared<AutocompleteDropdown>(scale);
+		dropdown->init(ui);
+		dropdown->setParent(std::dynamic_pointer_cast<Autocompleter>(shared_from_this()));
+		dropdown->setOrigin({lastRectangle.x, lastRectangle.y + lastRectangle.height});
+		dropdown->setSuggestions(std::move(relevant));
+		dropdown->setFixedSize(lastRectangle.width, scale * 50);
+		// dropdown->queueConstrainSize();
+		ui.setAutocompleteDropdown(std::move(dropdown));
+	}
+
+	bool TextInput::ownsDropdown(UIContext &ui) const {
+		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
+		return dropdown && dropdown->checkParent(*this);
+	}
+
+	void TextInput::hideDropdown(UIContext &ui) const {
+		ui.setAutocompleteDropdown(nullptr);
 	}
 }

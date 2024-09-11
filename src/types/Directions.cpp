@@ -1,5 +1,5 @@
 #include "types/Directions.h"
-#include "MarchingSquares.h"
+#include "algorithm/MarchingSquares.h"
 #include "net/Buffer.h"
 
 namespace Game3 {

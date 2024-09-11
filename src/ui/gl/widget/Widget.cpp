@@ -33,7 +33,7 @@ namespace Game3 {
 	}
 
 	bool Widget::click(UIContext &ui, int button, int x, int y) {
-		if (onClick)
+		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick)
 			return onClick(*this, ui, button, x - lastRectangle.x, y - lastRectangle.y);
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
@@ -44,7 +44,7 @@ namespace Game3 {
 	}
 
 	bool Widget::dragStart(UIContext &ui, int x, int y) {
-		dragging = true;
+		dragOrigin.emplace(x, y);
 
 		if (onDragStart && onDragStart(*this, ui, x - lastRectangle.x, y - lastRectangle.y))
 			return true;
@@ -68,7 +68,7 @@ namespace Game3 {
 	}
 
 	bool Widget::dragEnd(UIContext &ui, int x, int y) {
-		dragging = false;
+		dragOrigin.reset();
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
 			if (child->getLastRectangle().contains(x, y) && child->dragEnd(ui, x, y))
@@ -94,12 +94,15 @@ namespace Game3 {
 	}
 
 	bool Widget::isDragging() const {
-		return dragging;
+		return dragOrigin.has_value();
 	}
 
 	void Widget::onFocus(UIContext &) {}
 
-	void Widget::onBlur(UIContext &) {}
+	void Widget::onBlur(UIContext &ui) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			child->onBlur(ui);
+	}
 
 	WidgetPtr Widget::getParent() const {
 		return weakParent.lock();

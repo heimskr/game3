@@ -61,10 +61,12 @@ namespace Game3 {
 			Color interiorColor;
 			Color textColor;
 			Color cursorColor;
+			Color focusedCursorColor;
 			UString text;
 			UString::iterator cursorIterator = text.begin();
 			std::size_t cursor = 0;
 			bool cursorFixQueued = false;
+			bool focused = false;
 			std::optional<std::vector<UString>> suggestions;
 			std::optional<UString> deferredText;
 
@@ -77,5 +79,8 @@ namespace Game3 {
 			void fixCursorOffset();
 			void changed(UIContext &);
 			void forwardSuggestions(UIContext &);
+			void makeDropdown(UIContext &);
+			bool ownsDropdown(UIContext &) const;
+			void hideDropdown(UIContext &) const;
 	};
 }

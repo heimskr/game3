@@ -1,4 +1,4 @@
-#include "MarchingSquares.h"
+#include "algorithm/MarchingSquares.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"

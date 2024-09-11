@@ -73,7 +73,7 @@ namespace Game3 {
 			"vanadium_magnetite",
 		};
 
-		for (const std::string &rare: rares) {
+		for (std::string rare: rares) {
 			Identifier tile("base:tile/cave_" + rare);
 			Identifier item("base:item/" + rare + "_ore");
 			reg.add(tile, std::make_shared<CaveTile>(tile, ItemStack::create(self, item), "base:tile/cave_dirt"));

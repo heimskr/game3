@@ -433,7 +433,7 @@ namespace Game3 {
 			wrapper.object->skip = old_skip;
 		}, wrap(this)));
 
-		instance->SetAccessor(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
+		instance->SetNativeDataProperty(string("length"), [](v8::Local<v8::Name>, const v8::PropertyCallbackInfo<v8::Value> &info) {
 			auto &wrapper = ObjectWrap<Buffer>::unwrap("Buffer", info.This());
 			size_t size = wrapper->size();
 			if (size <= UINT32_MAX)
