@@ -5,16 +5,16 @@
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
-#include "ui/gl/module/InventoryModule.h"
+#include "ui/gl/module/AutocrafterModule.h"
 #include "ui/gl/module/EnergyModule.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/GeneInfoModule.h"
-#include "ui/gl/module/ModuleFactory.h"
+#include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/MicroscopeModule.h"
+#include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/module/MultiModule.h"
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
-#include "ui/module/GTKAutocrafterModule.h"
 #include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/CombinerModule.h"
 #include "ui/module/ComputerModule.h"
@@ -54,12 +54,11 @@ namespace Game3 {
 		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
 		add(GTKModuleFactory::create<ItemFilterModule>());
 		add(GTKModuleFactory::create<CombinerModule>());
-		add(GTKModuleFactory::create<GTKAutocrafterModule>());
 		add(GTKModuleFactory::create<VillageTradeModule>());
-		add(ModuleFactory::create<InventoryModule>());
-		add(ModuleFactory::create<TextModule>());
+		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<EnergyModule>());
 		add(ModuleFactory::create<FluidsModule>());
+		add(ModuleFactory::create<InventoryModule>());
 		add(ModuleFactory::create<MicroscopeModule<0>>());
 		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy>>());
 		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
@@ -69,6 +68,7 @@ namespace Game3 {
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<MultiModule<Substance::Energy, Substance::Fluid>>());
+		add(ModuleFactory::create<TextModule>());
 #ifdef GAME3_ENABLE_SCRIPTING
 		add(GTKModuleFactory::create<ComputerModule>());
 #endif

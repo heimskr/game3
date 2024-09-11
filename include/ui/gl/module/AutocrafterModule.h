@@ -11,13 +11,26 @@ namespace Game3 {
 	class ClientGame;
 	class EnergyModule;
 	class InventoryModule;
+	class TextInput;
 
 	class AutocrafterModule: public Module {
 		public:
 			static Identifier ID() { return {"base", "module/autocrafter"}; }
 
-			AutocrafterModule(std::shared_ptr<ClientGame>, const std::any &);
-			AutocrafterModule(std::shared_ptr<ClientGame>, std::shared_ptr<Autocrafter>);
+			AutocrafterModule(const std::shared_ptr<ClientGame> &, const std::any &);
+			AutocrafterModule(const std::shared_ptr<ClientGame> &, std::shared_ptr<Autocrafter>);
+
+			Identifier getID() const final { return ID(); }
+			void init(UIContext &) final;
+
+			using Module::render;
+			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			SizeRequestMode getRequestMode() const final;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
+
+			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
+			void setInventory(std::shared_ptr<ClientInventory>) final;
+			// std::shared_ptr<GTKInventoryModule> getPrimaryInventoryModule() final { return inventoryModule; }
 
 		private:
 			std::weak_ptr<ClientGame> weakGame;
@@ -25,5 +38,8 @@ namespace Game3 {
 			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<InventoryModule> stationInventoryModule;
 			std::shared_ptr<EnergyModule> energyModule;
+			std::shared_ptr<TextInput> identifierInput;
+
+			void setTarget(const std::string &);
 	};
 }

@@ -18,6 +18,7 @@ namespace Game3 {
 		public:
 			sigc::signal<void(TextInput &, UIContext &)> onSubmit;
 			sigc::signal<void(TextInput &, const UString &)> onChange;
+			sigc::signal<void(TextInput &, const UString &)> onAcceptSuggestion;
 
 			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
 			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
@@ -52,6 +53,7 @@ namespace Game3 {
 			void goEnd(UIContext &);
 
 			void autocomplete(const UString &) final;
+			void hideDropdown(UIContext &) const;
 
 		private:
 			float xOffset = 0;
@@ -81,6 +83,5 @@ namespace Game3 {
 			void forwardSuggestions(UIContext &);
 			void makeDropdown(UIContext &);
 			bool ownsDropdown(UIContext &) const;
-			void hideDropdown(UIContext &) const;
 	};
 }

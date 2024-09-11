@@ -364,6 +364,7 @@ namespace Game3 {
 
 	void TextInput::autocomplete(const UString &completion) {
 		setText(completion);
+		onAcceptSuggestion(*this, completion);
 	}
 
 	float TextInput::getTextScale() const {
