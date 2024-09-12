@@ -8,10 +8,10 @@
 #include "types/DirectedPlace.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/ItemFilterModule.h"
+#include "ui/module/GTKItemFilterModule.h"
 
 namespace Game3 {
-	ItemFilterModule::ItemFilterModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+	GTKItemFilterModule::GTKItemFilterModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	place(std::any_cast<DirectedPlace>(argument)) {
 		auto target = Gtk::DropTarget::create(Glib::Value<DragSource>::value_type(), Gdk::DragAction::MOVE);
@@ -119,23 +119,23 @@ namespace Game3 {
 		populate();
 	}
 
-	Gtk::Widget & ItemFilterModule::getWidget() {
+	Gtk::Widget & GTKItemFilterModule::getWidget() {
 		return vbox;
 	}
 
-	void ItemFilterModule::update() {
+	void GTKItemFilterModule::update() {
 		populate();
 	}
 
-	void ItemFilterModule::reset() {
+	void GTKItemFilterModule::reset() {
 		populate();
 	}
 
-	std::optional<Buffer> ItemFilterModule::handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) {
+	std::optional<Buffer> GTKItemFilterModule::handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) {
 		return std::nullopt;
 	}
 
-	bool ItemFilterModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot source_slot) {
+	bool GTKItemFilterModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot source_slot) {
 		if (ItemStackPtr stack = (*source_inventory)[source_slot]) {
 			setFilter();
 			filter->addItem(stack);
@@ -146,7 +146,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void ItemFilterModule::setMode(bool allow) {
+	void GTKItemFilterModule::setMode(bool allow) {
 		setFilter();
 		if (filter) {
 			filter->setAllowMode(allow);
@@ -154,7 +154,7 @@ namespace Game3 {
 		}
 	}
 
-	void ItemFilterModule::setStrict(bool strict) {
+	void GTKItemFilterModule::setStrict(bool strict) {
 		setFilter();
 		if (filter) {
 			filter->setStrict(strict);
@@ -162,7 +162,7 @@ namespace Game3 {
 		}
 	}
 
-	void ItemFilterModule::upload(ItemFilterPtr filter_to_use) {
+	void GTKItemFilterModule::upload(ItemFilterPtr filter_to_use) {
 		if (!filter_to_use)
 			filter_to_use = filter;
 
@@ -170,17 +170,17 @@ namespace Game3 {
 			return;
 
 		if (!pipe) {
-			WARN("Pipe is missing in ItemFilterModule::upload");
+			WARN("Pipe is missing in GTKItemFilterModule::upload");
 			return;
 		}
 
 		if (!game)
-			throw std::runtime_error("Game is missing in ItemFilterModule::upload");
+			throw std::runtime_error("Game is missing in GTKItemFilterModule::upload");
 
 		game->getPlayer()->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
 	}
 
-	bool ItemFilterModule::setFilter() {
+	bool GTKItemFilterModule::setFilter() {
 		if (!pipe)
 			pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
 
@@ -198,7 +198,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool ItemFilterModule::saveFilter() {
+	bool GTKItemFilterModule::saveFilter() {
 		if (!pipe)
 			pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
 
@@ -209,7 +209,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void ItemFilterModule::populate(ItemFilterPtr filter_to_use) {
+	void GTKItemFilterModule::populate(ItemFilterPtr filter_to_use) {
 		removeChildren(vbox);
 		widgets.clear();
 
@@ -228,7 +228,7 @@ namespace Game3 {
 				addHbox(id, config);
 	}
 
-	void ItemFilterModule::addHbox(const Identifier &id, const ItemFilter::Config &config) {
+	void GTKItemFilterModule::addHbox(const Identifier &id, const ItemFilter::Config &config) {
 		ItemStackPtr stack = ItemStack::create(game, id, 1, config.data);
 		auto hbox = std::make_unique<Gtk::Box>(Gtk::Orientation::HORIZONTAL);
 		auto image = makeImage(*stack);
@@ -258,7 +258,7 @@ namespace Game3 {
 		widgets.push_back(std::move(hbox));
 	}
 
-	std::unique_ptr<Gtk::Image> ItemFilterModule::makeImage(ItemStack &stack) {
+	std::unique_ptr<Gtk::Image> GTKItemFilterModule::makeImage(ItemStack &stack) {
 		auto image = std::make_unique<Gtk::Image>(stack.getImage(*game));
 		image->set_margin(10);
 		image->set_margin_top(6);
@@ -266,14 +266,14 @@ namespace Game3 {
 		return image;
 	}
 
-	std::unique_ptr<Gtk::Label> ItemFilterModule::makeLabel(const ItemStack &stack) {
+	std::unique_ptr<Gtk::Label> GTKItemFilterModule::makeLabel(const ItemStack &stack) {
 		auto label = std::make_unique<Gtk::Label>(stack.getTooltip());
 		label->set_halign(Gtk::Align::START);
 		label->set_margin_end(10);
 		return label;
 	}
 
-	std::unique_ptr<Gtk::Button> ItemFilterModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
+	std::unique_ptr<Gtk::Button> GTKItemFilterModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
 		auto button = std::make_unique<Gtk::Button>();
 		button->set_expand(false);
 		button->set_has_frame(false);
@@ -312,7 +312,7 @@ namespace Game3 {
 		return button;
 	}
 
-	std::unique_ptr<Gtk::SpinButton> ItemFilterModule::makeThreshold(const Identifier &id, const ItemFilter::Config &config) {
+	std::unique_ptr<Gtk::SpinButton> GTKItemFilterModule::makeThreshold(const Identifier &id, const ItemFilter::Config &config) {
 		if (config.comparator == ItemFilter::Comparator::None)
 			return {};
 
@@ -338,7 +338,7 @@ namespace Game3 {
 		return spin;
 	}
 
-	std::unique_ptr<Gtk::Button> ItemFilterModule::makeButton(const ItemStackPtr &stack) {
+	std::unique_ptr<Gtk::Button> GTKItemFilterModule::makeButton(const ItemStackPtr &stack) {
 		auto button = std::make_unique<Gtk::Button>();
 		button->set_icon_name("list-remove-symbolic");
 		button->set_expand(false);

@@ -17,11 +17,11 @@ namespace Game3 {
 	class ItemFilter;
 	class Pipe;
 
-	class ItemFilterModule: public GTKModule {
+	class GTKItemFilterModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/item_filters"}; }
 
-			ItemFilterModule(std::shared_ptr<ClientGame>, const std::any &);
+			GTKItemFilterModule(std::shared_ptr<ClientGame>, const std::any &);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
