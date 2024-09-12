@@ -10,6 +10,7 @@
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/GeneInfoModule.h"
 #include "ui/gl/module/InventoryModule.h"
+#include "ui/gl/module/ItemFiltersModule.h"
 #include "ui/gl/module/MicroscopeModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/module/MultiModule.h"
@@ -59,6 +60,7 @@ namespace Game3 {
 		add(ModuleFactory::create<EnergyModule>());
 		add(ModuleFactory::create<FluidsModule>());
 		add(ModuleFactory::create<InventoryModule>());
+		add(ModuleFactory::create<ItemFiltersModule>());
 		add(ModuleFactory::create<MicroscopeModule<0>>());
 		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy>>());
 		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());

@@ -32,16 +32,24 @@ namespace Game3 {
 		float &coordinate = vertical? y : x;
 		float &size = vertical? height : width;
 		float &last_size = vertical? lastRenderedSize.second : lastRenderedSize.first;
+		const float original_width = width;
+		const float original_height = height;
 
 		size_t i = 0;
 
 		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
-			if (child != firstChild && separatorThickness > 0) {
-				coordinate += padding * scale;
-				rectangler(separatorColor, x, y, separator_width, separator_height);
-				coordinate += (padding + separatorThickness) * scale;
-				last_size += (2 * padding + separatorThickness) * scale;
-				size -= (2 * padding + separatorThickness) * scale;
+			if (child != firstChild) {
+				if (separatorThickness > 0) {
+					coordinate += padding * scale;
+					rectangler(separatorColor, x, y, separator_width, separator_height);
+					coordinate += (padding + separatorThickness) * scale;
+					last_size += (2 * padding + separatorThickness) * scale;
+					size -= (2 * padding + separatorThickness) * scale;
+				} else {
+					coordinate += padding * scale;
+					last_size += 2 * padding * scale;
+					size -= 2 * padding * scale;
+				}
 			}
 
 			float to_add = -1;
@@ -49,8 +57,15 @@ namespace Game3 {
 			bool try_measure = true;
 
 			if (i < childMeasurements.size()) {
-				const auto [child_width, child_height] = childMeasurements[i];
+				const auto &[child_width, child_height] = childMeasurements[i];
 				to_add = vertical? child_height : child_width;
+
+				if (to_add < 0) {
+					float minimum{}, natural{};
+					measure(renderers, orientation, original_width, original_height, minimum, natural);
+					to_add = vertical? child_height : child_width;
+					assert(0 <= to_add);
+				}
 
 				if (0 <= to_add) {
 					try_measure = false;
@@ -96,15 +111,46 @@ namespace Game3 {
 
 		if (measure_orientation == orientation) {
 			minimum = natural = (childCount - 1) * scale * (2 * padding + separatorThickness);
+			const float original_minimum = minimum;
+
+			float accumulated_nonexpanding_natural = 0;
+			std::size_t expand_count = 0;
+			std::size_t j = 0;
+			std::vector<float> naturals(childCount, -1);
 
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
-				float child_minimum{};
-				float child_natural{};
-				child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
-				minimum += child_minimum;
-				natural += child_natural;
+				if (child->getExpand(measure_orientation)) {
+					++expand_count;
+				} else {
+					float child_minimum{};
+					float child_natural{};
+					child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
+					minimum += child_minimum;
+					natural += child_natural;
+					accumulated_nonexpanding_natural += child_natural;
+					naturals[j] = child_natural;
+				}
+
+				++j;
+			}
+
+			j = 0;
+
+			const float for_size = measure_orientation == Orientation::Horizontal? for_width : for_height;
+			if (0 < expand_count)
+				natural = for_size;
+
+			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 				auto &pair = childMeasurements.at(i++);
-				(measure_orientation == Orientation::Horizontal? pair.first : pair.second) = child_natural;
+				auto &item = measure_orientation == Orientation::Horizontal? pair.first : pair.second;
+
+				if (child->getExpand(measure_orientation)) {
+					item = (for_size - accumulated_nonexpanding_natural - original_minimum) / expand_count;
+				} else {
+					item = naturals[j];
+				}
+
+				++j;
 			}
 		} else {
 			minimum = 0;

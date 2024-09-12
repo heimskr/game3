@@ -108,7 +108,6 @@ namespace Game3 {
 			return sizeContainer[*row, *column].second;
 		};
 
-
 		for (outer = 0; outer < outer_size; ++outer) {
 			float max_minimum = 0;
 			float max_natural = 0;
