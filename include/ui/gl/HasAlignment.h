@@ -13,6 +13,7 @@ namespace Game3 {
 			Alignment getAlignment(Orientation) const;
 			virtual void setHorizontalAlignment(Alignment);
 			virtual void setVerticalAlignment(Alignment);
+			void setAlignment(Alignment);
 			void setAlignment(Orientation, Alignment);
 			virtual void setAlignment(Alignment horizontal, Alignment vertical);
 

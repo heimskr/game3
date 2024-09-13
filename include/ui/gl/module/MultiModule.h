@@ -59,19 +59,19 @@ namespace Game3 {
 							assert(inventoried);
 							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
 								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
-								submodules.emplace_back(std::make_shared<InventoryModule>(ui, game, std::move(inventory)));
+								submodules.emplace_back(std::make_shared<InventoryModule>(ui, std::move(inventory)));
 							}
 							break;
 						}
 
 						case Substance::Fluid: {
 							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
-							submodules.emplace_back(std::make_shared<FluidsModule>(ui, game, agent));
+							submodules.emplace_back(std::make_shared<FluidsModule>(ui, agent));
 							break;
 						}
 
 						case Substance::Energy: {
-							submodules.emplace_back(std::make_shared<EnergyModule>(ui, game, agent, false));
+							submodules.emplace_back(std::make_shared<EnergyModule>(ui, agent, false));
 							break;
 						}
 

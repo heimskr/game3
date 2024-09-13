@@ -23,8 +23,8 @@ namespace Game3 {
 		Module(ui),
 		weakGame(game),
 		autocrafter(std::move(autocrafter)),
-		inventoryModule(std::make_shared<InventoryModule>(ui, game, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
-		stationInventoryModule(std::make_shared<InventoryModule>(ui, game, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
+		inventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
+		stationInventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
 		energyModule(std::make_shared<EnergyModule>(ui, game, std::static_pointer_cast<Agent>(this->autocrafter), false)) {}
 
 	void AutocrafterModule::init() {

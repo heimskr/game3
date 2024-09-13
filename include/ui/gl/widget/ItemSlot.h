@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/HasAlignment.h"
 
 #include <memory>
 
@@ -9,7 +10,7 @@ namespace Game3 {
 	class ItemStack;
 	class ItemTexture;
 
-	class ItemSlot: public Widget {
+	class ItemSlot: public Widget, public HasAlignment {
 		private:
 			std::shared_ptr<Inventory> inventory;
 			std::shared_ptr<ItemStack> stack;
@@ -21,6 +22,7 @@ namespace Game3 {
 		public:
 			ItemSlot(UIContext &, std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
 			ItemSlot(UIContext &, Slot, float size, float scale, bool active = false);
+			ItemSlot(UIContext &, Slot = -1, bool active = false);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

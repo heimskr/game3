@@ -128,7 +128,7 @@ namespace Game3 {
 	}
 
 	SizeRequestMode Button::getRequestMode() const {
-		return SizeRequestMode::WidthForHeight;
+		return SizeRequestMode::ConstantSize;
 	}
 
 	void Button::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
@@ -139,13 +139,15 @@ namespace Game3 {
 				return;
 			}
 
-			if (for_height < 0)
-				for_height = std::max(fixedHeight, getMinimumPreferredHeight());
-
-			minimum = natural = getWidth(renderers, for_height);
+			minimum = natural = getWidth(renderers, std::max(fixedHeight, getMinimumPreferredHeight()));
 		} else {
 			minimum = getMinimumPreferredHeight();
-			natural = std::max(minimum, fixedHeight);
+
+			if (verticalExpand && 0 <= for_height) {
+				natural = for_height;
+			} else {
+				natural = std::max(minimum, fixedHeight);
+			}
 		}
 	}
 

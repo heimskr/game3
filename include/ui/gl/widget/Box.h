@@ -26,5 +26,7 @@ namespace Game3 {
 			float separatorThickness;
 			Color separatorColor;
 			std::vector<std::pair<float, float>> childMeasurements;
+			/** If the box is horizontal, this will be the maximum child height; otherwise, it will be the maximum child width. */
+			std::optional<float> maximumPerpendicularChildMeasurement;
 	};
 }

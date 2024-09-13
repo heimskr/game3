@@ -15,7 +15,7 @@ namespace {
 }
 
 namespace Game3 {
-	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const std::any &argument):
+	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument):
 		InventoryModule(ui, getInventory(argument)) {}
 
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):

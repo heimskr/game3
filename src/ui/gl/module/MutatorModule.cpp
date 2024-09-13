@@ -20,7 +20,7 @@ namespace Game3 {
 		Module(ui),
 		weakGame(game),
 		mutator(std::move(mutator)),
-		inventoryModule(std::make_shared<InventoryModule>(ui, game, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
+		inventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
 		fluidsModule(std::make_shared<FluidsModule>(ui, game, std::make_any<AgentPtr>(this->mutator), false)),
 		geneInfoModule(std::make_shared<GeneInfoModule>(ui, nullptr)) {}
 

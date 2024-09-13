@@ -70,7 +70,12 @@ namespace Game3 {
 
 				if (0 <= to_add) {
 					try_measure = false;
-					child->render(renderers, x, y, child_width < 0? width : child_width, child_height < 0? height : child_height);
+					if (orientation == Orientation::Horizontal) {
+						child->render(renderers, x, y, child_width < 0? width : child_width, maximumPerpendicularChildMeasurement.value_or(child_height < 0? height : child_height));
+					} else {
+						child->render(renderers, x, y, maximumPerpendicularChildMeasurement.value_or(child_width < 0? width : child_width), child_height < 0? height : child_height);
+
+					}
 				}
 			}
 
@@ -109,6 +114,7 @@ namespace Game3 {
 
 		size_t i = 0;
 		childMeasurements.resize(childCount, {-1, -1});
+		maximumPerpendicularChildMeasurement.reset();
 
 		if (measure_orientation == orientation) {
 			minimum = natural = (childCount - 1) * scale * (0 < separatorThickness? 2 * padding + separatorThickness : padding);
@@ -166,6 +172,9 @@ namespace Game3 {
 				natural = std::max(natural, child_natural);
 				auto &pair = childMeasurements.at(i++);
 				(measure_orientation == Orientation::Horizontal? pair.first : pair.second) = child_natural;
+
+				if (0 <= child_natural)
+					maximumPerpendicularChildMeasurement = std::max(child_natural, maximumPerpendicularChildMeasurement.value_or(-1));
 			}
 		}
 	}

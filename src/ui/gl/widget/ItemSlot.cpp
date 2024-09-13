@@ -11,6 +11,7 @@
 #include "packet/SetActiveSlotPacket.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Tooltip.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
@@ -25,8 +26,14 @@ namespace Game3 {
 	ItemSlot::ItemSlot(UIContext &ui, Slot slot, float size, float scale, bool active):
 		ItemSlot(ui, nullptr, nullptr, slot, size, scale, active) {}
 
+	ItemSlot::ItemSlot(UIContext &ui, Slot slot, bool active):
+		ItemSlot(ui, slot, INNER_SLOT_SIZE, SLOT_SCALE, active) {}
+
 	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(renderers, x, y, width, height);
+
+		adjustCoordinate(Orientation::Horizontal, x, width, size * scale);
+		adjustCoordinate(Orientation::Vertical, y, height, size * scale);
 
 		if (!ui.renderingDraggedWidget) {
 			const float alpha = active? 0.4 : 0.15;
