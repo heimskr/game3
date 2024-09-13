@@ -81,6 +81,7 @@ namespace Game3 {
 				}
 
 				box = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+				box->setHorizontalExpand(true);
 				box->insertAtEnd(shared_from_this());
 
 				for (const ModulePtr &submodule: submodules) {

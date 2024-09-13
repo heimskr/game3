@@ -3,7 +3,7 @@
 
 namespace Game3 {
 	Module::Module(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+		ChildDependentExpandingWidget<Widget>(ui, scale) {}
 
 	Module::Module(UIContext &ui):
 		Module(ui, UI_SCALE) {}

@@ -1,16 +1,17 @@
 #pragma once
 
 #include "graphics/Color.h"
+#include "ui/gl/widget/ChildDependentExpandingWidget.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/Types.h"
 
 namespace Game3 {
-	class Box: public Widget {
+	class Box: public ChildDependentExpandingWidget<Widget> {
 		public:
 			Box(UIContext &, float scale, Orientation, float padding, float separator_thickness, Color separator_color);
 			Box(UIContext &, float scale, Orientation = Orientation::Vertical);
 
-			using Widget::render;
+			using ChildDependentExpandingWidget<Widget>::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;

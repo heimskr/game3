@@ -25,7 +25,6 @@ namespace Game3 {
 		geneInfoModule(std::make_shared<GeneInfoModule>(ui, nullptr)) {}
 
 	void MutatorModule::init() {
-		setHorizontalExpand(true);
 		inventoryModule->init();
 		fluidsModule->init();
 		geneInfoModule->init();

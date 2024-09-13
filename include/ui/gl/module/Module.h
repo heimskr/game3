@@ -3,6 +3,7 @@
 #include "data/Identifier.h"
 #include "net/Buffer.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/widget/ChildDependentExpandingWidget.h"
 
 #include <any>
 #include <string>
@@ -11,7 +12,7 @@ namespace Game3 {
 	class Agent;
 	class ClientInventory;
 
-	class Module: public Widget {
+	class Module: public ChildDependentExpandingWidget<Widget> {
 		public:
 			Module(UIContext &, float scale);
 			Module(UIContext &);

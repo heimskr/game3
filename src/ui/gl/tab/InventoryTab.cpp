@@ -33,12 +33,15 @@ namespace Game3 {
 	void InventoryTab::init() {
 		assert(!playerInventoryModule);
 		playerInventoryModule = makePlayerInventoryModule(ui);
+		playerInventoryModule->init();
 
 		assert(!playerScroller);
 		playerScroller = makePlayerScroller();
+		playerScroller->init();
 
 		assert(!moduleScroller);
 		moduleScroller = makeModuleScroller();
+		moduleScroller->init();
 	}
 
 	void InventoryTab::render(const RendererContext &renderers, float x, float y, float width, float height) {

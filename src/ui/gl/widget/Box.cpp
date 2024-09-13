@@ -10,7 +10,7 @@ namespace {
 
 namespace Game3 {
 	Box::Box(UIContext &ui, float scale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
-		Widget(ui, scale),
+		ChildDependentExpandingWidget<Widget>(ui, scale),
 		orientation(orientation),
 		padding(padding),
 		separatorThickness(separator_thickness),
@@ -21,7 +21,7 @@ namespace Game3 {
 
 	void Box::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		maybeRemeasure(renderers, width, height);
-		Widget::render(renderers, x, y, width, height);
+		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
@@ -105,7 +105,6 @@ namespace Game3 {
 		}
 
 		std::size_t i = 0;
-		std::size_t old_size = childMeasurements.size();
 		childMeasurements.resize(childCount, {-1, -1});
 
 		if (measure_orientation == orientation) {
@@ -117,7 +116,7 @@ namespace Game3 {
 			std::size_t j = 0;
 			std::vector<float> naturals(childCount, -1);
 
-			const bool vertical = measure_orientation == Orientation::Vertical;
+			// const bool vertical = measure_orientation == Orientation::Vertical;
 
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 				if (child->getExpand(measure_orientation)) {

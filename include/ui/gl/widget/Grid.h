@@ -1,17 +1,18 @@
 #pragma once
 
 #include "container/GridContainer.h"
+#include "ui/gl/widget/ChildDependentExpandingWidget.h"
 #include "ui/gl/widget/Widget.h"
 
 #include <optional>
 #include <vector>
 
 namespace Game3 {
-	class Grid: public Widget {
+	class Grid: public ChildDependentExpandingWidget<Widget> {
 		public:
-			using Widget::Widget;
+			using ChildDependentExpandingWidget<Widget>::ChildDependentExpandingWidget;
 
-			using Widget::render;
+			using ChildDependentExpandingWidget<Widget>::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;

@@ -1,7 +1,7 @@
-#include "Log.h"
 #include "graphics/Rectangle.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/UIContext.h"
+#include "util/Defer.h"
 #include "util/Demangle.h"
 
 #include <cassert>
@@ -154,6 +154,8 @@ namespace Game3 {
 			parent->lastChild = self;
 
 		++parent->childCount;
+
+		onChildrenUpdated();
 	}
 
 	void Widget::insertBefore(WidgetPtr parent, WidgetPtr sibling) {
@@ -178,6 +180,8 @@ namespace Game3 {
 			parent->firstChild = self;
 
 		++parent->childCount;
+
+		onChildrenUpdated();
 	}
 
 	void Widget::insertAtStart(WidgetPtr parent) {
@@ -200,6 +204,8 @@ namespace Game3 {
 			parent->lastChild = self;
 
 		++parent->childCount;
+
+		parent->onChildrenUpdated();
 	}
 
 	void Widget::insertAtEnd(WidgetPtr parent) {
@@ -222,6 +228,8 @@ namespace Game3 {
 			parent->firstChild = self;
 
 		++parent->childCount;
+
+		parent->onChildrenUpdated();
 	}
 
 	void Widget::remove(WidgetPtr child) {
@@ -239,11 +247,19 @@ namespace Game3 {
 
 		child->weakParent.reset();
 		--childCount;
+
+		onChildrenUpdated();
 	}
 
 	void Widget::clearChildren() {
-		while (firstChild)
-			remove(firstChild);
+		{
+			suppressChildUpdates = true;
+			Defer defer([this] { suppressChildUpdates = false; });
+			while (firstChild)
+				remove(firstChild);
+		}
+
+		onChildrenUpdated();
 	}
 
 	std::size_t Widget::getChildCount() const {
@@ -252,6 +268,10 @@ namespace Game3 {
 
 	UIContext & Widget::getUI() {
 		return ui;
+	}
+
+	bool Widget::onChildrenUpdated() {
+		return !suppressChildUpdates;
 	}
 
 	void Widget::setOnClick(decltype(onClick) new_onclick) {

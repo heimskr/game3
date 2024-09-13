@@ -35,13 +35,12 @@ namespace Game3 {
 			label->insertAtEnd(vbox);
 		}
 
-		auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
-		hbox->setSeparatorThickness(0);
+		vbox->setHorizontalExpand(true);
 
 		grid = std::make_shared<Grid>(ui, scale);
-		grid->insertAtEnd(hbox);
+		grid->setHorizontalExpand(true);
+		grid->insertAtEnd(vbox);
 
-		hbox->insertAtEnd(vbox);
 		vbox->insertAtEnd(shared_from_this());
 	}
 

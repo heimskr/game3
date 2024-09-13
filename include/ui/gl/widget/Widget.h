@@ -80,6 +80,7 @@ namespace Game3 {
 			WeakWidgetPtr previousSibling;
 			WidgetPtr nextSibling;
 			std::size_t childCount = 0;
+			bool suppressChildUpdates = false;
 
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, int button, int mouse_x, int mouse_y)> onClick;
@@ -89,6 +90,9 @@ namespace Game3 {
 
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, int mouse_x, int mouse_y)> onDragUpdate;
+
+			/** Returns false if updates are suppressed. */
+			virtual bool onChildrenUpdated();
 
 		public:
 			virtual void setOnClick(decltype(onClick));

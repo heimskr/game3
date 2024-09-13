@@ -4,7 +4,6 @@
 #include "graphics/RendererContext.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/UIContext.h"
-#include "util/Defer.h"
 
 namespace {
 	constexpr float SCROLL_SPEED = 64;
@@ -26,6 +25,10 @@ namespace Game3 {
 			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
 		}
 
+		if (firstChild && static_cast<int>(width) != lastRectangle.width) {
+			firstChild->measure(renderers, Orientation::Horizontal, width, height, dummy, dummy);
+		}
+
 		maybeRemeasure(renderers, width, height);
 
 		Widget::render(renderers, x, y, width, height);
@@ -34,6 +37,9 @@ namespace Game3 {
 			return;
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
+
+		if (firstChild && lastChildHeight < 0)
+			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
 
 		firstChild->render(renderers, xOffset, yOffset, width, height);
 

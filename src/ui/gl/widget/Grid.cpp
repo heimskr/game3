@@ -9,6 +9,8 @@ namespace Game3 {
 			sizesDirty = false;
 		}
 
+		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
+
 		const float original_x = x;
 
 		for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {
@@ -268,5 +270,7 @@ namespace Game3 {
 	void Grid::markDirty() {
 		sizesDirty = true;
 		lastMode.reset();
+		lastCalculatedHorizontalExpand.reset();
+		lastCalculatedVerticalExpand.reset();
 	}
 }
