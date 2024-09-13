@@ -18,7 +18,6 @@ namespace Game3 {
 		scroller->insertAtEnd(tab);
 
 		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
-		vbox->setHorizontalExpand(true);
 		vbox->insertAtEnd(scroller);
 
 		auto input = std::make_shared<TextInput>(ui, scale);
@@ -36,9 +35,10 @@ namespace Game3 {
 	}
 
 	void CraftingTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		WidgetPtr child = firstChild;
-		assert(child != nullptr);
-		child->render(renderers, x, y, width, height);
+		maybeRemeasure(renderers, width, height);
+		assert(firstChild != nullptr);
+		Tab::render(renderers, x, y, width, height);
+		firstChild->render(renderers, x, y, width, height);
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {

@@ -139,8 +139,10 @@ namespace Game3 {
 			j = 0;
 
 			const float for_size = measure_orientation == Orientation::Horizontal? for_width : for_height;
-			if (0 < expand_count)
+
+			if (0 < expand_count) {
 				natural = for_size;
+			}
 
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 				auto &pair = childMeasurements.at(i++);
@@ -165,15 +167,22 @@ namespace Game3 {
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 				float child_minimum{};
 				float child_natural{};
-				expansive = expansive || child->getExpand(measure_orientation);
+				const bool child_expansive = child->getExpand(measure_orientation);
 				child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
 				minimum = std::max(minimum, child_minimum);
 				natural = std::max(natural, child_natural);
+
+				if (child_expansive) {
+					expansive = true;
+					child_natural = measure_orientation == Orientation::Horizontal? for_width : for_height;
+				}
+
+				if (0 <= child_natural) {
+					maximumPerpendicularChildMeasurement = std::max(child_natural, maximumPerpendicularChildMeasurement.value_or(-1));
+				}
+
 				auto &pair = childMeasurements.at(i++);
 				(measure_orientation == Orientation::Horizontal? pair.first : pair.second) = child_natural;
-
-				if (0 <= child_natural)
-					maximumPerpendicularChildMeasurement = std::max(child_natural, maximumPerpendicularChildMeasurement.value_or(-1));
 			}
 
 			if (expansive) {
