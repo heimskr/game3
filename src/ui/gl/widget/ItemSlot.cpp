@@ -30,6 +30,12 @@ namespace Game3 {
 		ItemSlot(ui, slot, INNER_SLOT_SIZE, SLOT_SCALE, active) {}
 
 	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		if (width < 0)
+			width = size * scale;
+
+		if (height < 0)
+			height = size * scale;
+
 		Widget::render(renderers, x, y, width, height);
 
 		adjustCoordinate(Orientation::Horizontal, x, width, size * scale);
