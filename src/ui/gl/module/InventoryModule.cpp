@@ -21,6 +21,17 @@ namespace Game3 {
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):
 		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
 
+	void InventoryModule::init() {
+		InventoryPtr inventory = inventoryGetter->get();
+		auto inventory_lock = inventory->sharedLock();
+		const Slot slot_count = inventory->getSlotCount();
+		assert(0 <= slot_count);
+		const bool is_player = inventory->getOwner() == ui.getPlayer();
+		const Slot active_slot = inventory->activeSlot;
+		for (Slot slot = 0; slot < slot_count; ++slot)
+			slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
+	}
+
 	void InventoryModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(renderers, x, y, width, height);
 

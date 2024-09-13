@@ -204,6 +204,6 @@ namespace Game3 {
 	}
 
 	float Button::getMinimumPreferredHeight() const {
-		return scale * 12;
+		return scale * 10;
 	}
 }

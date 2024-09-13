@@ -22,7 +22,7 @@ namespace Game3 {
 	class MultiModule: public Module {
 		public:
 			static Identifier ID() {
-				return {"base", "module/multi_" + getSuffix()};
+				return {"base", "module/multi/" + getSuffix()};
 			}
 
 			static std::string getSuffix() {

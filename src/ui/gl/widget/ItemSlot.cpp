@@ -100,7 +100,7 @@ namespace Game3 {
 	}
 
 	void ItemSlot::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
-		minimum = natural = 16 * scale;
+		minimum = natural = size * scale;
 	}
 
 	void ItemSlot::setStack(std::shared_ptr<ItemStack> new_stack) {

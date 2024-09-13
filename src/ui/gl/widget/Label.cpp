@@ -11,15 +11,19 @@ namespace Game3 {
 		Widget(ui, scale) {}
 
 	void Label::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (lastRectangle.width != width) {
+		if (lastRectangle.width != static_cast<int>(width)) {
 			wrapped.reset();
 		}
 
-		Widget::render(renderers, x, y, width, height);
 		const float padding = getPadding();
 
 		tryWrap(renderers.text, width);
 		const UString &string = wrapped? wrapped.value() : text;
+
+		if (0 <= lastUnwrappedTextWidth)
+			adjustCoordinate(Orientation::Horizontal, x, width, std::min(width, lastUnwrappedTextWidth));
+
+		Widget::render(renderers, x, y, width, height);
 
 		float y_pos = y + padding;
 		bool align_top = true;
@@ -46,7 +50,6 @@ namespace Game3 {
 			.color{0, 0, 0, 1},
 			.alignTop = align_top,
 			.shadow{0, 0, 0, 0},
-			.heightOut = &lastTextHeight,
 		});
 	}
 
@@ -99,6 +102,7 @@ namespace Game3 {
 
 		text = std::move(new_text);
 		wrapped.reset();
+		lastUnwrappedTextWidth = ui.getRenderers().text.textWidth(text, getTextScale());
 	}
 
 	const UString & Label::getText() const {

@@ -104,6 +104,18 @@ namespace Game3 {
 			child->onBlur();
 	}
 
+	void Widget::maybeRemeasure(const RendererContext &renderers, int width, int height) {
+		float minimum{}, natural{};
+
+		if (width != lastRectangle.width) {
+			measure(renderers, Orientation::Horizontal, width, height, minimum, natural);
+		}
+
+		if (height != lastRectangle.height) {
+			measure(renderers, Orientation::Vertical, width, height, minimum, natural);
+		}
+	}
+
 	WidgetPtr Widget::getParent() const {
 		return weakParent.lock();
 	}

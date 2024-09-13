@@ -51,6 +51,9 @@ namespace Game3 {
 			virtual bool isDragging() const;
 			virtual void onFocus();
 			virtual void onBlur();
+			/** Calls horizontal `measure` if `width` isn't the same as the last recorded width.
+			 *  Calls vertical `measure` if `height` isn't the same as the last recorded height. */
+			virtual void maybeRemeasure(const RendererContext &, int width, int height);
 
 			WidgetPtr getParent() const;
 			WidgetPtr getPreviousSibling() const;

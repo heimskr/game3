@@ -55,8 +55,9 @@ namespace Game3 {
 		grid->attach(hostname_label, row, 0);
 
 		auto hostname_input = std::make_shared<TextInput>(ui, scale);
-		hostname_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		hostname_input->setFixedHeight(scale * TEXT_INPUT_HEIGHT_FACTOR);
 		hostname_input->setText(settings.hostname);
+		hostname_input->setHorizontalExpand(true);
 		hostname_input->onChange.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
 				input.setInteriorColor(getInvalidColor());

@@ -18,9 +18,11 @@ namespace Game3 {
 		scroller->insertAtEnd(tab);
 
 		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+		vbox->setHorizontalExpand(true);
 		vbox->insertAtEnd(scroller);
 
 		auto input = std::make_shared<TextInput>(ui, scale);
+		input->setHorizontalExpand(true);
 		input->setSuggestions(std::vector<UString>{
 			"foo",
 			"bar",

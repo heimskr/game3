@@ -20,6 +20,14 @@ namespace Game3 {
 		Scroller(ui, scale, DEFAULT_SCROLLBAR_COLOR) {}
 
 	void Scroller::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		float dummy{};
+
+		if (firstChild && static_cast<int>(height) != lastRectangle.height) {
+			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
+		}
+
+		maybeRemeasure(renderers, width, height);
+
 		Widget::render(renderers, x, y, width, height);
 
 		if (!firstChild)
@@ -27,11 +35,7 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
-		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateSize
 		firstChild->render(renderers, xOffset, yOffset, width, height);
-
-		float dummy{};
-		firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
 
 		if (lastChildHeight > 0) {
 			updateVerticalRectangle();

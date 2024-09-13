@@ -20,19 +20,12 @@ namespace Game3 {
 		Box(ui, scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
 
 	void Box::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (width != lastRectangle.width || height != lastRectangle.height || childMeasurements.empty()) {
-			childMeasurements.clear();
-			float minimum{}, natural{};
-			measure(renderers, Orientation::Vertical, width, height, minimum, natural);
-			measure(renderers, Orientation::Horizontal, width, height, minimum, natural);
-		}
-
+		maybeRemeasure(renderers, width, height);
 		Widget::render(renderers, x, y, width, height);
-
-		const bool vertical = orientation == Orientation::Vertical;
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
+		const bool vertical = orientation == Orientation::Vertical;
 		const float separator_width = vertical? width : separatorThickness * scale;
 		const float separator_height = vertical? separatorThickness * scale : height;
 		float &coordinate = vertical? y : x;
@@ -65,7 +58,7 @@ namespace Game3 {
 					float minimum{}, natural{};
 					measure(renderers, orientation, width, height, minimum, natural);
 					to_add = vertical? child_height : child_width;
-					// assert(0 <= to_add);
+					assert(0 <= to_add);
 				}
 
 				if (0 <= to_add) {
@@ -74,7 +67,6 @@ namespace Game3 {
 						child->render(renderers, x, y, child_width < 0? width : child_width, maximumPerpendicularChildMeasurement.value_or(child_height < 0? height : child_height));
 					} else {
 						child->render(renderers, x, y, maximumPerpendicularChildMeasurement.value_or(child_width < 0? width : child_width), child_height < 0? height : child_height);
-
 					}
 				}
 			}
@@ -112,9 +104,9 @@ namespace Game3 {
 			return;
 		}
 
-		size_t i = 0;
+		std::size_t i = 0;
+		std::size_t old_size = childMeasurements.size();
 		childMeasurements.resize(childCount, {-1, -1});
-		maximumPerpendicularChildMeasurement.reset();
 
 		if (measure_orientation == orientation) {
 			minimum = natural = (childCount - 1) * scale * (0 < separatorThickness? 2 * padding + separatorThickness : padding);
@@ -125,6 +117,8 @@ namespace Game3 {
 			std::size_t j = 0;
 			std::vector<float> naturals(childCount, -1);
 
+			const bool vertical = measure_orientation == Orientation::Vertical;
+
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 				if (child->getExpand(measure_orientation)) {
 					++expand_count;
@@ -132,7 +126,8 @@ namespace Game3 {
 					float child_minimum{};
 					float child_natural{};
 					// child->measure(renderers, measure_orientation, vertical? for_width : -1, vertical? -1 : for_height, child_minimum, child_natural);
-					child->measure(renderers, measure_orientation, -1, -1, child_minimum, child_natural);
+					// child->measure(renderers, measure_orientation, -1, -1, child_minimum, child_natural);
+					child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
 					minimum += child_minimum;
 					natural += child_natural;
 					accumulated_nonexpanding_natural += child_natural;
@@ -161,12 +156,17 @@ namespace Game3 {
 				++j;
 			}
 		} else {
+			maximumPerpendicularChildMeasurement.reset();
+
 			minimum = 0;
 			natural = 0;
+
+			bool expansive = false;
 
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 				float child_minimum{};
 				float child_natural{};
+				expansive = expansive || child->getExpand(measure_orientation);
 				child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
 				minimum = std::max(minimum, child_minimum);
 				natural = std::max(natural, child_natural);
@@ -175,6 +175,10 @@ namespace Game3 {
 
 				if (0 <= child_natural)
 					maximumPerpendicularChildMeasurement = std::max(child_natural, maximumPerpendicularChildMeasurement.value_or(-1));
+			}
+
+			if (expansive) {
+				natural = std::max(natural, measure_orientation == Orientation::Vertical? for_height : for_width);
 			}
 		}
 	}

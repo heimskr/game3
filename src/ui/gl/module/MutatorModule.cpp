@@ -25,15 +25,18 @@ namespace Game3 {
 		geneInfoModule(std::make_shared<GeneInfoModule>(ui, nullptr)) {}
 
 	void MutatorModule::init() {
+		setHorizontalExpand(true);
 		inventoryModule->init();
 		fluidsModule->init();
 		geneInfoModule->init();
 
 		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
+		vbox->setHorizontalExpand(true);
 
 		header = std::make_shared<Label>(ui, scale);
 		header->setText(mutator->getName());
-		header->setHorizontalAlignment(Alignment::Middle); // TODO: it's not aligning
+		header->setHorizontalAlignment(Alignment::Middle);
+		header->setHorizontalExpand(true);
 		header->insertAtEnd(vbox);
 
 		hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
@@ -42,7 +45,7 @@ namespace Game3 {
 
 		mutateButton = std::make_shared<Button>(ui, scale);
 		mutateButton->setText("Mutate");
-		mutateButton->setFixedHeight(12 * scale);
+		mutateButton->setFixedHeight(10 * scale);
 		mutateButton->setVerticalAlignment(Alignment::Middle);
 		mutateButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button != 1)

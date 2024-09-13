@@ -26,6 +26,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "module/inventory"}; }
 
 			Identifier getID() const final { return ID(); }
+			void init() final;
 
 			using Module::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

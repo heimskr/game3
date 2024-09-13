@@ -24,6 +24,7 @@ namespace Game3 {
 			UString text;
 			std::optional<UString> wrapped;
 			float lastTextHeight = -1;
+			float lastUnwrappedTextWidth = -1;
 
 			float getTextScale() const;
 			float getPadding() const;
