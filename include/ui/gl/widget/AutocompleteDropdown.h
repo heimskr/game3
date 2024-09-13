@@ -12,11 +12,11 @@ namespace Game3 {
 
 	class AutocompleteDropdown: public Widget, public HasFixedSize {
 		public:
-			AutocompleteDropdown(float scale, Color exterior_color, Color interior_color);
-			AutocompleteDropdown(float scale);
+			AutocompleteDropdown(UIContext &, float scale, Color exterior_color, Color interior_color);
+			AutocompleteDropdown(UIContext &, float scale);
 
-			void init(UIContext &) final;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void init() final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
@@ -30,8 +30,7 @@ namespace Game3 {
 
 			void setSuggestions(std::vector<UString>);
 
-			void queueConstrainSize();
-			void constrainSize(UIContext &);
+			void constrainSize();
 
 		private:
 			Color exteriorColor;
@@ -41,7 +40,6 @@ namespace Game3 {
 			std::shared_ptr<Box> vbox;
 			std::pair<float, float> origin;
 			std::vector<UString> suggestions;
-			bool sizeConstrainQueued = false;
 
 			void choose(const UString &);
 	};

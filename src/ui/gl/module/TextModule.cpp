@@ -8,19 +8,19 @@
 #include "util/Defer.h"
 
 namespace Game3 {
-	TextModule::TextModule(std::shared_ptr<ClientGame> game, const std::any &argument):
-		TextModule(std::move(game), std::any_cast<std::string>(argument)) {}
+	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, const std::any &argument):
+		TextModule(ui, std::move(game), std::any_cast<std::string>(argument)) {}
 
-	TextModule::TextModule(std::shared_ptr<ClientGame> game, std::string text):
-		Module(UI_SCALE), weakGame(game) {
+	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, std::string text):
+		Module(ui), weakGame(game) {
 			setText(game->getUIContext(), std::move(text));
 		}
 
-	void TextModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void TextModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (lastRectangle.width != width)
 			wrapped.reset();
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 		const float padding = getPadding();
 
 		tryWrap();

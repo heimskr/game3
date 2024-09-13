@@ -13,8 +13,8 @@ namespace Game3 {
 
 	class Module: public Widget {
 		public:
-			Module(float scale);
-			Module();
+			Module(UIContext &, float scale);
+			Module(UIContext &);
 
 			virtual ~Module() = default;
 

@@ -7,20 +7,15 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Label::Label(float scale):
-		Widget(scale) {}
+	Label::Label(UIContext &ui, float scale):
+		Widget(ui, scale) {}
 
-	void Label::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Label::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (lastRectangle.width != width) {
 			wrapped.reset();
 		}
 
-		if (deferredText) {
-			setText(ui, *deferredText);
-			deferredText.reset();
-		}
-
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 		const float padding = getPadding();
 
 		tryWrap(renderers.text, width);
@@ -98,16 +93,12 @@ namespace Game3 {
 		}
 	}
 
-	void Label::setText(UIContext &, UString new_text) {
+	void Label::setText(UString new_text) {
 		if (text == new_text)
 			return;
 
 		text = std::move(new_text);
 		wrapped.reset();
-	}
-
-	void Label::setText(UString new_text) {
-		deferredText = std::move(new_text);
 	}
 
 	const UString & Label::getText() const {

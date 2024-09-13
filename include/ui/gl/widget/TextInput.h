@@ -16,22 +16,22 @@
 namespace Game3 {
 	class TextInput: public Widget, public HasFixedSize, public Autocompleter {
 		public:
-			sigc::signal<void(TextInput &, UIContext &)> onSubmit;
+			sigc::signal<void(TextInput &, const UString &)> onSubmit;
 			sigc::signal<void(TextInput &, const UString &)> onChange;
 			sigc::signal<void(TextInput &, const UString &)> onAcceptSuggestion;
 
-			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
-			TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
-			TextInput(float scale, float thickness);
-			TextInput(float scale);
+			TextInput(UIContext &, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
+			TextInput(UIContext &, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
+			TextInput(UIContext &, float scale, float thickness);
+			TextInput(UIContext &, float scale);
 
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
-			bool click(UIContext &, int button, int x, int y) final;
-			bool keyPressed(UIContext &, uint32_t character, Modifiers) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
+			bool click(int button, int x, int y) final;
+			bool keyPressed(uint32_t character, Modifiers) final;
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
-			void onFocus(UIContext &) final;
-			void onBlur(UIContext &) final;
+			void onFocus() final;
+			void onBlur() final;
 
 			void setInteriorColor(Color);
 			void setInteriorColor();
@@ -40,20 +40,19 @@ namespace Game3 {
 			std::vector<UString> getRelevantSuggestions() const;
 
 			const UString & getText() const;
-			void setText(UIContext &, UString);
 			void setText(UString);
 			UString clear();
-			void insert(UIContext &, gunichar);
-			void eraseWord(UIContext &);
-			void eraseCharacter(UIContext &);
-			void eraseForward(UIContext &);
-			void goLeft(UIContext &, std::size_t = 1);
-			void goRight(UIContext &, std::size_t = 1);
-			void goStart(UIContext &);
-			void goEnd(UIContext &);
+			void insert(gunichar);
+			void eraseWord();
+			void eraseCharacter();
+			void eraseForward();
+			void goLeft(std::size_t = 1);
+			void goRight(std::size_t = 1);
+			void goStart();
+			void goEnd();
 
 			void autocomplete(const UString &) final;
-			void hideDropdown(UIContext &) const;
+			void hideDropdown() const;
 
 		private:
 			float xOffset = 0;
@@ -79,9 +78,9 @@ namespace Game3 {
 			void adjustCursorOffset(float offset);
 			void setCursorOffset(float);
 			void fixCursorOffset();
-			void changed(UIContext &);
-			void forwardSuggestions(UIContext &);
-			void makeDropdown(UIContext &);
-			bool ownsDropdown(UIContext &) const;
+			void changed();
+			void forwardSuggestions();
+			void makeDropdown();
+			bool ownsDropdown() const;
 	};
 }

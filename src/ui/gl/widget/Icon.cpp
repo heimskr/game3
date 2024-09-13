@@ -4,10 +4,10 @@
 #include "ui/gl/widget/Icon.h"
 
 namespace Game3 {
-	Icon::Icon(float scale):
-		Widget(scale) {}
+	Icon::Icon(UIContext &ui, float scale):
+		Widget(ui, scale) {}
 
-	void Icon::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Icon::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (fixedHeight > 0)
 			height = fixedHeight;
 
@@ -17,7 +17,7 @@ namespace Game3 {
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		if (!iconTexture)
 			return;

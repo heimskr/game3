@@ -20,8 +20,6 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 		protected:
-			UIContext &ui;
-
 			void renderIconTexture(const RendererContext &, const std::shared_ptr<Texture> &);
 	};
 

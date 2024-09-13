@@ -18,17 +18,17 @@ namespace Game3 {
 
 	class FluidsModule: public Module {
 		public:
-			FluidsModule(std::shared_ptr<ClientGame>, const std::any &, bool show_header = true);
-			FluidsModule(std::shared_ptr<ClientGame>, const AgentPtr &, bool show_header = true);
-			FluidsModule(std::shared_ptr<HasFluids>, bool show_header = true);
+			FluidsModule(UIContext &, const std::shared_ptr<ClientGame> &, const std::any &, bool show_header = true);
+			FluidsModule(UIContext &, const AgentPtr &, bool show_header = true);
+			FluidsModule(UIContext &, std::shared_ptr<HasFluids>, bool show_header = true);
 
 			static Identifier ID() { return {"base", "module/fluid_levels"}; }
 
 			Identifier getID() const final { return ID(); }
-			void init(UIContext &) final;
+			void init() final;
 
 			using Module::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
@@ -41,6 +41,6 @@ namespace Game3 {
 			bool showHeader{};
 
 			std::pair<std::shared_ptr<Label>, std::shared_ptr<ProgressBar>> makePair(Color bar_interior) const;
-			void updateFluids(UIContext &);
+			void updateFluids();
 	};
 }

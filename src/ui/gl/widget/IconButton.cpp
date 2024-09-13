@@ -10,7 +10,7 @@ namespace Game3 {
 			iconTexture->init();
 	}
 
-	void IconButton::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
+	void IconButton::renderLabel(const RendererContext &renderers, const Rectangle &rectangle) {
 		if (!iconTexture)
 			return;
 

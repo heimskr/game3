@@ -14,13 +14,13 @@ namespace {
 }
 
 namespace Game3 {
-	Tooltip::Tooltip(float scale):
-		Widget(scale),
+	Tooltip::Tooltip(UIContext &ui, float scale):
+		Widget(ui, scale),
 		maxWidth(DEFAULT_MAX_WIDTH),
 		backgroundColor(DEFAULT_BACKGROUND_COLOR),
 		textColor(DEFAULT_TEXT_COLOR) {}
 
-	void Tooltip::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Tooltip::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (!visible)
 			return;
 
@@ -37,7 +37,7 @@ namespace Game3 {
 			y += CURSOR_HEIGHT;
 		}
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;

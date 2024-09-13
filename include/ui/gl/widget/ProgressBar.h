@@ -14,12 +14,12 @@ namespace Game3 {
 
 	class ProgressBar: public Widget, public HasFixedSize {
 		public:
-			ProgressBar(float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
-			ProgressBar(float scale, Color interior_color, float progress = 0);
-			ProgressBar(float scale, float progress = 0);
+			ProgressBar(UIContext &, float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
+			ProgressBar(UIContext &, float scale, Color interior_color, float progress = 0);
+			ProgressBar(UIContext &, float scale, float progress = 0);
 
 			using Widget::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

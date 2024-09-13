@@ -12,15 +12,15 @@ namespace {
 }
 
 namespace Game3 {
-	Slider::Slider(float scale):
-		Widget(scale),
+	Slider::Slider(UIContext &ui, float scale):
+		Widget(ui, scale),
 		barColor(DEFAULT_BAR_COLOR),
 		handleColor(DEFAULT_HANDLE_COLOR) {}
 
-	void Slider::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Slider::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		const float handle_size = getHandleSize();
 		x += handle_size / 2;
@@ -51,14 +51,14 @@ namespace Game3 {
 		}
 	}
 
-	bool Slider::dragStart(UIContext &ui, int x, int y) {
-		Widget::dragStart(ui, x, y);
+	bool Slider::dragStart(int x, int y) {
+		Widget::dragStart(x, y);
 		ui.addDragUpdater(shared_from_this());
 		return true;
 	}
 
-	bool Slider::dragUpdate(UIContext &ui, int x, int y) {
-		Widget::dragUpdate(ui, x, y);
+	bool Slider::dragUpdate(int x, int y) {
+		Widget::dragUpdate(x, y);
 
 		if (!isDragging())
 			return false;

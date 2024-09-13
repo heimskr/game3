@@ -18,18 +18,18 @@ namespace Game3 {
 
 	class MutatorModule: public Module {
 		public:
-			MutatorModule(std::shared_ptr<ClientGame>, const std::any &);
-			MutatorModule(std::shared_ptr<ClientGame>, std::shared_ptr<Mutator>);
+			MutatorModule(UIContext &, const ClientGamePtr &, const std::any &);
+			MutatorModule(UIContext &, const ClientGamePtr &, std::shared_ptr<Mutator>);
 
 			static Identifier ID() { return {"base", "module/mutator"}; }
 
 			Identifier getID() const final { return ID(); }
-			void init(UIContext &) final;
+			void init() final;
 			void reset() final;
 			void update() final;
 
 			using Module::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
@@ -38,7 +38,7 @@ namespace Game3 {
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
 		private:
-			std::shared_ptr<ClientGame> game;
+			std::weak_ptr<ClientGame> weakGame;
 			std::shared_ptr<Mutator> mutator;
 			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<FluidsModule> fluidsModule;

@@ -6,10 +6,10 @@
 namespace Game3 {
 	class Icon: public Widget, public HasFixedSize {
 		public:
-			Icon(float scale);
+			Icon(UIContext &, float scale);
 
 			using Widget::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

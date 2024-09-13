@@ -16,8 +16,8 @@ namespace {
 }
 
 namespace Game3 {
-	ProgressBar::ProgressBar(float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
-		Widget(scale),
+	ProgressBar::ProgressBar(UIContext &ui, float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
+		Widget(ui, scale),
 		topInteriorColor(interior_color),
 		bottomInteriorColor(topInteriorColor.darken()),
 		backgroundColor(background_color),
@@ -25,15 +25,15 @@ namespace Game3 {
 		bottomExteriorColor(topExteriorColor.darken()),
 		progress(progress) {}
 
-	ProgressBar::ProgressBar(float scale, Color interior_color, float progress):
-		ProgressBar(scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
+	ProgressBar::ProgressBar(UIContext &ui, float scale, Color interior_color, float progress):
+		ProgressBar(ui, scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
 
-	ProgressBar::ProgressBar(float scale, float progress):
-		ProgressBar(scale, DEFAULT_INTERIOR_COLOR, progress) {}
+	ProgressBar::ProgressBar(UIContext &ui, float scale, float progress):
+		ProgressBar(ui, scale, DEFAULT_INTERIOR_COLOR, progress) {}
 
-	void ProgressBar::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void ProgressBar::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();

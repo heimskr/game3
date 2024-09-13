@@ -7,7 +7,6 @@
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
-#include "util/Defer.h"
 
 namespace {
 	constexpr Game3::Color DEFAULT_BORDER_COLOR{"#926641"};
@@ -37,8 +36,8 @@ namespace {
 }
 
 namespace Game3 {
-	TextInput::TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		Widget(scale),
+	TextInput::TextInput(UIContext &ui, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
+		Widget(ui, scale),
 		HasFixedSize(-1, scale * TEXT_INPUT_HEIGHT_FACTOR),
 		thickness(thickness),
 		borderColor(border_color),
@@ -47,26 +46,20 @@ namespace Game3 {
 		cursorColor(cursor_color),
 		focusedCursorColor(cursorColor.darken(3)) {}
 
-	TextInput::TextInput(float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
-		TextInput(scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(UIContext &ui, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
+		TextInput(ui, scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
-	TextInput::TextInput(float scale, float thickness):
-		TextInput(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
+	TextInput::TextInput(UIContext &ui, float scale, float thickness):
+		TextInput(ui, scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
-	TextInput::TextInput(float scale):
-		TextInput(scale, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(UIContext &ui, float scale):
+		TextInput(ui, scale, DEFAULT_THICKNESS) {}
 
-	void TextInput::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		if (deferredText) {
-			setText(ui, std::move(*deferredText));
-			deferredText.reset();
-			changed(ui);
-		}
-
+	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (0 < fixedHeight)
 			height = fixedHeight;
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		if (cursorFixQueued)
 			fixCursorOffset();
@@ -98,7 +91,7 @@ namespace Game3 {
 		});
 	}
 
-	bool TextInput::click(UIContext &ui, int button, int, int) {
+	bool TextInput::click(int button, int, int) {
 		if (button == 1) {
 			ui.focusWidget(shared_from_this());
 			return true;
@@ -107,12 +100,12 @@ namespace Game3 {
 		return false;
 	}
 
-	bool TextInput::keyPressed(UIContext &ui, uint32_t character, Modifiers modifiers) {
+	bool TextInput::keyPressed(uint32_t character, Modifiers modifiers) {
 		if (modifiers.ctrl) {
 			switch (character) {
 				case GDK_KEY_BackSpace:
-					eraseWord(ui);
-					changed(ui);
+					eraseWord();
+					changed();
 					break;
 
 				default:
@@ -125,31 +118,31 @@ namespace Game3 {
 
 		switch (character) {
 			case GDK_KEY_BackSpace:
-				eraseCharacter(ui);
-				changed(ui);
+				eraseCharacter();
+				changed();
 				return true;
 
 			case GDK_KEY_Delete:
-				eraseForward(ui);
-				changed(ui);
+				eraseForward();
+				changed();
 				return true;
 
 			case GDK_KEY_Left:
-				goLeft(ui);
+				goLeft();
 				return true;
 
 			case GDK_KEY_Right:
-				goRight(ui);
+				goRight();
 				return true;
 
 			case GDK_KEY_Home:
 			case GDK_KEY_Up:
-				goStart(ui);
+				goStart();
 				return true;
 
 			case GDK_KEY_End:
 			case GDK_KEY_Down:
-				goEnd(ui);
+				goEnd();
 				return true;
 
 			case GDK_KEY_Shift_L:
@@ -164,23 +157,23 @@ namespace Game3 {
 				return true;
 
 			case GDK_KEY_Escape:
-				if (ownsDropdown(ui))
-					hideDropdown(ui);
+				if (ownsDropdown())
+					hideDropdown();
 				else
 					ui.unfocus();
 				return true;
 
 			case GDK_KEY_Return:
 			case GDK_KEY_KP_Enter:
-				onSubmit(*this, ui);
+				onSubmit(*this, text);
 				return true;
 
 			default:
 				break;
 		}
 
-		insert(ui, static_cast<gunichar>(character));
-		changed(ui);
+		insert(static_cast<gunichar>(character));
+		changed();
 		return true;
 	}
 
@@ -208,12 +201,12 @@ namespace Game3 {
 		}
 	}
 
-	void TextInput::onFocus(UIContext &ui) {
+	void TextInput::onFocus() {
 		focused = true;
-		makeDropdown(ui);
+		makeDropdown();
 	}
 
-	void TextInput::onBlur(UIContext &ui) {
+	void TextInput::onBlur() {
 		focused = false;
 
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
@@ -251,17 +244,13 @@ namespace Game3 {
 		return text;
 	}
 
-	void TextInput::setText(UIContext &ui, UString new_text) {
+	void TextInput::setText(UString new_text) {
 		if (text != new_text) {
 			text = std::move(new_text);
 			onChange(*this, text);
 		}
 
-		goEnd(ui);
-	}
-
-	void TextInput::setText(UString new_text) {
-		deferredText = std::move(new_text);
+		goEnd();
 	}
 
 	UString TextInput::clear() {
@@ -273,14 +262,14 @@ namespace Game3 {
 		return out;
 	}
 
-	void TextInput::insert(UIContext &ui, gunichar character) {
+	void TextInput::insert(gunichar character) {
 		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
 		++cursor;
 		adjustCursorOffset(ui.getRenderers().text.textWidth(UString(1, character)));
 	}
 
-	void TextInput::eraseWord(UIContext &ui) {
+	void TextInput::eraseWord() {
 		if (cursor == 0)
 			return;
 
@@ -288,32 +277,32 @@ namespace Game3 {
 
 		if (isWhitespace(cursorIterator)) {
 			do {
-				eraseCharacter(ui);
+				eraseCharacter();
 			} while (cursorIterator != text.begin() && isWhitespace(cursorIterator));
 
 			while (cursorIterator != text.begin() && !isStopChar(cursorIterator))
-				eraseCharacter(ui);
+				eraseCharacter();
 
 			return;
 		}
 
 		if (isStopChar(cursorIterator)) {
 			do {
-				eraseCharacter(ui);
+				eraseCharacter();
 			} while (cursorIterator != text.begin() && isStopChar(cursorIterator));
 
 			return;
 		}
 
 		do {
-			eraseCharacter(ui);
+			eraseCharacter();
 		} while (cursorIterator != text.begin() && !isStopChar(cursorIterator));
 
 		while (cursorIterator != text.begin() && isWhitespace(cursorIterator))
-			eraseCharacter(ui);
+			eraseCharacter();
 	}
 
-	void TextInput::eraseCharacter(UIContext &ui) {
+	void TextInput::eraseCharacter() {
 		if (cursor == 0)
 			return;
 
@@ -321,12 +310,12 @@ namespace Game3 {
 		cursorIterator = text.erase(--cursorIterator);
 	}
 
-	void TextInput::eraseForward(UIContext &) {
+	void TextInput::eraseForward() {
 		if (!text.empty() && cursorIterator != text.end())
 			cursorIterator = text.erase(cursorIterator);
 	}
 
-	void TextInput::goLeft(UIContext &ui, size_t count) {
+	void TextInput::goLeft(size_t count) {
 		RendererContext renderers = ui.getRenderers();
 		UString piece;
 
@@ -337,7 +326,7 @@ namespace Game3 {
 		}
 	}
 
-	void TextInput::goRight(UIContext &ui, size_t count) {
+	void TextInput::goRight(size_t count) {
 		RendererContext renderers = ui.getRenderers();
 		UString piece;
 
@@ -348,14 +337,14 @@ namespace Game3 {
 		}
 	}
 
-	void TextInput::goStart(UIContext &) {
+	void TextInput::goStart() {
 		cursor = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
 		setCursorOffset(0);
 	}
 
-	void TextInput::goEnd(UIContext &ui) {
+	void TextInput::goEnd() {
 		cursor = text.length();
 		cursorIterator = text.end();
 		xOffset = 0;
@@ -410,29 +399,29 @@ namespace Game3 {
 		cursorFixQueued = false;
 	}
 
-	void TextInput::changed(UIContext &ui) {
+	void TextInput::changed() {
 		onChange(*this, text);
-		forwardSuggestions(ui);
+		forwardSuggestions();
 	}
 
-	void TextInput::forwardSuggestions(UIContext &ui) {
+	void TextInput::forwardSuggestions() {
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
 
 		if (dropdown && dropdown->checkParent(*this)) {
 			dropdown->setSuggestions(getRelevantSuggestions());
 			// dropdown->queueConstrainSize();
 		} else {
-			makeDropdown(ui);
+			makeDropdown();
 		}
 	}
 
-	void TextInput::makeDropdown(UIContext &ui) {
+	void TextInput::makeDropdown() {
 		std::vector<UString> relevant = getRelevantSuggestions();
 		if (relevant.empty())
 			return;
 
-		auto dropdown = std::make_shared<AutocompleteDropdown>(scale);
-		dropdown->init(ui);
+		auto dropdown = std::make_shared<AutocompleteDropdown>(ui, scale);
+		dropdown->init();
 		dropdown->setParent(std::dynamic_pointer_cast<Autocompleter>(shared_from_this()));
 		dropdown->setOrigin({lastRectangle.x, lastRectangle.y + lastRectangle.height});
 		dropdown->setSuggestions(std::move(relevant));
@@ -441,12 +430,12 @@ namespace Game3 {
 		ui.setAutocompleteDropdown(std::move(dropdown));
 	}
 
-	bool TextInput::ownsDropdown(UIContext &ui) const {
+	bool TextInput::ownsDropdown() const {
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
 		return dropdown && dropdown->checkParent(*this);
 	}
 
-	void TextInput::hideDropdown(UIContext &ui) const {
+	void TextInput::hideDropdown() const {
 		ui.setAutocompleteDropdown(nullptr);
 	}
 }

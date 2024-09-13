@@ -13,32 +13,32 @@ namespace Game3 {
 		constexpr Color DEFAULT_INTERIOR_COLOR{"#ddbc82d0"};
 	}
 
-	AutocompleteDropdown::AutocompleteDropdown(float scale, Color exterior_color, Color interior_color):
-		Widget(scale), exteriorColor(exterior_color), interiorColor(interior_color) {}
+	AutocompleteDropdown::AutocompleteDropdown(UIContext &ui, float scale, Color exterior_color, Color interior_color):
+		Widget(ui, scale), exteriorColor(exterior_color), interiorColor(interior_color) {}
 
-	AutocompleteDropdown::AutocompleteDropdown(float scale):
-		AutocompleteDropdown(scale, DEFAULT_EXTERIOR_COLOR, DEFAULT_INTERIOR_COLOR) {}
+	AutocompleteDropdown::AutocompleteDropdown(UIContext &ui, float scale):
+		AutocompleteDropdown(ui, scale, DEFAULT_EXTERIOR_COLOR, DEFAULT_INTERIOR_COLOR) {}
 
-	void AutocompleteDropdown::init(UIContext &) {
-		scroller = std::make_shared<Scroller>(scale);
-		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 0, 0, Color{});
+	void AutocompleteDropdown::init() {
+		scroller = std::make_shared<Scroller>(ui, scale);
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
 		scroller->setChild(vbox);
 		scroller->insertAtEnd(shared_from_this());
 	}
 
-	void AutocompleteDropdown::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void AutocompleteDropdown::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);
 		x = origin.first;
 		y = origin.second;
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
 		// Interior
 		rectangler.drawOnScreen(interiorColor, x + scale, y, width - 2 * scale, height - scale);
 
-		scroller->render(ui, renderers, x + scale, y, width - 2 * scale, height - scale);
+		scroller->render(renderers, x + scale, y, width - 2 * scale, height - scale);
 
 		// Left side
 		rectangler.drawOnScreen(exteriorColor, x, y, scale, height - scale);
@@ -50,11 +50,6 @@ namespace Game3 {
 		rectangler.drawOnScreen(exteriorColor, x + scale, y + height - 2 * scale, scale, scale);
 		// Bottom right corner
 		rectangler.drawOnScreen(exteriorColor, x + width - 2 * scale, y + height - 2 * scale, scale, scale);
-
-		if (sizeConstrainQueued) {
-			sizeConstrainQueued = false;
-			constrainSize(ui);
-		}
 	}
 
 	SizeRequestMode AutocompleteDropdown::getRequestMode() const {
@@ -89,9 +84,9 @@ namespace Game3 {
 		suggestions = std::move(new_suggestions);
 		vbox->clearChildren();
 		for (const UString &suggestion: suggestions) {
-			auto label = std::make_shared<Label>(scale);
+			auto label = std::make_shared<Label>(ui, scale);
 			label->setText(suggestion);
-			label->setOnClick([this, weak = std::weak_ptr(label)](Widget &, UIContext &, int button, int, int) {
+			label->setOnClick([this, weak = std::weak_ptr(label)](Widget &, int button, int, int) {
 				if (auto label = weak.lock(); label && button == 1)
 					choose(label->getText());
 				return true;
@@ -101,11 +96,7 @@ namespace Game3 {
 		scroller->setChild(vbox);
 	}
 
-	void AutocompleteDropdown::queueConstrainSize() {
-		sizeConstrainQueued = true;
-	}
-
-	void AutocompleteDropdown::constrainSize(UIContext &ui) {
+	void AutocompleteDropdown::constrainSize() {
 		if (!scroller)
 			return;
 

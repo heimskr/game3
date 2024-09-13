@@ -2,11 +2,11 @@
 #include "ui/gl/Constants.h"
 
 namespace Game3 {
-	Module::Module(float scale):
-		Widget(scale) {}
+	Module::Module(UIContext &ui, float scale):
+		Widget(ui, scale) {}
 
-	Module::Module():
-		Module(UI_SCALE) {}
+	Module::Module(UIContext &ui):
+		Module(ui, UI_SCALE) {}
 
 	void Module::reset() {}
 

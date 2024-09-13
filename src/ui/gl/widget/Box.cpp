@@ -9,17 +9,17 @@ namespace {
 }
 
 namespace Game3 {
-	Box::Box(float scale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
-		Widget(scale),
+	Box::Box(UIContext &ui, float scale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
+		Widget(ui, scale),
 		orientation(orientation),
 		padding(padding),
 		separatorThickness(separator_thickness),
 		separatorColor(separator_color) {}
 
-	Box::Box(float scale, Orientation orientation):
-		Box(scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
+	Box::Box(UIContext &ui, float scale, Orientation orientation):
+		Box(ui, scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
 
-	void Box::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Box::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (width != lastRectangle.width || height != lastRectangle.height || childMeasurements.empty()) {
 			childMeasurements.clear();
 			float minimum{}, natural{};
@@ -27,7 +27,7 @@ namespace Game3 {
 			measure(renderers, Orientation::Horizontal, width, height, minimum, natural);
 		}
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		const bool vertical = orientation == Orientation::Vertical;
 
@@ -70,7 +70,7 @@ namespace Game3 {
 
 				if (0 <= to_add) {
 					try_measure = false;
-					child->render(ui, renderers, x, y, child_width < 0? width : child_width, child_height < 0? height : child_height);
+					child->render(renderers, x, y, child_width < 0? width : child_width, child_height < 0? height : child_height);
 				}
 			}
 
@@ -80,9 +80,9 @@ namespace Game3 {
 				child->measure(renderers, orientation, width, height, child_minimum, child_natural);
 
 				if (vertical) {
-					child->render(ui, renderers, x, y, width, child_natural);
+					child->render(renderers, x, y, width, child_natural);
 				} else {
-					child->render(ui, renderers, x, y, child_natural, height);
+					child->render(renderers, x, y, child_natural, height);
 				}
 
 				to_add = child_natural;

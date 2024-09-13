@@ -8,18 +8,18 @@ namespace {
 }
 
 namespace Game3 {
-	Checkbox::Checkbox(float scale, Color top_color, Color bottom_color, Color check_color, Color interior_color):
-		Widget(scale), topColor(top_color), bottomColor(bottom_color), checkColor(check_color), interiorColor(interior_color) {}
+	Checkbox::Checkbox(UIContext &ui, float scale, Color top_color, Color bottom_color, Color check_color, Color interior_color):
+		Widget(ui, scale), topColor(top_color), bottomColor(bottom_color), checkColor(check_color), interiorColor(interior_color) {}
 
-	Checkbox::Checkbox(float scale, Color primary_color, Color interior_color):
-		Checkbox(scale, primary_color, primary_color.darken(), primary_color.darken(), interior_color) {}
+	Checkbox::Checkbox(UIContext &ui, float scale, Color primary_color, Color interior_color):
+		Checkbox(ui, scale, primary_color, primary_color.darken(), primary_color.darken(), interior_color) {}
 
-	Checkbox::Checkbox(float scale):
-		Checkbox(scale, DEFAULT_PRIMARY_COLOR, DEFAULT_INTERIOR_COLOR) {}
+	Checkbox::Checkbox(UIContext &ui, float scale):
+		Checkbox(ui, scale, DEFAULT_PRIMARY_COLOR, DEFAULT_INTERIOR_COLOR) {}
 
-	void Checkbox::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Checkbox::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
@@ -36,7 +36,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Checkbox::click(UIContext &, int, int, int) {
+	bool Checkbox::click(int, int, int) {
 		setChecked(!getChecked());
 		return true;
 	}

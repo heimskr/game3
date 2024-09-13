@@ -34,29 +34,29 @@ namespace {
 }
 
 namespace Game3 {
-	void SettingsTab::init(UIContext &) {
+	void SettingsTab::init() {
 		auto tab = shared_from_this();
 
 		auto &settings = ui.getRenderers().settings;
 		auto settings_lock = settings.sharedLock();
 
-		scroller = std::make_shared<Scroller>(scale);
+		scroller = std::make_shared<Scroller>(ui, scale);
 		scroller->insertAtEnd(tab);
 
-		grid = std::make_shared<Grid>(scale);
+		grid = std::make_shared<Grid>(ui, scale);
 		grid->setSpacing(2 * scale);
 		grid->insertAtEnd(scroller);
 
 		std::size_t row = 0;
 
-		auto hostname_label = std::make_shared<Label>(scale);
-		hostname_label->setText(ui, "Default Hostname");
+		auto hostname_label = std::make_shared<Label>(ui, scale);
+		hostname_label->setText("Default Hostname");
 		hostname_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(hostname_label, row, 0);
 
-		auto hostname_input = std::make_shared<TextInput>(scale);
+		auto hostname_input = std::make_shared<TextInput>(ui, scale);
 		hostname_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
-		hostname_input->setText(ui, settings.hostname);
+		hostname_input->setText(settings.hostname);
 		hostname_input->onChange.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
 				input.setInteriorColor(getInvalidColor());
@@ -70,14 +70,14 @@ namespace Game3 {
 
 		++row;
 
-		auto port_label = std::make_shared<Label>(scale);
-		port_label->setText(ui, "Default Port");
+		auto port_label = std::make_shared<Label>(ui, scale);
+		port_label->setText("Default Port");
 		port_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(port_label, row, 0);
 
-		auto port_input = std::make_shared<TextInput>(scale);
+		auto port_input = std::make_shared<TextInput>(ui, scale);
 		port_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
-		port_input->setText(ui, std::to_string(settings.port));
+		port_input->setText(std::to_string(settings.port));
 		port_input->onChange.connect([this](TextInput &input, const UString &text) {
 			uint16_t port{};
 
@@ -99,14 +99,14 @@ namespace Game3 {
 
 		++row;
 
-		auto username_label = std::make_shared<Label>(scale);
-		username_label->setText(ui, "Default Username");
+		auto username_label = std::make_shared<Label>(ui, scale);
+		username_label->setText("Default Username");
 		username_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(username_label, row, 0);
 
-		auto username_input = std::make_shared<TextInput>(scale);
+		auto username_input = std::make_shared<TextInput>(ui, scale);
 		username_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
-		username_input->setText(ui, settings.username);
+		username_input->setText(settings.username);
 		username_input->onChange.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
 				input.setInteriorColor(getInvalidColor());
@@ -120,12 +120,12 @@ namespace Game3 {
 
 		++row;
 
-		auto alert_label = std::make_shared<Label>(scale);
-		alert_label->setText(ui, "Alert on Connect");
+		auto alert_label = std::make_shared<Label>(ui, scale);
+		alert_label->setText("Alert on Connect");
 		alert_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(alert_label, row, 0);
 
-		auto alert_checkbox = std::make_shared<Checkbox>(scale);
+		auto alert_checkbox = std::make_shared<Checkbox>(ui, scale);
 		alert_checkbox->setChecked(settings.alertOnConnection);
 		alert_checkbox->setFixedSize(scale * 8);
 		alert_checkbox->onCheck.connect([this](bool checked) {
@@ -135,12 +135,12 @@ namespace Game3 {
 
 		++row;
 
-		auto lighting_label = std::make_shared<Label>(scale);
-		lighting_label->setText(ui, "Render Lighting");
+		auto lighting_label = std::make_shared<Label>(ui, scale);
+		lighting_label->setText("Render Lighting");
 		lighting_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(lighting_label, row, 0);
 
-		auto lighting_checkbox = std::make_shared<Checkbox>(scale);
+		auto lighting_checkbox = std::make_shared<Checkbox>(ui, scale);
 		lighting_checkbox->setChecked(settings.renderLighting);
 		lighting_checkbox->setFixedSize(scale * 8);
 		lighting_checkbox->onCheck.connect([this](bool checked) {
@@ -150,12 +150,12 @@ namespace Game3 {
 
 		++row;
 
-		auto timer_label = std::make_shared<Label>(scale);
-		timer_label->setText(ui, "Enable Timers");
+		auto timer_label = std::make_shared<Label>(ui, scale);
+		timer_label->setText("Enable Timers");
 		timer_label->setVerticalAlignment(Alignment::Middle);
 		grid->attach(timer_label, row, 0);
 
-		auto timer_checkbox = std::make_shared<Checkbox>(scale);
+		auto timer_checkbox = std::make_shared<Checkbox>(ui, scale);
 		timer_checkbox->setChecked(!settings.hideTimers);
 		timer_checkbox->setFixedSize(scale * 8);
 		timer_checkbox->onCheck.connect([this](bool checked) {
@@ -166,22 +166,22 @@ namespace Game3 {
 		++row;
 
 		auto add_slider = [&](UString label_text) {
-			auto label = std::make_shared<Label>(scale);
-			label->setText(ui, std::move(label_text));
+			auto label = std::make_shared<Label>(ui, scale);
+			label->setText(std::move(label_text));
 			label->setVerticalAlignment(Alignment::Middle);
 			grid->attach(label, row, 0);
 
-			auto slider = std::make_shared<Slider>(scale);
+			auto slider = std::make_shared<Slider>(ui, scale);
 			slider->setFixedSize(100 * scale, 8 * scale);
 			grid->attach(slider, row, 1);
 
-			auto value_label = std::make_shared<Label>(scale);
+			auto value_label = std::make_shared<Label>(ui, scale);
 			value_label->setVerticalAlignment(Alignment::Middle);
 			grid->attach(value_label, row, 2);
 
-			slider->onValueUpdate.connect([this, weak_label = std::weak_ptr(value_label)](Slider &slider, double) {
+			slider->onValueUpdate.connect([weak_label = std::weak_ptr(value_label)](Slider &slider, double) {
 				if (auto label = weak_label.lock())
-					label->setText(ui, slider.getTooltipText());
+					label->setText(slider.getTooltipText());
 			});
 
 			++row;
@@ -215,18 +215,18 @@ namespace Game3 {
 			applySetting(&ClientSettings::tickFrequency, value);
 		});
 
-		auto save_button = std::make_shared<Button>(scale);
+		auto save_button = std::make_shared<Button>(ui, scale);
 		save_button->setText("Save");
 		save_button->setFixedHeight(10 * scale);
-		save_button->setOnClick([this](Widget &, UIContext &, int, int, int) {
+		save_button->setOnClick([this](Widget &, int, int, int) {
 			saveSettings();
 			return true;
 		});
 		grid->attach(save_button, row++, 0);
 	}
 
-	void SettingsTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		scroller->render(ui, renderers, x, y, width, height);
+	void SettingsTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		scroller->render(renderers, x, y, width, height);
 	}
 
 	void SettingsTab::renderIcon(const RendererContext &renderers) {

@@ -20,10 +20,12 @@ namespace Game3 {
 
 			std::shared_ptr<Module> operator()(const std::shared_ptr<ClientGame> &, const std::any &) const;
 
+			static UIContext & getUIContext(ClientGame &);
+
 			template <typename T>
 			static ModuleFactory create(const Identifier &id = T::ID()) {
 				return {id, [](const std::shared_ptr<ClientGame> &game, const std::any &argument) {
-					return std::make_shared<T>(game, argument);
+					return std::make_shared<T>(getUIContext(*game), game, argument);
 				}};
 			}
 	};

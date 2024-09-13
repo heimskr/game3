@@ -10,20 +10,20 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Hotbar::Hotbar(float scale): Widget(scale) {
+	Hotbar::Hotbar(UIContext &ui, float scale): Widget(ui, scale) {
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-			slotWidgets.emplace_back(std::make_shared<ItemSlot>(slot, INNER_SLOT_SIZE, scale, false));
+			slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
 		}
 	}
 
-	void Hotbar::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Hotbar::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		const float original_width = width;
 		const float original_height = height;
 		float dummy{};
 
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		const float offset = SLOT_PADDING * scale / 3;
 		renderers.rectangle.drawOnScreen(Color{0.7, 0.5, 0, 1}, x, y, width, height);
@@ -46,20 +46,20 @@ namespace Game3 {
 				widget->setInventory(inventory);
 				widget->setStack((*inventory)[slot]);
 				widget->setActive(slot == active_slot);
-				widget->render(ui, renderers, x + scale * (SLOT_PADDING + OUTER_SLOT_SIZE * slot), y + scale * SLOT_PADDING, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
+				widget->render(renderers, x + scale * (SLOT_PADDING + OUTER_SLOT_SIZE * slot), y + scale * SLOT_PADDING, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
 			}
 		}
 	}
 
-	bool Hotbar::click(UIContext &ui, int button, int x, int y) {
+	bool Hotbar::click(int button, int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
+			if (widget->getLastRectangle().contains(x, y) && widget->click(button, x, y))
 				break;
 
 		return true;
 	}
 
-	bool Hotbar::dragStart(UIContext &, int, int) {
+	bool Hotbar::dragStart(int, int) {
 		return true;
 	}
 

@@ -14,16 +14,16 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/genetic_analysis"}; }
 
-			GeneticAnalysisModule(ClientGamePtr, const std::any &);
-			GeneticAnalysisModule();
+			using Module::Module;
+			GeneticAnalysisModule(UIContext &, const ClientGamePtr &, const std::any &);
 
 			Identifier getID() const final { return ID(); }
-			void init(UIContext &) final;
+			void init() final;
 			void reset() final;
 			void update() final;
 			void update(const ItemStackPtr &);
 
-			void render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) final;
+			void render(const RendererContext &renderers, float x, float y, float width, float height) final;
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) final;
 

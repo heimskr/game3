@@ -16,37 +16,38 @@
 #include <cassert>
 
 namespace Game3 {
-	AutocrafterModule::AutocrafterModule(const std::shared_ptr<ClientGame> &game, const std::any &argument):
-		AutocrafterModule(game, safeDynamicCast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
+	AutocrafterModule::AutocrafterModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
+		AutocrafterModule(ui, game, safeDynamicCast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
 
-	AutocrafterModule::AutocrafterModule(const std::shared_ptr<ClientGame> &game, std::shared_ptr<Autocrafter> autocrafter):
+	AutocrafterModule::AutocrafterModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Autocrafter> autocrafter):
+		Module(ui),
 		weakGame(game),
 		autocrafter(std::move(autocrafter)),
-		inventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
-		stationInventoryModule(std::make_shared<InventoryModule>(game, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
-		energyModule(std::make_shared<EnergyModule>(game, std::static_pointer_cast<Agent>(this->autocrafter), false)) {}
+		inventoryModule(std::make_shared<InventoryModule>(ui, game, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
+		stationInventoryModule(std::make_shared<InventoryModule>(ui, game, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
+		energyModule(std::make_shared<EnergyModule>(ui, game, std::static_pointer_cast<Agent>(this->autocrafter), false)) {}
 
-	void AutocrafterModule::init(UIContext &ui) {
+	void AutocrafterModule::init() {
 		assert(autocrafter);
 
 		ClientGamePtr game = weakGame.lock();
 		assert(game);
 
-		auto vbox = std::make_shared<Box>(scale, Orientation::Vertical);
+		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
 		vbox->insertAtEnd(shared_from_this());
 
-		auto header = std::make_shared<Label>(scale);
-		header->setText(ui, autocrafter->getName());
+		auto header = std::make_shared<Label>(ui, scale);
+		header->setText(autocrafter->getName());
 		header->insertAtEnd(vbox);
 
-		identifierInput = std::make_shared<TextInput>(scale);
+		identifierInput = std::make_shared<TextInput>(ui, scale);
 		identifierInput->setText(autocrafter->getTarget().copyBase().str());
-		identifierInput->onSubmit.connect([this](TextInput &input, const UIContext &) {
-			setTarget(input.getText().raw());
+		identifierInput->onSubmit.connect([this](TextInput &, const UString &text) {
+			setTarget(text.raw());
 		});
-		identifierInput->onAcceptSuggestion.connect([this, &ui](TextInput &input, const UString &target) {
+		identifierInput->onAcceptSuggestion.connect([this](TextInput &input, const UString &target) {
 			setTarget(target.raw());
-			input.hideDropdown(ui);
+			input.hideDropdown();
 		});
 		std::set<UString> item_names;
 		for (const auto &recipe: game->registry<CraftingRecipeRegistry>())
@@ -59,14 +60,14 @@ namespace Game3 {
 		inventoryModule->insertAtEnd(vbox);
 		energyModule->insertAtEnd(vbox);
 
-		stationInventoryModule->init(ui);
-		inventoryModule->init(ui);
-		energyModule->init(ui);
+		stationInventoryModule->init();
+		inventoryModule->init();
+		energyModule->init();
 	}
 
-	void AutocrafterModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(ui, renderers, x, y, width, height);
-		firstChild->render(ui, renderers, x, y, width, height);
+	void AutocrafterModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(renderers, x, y, width, height);
+		firstChild->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode AutocrafterModule::getRequestMode() const {

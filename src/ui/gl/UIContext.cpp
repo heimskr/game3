@@ -16,8 +16,11 @@
 namespace Game3 {
 	UIContext::UIContext(Canvas &canvas):
 		canvas(canvas),
-		hotbar(std::make_shared<Hotbar>(HOTBAR_SCALE)),
-		tooltip(std::make_shared<Tooltip>(UI_SCALE)) {}
+		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE)),
+		tooltip(std::make_shared<Tooltip>(*this, UI_SCALE)) {
+			hotbar->init();
+			tooltip->init();
+		}
 
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = canvas.getRendererContext();
@@ -27,7 +30,7 @@ namespace Game3 {
 		if (dialogs.empty()) {
 			scissorStack = internalScissorStack;
 			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-			hotbar->render(*this, context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
+			hotbar->render(context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 		} else {
 			for (const std::shared_ptr<Dialog> &dialog: dialogs) {
 				scissorStack = internalScissorStack;
@@ -36,10 +39,10 @@ namespace Game3 {
 		}
 
 		if (autocompleteDropdown)
-			autocompleteDropdown->render(*this, context, -1, -1, -1, -1); // The dropdown is responsible for knowing where to render.
+			autocompleteDropdown->render(context, -1, -1, -1, -1); // The dropdown is responsible for knowing where to render.
 
 		if (tooltip)
-			tooltip->render(*this, context, mouse_x * factor, mouse_y * factor, -1, -1);
+			tooltip->render(context, mouse_x * factor, mouse_y * factor, -1, -1);
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
@@ -48,7 +51,7 @@ namespace Game3 {
 			GL::Viewport(0, 0, width, height);
 			context.updateSize(width, height);
 			renderingDraggedWidget = true;
-			draggedWidget->render(*this, context, mouse_x * factor, mouse_y * factor + height / factor, -1, -1);
+			draggedWidget->render(context, mouse_x * factor, mouse_y * factor + height / factor, -1, -1);
 			renderingDraggedWidget = false;
 		}
 	}
@@ -75,18 +78,18 @@ namespace Game3 {
 	}
 
 	bool UIContext::click(int button, int x, int y) {
-		if (autocompleteDropdown && autocompleteDropdown->click(*this, button, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y))
 			return true;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->click(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->click(*this, button, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->click(button, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
-		if (autocompleteDropdown && autocompleteDropdown->dragStart(*this, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->dragStart(x, y))
 			return true;
 
 		unfocus();
@@ -96,37 +99,37 @@ namespace Game3 {
 			if (dialog->dragStart(x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragStart(*this, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragStart(x, y);
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
-		if (autocompleteDropdown && autocompleteDropdown->dragUpdate(*this, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->dragUpdate(x, y))
 			return true;
 
 		if (draggedWidget && dragOrigin != std::pair{x, y})
 			draggedWidgetActive = true;
 
 		for (const WidgetPtr &widget: extraDragUpdaters)
-			if (widget->dragUpdate(*this, x, y))
+			if (widget->dragUpdate(x, y))
 				return true;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->dragUpdate(x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragUpdate(*this, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragUpdate(x, y);
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
-		if (autocompleteDropdown && autocompleteDropdown->dragEnd(*this, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->dragEnd(x, y))
 			return true;
 
 		if (auto pressed = getPressedWidget())
-			return pressed->dragEnd(*this, x, y);
+			return pressed->dragEnd(x, y);
 
 		for (const WidgetPtr &widget: extraDragUpdaters) {
 			widget->dragOrigin.reset();
-			widget->dragEnd(*this, x, y);
+			widget->dragEnd(x, y);
 		}
 
 		extraDragUpdaters.clear();
@@ -144,32 +147,32 @@ namespace Game3 {
 		setDraggedWidget(nullptr);
 
 		if (!out)
-			return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragEnd(*this, x, y);
+			return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragEnd(x, y);
 
 		return true;
 	}
 
 	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
-		if (autocompleteDropdown && autocompleteDropdown->scroll(*this, x_delta, y_delta, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y))
 			return true;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->scroll(x_delta, y_delta, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->scroll(*this, x_delta, y_delta, x, y);
+		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
 	}
 
 	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers) {
 		if (auto focused = getFocusedWidget())
-			if (focused->keyPressed(*this, character, modifiers))
+			if (focused->keyPressed(character, modifiers))
 				return true;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
 			if (dialog->keyPressed(character, modifiers))
 				return true;
 
-		return dialogs.empty() && hotbar->keyPressed(*this, character, modifiers);
+		return dialogs.empty() && hotbar->keyPressed(character, modifiers);
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
@@ -195,12 +198,12 @@ namespace Game3 {
 			return;
 
 		if (locked)
-			locked->onBlur(*this);
+			locked->onBlur();
 
 		focusedWidget = to_focus;
 
 		if (to_focus)
-			to_focus->onFocus(*this);
+			to_focus->onFocus();
 	}
 
 	WidgetPtr UIContext::getFocusedWidget() const {
@@ -209,7 +212,7 @@ namespace Game3 {
 
 	void UIContext::unfocus() {
 		if (auto widget = focusedWidget.lock())
-			widget->onBlur(*this);
+			widget->onBlur();
 		focusedWidget.reset();
 	}
 

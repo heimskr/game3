@@ -13,37 +13,38 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	MutatorModule::MutatorModule(std::shared_ptr<ClientGame> game, const std::any &argument):
-		MutatorModule(std::move(game), std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
+	MutatorModule::MutatorModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
+		MutatorModule(ui, game, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
 
-	MutatorModule::MutatorModule(std::shared_ptr<ClientGame> game, std::shared_ptr<Mutator> mutator):
-		game(std::move(game)),
+	MutatorModule::MutatorModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Mutator> mutator):
+		Module(ui),
+		weakGame(game),
 		mutator(std::move(mutator)),
-		inventoryModule(std::make_shared<InventoryModule>(this->game, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
-		fluidsModule(std::make_shared<FluidsModule>(this->game, std::make_any<AgentPtr>(this->mutator), false)),
-		geneInfoModule(std::make_shared<GeneInfoModule>(nullptr)) {}
+		inventoryModule(std::make_shared<InventoryModule>(ui, game, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
+		fluidsModule(std::make_shared<FluidsModule>(ui, game, std::make_any<AgentPtr>(this->mutator), false)),
+		geneInfoModule(std::make_shared<GeneInfoModule>(ui, nullptr)) {}
 
-	void MutatorModule::init(UIContext &ui) {
-		inventoryModule->init(ui);
-		fluidsModule->init(ui);
-		geneInfoModule->init(ui);
+	void MutatorModule::init() {
+		inventoryModule->init();
+		fluidsModule->init();
+		geneInfoModule->init();
 
-		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 5, 0, Color{});
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
 
-		header = std::make_shared<Label>(scale);
-		header->setText(ui, mutator->getName());
+		header = std::make_shared<Label>(ui, scale);
+		header->setText(mutator->getName());
 		header->setHorizontalAlignment(Alignment::Middle); // TODO: it's not aligning
 		header->insertAtEnd(vbox);
 
-		hbox = std::make_shared<Box>(scale, Orientation::Horizontal);
+		hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
 
 		inventoryModule->insertAtEnd(hbox);
 
-		mutateButton = std::make_shared<Button>(scale);
+		mutateButton = std::make_shared<Button>(ui, scale);
 		mutateButton->setText("Mutate");
 		mutateButton->setFixedHeight(12 * scale);
 		mutateButton->setVerticalAlignment(Alignment::Middle);
-		mutateButton->setOnClick([this](Widget &, UIContext &, int button, int, int) {
+		mutateButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button != 1)
 				return false;
 			mutate();
@@ -71,9 +72,9 @@ namespace Game3 {
 		geneInfoModule->update(std::shared_ptr<Gene>(mutator->getGene()));
 	}
 
-	void MutatorModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Module::render(ui, renderers, x, y, width, height);
-		vbox->render(ui, renderers, x, y, width, height);
+	void MutatorModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Module::render(renderers, x, y, width, height);
+		vbox->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode MutatorModule::getRequestMode() const {
@@ -86,6 +87,8 @@ namespace Game3 {
 
 	void MutatorModule::mutate() {
 		assert(mutator);
+		auto game = weakGame.lock();
+		assert(game);
 		std::any buffer = std::make_any<Buffer>(Side::Client);
 		game->getPlayer()->sendMessage(mutator, "Mutate", buffer);
 	}
@@ -99,6 +102,8 @@ namespace Game3 {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == mutator->getGID()) {
+				auto game = weakGame.lock();
+				assert(game);
 				MainWindow &window = game->getWindow();
 				window.queue([&window] { window.removeModule(); });
 			}

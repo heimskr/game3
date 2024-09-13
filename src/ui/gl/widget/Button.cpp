@@ -16,19 +16,19 @@ namespace {
 }
 
 namespace Game3 {
-	Button::Button(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
-		Widget(scale),
+	Button::Button(UIContext &ui, float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
+		Widget(ui, scale),
 		texture(std::move(texture)) {
 			setColors(top_border_color, bottom_border_color, text_color);
 		}
 
-	Button::Button(float scale, Color border_color, Color text_color, TexturePtr texture):
-		Button(scale, border_color, border_color.darken(), text_color, std::move(texture)) {}
+	Button::Button(UIContext &ui, float scale, Color border_color, Color text_color, TexturePtr texture):
+		Button(ui, scale, border_color, border_color.darken(), text_color, std::move(texture)) {}
 
-	Button::Button(float scale, TexturePtr texture):
-		Button(scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
+	Button::Button(UIContext &ui, float scale, TexturePtr texture):
+		Button(ui, scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
 
-	void Button::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Button::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		const float original_width = width;
 		const float original_height = height;
 
@@ -43,7 +43,7 @@ namespace Game3 {
 		adjustCoordinate(Orientation::Horizontal, x, original_width, width);
 		adjustCoordinate(Orientation::Vertical, y, original_height, height);
 
-		Widget::render(ui, renderers, x, y, width, height);
+		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		const Color &top_color = pressed? topBorderColorPressed : topBorderColor;
@@ -75,7 +75,7 @@ namespace Game3 {
 			.wrapMode = GL_REPEAT,
 		});
 
-		renderLabel(ui, renderers, Rectangle(x + scale, adjusted_y + scale, width - 2 * scale, height - 4 * scale));
+		renderLabel(renderers, Rectangle(x + scale, adjusted_y + scale, width - 2 * scale, height - 4 * scale));
 
 		// Top left
 		rectangler(top_color, x + scale, adjusted_y + scale, scale, scale);
@@ -103,24 +103,24 @@ namespace Game3 {
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
-	bool Button::click(UIContext &, int, int, int) {
+	bool Button::click(int, int, int) {
 		return false;
 	}
 
-	bool Button::dragStart(UIContext &ui, int, int) {
+	bool Button::dragStart(int, int) {
 		pressed = true;
 		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
 		ui.setPressedWidget(shared_from_this());
 		return true;
 	}
 
-	bool Button::dragEnd(UIContext &ui, int x, int y) {
+	bool Button::dragEnd(int x, int y) {
 		if (pressed) {
 			pressed = false;
 			ui.unpress();
 			if (lastRectangle.contains(x, y)) {
 				if (onClick)
-					onClick(*this, ui, 1, x - lastRectangle.x, y - lastRectangle.y);
+					onClick(*this, 1, x - lastRectangle.x, y - lastRectangle.y);
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace Game3 {
 		text = std::move(new_text);
 	}
 
-	void Button::renderLabel(UIContext &, const RendererContext &renderers, const Rectangle &rectangle) {
+	void Button::renderLabel(const RendererContext &renderers, const Rectangle &rectangle) {
 		if (text.empty())
 			return;
 

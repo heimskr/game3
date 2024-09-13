@@ -14,19 +14,19 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	ItemSlot::ItemSlot(InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
-		Widget(scale),
+	ItemSlot::ItemSlot(UIContext &ui, InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
+		Widget(ui, scale),
 		inventory(std::move(inventory)),
 		stack(std::move(stack)),
 		slot(slot),
 		size(size),
 		active(active) {}
 
-	ItemSlot::ItemSlot(Slot slot, float size, float scale, bool active):
-		ItemSlot(nullptr, nullptr, slot, size, scale, active) {}
+	ItemSlot::ItemSlot(UIContext &ui, Slot slot, float size, float scale, bool active):
+		ItemSlot(ui, nullptr, nullptr, slot, size, scale, active) {}
 
-	void ItemSlot::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(ui, renderers, x, y, width, height);
+	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(renderers, x, y, width, height);
 
 		if (!ui.renderingDraggedWidget) {
 			const float alpha = active? 0.4 : 0.15;
@@ -76,7 +76,7 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlot::click(UIContext &ui, int, int, int) {
+	bool ItemSlot::click(int, int, int) {
 		if (inventory && inventory->getOwner() == ui.getPlayer())
 			ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
 		return true;

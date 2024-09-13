@@ -10,16 +10,16 @@
 namespace Game3 {
 	class Button: public Widget, public HasFixedSize, public HasAlignment {
 		public:
-			Button(float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			Button(float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			Button(float scale, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float scale, TexturePtr texture = getDefaultTexture());
 
 			using Widget::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool click(UIContext &, int button, int x, int y) final;
-			bool dragStart(UIContext &, int x, int y) final;
-			bool dragEnd(UIContext &, int x, int y) final;
+			bool click(int button, int x, int y) final;
+			bool dragStart(int x, int y) final;
+			bool dragEnd(int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
@@ -28,7 +28,7 @@ namespace Game3 {
 			void setText(UString);
 
 		protected:
-			virtual void renderLabel(UIContext &, const RendererContext &, const Rectangle &);
+			virtual void renderLabel(const RendererContext &, const Rectangle &);
 			virtual float getWidth(const RendererContext &, float height) const;
 
 		private:

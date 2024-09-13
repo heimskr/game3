@@ -4,17 +4,17 @@
 #include "ui/gl/widget/Label.h"
 
 namespace Game3 {
-	GeneInfoModule::GeneInfoModule(GenePtr gene):
-		gene(std::move(gene)) {}
+	GeneInfoModule::GeneInfoModule(UIContext &ui, GenePtr gene):
+		Module(ui), gene(std::move(gene)) {}
 
-	void GeneInfoModule::init(UIContext &) {
-		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 0, 0, Color{});
+	void GeneInfoModule::init() {
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 	}
 
-	void GeneInfoModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Module::render(ui, renderers, x, y, width, height);
-		vbox->render(ui, renderers, x, y, width, height);
+	void GeneInfoModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Module::render(renderers, x, y, width, height);
+		vbox->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode GeneInfoModule::getRequestMode() const {
@@ -35,7 +35,7 @@ namespace Game3 {
 			return;
 
 		for (const std::string &line: gene->describeLong()) {
-			auto label = std::make_shared<Label>(scale);
+			auto label = std::make_shared<Label>(ui, scale);
 			label->setText(line);
 			label->insertAtEnd(vbox);
 		}

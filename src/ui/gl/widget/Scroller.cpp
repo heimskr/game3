@@ -13,14 +13,14 @@ namespace {
 }
 
 namespace Game3 {
-	Scroller::Scroller(float scale, Color scrollbar_color):
-		Widget(scale), scrollbarColor(scrollbar_color) {}
+	Scroller::Scroller(UIContext &ui, float scale, Color scrollbar_color):
+		Widget(ui, scale), scrollbarColor(scrollbar_color) {}
 
-	Scroller::Scroller(float scale):
-		Scroller(scale, DEFAULT_SCROLLBAR_COLOR) {}
+	Scroller::Scroller(UIContext &ui, float scale):
+		Scroller(ui, scale, DEFAULT_SCROLLBAR_COLOR) {}
 
-	void Scroller::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(ui, renderers, x, y, width, height);
+	void Scroller::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(renderers, x, y, width, height);
 
 		if (!firstChild)
 			return;
@@ -28,7 +28,7 @@ namespace Game3 {
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
 		// TODO: make Widget::render return a pair of width and height so we don't have to call calculateSize
-		firstChild->render(ui, renderers, xOffset, yOffset, width, height);
+		firstChild->render(renderers, xOffset, yOffset, width, height);
 
 		float dummy{};
 		firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
@@ -42,14 +42,14 @@ namespace Game3 {
 		}
 	}
 
-	bool Scroller::click(UIContext &ui, int button, int x, int y) {
+	bool Scroller::click(int button, int x, int y) {
 		if (lastVerticalScrollMouse || lastHorizontalScrollMouse)
 			return false;
 
-		return firstChild && firstChild->click(ui, button, x, y);
+		return firstChild && firstChild->click(button, x, y);
 	}
 
-	bool Scroller::dragStart(UIContext &ui, int x, int y) {
+	bool Scroller::dragStart(int x, int y) {
 		const auto [last_x, last_y, width, height] = lastRectangle;
 
 		if (lastVerticalScrollbarRectangle) {
@@ -72,7 +72,7 @@ namespace Game3 {
 			}
 		}
 
-		if (firstChild && firstChild->dragStart(ui, x, y))
+		if (firstChild && firstChild->dragStart(x, y))
 			return true;
 
 		lastVerticalScrollMouse = y - last_y;
@@ -81,7 +81,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Scroller::dragUpdate(UIContext &ui, int x, int y) {
+	bool Scroller::dragUpdate(int x, int y) {
 		if (lastVerticalScrollMouse) {
 			const auto start_y = *lastVerticalScrollMouse;
 			const float last_y = lastRectangle.y;
@@ -92,10 +92,10 @@ namespace Game3 {
 			return true;
 		}
 
-		return firstChild && firstChild->dragUpdate(ui, x, y);
+		return firstChild && firstChild->dragUpdate(x, y);
 	}
 
-	bool Scroller::dragEnd(UIContext &ui, int x, int y) {
+	bool Scroller::dragEnd(int x, int y) {
 		reverseScroll = false;
 
 		if (lastVerticalScrollMouse) {
@@ -108,10 +108,10 @@ namespace Game3 {
 			return true;
 		}
 
-		return firstChild && firstChild->dragEnd(ui, x, y);
+		return firstChild && firstChild->dragEnd(x, y);
 	}
 
-	bool Scroller::scroll(UIContext &, float x_delta, float y_delta, int, int) {
+	bool Scroller::scroll(float x_delta, float y_delta, int, int) {
 		xOffset += (getNatural()? x_delta : -x_delta) * SCROLL_SPEED;
 		yOffset += (getNatural()? y_delta : -y_delta) * SCROLL_SPEED;
 		xOffset = std::min(0.f, xOffset);

@@ -21,16 +21,16 @@ namespace Game3 {
 	namespace {
 		std::shared_ptr<InventoryModule> makePlayerInventoryModule(UIContext &ui) {
 			if (ClientPlayerPtr player = ui.getPlayer())
-				return std::make_shared<InventoryModule>(ui.getGame(), std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+				return std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
 
-			return std::make_shared<InventoryModule>(ui.getGame(), std::shared_ptr<ClientInventory>{});
+			return std::make_shared<InventoryModule>(ui, std::shared_ptr<ClientInventory>{});
 		}
 	}
 
 	InventoryTab::InventoryTab(UIContext &ui):
 		Tab(ui)  {}
 
-	void InventoryTab::init(UIContext &) {
+	void InventoryTab::init() {
 		assert(!playerInventoryModule);
 		playerInventoryModule = makePlayerInventoryModule(ui);
 
@@ -41,7 +41,7 @@ namespace Game3 {
 		moduleScroller = makeModuleScroller();
 	}
 
-	void InventoryTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void InventoryTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		Rectangle rectangle(x, y, width, height);
 
 		std::unique_lock<DefaultMutex> module_lock;
@@ -53,14 +53,14 @@ namespace Game3 {
 
 			{
 				auto saver = ui.scissorStack.pushRelative(Rectangle(rectangle.width + SEPARATION, 0) + rectangle, renderers);
-				moduleScroller->render(ui, renderers, rectangle);
+				moduleScroller->render(renderers, rectangle);
 				module_lock.unlock();
 			}
 
 			auto subsaver = ui.scissorStack.pushRelative(rectangle, renderers);
-			playerScroller->render(ui, renderers, rectangle);
+			playerScroller->render(renderers, rectangle);
 		} else {
-			playerScroller->render(ui, renderers, rectangle);
+			playerScroller->render(renderers, rectangle);
 		}
 	}
 
@@ -68,50 +68,50 @@ namespace Game3 {
 		renderIconTexture(renderers, cacheTexture("resources/gui/inventory.png"));
 	}
 
-	bool InventoryTab::click(UIContext &ui, int button, int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->click(ui, button, x, y))
+	bool InventoryTab::click(int button, int x, int y) {
+		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->click(button, x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				return moduleScroller->click(ui, button, x, y);
+				return moduleScroller->click(button, x, y);
 
 		return false;
 	}
 
-	bool InventoryTab::dragStart(UIContext &ui, int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragStart(ui, x, y))
+	bool InventoryTab::dragStart(int x, int y) {
+		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragStart(x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				return moduleScroller->dragStart(ui, x, y);
+				return moduleScroller->dragStart(x, y);
 
 		return false;
 	}
 
-	bool InventoryTab::dragEnd(UIContext &ui, int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragEnd(ui, x, y))
+	bool InventoryTab::dragEnd(int x, int y) {
+		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragEnd(x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				return moduleScroller->dragEnd(ui, x, y);
+				return moduleScroller->dragEnd(x, y);
 
 		return false;
 	}
 
-	bool InventoryTab::scroll(UIContext &ui, float x_delta, float y_delta, int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->scroll(ui, x_delta, y_delta, x, y))
+	bool InventoryTab::scroll(float x_delta, float y_delta, int x, int y) {
+		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->scroll(x_delta, y_delta, x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
 			if (moduleScroller->getLastRectangle().contains(x, y))
-				return moduleScroller->scroll(ui, x_delta, y_delta, x, y);
+				return moduleScroller->scroll(x_delta, y_delta, x, y);
 
 		return false;
 	}
@@ -119,7 +119,7 @@ namespace Game3 {
 	void InventoryTab::setModule(std::shared_ptr<Module> new_module) {
 		assert(new_module);
 		auto lock = activeModule.uniqueLock();
-		(activeModule.getBase() = std::move(new_module))->init(ui);
+		(activeModule.getBase() = std::move(new_module))->init();
 		moduleScroller->setChild(activeModule);
 		activeModule->reset();
 	}
@@ -142,14 +142,14 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Scroller> InventoryTab::makePlayerScroller() {
-		auto scroller = std::make_shared<Scroller>(scale);
+		auto scroller = std::make_shared<Scroller>(ui, scale);
 		scroller->setChild(playerInventoryModule);
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 
 	std::shared_ptr<Scroller> InventoryTab::makeModuleScroller() {
-		auto scroller = std::make_shared<Scroller>(scale);
+		auto scroller = std::make_shared<Scroller>(ui, scale);
 		scroller->setChild(activeModule.copyBase());
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;

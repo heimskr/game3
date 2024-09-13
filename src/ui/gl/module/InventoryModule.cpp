@@ -15,14 +15,14 @@ namespace {
 }
 
 namespace Game3 {
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame> game, const std::any &argument):
-		InventoryModule(std::move(game), getInventory(argument)) {}
+	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const std::any &argument):
+		InventoryModule(ui, getInventory(argument)) {}
 
-	InventoryModule::InventoryModule(std::shared_ptr<ClientGame>, const std::shared_ptr<ClientInventory> &inventory):
-		Module(SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
+	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):
+		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
 
-	void InventoryModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(ui, renderers, x, y, width, height);
+	void InventoryModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(renderers, x, y, width, height);
 
 		InventoryPtr inventory = inventoryGetter->get();
 		auto inventory_lock = inventory->sharedLock();
@@ -36,7 +36,7 @@ namespace Game3 {
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlot>(inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
@@ -63,7 +63,7 @@ namespace Game3 {
 		float slot_y = SLOT_PADDING * SLOT_SCALE;
 
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
-			widget->render(ui, renderers, x + slot_x, y + slot_y, -1, -1);
+			widget->render(renderers, x + slot_x, y + slot_y, -1, -1);
 
 			slot_x += OUTER_SLOT_SIZE * SLOT_SCALE;
 
@@ -75,15 +75,15 @@ namespace Game3 {
 		}
 	}
 
-	bool InventoryModule::click(UIContext &ui, int button, int x, int y) {
+	bool InventoryModule::click(int button, int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->getLastRectangle().contains(x, y) && widget->click(ui, button, x, y))
+			if (widget->getLastRectangle().contains(x, y) && widget->click(button, x, y))
 				return true;
 
 		return false;
 	}
 
-	bool InventoryModule::dragStart(UIContext &ui, int x, int y) {
+	bool InventoryModule::dragStart(int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget->getLastRectangle().contains(x, y)) {
 				WidgetPtr dragged_widget = widget->getDragStartWidget();
@@ -96,7 +96,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool InventoryModule::dragEnd(UIContext &ui, int x, int y) {
+	bool InventoryModule::dragEnd(int x, int y) {
 		auto dragged = std::dynamic_pointer_cast<ItemSlot>(ui.getDraggedWidget());
 
 		if (!dragged)

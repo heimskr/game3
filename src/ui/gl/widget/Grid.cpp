@@ -1,7 +1,7 @@
 #include "ui/gl/widget/Grid.h"
 
 namespace Game3 {
-	void Grid::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void Grid::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (sizesDirty) {
 			float dummy{};
 			measure(renderers, Orientation::Horizontal, width, height, dummy, dummy);
@@ -19,7 +19,7 @@ namespace Game3 {
 				if (Widget *widget = widgetContainer[row, column]) {
 					const auto [child_width, child_height] = sizeContainer.at(row, column);
 					max_height = std::max(max_height, child_height);
-					widget->render(ui, renderers, x, y, child_width, child_height);
+					widget->render(renderers, x, y, child_width, child_height);
 					x += child_width + columnSpacing;
 				}
 			}

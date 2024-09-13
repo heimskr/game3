@@ -797,7 +797,7 @@ namespace Game3 {
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(has_fluids));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(canvas->uiContext, has_fluids));
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {

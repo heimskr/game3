@@ -13,44 +13,44 @@
 #include <cassert>
 
 namespace Game3 {
-	FluidsModule::FluidsModule(std::shared_ptr<ClientGame> game, const std::any &argument, bool show_header):
-		FluidsModule(std::move(game), std::any_cast<AgentPtr>(argument), show_header) {}
+	FluidsModule::FluidsModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument, bool show_header):
+		FluidsModule(ui, std::any_cast<AgentPtr>(argument), show_header) {}
 
-	FluidsModule::FluidsModule(std::shared_ptr<ClientGame>, const AgentPtr &agent, bool show_header):
-		FluidsModule(std::dynamic_pointer_cast<HasFluids>(agent), show_header) {}
+	FluidsModule::FluidsModule(UIContext &ui, const AgentPtr &agent, bool show_header):
+		FluidsModule(ui, std::dynamic_pointer_cast<HasFluids>(agent), show_header) {}
 
-	FluidsModule::FluidsModule(std::shared_ptr<HasFluids> fluid_haver, bool show_header):
-		fluidHaver(std::move(fluid_haver)), showHeader(show_header) {}
+	FluidsModule::FluidsModule(UIContext &ui, std::shared_ptr<HasFluids> fluid_haver, bool show_header):
+		Module(ui), fluidHaver(std::move(fluid_haver)), showHeader(show_header) {}
 
-	void FluidsModule::init(UIContext &ui) {
-		auto vbox = std::make_shared<Box>(scale);
+	void FluidsModule::init() {
+		auto vbox = std::make_shared<Box>(ui, scale);
 		vbox->setSeparatorThickness(0);
 
 		if (showHeader) {
-			auto label = std::make_shared<Label>(scale);
+			auto label = std::make_shared<Label>(ui, scale);
 			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
-				label->setText(ui, agent->getName());
+				label->setText(agent->getName());
 			else
-				label->setText(ui, "???");
+				label->setText("???");
 			label->insertAtEnd(vbox);
 		}
 
-		auto hbox = std::make_shared<Box>(scale, Orientation::Horizontal);
+		auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
 		hbox->setSeparatorThickness(0);
 
-		grid = std::make_shared<Grid>(scale);
+		grid = std::make_shared<Grid>(ui, scale);
 		grid->insertAtEnd(hbox);
 
 		hbox->insertAtEnd(vbox);
 		vbox->insertAtEnd(shared_from_this());
 	}
 
-	void FluidsModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Module::render(ui, renderers, x, y, width, height);
+	void FluidsModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Module::render(renderers, x, y, width, height);
 
-		updateFluids(ui);
+		updateFluids();
 
-		grid->render(ui, renderers, x, y, width, height);
+		grid->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode FluidsModule::getRequestMode() const {
@@ -62,17 +62,17 @@ namespace Game3 {
 	}
 
 	std::pair<std::shared_ptr<Label>, std::shared_ptr<ProgressBar>> FluidsModule::makePair(Color bar_interior) const {
-		auto bar = std::make_shared<ProgressBar>(scale, bar_interior);
+		auto bar = std::make_shared<ProgressBar>(ui, scale, bar_interior);
 		bar->setFixedHeight(12 * scale);
 		bar->setHorizontalExpand(true);
 
-		auto label = std::make_shared<Label>(scale);
+		auto label = std::make_shared<Label>(ui, scale);
 		label->setVerticalAlignment(Alignment::Middle);
 
 		return std::make_pair(std::move(label), std::move(bar));
 	}
 
-	void FluidsModule::updateFluids(UIContext &ui) {
+	void FluidsModule::updateFluids() {
 		std::shared_ptr<FluidContainer> container = fluidHaver->fluidContainer;
 		Lockable<FluidContainer::Map> &levels = container->levels;
 		ClientGamePtr game = ui.getGame();
@@ -102,7 +102,7 @@ namespace Game3 {
 				auto [iter, inserted] = widgetPairs.emplace(fluid_id, makePair(fluid->color));
 				assert(inserted);
 				const auto &[label, bar] = iter->second;
-				label->setText(ui, fluid->name);
+				label->setText(fluid->name);
 				bar->setProgress(progress);
 				should_regrid = true;
 				iteratorsByID[fluid_id] = iter;

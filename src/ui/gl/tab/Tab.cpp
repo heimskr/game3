@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	Tab::Tab(UIContext &ui):
-		Widget(UI_SCALE), ui(ui) {}
+		Widget(ui, UI_SCALE) {}
 
 	void Tab::renderIcon(const RendererContext &) {}
 

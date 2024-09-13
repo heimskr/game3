@@ -12,15 +12,15 @@
 #include <cassert>
 
 namespace Game3 {
-	void CraftingTab::init(UIContext &) {
+	void CraftingTab::init() {
 		auto tab = shared_from_this();
-		auto scroller = std::make_shared<Scroller>(scale);
+		auto scroller = std::make_shared<Scroller>(ui, scale);
 		scroller->insertAtEnd(tab);
 
-		auto vbox = std::make_shared<Box>(scale, Orientation::Vertical);
+		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
 		vbox->insertAtEnd(scroller);
 
-		auto input = std::make_shared<TextInput>(scale);
+		auto input = std::make_shared<TextInput>(ui, scale);
 		input->setSuggestions(std::vector<UString>{
 			"foo",
 			"bar",
@@ -33,10 +33,10 @@ namespace Game3 {
 		input->insertAtEnd(vbox);
 	}
 
-	void CraftingTab::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
+	void CraftingTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		WidgetPtr child = firstChild;
 		assert(child != nullptr);
-		child->render(ui, renderers, x, y, width, height);
+		child->render(renderers, x, y, width, height);
 	}
 
 	void CraftingTab::renderIcon(const RendererContext &renderers) {

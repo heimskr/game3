@@ -14,15 +14,15 @@ namespace Game3 {
 
 	class TextModule: public Module {
 		public:
-			TextModule(std::shared_ptr<ClientGame>, const std::any &);
-			TextModule(std::shared_ptr<ClientGame>, std::string);
+			TextModule(UIContext &, std::shared_ptr<ClientGame>, const std::any &);
+			TextModule(UIContext &, std::shared_ptr<ClientGame>, std::string);
 
 			static Identifier ID() { return {"base", "module/text"}; }
 
 			Identifier getID() const final { return ID(); }
 
 			using Module::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

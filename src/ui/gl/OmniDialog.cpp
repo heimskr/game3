@@ -38,7 +38,7 @@ namespace Game3 {
 		tabRectangles.resize(tabs.size());
 
 		for (const TabPtr &tab: tabs)
-			tab->init(ui);
+			tab->init();
 	}
 
 	void OmniDialog::render(const RendererContext &renderers) {
@@ -67,7 +67,7 @@ namespace Game3 {
 			auto subsaver = stack.pushRelative(rectangle, renderers);
 
 			if (activeTab)
-				activeTab->render(ui, renderers, 0, 0, rectangle.width, rectangle.height);
+				activeTab->render(renderers, 0, 0, rectangle.width, rectangle.height);
 		}
 
 		auto saver = renderers.getSaver();
@@ -129,7 +129,7 @@ namespace Game3 {
 	void OmniDialog::onClose() {
 		ui.getTooltip()->hide();
 		inventoryTab->removeModule();
-		activeTab->onBlur(ui);
+		activeTab->onBlur();
 	}
 
 	bool OmniDialog::click(int button, int x, int y) {
@@ -137,7 +137,7 @@ namespace Game3 {
 			if (tabRectangles[i].contains(x, y)) {
 				const TabPtr &clicked_tab = tabs.at(i);
 				if (clicked_tab != activeTab) {
-					activeTab->onBlur(ui);
+					activeTab->onBlur();
 					activeTab = clicked_tab;
 				}
 				return true;
@@ -148,7 +148,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->click(ui, button, x, y);
+			activeTab->click(button, x, y);
 
 		return true;
 	}
@@ -158,7 +158,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->dragStart(ui, x, y);
+			activeTab->dragStart(x, y);
 
 		return true;
 	}
@@ -168,7 +168,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->dragUpdate(ui, x, y);
+			activeTab->dragUpdate(x, y);
 
 		return true;
 	}
@@ -178,7 +178,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->dragEnd(ui, x, y);
+			activeTab->dragEnd(x, y);
 
 		return true;
 	}
@@ -188,7 +188,7 @@ namespace Game3 {
 			return false;
 
 		if (activeTab)
-			activeTab->scroll(ui, x_delta, y_delta, x, y);
+			activeTab->scroll(x_delta, y_delta, x, y);
 
 		return true;
 	}

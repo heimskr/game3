@@ -31,28 +31,29 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", std::format("module/microscope_{}{}", S, Submodule::getSuffix())}; }
 
-			MicroscopeModule(ClientGamePtr game, const std::any &argument):
-				MicroscopeModule(std::move(game), std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
+			MicroscopeModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
+				MicroscopeModule(ui, game, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
 
-			MicroscopeModule(ClientGamePtr game, std::shared_ptr<InventoriedTileEntity> tile_entity):
+			MicroscopeModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<InventoriedTileEntity> tile_entity):
+				Module(ui),
 				weakGame(game),
 				tileEntity(std::move(tile_entity)),
-				multiModule(std::make_shared<Submodule>(game, std::static_pointer_cast<Agent>(tileEntity))),
-				geneticAnalysisModule(std::make_shared<GeneticAnalysisModule>()) {}
+				multiModule(std::make_shared<Submodule>(ui, game, std::static_pointer_cast<Agent>(tileEntity))),
+				geneticAnalysisModule(std::make_shared<GeneticAnalysisModule>(ui)) {}
 
 			Identifier getID() const final {
 				return ID();
 			}
 
-			void init(UIContext &ui) final {
-				multiModule->init(ui);
-				geneticAnalysisModule->init(ui);
+			void init() final {
+				multiModule->init();
+				geneticAnalysisModule->init();
 
-				vbox = std::make_shared<Box>(scale);
+				vbox = std::make_shared<Box>(ui, scale);
 				vbox->setHorizontalExpand(true);
 
-				header = std::make_shared<Label>(scale);
-				header->setText(ui, tileEntity->getName());
+				header = std::make_shared<Label>(ui, scale);
+				header->setText(tileEntity->getName());
 				header->insertAtEnd(vbox);
 
 				multiModule->insertAtEnd(vbox);
@@ -115,9 +116,9 @@ namespace Game3 {
 			// 	return multiModule->getPrimaryInventoryModule();
 			// }
 
-			void render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) final {
-				Widget::render(ui, renderers, x, y, width, height);
-				vbox->render(ui, renderers, x, y, width, height);
+			void render(const RendererContext &renderers, float x, float y, float width, float height) final {
+				Widget::render(renderers, x, y, width, height);
+				vbox->render(renderers, x, y, width, height);
 			}
 
 			SizeRequestMode getRequestMode() const final {

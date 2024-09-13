@@ -13,8 +13,8 @@ namespace Game3 {
 		public:
 			using Tab::Tab;
 
-			void init(UIContext &) final;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void init() final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void renderIcon(const RendererContext &) final;
 
 		private:

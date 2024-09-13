@@ -38,17 +38,17 @@ namespace Game3 {
 				return suffix;
 			}
 
-			MultiModule(ClientGamePtr game, const std::any &argument):
-				MultiModule(std::move(game), std::any_cast<AgentPtr>(argument)) {}
+			MultiModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
+				MultiModule(ui, game, std::any_cast<AgentPtr>(argument)) {}
 
-			MultiModule(ClientGamePtr game, const AgentPtr &agent):
-				weakGame(game), agent(std::move(agent)) {}
+			MultiModule(UIContext &ui, const ClientGamePtr &game, const AgentPtr &agent):
+				Module(ui), weakGame(game), agent(std::move(agent)) {}
 
 			Identifier getID() const final {
 				return ID();
 			}
 
-			void init(UIContext &ui) final {
+			void init() final {
 				ClientGamePtr game = weakGame.lock();
 				assert(game);
 
@@ -59,19 +59,19 @@ namespace Game3 {
 							assert(inventoried);
 							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
 								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
-								submodules.emplace_back(std::make_shared<InventoryModule>(game, std::move(inventory)));
+								submodules.emplace_back(std::make_shared<InventoryModule>(ui, game, std::move(inventory)));
 							}
 							break;
 						}
 
 						case Substance::Fluid: {
 							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
-							submodules.emplace_back(std::make_shared<FluidsModule>(game, agent));
+							submodules.emplace_back(std::make_shared<FluidsModule>(ui, game, agent));
 							break;
 						}
 
 						case Substance::Energy: {
-							submodules.emplace_back(std::make_shared<EnergyModule>(game, agent, false));
+							submodules.emplace_back(std::make_shared<EnergyModule>(ui, game, agent, false));
 							break;
 						}
 
@@ -80,12 +80,12 @@ namespace Game3 {
 					}
 				}
 
-				box = std::make_shared<Box>(scale, Orientation::Vertical);
+				box = std::make_shared<Box>(ui, scale, Orientation::Vertical);
 				box->insertAtEnd(shared_from_this());
 
 				for (const ModulePtr &submodule: submodules) {
 					submodule->insertAtEnd(box);
-					submodule->init(ui);
+					submodule->init();
 				}
 			}
 
@@ -106,9 +106,9 @@ namespace Game3 {
 				return std::nullopt;
 			}
 
-			void render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) final {
-				Widget::render(ui, renderers, x, y, width, height);
-				box->render(ui, renderers, x, y, width, height);
+			void render(const RendererContext &renderers, float x, float y, float width, float height) final {
+				Widget::render(renderers, x, y, width, height);
+				box->render(renderers, x, y, width, height);
 			}
 
 			SizeRequestMode getRequestMode() const final {

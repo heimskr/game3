@@ -15,13 +15,13 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/gene_info"}; }
 
-			GeneInfoModule(std::shared_ptr<Gene>);
+			GeneInfoModule(UIContext &, std::shared_ptr<Gene>);
 
 			Identifier getID() const final { return ID(); }
-			void init(UIContext &) final;
+			void init() final;
 
 			using Module::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

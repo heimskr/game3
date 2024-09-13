@@ -9,22 +9,20 @@
 namespace Game3 {
 	class Label: public Widget, public HasAlignment, public HasFixedSize {
 		public:
-			Label(float scale);
+			Label(UIContext &, float scale);
 
 			using Widget::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
-			void setText(UIContext &, UString);
 			void setText(UString);
 			const UString & getText() const;
 
 		protected:
 			UString text;
 			std::optional<UString> wrapped;
-			std::optional<UString> deferredText;
 			float lastTextHeight = -1;
 
 			float getTextScale() const;

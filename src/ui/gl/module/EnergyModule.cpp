@@ -7,34 +7,34 @@
 #include "ui/gl/widget/ProgressBar.h"
 
 namespace Game3 {
-	EnergyModule::EnergyModule(std::shared_ptr<ClientGame> game, const std::any &argument, bool show_header):
-		EnergyModule(std::move(game), std::any_cast<AgentPtr>(argument), show_header) {}
+	EnergyModule::EnergyModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument, bool show_header):
+		EnergyModule(ui, std::any_cast<AgentPtr>(argument), show_header) {}
 
-	EnergyModule::EnergyModule(std::shared_ptr<ClientGame>, const AgentPtr &agent, bool show_header):
-		energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)), showHeader(show_header) {}
+	EnergyModule::EnergyModule(UIContext &ui, const AgentPtr &agent, bool show_header):
+		Module(ui), energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)), showHeader(show_header) {}
 
-	void EnergyModule::init(UIContext &ui) {
-		auto vbox = std::make_shared<Box>(scale);
+	void EnergyModule::init() {
+		auto vbox = std::make_shared<Box>(ui, scale);
 		vbox->setSeparatorThickness(0);
 
 		if (showHeader) {
-			auto label = std::make_shared<Label>(scale);
+			auto label = std::make_shared<Label>(ui, scale);
 			if (auto agent = std::dynamic_pointer_cast<Agent>(energyHaver))
-				label->setText(ui, agent->getName());
+				label->setText(agent->getName());
 			else
-				label->setText(ui, "???");
+				label->setText("???");
 			label->insertAtEnd(vbox);
 		}
 
-		auto hbox = std::make_shared<Box>(scale, Orientation::Horizontal);
+		auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
 		hbox->setSeparatorThickness(0);
 
-		auto label = std::make_shared<Label>(scale);
-		label->setText(ui, "Energy");
+		auto label = std::make_shared<Label>(ui, scale);
+		label->setText("Energy");
 		label->setVerticalAlignment(Alignment::Middle);
 		label->insertAtEnd(hbox);
 
-		bar = std::make_shared<ProgressBar>(scale);
+		bar = std::make_shared<ProgressBar>(ui, scale);
 		bar->setFixedHeight(12 * scale);
 		bar->setHorizontalExpand(true);
 		bar->insertAtEnd(hbox);
@@ -43,8 +43,8 @@ namespace Game3 {
 		vbox->insertAtEnd(shared_from_this());
 	}
 
-	void EnergyModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Module::render(ui, renderers, x, y, width, height);
+	void EnergyModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Module::render(renderers, x, y, width, height);
 
 		EnergyAmount max{}, amount{};
 		{
@@ -54,7 +54,7 @@ namespace Game3 {
 		}
 
 		bar->setProgress(amount < max && max != 0? static_cast<double>(amount) / max : 1.);
-		firstChild->render(ui, renderers, x, y, width, height);
+		firstChild->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode EnergyModule::getRequestMode() const {

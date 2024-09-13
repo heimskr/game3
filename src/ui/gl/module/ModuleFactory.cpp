@@ -1,4 +1,6 @@
+#include "game/ClientGame.h"
 #include "ui/gl/module/ModuleFactory.h"
+#include "ui/Canvas.h"
 
 namespace Game3 {
 	ModuleFactory::ModuleFactory(Identifier identifier, decltype(function) function):
@@ -9,5 +11,9 @@ namespace Game3 {
 			throw std::logic_error("ModuleFactory is missing a function");
 
 		return function(game, argument);
+	}
+
+	UIContext & ModuleFactory::getUIContext(ClientGame &game) {
+		return game.canvas.uiContext;
 	}
 }

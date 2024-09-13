@@ -16,13 +16,13 @@ namespace Game3 {
 		public:
 			sigc::signal<void(Slider &, double)> onValueUpdate;
 
-			Slider(float scale);
+			Slider(UIContext &, float scale);
 
 			using Widget::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool dragStart(UIContext &, int x, int y) final;
-			bool dragUpdate(UIContext &, int x, int y) final;
+			bool dragStart(int x, int y) final;
+			bool dragUpdate(int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

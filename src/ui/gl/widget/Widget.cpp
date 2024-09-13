@@ -7,21 +7,21 @@
 #include <cassert>
 
 namespace Game3 {
-	Widget::Widget(float scale):
-		scale(scale) {}
+	Widget::Widget(UIContext &ui, float scale):
+		ui(ui), scale(scale) {}
 
-	void Widget::init(UIContext &) {}
+	void Widget::init() {}
 
 	const Rectangle & Widget::getLastRectangle() const {
 		return lastRectangle;
 	}
 
-	void Widget::render(UIContext &ui, const RendererContext &, float x, float y, float width, float height) {
+	void Widget::render(const RendererContext &, float x, float y, float width, float height) {
 		lastRectangle = ui.scissorStack.getTop().rectangle + Rectangle(x, y, width, height);
 	}
 
-	void Widget::render(UIContext &ui, const RendererContext &renderers, const Rectangle &rectangle) {
-		render(ui, renderers,
+	void Widget::render(const RendererContext &renderers, const Rectangle &rectangle) {
+		render(renderers,
 		       static_cast<float>(rectangle.x),
 		       static_cast<float>(rectangle.y),
 		       static_cast<float>(rectangle.width),
@@ -32,60 +32,60 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool Widget::click(UIContext &ui, int button, int x, int y) {
+	bool Widget::click(int button, int x, int y) {
 		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick)
-			return onClick(*this, ui, button, x - lastRectangle.x, y - lastRectangle.y);
+			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->click(ui, button, x, y))
+			if (child->getLastRectangle().contains(x, y) && child->click(button, x, y))
 				return true;
 
 		return false;
 	}
 
-	bool Widget::dragStart(UIContext &ui, int x, int y) {
+	bool Widget::dragStart(int x, int y) {
 		dragOrigin.emplace(x, y);
 
-		if (onDragStart && onDragStart(*this, ui, x - lastRectangle.x, y - lastRectangle.y))
+		if (onDragStart && onDragStart(*this, x - lastRectangle.x, y - lastRectangle.y))
 			return true;
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->dragStart(ui, x, y))
+			if (child->getLastRectangle().contains(x, y) && child->dragStart(x, y))
 				return true;
 
 		return false;
 	}
 
-	bool Widget::dragUpdate(UIContext &ui, int x, int y) {
-		if (onDragUpdate && onDragUpdate(*this, ui, x - lastRectangle.x, y - lastRectangle.y))
+	bool Widget::dragUpdate(int x, int y) {
+		if (onDragUpdate && onDragUpdate(*this, x - lastRectangle.x, y - lastRectangle.y))
 			return true;
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->dragUpdate(ui, x, y))
+			if (child->getLastRectangle().contains(x, y) && child->dragUpdate(x, y))
 				return true;
 
 		return false;
 	}
 
-	bool Widget::dragEnd(UIContext &ui, int x, int y) {
+	bool Widget::dragEnd(int x, int y) {
 		dragOrigin.reset();
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->dragEnd(ui, x, y))
+			if (child->getLastRectangle().contains(x, y) && child->dragEnd(x, y))
 				return true;
 
 		return false;
 	}
 
-	bool Widget::scroll(UIContext &ui, float x_delta, float y_delta, int x, int y) {
+	bool Widget::scroll(float x_delta, float y_delta, int x, int y) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->scroll(ui, x_delta, y_delta, x, y))
+			if (child->getLastRectangle().contains(x, y) && child->scroll(x_delta, y_delta, x, y))
 				return true;
 
 		return false;
 	}
 
-	bool Widget::keyPressed(UIContext &, uint32_t, Modifiers) {
+	bool Widget::keyPressed(uint32_t, Modifiers) {
 		return false;
 	}
 
@@ -97,11 +97,11 @@ namespace Game3 {
 		return dragOrigin.has_value();
 	}
 
-	void Widget::onFocus(UIContext &) {}
+	void Widget::onFocus() {}
 
-	void Widget::onBlur(UIContext &ui) {
+	void Widget::onBlur() {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			child->onBlur(ui);
+			child->onBlur();
 	}
 
 	WidgetPtr Widget::getParent() const {
@@ -236,6 +236,10 @@ namespace Game3 {
 
 	std::size_t Widget::getChildCount() const {
 		return childCount;
+	}
+
+	UIContext & Widget::getUI() {
+		return ui;
 	}
 
 	void Widget::setOnClick(decltype(onClick) new_onclick) {

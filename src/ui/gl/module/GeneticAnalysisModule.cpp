@@ -11,13 +11,11 @@
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	GeneticAnalysisModule::GeneticAnalysisModule(ClientGamePtr, const std::any &):
-		GeneticAnalysisModule() {}
+	GeneticAnalysisModule::GeneticAnalysisModule(UIContext &ui, const ClientGamePtr &, const std::any &):
+		GeneticAnalysisModule(ui) {}
 
-	GeneticAnalysisModule::GeneticAnalysisModule() = default;
-
-	void GeneticAnalysisModule::init(UIContext &) {
-		vbox = std::make_shared<Box>(scale, Orientation::Vertical, 0, 0, Color{});
+	void GeneticAnalysisModule::init() {
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
 	}
 
 	void GeneticAnalysisModule::reset() {
@@ -41,9 +39,9 @@ namespace Game3 {
 		}
 	}
 
-	void GeneticAnalysisModule::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(ui, renderers, x, y, width, height);
-		vbox->render(ui, renderers, x, y, width, height);
+	void GeneticAnalysisModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(renderers, x, y, width, height);
+		vbox->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode GeneticAnalysisModule::getRequestMode() const {
@@ -78,7 +76,7 @@ namespace Game3 {
 		});
 
 		if (descriptions.empty()) {
-			auto label = std::make_shared<Label>(scale);
+			auto label = std::make_shared<Label>(ui, scale);
 			label->setText("No genes found.");
 			label->insertAtEnd(vbox);
 			return;
@@ -137,7 +135,7 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::addLabel(const std::string &text) {
-		auto label = std::make_shared<Label>(scale);
+		auto label = std::make_shared<Label>(ui, scale);
 		label->setText(text);
 		label->insertAtEnd(vbox);
 	}

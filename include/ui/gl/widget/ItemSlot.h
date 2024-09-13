@@ -19,14 +19,14 @@ namespace Game3 {
 			std::shared_ptr<ItemTexture> texture;
 
 		public:
-			ItemSlot(std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
-			ItemSlot(Slot, float size, float scale, bool active = false);
+			ItemSlot(UIContext &, std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
+			ItemSlot(UIContext &, Slot, float size, float scale, bool active = false);
 
 			using Widget::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			std::shared_ptr<Widget> getDragStartWidget() final;
-			bool click(UIContext &, int button, int x, int y) final;
+			bool click(int button, int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

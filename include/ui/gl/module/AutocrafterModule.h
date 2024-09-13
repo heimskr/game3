@@ -8,7 +8,6 @@
 
 namespace Game3 {
 	class Autocrafter;
-	class ClientGame;
 	class EnergyModule;
 	class InventoryModule;
 	class TextInput;
@@ -17,14 +16,14 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/autocrafter"}; }
 
-			AutocrafterModule(const std::shared_ptr<ClientGame> &, const std::any &);
-			AutocrafterModule(const std::shared_ptr<ClientGame> &, std::shared_ptr<Autocrafter>);
+			AutocrafterModule(UIContext &, const ClientGamePtr &, const std::any &);
+			AutocrafterModule(UIContext &, const ClientGamePtr &, std::shared_ptr<Autocrafter>);
 
 			Identifier getID() const final { return ID(); }
-			void init(UIContext &) final;
+			void init() final;
 
 			using Module::render;
-			void render(UIContext &, const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 

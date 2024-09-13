@@ -45,7 +45,7 @@ namespace Game3 {
 			template <typename T, typename... Args>
 			void addTab(Args &&...args) {
 				auto lock = tabs.uniqueLock();
-				tabs.emplace_back(std::make_shared<T>(ui, std::forward<Args>(args)...));
+				tabs.emplace_back(std::make_shared<T>(std::forward<Args>(args)...));
 			}
 
 		private:
