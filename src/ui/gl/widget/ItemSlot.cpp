@@ -28,9 +28,6 @@ namespace Game3 {
 	void ItemSlot::render(UIContext &ui, const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(ui, renderers, x, y, width, height);
 
-		lastRectangle.width = 16 * scale;
-		lastRectangle.height = 16 * scale;
-
 		if (!ui.renderingDraggedWidget) {
 			const float alpha = active? 0.4 : 0.15;
 			renderers.rectangle.drawOnScreen(Color{0.6, 0.3, 0, alpha}, x, y, size * scale, size * scale);

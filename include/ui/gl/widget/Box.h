@@ -25,7 +25,6 @@ namespace Game3 {
 			float padding;
 			float separatorThickness;
 			Color separatorColor;
-			std::pair<float, float> lastRenderedSize{-1, -1};
 			std::vector<std::pair<float, float>> childMeasurements;
 	};
 }
