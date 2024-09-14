@@ -18,14 +18,8 @@ namespace Game3 {
 		return lastRectangle;
 	}
 
-	void Widget::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		// double hue = 360.0 * ((double) ((((uintptr_t) this) >> 10) & 1023) / 1024.0);
-		double hue = 0; for (WidgetPtr parent = getParent(); parent; parent = parent->getParent()) hue += 0.1;
-
-		Color color = OKHsv(hue, 1, 1, 0.25).convert<Color>();
-
+	void Widget::render(const RendererContext &, float x, float y, float width, float height) {
 		lastRectangle = ui.scissorStack.getTop().rectangle + Rectangle(x, y, width, height);
-		renderers.rectangle.drawOnScreen(color, x, y, width, height);
 	}
 
 	void Widget::render(const RendererContext &renderers, const Rectangle &rectangle) {
