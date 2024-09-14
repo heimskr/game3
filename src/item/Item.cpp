@@ -37,15 +37,32 @@ namespace Game3 {
 	Item::Item(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count):
 		NamedRegisterable(std::move(id_)), name(std::move(name_)), basePrice(base_price), maxCount(max_count) {}
 
+	Item::~Item() = default;
+
 	Glib::RefPtr<Gdk::Pixbuf> Item::getImage(const Game &game, const ConstItemStackPtr &stack) const {
 		if (!isTextureCacheable() || !cachedImage)
 			cachedImage = makeImage(game, stack);
 		return cachedImage;
 	}
 
-	Item::~Item() = default;
-
 	Glib::RefPtr<Gdk::Pixbuf> Item::makeImage(const Game &game, const ConstItemStackPtr &stack) const {
+		TexturePtr texture = getTexture(game, stack);
+
+		const auto width = texture->width;
+		const auto height = texture->height;
+		constexpr int doublings = 3;
+
+		return Gdk::Pixbuf::create_from_data(texture->data.get(), Gdk::Colorspace::RGB, texture->alpha, 8, width, height, int(texture->alpha? 4 * width : 3 * width))
+		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
+	}
+
+	TexturePtr Item::getTexture(const Game &game, const ConstItemStackPtr &stack) const {
+		if (!isTextureCacheable() || !cachedTexture)
+			cachedTexture = makeTexture(game, stack);
+		return cachedTexture;
+	}
+
+	TexturePtr Item::makeTexture(const Game &game, const ConstItemStackPtr &stack) const {
 		auto item_texture = game.registry<ItemTextureRegistry>().at(getTextureIdentifier(stack));
 		auto texture = item_texture->getTexture();
 		texture->init();
@@ -55,7 +72,7 @@ namespace Game3 {
 		const size_t row_size = channels * width;
 
 		if (!rawImage || !isTextureCacheable()) {
-			rawImage = std::make_unique<uint8_t[]>(channels * width * height);
+			rawImage = std::make_shared<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
 			uint8_t *texture_pointer = texture->data.get() + item_texture->y * texture->width * channels + static_cast<ptrdiff_t>(item_texture->x) * channels;
 			for (int row = 0; row < height; ++row) {
@@ -64,9 +81,13 @@ namespace Game3 {
 			}
 		}
 
-		constexpr int doublings = 3;
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, texture->alpha, 8, width, height, int(row_size))
-		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
+		TexturePtr new_texture = std::make_shared<Texture>(texture->identifier);
+		new_texture->alpha = texture->alpha;
+		new_texture->filter = texture->filter;
+		new_texture->format = texture->format;
+		new_texture->init(rawImage, width, height);
+
+		return new_texture;
 	}
 
 	Identifier Item::getTextureIdentifier(const ConstItemStackPtr &) const {
@@ -91,12 +112,12 @@ namespace Game3 {
 		return *this;
 	}
 
-	std::shared_ptr<ItemTexture> Item::getTexture(const ConstItemStackPtr &stack) {
-		if (isTextureCacheable() && cachedTexture)
-			return cachedTexture;
+	std::shared_ptr<ItemTexture> Item::getItemTexture(const ConstItemStackPtr &stack) {
+		if (isTextureCacheable() && cachedItemTexture)
+			return cachedItemTexture;
 
 		GamePtr game = stack->getGame();
-		return cachedTexture = game->registry<ItemTextureRegistry>().at(identifier);
+		return cachedItemTexture = game->registry<ItemTextureRegistry>().at(identifier);
 	}
 
 	std::string Item::getTooltip(const ConstItemStackPtr &) {
@@ -148,12 +169,6 @@ namespace Game3 {
 		item->initStack(*game, *this);
 	}
 
-	bool ItemStack::canMerge(const ItemStack &other) const {
-		if (!item || !other.item)
-			return false;
-		return *item == *other.item && data == other.data;
-	}
-
 	Glib::RefPtr<Gdk::Pixbuf> ItemStack::getImage() const {
 		GamePtr game = getGame();
 		return getImage(*game);
@@ -167,6 +182,27 @@ namespace Game3 {
 			return cachedImage = item->getImage(game_, shared_from_this());
 
 		return {};
+	}
+
+	TexturePtr ItemStack::getTexture() const {
+		GamePtr game = getGame();
+		return getTexture(*game);
+	}
+
+	TexturePtr ItemStack::getTexture(const Game &game_) const {
+		if (!(item && !item->isTextureCacheable()) && cachedTexture)
+			return cachedTexture;
+
+		if (item)
+			return cachedTexture = item->getTexture(game_, shared_from_this());
+
+		return {};
+	}
+
+	bool ItemStack::canMerge(const ItemStack &other) const {
+		if (!item || !other.item)
+			return false;
+		return *item == *other.item && data == other.data;
 	}
 
 	ItemStackPtr ItemStack::withCount(ItemCount new_count) const {
@@ -217,8 +253,8 @@ namespace Game3 {
 		place.realm->spawn<ItemEntity>(place.position, copy());
 	}
 
-	std::shared_ptr<ItemTexture> ItemStack::getTexture(Game &) const {
-		return item->getTexture(shared_from_this());
+	std::shared_ptr<ItemTexture> ItemStack::getItemTexture(Game &) const {
+		return item->getItemTexture(shared_from_this());
 	}
 
 	void ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json, ItemStack &stack) {

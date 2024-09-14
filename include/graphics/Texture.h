@@ -6,6 +6,10 @@
 
 #include "registry/Registerable.h"
 
+namespace Gdk {
+	class Pixbuf;
+}
+
 namespace Game3 {
 	class Texture: public NamedRegisterable {
 		public:
@@ -18,8 +22,8 @@ namespace Game3 {
 			std::filesystem::path path;
 			std::shared_ptr<uint8_t[]> data;
 
-			Texture(Identifier = {});
-			Texture(Identifier, std::filesystem::path, bool alpha_ = true, int filter_ = -1);
+			Texture(Identifier = {}, bool alpha = true, int filter = -1);
+			Texture(Identifier, std::filesystem::path, bool alpha = true, int filter = -1);
 
 			Texture(const Texture &) = default;
 			Texture(Texture &&) = default;
@@ -28,9 +32,11 @@ namespace Game3 {
 			Texture & operator=(Texture &&) = default;
 
 			void init();
-			void init(std::shared_ptr<uint8_t[]>);
+			void init(std::shared_ptr<uint8_t[]>, int data_width, int data_height);
 			void bind(int bind_id = -1);
 			bool getValid() const { return valid; }
+
+			std::shared_ptr<Gdk::Pixbuf> toPixbuf() const;
 
 			static std::string filterToString(int);
 			static int stringToFilter(const std::string &);

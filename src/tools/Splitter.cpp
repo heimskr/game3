@@ -113,7 +113,7 @@ namespace Game3 {
 			} else if (credit_override_vadim.contains(end)) {
 				meta["credit"] = "Vadim";
 			} else {
-				const Identifier texture_id = item->getTexture(ItemStack::create(game, item))->getTexture()->identifier;
+				const Identifier texture_id = item->getItemTexture(ItemStack::create(game, item))->getTexture()->identifier;
 				if (auto iter = credits.find(texture_id); iter != credits.end())
 					meta["credit"] = iter->second;
 				else

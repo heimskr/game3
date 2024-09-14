@@ -16,6 +16,7 @@ namespace Game3 {
 			std::optional<T> west;
 
 			// Sorry for all the duplication.
+
 			inline T & operator[](Direction direction) {
 				std::optional<T> *item = nullptr;
 				switch (direction) {

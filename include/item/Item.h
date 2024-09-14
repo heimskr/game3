@@ -47,10 +47,12 @@ namespace Game3 {
 
 			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ConstItemStackPtr &) const;
 			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ConstItemStackPtr &) const;
+			virtual TexturePtr getTexture(const Game &, const ConstItemStackPtr &) const;
+			virtual TexturePtr makeTexture(const Game &, const ConstItemStackPtr &) const;
 			virtual Identifier getTextureIdentifier(const ConstItemStackPtr &) const;
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
 			Item & addAttribute(Identifier);
-			virtual std::shared_ptr<ItemTexture> getTexture(const ConstItemStackPtr &);
+			virtual std::shared_ptr<ItemTexture> getItemTexture(const ConstItemStackPtr &);
 			virtual std::string getTooltip(const ConstItemStackPtr &);
 
 			inline bool operator==(const Item &other) const { return identifier == other.identifier; }
@@ -78,9 +80,10 @@ namespace Game3 {
 			virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
 		protected:
-			mutable std::unique_ptr<uint8_t[]> rawImage;
+			mutable std::shared_ptr<uint8_t[]> rawImage;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
-			mutable std::shared_ptr<ItemTexture> cachedTexture;
+			mutable std::shared_ptr<ItemTexture> cachedItemTexture;
+			mutable TexturePtr cachedTexture;
 	};
 
 	using ItemPtr = std::shared_ptr<Item>;
@@ -103,9 +106,12 @@ namespace Game3 {
 				return stack;
 			}
 
-			bool canMerge(const ItemStack &) const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage() const;
 			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &) const;
+			TexturePtr getTexture() const;
+			TexturePtr getTexture(const Game &) const;
+
+			bool canMerge(const ItemStack &) const;
 			/** Returns a copy of the ItemStack with a different count. */
 			ItemStackPtr withCount(ItemCount) const;
 
@@ -140,7 +146,7 @@ namespace Game3 {
 
 			void spawn(const Place &) const;
 
-			std::shared_ptr<ItemTexture> getTexture(Game &) const;
+			std::shared_ptr<ItemTexture> getItemTexture(Game &) const;
 
 			static void fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, ItemStack &);
 			static ItemStackPtr fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
@@ -162,6 +168,7 @@ namespace Game3 {
 		private:
 			std::weak_ptr<Game> weakGame;
 			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
+			mutable TexturePtr cachedTexture;
 
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Game> &);

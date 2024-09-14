@@ -19,7 +19,7 @@ namespace Game3 {
 		y_offset = float(subID / 6) * 8.f;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> Mushroom::makeImage(const Game &game, const ConstItemStackPtr &) const {
+	TexturePtr Mushroom::makeTexture(const Game &game, const ConstItemStackPtr &) const {
 		auto texture = game.registry<TextureRegistry>().at("base:texture/mushrooms");
 		texture->init();
 		constexpr int width  = 16;
@@ -40,8 +40,12 @@ namespace Game3 {
 			}
 		}
 
-		constexpr int doublings = 3;
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, texture->alpha, 8, width, height, row_size)
-		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
+		TexturePtr new_texture = std::make_shared<Texture>(texture->identifier);
+		new_texture->alpha = texture->alpha;
+		new_texture->filter = texture->filter;
+		new_texture->format = texture->format;
+		new_texture->init(rawImage, width, height);
+
+		return new_texture;
 	}
 }

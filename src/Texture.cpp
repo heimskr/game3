@@ -14,20 +14,21 @@
 #include "lib/stb/stb_image.h"
 #endif
 
+#include <gtkmm.h>
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
 	static constexpr GLint DEFAULT_FILTER = GL_NEAREST;
 
-	Texture::Texture(Identifier identifier_):
-		NamedRegisterable(std::move(identifier_)) {}
+	Texture::Texture(Identifier identifier, bool alpha, int filter):
+		Texture(std::move(identifier), std::filesystem::path{}, alpha, filter) {}
 
-	Texture::Texture(Identifier identifier_, std::filesystem::path path_, bool alpha_, int filter_):
-		NamedRegisterable(std::move(identifier_)),
-		format(alpha_? GL_RGBA : GL_RGB),
-		filter(filter_ == -1? DEFAULT_FILTER : filter_),
-		alpha(alpha_),
-		path(std::move(path_)) {}
+	Texture::Texture(Identifier identifier, std::filesystem::path path, bool alpha, int filter):
+		NamedRegisterable(std::move(identifier)),
+		format(alpha? GL_RGBA : GL_RGB),
+		filter(filter == -1? DEFAULT_FILTER : filter),
+		alpha(alpha),
+		path(std::move(path)) {}
 
 	void Texture::init() {
 		if (!valid) {
@@ -35,12 +36,14 @@ namespace Game3 {
 			uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
 			if (raw == nullptr)
 				throw std::runtime_error("Couldn't load image from " + path.string());
-			init(std::shared_ptr<uint8_t[]>(raw, free));
+			init(std::shared_ptr<uint8_t[]>(raw, stbi_image_free), width, height);
 		}
 	}
 
-	void Texture::init(std::shared_ptr<uint8_t[]> new_data) {
+	void Texture::init(std::shared_ptr<uint8_t[]> new_data, int data_width, int data_height) {
 		if (!valid) {
+			width = data_width;
+			height = data_height;
 			data = std::move(new_data);
 			glGenTextures(1, &id); CHECKGL
 			glBindTexture(GL_TEXTURE_2D, id); CHECKGL
@@ -60,6 +63,13 @@ namespace Game3 {
 			glActiveTexture(GL_TEXTURE0 + bind_id); CHECKGL
 		}
 		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+	}
+
+	Glib::RefPtr<Gdk::Pixbuf> Texture::toPixbuf() const {
+		constexpr int doublings = 3;
+
+		return Gdk::Pixbuf::create_from_data(data.get(), Gdk::Colorspace::RGB, alpha, 8, width, height, int(alpha? 4 * width : 3 * width))
+		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;

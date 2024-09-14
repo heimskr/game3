@@ -82,7 +82,7 @@ namespace Game3 {
 		size_t dimension = base_size * static_cast<size_t>(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(4 * effective_2x2s))))));
 
 		const size_t raw_byte_count = dimension * dimension * 4;
-		auto raw = std::make_unique<uint8_t[]>(raw_byte_count); // 4 channels: RGBA
+		auto raw = std::make_shared<uint8_t[]>(raw_byte_count); // 4 channels: RGBA
 
 		// In pixels.
 		size_t x_index = 0;
@@ -168,9 +168,7 @@ namespace Game3 {
 			*png_out = ss.str();
 		}
 
-		texture->width = dimension;
-		texture->height = dimension;
-		texture->init(std::move(raw));
+		texture->init(std::move(raw), dimension, dimension);
 
 		out.cachedTexture = std::move(texture);
 

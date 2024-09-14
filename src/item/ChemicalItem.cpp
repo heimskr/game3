@@ -2,12 +2,15 @@
 #include "chemistry/MoleculeColors.h"
 #include "chemistry/MoleculeNames.h"
 #include "graphics/HSL.h"
+#include "graphics/OpenGL.h"
+#include "graphics/Texture.h"
 #include "item/ChemicalItem.h"
 
 #include <random>
 
 namespace Game3 {
 	Lockable<std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>>> ChemicalItem::imageCache{};
+	Lockable<std::unordered_map<std::string, TexturePtr>> ChemicalItem::textureCache{};
 
 	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::getImage(const Game &game, const ConstItemStackPtr &stack) const {
 		const std::string formula = getFormula(*stack);
@@ -19,12 +22,27 @@ namespace Game3 {
 		}
 
 		auto unique_lock = imageCache.uniqueLock();
-		auto image = makeImage(game, stack);
+		Glib::RefPtr<Gdk::Pixbuf> image = makeImage(game, stack);
 		imageCache.emplace(formula, image);
 		return image;
 	}
 
-	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::makeImage(const Game &, const ConstItemStackPtr &stack) const {
+	TexturePtr ChemicalItem::getTexture(const Game &game, const ConstItemStackPtr &stack) const {
+		const std::string formula = getFormula(*stack);
+
+		{
+			auto shared_lock = textureCache.sharedLock();
+			if (auto iter = textureCache.find(formula); iter != textureCache.end())
+				return iter->second;
+		}
+
+		auto unique_lock = textureCache.uniqueLock();
+		TexturePtr image = makeTexture(game, stack);
+		textureCache.emplace(formula, image);
+		return image;
+	}
+
+	TexturePtr ChemicalItem::makeTexture(const Game &, const ConstItemStackPtr &stack) const {
 		const std::string formula = getFormula(*stack);
 
 		HSL hsl;
@@ -47,7 +65,13 @@ namespace Game3 {
 
 		rawImage = generateFlaskRaw("resources/testtubebase.png", "resources/testtubemask.png", hsl.h, hsl.s, hsl.l, &width, &height);
 
-		return Gdk::Pixbuf::create_from_data(rawImage.get(), Gdk::Colorspace::RGB, true, 8, width, height, 4 * width)->scale_simple(width << 3, height << 3, Gdk::InterpType::NEAREST);
+		TexturePtr new_texture = std::make_shared<Texture>();
+		new_texture->alpha = true;
+		new_texture->filter = GL_NEAREST;
+		new_texture->format = GL_RGBA;
+		new_texture->init(rawImage, width, height);
+
+		return new_texture;
 	}
 
 	std::string ChemicalItem::getTooltip(const ConstItemStackPtr &stack) {

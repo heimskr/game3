@@ -158,7 +158,7 @@ namespace Game3 {
 		dimension *= tilesize;
 
 		const size_t raw_byte_count = dimension * dimension * 4;
-		auto raw = std::make_unique<uint8_t[]>(raw_byte_count); // 4 channels: RGBA
+		auto raw = std::make_shared<uint8_t[]>(raw_byte_count); // 4 channels: RGBA
 
 		// In pixels.
 		size_t x_index = 512;
@@ -300,9 +300,7 @@ namespace Game3 {
 			texture->alpha = true;
 			texture->filter = GL_NEAREST;
 			texture->format = GL_RGBA;
-			texture->width = dimension;
-			texture->height = dimension;
-			texture->init(std::move(raw));
+			texture->init(raw, dimension, dimension);
 
 			out.cachedTexture = std::move(texture);
 		}
