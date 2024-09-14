@@ -82,6 +82,8 @@ namespace Game3 {
 			std::size_t childCount = 0;
 			bool suppressChildUpdates = false;
 
+			std::set<std::string> debugAttributes;
+
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, int button, int mouse_x, int mouse_y)> onClick;
 
@@ -98,6 +100,13 @@ namespace Game3 {
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnDragStart(decltype(onDragStart));
 			virtual void setOnDragUpdate(decltype(onDragUpdate));
+
+			/** Returns true if this element or any of its ancestors (up to a given limit) has a given attribute. */
+			virtual bool findAttributeUp(const std::string &, int depth_limit = INT_MAX) const;
+			/** Returns true if this element or any of its descendants (up to a given limit) has a given attribute. */
+			virtual bool findAttributeDown(const std::string &, int depth_limit = INT_MAX) const;
+			virtual bool hasAttribute(const std::string &) const;
+			virtual void bestowAttribute(std::string attribute);
 
 		friend class UIContext;
 		friend class GeneInfoModule;

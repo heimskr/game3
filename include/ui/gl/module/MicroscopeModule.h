@@ -1,12 +1,8 @@
 #pragma once
 
 #include "game/ClientInventory.h"
-#include "tileentity/EnergeticTileEntity.h"
-#include "tileentity/FluidHoldingTileEntity.h"
-#include "tileentity/InventoriedTileEntity.h"
 #include "types/Types.h"
 #include "ui/gl/module/EnergyModule.h"
-#include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/GeneticAnalysisModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/MicroscopeModule.h"

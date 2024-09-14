@@ -1,4 +1,6 @@
 #include "graphics/Rectangle.h"
+#include "graphics/RectangleRenderer.h"
+#include "graphics/RendererContext.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
@@ -16,8 +18,14 @@ namespace Game3 {
 		return lastRectangle;
 	}
 
-	void Widget::render(const RendererContext &, float x, float y, float width, float height) {
+	void Widget::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		// double hue = 360.0 * ((double) ((((uintptr_t) this) >> 10) & 1023) / 1024.0);
+		double hue = 0; for (WidgetPtr parent = getParent(); parent; parent = parent->getParent()) hue += 0.1;
+
+		Color color = OKHsv(hue, 1, 1, 0.25).convert<Color>();
+
 		lastRectangle = ui.scissorStack.getTop().rectangle + Rectangle(x, y, width, height);
+		renderers.rectangle.drawOnScreen(color, x, y, width, height);
 	}
 
 	void Widget::render(const RendererContext &renderers, const Rectangle &rectangle) {
@@ -272,6 +280,31 @@ namespace Game3 {
 
 	bool Widget::onChildrenUpdated() {
 		return !suppressChildUpdates;
+	}
+
+	bool Widget::findAttributeUp(const std::string &attribute, int depth_limit) const {
+		for (std::shared_ptr<const Widget> widget = shared_from_this(); widget && depth_limit >= 0; --depth_limit, widget = widget->getParent())
+			if (widget->hasAttribute(attribute))
+				return true;
+		return false;
+	}
+
+	bool Widget::findAttributeDown(const std::string &attribute, int depth_limit) const {
+		if (hasAttribute(attribute))
+			return true;
+		if (depth_limit > 0)
+			for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+				if (child->findAttributeDown(attribute, depth_limit - 1))
+					return true;
+		return false;
+	}
+
+	bool Widget::hasAttribute(const std::string &attribute) const {
+		return debugAttributes.contains(attribute);
+	}
+
+	void Widget::bestowAttribute(std::string attribute) {
+		debugAttributes.insert(std::move(attribute));
 	}
 
 	void Widget::setOnClick(decltype(onClick) new_onclick) {

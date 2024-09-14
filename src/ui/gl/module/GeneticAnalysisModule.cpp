@@ -16,6 +16,7 @@ namespace Game3 {
 
 	void GeneticAnalysisModule::init() {
 		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+		vbox->insertAtEnd(shared_from_this());
 	}
 
 	void GeneticAnalysisModule::reset() {

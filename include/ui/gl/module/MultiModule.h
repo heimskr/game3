@@ -66,7 +66,7 @@ namespace Game3 {
 
 						case Substance::Fluid: {
 							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
-							submodules.emplace_back(std::make_shared<FluidsModule>(ui, agent));
+							submodules.emplace_back(std::make_shared<FluidsModule>(ui, agent, false));
 							break;
 						}
 

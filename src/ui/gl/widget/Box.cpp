@@ -145,7 +145,7 @@ namespace Game3 {
 			}
 
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
-				auto &pair = childMeasurements.at(i++);
+				auto &pair = childMeasurements.at(j);
 				auto &item = measure_orientation == Orientation::Horizontal? pair.first : pair.second;
 
 				if (child->getExpand(measure_orientation)) {
@@ -181,8 +181,10 @@ namespace Game3 {
 					maximumPerpendicularChildMeasurement = std::max(child_natural, maximumPerpendicularChildMeasurement.value_or(-1));
 				}
 
-				auto &pair = childMeasurements.at(i++);
+				auto &pair = childMeasurements.at(i);
 				(measure_orientation == Orientation::Horizontal? pair.first : pair.second) = child_natural;
+
+				++i;
 			}
 
 			if (expansive) {

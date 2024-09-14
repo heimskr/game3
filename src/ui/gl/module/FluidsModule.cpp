@@ -24,7 +24,7 @@ namespace Game3 {
 
 	void FluidsModule::init() {
 		auto vbox = std::make_shared<Box>(ui, scale);
-		vbox->setSeparatorThickness(0);
+		vbox->insertAtEnd(shared_from_this());
 
 		if (showHeader) {
 			auto label = std::make_shared<Label>(ui, scale);
@@ -41,7 +41,7 @@ namespace Game3 {
 		grid->setHorizontalExpand(true);
 		grid->insertAtEnd(vbox);
 
-		vbox->insertAtEnd(shared_from_this());
+		updateFluids();
 	}
 
 	void FluidsModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -49,7 +49,7 @@ namespace Game3 {
 
 		updateFluids();
 
-		grid->render(renderers, x, y, width, height);
+		firstChild->render(renderers, x, y, width, height);
 	}
 
 	SizeRequestMode FluidsModule::getRequestMode() const {
@@ -57,6 +57,7 @@ namespace Game3 {
 	}
 
 	void FluidsModule::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		assert(firstChild != nullptr);
 		firstChild->measure(renderers, orientation, for_width, for_height, minimum, natural);
 	}
 
