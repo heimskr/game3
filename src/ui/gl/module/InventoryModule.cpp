@@ -1,7 +1,7 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
-#include "packet/SwapSlotsPacket.h"
+#include "packet/MoveSlotsPacket.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -116,7 +116,7 @@ namespace Game3 {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget->getLastRectangle().contains(x, y)) {
 				ClientPlayerPtr player = ui.getPlayer();
-				player->send(SwapSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
+				player->send(MoveSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
 				ui.setDraggedWidget(nullptr);
 				break;
 			}

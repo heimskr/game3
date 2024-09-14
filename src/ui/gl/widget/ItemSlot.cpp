@@ -36,10 +36,13 @@ namespace Game3 {
 		if (height < 0)
 			height = size * scale;
 
-		Widget::render(renderers, x, y, width, height);
-
 		adjustCoordinate(Orientation::Horizontal, x, width, size * scale);
 		adjustCoordinate(Orientation::Vertical, y, height, size * scale);
+
+		width = size * scale;
+		height = size * scale;
+
+		Widget::render(renderers, x, y, width, height);
 
 		if (!ui.renderingDraggedWidget) {
 			const float alpha = active? 0.4 : 0.15;
@@ -64,13 +67,11 @@ namespace Game3 {
 		if (!texture)
 			texture = stack->getTexture(*ui.getGame());
 
-		renderers.singleSprite.drawOnScreen(texture->getTexture(), RenderOptions{
+		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
 			.x = x,
 			.y = y,
-			.offsetX = double(texture->x),
-			.offsetY = double(texture->y),
-			.sizeX = double(texture->width),
-			.sizeY = double(texture->height),
+			.sizeX = -1,
+			.sizeY = -1,
 			.scaleX = scale * 16. / texture->width,
 			.scaleY = scale * 16. / texture->height,
 			.invertY = false,
@@ -95,6 +96,17 @@ namespace Game3 {
 		return true;
 	}
 
+	bool ItemSlot::dragEnd(int, int) {
+		if (!onDrop.empty()) {
+			if (WidgetPtr dragged = ui.getDraggedWidget()) {
+				onDrop(*this, dragged);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	SizeRequestMode ItemSlot::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
@@ -103,9 +115,13 @@ namespace Game3 {
 		minimum = natural = size * scale;
 	}
 
-	void ItemSlot::setStack(std::shared_ptr<ItemStack> new_stack) {
+	void ItemSlot::setStack(ItemStackPtr new_stack) {
 		stack = std::move(new_stack);
 		texture = {};
+	}
+
+	ItemStackPtr ItemSlot::getStack() const {
+		return stack;
 	}
 
 	void ItemSlot::setActive(bool new_active) {

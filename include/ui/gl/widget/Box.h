@@ -17,6 +17,8 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
+			void append(const WidgetPtr &);
+
 			void setPadding(float);
 			void setSeparatorThickness(float);
 			void setSeparatorColor(Color);

@@ -51,12 +51,17 @@ namespace Game3 {
 			bool try_measure = true;
 
 			if (i < childMeasurements.size()) {
-				const auto &[child_width, child_height] = childMeasurements.at(i);
+				const auto &pair = childMeasurements.at(i);
+				auto [child_width, child_height] = pair;
 				to_add = vertical? child_height : child_width;
 
 				if (to_add < 0) {
 					float minimum{}, natural{};
 					measure(renderers, orientation, width, height, minimum, natural);
+					// Resize can invalidate. That shouldn't happen here, but just in case...
+					const auto &pair = childMeasurements.at(i);
+					child_width = pair.first;
+					child_height = pair.second;
 					to_add = vertical? child_height : child_width;
 					assert(0 <= to_add);
 				}
@@ -191,6 +196,10 @@ namespace Game3 {
 				natural = std::max(natural, measure_orientation == Orientation::Vertical? for_height : for_width);
 			}
 		}
+	}
+
+	void Box::append(const WidgetPtr &child) {
+		child->insertAtEnd(shared_from_this());
 	}
 
 	void Box::setPadding(float new_padding) {

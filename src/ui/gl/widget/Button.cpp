@@ -180,7 +180,7 @@ namespace Game3 {
 			return scale * 6 + renderers.text.textWidth(text, text_scale);
 		}
 
-		return -1;
+		return scale * 6;
 	}
 
 	float Button::getTextScale(const RendererContext &renderers, float height) const {
