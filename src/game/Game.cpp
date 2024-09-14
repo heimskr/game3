@@ -21,7 +21,6 @@
 #include "ui/module/ComputerModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
-#include "ui/module/GTKItemFilterModule.h"
 #include "ui/module/GTKModuleFactory.h"
 #include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
@@ -53,7 +52,6 @@ namespace Game3 {
 		add(GTKModuleFactory::create<GTKInventoryModule>());
 		add(GTKModuleFactory::create<ChemicalReactorModule>());
 		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
-		add(GTKModuleFactory::create<GTKItemFilterModule>());
 		add(GTKModuleFactory::create<CombinerModule>());
 		add(GTKModuleFactory::create<VillageTradeModule>());
 		add(ModuleFactory::create<AutocrafterModule>());

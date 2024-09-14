@@ -5,7 +5,7 @@
 #include "packet/OpenItemFiltersPacket.h"
 #include "types/DirectedPlace.h"
 #include "ui/MainWindow.h"
-#include "ui/module/GTKItemFilterModule.h"
+#include "ui/gl/module/ItemFiltersModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
@@ -33,7 +33,7 @@ namespace Game3 {
 		DirectedPlace place{direction, Place(position, realm, {})};
 
 		window.queue([&window, place = std::move(place)] {
-			window.openModule(GTKItemFilterModule::ID(), std::any(place));
+			window.openModule(ItemFiltersModule::ID(), std::any(place));
 		});
 	}
 }
