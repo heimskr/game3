@@ -9,6 +9,7 @@
 #include "ui/gl/widget/Checkbox.h"
 #include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/Icon.h"
+#include "ui/gl/widget/IconButton.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
@@ -23,7 +24,7 @@ namespace Game3 {
 		Module(ui), weakGame(game), place(place) {}
 
 	void ItemFiltersModule::init() {
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 
 		topHBox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
@@ -45,7 +46,7 @@ namespace Game3 {
 		dropSlot->setAlignment(Alignment::Middle);
 		dropSlot->insertAtEnd(topHBox);
 		dropSlot->onDrop.connect([this](ItemSlot &, const WidgetPtr &widget) {
-
+			onDrop(widget);
 		});
 
 		auto paste_button = std::make_shared<Button>(ui, scale);
@@ -133,6 +134,7 @@ namespace Game3 {
 			whitelistCheckbox->setChecked(filter->isAllowMode());
 			strictCheckbox->setChecked(filter->isStrict());
 			saveFilter();
+			populate(shared_filter);
 			upload(shared_filter);
 		}
 	}
@@ -226,6 +228,9 @@ namespace Game3 {
 			filter_to_use = filter;
 		}
 
+		whitelistCheckbox->setChecked(filter_to_use->isAllowMode());
+		strictCheckbox->setChecked(filter_to_use->isStrict());
+
 		std::shared_lock<DefaultMutex> configs_lock;
 		auto &configs = filter_to_use->getConfigs(configs_lock);
 		for (const auto &[id, set]: configs)
@@ -243,7 +248,6 @@ namespace Game3 {
 		auto comparator = makeComparator(id, config);
 		auto threshold = makeThreshold(id, config);
 		auto button = makeButton(stack);
-		// hbox->set_margin_top(10);
 		hbox->append(image);
 		hbox->append(label);
 		hbox->append(comparator);
@@ -265,24 +269,18 @@ namespace Game3 {
 		auto image = std::make_shared<Icon>(ui, scale);
 		image->setFixedSize(8 * scale);
 		image->setIconTexture(stack.getTexture(*game));
-		// stack.getImage(*game));
-		// image->set_margin(10);
-		// image->set_margin_top(6);
-		// image->set_size_request(32, 32);
 		return image;
 	}
 
 	std::shared_ptr<Label> ItemFiltersModule::makeLabel(const ItemStack &stack) {
 		auto label = std::make_shared<Label>(ui, scale);
 		label->setText(stack.getTooltip());
-		// label->set_margin_end(10);
 		return label;
 	}
 
 	std::shared_ptr<Button> ItemFiltersModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
 		auto button = std::make_shared<Button>(ui, scale);
 		button->setExpand(false, false);
-		// button->set_has_frame(false);
 
 		if (config.comparator == ItemFilter::Comparator::Less)
 			button->setText("<");
@@ -290,8 +288,6 @@ namespace Game3 {
 			button->setText(">");
 		else
 			button->setText("~");
-
-		// button->add_css_class("comparator-button");
 
 		button->setOnClick([this, id = id, config = config](Widget &, int button, int, int) {
 			if (button != 1)
@@ -326,12 +322,9 @@ namespace Game3 {
 			return {};
 
 		auto threshold = std::make_shared<TextInput>(ui, scale);
-		// threshold->set_adjustment(Gtk::Adjustment::create(0., 0., 1e9));
-		// threshold->set_digits(0);
-		// threshold->set_value(config.count);
-		// threshold->set_hexpand(true);
-
-		// threshold->onChange.connect([this, id = id, config = config, threshold = threshold.get()]() mutable {
+		threshold->setHorizontalExpand(true);
+		threshold->setFixedHeight(10 * scale);
+		threshold->setText(std::to_string(config.count));
 		threshold->onChange.connect([this, id = id, config = config, threshold = threshold.get()](TextInput &, const UString &text) mutable {
 			setFilter();
 			ItemCount count{};
@@ -355,11 +348,8 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Button> ItemFiltersModule::makeButton(const ItemStackPtr &stack) {
-		auto button = std::make_shared<Button>(ui, scale);
-		// button->set_icon_name("list-remove-symbolic");
-		// button->set_expand(false);
-		// button->set_has_frame(false);
-		// button->set_margin_end(10);
+		auto button = std::make_shared<IconButton>(ui, scale);
+		button->setIconTexture(cacheTexture("resources/gui/minus.png"));
 		button->setOnClick([this, stack = stack->copy()](Widget &, int button, int, int) {
 			if (button != 1)
 				return false;
