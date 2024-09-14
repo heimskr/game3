@@ -217,8 +217,7 @@ namespace Game3 {
 
 		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
 			old_parent->remove(self);
-		else
-			weakParent = parent;
+		weakParent = parent;
 
 		previousSibling = parent->lastChild;
 		if (auto previous = previousSibling.lock())
@@ -241,6 +240,9 @@ namespace Game3 {
 		if (firstChild == child)
 			firstChild = child->nextSibling;
 
+		if (lastChild == child)
+			lastChild = child->previousSibling.lock();
+
 		if (auto previous = child->previousSibling.lock())
 			previous->nextSibling = child->nextSibling;
 
@@ -248,6 +250,8 @@ namespace Game3 {
 			child->nextSibling->previousSibling = child->previousSibling;
 
 		child->weakParent.reset();
+		child->previousSibling.reset();
+		child->nextSibling.reset();
 		--childCount;
 
 		onChildrenUpdated();
@@ -266,6 +270,20 @@ namespace Game3 {
 
 	std::size_t Widget::getChildCount() const {
 		return childCount;
+	}
+
+	void Widget::setName(std::string new_name) {
+		name = std::move(new_name);
+	}
+
+	const std::string & Widget::getName() const {
+		return name;
+	}
+
+	std::string Widget::describe() const {
+		if (name.empty())
+			return DEMANGLE(*this);
+		return std::format("{}(name=\"{}\")", DEMANGLE(*this), name);
 	}
 
 	UIContext & Widget::getUI() {

@@ -67,6 +67,10 @@ namespace Game3 {
 			virtual void clearChildren();
 			virtual std::size_t getChildCount() const;
 
+			virtual void setName(std::string);
+			virtual const std::string & getName() const;
+			virtual std::string describe() const;
+
 			UIContext & getUI();
 
 		protected:
@@ -81,6 +85,7 @@ namespace Game3 {
 			WidgetPtr nextSibling;
 			std::size_t childCount = 0;
 			bool suppressChildUpdates = false;
+			std::string name;
 
 			std::set<std::string> debugAttributes;
 
