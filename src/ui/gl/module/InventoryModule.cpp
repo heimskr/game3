@@ -29,7 +29,7 @@ namespace Game3 {
 		const bool is_player = inventory->getOwner() == ui.getPlayer();
 		const Slot active_slot = inventory->activeSlot;
 		for (Slot slot = 0; slot < slot_count; ++slot)
-			slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
+			slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
 	}
 
 	void InventoryModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -47,7 +47,7 @@ namespace Game3 {
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
 			slotWidgets.clear();
 			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, SLOT_SCALE, is_player && slot == active_slot));
+				slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
 		} else {
 			for (Slot slot = 0; slot < slot_count; ++slot)
 				slotWidgets[slot]->setStack((*inventory)[slot]);
@@ -67,21 +67,21 @@ namespace Game3 {
 		previousActive = active_slot;
 
 		const int column_count = getColumnCount(width, slotWidgets.size());
-		const float x_pad = (width - column_count * (OUTER_SLOT_SIZE * SLOT_SCALE) + SLOT_PADDING * SLOT_SCALE) / 2;
+		const float x_pad = (width - column_count * (OUTER_SLOT_SIZE * scale) + SLOT_PADDING * scale) / 2;
 
 		int column = 0;
 		float slot_x = x_pad;
-		float slot_y = SLOT_PADDING * SLOT_SCALE;
+		float slot_y = topPadding * scale;
 
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			widget->render(renderers, x + slot_x, y + slot_y, -1, -1);
 
-			slot_x += OUTER_SLOT_SIZE * SLOT_SCALE;
+			slot_x += OUTER_SLOT_SIZE * scale;
 
 			if (++column == column_count) {
 				column = 0;
 				slot_x = x_pad;
-				slot_y += OUTER_SLOT_SIZE * SLOT_SCALE;
+				slot_y += OUTER_SLOT_SIZE * scale;
 			}
 		}
 	}
@@ -130,11 +130,24 @@ namespace Game3 {
 	}
 
 	void InventoryModule::measure(const RendererContext &, Orientation orientation, float for_width, float, float &minimum, float &natural) {
-		if (orientation == Orientation::Horizontal) {
-			minimum = natural = getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE * scale;
-		} else {
-			minimum = natural = updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE * scale;
+		if (slotWidgets.empty()) {
+			minimum = natural = 0;
+			return;
 		}
+
+		if (orientation == Orientation::Horizontal) {
+			minimum = natural = (getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * scale;
+		} else {
+			minimum = natural = (updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * scale;
+		}
+	}
+
+	void InventoryModule::setTopPadding(float new_top_padding) {
+		topPadding = new_top_padding;
+	}
+
+	float InventoryModule::getTopPadding() const {
+		return topPadding;
 	}
 
 	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {

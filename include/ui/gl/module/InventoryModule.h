@@ -38,10 +38,14 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
+			void setTopPadding(float);
+			float getTopPadding() const;
+
 		private:
 			std::vector<std::shared_ptr<ItemSlot>> slotWidgets;
 			std::unique_ptr<InventoryGetter> inventoryGetter;
 			Slot previousActive = -1;
+			float topPadding = 0;
 
 			static std::shared_ptr<ClientInventory> getInventory(const std::any &);
 	};

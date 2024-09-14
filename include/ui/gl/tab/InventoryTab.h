@@ -5,6 +5,7 @@
 #include "ui/gl/tab/Tab.h"
 
 namespace Game3 {
+	class InventoryModule;
 	class Module;
 	class Scroller;
 
@@ -27,7 +28,7 @@ namespace Game3 {
 
 		private:
 			LockableSharedPtr<Module> activeModule;
-			std::shared_ptr<Module> playerInventoryModule;
+			std::shared_ptr<InventoryModule> playerInventoryModule;
 			std::shared_ptr<Scroller> playerScroller;
 			std::shared_ptr<Scroller> moduleScroller;
 

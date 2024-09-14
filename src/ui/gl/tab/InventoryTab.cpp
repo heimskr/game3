@@ -28,11 +28,12 @@ namespace Game3 {
 	}
 
 	InventoryTab::InventoryTab(UIContext &ui):
-		Tab(ui)  {}
+		Tab(ui) {}
 
 	void InventoryTab::init() {
 		assert(!playerInventoryModule);
 		playerInventoryModule = makePlayerInventoryModule(ui);
+		playerInventoryModule->setTopPadding(SLOT_PADDING);
 		playerInventoryModule->init();
 
 		assert(!playerScroller);
