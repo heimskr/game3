@@ -18,7 +18,6 @@
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
 #include "ui/module/ChemicalReactorModule.h"
-#include "ui/module/GTKCombinerModule.h"
 #include "ui/module/ComputerModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
@@ -53,7 +52,6 @@ namespace Game3 {
 		add(GTKModuleFactory::create<GTKInventoryModule>());
 		add(GTKModuleFactory::create<ChemicalReactorModule>());
 		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
-		add(GTKModuleFactory::create<GTKCombinerModule>());
 		add(GTKModuleFactory::create<VillageTradeModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<CombinerModule>());

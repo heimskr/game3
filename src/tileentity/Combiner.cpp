@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "recipe/CombinerRecipe.h"
 #include "tileentity/Combiner.h"
-#include "ui/module/GTKCombinerModule.h"
+#include "ui/gl/module/CombinerModule.h"
 
 #include <cassert>
 #include <numeric>
@@ -64,7 +64,7 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 
 			if (source)
-				sendMessage(source, "ModuleMessage", GTKCombinerModule::ID(), "TargetSet", success, new_target);
+				sendMessage(source, "ModuleMessage", CombinerModule::ID(), "TargetSet", success, new_target);
 
 		} else if (name == "GetInventory") {
 
@@ -120,7 +120,7 @@ namespace Game3 {
 		if (modifiers.onlyShift()) {
 			EnergeticTileEntity::addObserver(player, false);
 		} else {
-			player->send(OpenModuleForAgentPacket(GTKCombinerModule::ID(), getGID()));
+			player->send(OpenModuleForAgentPacket(CombinerModule::ID(), getGID()));
 			InventoriedTileEntity::addObserver(player, true);
 		}
 
