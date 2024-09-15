@@ -4,7 +4,7 @@
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/EnergeticTileEntity.h"
-#include "ui/module/GTKEnergyLevelModule.h"
+#include "ui/gl/module/EnergyModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -54,7 +54,7 @@ namespace Game3 {
 		player->send(TileEntityPacket(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(GTKEnergyLevelModule::ID(), getGID(), true));
+			player->send(OpenModuleForAgentPacket(EnergyModule::ID(), getGID(), true));
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())

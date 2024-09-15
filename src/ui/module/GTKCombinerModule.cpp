@@ -6,17 +6,17 @@
 #include "tileentity/Combiner.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/CombinerModule.h"
+#include "ui/module/GTKCombinerModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 
 namespace Game3 {
-	CombinerModule::CombinerModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
-		CombinerModule(game_, std::dynamic_pointer_cast<Combiner>(std::any_cast<AgentPtr>(argument))) {}
+	GTKCombinerModule::GTKCombinerModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+		GTKCombinerModule(game_, std::dynamic_pointer_cast<Combiner>(std::any_cast<AgentPtr>(argument))) {}
 
-	CombinerModule::CombinerModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Combiner> combiner_):
+	GTKCombinerModule::GTKCombinerModule(std::shared_ptr<ClientGame> game_, std::shared_ptr<Combiner> combiner_):
 	game(std::move(game_)),
 	combiner(std::move(combiner_)),
 	inventoryModule(std::make_shared<GTKInventoryModule>(game, std::static_pointer_cast<ClientInventory>(combiner->getInventory(0)))),
@@ -75,26 +75,26 @@ namespace Game3 {
 		vbox.append(energyModule->getWidget());
 	}
 
-	Gtk::Widget & CombinerModule::getWidget() {
+	Gtk::Widget & GTKCombinerModule::getWidget() {
 		return vbox;
 	}
 
-	void CombinerModule::reset() {
+	void GTKCombinerModule::reset() {
 		inventoryModule->reset();
 		energyModule->reset();
 	}
 
-	void CombinerModule::update() {
+	void GTKCombinerModule::update() {
 		inventoryModule->update();
 		energyModule->update();
 	}
 
-	void CombinerModule::onResize(int width) {
+	void GTKCombinerModule::onResize(int width) {
 		inventoryModule->onResize(width);
 		energyModule->onResize(width);
 	}
 
-	std::optional<Buffer> CombinerModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+	std::optional<Buffer> GTKCombinerModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		if (name == "TargetSet") {
 
 			auto *buffer = std::any_cast<Buffer>(&data);
@@ -132,11 +132,11 @@ namespace Game3 {
 		return {};
 	}
 
-	void CombinerModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
+	void GTKCombinerModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
 		inventoryModule->setInventory(std::move(inventory));
 	}
 
-	void CombinerModule::setTarget(const std::string &target) {
+	void GTKCombinerModule::setTarget(const std::string &target) {
 		if (combiner)
 			game->getPlayer()->sendMessage(combiner, "SetTarget", target);
 	}

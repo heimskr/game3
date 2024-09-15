@@ -42,15 +42,14 @@ namespace Game3 {
 				MultiModule(ui, game, std::any_cast<AgentPtr>(argument)) {}
 
 			MultiModule(UIContext &ui, const ClientGamePtr &game, const AgentPtr &agent):
-				Module(ui), weakGame(game), agent(std::move(agent)) {}
+				Module(ui, game), agent(std::move(agent)) {}
 
 			Identifier getID() const final {
 				return ID();
 			}
 
 			void init() final {
-				ClientGamePtr game = weakGame.lock();
-				assert(game);
+				ClientGamePtr game = getGame();
 
 				for (Substance substance: {S...}) {
 					switch (substance) {
@@ -121,7 +120,6 @@ namespace Game3 {
 			}
 
 		private:
-			std::weak_ptr<ClientGame> weakGame;
 			AgentPtr agent;
 			std::shared_ptr<Box> box;
 			std::vector<ModulePtr> submodules;

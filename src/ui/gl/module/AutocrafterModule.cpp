@@ -20,8 +20,7 @@ namespace Game3 {
 		AutocrafterModule(ui, game, safeDynamicCast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
 
 	AutocrafterModule::AutocrafterModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Autocrafter> autocrafter):
-		Module(ui),
-		weakGame(game),
+		Module(ui, game),
 		autocrafter(std::move(autocrafter)),
 		inventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
 		stationInventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
@@ -30,8 +29,7 @@ namespace Game3 {
 	void AutocrafterModule::init() {
 		assert(autocrafter);
 
-		ClientGamePtr game = weakGame.lock();
-		assert(game);
+		ClientGamePtr game = getGame();
 
 		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
 		vbox->insertAtEnd(shared_from_this());
@@ -97,8 +95,7 @@ namespace Game3 {
 		} else if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == autocrafter->getGID()) {
-				ClientGamePtr game = weakGame.lock();
-				assert(game);
+				ClientGamePtr game = getGame();
 				stationInventoryModule->handleMessage(source, name, data);
 				inventoryModule->handleMessage(source, name, data);
 				MainWindow &window = game->getWindow();
@@ -131,8 +128,7 @@ namespace Game3 {
 
 	void AutocrafterModule::setTarget(const std::string &target) {
 		if (autocrafter) {
-			ClientGamePtr game = weakGame.lock();
-			assert(game);
+			ClientGamePtr game = getGame();
 			game->getPlayer()->sendMessage(autocrafter, "SetTarget", target);
 		}
 	}

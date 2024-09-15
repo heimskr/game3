@@ -13,12 +13,12 @@ namespace Game3 {
 	class GTKEnergyLevelModule;
 	class GTKInventoryModule;
 
-	class CombinerModule: public GTKModule {
+	class GTKCombinerModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/combiner"}; }
 
-			CombinerModule(std::shared_ptr<ClientGame>, const std::any &);
-			CombinerModule(std::shared_ptr<ClientGame>, std::shared_ptr<Combiner>);
+			GTKCombinerModule(std::shared_ptr<ClientGame>, const std::any &);
+			GTKCombinerModule(std::shared_ptr<ClientGame>, std::shared_ptr<Combiner>);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;

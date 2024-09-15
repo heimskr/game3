@@ -31,8 +31,7 @@ namespace Game3 {
 				MicroscopeModule(ui, game, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
 
 			MicroscopeModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<InventoriedTileEntity> tile_entity):
-				Module(ui),
-				weakGame(game),
+				Module(ui, game),
 				tileEntity(std::move(tile_entity)),
 				multiModule(std::make_shared<Submodule>(ui, game, std::static_pointer_cast<Agent>(tileEntity))),
 				geneticAnalysisModule(std::make_shared<GeneticAnalysisModule>(ui)) {}
@@ -84,9 +83,7 @@ namespace Game3 {
 
 					if (source && source->getGID() == tileEntity->getGID()) {
 						multiModule->handleMessage(source, name, data);
-						auto game = weakGame.lock();
-						assert(game);
-						MainWindow &window = game->getWindow();
+						MainWindow &window = getGame()->getWindow();
 						window.queue([&window] { window.removeModule(); });
 					}
 
@@ -126,7 +123,6 @@ namespace Game3 {
 			}
 
 		private:
-			std::weak_ptr<ClientGame> weakGame;
 			std::shared_ptr<InventoriedTileEntity> tileEntity;
 			std::shared_ptr<Submodule> multiModule;
 			std::shared_ptr<GeneticAnalysisModule> geneticAnalysisModule;

@@ -30,7 +30,6 @@ namespace Game3 {
 			void setText(UIContext &, UString);
 
 		private:
-			std::weak_ptr<ClientGame> weakGame;
 			UString text;
 			std::optional<UString> wrapped;
 			float lastTextHeight = -1;
@@ -40,6 +39,5 @@ namespace Game3 {
 			float getWrapWidth(float width) const;
 			void tryWrap(const TextRenderer &);
 			void tryWrap();
-			ClientGame & getGame() const;
 	};
 }

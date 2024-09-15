@@ -12,7 +12,7 @@ namespace Game3 {
 		TextModule(ui, std::move(game), std::any_cast<std::string>(argument)) {}
 
 	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, std::string text):
-		Module(ui), weakGame(game) {
+		Module(ui, game) {
 			setText(game->getUIContext(), std::move(text));
 		}
 
@@ -100,12 +100,6 @@ namespace Game3 {
 	}
 
 	void TextModule::tryWrap() {
-		tryWrap(getGame().canvas.textRenderer);
-	}
-
-	ClientGame & TextModule::getGame() const {
-		if (auto game = weakGame.lock())
-			return *game;
-		throw std::runtime_error("Couldn't lock TextModule's game");
+		tryWrap(getGame()->canvas.textRenderer);
 	}
 }

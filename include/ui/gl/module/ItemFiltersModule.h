@@ -37,7 +37,6 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 		private:
-			std::weak_ptr<ClientGame> weakGame;
 			DirectedPlace place;
 			std::shared_ptr<Pipe> pipe;
 			std::shared_ptr<ItemFilter> filter;

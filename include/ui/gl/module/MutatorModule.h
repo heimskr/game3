@@ -38,7 +38,6 @@ namespace Game3 {
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 
 		private:
-			std::weak_ptr<ClientGame> weakGame;
 			std::shared_ptr<Mutator> mutator;
 			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<FluidsModule> fluidsModule;

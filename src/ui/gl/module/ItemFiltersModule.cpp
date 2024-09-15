@@ -21,7 +21,7 @@ namespace Game3 {
 		ItemFiltersModule(ui, game, std::any_cast<DirectedPlace>(argument)) {}
 
 	ItemFiltersModule::ItemFiltersModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const DirectedPlace &place):
-		Module(ui), weakGame(game), place(place) {}
+		Module(ui, game), place(place) {}
 
 	void ItemFiltersModule::init() {
 		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
@@ -118,15 +118,13 @@ namespace Game3 {
 
 	void ItemFiltersModule::copy() {;
 		if (filter) {
-			ClientGamePtr game = weakGame.lock();
-			assert(game);
+			ClientGamePtr game = getGame();
 			game->getPlayer()->copyItemFilter(*filter);
 		}
 	}
 
 	void ItemFiltersModule::paste() {
-		ClientGamePtr game = weakGame.lock();
-		assert(game);
+		ClientGamePtr game = getGame();
 
 		if (auto pasted = game->getPlayer()->pasteItemFilter()) {
 			auto shared_filter = std::make_shared<ItemFilter>(*pasted);
@@ -167,12 +165,7 @@ namespace Game3 {
 			return;
 		}
 
-		ClientGamePtr game = weakGame.lock();
-
-		if (!game)
-			throw std::runtime_error("Game is missing in ItemFiltersModule::upload");
-
-		game->getPlayer()->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
+		getGame()->getPlayer()->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
 	}
 
 	bool ItemFiltersModule::setFilter() {
@@ -239,8 +232,7 @@ namespace Game3 {
 	}
 
 	void ItemFiltersModule::addHBox(const Identifier &id, const ItemFilter::Config &config) {
-		ClientGamePtr game = weakGame.lock();
-		assert(game);
+		ClientGamePtr game = getGame();
 		ItemStackPtr stack = ItemStack::create(game, id, 1, config.data);
 		auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
 		auto image = makeImage(*stack);
@@ -263,9 +255,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Icon> ItemFiltersModule::makeImage(ItemStack &stack) {
-		ClientGamePtr game = weakGame.lock();
-		assert(game);
-
+		ClientGamePtr game = getGame();
 		auto image = std::make_shared<Icon>(ui, scale);
 		image->setFixedSize(8 * scale);
 		image->setIconTexture(stack.getTexture(*game));

@@ -17,8 +17,7 @@ namespace Game3 {
 		MutatorModule(ui, game, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
 
 	MutatorModule::MutatorModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Mutator> mutator):
-		Module(ui),
-		weakGame(game),
+		Module(ui, game),
 		mutator(std::move(mutator)),
 		inventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
 		fluidsModule(std::make_shared<FluidsModule>(ui, game, std::make_any<AgentPtr>(this->mutator), false)),
@@ -89,10 +88,8 @@ namespace Game3 {
 
 	void MutatorModule::mutate() {
 		assert(mutator);
-		auto game = weakGame.lock();
-		assert(game);
 		std::any buffer = std::make_any<Buffer>(Side::Client);
-		game->getPlayer()->sendMessage(mutator, "Mutate", buffer);
+		getGame()->getPlayer()->sendMessage(mutator, "Mutate", buffer);
 	}
 
 	void MutatorModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
@@ -104,9 +101,7 @@ namespace Game3 {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == mutator->getGID()) {
-				auto game = weakGame.lock();
-				assert(game);
-				MainWindow &window = game->getWindow();
+				MainWindow &window = getGame()->getWindow();
 				window.queue([&window] { window.removeModule(); });
 			}
 

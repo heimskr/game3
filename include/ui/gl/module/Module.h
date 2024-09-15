@@ -14,6 +14,8 @@ namespace Game3 {
 
 	class Module: public ChildDependentExpandingWidget<Widget> {
 		public:
+			Module(UIContext &, std::weak_ptr<ClientGame>, float scale);
+			Module(UIContext &, std::weak_ptr<ClientGame>);
 			Module(UIContext &, float scale);
 			Module(UIContext &);
 
@@ -24,6 +26,11 @@ namespace Game3 {
 			virtual void update();
 			virtual void setInventory(std::shared_ptr<ClientInventory>);
 			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &);
+
+			ClientGamePtr getGame() const;
+
+		protected:
+			std::weak_ptr<ClientGame> weakGame;
 	};
 
 	using ModulePtr = std::shared_ptr<Module>;

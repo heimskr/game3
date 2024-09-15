@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "recipe/CombinerRecipe.h"
 #include "tileentity/Combiner.h"
-#include "ui/module/CombinerModule.h"
+#include "ui/module/GTKCombinerModule.h"
 
 #include <cassert>
 #include <numeric>
@@ -64,7 +64,7 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 
 			if (source)
-				sendMessage(source, "ModuleMessage", CombinerModule::ID(), "TargetSet", success, new_target);
+				sendMessage(source, "ModuleMessage", GTKCombinerModule::ID(), "TargetSet", success, new_target);
 
 		} else if (name == "GetInventory") {
 
@@ -120,7 +120,7 @@ namespace Game3 {
 		if (modifiers.onlyShift()) {
 			EnergeticTileEntity::addObserver(player, false);
 		} else {
-			player->send(OpenModuleForAgentPacket(CombinerModule::ID(), getGID()));
+			player->send(OpenModuleForAgentPacket(GTKCombinerModule::ID(), getGID()));
 			InventoriedTileEntity::addObserver(player, true);
 		}
 
@@ -194,16 +194,18 @@ namespace Game3 {
 
 		{
 			auto energy_lock = energyContainer->sharedLock();
-			if (energyContainer->energy < ENERGY_PER_OPERATION)
+			if (energyContainer->energy < ENERGY_PER_OPERATION) {
 				return false;
+			}
 		}
 
 		auto inventory_lock = inventory->uniqueLock();
 
 		GamePtr game = getGame();
 
-		if (!recipe)
+		if (!recipe) {
 			return false;
+		}
 
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		auto suppressor = inventory_copy->suppress();
@@ -213,8 +215,9 @@ namespace Game3 {
 		auto input_span  = std::make_shared<InventorySpan>(inventory_copy, 0, INPUT_CAPACITY - 1);
 		auto output_span = std::make_shared<InventorySpan>(inventory_copy, INPUT_CAPACITY, INPUT_CAPACITY + OUTPUT_CAPACITY - 1);
 
-		if (!recipe->craft(game, input_span, output_span, leftover) || leftover)
+		if (!recipe->craft(game, input_span, output_span, leftover) || leftover) {
 			return false;
+		}
 
 		{
 			const EnergyAmount to_consume = ENERGY_PER_OPERATION;

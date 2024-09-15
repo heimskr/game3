@@ -2,8 +2,14 @@
 #include "ui/gl/Constants.h"
 
 namespace Game3 {
+	Module::Module(UIContext &ui, std::weak_ptr<ClientGame> weak_game, float scale):
+		ChildDependentExpandingWidget<Widget>(ui, scale), weakGame(std::move(weak_game)) {}
+
+	Module::Module(UIContext &ui, std::weak_ptr<ClientGame> weak_game):
+		Module(ui, std::move(weak_game), UI_SCALE) {}
+
 	Module::Module(UIContext &ui, float scale):
-		ChildDependentExpandingWidget<Widget>(ui, scale) {}
+		Module(ui, {}, scale) {}
 
 	Module::Module(UIContext &ui):
 		Module(ui, UI_SCALE) {}
@@ -16,5 +22,11 @@ namespace Game3 {
 
 	std::optional<Buffer> Module::handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &) {
 		return {};
+	}
+
+	ClientGamePtr Module::getGame() const {
+		if (auto game = weakGame.lock())
+			return game;
+		throw std::runtime_error("Couldn't lock Module's game");
 	}
 }
