@@ -37,6 +37,7 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
 		Inventory::operator=(other);
+		storage = other.storage;
 		return *this;
 	}
 
@@ -47,6 +48,7 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
 		Inventory::operator=(std::move(other));
+		storage = std::move(other.storage);
 		return *this;
 	}
 
