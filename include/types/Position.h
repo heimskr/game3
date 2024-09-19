@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Direction.h"
-#include "Layer.h"
+#include "types/Layer.h"
 #include "types/Types.h"
 
 #include <cmath>

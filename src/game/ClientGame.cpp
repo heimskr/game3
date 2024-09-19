@@ -140,7 +140,7 @@ namespace Game3 {
 		canvas.window.activateContext();
 	}
 
-	void ClientGame::setText(const Glib::ustring &text, const Glib::ustring &name, bool focus, bool ephemeral) {
+	void ClientGame::setText(const Glib::ustring &text) {
 		MainWindow &window = getWindow();
 		window.showOmniDialog();
 		window.openModule("base:module/text", std::any(text.raw()));
@@ -156,8 +156,9 @@ namespace Game3 {
 			auto command = (*factory)();
 			command->pieces = std::move(pieces);
 			(*command)(*getClient());
-		} else
+		} else {
 			getClient()->send(CommandPacket(threadContext.rng(), command));
+		}
 	}
 
 	bool ClientGame::tick() {
@@ -313,8 +314,9 @@ namespace Game3 {
 		if (tickThread.joinable()) {
 			active = false;
 			tickThread.join();
-		} else
+		} else {
 			WARN("Trying to stop an unjoinable ClientGame");
+		}
 	}
 
 	void ClientGame::garbageCollect() {
