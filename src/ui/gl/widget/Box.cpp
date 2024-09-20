@@ -198,6 +198,14 @@ namespace Game3 {
 		}
 	}
 
+	bool Box::onChildrenUpdated() {
+		if (!ChildDependentExpandingWidget<Widget>::onChildrenUpdated())
+			return false;
+
+		childMeasurements.clear();
+		return true;
+	}
+
 	void Box::append(const WidgetPtr &child) {
 		child->insertAtEnd(shared_from_this());
 	}

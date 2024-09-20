@@ -17,6 +17,8 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const override;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) override;
 
+			bool onChildrenUpdated() override;
+
 			void append(const WidgetPtr &);
 
 			void setPadding(float);

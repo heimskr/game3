@@ -157,7 +157,7 @@ namespace Game3 {
 
 		++parent->childCount;
 
-		onChildrenUpdated();
+		parent->onChildrenUpdated();
 	}
 
 	void Widget::insertBefore(WidgetPtr parent, WidgetPtr sibling) {
@@ -183,7 +183,7 @@ namespace Game3 {
 
 		++parent->childCount;
 
-		onChildrenUpdated();
+		parent->onChildrenUpdated();
 	}
 
 	void Widget::insertAtStart(WidgetPtr parent) {

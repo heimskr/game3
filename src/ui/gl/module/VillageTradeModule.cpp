@@ -37,25 +37,39 @@ namespace Game3 {
 		laborLabel->setHorizontalExpand(true);
 		vbox->append(laborLabel);
 
-		sellRow = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
+		sellRow = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
 		sellRow->setExpand(true, false);
 
 		totalPriceLabel = std::make_shared<Label>(ui, scale);
 		unitPriceLabel = std::make_shared<Label>(ui, scale);
 
 		sellLabelBox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
-		sellLabelBox->setExpand(true, true);
+		sellLabelBox->setExpand(true, false);
 		sellLabelBox->append(totalPriceLabel);
 		sellLabelBox->append(unitPriceLabel);
 
 		sellSlot = std::make_shared<ItemSlot>(ui);
+		sellSlot->onDrop.connect([this](ItemSlot &, const WidgetPtr &dropped_widget) {
+			auto dropped = std::dynamic_pointer_cast<ItemSlot>(dropped_widget);
+			if (!dropped)
+				return;
+
+			if (ItemStackPtr stack = dropped->getStack()) {
+				setSellStack(std::move(stack));
+			} else {
+				WARN("No stack in sellSlot->onDrop");
+			}
+		});
 
 		sellCount = std::make_shared<TextInput>(ui, scale);
 		sellCount->setText("0");
+		sellCount->setFixedWidth(16 * scale);
+		sellCount->setVerticalAlignment(Alignment::Center);
 
 		sellButton = std::make_shared<Button>(ui, scale);
 		sellButton->setText("Sell");
 		sellButton->setVerticalAlignment(Alignment::Center);
+		sellButton->setFixedHeight(10 * scale);
 		sellButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button == 1)
 				sell();
@@ -66,6 +80,12 @@ namespace Game3 {
 		sellRow->append(sellCount);
 		sellRow->append(sellButton);
 		sellRow->append(sellLabelBox);
+
+		sellRow->bestowAttribute("sellRow");
+		vbox->append(sellRow);
+		sellRowShown = true;
+
+		showSell();
 	}
 
 	void VillageTradeModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -85,6 +105,8 @@ namespace Game3 {
 		vbox->clearChildren();
 		vbox->append(villageName);
 		vbox->append(laborLabel);
+		if (sellRowShown)
+			vbox->append(sellRow);
 		rows.clear();
 		update();
 	}
@@ -97,7 +119,7 @@ namespace Game3 {
 		populate();
 	}
 
-	std::optional<Buffer> VillageTradeModule::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
+	std::optional<Buffer> VillageTradeModule::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
 		if (name == "VillageUpdate") {
 
 			VillagePtr updated_village = std::any_cast<VillagePtr>(data);
@@ -107,6 +129,18 @@ namespace Game3 {
 		}
 
 		return {};
+	}
+
+	bool VillageTradeModule::setSellStack(ItemStackPtr stack) {
+		if (!isSellable(stack))
+			return false;
+
+		sellSlot->setStack(stack);
+		// const double max(stack->count);
+		// sellCount.set_adjustment(Gtk::Adjustment::create(max, 1.0, max));
+		sellCount->setText(std::to_string(stack->count));
+		updateSell(stack);
+		return true;
 	}
 
 	void VillageTradeModule::updateSell(const ItemStackPtr &stack) {
@@ -131,8 +165,13 @@ namespace Game3 {
 
 		if (std::optional<MoneyCount> sell_price = totalSellPrice(amount.value_or(0.0), -1, stack->item->basePrice, static_cast<ItemCount>(old_value), village->getGreed())) {
 			// sellButton.setTooltipText(std::format("Price: {}", *sell_price));
-			totalPriceLabel->setText(std::format("Total: {}", *sell_price));
-			unitPriceLabel->setText(std::format("Unit: {:.2f}", *sell_price / old_value));
+			if (old_value == 0) {
+				totalPriceLabel->setText({});
+				unitPriceLabel->setText({});
+			} else {
+				totalPriceLabel->setText(std::format("Total: {}", *sell_price));
+				unitPriceLabel->setText(std::format("Unit: {:.2f}", *sell_price / old_value));
+			}
 		} else {
 			// sellButton.setTooltipText("Village lacks funds!");
 		}

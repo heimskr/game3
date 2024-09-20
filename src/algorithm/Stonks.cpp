@@ -73,6 +73,9 @@ namespace Game3 {
 		double price = 0.;
 		double money(merchant_money);
 
+		if (merchant_money == static_cast<MoneyCount>(-1))
+			money = -1;
+
 		while (1 <= count) {
 			const double unit_price = sellPrice(base_price, merchant_count++, money < 0? MoneyCount(-1) : MoneyCount(money), greed);
 
