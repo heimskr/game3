@@ -28,12 +28,12 @@ namespace Game3 {
 
 		villageName = std::make_shared<Label>(ui, scale);
 		villageName->setText(village->getName());
-		villageName->setHorizontalAlignment(Alignment::Middle);
+		villageName->setHorizontalAlignment(Alignment::Center);
 		villageName->setHorizontalExpand(true);
 		vbox->append(villageName);
 
 		laborLabel = std::make_shared<Label>(ui, scale);
-		laborLabel->setHorizontalAlignment(Alignment::Middle);
+		laborLabel->setHorizontalAlignment(Alignment::Center);
 		laborLabel->setHorizontalExpand(true);
 		vbox->append(laborLabel);
 
@@ -55,7 +55,7 @@ namespace Game3 {
 
 		sellButton = std::make_shared<Button>(ui, scale);
 		sellButton->setText("Sell");
-		sellButton->setVerticalAlignment(Alignment::Middle);
+		sellButton->setVerticalAlignment(Alignment::Center);
 		sellButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button == 1)
 				sell();
@@ -240,14 +240,15 @@ namespace Game3 {
 
 		buyButton->setText("Buy");
 		buyButton->setFixedHeight(10 * scale);
-		buyButton->setVerticalAlignment(Alignment::Middle);
+		buyButton->setVerticalAlignment(Alignment::Center);
 		itemSlot->setStack(ItemStack::create(game, resource, ItemCount(-1)));
 		updateLabel();
 		updateTooltips(1);
 		quantityLabel->setFixedWidth(64);
-		quantityLabel->setVerticalAlignment(Alignment::Middle);
+		quantityLabel->setVerticalAlignment(Alignment::Center);
 		transferAmount->setText("0");
 		transferAmount->setFixedWidth(16 * scale);
+		transferAmount->setVerticalAlignment(Alignment::Center);
 
 		transferAmount->onChange.connect([this](TextInput &, const UString &) {
 			try {

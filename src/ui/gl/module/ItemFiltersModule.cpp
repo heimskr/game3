@@ -32,7 +32,7 @@ namespace Game3 {
 
 		auto copy_button = std::make_shared<Button>(ui, scale);
 		copy_button->setText("Copy");
-		copy_button->setAlignment(Alignment::Middle);
+		copy_button->setAlignment(Alignment::Center);
 		copy_button->setFixedHeight(12 * scale);
 		copy_button->setOnClick([this](Widget &, int button, int, int) {
 			if (button == 1)
@@ -43,7 +43,7 @@ namespace Game3 {
 
 		dropSlot = std::make_shared<ItemSlot>(ui);
 		dropSlot->setHorizontalExpand(true);
-		dropSlot->setAlignment(Alignment::Middle);
+		dropSlot->setAlignment(Alignment::Center);
 		dropSlot->insertAtEnd(topHBox);
 		dropSlot->onDrop.connect([this](ItemSlot &, const WidgetPtr &widget) {
 			onDrop(widget);
@@ -51,7 +51,7 @@ namespace Game3 {
 
 		auto paste_button = std::make_shared<Button>(ui, scale);
 		paste_button->setText("Paste");
-		paste_button->setAlignment(Alignment::Middle);
+		paste_button->setAlignment(Alignment::Center);
 		paste_button->setFixedHeight(12 * scale);
 		paste_button->setOnClick([this](Widget &, int button, int, int) {
 			if (button == 1)

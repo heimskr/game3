@@ -56,8 +56,13 @@ namespace Game3 {
 		TextInput(ui, scale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		const float original_height = height;
+
 		if (0 < fixedHeight)
 			height = fixedHeight;
+
+		adjustCoordinate(Orientation::Horizontal, x, width, width);
+		adjustCoordinate(Orientation::Vertical, y, original_height, height);
 
 		Widget::render(renderers, x, y, width, height);
 

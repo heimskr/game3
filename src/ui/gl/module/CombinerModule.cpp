@@ -24,7 +24,7 @@ namespace Game3 {
 
 		auto header = std::make_shared<Label>(ui, scale);
 		header->setText(combiner->getName());
-		header->setHorizontalAlignment(Alignment::Middle);
+		header->setHorizontalAlignment(Alignment::Center);
 		vbox->append(header);
 
 		std::set<Identifier> item_names;

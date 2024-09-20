@@ -5,6 +5,7 @@
 #include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/Autocompleter.h"
+#include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasFixedSize.h"
 
 #include <sigc++/sigc++.h>
@@ -14,7 +15,7 @@
 #include <vector>
 
 namespace Game3 {
-	class TextInput: public Widget, public HasFixedSize, public Autocompleter {
+	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public Autocompleter {
 		public:
 			sigc::signal<void(TextInput &, const UString &)> onSubmit;
 			sigc::signal<void(TextInput &, const UString &)> onChange;

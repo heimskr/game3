@@ -131,19 +131,25 @@ namespace Game3 {
 
 	Shader & Shader::set(const char *uniform_name, GLint value) {
 		glUniform1i(uniform(uniform_name), value);
+#ifndef HIDE_CHECKGL
 		if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << (__LINE__-1) << ": " << gluErrorString(err) << "\e[39m, \"" << uniform_name << "\" -> " << value << '\n'; }
+#endif
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, GLfloat value) {
 		glUniform1f(uniform(uniform_name), value);
+#ifndef HIDE_CHECKGL
 		if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << (__LINE__-1) << ": " << gluErrorString(err) << "\e[39m, \"" << uniform_name << "\" -> " << value << '\n'; }
+#endif
 		return *this;
 	}
 
 	Shader & Shader::set(const char *uniform_name, GLfloat first, GLfloat second) {
 		glUniform2f(uniform(uniform_name), first, second);
+#ifndef HIDE_CHECKGL
 		if (auto err = glGetError()) { std::cerr << "\e[31mError at " << __FILE__ << ':' << (__LINE__-1) << ": " << gluErrorString(err) << "\e[39m, \"" << uniform_name << "\" -> (" << first << ", " << second << ")\n"; }
+#endif
 		return *this;
 	}
 

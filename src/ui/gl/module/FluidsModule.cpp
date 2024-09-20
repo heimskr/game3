@@ -67,7 +67,7 @@ namespace Game3 {
 		bar->setHorizontalExpand(true);
 
 		auto label = std::make_shared<Label>(ui, scale);
-		label->setVerticalAlignment(Alignment::Middle);
+		label->setVerticalAlignment(Alignment::Center);
 
 		return std::make_pair(std::move(label), std::move(bar));
 	}

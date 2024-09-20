@@ -51,7 +51,7 @@ namespace Game3 {
 			case Alignment::Start:
 				break;
 
-			case Alignment::Middle:
+			case Alignment::Center:
 				coordinate += (available_size - widget_size) / 2;
 				break;
 

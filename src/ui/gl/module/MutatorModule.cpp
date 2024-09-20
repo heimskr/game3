@@ -33,7 +33,7 @@ namespace Game3 {
 
 		header = std::make_shared<Label>(ui, scale);
 		header->setText(mutator->getName());
-		header->setHorizontalAlignment(Alignment::Middle);
+		header->setHorizontalAlignment(Alignment::Center);
 		header->setHorizontalExpand(true);
 		header->insertAtEnd(vbox);
 
@@ -44,7 +44,7 @@ namespace Game3 {
 		mutateButton = std::make_shared<Button>(ui, scale);
 		mutateButton->setText("Mutate");
 		mutateButton->setFixedHeight(10 * scale);
-		mutateButton->setVerticalAlignment(Alignment::Middle);
+		mutateButton->setVerticalAlignment(Alignment::Center);
 		mutateButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button != 1)
 				return false;

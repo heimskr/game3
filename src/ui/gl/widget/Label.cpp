@@ -33,7 +33,7 @@ namespace Game3 {
 			y_pos -= padding;
 			if (0 <= height)
 				y_pos += height;
-		} else if (verticalAlignment == Alignment::Middle) {
+		} else if (verticalAlignment == Alignment::Center) {
 			y_pos -= padding;
 			if (0 < lastTextHeight) {
 				align_top = true;

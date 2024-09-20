@@ -51,7 +51,7 @@ namespace Game3 {
 
 		auto hostname_label = std::make_shared<Label>(ui, scale);
 		hostname_label->setText("Default Hostname");
-		hostname_label->setVerticalAlignment(Alignment::Middle);
+		hostname_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(hostname_label, row, 0);
 
 		auto hostname_input = std::make_shared<TextInput>(ui, scale);
@@ -73,7 +73,7 @@ namespace Game3 {
 
 		auto port_label = std::make_shared<Label>(ui, scale);
 		port_label->setText("Default Port");
-		port_label->setVerticalAlignment(Alignment::Middle);
+		port_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(port_label, row, 0);
 
 		auto port_input = std::make_shared<TextInput>(ui, scale);
@@ -102,7 +102,7 @@ namespace Game3 {
 
 		auto username_label = std::make_shared<Label>(ui, scale);
 		username_label->setText("Default Username");
-		username_label->setVerticalAlignment(Alignment::Middle);
+		username_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(username_label, row, 0);
 
 		auto username_input = std::make_shared<TextInput>(ui, scale);
@@ -123,7 +123,7 @@ namespace Game3 {
 
 		auto alert_label = std::make_shared<Label>(ui, scale);
 		alert_label->setText("Alert on Connect");
-		alert_label->setVerticalAlignment(Alignment::Middle);
+		alert_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(alert_label, row, 0);
 
 		auto alert_checkbox = std::make_shared<Checkbox>(ui, scale);
@@ -138,7 +138,7 @@ namespace Game3 {
 
 		auto lighting_label = std::make_shared<Label>(ui, scale);
 		lighting_label->setText("Render Lighting");
-		lighting_label->setVerticalAlignment(Alignment::Middle);
+		lighting_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(lighting_label, row, 0);
 
 		auto lighting_checkbox = std::make_shared<Checkbox>(ui, scale);
@@ -153,7 +153,7 @@ namespace Game3 {
 
 		auto timer_label = std::make_shared<Label>(ui, scale);
 		timer_label->setText("Enable Timers");
-		timer_label->setVerticalAlignment(Alignment::Middle);
+		timer_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(timer_label, row, 0);
 
 		auto timer_checkbox = std::make_shared<Checkbox>(ui, scale);
@@ -169,7 +169,7 @@ namespace Game3 {
 		auto add_slider = [&](UString label_text) {
 			auto label = std::make_shared<Label>(ui, scale);
 			label->setText(std::move(label_text));
-			label->setVerticalAlignment(Alignment::Middle);
+			label->setVerticalAlignment(Alignment::Center);
 			grid->attach(label, row, 0);
 
 			auto slider = std::make_shared<Slider>(ui, scale);
@@ -177,7 +177,7 @@ namespace Game3 {
 			grid->attach(slider, row, 1);
 
 			auto value_label = std::make_shared<Label>(ui, scale);
-			value_label->setVerticalAlignment(Alignment::Middle);
+			value_label->setVerticalAlignment(Alignment::Center);
 			grid->attach(value_label, row, 2);
 
 			slider->onValueUpdate.connect([weak_label = std::weak_ptr(value_label)](Slider &slider, double) {

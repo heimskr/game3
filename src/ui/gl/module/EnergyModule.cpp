@@ -31,7 +31,7 @@ namespace Game3 {
 
 		auto label = std::make_shared<Label>(ui, scale);
 		label->setText("Energy");
-		label->setVerticalAlignment(Alignment::Middle);
+		label->setVerticalAlignment(Alignment::Center);
 		label->insertAtEnd(hbox);
 
 		bar = std::make_shared<ProgressBar>(ui, scale);
