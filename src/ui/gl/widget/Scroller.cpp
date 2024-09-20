@@ -38,10 +38,10 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
-		if (firstChild && lastChildHeight < 0)
+		if (lastChildHeight < 0)
 			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
 
-		firstChild->render(renderers, xOffset, yOffset, width, height);
+		firstChild->render(renderers, xOffset, yOffset, width, lastChildHeight);
 
 		if (lastChildHeight > 0) {
 			updateVerticalRectangle();
