@@ -6,6 +6,7 @@
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "ui/gl/module/AutocrafterModule.h"
+#include "ui/gl/module/ChemicalReactorModule.h"
 #include "ui/gl/module/CombinerModule.h"
 #include "ui/gl/module/EnergyModule.h"
 #include "ui/gl/module/FluidsModule.h"
@@ -17,7 +18,6 @@
 #include "ui/gl/module/MultiModule.h"
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
-#include "ui/module/ChemicalReactorModule.h"
 #include "ui/module/ComputerModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
@@ -50,10 +50,10 @@ namespace Game3 {
 
 	void Game::addModuleFactories() {
 		add(GTKModuleFactory::create<GTKInventoryModule>());
-		add(GTKModuleFactory::create<ChemicalReactorModule>());
 		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
 		add(GTKModuleFactory::create<VillageTradeModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
+		add(ModuleFactory::create<ChemicalReactorModule>());
 		add(ModuleFactory::create<CombinerModule>());
 		add(ModuleFactory::create<EnergyModule>());
 		add(ModuleFactory::create<FluidsModule>());

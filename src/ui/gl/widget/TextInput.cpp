@@ -222,6 +222,14 @@ namespace Game3 {
 		interiorColor = DEFAULT_TEXTINPUT_INTERIOR_COLOR;
 	}
 
+	void TextInput::setTextColor(Color color) {
+		textColor = color;
+	}
+
+	void TextInput::setTextColor() {
+		textColor = DEFAULT_TEXT_COLOR;
+	}
+
 	void TextInput::setSuggestions(std::optional<std::vector<UString>> new_suggestions) {
 		suggestions = std::move(new_suggestions);
 	}

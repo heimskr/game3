@@ -36,6 +36,9 @@ namespace Game3 {
 			void setInteriorColor(Color);
 			void setInteriorColor();
 
+			void setTextColor(Color);
+			void setTextColor();
+
 			void setSuggestions(std::optional<std::vector<UString>>);
 			std::vector<UString> getRelevantSuggestions() const;
 

@@ -64,7 +64,7 @@ namespace Game3 {
 	}
 
 	void AutocrafterModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		Widget::render(renderers, x, y, width, height);
+		Module::render(renderers, x, y, width, height);
 		firstChild->render(renderers, x, y, width, height);
 	}
 
@@ -118,12 +118,13 @@ namespace Game3 {
 	}
 
 	void AutocrafterModule::setInventory(std::shared_ptr<ClientInventory> inventory) {
-		if (inventory->index == 0)
+		if (inventory->index == 0) {
 			inventoryModule->setInventory(std::move(inventory));
-		else if (inventory->index == 1)
+		} else if (inventory->index == 1) {
 			stationInventoryModule->setInventory(std::move(inventory));
-		else
+		} else {
 			throw std::invalid_argument("Can't set AutocrafterModule inventory at index " + std::to_string(inventory->index));
+		}
 	}
 
 	void AutocrafterModule::setTarget(const std::string &target) {

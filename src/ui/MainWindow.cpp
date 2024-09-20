@@ -778,10 +778,13 @@ namespace Game3 {
 
 	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
 		std::unique_lock<DefaultMutex> module_lock;
-		GTKModule *current_module = inventoryTab->getModule(module_lock);
-		if (current_module != nullptr && (module_id.empty() || current_module->getID() == module_id)) {
+
+		if (Module *module_ = getOmniDialog()->inventoryTab->getModule(module_lock); module_ != nullptr && (module_id.empty() || module_->getID() == module_id)) {
 			std::any data{std::move(buffer)};
-			current_module->handleMessage(source, name, data);
+			module_->handleMessage(source, name, data);
+		} else if (GTKModule *module_ = inventoryTab->getModule(module_lock); module_ != nullptr && (module_id.empty() || module_->getID() == module_id)) {
+			std::any data{std::move(buffer)};
+			module_->handleMessage(source, name, data);
 		}
 	}
 
