@@ -15,7 +15,6 @@
 #include "tileentity/Teleporter.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/GTKInventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -61,11 +60,11 @@ namespace Game3 {
 
 		if (getSide() == Side::Client) {
 			MainWindow &window = getRealm()->getGame()->toClient().getWindow();
-			const auto &tab = window.inventoryTab;
-			player->queueForMove([tab](const auto &, bool) {
-				tab->removeModule();
-				return true;
-			});
+			// const auto &tab = window.inventoryTab;
+			// player->queueForMove([tab](const auto &, bool) {
+			// 	tab->removeModule();
+			// 	return true;
+			// });
 			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
 		}
 

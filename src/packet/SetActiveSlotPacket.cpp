@@ -7,8 +7,9 @@
 #include "net/RemoteClient.h"
 #include "packet/SetActiveSlotPacket.h"
 #include "ui/MainWindow.h"
+#include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/Constants.h"
-#include "ui/tab/GTKInventoryTab.h"
+#include "ui/gl/OmniDialog.h"
 
 namespace Game3 {
 	void SetActiveSlotPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
@@ -22,6 +23,5 @@ namespace Game3 {
 
 	void SetActiveSlotPacket::handle(const ClientGamePtr &game) {
 		game->getPlayer()->getInventory(0)->setActive(slot, true);
-		game->getWindow().inventoryTab->activeSlotSet();
 	}
 }

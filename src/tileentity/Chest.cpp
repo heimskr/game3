@@ -8,7 +8,6 @@
 #include "graphics/SpriteRenderer.h"
 #include "realm/Realm.h"
 #include "tileentity/Chest.h"
-#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	Chest::Chest(Identifier tile_id, const Position &position_, std::string name_, Identifier item_name):

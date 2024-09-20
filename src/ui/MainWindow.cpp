@@ -18,6 +18,7 @@
 #include "realm/Overworld.h"
 #include "ui/gl/OmniDialog.h"
 #include "ui/gl/module/FluidsModule.h"
+#include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gtk/ConnectDialog.h"
@@ -25,10 +26,6 @@
 #include "ui/gtk/EntryDialog.h"
 #include "ui/gtk/LoginDialog.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/GTKInventoryModule.h"
-#include "ui/module/GTKModuleFactory.h"
-#include "ui/tab/GTKCraftingTab.h"
-#include "ui/tab/GTKInventoryTab.h"
 #include "ui/App.h"
 #include "ui/Canvas.h"
 #include "ui/LogOverlay.h"
@@ -260,7 +257,7 @@ namespace Game3 {
 
 			if (PlayerPtr player = game->getPlayer()) {
 				player->getInventory(0)->nextSlot();
-				inventoryTab->update(game);
+				getOmniDialog()->updateModule();
 			}
 		}, 9, true));
 
@@ -270,7 +267,7 @@ namespace Game3 {
 
 			if (PlayerPtr player = game->getPlayer()) {
 				player->getInventory(0)->prevSlot();
-				inventoryTab->update(game);
+				getOmniDialog()->updateModule();
 			}
 		}, 8, true));
 
@@ -330,43 +327,15 @@ namespace Game3 {
 
 		vbox.append(statusBox);
 
-		paned.set_orientation(Gtk::Orientation::HORIZONTAL);
-		paned.set_start_child(vbox);
-		paned.set_end_child(notebook);
-
-		paned.set_resize_start_child(true);
-		paned.set_shrink_start_child(false);
-		paned.set_resize_end_child(false);
-		paned.set_shrink_end_child(false);
-		paned.property_position().signal_changed().connect([this] {
-			tabMap.at(notebook.get_nth_page(notebook.get_current_page()))->onResize(game);
-		});
-
 		glArea.set_expand(true);
 		glArea.signal_resize().connect([&](int, int) {
 			canvas->onResize();
 		});
 
-		notebook.set_hexpand(false);
-		notebook.set_vexpand(true);
-		notebook.property_page().signal_changed().connect([this] {
-			if (activeTab)
-				activeTab->onBlur();
-			activeTab = tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
-			activeTab->onFocus();
-		});
-
-		initTab(inventoryTab, *this).add();
-		initTab(craftingTab, *this).add();
-		activeTab = inventoryTab;
-
-		stack.add(paned);
+		stack.add(vbox);
 		stack.add(logOverlay);
 
 		set_child(stack);
-		delay([this] {
-			paned.set_position(paned.get_width() - 365);
-		}, 2);
 
 		if (std::filesystem::exists("settings.json"))
 			settings = nlohmann::json::parse(readFile("settings.json"));
@@ -430,16 +399,6 @@ namespace Game3 {
 		canvas->game = game;
 		settings.apply(*game);
 
-		for (auto &[widget, tab]: tabMap)
-			tab->reset(game);
-
-		game->signalPlayerInventoryUpdate().connect([this](const PlayerPtr &player) {
-			if (player != game->getPlayer())
-				return;
-			inventoryTab->update(game);
-			craftingTab->update(game);
-		});
-
 		game->signalOtherInventoryUpdate().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
@@ -447,8 +406,6 @@ namespace Game3 {
 					if (owner->getGID() == getExternalGID()) {
 						std::unique_lock<DefaultMutex> lock;
 						if (Module *module_ = getOmniDialog()->inventoryTab->getModule(lock)) {
-							module_->setInventory(client_inventory);
-						} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 							module_->setInventory(client_inventory);
 						}
 					}
@@ -470,9 +427,6 @@ namespace Game3 {
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 					std::any data(std::move(has_fluids));
 					module_->handleMessage({}, "UpdateFluids", data);
-				} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
-					std::any data(std::move(has_fluids));
-					module_->handleMessage({}, "UpdateFluids", data);
 				}
 			});
 		});
@@ -487,9 +441,6 @@ namespace Game3 {
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 					std::any data(std::move(has_energy));
 					module_->handleMessage({}, "UpdateEnergy", data);
-				} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
-					std::any data(std::move(has_energy));
-					module_->handleMessage({}, "UpdateEnergy", data);
 				}
 			});
 		});
@@ -502,9 +453,6 @@ namespace Game3 {
 				std::unique_lock<DefaultMutex> lock;
 
 				if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
-					std::any data(std::move(village));
-					module_->handleMessage({}, "VillageUpdate", data);
-				} else if (GTKModule *module_ = inventoryTab->getModule(lock)) {
 					std::any data(std::move(village));
 					module_->handleMessage({}, "VillageUpdate", data);
 				}
@@ -643,12 +591,9 @@ namespace Game3 {
 			if (dialog)
 				dialog->close();
 
-			inventoryTab->reset(nullptr);
 			removeModule();
 			game->stopThread();
 			canvas->game = nullptr;
-			for (const auto &[widget, tab]: tabMap)
-				tab->reset(nullptr);
 			game = nullptr;
 
 			omniDialog.reset();
@@ -677,7 +622,7 @@ namespace Game3 {
 	}
 
 	bool MainWindow::activateContext() {
-		if (stack.get_visible_child() != &paned)
+		if (stack.get_visible_child() != &vbox)
 			return false;
 
 		glArea.get_context()->make_current();
@@ -713,25 +658,18 @@ namespace Game3 {
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
 		assert(inventory);
-		inventoryTab->setModule(std::make_shared<GTKInventoryModule>(game, inventory));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(canvas->uiContext, inventory));
 	}
 
 	GlobalID MainWindow::getExternalGID() const {
-		std::unique_lock<DefaultMutex> lock;
-
-		auto query_module = [&](auto *module_) -> GlobalID {
-			std::any empty;
-			if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
-				return response->take<GlobalID>();
-			return -1;
-		};
-
-		if (omniDialog)
-			if (Module *module_ = omniDialog->inventoryTab->getModule(lock))
-				return query_module(module_);
-
-		if (GTKModule *module_ = inventoryTab->getModule(lock))
-			return query_module(module_);
+		if (omniDialog) {
+			std::unique_lock<DefaultMutex> lock;
+			if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
+				std::any empty;
+				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
+					return response->take<GlobalID>();
+			}
+		}
 
 		return -1;
 	}
@@ -742,46 +680,28 @@ namespace Game3 {
 	}
 
 	void MainWindow::openModule(const Identifier &module_id, const std::any &argument) {
-		std::unique_lock<DefaultMutex> module_lock;
-		GTKModule *current_module = inventoryTab->getModule(module_lock);
-		if (current_module != nullptr && current_module->getID() == module_id) {
-			current_module->update();
-		} else {
-			if (current_module != nullptr)
-				module_lock.unlock();
+		auto &registry = game->registry<ModuleFactoryRegistry>();
 
-			auto &registry = game->registry<ModuleFactoryRegistry>();
-			if (auto factory = registry[module_id]) {
-				getOmniDialog();
-				omniDialog->inventoryTab->setModule((*factory)(game, argument));
-				omniDialog->activeTab = omniDialog->inventoryTab;
-				if (!canvas->uiContext.hasDialog<OmniDialog>())
-					canvas->uiContext.addDialog(omniDialog);
-				return;
-			}
-
-			auto &gtk_registry = game->registry<GTKModuleFactoryRegistry>();
-			if (auto gtk_factory = gtk_registry[module_id]) {
-				inventoryTab->setModule((*gtk_factory)(game, argument));
-				return;
-			}
-
-			WARN("Couldn't find module {}", module_id);
+		if (auto factory = registry[module_id]) {
+			getOmniDialog();
+			omniDialog->inventoryTab->setModule((*factory)(game, argument));
+			omniDialog->activeTab = omniDialog->inventoryTab;
+			if (!canvas->uiContext.hasDialog<OmniDialog>())
+				canvas->uiContext.addDialog(omniDialog);
+			return;
 		}
+
+		WARN("Couldn't find module {}", module_id);
 	}
 
 	void MainWindow::removeModule() {
 		getOmniDialog()->inventoryTab->removeModule();
-		inventoryTab->removeModule();
 	}
 
 	void MainWindow::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
 		std::unique_lock<DefaultMutex> module_lock;
 
 		if (Module *module_ = getOmniDialog()->inventoryTab->getModule(module_lock); module_ != nullptr && (module_id.empty() || module_->getID() == module_id)) {
-			std::any data{std::move(buffer)};
-			module_->handleMessage(source, name, data);
-		} else if (GTKModule *module_ = inventoryTab->getModule(module_lock); module_ != nullptr && (module_id.empty() || module_->getID() == module_id)) {
 			std::any data{std::move(buffer)};
 			module_->handleMessage(source, name, data);
 		}
@@ -1189,19 +1109,15 @@ namespace Game3 {
 	}
 
 	bool MainWindow::toggleLog() {
-		if (stack.get_visible_child() == &paned) {
+		if (stack.get_visible_child() == &vbox) {
 			stack.set_visible_child(logOverlay);
 			toggleLogButton.set_active(true);
 			return true;
 		}
 
-		stack.set_visible_child(paned);
+		stack.set_visible_child(vbox);
 		toggleLogButton.set_active(false);
 		return false;
-	}
-
-	bool MainWindow::isFocused(const std::shared_ptr<GTKTab> &tab) const {
-		return tab == tabMap.at(notebook.get_nth_page(notebook.get_current_page()));
 	}
 
 	const std::shared_ptr<OmniDialog> & MainWindow::getOmniDialog() {

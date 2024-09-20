@@ -29,7 +29,6 @@ namespace Game3 {
 	class ClientGame;
 	class ClientInventory;
 	class GTKCraftingTab;
-	class GTKInventoryTab;
 	class GTKTab;
 	class HasFluids;
 	class OmniDialog;
@@ -40,10 +39,7 @@ namespace Game3 {
 		public:
 			std::unique_ptr<Gtk::Dialog> dialog;
 			Gtk::HeaderBar *header = nullptr;
-			Gtk::Notebook notebook;
 			std::shared_ptr<ClientGame> game;
-			std::shared_ptr<GTKInventoryTab> inventoryTab;
-			std::shared_ptr<GTKCraftingTab> craftingTab;
 			std::shared_ptr<OmniDialog> omniDialog;
 			Lockable<ClientSettings> settings;
 
@@ -92,8 +88,6 @@ namespace Game3 {
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
 			GlobalID getExternalGID() const;
 
-			inline auto getActiveTab() const { return activeTab; }
-
 			inline Modifiers getModifiers() const { return glAreaModifiers; }
 			Position getHoveredPosition() const;
 			inline Gtk::PopoverMenu & getGLMenu() { return glMenu; }
@@ -112,6 +106,8 @@ namespace Game3 {
 				moduleMessageBuffer(module_id, source, name, Buffer{std::forward<Args>(args)...});
 			}
 
+			const std::shared_ptr<OmniDialog> & getOmniDialog();
+
 		private:
 			constexpr static std::chrono::milliseconds keyRepeatTime {100};
 			constexpr static std::chrono::seconds statusbarExpirationTime {5};
@@ -125,7 +121,6 @@ namespace Game3 {
 			Lockable<std::list<std::function<bool()>>> boolFunctions;
 			Glib::Dispatcher functionQueueDispatcher;
 			Glib::Dispatcher boolFunctionDispatcher;
-			Gtk::Paned paned;
 			Gtk::Box vbox {Gtk::Orientation::VERTICAL};
 			Gtk::Box statusBox {Gtk::Orientation::HORIZONTAL};
 			Gtk::GLArea glArea;
@@ -135,8 +130,6 @@ namespace Game3 {
 			Gtk::Label timeLabel;
 			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
-			std::unordered_map<const Gtk::Widget *, std::shared_ptr<GTKTab>> tabMap;
-			std::shared_ptr<GTKTab> activeTab;
 			double lastDragX = 0.;
 			double lastDragY = 0.;
 			double glAreaMouseX = 0.;
@@ -192,26 +185,10 @@ namespace Game3 {
 			void autoConnect();
 			void playLocally();
 			void onGameLoaded();
-			bool isFocused(const std::shared_ptr<GTKTab> &) const;
 			void connectClose(Gtk::Dialog &);
 			void updateMoneyLabel(MoneyCount);
 			void continueLocalConnection();
 			bool toggleLog();
-			const std::shared_ptr<OmniDialog> & getOmniDialog();
-
-			template <typename T>
-			T & initTab(std::shared_ptr<T> &tab) {
-				tab = std::make_shared<T>(notebook);
-				tabMap.emplace(&tab->getWidget(), tab);
-				return *tab;
-			}
-
-			template <typename T, typename... Args>
-			T & initTab(std::shared_ptr<T> &tab, Args && ...args) {
-				tab = std::make_shared<T>(std::forward<Args>(args)...);
-				tabMap.emplace(&tab->getWidget(), tab);
-				return *tab;
-			}
 
 		friend class Canvas;
 	};

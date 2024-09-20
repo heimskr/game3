@@ -6,7 +6,6 @@
 #include "types/DirectedPlace.h"
 #include "ui/MainWindow.h"
 #include "ui/gl/module/ItemFiltersModule.h"
-#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	void OpenItemFiltersPacket::handle(const ClientGamePtr &game) {
@@ -19,16 +18,17 @@ namespace Game3 {
 		MainWindow &window = game->getWindow();
 
 		if (removeOnMove) {
-			game->getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
-				window.queue([tab] {
-					tab->removeModule();
+			game->getPlayer()->queueForMove([&window](const auto &, bool) {
+				window.queue([&window] {
+					window.removeModule();
+					window.closeOmniDialog();
 				});
 				return true;
 			});
 		}
 
 		// Force a fresh module construction instead of an update
-		window.inventoryTab->removeModule();
+		window.removeModule();
 
 		DirectedPlace place{direction, Place(position, realm, {})};
 

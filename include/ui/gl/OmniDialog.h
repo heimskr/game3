@@ -29,6 +29,7 @@ namespace Game3 {
 			bool dragUpdate(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 			bool scroll(float x_delta, float y_delta, int x, int y) final;
+			void updateModule();
 
 			template <typename T>
 			size_t removeTab() {

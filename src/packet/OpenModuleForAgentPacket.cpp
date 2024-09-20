@@ -4,7 +4,6 @@
 #include "game/ClientInventory.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	void OpenModuleForAgentPacket::handle(const ClientGamePtr &game) {
@@ -20,6 +19,7 @@ namespace Game3 {
 			game->getPlayer()->queueForMove([&window](const auto &, bool) {
 				window.queue([&window] {
 					window.removeModule();
+					window.closeOmniDialog();
 				});
 				return true;
 			});

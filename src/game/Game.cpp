@@ -19,10 +19,6 @@
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
 #include "ui/gl/module/VillageTradeModule.h"
-#include "ui/module/ComputerModule.h"
-#include "ui/module/GTKInventoryModule.h"
-#include "ui/module/GTKEnergyLevelModule.h"
-#include "ui/module/GTKModuleFactory.h"
 #include "algorithm/AStar.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -49,8 +45,6 @@ namespace Game3 {
 	}
 
 	void Game::addModuleFactories() {
-		add(GTKModuleFactory::create<GTKInventoryModule>());
-		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<ChemicalReactorModule>());
 		add(ModuleFactory::create<CombinerModule>());
@@ -70,7 +64,7 @@ namespace Game3 {
 		add(ModuleFactory::create<TextModule>());
 		add(ModuleFactory::create<VillageTradeModule>());
 #ifdef GAME3_ENABLE_SCRIPTING
-		add(GTKModuleFactory::create<ComputerModule>());
+		// add(GTKModuleFactory::create<ComputerModule>());
 #endif
 	}
 
@@ -103,11 +97,6 @@ namespace Game3 {
 		registry<ItemRegistry>().add(item->identifier, item);
 		for (const auto &attribute: item->attributes)
 			itemsByAttribute[attribute].insert(item);
-	}
-
-	void Game::add(GTKModuleFactory &&factory) {
-		auto shared = std::make_shared<GTKModuleFactory>(std::move(factory));
-		registry<GTKModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
 	void Game::add(ModuleFactory &&factory) {

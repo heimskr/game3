@@ -24,7 +24,6 @@
 #include <utility>
 #include <variant>
 
-#include <gtkmm.h>
 #include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
@@ -42,8 +41,6 @@ namespace Game3 {
 
 	class Game: public std::enable_shared_from_this<Game>, public OwnsVillages, public BufferContext, public HasTickQueue<const TickArgs &> {
 		public:
-			static constexpr const char *DEFAULT_PATH = "game.g3";
-
 			/** Seconds since the last tick */
 			float delta = 0.f;
 			std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
@@ -95,7 +92,6 @@ namespace Game3 {
 			void add(TileEntityFactory &&);
 			void add(RealmFactory &&);
 			void add(LocalCommandFactory &&);
-			void add(GTKModuleFactory &&);
 			void add(ModuleFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadData(const nlohmann::json &);

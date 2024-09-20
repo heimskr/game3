@@ -10,7 +10,6 @@
 #include "tileentity/ItemSpawner.h"
 #include "ui/Canvas.h"
 #include "ui/MainWindow.h"
-#include "ui/tab/GTKInventoryTab.h"
 #include "util/Util.h"
 
 namespace Game3 {

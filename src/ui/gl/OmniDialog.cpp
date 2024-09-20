@@ -186,4 +186,11 @@ namespace Game3 {
 
 		return true;
 	}
+
+	void OmniDialog::updateModule() {
+		std::unique_lock<DefaultMutex> lock;
+
+		if (Module *module_ = inventoryTab->getModule(lock))
+			module_->update();
+	}
 }

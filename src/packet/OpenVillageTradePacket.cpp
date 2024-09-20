@@ -6,7 +6,6 @@
 #include "types/DirectedPlace.h"
 #include "ui/MainWindow.h"
 #include "ui/gl/module/VillageTradeModule.h"
-#include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
 	void OpenVillageTradePacket::handle(const ClientGamePtr &game) {
@@ -22,16 +21,17 @@ namespace Game3 {
 		}
 
 		if (removeOnMove) {
-			game->getPlayer()->queueForMove([&window, tab = window.inventoryTab](const auto &, bool) {
-				window.queue([tab] {
-					tab->removeModule();
+			game->getPlayer()->queueForMove([&window](const auto &, bool) {
+				window.queue([&window] {
+					window.removeModule();
+					window.closeOmniDialog();
 				});
 				return true;
 			});
 		}
 
 		// Force a fresh module construction instead of an update
-		window.inventoryTab->removeModule();
+		window.removeModule();
 
 		window.queue([&window, village = std::move(village)] {
 			window.openModule(VillageTradeModule::ID(), std::any(village));
