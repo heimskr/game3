@@ -6,16 +6,14 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
-namespace {
-	using namespace Game3;
-
-	constexpr Color DEFAULT_INTERIOR_COLOR{"#ff0000"};
-	constexpr Color DEFAULT_EXTERIOR_COLOR{0.6, 0.3, 0.0, 1.0};
-	constexpr Color DEFAULT_BACKGROUND_COLOR{0.25, 0.0, 0.0, 1.0};
-	constexpr std::chrono::milliseconds PROGRESS_UPDATE_TIME{100};
-}
-
 namespace Game3 {
+	namespace {
+		constexpr Color DEFAULT_BAR_INTERIOR_COLOR{"#ff0000"};
+		constexpr Color DEFAULT_BAR_EXTERIOR_COLOR{0.6, 0.3, 0.0, 1.0};
+		constexpr Color DEFAULT_BAR_BACKGROUND_COLOR{0.25, 0.0, 0.0, 1.0};
+		constexpr std::chrono::milliseconds PROGRESS_UPDATE_TIME{100};
+	}
+
 	ProgressBar::ProgressBar(UIContext &ui, float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
 		Widget(ui, scale),
 		topInteriorColor(interior_color),
@@ -26,10 +24,10 @@ namespace Game3 {
 		progress(progress) {}
 
 	ProgressBar::ProgressBar(UIContext &ui, float scale, Color interior_color, float progress):
-		ProgressBar(ui, scale, interior_color, DEFAULT_BACKGROUND_COLOR, DEFAULT_EXTERIOR_COLOR, progress) {}
+		ProgressBar(ui, scale, interior_color, DEFAULT_BAR_BACKGROUND_COLOR, DEFAULT_BAR_EXTERIOR_COLOR, progress) {}
 
 	ProgressBar::ProgressBar(UIContext &ui, float scale, float progress):
-		ProgressBar(ui, scale, DEFAULT_INTERIOR_COLOR, progress) {}
+		ProgressBar(ui, scale, DEFAULT_BAR_INTERIOR_COLOR, progress) {}
 
 	void ProgressBar::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);

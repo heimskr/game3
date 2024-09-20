@@ -96,7 +96,10 @@ namespace Game3 {
 		});
 	}
 
-	bool TextInput::click(int button, int, int) {
+	bool TextInput::click(int button, int x, int y) {
+		if (Widget::click(button, x, y))
+			return true;
+
 		if (button == 1) {
 			ui.focusWidget(shared_from_this());
 			return true;

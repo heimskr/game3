@@ -30,9 +30,6 @@ namespace Game3 {
 			virtual bool dragEnd(int x, int y);
 			virtual bool scroll(float x_delta, float y_delta, int x, int y);
 			virtual bool keyPressed(uint32_t character, Modifiers);
-
-			/** Order: clockwise starting at top left. */
-			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 	};
 
 	using DialogPtr = std::shared_ptr<Dialog>;

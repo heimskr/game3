@@ -88,7 +88,7 @@ namespace Game3 {
 
 	bool InventoryModule::click(int button, int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->getLastRectangle().contains(x, y) && widget->click(button, x, y))
+			if (widget->contains(x, y) && widget->click(button, x, y))
 				return true;
 
 		return false;
@@ -96,7 +96,7 @@ namespace Game3 {
 
 	bool InventoryModule::dragStart(int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
-			if (widget->getLastRectangle().contains(x, y)) {
+			if (widget->contains(x, y)) {
 				WidgetPtr dragged_widget = widget->getDragStartWidget();
 				const bool out = dragged_widget != nullptr;
 				ui.setDraggedWidget(std::move(dragged_widget));
@@ -114,7 +114,7 @@ namespace Game3 {
 			return false;
 
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
-			if (widget->getLastRectangle().contains(x, y)) {
+			if (widget->contains(x, y)) {
 				ClientPlayerPtr player = ui.getPlayer();
 				player->send(MoveSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
 				ui.setDraggedWidget(nullptr);

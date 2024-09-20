@@ -4,6 +4,7 @@
 #include "graphics/Texture.h"
 #include "types/Types.h"
 #include "ui/gl/widget/AutocompleteDropdown.h"
+#include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
@@ -40,6 +41,9 @@ namespace Game3 {
 
 		if (autocompleteDropdown)
 			autocompleteDropdown->render(context, -1, -1, -1, -1); // The dropdown is responsible for knowing where to render.
+
+		if (contextMenu)
+			contextMenu->render(context, -1, -1, -1, -1); // Same here.
 
 		if (tooltip)
 			tooltip->render(context, mouse_x * factor, mouse_y * factor, -1, -1);
@@ -78,6 +82,9 @@ namespace Game3 {
 	}
 
 	bool UIContext::click(int button, int x, int y) {
+		if (contextMenu && contextMenu->click(button, x, y))
+			return true;
+
 		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y))
 			return true;
 
@@ -85,10 +92,13 @@ namespace Game3 {
 			if (dialog->click(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->click(button, x, y);
+		return dialogs.empty() && hotbar->contains(x, y) && hotbar->click(button, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
+		if (contextMenu && contextMenu->dragStart(x, y))
+			return true;
+
 		if (autocompleteDropdown && autocompleteDropdown->dragStart(x, y))
 			return true;
 
@@ -99,10 +109,13 @@ namespace Game3 {
 			if (dialog->dragStart(x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragStart(x, y);
+		return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragStart(x, y);
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
+		if (contextMenu && contextMenu->dragUpdate(x, y))
+			return true;
+
 		if (autocompleteDropdown && autocompleteDropdown->dragUpdate(x, y))
 			return true;
 
@@ -117,10 +130,13 @@ namespace Game3 {
 			if (dialog->dragUpdate(x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragUpdate(x, y);
+		return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragUpdate(x, y);
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
+		if (contextMenu && contextMenu->dragEnd(x, y))
+			return true;
+
 		if (autocompleteDropdown && autocompleteDropdown->dragEnd(x, y))
 			return true;
 
@@ -147,12 +163,15 @@ namespace Game3 {
 		setDraggedWidget(nullptr);
 
 		if (!out)
-			return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->dragEnd(x, y);
+			return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragEnd(x, y);
 
 		return true;
 	}
 
 	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
+		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y))
+			return true;
+
 		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y))
 			return true;
 
@@ -160,12 +179,16 @@ namespace Game3 {
 			if (dialog->scroll(x_delta, y_delta, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->getLastRectangle().contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
+		return dialogs.empty() && hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
 	}
 
 	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers) {
 		if (auto focused = getFocusedWidget())
 			if (focused->keyPressed(character, modifiers))
+				return true;
+
+		if (auto context_menu = getContextMenu())
+			if (context_menu->keyPressed(character, modifiers))
 				return true;
 
 		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
@@ -268,5 +291,115 @@ namespace Game3 {
 
 	bool UIContext::anyDragUpdaters() const {
 		return !extraDragUpdaters.empty();
+	}
+
+	void UIContext::setContextMenu(std::shared_ptr<ContextMenu> new_context_menu) {
+		contextMenu = std::move(new_context_menu);
+	}
+
+	std::shared_ptr<ContextMenu> UIContext::getContextMenu() const {
+		return contextMenu;
+	}
+
+	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
+		const Rectangle rectangle = scissorStack.getTop().rectangle;
+		SingleSpriteRenderer &single = renderers.singleSprite;
+
+		TexturePtr top_left     = cacheTexture(pieces[0], alpha);
+		TexturePtr top          = cacheTexture(pieces[1], alpha);
+		TexturePtr top_right    = cacheTexture(pieces[2], alpha);
+		TexturePtr right        = cacheTexture(pieces[3], alpha);
+		TexturePtr bottom_right = cacheTexture(pieces[4], alpha);
+		TexturePtr bottom       = cacheTexture(pieces[5], alpha);
+		TexturePtr bottom_left  = cacheTexture(pieces[6], alpha);
+		TexturePtr left         = cacheTexture(pieces[7], alpha);
+
+		single.drawOnScreen(top_left, RenderOptions{
+			.x = 0,
+			.y = 0,
+			.sizeX = -1,
+			.sizeY = -1,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+		});
+
+		single.drawOnScreen(top, RenderOptions{
+			.x = top_left->width * scale,
+			.y = 0,
+			.sizeX = rectangle.width - (top_left->width + top_right->width) * scale,
+			.sizeY = -1,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+			.wrapMode = GL_REPEAT,
+		});
+
+		single.drawOnScreen(top_right, RenderOptions{
+			.x = rectangle.width - top_right->width * scale,
+			.y = 0,
+			.sizeX = -1,
+			.sizeY = -1,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+		});
+
+		single.drawOnScreen(left, RenderOptions{
+			.x = 0,
+			.y = top_left->height * scale,
+			.sizeX = -1,
+			.sizeY = rectangle.height - (top_left->height + bottom_left->height) * scale,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+			.wrapMode = GL_REPEAT,
+		});
+
+		single.drawOnScreen(right, RenderOptions{
+			.x = rectangle.width - top_right->width * scale,
+			.y = top_right->height * scale,
+			.sizeX = -1,
+			.sizeY = rectangle.height - (top_right->height + bottom_right->height) * scale,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+			.wrapMode = GL_REPEAT,
+		});
+
+		single.drawOnScreen(bottom_left, RenderOptions{
+			.x = 0,
+			.y = rectangle.height - bottom_left->height * scale,
+			.sizeX = -1,
+			.sizeY = -1,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+		});
+
+		single.drawOnScreen(bottom, RenderOptions{
+			.x = bottom_left->width * scale,
+			.y = rectangle.height - bottom->height * scale,
+			.sizeX = rectangle.width - (bottom_left->width + bottom_right->width) * scale,
+			.sizeY = -1,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+			.wrapMode = GL_REPEAT,
+		});
+
+		single.drawOnScreen(bottom_right, RenderOptions{
+			.x = rectangle.width - bottom_right->width * scale,
+			.y = rectangle.height - bottom_right->height * scale,
+			.sizeX = -1,
+			.sizeY = -1,
+			.scaleX = scale,
+			.scaleY = scale,
+			.invertY = false,
+		});
+
+		if (interior.alpha > 0) {
+			renderers.rectangle.drawOnScreen(interior, left->width * scale, top->height * scale, rectangle.width - (left->width + right->width) * scale, rectangle.height - (top->height + bottom->height) * scale);
+		}
 	}
 }

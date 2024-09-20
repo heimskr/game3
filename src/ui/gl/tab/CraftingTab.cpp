@@ -3,6 +3,7 @@
 #include "threading/ThreadContext.h"
 #include "ui/gl/tab/CraftingTab.h"
 #include "ui/gl/widget/Box.h"
+#include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
@@ -29,6 +30,23 @@ namespace Game3 {
 			"baz",
 			"apple",
 			"application",
+		});
+
+		input->setOnClick([this](Widget &input, int button, int mouse_x, int mouse_y) {
+			if (button != 3)
+				return false;
+
+			auto menu = std::make_shared<ContextMenu>(ui, scale, input.shared_from_this(), mouse_x, mouse_y);
+
+			for (std::string str: {"Hello", "World!", "Foo", "Bar", "Baz"}) {
+				menu->addItem(std::make_shared<ContextMenuItem>(ui, scale, str, [str] { INFO("{}", str); }));
+			}
+
+			menu->maybeRemeasure(ui.getRenderers(), -2, -2);
+
+			ui.setContextMenu(std::move(menu));
+
+			return true;
 		});
 
 		input->insertAtEnd(vbox);

@@ -53,7 +53,7 @@ namespace Game3 {
 
 	bool Hotbar::click(int button, int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->getLastRectangle().contains(x, y) && widget->click(button, x, y))
+			if (widget->contains(x, y) && widget->click(button, x, y))
 				break;
 
 		return true;

@@ -16,6 +16,7 @@ namespace Game3 {
 	class Canvas;
 	class ClientGame;
 	class ClientPlayer;
+	class ContextMenu;
 	class AutocompleteDropdown;
 	class Hotbar;
 	class Texture;
@@ -61,6 +62,10 @@ namespace Game3 {
 			std::shared_ptr<Tooltip> getTooltip() const;
 			void addDragUpdater(WidgetPtr);
 			bool anyDragUpdaters() const;
+			void setContextMenu(std::shared_ptr<ContextMenu>);
+			std::shared_ptr<ContextMenu> getContextMenu() const;
+			/** Order: clockwise starting at top left. */
+			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 
 			template <typename T>
 			size_t removeDialogs() {
@@ -86,6 +91,7 @@ namespace Game3 {
 			std::shared_ptr<Hotbar> hotbar;
 			std::shared_ptr<Tooltip> tooltip;
 			std::shared_ptr<AutocompleteDropdown> autocompleteDropdown;
+			std::shared_ptr<ContextMenu> contextMenu;
 			WeakWidgetPtr focusedWidget;
 			WeakWidgetPtr pressedWidget;
 			std::set<WidgetPtr> extraDragUpdaters;

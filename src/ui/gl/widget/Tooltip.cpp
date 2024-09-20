@@ -7,8 +7,8 @@
 
 namespace {
 	constexpr float DEFAULT_MAX_WIDTH = 800 * Game3::UI_SCALE / 8;
-	constexpr Game3::Color DEFAULT_BACKGROUND_COLOR{"#000000af"};
-	constexpr Game3::Color DEFAULT_TEXT_COLOR{"#ffffff"};
+	constexpr Game3::Color DEFAULT_TOOLTIP_BACKGROUND_COLOR{"#000000af"};
+	constexpr Game3::Color DEFAULT_TOOLTIP_TEXT_COLOR{"#ffffff"};
 	constexpr float CURSOR_WIDTH = 10;
 	constexpr float CURSOR_HEIGHT = 20;
 }
@@ -17,8 +17,8 @@ namespace Game3 {
 	Tooltip::Tooltip(UIContext &ui, float scale):
 		Widget(ui, scale),
 		maxWidth(DEFAULT_MAX_WIDTH),
-		backgroundColor(DEFAULT_BACKGROUND_COLOR),
-		textColor(DEFAULT_TEXT_COLOR) {}
+		backgroundColor(DEFAULT_TOOLTIP_BACKGROUND_COLOR),
+		textColor(DEFAULT_TOOLTIP_TEXT_COLOR) {}
 
 	void Tooltip::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (!visible)

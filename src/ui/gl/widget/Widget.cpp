@@ -39,7 +39,7 @@ namespace Game3 {
 			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->click(button, x, y))
+			if (child->contains(x, y) && child->click(button, x, y))
 				return true;
 
 		return false;
@@ -52,7 +52,7 @@ namespace Game3 {
 			return true;
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->dragStart(x, y))
+			if (child->contains(x, y) && child->dragStart(x, y))
 				return true;
 
 		return false;
@@ -63,7 +63,7 @@ namespace Game3 {
 			return true;
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->dragUpdate(x, y))
+			if (child->contains(x, y) && child->dragUpdate(x, y))
 				return true;
 
 		return false;
@@ -73,7 +73,7 @@ namespace Game3 {
 		dragOrigin.reset();
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->dragEnd(x, y))
+			if (child->contains(x, y) && child->dragEnd(x, y))
 				return true;
 
 		return false;
@@ -81,7 +81,7 @@ namespace Game3 {
 
 	bool Widget::scroll(float x_delta, float y_delta, int x, int y) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->getLastRectangle().contains(x, y) && child->scroll(x_delta, y_delta, x, y))
+			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y))
 				return true;
 
 		return false;
@@ -116,6 +116,10 @@ namespace Game3 {
 		if (height != lastRectangle.height) {
 			measure(renderers, Orientation::Vertical, width, height, minimum, natural);
 		}
+	}
+
+	bool Widget::contains(int x, int y) const {
+		return lastRectangle.contains(x, y);
 	}
 
 	WidgetPtr Widget::getParent() const {

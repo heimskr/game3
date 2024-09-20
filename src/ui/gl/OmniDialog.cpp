@@ -17,11 +17,6 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr std::array<std::string_view, 8> PIECES{
-		"resources/gui/gui_topleft.png", "resources/gui/gui_top.png", "resources/gui/gui_topright.png", "resources/gui/gui_right.png",
-		"resources/gui/gui_bottomright.png", "resources/gui/gui_bottom.png", "resources/gui/gui_bottomleft.png", "resources/gui/gui_left.png",
-	};
-
 	constexpr std::array<std::string_view, 8> TAB_PIECES{
 		"resources/gui/gui_topleft.png", "resources/gui/gui_top.png", "resources/gui/gui_topright.png", "resources/gui/gui_right.png",
 		"resources/gui/gui_bottomright_empty.png", "resources/gui/gui_bottom_empty.png", "resources/gui/gui_bottomleft_empty.png", "resources/gui/gui_left.png",
@@ -45,14 +40,13 @@ namespace Game3 {
 		ScissorStack &stack = ui.scissorStack;
 
 		Rectangle rectangle = getPosition();
-		constexpr Color inner_color{0.88, 0.77, 0.55};
 		const Rectangle original_rectangle = rectangle;
 		RectangleRenderer &rectangler = renderers.rectangle;
 
 		{
 			auto saver = stack.pushRelative(rectangle, renderers);
 
-			drawFrame(renderers, UI_SCALE, false, PIECES, inner_color);
+			ui.drawFrame(renderers, UI_SCALE, false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
 
 			rectangle.x = 9 * UI_SCALE;
 			rectangle.y = 9 * UI_SCALE;
@@ -80,13 +74,13 @@ namespace Game3 {
 
 			{
 				auto saver = stack.pushRelative(tab_rectangle, renderers);
-				drawFrame(renderers, UI_SCALE / UNSCALE, true, TAB_PIECES, inner_color);
+				ui.drawFrame(renderers, UI_SCALE / UNSCALE, true, TAB_PIECES, DEFAULT_BACKGROUND_COLOR);
 				tabRectangles.at(i) = tab_rectangle;
 			}
 
 			if (tab == activeTab) {
 				auto saver = stack.pushRelative(original_rectangle, renderers);
-				rectangler.drawOnScreen(inner_color, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * UI_SCALE);
+				rectangler.drawOnScreen(DEFAULT_BACKGROUND_COLOR, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * UI_SCALE);
 
 				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_left.png", true), RenderOptions{
 					.x = double(x_offset + UI_SCALE / UNSCALE),

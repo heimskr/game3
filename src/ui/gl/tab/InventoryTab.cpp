@@ -73,48 +73,48 @@ namespace Game3 {
 	}
 
 	bool InventoryTab::click(int button, int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->click(button, x, y))
+		if (playerScroller->contains(x, y) && playerScroller->click(button, x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
-			if (moduleScroller->getLastRectangle().contains(x, y))
+			if (moduleScroller->contains(x, y))
 				return moduleScroller->click(button, x, y);
 
 		return false;
 	}
 
 	bool InventoryTab::dragStart(int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragStart(x, y))
+		if (playerScroller->contains(x, y) && playerScroller->dragStart(x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
-			if (moduleScroller->getLastRectangle().contains(x, y))
+			if (moduleScroller->contains(x, y))
 				return moduleScroller->dragStart(x, y);
 
 		return false;
 	}
 
 	bool InventoryTab::dragEnd(int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->dragEnd(x, y))
+		if (playerScroller->contains(x, y) && playerScroller->dragEnd(x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
-			if (moduleScroller->getLastRectangle().contains(x, y))
+			if (moduleScroller->contains(x, y))
 				return moduleScroller->dragEnd(x, y);
 
 		return false;
 	}
 
 	bool InventoryTab::scroll(float x_delta, float y_delta, int x, int y) {
-		if (playerScroller->getLastRectangle().contains(x, y) && playerScroller->scroll(x_delta, y_delta, x, y))
+		if (playerScroller->contains(x, y) && playerScroller->scroll(x_delta, y_delta, x, y))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock))
-			if (moduleScroller->getLastRectangle().contains(x, y))
+			if (moduleScroller->contains(x, y))
 				return moduleScroller->scroll(x_delta, y_delta, x, y);
 
 		return false;
