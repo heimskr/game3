@@ -27,7 +27,6 @@
 #include "ui/gtk/Util.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GTKModuleFactory.h"
-#include "ui/module/GTKVillageTradeModule.h"
 #include "ui/tab/GTKCraftingTab.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/App.h"

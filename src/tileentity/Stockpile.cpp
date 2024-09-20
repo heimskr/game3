@@ -4,7 +4,6 @@
 #include "packet/VillageUpdatePacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Stockpile.h"
-#include "ui/module/GTKVillageTradeModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {
