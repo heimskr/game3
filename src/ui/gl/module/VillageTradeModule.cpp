@@ -265,10 +265,11 @@ namespace Game3 {
 					try {
 						amount = parseNumber<ItemCount>(amount_text);
 					} catch (const std::invalid_argument &) {
+						WARN("Couldn't parse \"{}\"", amount_text);
 						return true;
 					}
 
-					buy(game, ItemCount());
+					buy(game, amount);
 				}
 			}
 
@@ -287,7 +288,7 @@ namespace Game3 {
 		amount = new_amount;
 		const ItemCount old_count = getCount();
 		// transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, std::min(amount, 999.)));
-		transferAmount->setText(std::to_string(std::min({static_cast<double>(old_count), amount, 999.})));
+		transferAmount->setText(std::to_string(static_cast<ItemCount>(std::min({static_cast<double>(old_count), amount, 999.}))));
 	}
 
 	void VillageTradeRow::updateLabel() {
