@@ -225,7 +225,6 @@ namespace Game3 {
 		weakGame(game),
 		villageID(village_id),
 		resource(item.identifier),
-		// itemSlot(game, -1, nullptr),
 		basePrice(item.basePrice),
 		amount(amount_) {}
 
@@ -286,9 +285,9 @@ namespace Game3 {
 		if (amount == new_amount)
 			return;
 		amount = new_amount;
-		const ItemCount old_count = getCount();
+		// const ItemCount old_count = getCount();
 		// transferAmount.set_adjustment(Gtk::Adjustment::create(1.0, 1.0, std::min(amount, 999.)));
-		transferAmount->setText(std::to_string(static_cast<ItemCount>(std::min({static_cast<double>(old_count), amount, 999.}))));
+		// transferAmount->setText(std::to_string(static_cast<ItemCount>(std::min({static_cast<double>(old_count), amount, 999.}))));
 	}
 
 	void VillageTradeRow::updateLabel() {
