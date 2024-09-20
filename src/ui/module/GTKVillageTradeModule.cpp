@@ -7,7 +7,7 @@
 #include "packet/DoVillageTradePacket.h"
 #include "ui/gtk/DragSource.h"
 #include "ui/gtk/Util.h"
-#include "ui/module/VillageTradeModule.h"
+#include "ui/module/GTKVillageTradeModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 #include "ui/MainWindow.h"
 #include "util/Util.h"
@@ -15,7 +15,7 @@
 #include <format>
 
 namespace Game3 {
-	VillageTradeModule::VillageTradeModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
+	GTKVillageTradeModule::GTKVillageTradeModule(std::shared_ptr<ClientGame> game_, const std::any &argument):
 	game(std::move(game_)),
 	village(std::any_cast<VillagePtr>(argument)),
 	sellSlot(game, -1, {}, {}) {
@@ -56,7 +56,7 @@ namespace Game3 {
 		sellRow.append(sellCount);
 		sellRow.append(sellButton);
 		sellRow.append(sellLabelBox);
-		sellButton.signal_clicked().connect(sigc::mem_fun(*this, &VillageTradeModule::sell));
+		sellButton.signal_clicked().connect(sigc::mem_fun(*this, &GTKVillageTradeModule::sell));
 
 		sellSlot.onDrop = [this](const ItemStackPtr &stack) {
 			if (stack)
@@ -93,11 +93,11 @@ namespace Game3 {
 		vbox.add_controller(dropTarget);
 	}
 
-	Gtk::Widget & VillageTradeModule::getWidget() {
+	Gtk::Widget & GTKVillageTradeModule::getWidget() {
 		return vbox;
 	}
 
-	void VillageTradeModule::reset() {
+	void GTKVillageTradeModule::reset() {
 		removeChildren(vbox);
 		vbox.append(villageName);
 		vbox.append(laborLabel);
@@ -105,7 +105,7 @@ namespace Game3 {
 		update();
 	}
 
-	void VillageTradeModule::update() {
+	void GTKVillageTradeModule::update() {
 		villageName.set_text(village->getName());
 		laborLabel.set_text(std::format("Available labor: {:.2f}", village->getLabor()));
 		if (const ItemStackPtr &stack = sellSlot.getStack())
@@ -113,7 +113,7 @@ namespace Game3 {
 		populate();
 	}
 
-	std::optional<Buffer> VillageTradeModule::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
+	std::optional<Buffer> GTKVillageTradeModule::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
 		if (name == "VillageUpdate") {
 
 			VillagePtr updated_village = std::any_cast<VillagePtr>(data);
@@ -125,7 +125,7 @@ namespace Game3 {
 		return {};
 	}
 
-	bool VillageTradeModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot slot) {
+	bool GTKVillageTradeModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot slot) {
 		if (ItemStackPtr stack = (*source_inventory)[slot]) {
 			if (setSellStack(stack)) {
 				showSell();
@@ -136,7 +136,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool VillageTradeModule::setSellStack(ItemStackPtr stack) {
+	bool GTKVillageTradeModule::setSellStack(ItemStackPtr stack) {
 		if (!isSellable(stack))
 			return false;
 
@@ -148,9 +148,9 @@ namespace Game3 {
 		return true;
 	}
 
-	void VillageTradeModule::updateSell(const ItemStackPtr &stack) {
+	void GTKVillageTradeModule::updateSell(const ItemStackPtr &stack) {
 		if (!village) {
-			WARN("No village in VillageTradeModule::setSellStack");
+			WARN("No village in GTKVillageTradeModule::setSellStack");
 			return;
 		}
 
@@ -170,7 +170,7 @@ namespace Game3 {
 		}
 	}
 
-	void VillageTradeModule::sell() {
+	void GTKVillageTradeModule::sell() {
 		if (!village)
 			return;
 
@@ -198,7 +198,7 @@ namespace Game3 {
 		game->getPlayer()->send(DoVillageTradePacket(village->getID(), stack->getID(), sell_count, true));
 	}
 
-	void VillageTradeModule::showSell() {
+	void GTKVillageTradeModule::showSell() {
 		if (sellRowShown)
 			return;
 
@@ -206,7 +206,7 @@ namespace Game3 {
 		vbox.insert_child_after(sellRow, laborLabel);
 	}
 
-	void VillageTradeModule::hideSell() {
+	void GTKVillageTradeModule::hideSell() {
 		if (!sellRowShown)
 			return;
 
@@ -214,7 +214,7 @@ namespace Game3 {
 		vbox.remove(sellRow);
 	}
 
-	void VillageTradeModule::populate() {
+	void GTKVillageTradeModule::populate() {
 		assert(village);
 
 		const auto &resources = village->getResources();
@@ -242,7 +242,7 @@ namespace Game3 {
 		}
 	}
 
-	VillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
+	GTKVillageTradeModule::Row::Row(const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
 	Gtk::Box(Gtk::Orientation::HORIZONTAL),
 	villageID(village_id),
 	resource(item.identifier),
@@ -281,7 +281,7 @@ namespace Game3 {
 		append(buyButton);
 	}
 
-	void VillageTradeModule::Row::setAmount(double amount_) {
+	void GTKVillageTradeModule::Row::setAmount(double amount_) {
 		if (amount == amount_)
 			return;
 		amount = amount_;
@@ -290,26 +290,26 @@ namespace Game3 {
 		transferAmount.set_value(std::min({double(old_count), amount, 999.0}));
 	}
 
-	void VillageTradeModule::Row::updateLabel() {
+	void GTKVillageTradeModule::Row::updateLabel() {
 		quantityLabel.set_text(std::format("\u00d7 {:.2f}", amount));
 	}
 
-	void VillageTradeModule::Row::updateTooltips(ItemCount count) {
+	void GTKVillageTradeModule::Row::updateTooltips(ItemCount count) {
 		if (std::optional<MoneyCount> buy_price = totalBuyPrice(ItemCount(amount), -1, basePrice, count))
 			buyButton.set_tooltip_text(std::format("Price: {}", *buy_price));
 		else
 			buyButton.set_tooltip_text("Village doesn't have that many!");
 	}
 
-	ItemCount VillageTradeModule::Row::getCount() const {
+	ItemCount GTKVillageTradeModule::Row::getCount() const {
 		return ItemCount(transferAmount.get_value());
 	}
 
-	void VillageTradeModule::Row::buy(const ClientGamePtr &game, ItemCount amount) {
+	void GTKVillageTradeModule::Row::buy(const ClientGamePtr &game, ItemCount amount) {
 		game->getPlayer()->send(DoVillageTradePacket(villageID, resource, amount, false));
 	}
 
-	void VillageTradeModule::Row::sell(const ClientGamePtr &game, ItemCount amount) {
+	void GTKVillageTradeModule::Row::sell(const ClientGamePtr &game, ItemCount amount) {
 		game->getPlayer()->send(DoVillageTradePacket(villageID, resource, amount, true));
 	}
 }

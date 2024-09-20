@@ -5,7 +5,7 @@
 #include "packet/OpenVillageTradePacket.h"
 #include "types/DirectedPlace.h"
 #include "ui/MainWindow.h"
-#include "ui/module/VillageTradeModule.h"
+#include "ui/module/GTKVillageTradeModule.h"
 #include "ui/tab/GTKInventoryTab.h"
 
 namespace Game3 {
@@ -34,7 +34,7 @@ namespace Game3 {
 		window.inventoryTab->removeModule();
 
 		window.queue([&window, village = std::move(village)] {
-			window.openModule(VillageTradeModule::ID(), std::any(village));
+			window.openModule(GTKVillageTradeModule::ID(), std::any(village));
 		});
 	}
 }

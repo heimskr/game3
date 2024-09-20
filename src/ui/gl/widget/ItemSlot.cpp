@@ -77,13 +77,15 @@ namespace Game3 {
 			.invertY = false,
 		});
 
-		renderers.text.drawOnScreen(std::to_string(stack->count), TextRenderOptions{
-			.x = x + (size - 3) * scale,
-			.y = y + (size + 1) * scale,
-			.scaleX = scale / 16,
-			.scaleY = scale / 16,
-			.shadowOffset{.375 * scale, .375 * scale},
-		});
+		if (stack->count != static_cast<ItemCount>(-1)) {
+			renderers.text.drawOnScreen(std::to_string(stack->count), TextRenderOptions{
+				.x = x + (size - 3) * scale,
+				.y = y + (size + 1) * scale,
+				.scaleX = scale / 16,
+				.scaleY = scale / 16,
+				.shadowOffset{.375 * scale, .375 * scale},
+			});
+		}
 	}
 
 	std::shared_ptr<Widget> ItemSlot::getDragStartWidget() {

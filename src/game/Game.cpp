@@ -18,11 +18,11 @@
 #include "ui/gl/module/MultiModule.h"
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
+#include "ui/gl/module/VillageTradeModule.h"
 #include "ui/module/ComputerModule.h"
 #include "ui/module/GTKInventoryModule.h"
 #include "ui/module/GTKEnergyLevelModule.h"
 #include "ui/module/GTKModuleFactory.h"
-#include "ui/module/VillageTradeModule.h"
 #include "algorithm/AStar.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -51,7 +51,6 @@ namespace Game3 {
 	void Game::addModuleFactories() {
 		add(GTKModuleFactory::create<GTKInventoryModule>());
 		add(GTKModuleFactory::create<GTKEnergyLevelModule>());
-		add(GTKModuleFactory::create<VillageTradeModule>());
 		add(ModuleFactory::create<AutocrafterModule>());
 		add(ModuleFactory::create<ChemicalReactorModule>());
 		add(ModuleFactory::create<CombinerModule>());
@@ -69,6 +68,7 @@ namespace Game3 {
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<MultiModule<Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<TextModule>());
+		add(ModuleFactory::create<VillageTradeModule>());
 #ifdef GAME3_ENABLE_SCRIPTING
 		add(GTKModuleFactory::create<ComputerModule>());
 #endif

@@ -14,11 +14,11 @@ namespace Game3 {
 	class Item;
 	class Village;
 
-	class VillageTradeModule: public GTKModule {
+	class GTKVillageTradeModule: public GTKModule {
 		public:
 			static Identifier ID() { return {"base", "module/village_trade"}; }
 
-			VillageTradeModule(std::shared_ptr<ClientGame>, const std::any &);
+			GTKVillageTradeModule(std::shared_ptr<ClientGame>, const std::any &);
 
 			Identifier getID() const final { return ID(); }
 			Gtk::Widget & getWidget() final;
