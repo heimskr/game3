@@ -55,7 +55,7 @@ namespace Game3 {
 				return;
 			}
 
-			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, -1, item->basePrice, amount, village->getGreed())) {
+			if (std::optional<MoneyCount> sell_price = totalSellPrice(resource_count, 0, item->basePrice, amount, village->getGreed())) {
 				player->addMoney(*sell_price);
 				inventory->remove(ItemStack::create(game, resource, amount));
 				village->setResourceAmount(resource, resource_count + amount);
@@ -68,7 +68,7 @@ namespace Game3 {
 
 		// Handle buying
 
-		if (std::optional<MoneyCount> buy_price = totalBuyPrice(resource_count, -1, item->basePrice, amount)) {
+		if (std::optional<MoneyCount> buy_price = totalBuyPrice(resource_count, 0, item->basePrice, amount)) {
 			if (!player->removeMoney(*buy_price)) {
 				auto money = player->getMoney();
 				client.sendError("Village trade failed: insufficient funds (have {}, need {})", money, *buy_price);

@@ -1,10 +1,10 @@
-#include <cmath>
-
 #include "algorithm/Stonks.h"
 #include "entity/Merchant.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "item/Item.h"
+
+#include <cmath>
 
 namespace Game3 {
 	namespace {
