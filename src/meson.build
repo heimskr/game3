@@ -24,6 +24,7 @@ game3_deps = [
 	dependency('liblz4'),
 	dependency('nlohmann_json'),
 	dependency('glm'),
+	dependency('glfw3'),
 	dependency('boost'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('vte-2.91-gtk4'),

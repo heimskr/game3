@@ -38,13 +38,13 @@
 #include <utility>
 
 namespace Game3 {
-	class Canvas;
 	class Game;
 	class Inventory;
 	class Player;
 	class Realm;
 	class RemoteClient;
 	class TileEntity;
+	class Window;
 	struct RendererContext;
 
 	enum class RideType {
@@ -146,7 +146,7 @@ namespace Game3 {
 			inline Direction getDirection() const { return direction.load(); }
 			Entity & setRealm(const Game &, RealmID);
 			Entity & setRealm(const std::shared_ptr<Realm>);
-			void focus(Canvas &, bool is_autofocus);
+			void focus(Window &, bool is_autofocus);
 			/** Returns whether the entity moved to a new chunk. */
 			bool teleport(const Position &, MovementContext = {});
 			virtual void teleport(const Position &, const std::shared_ptr<Realm> &, MovementContext);

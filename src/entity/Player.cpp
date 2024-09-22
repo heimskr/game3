@@ -16,8 +16,8 @@
 #include "packet/RealmNoticePacket.h"
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "realm/Realm.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -171,7 +171,7 @@ namespace Game3 {
 					active_realm = new_realm;
 					active_realm->onFocus();
 					client_game.setActiveRealm(std::move(active_realm));
-					focus(client_game.canvas, true);
+					focus(*client_game.getWindow(), true);
 					client_game.requestFromLimbo(new_realm->id);
 				}
 			} else {

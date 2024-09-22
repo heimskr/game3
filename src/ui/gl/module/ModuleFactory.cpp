@@ -1,6 +1,6 @@
 #include "game/ClientGame.h"
 #include "ui/gl/module/ModuleFactory.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	ModuleFactory::ModuleFactory(Identifier identifier, decltype(function) function):
@@ -14,6 +14,6 @@ namespace Game3 {
 	}
 
 	UIContext & ModuleFactory::getUIContext(ClientGame &game) {
-		return game.canvas.uiContext;
+		return game.getWindow()->uiContext;
 	}
 }

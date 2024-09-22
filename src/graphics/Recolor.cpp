@@ -1,12 +1,13 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.ull_source/sprite_renderer.cpp
 
+#include "game/ClientGame.h"
 #include "graphics/Shader.h"
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
-#include "game/ClientGame.h"
 #include "graphics/GL.h"
 #include "graphics/Recolor.h"
-#include "ui/Canvas.h"
+#include "graphics/RenderOptions.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -18,23 +19,22 @@ namespace Game3 {
 		const std::string & spriteVert()  { static auto out = readFile("resources/sprite.vert");  return out; }
 	}
 
-	Recolor::Recolor(Canvas &canvas_): canvas(&canvas_), shader("Recolor") {
-		shader.init(spriteVert(), recolorFrag());
-		initRenderData();
-	}
+	Recolor::Recolor(Window &window):
+		window(&window),
+		shader("Recolor") {
+			shader.init(spriteVert(), recolorFrag());
+			initRenderData();
+		}
 
-	Recolor::Recolor(Recolor &&other) noexcept: Recolor(*other.canvas) {
-		other.canvas = nullptr;
-		shader = std::move(other.shader);
-		quadVAO = other.quadVAO;
-		initialized = other.initialized;
-		backbufferWidth = other.backbufferWidth;
-		backbufferHeight = other.backbufferHeight;
-		other.quadVAO = 0;
-		other.initialized = false;
-		other.backbufferWidth = -1;
-		other.backbufferHeight = -1;
-	}
+	Recolor::Recolor(Recolor &&other) noexcept:
+		Recolor(*other.window) {
+			other.window = nullptr;
+			shader = std::move(other.shader);
+			quadVAO = std::exchange(other.quadVAO, 0);
+			initialized = std::exchange(other.initialized, false);
+			backbufferWidth = std::exchange(other.backbufferWidth, -1);
+			backbufferHeight = std::exchange(other.backbufferHeight, -1);
+		}
 
 	Recolor::~Recolor() {
 		remove();
@@ -49,25 +49,20 @@ namespace Game3 {
 	}
 
 	Recolor & Recolor::operator=(Recolor &&other) noexcept {
-		canvas = other.canvas;
-		other.canvas = nullptr;
+		window = std::exchange(other.window, nullptr);
 		shader.reset();
 		shader = std::move(other.shader);
-		quadVAO = other.quadVAO;
-		initialized = other.initialized;
-		backbufferWidth = other.backbufferWidth;
-		backbufferHeight = other.backbufferHeight;
-		other.quadVAO = 0;
-		other.initialized = false;
-		other.backbufferWidth = -1;
-		other.backbufferHeight = -1;
+		quadVAO = std::exchange(other.quadVAO, 0);
+		initialized = std::exchange(other.initialized, false);
+		backbufferWidth = std::exchange(other.backbufferWidth, -1);
+		backbufferHeight = std::exchange(other.backbufferHeight, -1);
 		return *this;
 	}
 
-	void Recolor::update(const Canvas &canvas) {
-		centerX = canvas.center.first;
-		centerY = canvas.center.second;
-		update(canvas.getWidth(), canvas.getHeight());
+	void Recolor::update(const Window &window) {
+		centerX = window.center.first;
+		centerY = window.center.second;
+		update(window.getWidth(), window.getHeight());
 	}
 
 	void Recolor::update(int width, int height) {
@@ -93,36 +88,36 @@ namespace Game3 {
 		if (size_y < 0)
 			size_y = texture->height;
 
-		assert(canvas != nullptr);
-		const auto [center_x, center_y] = canvas->center;
-		RealmPtr realm = canvas->game->getActiveRealm();
+		assert(window != nullptr);
+		const auto [center_x, center_y] = window->center;
+		RealmPtr realm = window->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		TilesetPtr tileset     = provider.getTileset(*window->game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * canvas->scale / 2.;
-		y *= tile_size * canvas->scale / 2.;
+		x *= tile_size * window->scale / 2.;
+		y *= tile_size * window->scale / 2.;
 
 		x += backbufferWidth / 2.;
-		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		x += center_x * canvas->scale * tile_size / 2.;
+		x -= map_length * tile_size * window->scale / window->magic * 2.; // TODO: the math here is a little sus... things might cancel out
+		x += center_x * window->scale * tile_size / 2.;
 
 		y += backbufferHeight / 2.;
-		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
-		y += center_y * canvas->scale * tile_size / 2.;
+		y -= map_length * tile_size * window->scale / window->magic * 2.;
+		y += center_y * window->scale * tile_size / 2.;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - options.offsetX * canvas->scale * options.scaleX, y - options.offsetY * canvas->scale * options.scaleY, 0.));
+		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * options.scaleX, y - options.offsetY * window->scale * options.scaleY, 0.));
 		if (options.angle != 0) {
 			model = glm::translate(model, glm::vec3(.5 * texture->width, .5 * texture->height, 0.)); // move origin of rotation to center of quad
 			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
 			model = glm::translate(model, glm::vec3(-.5 * texture->width, -.5 * texture->height, 0.)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * canvas->scale / 2., texture->height * options.scaleY * canvas->scale / 2., 2.)); // last scale
+		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * window->scale / 2., texture->height * options.scaleY * window->scale / 2., 2.)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", options.color);

@@ -27,9 +27,8 @@
 #include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	class ClientGame;
-	class MainWindow;
 	class Menu;
 	class Plantable;
 	class Player;
@@ -122,7 +121,7 @@ namespace Game3 {
 
 			inline void clearFluidCache() { fluidCache.clear(); }
 
-			using GameArgument = std::variant<Canvas *, std::pair<std::shared_ptr<Server>, size_t>>;
+			using GameArgument = std::variant<std::shared_ptr<Window>, std::pair<std::shared_ptr<Server>, size_t>>;
 
 			static std::shared_ptr<Game> create(Side, const GameArgument &);
 			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, const GameArgument &);

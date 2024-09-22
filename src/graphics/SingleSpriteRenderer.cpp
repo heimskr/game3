@@ -6,7 +6,7 @@
 #include "game/ClientGame.h"
 #include "graphics/GL.h"
 #include "graphics/SingleSpriteRenderer.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -18,22 +18,18 @@ namespace Game3 {
 		const std::string & spriteVert() { static auto out = readFile("resources/sprite.vert"); return out; }
 	}
 
-	SingleSpriteRenderer::SingleSpriteRenderer(Canvas &canvas_): SpriteRenderer(canvas_), shader("SingleSpriteRenderer") {
+	SingleSpriteRenderer::SingleSpriteRenderer(Window &window): SpriteRenderer(window), shader("SingleSpriteRenderer") {
 		shader.init(spriteVert(), spriteFrag());
 		initRenderData();
 	}
 
-	SingleSpriteRenderer::SingleSpriteRenderer(SingleSpriteRenderer &&other) noexcept: SingleSpriteRenderer(*other.canvas) {
-		other.canvas = nullptr;
+	SingleSpriteRenderer::SingleSpriteRenderer(SingleSpriteRenderer &&other) noexcept: SingleSpriteRenderer(*other.window) {
+		other.window = nullptr;
 		shader = std::move(other.shader);
-		quadVAO = other.quadVAO;
-		initialized = other.initialized;
-		backbufferWidth = other.backbufferWidth;
-		backbufferHeight = other.backbufferHeight;
-		other.quadVAO = 0;
-		other.initialized = false;
-		other.backbufferWidth = -1;
-		other.backbufferHeight = -1;
+		quadVAO = std::exchange(other.quadVAO, 0);
+		initialized = std::exchange(other.initialized, false);
+		backbufferWidth = std::exchange(other.backbufferWidth, -1);
+		backbufferHeight = std::exchange(other.backbufferHeight, -1);
 	}
 
 	SingleSpriteRenderer::~SingleSpriteRenderer() {
@@ -49,25 +45,20 @@ namespace Game3 {
 	}
 
 	SingleSpriteRenderer & SingleSpriteRenderer::operator=(SingleSpriteRenderer &&other) noexcept {
-		canvas = other.canvas;
-		other.canvas = nullptr;
+		window = std::exchange(other.window, nullptr);
 		shader.reset();
 		shader = std::move(other.shader);
-		quadVAO = other.quadVAO;
-		initialized = other.initialized;
-		backbufferWidth = other.backbufferWidth;
-		backbufferHeight = other.backbufferHeight;
-		other.quadVAO = 0;
-		other.initialized = false;
-		other.backbufferWidth = -1;
-		other.backbufferHeight = -1;
+		quadVAO = std::exchange(other.quadVAO, 0);
+		initialized = std::exchange(other.initialized, false);
+		backbufferWidth = std::exchange(other.backbufferWidth, -1);
+		backbufferHeight = std::exchange(other.backbufferHeight, -1);
 		return *this;
 	}
 
-	void SingleSpriteRenderer::update(const Canvas &canvas) {
-		centerX = canvas.center.first;
-		centerY = canvas.center.second;
-		update(canvas.getWidth(), canvas.getHeight());
+	void SingleSpriteRenderer::update(const Window &window) {
+		centerX = window.center.first;
+		centerY = window.center.second;
+		update(window.getWidth(), window.getHeight());
 	}
 
 	void SingleSpriteRenderer::update(int width, int height) {
@@ -106,35 +97,35 @@ namespace Game3 {
 		if (size_y < 0)
 			size_y = texture->height;
 
-		assert(canvas != nullptr);
-		RealmPtr realm = canvas->game->getActiveRealm();
+		assert(window != nullptr);
+		RealmPtr realm = window->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		TilesetPtr tileset     = provider.getTileset(*window->game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * canvas->scale / 2.;
-		y *= tile_size * canvas->scale / 2.;
+		x *= tile_size * window->scale / 2.;
+		y *= tile_size * window->scale / 2.;
 
-		x += canvas->getWidth() / 2.;
-		x -= map_length * tile_size * canvas->scale / canvas->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		x += canvas->center.first * canvas->scale * tile_size / 2.;
+		x += window->getWidth() / 2.;
+		x -= map_length * tile_size * window->scale / window->magic * 2.; // TODO: the math here is a little sus... things might cancel out
+		x += window->center.first * window->scale * tile_size / 2.;
 
-		y += canvas->getHeight() / 2.;
-		y -= map_length * tile_size * canvas->scale / canvas->magic * 2.;
-		y += canvas->center.second * canvas->scale * tile_size / 2.;
+		y += window->getHeight() / 2.;
+		y -= map_length * tile_size * window->scale / window->magic * 2.;
+		y += window->center.second * window->scale * tile_size / 2.;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - options.offsetX * canvas->scale * options.scaleX, y - options.offsetY * canvas->scale * options.scaleY, 0.));
+		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * options.scaleX, y - options.offsetY * window->scale * options.scaleY, 0.));
 		if (options.angle != 0) {
 			model = glm::translate(model, glm::vec3(.5 * texture->width, .5 * texture->height, 0.)); // move origin of rotation to center of quad
 			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
 			model = glm::translate(model, glm::vec3(-.5 * texture->width, -.5 * texture->height, 0.)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * canvas->scale / 2., texture->height * options.scaleY * canvas->scale / 2., 2.)); // last scale
+		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * window->scale / 2., texture->height * options.scaleY * window->scale / 2., 2.)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", options.color);
@@ -169,15 +160,15 @@ namespace Game3 {
 		if (size_y < 0)
 			size_y = texture_height;
 
-		assert(canvas != nullptr);
-		RealmPtr realm = canvas->game->getActiveRealm();
+		assert(window != nullptr);
+		RealmPtr realm = window->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		TilesetPtr tileset     = provider.getTileset(*window->game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * canvas->scale / 2.;
-		y *= tile_size * canvas->scale / 2.;
+		x *= tile_size * window->scale / 2.;
+		y *= tile_size * window->scale / 2.;
 
 		const double x_scale = options.scaleX;
 		const double y_scale = options.scaleY;
@@ -185,30 +176,30 @@ namespace Game3 {
 		auto viewport_y = options.viewportY;
 
 		if (viewport_x < 0)
-			viewport_x *= -canvas->getWidth();
+			viewport_x *= -window->getWidth();
 
 		if (viewport_y < 0)
-			viewport_y *= -canvas->getHeight();
+			viewport_y *= -window->getHeight();
 
 		x += viewport_x / 2.;
-		x -= map_length * tile_size * canvas->scale / 4.; // TODO: the math here is a little sus... things might cancel out
-		x += canvas->center.first * canvas->scale * tile_size / 2.;
+		x -= map_length * tile_size * window->scale / 4.; // TODO: the math here is a little sus... things might cancel out
+		x += window->center.first * window->scale * tile_size / 2.;
 
 		y += viewport_y / 2.;
-		y -= map_length * tile_size * canvas->scale / 4.;
-		y += canvas->center.second * canvas->scale * tile_size / 2.;
+		y -= map_length * tile_size * window->scale / 4.;
+		y += window->center.second * window->scale * tile_size / 2.;
 
 		shader.bind();
 
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - options.offsetX * canvas->scale * x_scale, y - options.offsetY * canvas->scale * y_scale, 0.));
+		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * x_scale, y - options.offsetY * window->scale * y_scale, 0.));
 		if (options.angle != 0) {
 			model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.)); // move origin of rotation to center of quad
 			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
 			model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(texture_width * x_scale * canvas->scale / 2., texture_height * y_scale * canvas->scale / 2., 2.)); // last scale
+		model = glm::scale(model, glm::vec3(texture_width * x_scale * window->scale / 2., texture_height * y_scale * window->scale / 2., 2.)); // last scale
 
 		shader.set("model", model);
 		shader.set("spriteColor", options.color);

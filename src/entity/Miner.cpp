@@ -13,8 +13,8 @@
 #include "tileentity/Chest.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -56,16 +56,19 @@ namespace Game3 {
 	}
 
 	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
+		(void) player;
 		std::cout << "Miner: money = " << money << ", phase = " << static_cast<int>(phase) << ", stuck = " << stuck << '\n';
 
 		if (getSide() == Side::Client) {
-			MainWindow &window = getRealm()->getGame()->toClient().getWindow();
+			// auto &window = getRealm()->getGame()->toClient().getWindow();
 			// const auto &tab = window.inventoryTab;
 			// player->queueForMove([tab](const auto &, bool) {
 			// 	tab->removeModule();
 			// 	return true;
 			// });
-			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
+
+			// TODO
+			// window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
 		}
 
 		return true;

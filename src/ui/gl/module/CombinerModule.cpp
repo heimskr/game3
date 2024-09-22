@@ -7,7 +7,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
 #include "util/Cast.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	CombinerModule::CombinerModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
@@ -84,8 +84,9 @@ namespace Game3 {
 			if (source && source->getGID() == combiner->getGID()) {
 				ClientGamePtr game = getGame();
 				multiModule->handleMessage(source, name, data);
-				MainWindow &window = game->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				game->getWindow()->queue([](Window &window) {
+					window.removeModule();
+				});
 			}
 
 		} else if (name == "GetAgentGID") {

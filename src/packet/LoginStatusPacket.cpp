@@ -5,7 +5,7 @@
 #include "game/Inventory.h"
 #include "packet/LoginStatusPacket.h"
 #include "packet/PacketError.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	LoginStatusPacket::LoginStatusPacket(bool success_, GlobalID global_id, std::string_view username_, std::string_view display_name, std::shared_ptr<Player> player):
@@ -31,12 +31,12 @@ namespace Game3 {
 			throw AuthenticationError("Login failed");
 
 		SUCCESS(2, "Login succeeded");
-		MainWindow &window = game->getWindow();
+		auto window = game->getWindow();
 		{
-			auto lock = window.settings.uniqueLock();
-			window.settings.username = username;
+			auto lock = window->settings.uniqueLock();
+			window->settings.username = username;
 		}
-		window.saveSettings();
+		window->saveSettings();
 		auto player = Entity::create<ClientPlayer>();
 		game->setPlayer(player);
 		player->setGID(globalID);

@@ -10,13 +10,13 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/Dialog.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "ui/Modifiers.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	UIContext::UIContext(Canvas &canvas):
-		canvas(canvas),
+	UIContext::UIContext(Window &window):
+		window(window),
 		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE)),
 		tooltip(std::make_shared<Tooltip>(*this, UI_SCALE)) {
 			hotbar->init();
@@ -24,14 +24,14 @@ namespace Game3 {
 		}
 
 	void UIContext::render(float mouse_x, float mouse_y) {
-		RendererContext context = canvas.getRendererContext();
+		RendererContext context = window.getRendererContext();
 
-		const int factor = canvas.getFactor();
+		const int factor = window.getFactor();
 
 		if (dialogs.empty()) {
 			scissorStack = internalScissorStack;
 			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-			hotbar->render(context, (canvas.getWidth() * factor - width) / 2, canvas.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
+			hotbar->render(context, (window.getWidth() * factor - width) / 2, window.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 		} else {
 			for (const std::shared_ptr<Dialog> &dialog: dialogs) {
 				scissorStack = internalScissorStack;
@@ -50,8 +50,8 @@ namespace Game3 {
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
-			const int width = canvas.getWidth() * factor * factor;
-			const int height = canvas.getHeight() * factor * factor;
+			const int width = window.getWidth() * factor * factor;
+			const int height = window.getHeight() * factor * factor;
 			GL::Viewport(0, 0, width, height);
 			context.updateSize(width, height);
 			renderingDraggedWidget = true;
@@ -65,7 +65,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ClientGame> UIContext::getGame() const {
-		return canvas.game;
+		return window.game;
 	}
 
 	void UIContext::onResize(int x, int y) {
@@ -207,11 +207,11 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ClientPlayer> UIContext::getPlayer() const {
-		return canvas.game->getPlayer();
+		return window.game->getPlayer();
 	}
 
 	RendererContext UIContext::getRenderers() const {
-		return canvas.getRendererContext();
+		return window.getRendererContext();
 	}
 
 	void UIContext::focusWidget(const WidgetPtr &to_focus) {
@@ -260,8 +260,8 @@ namespace Game3 {
 	}
 
 	std::pair<double, double> UIContext::getAbsoluteMouseCoordinates() const {
-		const auto [x, y] = canvas.getMouseCoordinates();
-		const auto factor = canvas.getFactor();
+		const auto [x, y] = window.getMouseCoordinates();
+		const auto factor = window.getFactor();
 		return {x * factor, y * factor};
 	}
 

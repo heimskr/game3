@@ -3,7 +3,7 @@
 #include <vector>
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 
 	class HasBackbuffer {
 		public:
@@ -14,7 +14,7 @@ namespace Game3 {
 
 			virtual ~HasBackbuffer() = default;
 
-			virtual void update(const Canvas &);
+			virtual void update(const Window &);
 			virtual void update(int width, int height);
 
 			void pushBackbuffer();

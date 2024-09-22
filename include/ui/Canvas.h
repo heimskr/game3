@@ -1,70 +1,70 @@
 #pragma once
 
-#include <random>
+// #include <random>
 
-#include <gdkmm/rectangle.h>
-#include "lib/Eigen.h"
+// #include <gdkmm/rectangle.h>
+// #include "lib/Eigen.h"
 
-#include "types/Position.h"
-#include "graphics/Texture.h"
-#include "types/Types.h"
-#include "graphics/GL.h"
-#include "graphics/BatchSpriteRenderer.h"
-#include "graphics/CircleRenderer.h"
-#include "graphics/Multiplier.h"
-#include "graphics/Overlayer.h"
-#include "graphics/RectangleRenderer.h"
-#include "graphics/Recolor.h"
-#include "graphics/SingleSpriteRenderer.h"
-#include "graphics/TextRenderer.h"
-#include "ui/gl/UIContext.h"
+// #include "types/Position.h"
+// #include "graphics/Texture.h"
+// #include "types/Types.h"
+// #include "graphics/GL.h"
+// #include "graphics/BatchSpriteRenderer.h"
+// #include "graphics/CircleRenderer.h"
+// #include "graphics/Multiplier.h"
+// #include "graphics/Overlayer.h"
+// #include "graphics/RectangleRenderer.h"
+// #include "graphics/Recolor.h"
+// #include "graphics/SingleSpriteRenderer.h"
+// #include "graphics/TextRenderer.h"
+// #include "ui/gl/UIContext.h"
 
-namespace Game3 {
-	class ClientGame;
-	class MainWindow;
-	class Realm;
-	struct RendererContext;
+// namespace Game3 {
+// 	class ClientGame;
+// 	class Window;
+// 	class Realm;
+// 	struct RendererContext;
 
-	class Canvas {
-		public:
-			constexpr static double DEFAULT_SCALE = 8.;
+// 	class Canvas {
+// 		public:
+// 			constexpr static double DEFAULT_SCALE = 8.;
 
-			MainWindow &window;
-			std::shared_ptr<ClientGame> game;
-			std::pair<double, double> center{0., 0.};
-			double scale = DEFAULT_SCALE;
-			BatchSpriteRenderer  batchSpriteRenderer{*this};
-			SingleSpriteRenderer singleSpriteRenderer{*this};
-			TextRenderer textRenderer{*this};
-			RectangleRenderer rectangleRenderer{*this};
-			CircleRenderer circleRenderer{*this};
-			Recolor recolor{*this};
-			GL::Texture mainTexture;
-			GL::Texture staticLightingTexture;
-			GL::Texture dynamicLightingTexture;
-			GL::FBO fbo;
-			Multiplier multiplier;
-			Overlayer overlayer;
-			float magic = 8.f;
-			Gdk::Rectangle realmBounds;
-			const Realm *lastRealm = nullptr;
-			double sizeDivisor = 1.0;
-			UIContext uiContext{*this};
+// 			Window &window;
+// 			std::shared_ptr<ClientGame> game;
+// 			std::pair<double, double> center{0., 0.};
+// 			double scale = DEFAULT_SCALE;
+// 			BatchSpriteRenderer  batchSpriteRenderer{*this};
+// 			SingleSpriteRenderer singleSpriteRenderer{*this};
+// 			TextRenderer textRenderer{*this};
+// 			RectangleRenderer rectangleRenderer{*this};
+// 			CircleRenderer circleRenderer{*this};
+// 			Recolor recolor{*this};
+// 			GL::Texture mainTexture;
+// 			GL::Texture staticLightingTexture;
+// 			GL::Texture dynamicLightingTexture;
+// 			GL::FBO fbo;
+// 			Multiplier multiplier;
+// 			Overlayer overlayer;
+// 			float magic = 8.f;
+// 			Gdk::Rectangle realmBounds;
+// 			const Realm *lastRealm = nullptr;
+// 			double sizeDivisor = 1.0;
+// 			UIContext uiContext{*this};
 
-			Canvas(MainWindow &);
+// 			Canvas(Window &);
 
-			void drawGL();
-			int getWidth() const;
-			int getHeight() const;
-			int getFactor() const;
-			void onResize();
-			std::pair<double, double> getMouseCoordinates() const;
+// 			void drawGL();
+// 			int getWidth() const;
+// 			int getHeight() const;
+// 			int getFactor() const;
+// 			void onResize();
+// 			std::pair<double, double> getMouseCoordinates() const;
 
-			bool inBounds(const Position &) const;
+// 			bool inBounds(const Position &) const;
 
-			RendererContext getRendererContext();
+// 			RendererContext getRendererContext();
 
-		private:
-			GL::Texture scratchTexture;
-	};
-}
+// 		private:
+// 			GL::Texture scratchTexture;
+// 	};
+// }

@@ -11,7 +11,7 @@
 #include "game/ClientGame.h"
 #include "graphics/TextRenderer.h"
 #include "realm/Realm.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 
 namespace Game3 {
@@ -24,9 +24,12 @@ namespace Game3 {
 		const std::string & textVert() { static auto out = readFile("resources/text.vert"); return out; }
 	}
 
-	TextRenderer::TextRenderer(Canvas &canvas_, uint32_t font_scale): canvas(&canvas_), shader("TextRenderer"), fontScale(font_scale) {
-		shader.init(textVert(), textFrag());
-	}
+	TextRenderer::TextRenderer(Window &window, uint32_t font_scale):
+		window(&window),
+		shader("TextRenderer"),
+		fontScale(font_scale) {
+			shader.init(textVert(), textFrag());
+		}
 
 	TextRenderer::~TextRenderer() {
 		remove();
@@ -102,10 +105,10 @@ namespace Game3 {
 		initialized = true;
 	}
 
-	void TextRenderer::update(const Canvas &canvas) {
-		centerX = canvas.center.first;
-		centerY = canvas.center.second;
-		update(canvas.getWidth(), canvas.getHeight());
+	void TextRenderer::update(const Window &window) {
+		centerX = window.center.first;
+		centerY = window.center.second;
+		update(window.getWidth(), window.getHeight());
 	}
 
 	void TextRenderer::update(int width, int height) {
@@ -149,9 +152,9 @@ namespace Game3 {
 			std::swap(options.y, y);
 		}
 
-		RealmPtr realm = canvas->game->getActiveRealm();
+		RealmPtr realm = window->game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas->game);
+		TilesetPtr tileset     = provider.getTileset(*window->game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
@@ -160,14 +163,14 @@ namespace Game3 {
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
 
-		scale_x *= canvas->scale * 6 / fontScale;
-		scale_y *= canvas->scale * 6 / fontScale;
+		scale_x *= window->scale * 6 / fontScale;
+		scale_y *= window->scale * 6 / fontScale;
 
 		x *= 8;
 		y *= -8;
 
-		x += backbufferWidth / 2 / canvas->scale;
-		y += backbufferHeight / 2 / canvas->scale;
+		x += backbufferWidth / 2 / window->scale;
+		y += backbufferHeight / 2 / window->scale;
 
 		x -= map_length * tile_size / 4;
 		y += map_length * tile_size / 4;
@@ -175,8 +178,8 @@ namespace Game3 {
 		x += centerX * 8;
 		y -= centerY * 8;
 
-		x *= canvas->scale;
-		y *= canvas->scale;
+		x *= window->scale;
+		y *= window->scale;
 
 		if (options.align == TextAlign::Center)
 			x -= textWidth(text, scale_x) / 2;

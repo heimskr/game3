@@ -7,8 +7,8 @@
 #include "packet/DisplayTextPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):

@@ -11,6 +11,8 @@
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
 #include "ui/App.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"
 #include "util/FS.h"
@@ -21,12 +23,15 @@
 #define JC_VORONOI_IMPLEMENTATION
 #include "jc_voronoi.h"
 
+#include <GLFW/glfw3.h>
+
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <random>
 #include <vector>
 
+#define USE_GLFW
 
 namespace Game3 {
 	void test();
@@ -42,9 +47,11 @@ namespace Game3 {
 }
 
 int main(int argc, char **argv) {
+	using namespace Game3;
+
 #ifdef GAME3_ENABLE_SCRIPTING
-	Game3::ScriptEngine::init(argv[0]);
-	Game3::Defer v8_deinit(Game3::ScriptEngine::deinit);
+	ScriptEngine::init(argv[0]);
+	Defer v8_deinit(ScriptEngine::deinit);
 #endif
 
 #ifdef IS_FLATPAK
@@ -63,11 +70,11 @@ int main(int argc, char **argv) {
 
 	std::filesystem::current_path(".var/app/gay.heimskr.Game3/data");
 	if (!std::filesystem::exists("resources"))
-		std::filesystem::create_symlink(Game3::dataRoot / "resources", "resources");
+		std::filesystem::create_symlink(dataRoot / "resources", "resources");
 #endif
 
 	if (2 <= argc) {
-		if (Game3::chemskrTest(argc, argv))
+		if (chemskrTest(argc, argv))
 			return 0;
 
 		const std::string_view arg1{argv[1]};
@@ -78,8 +85,8 @@ int main(int argc, char **argv) {
 				return 1;
 			}
 
-			const std::string secret = Game3::readFile(".secret");
-			std::cout << Game3::computeSHA3_512<Game3::Token>(secret + '/' + argv[2]) << '\n';
+			const std::string secret = readFile(".secret");
+			std::cout << computeSHA3_512<Token>(secret + '/' + argv[2]) << '\n';
 			return 0;
 		}
 
@@ -93,42 +100,42 @@ int main(int argc, char **argv) {
 		}
 
 		if (arg1 == "-s") {
-			const auto out = Game3::Server::main(argc, argv);
-			Game3::Timer::summary();
+			const auto out = Server::main(argc, argv);
+			Timer::summary();
 			return out;
 		}
 
 		if (arg1 == "-t") {
-			Game3::test();
+			test();
 			return 0;
 		}
 
 		if (arg1 == "--skew" && argc == 5) {
-			const double location = Game3::parseNumber<double>(argv[2]);
-			const double scale = Game3::parseNumber<double>(argv[3]);
-			const double shape = Game3::parseNumber<double>(argv[4]);
-			Game3::skewTest(location, scale, shape);
+			const double location = parseNumber<double>(argv[2]);
+			const double scale = parseNumber<double>(argv[3]);
+			const double shape = parseNumber<double>(argv[4]);
+			skewTest(location, scale, shape);
 			return 0;
 		}
 
 		if (arg1 == "--damage" && argc == 7) {
-			const auto weapon_damage = Game3::parseNumber<Game3::HitPoints>(argv[2]);
-			const auto defense = Game3::parseNumber<int>(argv[3]);
-			const auto variability = Game3::parseNumber<int>(argv[4]);
-			const auto attacker_luck = Game3::parseNumber<double>(argv[5]);
-			const auto defender_luck = Game3::parseNumber<double>(argv[6]);
-			Game3::damageTest(weapon_damage, defense, variability, attacker_luck, defender_luck);
+			const auto weapon_damage = parseNumber<HitPoints>(argv[2]);
+			const auto defense = parseNumber<int>(argv[3]);
+			const auto variability = parseNumber<int>(argv[4]);
+			const auto attacker_luck = parseNumber<double>(argv[5]);
+			const auto defender_luck = parseNumber<double>(argv[6]);
+			damageTest(weapon_damage, defense, variability, attacker_luck, defender_luck);
 			return 0;
 		}
 
 		if (arg1 == "--split") {
-			Game3::splitter();
+			splitter();
 			return 0;
 		}
 
 		if (arg1 == "--tile-stitch") {
 			if (argc == 3) {
-				const auto count = Game3::parseNumber<size_t>(argv[2]);
+				const auto count = parseNumber<size_t>(argv[2]);
 				size_t dimension = 16;
 				if (16 < count)
 					dimension = 4 * size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(count))))));
@@ -137,14 +144,14 @@ int main(int argc, char **argv) {
 			}
 
 			std::string png;
-			Game3::tileStitcher("resources/tileset", "base:tileset/monomap", Game3::Side::Server, &png);
+			tileStitcher("resources/tileset", "base:tileset/monomap", Side::Server, &png);
 			std::cout << png;
 			return 0;
 		}
 
 		if (arg1 == "--item-stitch") {
 			std::string png;
-			Game3::itemStitcher(nullptr, nullptr, "resources/items", "base:itemset/items", &png);
+			itemStitcher(nullptr, nullptr, "resources/items", "base:itemset/items", &png);
 			std::cout << png;
 			return 0;
 		}
@@ -153,11 +160,11 @@ int main(int argc, char **argv) {
 			std::vector<std::string> args;
 			for (int i = 2; i < argc; ++i)
 				args.emplace_back(argv[i]);
-			return Game3::migrate(args);
+			return migrate(args);
 		}
 
 		if (arg1 == "--maze") {
-			for (const auto &row: Game3::Mazer({32, 32}, 666, {2, 0}).getRows(false)) {
+			for (const auto &row: Mazer({32, 32}, 666, {2, 0}).getRows(false)) {
 				for (const auto column: row)
 					std::cout << (column? "\u2588" : " ");
 				std::cout << std::endl;
@@ -167,12 +174,12 @@ int main(int argc, char **argv) {
 		}
 
 		if (arg1 == "--omni-opt-out") {
-			Game3::omniOptOut();
+			omniOptOut();
 			return 0;
 		}
 
 		if (arg1 == "--filter-test") {
-			Game3::filterTest();
+			filterTest();
 			return 0;
 		}
 
@@ -188,12 +195,12 @@ int main(int argc, char **argv) {
 			}
 
 			{
-				auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"}, std::chrono::seconds(1), SIGINT);
+				auto [out, err] = runCommand("./game3", {"--shell-test", "print"}, std::chrono::seconds(1), SIGINT);
 				std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
 			}
 
 			{
-				auto [out, err] = Game3::runCommand("./game3", {"--shell-test", "print"});
+				auto [out, err] = runCommand("./game3", {"--shell-test", "print"});
 				std::cout << std::format("stdout[{}], stderr[{}]\n", out, err);
 			}
 
@@ -201,58 +208,83 @@ int main(int argc, char **argv) {
 		}
 
 		if (arg1 == "--wrapper-test") {
-			Game3::ServerWrapper wrapper;
+			ServerWrapper wrapper;
 			wrapper.run();
 			return 0;
 		}
 
 		if (arg1 == "--voronoi-test") {
-			Game3::voronoiTest();
+			voronoiTest();
 			return 0;
 		}
 
 		if (arg1 == "--script-test") {
-			Game3::scriptEngineTest();
+			scriptEngineTest();
 			return 0;
 		}
 
 		if (arg1 == "--buffer-test-2") {
-			Game3::testBuffer2();
+			testBuffer2();
 			return 0;
 		}
 
 		if (arg1 == "--ore-tile" && argc == 5) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "orebase.png", Game3::dataRoot / "resources" / "oremask.png", argv[2], argv[3], argv[4]);
+			std::cout << generateFlask(dataRoot / "resources" / "orebase.png", dataRoot / "resources" / "oremask.png", argv[2], argv[3], argv[4]);
 			return 0;
 		}
 
 		if (arg1 == "--ore-item" && argc == 5) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "oreitembase.png", Game3::dataRoot / "resources" / "oreitemmask.png", argv[2], argv[3], argv[4]);
+			std::cout << generateFlask(dataRoot / "resources" / "oreitembase.png", dataRoot / "resources" / "oreitemmask.png", argv[2], argv[3], argv[4]);
 			return 0;
 		}
 
 		if (arg1 == "--erlen" && argc == 5) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "erlenmeyerbase.png", Game3::dataRoot / "resources" / "erlenmeyermask.png", argv[2], argv[3], argv[4]);
+			std::cout << generateFlask(dataRoot / "resources" / "erlenmeyerbase.png", dataRoot / "resources" / "erlenmeyermask.png", argv[2], argv[3], argv[4]);
 			return 0;
 		}
 
 		if (arg1 == "--testtube" && argc == 5) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "testtubebase.png", Game3::dataRoot / "resources" / "testtubemask.png", argv[2], argv[3], argv[4]);
+			std::cout << generateFlask(dataRoot / "resources" / "testtubebase.png", dataRoot / "resources" / "testtubemask.png", argv[2], argv[3], argv[4]);
 			return 0;
 		}
 
 		if (arg1 == "--flask" && argc == 5) {
-			std::cout << Game3::generateFlask(Game3::dataRoot / "resources" / "flaskbase.png", Game3::dataRoot / "resources" / "flaskmask.png", argv[2], argv[3], argv[4]);
+			std::cout << generateFlask(dataRoot / "resources" / "flaskbase.png", dataRoot / "resources" / "flaskmask.png", argv[2], argv[3], argv[4]);
 			return 0;
 		}
 	}
 
-	Game3::richPresence.init();
-	Game3::richPresence.initActivity();
+	richPresence.init();
+	richPresence.initActivity();
 
-	auto app = Game3::App::create();
+#ifdef USE_GLFW
+	if (!glfwInit())
+		return 1;
+
+	GLFWwindow *glfw_window = glfwCreateWindow(1280, 960, "Game3", nullptr, nullptr);
+	if (!glfw_window) {
+		glfwTerminate();
+		return 2;
+	}
+
+	Window window(*glfw_window);
+
+	glfwMakeContextCurrent(glfw_window);
+
+	while (!glfwWindowShouldClose(glfw_window)) {
+		glClear(GL_COLOR_BUFFER_BIT);
+		glfwSwapBuffers(glfw_window);
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
+	const int out = 0;
+#else
+	auto app = App::create();
 	const int out = app->run(argc, argv);
-	Game3::Timer::summary();
-	Game3::richPresence.reset();
+#endif
+
+	Timer::summary();
+	richPresence.reset();
 	return out;
 }

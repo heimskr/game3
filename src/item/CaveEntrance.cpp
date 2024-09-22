@@ -12,8 +12,8 @@
 #include "threading/ThreadContext.h"
 #include "tileentity/Building.h"
 #include "types/Position.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "worldgen/CaveGen.h"
 
 namespace {

@@ -9,7 +9,7 @@
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/Defer.h"
 
 namespace {

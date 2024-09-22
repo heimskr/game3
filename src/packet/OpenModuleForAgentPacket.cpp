@@ -3,7 +3,7 @@
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "packet/OpenModuleForAgentPacket.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	void OpenModuleForAgentPacket::handle(const ClientGamePtr &game) {
@@ -13,11 +13,11 @@ namespace Game3 {
 			return;
 		}
 
-		MainWindow &window = game->getWindow();
+		auto window = game->getWindow();
 
 		if (removeOnMove) {
-			game->getPlayer()->queueForMove([&window](const auto &, bool) {
-				window.queue([&window] {
+			game->getPlayer()->queueForMove([window](const auto &, bool) {
+				window->queue([](Window &window) {
 					window.removeModule();
 					window.closeOmniDialog();
 				});
@@ -25,7 +25,7 @@ namespace Game3 {
 			});
 		}
 
-		window.queue([&window, agent, module_id = moduleID] {
+		window->queue([agent, module_id = moduleID](Window &window) {
 			window.openModule(module_id, std::any(agent));
 		});
 	}

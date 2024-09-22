@@ -11,7 +11,7 @@
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/UIContext.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "util/Cast.h"
 
 #include <any>
@@ -83,8 +83,9 @@ namespace Game3 {
 
 					if (source && source->getGID() == tileEntity->getGID()) {
 						multiModule->handleMessage(source, name, data);
-						MainWindow &window = getGame()->getWindow();
-						window.queue([&window] { window.removeModule(); });
+						getGame()->getWindow()->queue([](Window &window) {
+							window.removeModule();
+						});
 					}
 
 				} else if (name == "GetAgentGID") {

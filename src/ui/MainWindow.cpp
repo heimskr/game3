@@ -27,10 +27,10 @@
 #include "ui/gtk/LoginDialog.h"
 #include "ui/gtk/Util.h"
 #include "ui/App.h"
-#include "ui/Canvas.h"
-#include "ui/LogOverlay.h"
+#include "ui/Window.h"
 #include "ui/MainWindow.h"
 #include "ui/Modifiers.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -87,11 +87,6 @@ namespace Game3 {
 	Gtk::ApplicationWindow(cobject), builder(builder_) {
 		header = builder->get_widget<Gtk::HeaderBar>("headerbar");
 		set_titlebar(*header);
-
-		toggleLogButton.set_icon_name("utilities-terminal-symbolic");
-		toggleLogButton.signal_clicked().connect([this] { toggleLog(); });
-		header->pack_start(toggleLogButton);
-
 		set_icon_name("game3");
 		set_title("Game3");
 
@@ -122,8 +117,6 @@ namespace Game3 {
 
 		add_action("play_locally", Gio::ActionMap::ActivateSlot(sigc::mem_fun(*this, &MainWindow::playLocally)));
 
-		add_action("toggle_log", [this] { toggleLog(); });
-
 		debugAction = add_action_bool("debug", [this] {
 			if (game) {
 				game->debugMode = !game->debugMode;
@@ -138,7 +131,7 @@ namespace Game3 {
 			glArea.make_current();
 			INFO(3, "Using ES: {}", glArea.get_context()->get_use_es());
 			glArea.throw_if_error();
-			canvas = std::make_unique<Canvas>(*this);
+			canvas = std::make_unique<Canvas>();
 		});
 		glArea.signal_unrealize().connect([this] {
 			glArea.make_current();
@@ -151,8 +144,9 @@ namespace Game3 {
 
 			if (game) {
 				PlayerPtr player = game->getPlayer();
-				if (autofocus && player)
-					player->focus(*canvas, true);
+				if (autofocus && player) {
+					// player->focus(*canvas, true);
+				}
 				timeLabel.set_text(std::format("{}:{:02}", int(game->getHour()), int(game->getMinute())));
 			}
 
@@ -192,8 +186,8 @@ namespace Game3 {
 			lastDragX = x;
 			lastDragY = y;
 			if (canvas) {
-				canvas->center.first  += delta_x / (canvas->magic * canvas->scale / canvas->getFactor());
-				canvas->center.second += delta_y / (canvas->magic * canvas->scale / canvas->getFactor());
+				// canvas->center.first  += delta_x / (canvas->magic * canvas->scale / canvas->getFactor());
+				// canvas->center.second += delta_y / (canvas->magic * canvas->scale / canvas->getFactor());
 			}
 		});
 		glArea.add_controller(drag);
@@ -277,28 +271,28 @@ namespace Game3 {
 			if (!canvas)
 				return true;
 
-			const auto factor = canvas->getFactor();
+			// const auto factor = canvas->getFactor();
 
-			if (canvas->uiContext.scroll(x, y, glAreaMouseX * factor, glAreaMouseY * factor))
-				return true;
+			// if (canvas->uiContext.scroll(x, y, glAreaMouseX * factor, glAreaMouseY * factor))
+			// 	return true;
 
-			const auto old_scale = canvas->scale;
+			// const auto old_scale = canvas->scale;
 
-			if (y == -1)
-				canvas->scale *= 1.08;
-			else if (y == 1)
-				canvas->scale /= 1.08;
+			// if (y == -1)
+			// 	canvas->scale *= 1.08;
+			// else if (y == 1)
+			// 	canvas->scale /= 1.08;
 
-			const float w(glArea.get_width());
-			const float h(glArea.get_height());
+			// const float w(glArea.get_width());
+			// const float h(glArea.get_height());
 
-			const auto difference_x = w / old_scale - w / canvas->scale;
-			const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;
-			canvas->center.first -= difference_x * side_ratio_x / 8.f * factor;
+			// const auto difference_x = w / old_scale - w / canvas->scale;
+			// const auto side_ratio_x = (glAreaMouseX - w / 2.f) / w;
+			// canvas->center.first -= difference_x * side_ratio_x / 8.f * factor;
 
-			const auto difference_y = h / old_scale - h / canvas->scale;
-			const auto side_ratio_y = (glAreaMouseY - h / 2.f) / h;
-			canvas->center.second -= difference_y * side_ratio_y / 8.f * factor;
+			// const auto difference_y = h / old_scale - h / canvas->scale;
+			// const auto side_ratio_y = (glAreaMouseY - h / 2.f) / h;
+			// canvas->center.second -= difference_y * side_ratio_y / 8.f * factor;
 
 			return true;
 		}, false);
@@ -329,11 +323,10 @@ namespace Game3 {
 
 		glArea.set_expand(true);
 		glArea.signal_resize().connect([&](int, int) {
-			canvas->onResize();
+			// canvas->onResize();
 		});
 
 		stack.add(vbox);
-		stack.add(logOverlay);
 
 		set_child(stack);
 
@@ -351,7 +344,7 @@ namespace Game3 {
 
 	bool MainWindow::connect(const Glib::ustring &hostname, uint16_t port) {
 		closeGame();
-		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
+		// game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, canvas.get()));
 		auto client = std::make_shared<LocalClient>();
 		game->setClient(client);
 		try {
@@ -392,11 +385,11 @@ namespace Game3 {
 		richPresence.setActivityStartTime(false);
 		richPresence.setActivityDetails("Playing", true);
 
-		canvas->uiContext.reset();
+		// canvas->uiContext.reset();
 
 		debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
-		canvas->game = game;
+		// canvas->game = game;
 		settings.apply(*game);
 
 		game->signalOtherInventoryUpdate().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
@@ -498,10 +491,12 @@ namespace Game3 {
 
 		CHECKGL
 
-		if (autofocus && game)
-			if (PlayerPtr player = game->getPlayer())
-				player->focus(*canvas, true);
-		canvas->drawGL();
+		if (autofocus && game) {
+			if (PlayerPtr player = game->getPlayer()) {
+				// player->focus(*canvas, true);
+			}
+		}
+		// canvas->drawGL();
 		return true;
 	}
 
@@ -593,11 +588,11 @@ namespace Game3 {
 
 			removeModule();
 			game->stopThread();
-			canvas->game = nullptr;
+			// canvas->game = nullptr;
 			game = nullptr;
 
 			omniDialog.reset();
-			canvas->uiContext.reset();
+			// canvas->uiContext.reset();
 		}
 	}
 
@@ -637,7 +632,7 @@ namespace Game3 {
 		auto controller = Gtk::EventControllerKey::create();
 		controller->signal_key_pressed().connect([this](guint keyval, guint, Gdk::ModifierType) {
 			if (keyval == GDK_KEY_Escape) {
-				game->getWindow().yieldFocus();
+				// game->getWindow()->yieldFocus();
 				return true;
 			}
 
@@ -658,7 +653,7 @@ namespace Game3 {
 
 	void MainWindow::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
 		assert(inventory);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(canvas->uiContext, inventory));
+		// getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(canvas->uiContext, inventory));
 	}
 
 	GlobalID MainWindow::getExternalGID() const {
@@ -686,8 +681,8 @@ namespace Game3 {
 			getOmniDialog();
 			omniDialog->inventoryTab->setModule((*factory)(game, argument));
 			omniDialog->activeTab = omniDialog->inventoryTab;
-			if (!canvas->uiContext.hasDialog<OmniDialog>())
-				canvas->uiContext.addDialog(omniDialog);
+			// if (!canvas->uiContext.hasDialog<OmniDialog>())
+				// canvas->uiContext.addDialog(omniDialog);
 			return;
 		}
 
@@ -709,25 +704,25 @@ namespace Game3 {
 
 	void MainWindow::showOmniDialog() {
 		assert(canvas);
-		UIContext &ui = canvas->uiContext;
-		if (!ui.hasDialog<OmniDialog>())
-			ui.addDialog(getOmniDialog());
+		// UIContext &ui = canvas->uiContext;
+		// if (!ui.hasDialog<OmniDialog>())
+		// 	ui.addDialog(getOmniDialog());
 	}
 
 	void MainWindow::closeOmniDialog() {
-		canvas->uiContext.removeDialogs<OmniDialog>();
+		// canvas->uiContext.removeDialogs<OmniDialog>();
 	}
 
 	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(canvas->uiContext, has_fluids));
+		// getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(canvas->uiContext, has_fluids));
 	}
 
 	bool MainWindow::onKeyPressed(guint keyval, guint keycode, Gdk::ModifierType modifiers) {
 		if (dynamic_cast<Gtk::Text *>(get_focus()))
 			return false;
 
-		if (canvas && canvas->uiContext.keyPressed(keyval, Modifiers(modifiers)))
-			return true;
+		// if (canvas && canvas->uiContext.keyPressed(keyval, Modifiers(modifiers)))
+		// 	return true;
 
 		if (!keyTimes.contains(keyval)) {
 			handleKey(keyval, keycode, modifiers);
@@ -846,15 +841,15 @@ namespace Game3 {
 						player->send(ContinuousInteractionPacket(player->continuousInteractionModifiers));
 					return;
 				case GDK_KEY_E:
-					if (canvas->uiContext.hasDialog<OmniDialog>())
-						canvas->uiContext.removeDialogs<OmniDialog>();
-					else
+					// if (canvas->uiContext.hasDialog<OmniDialog>())
+					// 	canvas->uiContext.removeDialogs<OmniDialog>();
+					// else
 						game->interactNextTo(Modifiers(modifiers) | Modifiers(true, false, false, false), Hand::Right);
 					return;
 				case GDK_KEY_e:
-					if (canvas->uiContext.hasDialog<OmniDialog>())
-						canvas->uiContext.removeDialogs<OmniDialog>();
-					else
+					// if (canvas->uiContext.hasDialog<OmniDialog>())
+					// 	canvas->uiContext.removeDialogs<OmniDialog>();
+					// else
 						game->interactNextTo(Modifiers(modifiers), Hand::Right);
 					return;
 				case GDK_KEY_Return:
@@ -881,7 +876,7 @@ namespace Game3 {
 					return;
 				case GDK_KEY_b: {
 					const auto rect = game->getVisibleRealmBounds();
-					INFO("({}y, {}x) x ({}h, {}w)", rect.get_y(), rect.get_x(), rect.get_height(), rect.get_width());
+					INFO("({}y, {}x) x ({}h, {}w)", rect.y, rect.x, rect.height, rect.width);
 					return;
 				}
 				case GDK_KEY_m: {
@@ -909,9 +904,9 @@ namespace Game3 {
 					return;
 				}
 				case GDK_KEY_Escape:
-					if (canvas->uiContext.removeDialogs<OmniDialog>() == 0) {
-						canvas->uiContext.addDialog(getOmniDialog());
-					}
+					// if (canvas->uiContext.removeDialogs<OmniDialog>() == 0) {
+					// 	canvas->uiContext.addDialog(getOmniDialog());
+					// }
 					return;
 				case GDK_KEY_u:
 					if (control) {
@@ -923,8 +918,8 @@ namespace Game3 {
 				case GDK_KEY_f:
 					if (control)
 						autofocus = !autofocus;
-					else
-						game->getPlayer()->focus(*canvas, false);
+					// else
+					// 	game->getPlayer()->focus(*canvas, false);
 					return;
 				case GDK_KEY_t:
 					if (Modifiers(modifiers).ctrl) {
@@ -956,7 +951,7 @@ namespace Game3 {
 					std::cout << std::format("Position: {}\n", player->getPosition());
 					std::cout << std::format("Chunk position: {}\n", player->getPosition().getChunk());
 					std::cout << std::format("Update counter: {}\n", player->getRealm()->tileProvider.getUpdateCounter(player->getPosition().getChunk()));
-					std::cout << std::format("Canvas scale: {}\n", canvas->scale);
+					// std::cout << std::format("Canvas scale: {}\n", canvas->scale);
 					std::cout << std::format("Outdoors: {}\n", player->getRealm()->outdoors);
 					return;
 				}
@@ -965,11 +960,11 @@ namespace Game3 {
 						active_realm->queueStaticLightingTexture();
 					break;
 				case GDK_KEY_minus:
-					canvas->scale /= 1.08f;
+					// canvas->scale /= 1.08f;
 					return;
 				case GDK_KEY_equal:
 				case GDK_KEY_plus:
-					canvas->scale *= 1.08f;
+					// canvas->scale *= 1.08f;
 					return;
 				case GDK_KEY_0: case GDK_KEY_1: case GDK_KEY_2: case GDK_KEY_3: case GDK_KEY_4:
 				case GDK_KEY_5: case GDK_KEY_6: case GDK_KEY_7: case GDK_KEY_8: case GDK_KEY_9:
@@ -997,19 +992,19 @@ namespace Game3 {
 		}
 
 		if (!autofocus) {
-			const float delta = canvas->scale / 20.f;
+			// const float delta = canvas->scale / 20.f;
 			switch (keyval) {
 				case GDK_KEY_Down:
-					canvas->center.second -= delta;
+					// canvas->center.second -= delta;
 					break;
 				case GDK_KEY_Up:
-					canvas->center.second += delta;
+					// canvas->center.second += delta;
 					break;
 				case GDK_KEY_Left:
-					canvas->center.first += delta;
+					// canvas->center.first += delta;
 					break;
 				case GDK_KEY_Right:
-					canvas->center.first -= delta;
+					// canvas->center.first -= delta;
 					break;
 				default:
 					break;
@@ -1060,10 +1055,6 @@ namespace Game3 {
 			game->suppressDisconnectionMessage = true;
 		}
 
-		serverWrapper.onLog = [this](std::string_view text) {
-			logOverlay.print(text);
-		};
-
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {
 			try {
@@ -1108,21 +1099,9 @@ namespace Game3 {
 		queueDialog(std::move(login_dialog));
 	}
 
-	bool MainWindow::toggleLog() {
-		if (stack.get_visible_child() == &vbox) {
-			stack.set_visible_child(logOverlay);
-			toggleLogButton.set_active(true);
-			return true;
-		}
-
-		stack.set_visible_child(vbox);
-		toggleLogButton.set_active(false);
-		return false;
-	}
-
 	const std::shared_ptr<OmniDialog> & MainWindow::getOmniDialog() {
-		if (!omniDialog)
-			omniDialog = std::make_shared<OmniDialog>(canvas->uiContext);
+		// if (!omniDialog)
+		// 	omniDialog = std::make_shared<OmniDialog>(canvas->uiContext);
 		return omniDialog;
 	}
 }

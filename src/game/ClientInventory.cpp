@@ -15,7 +15,7 @@
 #include "packet/SwapSlotsPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -105,7 +105,7 @@ namespace Game3 {
 
 			ClientGamePtr game = owner->getRealm()->getGame()->toClientPointer();
 
-			game->getWindow().queue([game, weak = weakOwner, index = index.load()] {
+			game->getWindow()->queue([game, weak = weakOwner, index = index.load()](Window &) {
 				if (AgentPtr owner = weak.lock()) {
 					if (auto player = std::dynamic_pointer_cast<Player>(owner))
 						game->signalPlayerInventoryUpdate().emit(player);

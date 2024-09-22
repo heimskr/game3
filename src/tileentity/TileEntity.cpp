@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -167,7 +167,7 @@ namespace Game3 {
 		if (getSide() == Side::Client) {
 			GamePtr game = realm->getGame();
 			ClientGame &client_game = game->toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
+			return client_game.getWindow()->inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}
@@ -178,7 +178,7 @@ namespace Game3 {
 		if (getSide() == Side::Client) {
 			GamePtr game = realm->getGame();
 			ClientGame &client_game = game->toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
+			return client_game.getWindow()->inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 		return realm->isVisible(pos);
 	}

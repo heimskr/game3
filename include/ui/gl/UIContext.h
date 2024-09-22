@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	class ClientGame;
 	class ClientPlayer;
 	class ContextMenu;
@@ -25,11 +25,11 @@ namespace Game3 {
 
 	class UIContext {
 		public:
-			Canvas &canvas;
+			Window &window;
 			ScissorStack scissorStack;
 			bool renderingDraggedWidget = false;
 
-			UIContext(Canvas &);
+			UIContext(Window &);
 
 			void render(float mouse_x, float mouse_y);
 			void addDialog(std::shared_ptr<Dialog>);

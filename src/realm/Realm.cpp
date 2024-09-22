@@ -20,8 +20,8 @@
 #include "realm/RealmFactory.h"
 #include "threading/ThreadContext.h"
 #include "tile/Tile.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -39,7 +39,7 @@ namespace Game3 {
 
 	Realm::Realm(const GamePtr &game): weakGame(game) {
 		if (game->getSide() == Side::Client) {
-			game->toClient().getWindow().queue([this] {
+			game->toClient().getWindow()->queue([this](Window &) { // TODO: use weak_ptr
 				createRenderers();
 				initRendererRealms();
 				initRendererTileProviders();
@@ -52,7 +52,7 @@ namespace Game3 {
 	Realm::Realm(const GamePtr &game, RealmID id_, RealmType type_, Identifier tileset_id, int64_t seed_):
 	id(id_), type(std::move(type_)), tileProvider(std::move(tileset_id)), seed(seed_), weakGame(game) {
 		if (game->getSide() == Side::Client) {
-			game->toClient().getWindow().queue([this] {
+			game->toClient().getWindow()->queue([this](Window &) { // TODO: use weak_ptr
 				createRenderers();
 				initRendererRealms();
 				initTexture();
@@ -1626,7 +1626,7 @@ namespace Game3 {
 	void Realm::queueReupload() {
 		assert(getSide() == Side::Client);
 		if (!reuploadPending.exchange(true)) {
-			getGame()->toClient().getWindow().queue([weak = std::weak_ptr(shared_from_this())] {
+			getGame()->toClient().getWindow()->queue([weak = std::weak_ptr(shared_from_this())](Window &) {
 				if (auto shared = weak.lock()) {
 					shared->reupload();
 					shared->reuploadPending = false;
@@ -1683,9 +1683,9 @@ namespace Game3 {
 			return;
 
 		Timer timer("RemakeStaticLightingTexture");
-		Canvas &canvas = game.canvas;
-		GL::Texture &texture = canvas.staticLightingTexture;
-		GL::FBOBinder binder = canvas.fbo.getBinder();
+		auto window = game.getWindow();
+		GL::Texture &texture = window->staticLightingTexture;
+		GL::FBOBinder binder = window->fbo.getBinder();
 		GL::TextureFBOBinder texture_binder = texture.getBinder();
 		GL::clear(0, 0, 0, 0);
 		const ChunkPosition chunk = player->getChunk();
@@ -1695,7 +1695,7 @@ namespace Game3 {
 
 		Tileset &tileset = getTileset();
 		RealmPtr shared = shared_from_this();
-		RendererContext context = canvas.getRendererContext();
+		RendererContext context = window->getRendererContext();
 		auto saver = context.getSaver();
 		context.updateSize(texture.getWidth(), texture.getHeight());
 		GL::Viewport viewport(0, 0, texture.getWidth(), texture.getHeight());
@@ -1771,14 +1771,15 @@ namespace Game3 {
 				add(entity);
 
 		if (show_menu) {
-			MainWindow &window = game.getWindow();
-			auto &menu = window.getGLMenu();
-			window.remove_action_group("agent_menu");
-			window.insert_action_group("agent_menu", group);
-			menu.set_menu_model(gmenu);
-			menu.set_has_arrow(true);
-			menu.set_pointing_to({static_cast<int>(x), static_cast<int>(y), 1, 1});
-			menu.popup();
+			// TODO!: reimplement right click menus
+			// auto &window = game.getWindow();
+			// auto &menu = window.getGLMenu();
+			// window.remove_action_group("agent_menu");
+			// window.insert_action_group("agent_menu", group);
+			// menu.set_menu_model(gmenu);
+			// menu.set_has_arrow(true);
+			// menu.set_pointing_to({static_cast<int>(x), static_cast<int>(y), 1, 1});
+			// menu.popup();
 			return true;
 		}
 

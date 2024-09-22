@@ -5,7 +5,7 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
 #include "registry/Registries.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 
 namespace {
 	constexpr double GRAVITY = 32;
@@ -59,7 +59,7 @@ namespace Game3 {
 
 		if (texture == nullptr || needsTexture) {
 			if (needsTexture) {
-				setTexture(sprite_renderer.canvas->game);
+				setTexture(sprite_renderer.window->game);
 				needsTexture = false;
 			} else {
 				return;

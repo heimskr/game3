@@ -10,7 +10,7 @@
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	ItemEntity::ItemEntity(const GamePtr &game):
@@ -85,7 +85,7 @@ namespace Game3 {
 
 		if (texture == nullptr || needsTexture) {
 			if (needsTexture) {
-				setTexture(sprite_renderer.canvas->game);
+				setTexture(sprite_renderer.window->game);
 				needsTexture = false;
 			} else {
 				return;

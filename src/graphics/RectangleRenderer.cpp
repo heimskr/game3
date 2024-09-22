@@ -11,7 +11,7 @@
 #include "graphics/RenderOptions.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -21,10 +21,12 @@ namespace Game3 {
 		const std::string & rectangleVert() { static auto out = readFile("resources/rectangle.vert"); return out; }
 	}
 
-	RectangleRenderer::RectangleRenderer(Canvas &canvas_): shader("RectangleRenderer"), canvas(canvas_) {
-		shader.init(rectangleVert(), rectangleFrag()); CHECKGL
-		initRenderData(); CHECKGL
-	}
+	RectangleRenderer::RectangleRenderer(Window &window):
+		shader("RectangleRenderer"),
+		window(window) {
+			shader.init(rectangleVert(), rectangleFrag()); CHECKGL
+			initRenderData(); CHECKGL
+		}
 
 	RectangleRenderer::~RectangleRenderer() {
 		reset();
@@ -57,23 +59,23 @@ namespace Game3 {
 		auto x = options.x;
 		auto y = options.y;
 
-		const auto [center_x, center_y] = canvas.center;
-		RealmPtr realm = canvas.game->getActiveRealm();
+		const auto [center_x, center_y] = window.center;
+		RealmPtr realm = window.game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas.game);
+		TilesetPtr tileset     = provider.getTileset(*window.game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * canvas.scale / 2.;
-		y *= tile_size * canvas.scale / 2.;
+		x *= tile_size * window.scale / 2.;
+		y *= tile_size * window.scale / 2.;
 
 		x += backbufferWidth / 2.;
-		x -= map_length * tile_size * canvas.scale / canvas.magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		x += center_x * canvas.scale * tile_size / 2.;
+		x -= map_length * tile_size * window.scale / window.magic * 2.; // TODO: the math here is a little sus... things might cancel out
+		x += center_x * window.scale * tile_size / 2.;
 
 		y += backbufferHeight / 2.;
-		y -= map_length * tile_size * canvas.scale / canvas.magic * 2.;
-		y += center_y * canvas.scale * tile_size / 2.;
+		y -= map_length * tile_size * window.scale / window.magic * 2.;
+		y += center_y * window.scale * tile_size / 2.;
 
 		shader.bind(); CHECKGL
 
@@ -85,7 +87,7 @@ namespace Game3 {
 			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0, 0, 1)); // then rotate
 			model = glm::translate(model, glm::vec3(-width / 2, -height / 2, 0)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.f)); // last scale
+		model = glm::scale(model, glm::vec3(width * window.scale / 2., height * window.scale / 2., 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
 		shader.set("rectColor", options.color); CHECKGL

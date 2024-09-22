@@ -10,7 +10,7 @@
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
 #include "ui/gl/widget/Label.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	MutatorModule::MutatorModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
@@ -101,8 +101,9 @@ namespace Game3 {
 		if (name == "TileEntityRemoved") {
 
 			if (source && source->getGID() == mutator->getGID()) {
-				MainWindow &window = getGame()->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				getGame()->getWindow()->queue([](Window &window) {
+					window.removeModule();
+				});
 			}
 
 		} else if (name == "GetAgentGID") {

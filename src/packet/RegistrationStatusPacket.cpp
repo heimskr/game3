@@ -4,12 +4,12 @@
 #include "net/LocalClient.h"
 #include "packet/RegistrationStatusPacket.h"
 #include "packet/PacketError.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	void RegistrationStatusPacket::handle(const ClientGamePtr &game) {
 		if (token == 0) {
-			game->getWindow().error("Registration failed.");
+			game->getWindow()->error("Registration failed.");
 			return;
 		}
 

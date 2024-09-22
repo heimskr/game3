@@ -6,7 +6,7 @@
 #include "graphics/Tileset.h"
 #include "graphics/UpperRenderer.h"
 #include "realm/Realm.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Timer.h"
 
@@ -149,7 +149,7 @@ namespace Game3 {
 		std::future<bool> future = promise->get_future();
 		ClientGamePtr client_game = realm->getGame()->toClientPointer();
 
-		client_game->getWindow().queue([this, promise, client_game]() {
+		client_game->getWindow()->queue([this, promise, client_game](Window &) {
 			client_game->activateContext();
 			promise->set_value(reupload());
 		});

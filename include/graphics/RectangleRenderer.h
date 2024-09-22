@@ -6,7 +6,7 @@
 #include "graphics/Shader.h"
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	struct Color;
 	struct Rectangle;
 	struct RenderOptions;
@@ -15,7 +15,7 @@ namespace Game3 {
 		public:
 			Shader shader;
 
-			RectangleRenderer(Canvas &);
+			RectangleRenderer(Window &);
 
 			~RectangleRenderer();
 
@@ -30,7 +30,7 @@ namespace Game3 {
 			void operator()(const Color &, const Rectangle &, float angle = 0.f);
 
 		private:
-			Canvas &canvas;
+			Window &window;
 			glm::mat4 projection;
 			GLuint quadVAO = 0;
 			bool initialized = false;

@@ -22,7 +22,7 @@
 #include "packet/HeldItemSetPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "algorithm/AStar.h"
 #include "util/Cast.h"
 #include "util/Util.h"
@@ -663,9 +663,9 @@ namespace Game3 {
 		return false;
 	}
 
-	void Entity::focus(Canvas &canvas, bool is_autofocus) {
+	void Entity::focus(Window &window, bool is_autofocus) {
 		if (EntityPtr ridden = getRidden()) {
-			ridden->focus(canvas, is_autofocus);
+			ridden->focus(window, is_autofocus);
 			return;
 		}
 
@@ -674,14 +674,14 @@ namespace Game3 {
 			return;
 
 		if (!is_autofocus)
-			canvas.scale = 8.;
+			window.scale = 8.;
 
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
 			auto lock = offset.sharedLock();
 			const auto [row, column] = getPosition();
-			canvas.center.first  = -(column - map_length / 2. + .5) - offset.x;
-			canvas.center.second = -(row    - map_length / 2. + .5) - offset.y;
+			window.center.first  = -(column - map_length / 2. + .5) - offset.x;
+			window.center.second = -(row    - map_length / 2. + .5) - offset.y;
 		}
 	}
 
@@ -870,7 +870,7 @@ namespace Game3 {
 
 		if (game->getSide() == Side::Client) {
 			ClientGame &client_game = game->toClient();
-			return client_game.canvas.inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
+			return client_game.getWindow()->inBounds(pos) && ChunkRange(client_game.getPlayer()->getChunk()).contains(pos.getChunk());
 		}
 
 		return realm->isVisible(pos);

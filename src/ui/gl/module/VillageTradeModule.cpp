@@ -334,6 +334,7 @@ namespace Game3 {
 	}
 
 	void VillageTradeRow::updateTooltips(ItemCount count) {
+		(void) count;
 		// if (std::optional<MoneyCount> buy_price = totalBuyPrice(static_cast<ItemCount>(amount), -1, basePrice, count)) {
 		// 	buyButton->setTooltip(std::format("Price: {}", *buy_price));
 		// } else {

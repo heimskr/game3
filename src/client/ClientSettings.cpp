@@ -1,14 +1,14 @@
 #include "Log.h"
 #include "client/ClientSettings.h"
 #include "game/ClientGame.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/Timer.h"
 
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
 	void ClientSettings::apply(ClientGame &game) const {
-		game.canvas.sizeDivisor = sizeDivisor;
+		game.getWindow()->sizeDivisor = sizeDivisor;
 		apply();
 	}
 

@@ -9,7 +9,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/UIContext.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -85,8 +85,9 @@ namespace Game3 {
 			if (source && source->getGID() == reactor->getGID()) {
 				inventoryModule->handleMessage(source, name, data);
 				energyModule->handleMessage(source, name, data);
-				MainWindow &window = getGame()->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				getGame()->getWindow()->queue([](Window &window) {
+					window.removeModule();
+				});
 			}
 
 		} else if (name == "GetAgentGID") {

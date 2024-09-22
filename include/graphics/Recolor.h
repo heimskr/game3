@@ -9,18 +9,18 @@
 #include <memory>
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	class Texture;
 	struct RenderOptions;
 
 	class Recolor: public HasBackbuffer {
 		public:
-			Canvas *canvas = nullptr;
+			Window *window = nullptr;
 			Shader shader;
 			double centerX = 0;
 			double centerY = 0;
 
-			Recolor(Canvas &);
+			Recolor(Window &);
 			Recolor(const Recolor &) = delete;
 			Recolor(Recolor &&) noexcept;
 
@@ -30,7 +30,7 @@ namespace Game3 {
 			Recolor & operator=(Recolor &&) noexcept;
 
 			void remove();
-			void update(const Canvas &);
+			void update(const Window &);
 			void update(int width, int height);
 
 			void drawOnMap(const std::shared_ptr<Texture> &, const std::shared_ptr<Texture> &mask, const RenderOptions &, float hue, float saturation, float value_multiplier);

@@ -13,6 +13,6 @@ namespace Game3 {
 
 		RealmPtr realm = game->getRealm(realmID);
 		player->teleport(position, realm);
-		player->focus(game->canvas, true);
+		player->focus(*game->getWindow(), true); // TODO: probably replace `true` with `false`
 	}
 }

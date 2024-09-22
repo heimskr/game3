@@ -14,8 +14,8 @@
 #include "tileentity/Chest.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -58,16 +58,18 @@ namespace Game3 {
 	}
 
 	bool Woodcutter::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
+		(void) player;
+
 		if (getSide() == Side::Client) {
 			GamePtr game = getGame();
-			MainWindow &window = game->toClient().getWindow();
+			auto window = game->toClient().getWindow();
 			// std::shared_ptr<GTKInventoryTab> tab = window.inventoryTab;
 			// std::cout << "Woodcutter: money = " << money << ", phase = " << int(phase) << ", stuck = " << stuck << '\n';
 			// player->queueForMove([tab](const auto &, bool) {
 			// 	tab->removeModule();
 			// 	return true;
 			// });
-			window.showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
+			window->showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
 		}
 		return true;
 	}

@@ -20,7 +20,7 @@
 #include <glibmm/ustring.h>
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 
 	enum class TextAlign {Left, Center, Right};
 
@@ -42,7 +42,7 @@ namespace Game3 {
 
 	class TextRenderer: public HasBackbuffer {
 		public:
-			Canvas *canvas = nullptr;
+			Window *window = nullptr;
 			Shader shader;
 			double centerX = 0;
 			double centerY = 0;
@@ -57,11 +57,11 @@ namespace Game3 {
 
 			std::unordered_map<gunichar, Character> characters;
 
-			TextRenderer(Canvas &, uint32_t font_scale = 96);
+			TextRenderer(Window &, uint32_t font_scale = 96);
 			~TextRenderer();
 
 			void remove();
-			void update(const Canvas &) override;
+			void update(const Window &) override;
 			void update(int width, int height) override;
 
 			void drawOnMap(const Glib::ustring &text, float x, float y, TextAlign align, float scale, float angle, float alpha);

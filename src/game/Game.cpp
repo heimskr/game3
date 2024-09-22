@@ -163,7 +163,7 @@ namespace Game3 {
 		GamePtr out;
 
 		if (side == Side::Client) {
-			out = GamePtr(new ClientGame(*std::get<Canvas *>(argument)));
+			out = GamePtr(new ClientGame(std::get<std::shared_ptr<Window>>(argument)));
 		} else {
 			const auto [server_ptr, pool_size] = std::get<std::pair<std::shared_ptr<Server>, size_t>>(argument);
 			ServerGamePtr server_game = std::make_shared<ServerGame>(server_ptr, pool_size);

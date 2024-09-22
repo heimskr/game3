@@ -4,12 +4,12 @@
 #include "game/ClientInventory.h"
 #include "packet/OpenVillageTradePacket.h"
 #include "types/DirectedPlace.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "ui/gl/module/VillageTradeModule.h"
 
 namespace Game3 {
 	void OpenVillageTradePacket::handle(const ClientGamePtr &game) {
-		MainWindow &window = game->getWindow();
+		auto window = game->getWindow();
 
 		VillagePtr village;
 
@@ -21,8 +21,8 @@ namespace Game3 {
 		}
 
 		if (removeOnMove) {
-			game->getPlayer()->queueForMove([&window](const auto &, bool) {
-				window.queue([&window] {
+			game->getPlayer()->queueForMove([window](const auto &, bool) {
+				window->queue([](Window &window) {
 					window.removeModule();
 					window.closeOmniDialog();
 				});
@@ -31,9 +31,9 @@ namespace Game3 {
 		}
 
 		// Force a fresh module construction instead of an update
-		window.removeModule();
+		window->removeModule();
 
-		window.queue([&window, village = std::move(village)] {
+		window->queue([village = std::move(village)](Window &window) {
 			window.openModule(VillageTradeModule::ID(), std::any(village));
 		});
 	}

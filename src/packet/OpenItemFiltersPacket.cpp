@@ -4,7 +4,7 @@
 #include "game/ClientInventory.h"
 #include "packet/OpenItemFiltersPacket.h"
 #include "types/DirectedPlace.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "ui/gl/module/ItemFiltersModule.h"
 
 namespace Game3 {
@@ -15,11 +15,11 @@ namespace Game3 {
 			return;
 		}
 
-		MainWindow &window = game->getWindow();
+		auto window = game->getWindow();
 
 		if (removeOnMove) {
 			game->getPlayer()->queueForMove([&window](const auto &, bool) {
-				window.queue([&window] {
+				window->queue([](Window &window) {
 					window.removeModule();
 					window.closeOmniDialog();
 				});
@@ -28,11 +28,11 @@ namespace Game3 {
 		}
 
 		// Force a fresh module construction instead of an update
-		window.removeModule();
+		window->removeModule();
 
 		DirectedPlace place{direction, Place(position, realm, {})};
 
-		window.queue([&window, place = std::move(place)] {
+		window->queue([place = std::move(place)](Window &window) {
 			window.openModule(ItemFiltersModule::ID(), std::any(place));
 		});
 	}

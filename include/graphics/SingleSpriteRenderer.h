@@ -9,14 +9,14 @@ namespace GL {
 }
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	class Texture;
 
 	class SingleSpriteRenderer: public SpriteRenderer {
 		public:
 			Shader shader;
 
-			SingleSpriteRenderer(Canvas &);
+			SingleSpriteRenderer(Window &);
 			SingleSpriteRenderer(const SingleSpriteRenderer &) = delete;
 			SingleSpriteRenderer(SingleSpriteRenderer &&) noexcept;
 
@@ -26,7 +26,7 @@ namespace Game3 {
 			SingleSpriteRenderer & operator=(SingleSpriteRenderer &&) noexcept;
 
 			void remove();
-			void update(const Canvas &) override;
+			void update(const Window &) override;
 			void update(int width, int height) override;
 
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale, double angle, double alpha) override;

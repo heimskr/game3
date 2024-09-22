@@ -15,8 +15,8 @@
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 #include <array>
@@ -235,6 +235,6 @@ namespace Game3 {
 	}
 
 	void SettingsTab::saveSettings() {
-		ui.canvas.window.saveSettings();
+		ui.window.saveSettings();
 	}
 }

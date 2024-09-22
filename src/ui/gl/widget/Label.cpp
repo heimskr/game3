@@ -1,4 +1,4 @@
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Texture.h"

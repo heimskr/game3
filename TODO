@@ -11,3 +11,4 @@
 [2024/01/27 00:35:48] Investigate buy/sell prices. Broken?
 [2024/08/23 11:33:22] "Garbage collection" for entitiesByChunk
 [2024/08/28 21:16:36] Add word wrapping to the text module.
+[2024/09/22 11:44:14] Switch renderers' `window` members from `Window *` to `Window &`.

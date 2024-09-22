@@ -6,7 +6,7 @@
 #include "game/ServerGame.h"
 #include "net/RemoteClient.h"
 #include "packet/SetActiveSlotPacket.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/OmniDialog.h"

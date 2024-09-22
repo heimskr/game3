@@ -12,7 +12,7 @@ namespace Game3 {
 		public:
 			Shader shader;
 
-			BatchSpriteRenderer(Canvas &);
+			BatchSpriteRenderer(Window &);
 
 			BatchSpriteRenderer(const BatchSpriteRenderer &) = delete;
 			BatchSpriteRenderer(BatchSpriteRenderer &&) = delete;
@@ -23,7 +23,7 @@ namespace Game3 {
 			BatchSpriteRenderer & operator=(BatchSpriteRenderer &&) = delete;
 
 			void remove();
-			void update(const Canvas &) override;
+			void update(const Window &) override;
 			void update(int width, int height) override;
 
 			void drawOnMap(const std::shared_ptr<Texture> &, double x, double y, double scale = 1.f, double angle = 0.f, double alpha = 1.f) override;

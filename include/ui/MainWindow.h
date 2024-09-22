@@ -5,7 +5,6 @@
 #include "threading/MTQueue.h"
 #include "threading/Lockable.h"
 #include "types/Types.h"
-#include "ui/LogOverlay.h"
 #include "ui/Modifiers.h"
 
 #include <atomic>
@@ -25,7 +24,7 @@
 
 namespace Game3 {
 	class Agent;
-	class Canvas;
+	class Canvas {};
 	class ClientGame;
 	class ClientInventory;
 	class GTKCraftingTab;
@@ -130,10 +129,10 @@ namespace Game3 {
 			Gtk::Label timeLabel;
 			Glib::RefPtr<Gio::SimpleAction> debugAction;
 			std::unique_ptr<Canvas> canvas;
-			double lastDragX = 0.;
-			double lastDragY = 0.;
-			double glAreaMouseX = 0.;
-			double glAreaMouseY = 0.;
+			double lastDragX = 0;
+			double lastDragY = 0;
+			double glAreaMouseX = 0;
+			double glAreaMouseY = 0;
 			Modifiers glAreaModifiers;
 			bool autofocus = true;
 			bool statusbarWaiting = false;
@@ -149,7 +148,6 @@ namespace Game3 {
 			std::atomic<double> lastFPS = 0;
 			std::deque<double> fpses;
 			ServerWrapper serverWrapper;
-			LogOverlay logOverlay;
 
 			struct KeyInfo {
 				guint code;
@@ -170,10 +168,10 @@ namespace Game3 {
 			bool prevRight = false;
 			bool prevRightPad = false;
 			bool prevAutofocus = true;
-			float rightPadStartX = 0.f;
-			float rightPadStartY = 0.f;
-			float rightPadStartCanvasX = 0.f;
-			float rightPadStartCanvasY = 0.f;
+			float rightPadStartX = 0;
+			float rightPadStartY = 0;
+			float rightPadStartCanvasX = 0;
+			float rightPadStartCanvasY = 0;
 
 			bool connect(const Glib::ustring &hostname, uint16_t port);
 			bool render(const Glib::RefPtr<Gdk::GLContext> &);
@@ -190,6 +188,6 @@ namespace Game3 {
 			void continueLocalConnection();
 			bool toggleLog();
 
-		friend class Canvas;
+		friend class Window;
 	};
 }

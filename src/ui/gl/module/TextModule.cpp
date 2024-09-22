@@ -4,7 +4,7 @@
 #include "ui/gl/module/TextModule.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/Defer.h"
 
 namespace Game3 {
@@ -76,7 +76,7 @@ namespace Game3 {
 
 		text = std::move(new_text);
 		wrapped.reset();
-		tryWrap(ui.canvas.textRenderer);
+		tryWrap(ui.window.textRenderer);
 	}
 
 	float TextModule::getTextScale() const {
@@ -100,6 +100,6 @@ namespace Game3 {
 	}
 
 	void TextModule::tryWrap() {
-		tryWrap(getGame()->canvas.textRenderer);
+		tryWrap(getGame()->getWindow()->textRenderer);
 	}
 }

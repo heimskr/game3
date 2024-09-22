@@ -7,14 +7,14 @@
 #include "threading/Lockable.h"
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	struct RenderOptions;
 
 	class CircleRenderer: public HasBackbuffer {
 		public:
 			Shader shader;
 
-			CircleRenderer(Canvas &);
+			CircleRenderer(Window &);
 
 			~CircleRenderer();
 
@@ -28,7 +28,7 @@ namespace Game3 {
 			inline auto getHeight() const { return backbufferHeight; }
 
 		private:
-			Canvas &canvas;
+			Window &window;
 			glm::mat4 projection;
 			GLuint quadVAO = 0;
 			int initializedTo = 0;

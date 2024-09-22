@@ -12,7 +12,7 @@
 #include "graphics/RenderOptions.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -23,10 +23,12 @@ namespace Game3 {
 		constexpr GLenum BLEND_MODE = GL_ONE;
 	}
 
-	CircleRenderer::CircleRenderer(Canvas &canvas_): shader("CircleRenderer"), canvas(canvas_) {
-		shader.init(rectangleVert(), rectangleFrag()); CHECKGL
-		initRenderData(32); CHECKGL
-	}
+	CircleRenderer::CircleRenderer(Window &window):
+		shader("CircleRenderer"),
+		window(window) {
+			shader.init(rectangleVert(), rectangleFrag()); CHECKGL
+			initRenderData(32); CHECKGL
+		}
 
 	CircleRenderer::~CircleRenderer() {
 		reset();
@@ -59,23 +61,23 @@ namespace Game3 {
 		auto x = options.x;
 		auto y = options.y;
 
-		const auto [center_x, center_y] = canvas.center;
-		RealmPtr realm = canvas.game->getActiveRealm();
+		const auto [center_x, center_y] = window.center;
+		RealmPtr realm = window.game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*canvas.game);
+		TilesetPtr tileset     = provider.getTileset(*window.game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * canvas.scale / 2.;
-		y *= tile_size * canvas.scale / 2.;
+		x *= tile_size * window.scale / 2.;
+		y *= tile_size * window.scale / 2.;
 
 		x += backbufferWidth / 2.;
-		x -= map_length * tile_size * canvas.scale / canvas.magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		x += center_x * canvas.scale * tile_size / 2.;
+		x -= map_length * tile_size * window.scale / 4.; // TODO: the math here is a little sus... things might cancel out
+		x += center_x * window.scale * tile_size / 2.;
 
 		y += backbufferHeight / 2.;
-		y -= map_length * tile_size * canvas.scale / canvas.magic * 2.;
-		y += center_y * canvas.scale * tile_size / 2.;
+		y -= map_length * tile_size * window.scale;
+		y += center_y * tile_size * window.scale / 4.;
 
 		shader.bind(); CHECKGL
 
@@ -87,7 +89,7 @@ namespace Game3 {
 			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
 			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
 		}
-		model = glm::scale(model, glm::vec3(width * canvas.scale / 2., height * canvas.scale / 2., 1.f)); // last scale
+		model = glm::scale(model, glm::vec3(width * window.scale / 2., height * window.scale / 2., 1.f)); // last scale
 
 		shader.set("model", model); CHECKGL
 		shader.set("circleColor", options.color); CHECKGL

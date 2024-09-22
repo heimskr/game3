@@ -10,7 +10,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/widget/TextInput.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 #include "util/Cast.h"
 
 #include <cassert>
@@ -98,8 +98,9 @@ namespace Game3 {
 				ClientGamePtr game = getGame();
 				stationInventoryModule->handleMessage(source, name, data);
 				inventoryModule->handleMessage(source, name, data);
-				MainWindow &window = game->getWindow();
-				window.queue([&window] { window.removeModule(); });
+				game->getWindow()->queue([](Window &window) {
+					window.removeModule();
+				});
 			}
 
 		} else if (name == "GetAgentGID") {

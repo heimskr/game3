@@ -8,7 +8,7 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Label.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	GeneticAnalysisModule::GeneticAnalysisModule(UIContext &ui, const ClientGamePtr &, const std::any &):

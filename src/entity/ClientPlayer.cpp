@@ -13,13 +13,13 @@
 #include "packet/MovePlayerPacket.h"
 #include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	namespace {
-		constexpr Tick getMaxMessageAge(ClientGame &game) {
-			return 7 * game.getWindow().settings.tickFrequency;
+		inline Tick getMaxMessageAge(ClientGame &game) {
+			return 7 * game.getWindow()->settings.tickFrequency;
 		}
 	}
 
@@ -104,8 +104,8 @@ namespace Game3 {
 
 		if (InventoryPtr inventory = getInventory(0)) {
 			if (ItemStackPtr active = inventory->getActive()) {
-				MainWindow &window = getGame()->toClient().getWindow();
-				active->renderEffects(renderers, window.getHoveredPosition(), window.getModifiers());
+				auto window = getGame()->toClient().getWindow();
+				active->renderEffects(renderers, window->getHoveredPosition(), window->getModifiers());
 			}
 		}
 	}
@@ -256,7 +256,7 @@ namespace Game3 {
 			const auto module_name = buffer->take<Identifier>();
 			const auto message_name = buffer->take<std::string>();
 			GamePtr game = getGame();
-			game->toClient().getWindow().moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
+			game->toClient().getWindow()->moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
 		}
 	}
 
@@ -283,6 +283,6 @@ namespace Game3 {
 
 	void ClientPlayer::showText(const Glib::ustring &text, const Glib::ustring &name) {
 		(void) name;
-		getGame()->toClient().getWindow().openModule("base:module/text", std::any(text.raw()));
+		getGame()->toClient().getWindow()->openModule("base:module/text", std::any(text.raw()));
 	}
 }

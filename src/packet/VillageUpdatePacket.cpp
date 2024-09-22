@@ -2,7 +2,7 @@
 #include "game/ClientGame.h"
 #include "game/Village.h"
 #include "packet/VillageUpdatePacket.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	VillageUpdatePacket::VillageUpdatePacket(const Village &village):

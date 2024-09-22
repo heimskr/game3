@@ -9,7 +9,7 @@
 #include "game/ClientGame.h"
 #include "graphics/GL.h"
 #include "graphics/BatchSpriteRenderer.h"
-#include "ui/Canvas.h"
+#include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -19,10 +19,12 @@ namespace Game3 {
 		const std::string & spriteVert() { static auto out = readFile("resources/sprite_batch.vert"); return out; }
 	}
 
-	BatchSpriteRenderer::BatchSpriteRenderer(Canvas &canvas_): SpriteRenderer(canvas_), shader("BatchSpriteRenderer") {
-		shader.init(spriteVert(), spriteFrag());
-		initRenderData();
-	}
+	BatchSpriteRenderer::BatchSpriteRenderer(Window &window):
+		SpriteRenderer(window),
+		shader("BatchSpriteRenderer") {
+			shader.init(spriteVert(), spriteFrag());
+			initRenderData();
+		}
 
 	BatchSpriteRenderer::~BatchSpriteRenderer() {
 		remove();
@@ -32,10 +34,10 @@ namespace Game3 {
 		initialized = false;
 	}
 
-	void BatchSpriteRenderer::update(const Canvas &canvas) {
-		const int backbuffer_width  = canvas.getWidth();
-		const int backbuffer_height = canvas.getHeight();
-		const double scale = canvas.scale;
+	void BatchSpriteRenderer::update(const Window &window) {
+		const int backbuffer_width  = window.getWidth();
+		const int backbuffer_height = window.getHeight();
+		const double scale = window.scale;
 
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			HasBackbuffer::update(backbuffer_width, backbuffer_height);
@@ -49,9 +51,9 @@ namespace Game3 {
 			shader.set("canvasScale", float(scale));
 		}
 
-		if (canvas.center.first != centerX || canvas.center.second != centerY) {
-			centerX = canvas.center.first;
-			centerY = canvas.center.second;
+		if (window.center.first != centerX || window.center.second != centerY) {
+			centerX = window.center.first;
+			centerY = window.center.second;
 			shader.bind();
 			shader.set("center", Eigen::Vector2f(float(centerX), float(centerY)));
 		}
@@ -103,7 +105,7 @@ namespace Game3 {
 
 		constexpr static size_t BUFFER_CAPACITY = 1024;
 
-		const size_t tile_size = canvas->game->getActiveRealm()->getTileset().getTileSize();
+		const size_t tile_size = window->game->getActiveRealm()->getTileset().getTileSize();
 
 		for (const auto &[texture, options]: batchItems) {
 			if (texture != last_texture || buffer.size() >= BUFFER_CAPACITY) {

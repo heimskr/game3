@@ -6,15 +6,15 @@
 #include "types/Types.h"
 
 namespace Game3 {
-	class Canvas;
+	class Window;
 	class Texture;
 
 	class SpriteRenderer: public HasBackbuffer {
 		protected:
-			SpriteRenderer(Canvas &);
+			SpriteRenderer(Window &);
 
 		public:
-			Canvas *canvas = nullptr;
+			Window *window = nullptr;
 			double centerX = 0;
 			double centerY = 0;
 

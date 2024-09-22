@@ -18,8 +18,8 @@
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
 #include "threading/ThreadContext.h"
-#include "ui/Canvas.h"
-#include "ui/MainWindow.h"
+#include "ui/Window.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -27,12 +27,15 @@ namespace Game3 {
 		constexpr float GARBAGE_COLLECTION_TIME = 60;
 	}
 
+	ClientGame::ClientGame(const std::shared_ptr<Window> &window):
+		Game(), weakWindow(window) {}
+
 	ClientGame::~ClientGame() {
 		INFO(3, "\e[31m~ClientGame\e[39m({})", reinterpret_cast<void *>(this));
 	}
 
 	double ClientGame::getFrequency() const {
-		return getWindow().settings.tickFrequency;
+		return getWindow()->settings.tickFrequency;
 	}
 
 	void ClientGame::addEntityFactories() {
@@ -41,7 +44,9 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
-		if (canvas.uiContext.click(button, pos_x * canvas.getFactor(), pos_y * canvas.getFactor()))
+		auto window = getWindow();
+
+		if (window->uiContext.click(button, pos_x * window->getFactor(), pos_y * window->getFactor()))
 			return;
 
 		RealmPtr realm = activeRealm;
@@ -63,7 +68,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragStart(double x, double y, Modifiers modifiers) {
-		if (canvas.uiContext.dragStart(x * 2, y * 2))
+		if (getWindow()->uiContext.dragStart(x * 2, y * 2))
 			return;
 		Position position = translateCanvasCoordinates(x, y);
 		lastDragPosition = position;
@@ -71,7 +76,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
-		if (canvas.uiContext.dragUpdate(x * 2, y * 2))
+		if (getWindow()->uiContext.dragUpdate(x * 2, y * 2))
 			return;
 		Position position = translateCanvasCoordinates(x, y);
 		if (lastDragPosition && *lastDragPosition != position) {
@@ -81,7 +86,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragEnd(double x, double y, Modifiers modifiers) {
-		if (canvas.uiContext.dragEnd(x * 2, y * 2))
+		if (getWindow()->uiContext.dragEnd(x * 2, y * 2))
 			return;
 		if (lastDragPosition) {
 			Position position = translateCanvasCoordinates(x, y);
@@ -90,9 +95,10 @@ namespace Game3 {
 		}
 	}
 
-	Gdk::Rectangle ClientGame::getVisibleRealmBounds() const {
+	Rectangle ClientGame::getVisibleRealmBounds() const {
+		auto window = getWindow();
 		const auto [top,     left] = translateCanvasCoordinates(0, 0);
-		const auto [bottom, right] = translateCanvasCoordinates(canvas.getWidth() * canvas.sizeDivisor, canvas.getHeight() * canvas.sizeDivisor);
+		const auto [bottom, right] = translateCanvasCoordinates(window->getWidth() * window->sizeDivisor, window->getHeight() * window->sizeDivisor);
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -101,24 +107,22 @@ namespace Game3 {
 		};
 	}
 
-	MainWindow & ClientGame::getWindow() const {
-		return canvas.window;
-	}
-
 	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
 		RealmPtr realm = activeRealm;
 
 		if (!realm)
 			return {};
 
-		const int width = canvas.getWidth();
-		const int height = canvas.getHeight();
+		auto window = getWindow();
 
-		const auto scale = canvas.scale / canvas.getFactor() * canvas.sizeDivisor;
+		const int width = window->getWidth();
+		const int height = window->getHeight();
+
+		const auto scale = window->scale / window->getFactor() * window->sizeDivisor;
 		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= width  / 2. * canvas.sizeDivisor - (map_length * tile_size / 4.) * scale + canvas.center.first  * canvas.magic * scale;
-		y -= height / 2. * canvas.sizeDivisor - (map_length * tile_size / 4.) * scale + canvas.center.second * canvas.magic * scale;
+		x -= width  / 2. * window->sizeDivisor - (map_length * tile_size / 4.) * scale + window->center.first  * window->magic * scale;
+		y -= height / 2. * window->sizeDivisor - (map_length * tile_size / 4.) * scale + window->center.second * window->magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
 		const double sub_y = y < 0.? 1. : 0.;
 		x /= tile_size * scale / 2.;
@@ -137,13 +141,13 @@ namespace Game3 {
 	}
 
 	void ClientGame::activateContext() {
-		canvas.window.activateContext();
+		getWindow()->activateContext();
 	}
 
 	void ClientGame::setText(const Glib::ustring &text) {
-		MainWindow &window = getWindow();
-		window.showOmniDialog();
-		window.openModule("base:module/text", std::any(text.raw()));
+		auto window = getWindow();
+		window->showOmniDialog();
+		window->openModule("base:module/text", std::any(text.raw()));
 	}
 
 	void ClientGame::runCommand(const std::string &command) {
@@ -177,7 +181,7 @@ namespace Game3 {
 			try {
 				packet->handle(getSelf());
 			} catch (const Warning &warning) {
-				canvas.window.error(warning.what());
+				getWindow()->error(warning.what());
 			} catch (const std::exception &err) {
 				auto &packet_ref = *packet;
 				ERROR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
@@ -262,11 +266,11 @@ namespace Game3 {
 	}
 
 	UIContext & ClientGame::getUIContext() const {
-		return canvas.uiContext;
+		return getWindow()->uiContext;
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
-		getWindow().moduleMessageBuffer(module_id, source, name, std::move(data));
+		getWindow()->moduleMessageBuffer(module_id, source, name, std::move(data));
 	}
 
 	void ClientGame::setPlayer(ClientPlayerPtr new_player) {
@@ -300,7 +304,7 @@ namespace Game3 {
 					break;
 				}
 
-				std::this_thread::sleep_for(std::chrono::milliseconds(1000 / getWindow().settings.tickFrequency));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000 / getWindow()->settings.tickFrequency));
 			}
 
 			if (stoppedByError && errorCallback)
@@ -317,6 +321,12 @@ namespace Game3 {
 		} else {
 			WARN("Trying to stop an unjoinable ClientGame");
 		}
+	}
+
+	std::shared_ptr<Window> ClientGame::getWindow() const {
+		auto window = weakWindow.lock();
+		assert(window);
+		return window;
 	}
 
 	void ClientGame::garbageCollect() {

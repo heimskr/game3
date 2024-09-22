@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/Game.h"
+#include "graphics/Rectangle.h"
 #include "threading/Atomic.h"
 #include "ui/Modifiers.h"
 #include "ui/Sound.h"
@@ -12,6 +13,7 @@
 #include <thread>
 
 namespace Game3 {
+	class Window;
 	class HasEnergy;
 	class HasFluids;
 	class HasInventory;
@@ -21,13 +23,13 @@ namespace Game3 {
 
 	class ClientGame: public Game {
 		public:
-			Canvas &canvas;
 			bool stoppedByError = false;
 			std::function<void()> errorCallback;
 			SoundEngine sounds;
 			bool suppressDisconnectionMessage = false;
 
-			ClientGame(Canvas &canvas_): Game(), canvas(canvas_) {}
+			ClientGame(const std::shared_ptr<Window> &);
+
 			~ClientGame() override;
 
 			double getFrequency() const override;
@@ -36,8 +38,7 @@ namespace Game3 {
 			void dragStart(double x, double y, Modifiers);
 			void dragUpdate(double x, double y, Modifiers);
 			void dragEnd(double x, double y, Modifiers);
-			Gdk::Rectangle getVisibleRealmBounds() const;
-			MainWindow & getWindow() const;
+			Rectangle getVisibleRealmBounds() const;
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
 			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
 			void activateContext();
@@ -85,7 +86,10 @@ namespace Game3 {
 			std::shared_ptr<ClientGame> getSelf() { return std::static_pointer_cast<ClientGame>(shared_from_this()); }
 			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
 
+			std::shared_ptr<Window> getWindow() const;
+
 		private:
+			std::weak_ptr<Window> weakWindow;
 			ClientPlayerPtr player;
 			std::shared_ptr<LocalClient> client;
 			RealmPtr activeRealm;
