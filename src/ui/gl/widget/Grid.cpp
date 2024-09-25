@@ -82,6 +82,7 @@ namespace Game3 {
 		std::size_t outer{}, inner{};
 		std::size_t *row{}, *column{};
 		std::optional<std::vector<float>> *sizes{};
+		float spacing{};
 
 		if (orientation == Orientation::Horizontal) {
 			outer_size = widgetContainer.columns();
@@ -89,12 +90,14 @@ namespace Game3 {
 			column = &outer;
 			row = &inner;
 			sizes = &columnWidths;
+			spacing = columnSpacing;
 		} else {
 			outer_size = widgetContainer.rows();
 			inner_size = widgetContainer.columns();
 			row = &outer;
 			column = &inner;
 			sizes = &rowHeights;
+			spacing = rowSpacing;
 		}
 
 		if (!*sizes)
@@ -153,9 +156,9 @@ namespace Game3 {
 			}
 		}
 
-		const float spacing = (orientation == Orientation::Horizontal? columnSpacing : rowSpacing) * (inner_size - 1);
-		minimum = spacing + accumulated_minimum;
-		natural = spacing + accumulated_natural;
+		const float total_spacing = spacing * (outer_size - 1);
+		minimum = total_spacing + accumulated_minimum;
+		natural = total_spacing + accumulated_natural;
 	}
 
 	void Grid::remove(WidgetPtr child) {

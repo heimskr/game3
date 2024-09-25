@@ -64,7 +64,6 @@ namespace Game3 {
 				sslSock.async_handshake(asio::ssl::stream_base::client, [this](const asio::error_code &errc) {
 					asio::detail::throw_error(errc, "LocalClient async_handshake");
 					sslReady = true;
-					SUCCESS("Client finished handshake.");
 					for (const std::function<void()> &action: connectionActions.steal())
 						action();
 					doRead();
@@ -76,9 +75,7 @@ namespace Game3 {
 #if defined(__linux__) || defined(__APPLE__)
 			pthread_setname_np(pthread_self(), "LocalClient ioContext");
 #endif
-			SPAM("Starting client io_context");
 			ioContext.run();
-			SPAM("ioContext has stopped.");
 			--sslWaiter;
 		});
 #else
