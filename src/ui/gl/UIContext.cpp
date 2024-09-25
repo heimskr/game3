@@ -161,8 +161,11 @@ namespace Game3 {
 			}
 		}
 
-		draggedWidgetActive = false;
-		setDraggedWidget(nullptr);
+		if (draggedWidget != nullptr && draggedWidgetActive) {
+			draggedWidget->dragEnd(x, y);
+			draggedWidgetActive = false;
+			setDraggedWidget(nullptr);
+		}
 
 		if (!out)
 			return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragEnd(x, y);
