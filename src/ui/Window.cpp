@@ -1,7 +1,11 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Tileset.h"
+#include "net/LocalClient.h"
+#include "packet/ContinuousInteractionPacket.h"
+#include "packet/LoginPacket.h"
 #include "types/Position.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
@@ -11,24 +15,55 @@
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
 #include "ui/Window.h"
+#include "util/FS.h"
+#include "util/Util.h"
 
 #include <fstream>
 
 namespace Game3 {
 	Window::Window(GLFWwindow &glfw_window):
 		glfwWindow(&glfw_window),
-		scale(8) {}
+		scale(8) {
+			glfwSetWindowUserPointer(glfwWindow, this);
+			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
+				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->keyCallback(key, scancode, action, mods);
+			});
+
+			if (std::filesystem::exists("settings.json"))
+				settings = nlohmann::json::parse(readFile("settings.json"));
+
+			settings.apply();
+		}
 
 	void Window::queue(std::function<void(Window &)> function) {
 		functionQueue.push(std::move(function));
 	}
 
+	void Window::queueBool(std::function<bool(Window &)> function) {
+		auto lock = boolFunctions.uniqueLock();
+		boolFunctions.push_back(std::move(function));
+	}
+
+	void Window::delay(std::function<void(Window &)> function, uint32_t count) {
+		if (count <= 0) {
+			queue(std::move(function));
+		} else {
+			queue([function = std::move(function), count](Window &window) mutable {
+				window.delay(std::move(function), count - 1);
+			});
+		}
+	}
+
 	int Window::getWidth() const {
-		return 0;
+		int width;
+		glfwGetWindowSize(glfwWindow, &width, nullptr);
+		return width;
 	}
 
 	int Window::getHeight() const {
-		return 0;
+		int height;
+		glfwGetWindowSize(glfwWindow, nullptr, &height);
+		return height;
 	}
 
 	int Window::getFactor() const {
@@ -36,11 +71,15 @@ namespace Game3 {
 	}
 
 	int Window::getMouseX() const {
-		return 0;
+		double x;
+		glfwGetCursorPos(glfwWindow, &x, nullptr);
+		return static_cast<int>(x);
 	}
 
 	int Window::getMouseY() const {
-		return 0;
+		double y;
+		glfwGetCursorPos(glfwWindow, nullptr, &y);
+		return static_cast<int>(y);
 	}
 
 	std::pair<double, double> Window::getMouseCoordinates() const {
@@ -63,6 +102,8 @@ namespace Game3 {
 	}
 
 	void Window::openModule(const Identifier &module_id, const std::any &argument) {
+		assert(game != nullptr);
+
 		auto &registry = game->registry<ModuleFactoryRegistry>();
 
 		if (auto factory = registry[module_id]) {
@@ -82,11 +123,11 @@ namespace Game3 {
 	}
 
 	void Window::alert(const UString &message, bool queue, bool modal, bool use_markup) {
-
+		INFO("Alert: {}", message);
 	}
 
 	void Window::error(const UString &message, bool queue, bool modal, bool use_markup) {
-
+		ERROR("Error: {}", message);
 	}
 
 	Modifiers Window::getModifiers() const {
@@ -154,15 +195,26 @@ namespace Game3 {
 		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, recolor, settings, getFactor()};
 	}
 
-	void Window::drawGL() {
-		if (!game)
-			return;
+	void Window::tick() {
+		for (const auto &function: functionQueue.steal())
+			function(*this);
 
+		{
+			auto lock = boolFunctions.uniqueLock();
+			std::erase_if(boolFunctions, [this](const auto &function) {
+				return function(*this);
+			});
+		}
+
+		drawGL();
+	}
+
+	void Window::drawGL() {
 		const int factor = getFactor();
 		int width  = getWidth()  * factor;
 		int height = getHeight() * factor;
 
-		game->activateContext();
+		activateContext();
 		batchSpriteRenderer.update(*this);
 		singleSpriteRenderer.update(*this);
 		recolor.update(*this);
@@ -173,138 +225,432 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		game->iterateRealms([](const RealmPtr &realm) {
-			if (!realm->renderersReady)
+		if (game != nullptr) {
+			game->iterateRealms([](const RealmPtr &realm) {
+				if (!realm->renderersReady)
+					return;
+
+				if (realm->wakeupPending.exchange(false)) {
+					for (auto &row: *realm->baseRenderers)
+						for (auto &renderer: row)
+							renderer.wakeUp();
+
+					for (auto &row: *realm->upperRenderers)
+						for (auto &renderer: row)
+							renderer.wakeUp();
+
+					realm->reupload();
+				} else if (realm->snoozePending.exchange(false)) {
+					for (auto &row: *realm->baseRenderers)
+						for (auto &renderer: row)
+							renderer.snooze();
+
+					for (auto &row: *realm->upperRenderers)
+						for (auto &renderer: row)
+							renderer.snooze();
+				}
+			});
+
+			GLsizei tile_size = 16;
+			RealmPtr realm = game->getActiveRealm();
+
+			if (realm)
+				tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
+
+			const auto static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * factor);
+
+			if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
+				mainTexture.initRGBA(width, height, GL_NEAREST);
+				staticLightingTexture.initRGBA(static_size, static_size, GL_NEAREST);
+				dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
+				scratchTexture.initRGBA(width, height, GL_NEAREST);
+
+				GL::FBOBinder binder = fbo.getBinder();
+				dynamicLightingTexture.useInFB();
+				GL::clear(1, 1, 1);
+
+				if (realm) {
+					realm->queueStaticLightingTexture();
+				}
+			}
+
+			bool do_lighting{};
+			{
+				auto lock = settings.sharedLock();
+				do_lighting = settings.renderLighting;
+			}
+
+			if (!realm)
 				return;
 
-			if (realm->wakeupPending.exchange(false)) {
-				for (auto &row: *realm->baseRenderers)
-					for (auto &renderer: row)
-						renderer.wakeUp();
+			if (do_lighting) {
+				GL::FBOBinder binder = fbo.getBinder();
+				mainTexture.useInFB();
+				glViewport(0, 0, width, height); CHECKGL
+				GL::clear(.2, .2, .2);
+				RendererContext context = getRendererContext();
+				context.updateSize(width, height);
 
-				for (auto &row: *realm->upperRenderers)
-					for (auto &renderer: row)
-						renderer.wakeUp();
+				if (realm->prerender()) {
+					mainTexture.useInFB();
+					batchSpriteRenderer.update(*this);
+					singleSpriteRenderer.update(*this);
+					recolor.update(*this);
+					textRenderer.update(*this);
+					context.updateSize(getWidth(), getHeight());
+					glViewport(0, 0, width, height); CHECKGL
+					// Skip a frame to avoid glitchiness
+					return;
+				}
 
-				realm->reupload();
-			} else if (realm->snoozePending.exchange(false)) {
-				for (auto &row: *realm->baseRenderers)
-					for (auto &renderer: row)
-						renderer.snooze();
+				realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
-				for (auto &row: *realm->upperRenderers)
-					for (auto &renderer: row)
-						renderer.snooze();
+				dynamicLightingTexture.useInFB();
+
+				realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
+
+				scratchTexture.useInFB();
+				GL::clear(1, 1, 1);
+
+				singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
+					.x = 0,
+					.y = 0,
+					.sizeX = -1,
+					.sizeY = -1,
+					.scaleX = 1,
+					.scaleY = 1,
+				});
+
+				ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
+				const auto [static_y, static_x] = chunk.topLeft();
+				singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
+					.x = double(static_x),
+					.y = double(static_y),
+					.sizeX = -1,
+					.sizeY = -1,
+					.scaleX = 1. / factor,
+					.scaleY = 1. / factor,
+					.viewportX = -double(factor),
+					.viewportY = -double(factor),
+				});
+
+				binder.undo();
+
+				context.updateSize(width, height);
+				glViewport(0, 0, width, height); CHECKGL
+				multiplier(mainTexture, scratchTexture);
+			} else {
+				RendererContext context = getRendererContext();
+				glViewport(0, 0, width, height); CHECKGL
+				GL::clear(.2, .2, .2);
+				context.updateSize(width, height);
+
+				if (realm->prerender()) {
+					batchSpriteRenderer.update(*this);
+					singleSpriteRenderer.update(*this);
+					recolor.update(*this);
+					textRenderer.update(*this);
+					context.updateSize(width, height);
+				}
+
+				realm->render(width, height, center, scale, context, 1.f); CHECKGL
+			}
+
+			realmBounds = game->getVisibleRealmBounds();
+		}
+
+		uiContext.render(getMouseX(), getMouseY());
+	}
+
+	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
+		Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
+
+		if (action == GLFW_PRESS) {
+			INFO("key[{}], scancode[{}], action[{}], mods[{}]", key, scancode, action, modifiers);
+
+			if (modifiers.onlyCtrl() && key == 'P') {
+				playLocally();
+				return;
+			}
+		}
+
+		if (game) {
+			ClientPlayerPtr player = game->getPlayer();
+
+			if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+				if (modifiers.empty() || modifiers.onlyShift()) {
+					auto handle = [&](int movement_key, Direction direction) {
+						if (key != movement_key)
+							return false;
+
+						if (!player->isMoving())
+							player->setContinuousInteraction(modifiers.shift, Modifiers(modifiers));
+						if (!player->isMoving(direction))
+							player->startMoving(direction);
+
+						return true;
+					};
+
+					if (handle(GLFW_KEY_W, Direction::Up) || handle(GLFW_KEY_A, Direction::Left) || handle(GLFW_KEY_S, Direction::Down) || handle(GLFW_KEY_D, Direction::Right)) {
+						return;
+					}
+				}
+			}
+
+			if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+				if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
+					if (player->isMoving())
+						player->send(ContinuousInteractionPacket(player->continuousInteractionModifiers));
+					return;
+				}
+			}
+
+			if (action == GLFW_RELEASE) {
+				if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
+					player->stopContinuousInteraction();
+					return;
+				}
+
+				auto handle = [&](int released_key, Direction direction) {
+					if (key != released_key)
+						return false;
+
+					player->stopMoving(direction);
+					player->stopContinuousInteraction();
+
+					return true;
+				};
+
+				if (handle(GLFW_KEY_W, Direction::Up) || handle(GLFW_KEY_A, Direction::Left) || handle(GLFW_KEY_S, Direction::Down) || handle(GLFW_KEY_D, Direction::Right)) {
+					return;
+				}
+			}
+		}
+	}
+
+	void Window::closeGame() {
+		if (game == nullptr)
+			return;
+		// richPresence.setActivityDetails("Idling");
+
+		// uiContext.removeDialogs();
+
+		// if (dialog)
+		// 	dialog->close();
+
+		removeModule();
+		game->stopThread();
+		// canvas->game = nullptr;
+		game.reset();
+
+		omniDialog.reset();
+		// canvas->uiContext.reset();
+	}
+
+	void Window::onGameLoaded() {
+		// richPresence.setActivityStartTime(false);
+		// richPresence.setActivityDetails("Playing", true);
+
+		// canvas->uiContext.reset();
+
+		// debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
+		game->initInteractionSets();
+		// canvas->game = game;
+		settings.apply(*game);
+
+		game->signalOtherInventoryUpdate().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
+				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
+				queue([owner, client_inventory](Window &window) {
+					if (owner->getGID() == window.getExternalGID()) {
+						std::unique_lock<DefaultMutex> lock;
+						if (Module *module_ = window.getOmniDialog()->inventoryTab->getModule(lock)) {
+							module_->setInventory(client_inventory);
+						}
+					}
+				});
 			}
 		});
 
-		GLsizei tile_size = 16;
-		RealmPtr realm = game->getActiveRealm();
+		game->signalPlayerMoneyUpdate().connect([this](const PlayerPtr &player) {
+			// updateMoneyLabel(player->getMoney());
+		});
 
-		if (realm)
-			tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
+		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
+			queue([has_fluids](Window &window) mutable {
+				if (!window.omniDialog)
+					return;
 
-		const auto static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * factor);
+				std::unique_lock<DefaultMutex> lock;
 
-		if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
-			mainTexture.initRGBA(width, height, GL_NEAREST);
-			staticLightingTexture.initRGBA(static_size, static_size, GL_NEAREST);
-			dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
-			scratchTexture.initRGBA(width, height, GL_NEAREST);
+				if (Module *module_ = window.omniDialog->inventoryTab->getModule(lock)) {
+					std::any data(std::move(has_fluids));
+					module_->handleMessage({}, "UpdateFluids", data);
+				}
+			});
+		});
 
-			GL::FBOBinder binder = fbo.getBinder();
-			dynamicLightingTexture.useInFB();
-			GL::clear(1, 1, 1);
+		game->signalEnergyUpdate().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
+			queue([has_energy](Window &window) mutable {
+				if (!window.omniDialog)
+					return;
 
-			if (realm) {
-				realm->queueStaticLightingTexture();
-			}
+				std::unique_lock<DefaultMutex> lock;
+
+				if (Module *module_ = window.omniDialog->inventoryTab->getModule(lock)) {
+					std::any data(std::move(has_energy));
+					module_->handleMessage({}, "UpdateEnergy", data);
+				}
+			});
+		});
+
+		game->signalVillageUpdate().connect([this](const VillagePtr &village) {
+			queue([village](Window &window) mutable {
+				if (!window.omniDialog)
+					return;
+
+				std::unique_lock<DefaultMutex> lock;
+
+				if (Module *module_ = window.omniDialog->inventoryTab->getModule(lock)) {
+					std::any data(std::move(village));
+					module_->handleMessage({}, "VillageUpdate", data);
+				}
+			});
+		});
+
+		game->errorCallback = [this] {
+			if (game->suppressDisconnectionMessage)
+				return;
+
+			queue([](Window &window) {
+				// get_display()->beep();
+				window.error("Game disconnected.");
+				window.closeGame();
+			});
+		};
+
+		game->startThread();
+	}
+
+	bool Window::connect(const std::string &hostname, uint16_t port) {
+		closeGame();
+		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this()));
+		auto client = std::make_shared<LocalClient>();
+		game->setClient(client);
+		try {
+			client->connect(hostname, port);
+		} catch (const std::exception &err) {
+			closeGame();
+			error(err.what());
+			return false;
+		}
+		client->weakGame = game;
+		game->initEntities();
+
+		// It's assumed that the caller already owns a unique lock on the settings.
+		settings.hostname = hostname;
+		settings.port = port;
+
+		if (std::filesystem::exists("tokens.json"))
+			client->readTokens("tokens.json");
+		else
+			client->saveTokens("tokens.json");
+
+		activateContext();
+		onGameLoaded();
+
+		if (settings.alertOnConnection) {
+			SUCCESS("Connected.");
+			// auto success_dialog = std::make_unique<ConnectionSuccessDialog>(*this);
+			// success_dialog->signal_submit().connect([this](bool checked) {
+			// 	auto lock = settings.uniqueLock();
+			// 	settings.alertOnConnection = !checked;
+			// });
+			// queueDialog(std::move(success_dialog));
 		}
 
-		bool do_lighting{};
-		{
-			auto lock = settings.sharedLock();
-			do_lighting = settings.renderLighting;
+		return true;
+	}
+
+	void Window::autoConnect() {
+		auto lock = settings.uniqueLock();
+
+		if (settings.username.empty()) {
+			error("No username set. Try logging in manually first.");
+			return;
 		}
 
-		if (!realm)
+		if (!connect(settings.hostname, settings.port))
 			return;
 
-		if (do_lighting) {
-			GL::FBOBinder binder = fbo.getBinder();
-			mainTexture.useInFB();
-			glViewport(0, 0, width, height); CHECKGL
-			GL::clear(.2, .2, .2);
-			RendererContext context = getRendererContext();
-			context.updateSize(width, height);
+		LocalClientPtr client = game->getClient();
+		const std::string &hostname = client->getHostname();
+		if (std::optional<Token> token = client->getToken(hostname, settings.username)) {
+			queueBool([client, token, hostname, username = settings.username](Window &window) {
+				if (window.game && client && client->isReady()) {
+					client->send(LoginPacket(username, *token));
+					return true;
+				}
 
-			if (realm->prerender()) {
-				mainTexture.useInFB();
-				batchSpriteRenderer.update(*this);
-				singleSpriteRenderer.update(*this);
-				recolor.update(*this);
-				textRenderer.update(*this);
-				context.updateSize(getWidth(), getHeight());
-				glViewport(0, 0, width, height); CHECKGL
-				// Skip a frame to avoid glitchiness
-				return;
-			}
-
-			realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-			dynamicLightingTexture.useInFB();
-
-			realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-			scratchTexture.useInFB();
-			GL::clear(1, 1, 1);
-
-			singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
-				.x = 0,
-				.y = 0,
-				.sizeX = -1,
-				.sizeY = -1,
-				.scaleX = 1,
-				.scaleY = 1,
+				return false;
 			});
-
-			ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
-			const auto [static_y, static_x] = chunk.topLeft();
-			singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
-				.x = double(static_x),
-				.y = double(static_y),
-				.sizeX = -1,
-				.sizeY = -1,
-				.scaleX = 1. / factor,
-				.scaleY = 1. / factor,
-				.viewportX = -double(factor),
-				.viewportY = -double(factor),
-			});
-
-			binder.undo();
-
-			context.updateSize(width, height);
-			glViewport(0, 0, width, height); CHECKGL
-			multiplier(mainTexture, scratchTexture);
 		} else {
-			RendererContext context = getRendererContext();
-			glViewport(0, 0, width, height); CHECKGL
-			GL::clear(.2, .2, .2);
-			context.updateSize(width, height);
+			error("Couldn't find token for user " + settings.username + " on host " + hostname);
+		}
+	}
 
-			if (realm->prerender()) {
-				batchSpriteRenderer.update(*this);
-				singleSpriteRenderer.update(*this);
-				recolor.update(*this);
-				textRenderer.update(*this);
-				context.updateSize(width, height);
-			}
+	void Window::playLocally() {
+		const bool was_running = serverWrapper.isRunning();
 
-			realm->render(width, height, center, scale, context, 1.f); CHECKGL
+		if (game) {
+			game->suppressDisconnectionMessage = true;
 		}
 
-		realmBounds = game->getVisibleRealmBounds();
+		size_t seed = 1621;
+		if (std::filesystem::exists(".seed")) {
+			try {
+				seed = parseNumber<size_t>(trim(readFile(".seed")));
+				INFO("Using custom seed \e[1m{}\e[22m", seed);
+			} catch (const std::exception &err) {
+				ERROR("Failed to load seed from .seed: {}", err.what());
+			}
+		}
 
-		uiContext.render(getMouseX(), getMouseY());
+		serverWrapper.runInThread(seed);
+
+		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
+			error("Server failed to start within 10 seconds.");
+			return;
+		}
+
+		serverWrapper.save();
+
+		if (was_running) {
+			// Ugly hack!
+			delay([](Window &window) {
+				window.continueLocalConnection();
+			}, DEFAULT_CLIENT_TICK_FREQUENCY * 2);
+		} else {
+			continueLocalConnection();
+		}
+	}
+
+	void Window::continueLocalConnection() {
+		if (!connect("::1", serverWrapper.getPort())) {
+			error("Failed to connect to local server.");
+			return;
+		}
+
+		assert(game != nullptr);
+		LocalClientPtr client = game->getClient();
+
+		client->send(LoginPacket(settings.username, serverWrapper.getOmnitoken(), "Heimskr"));
+
+		// auto login_dialog = std::make_unique<LoginDialog>(*this, settings.username);
+		// login_dialog->signal_submit().connect([this, weak_client = std::weak_ptr(client)](const Glib::ustring &username, const Glib::ustring &display_name) {
+		// 	if (LocalClientPtr client = weak_client.lock())
+		// 		client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name));
+		// });
+		// queueDialog(std::move(login_dialog));
 	}
 }

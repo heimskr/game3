@@ -35,6 +35,8 @@ namespace Game3 {
 				} else {
 					ERROR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
 				}
+
+				raise(SIGTRAP);
 			}
 		}
 	}

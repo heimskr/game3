@@ -181,14 +181,14 @@ namespace Game3 {
 			autofocus = false;
 		});
 		drag->signal_drag_update().connect([this](double x, double y) {
-			double delta_x = x - lastDragX;
-			double delta_y = y - lastDragY;
-			lastDragX = x;
-			lastDragY = y;
-			if (canvas) {
-				// canvas->center.first  += delta_x / (canvas->magic * canvas->scale / canvas->getFactor());
-				// canvas->center.second += delta_y / (canvas->magic * canvas->scale / canvas->getFactor());
-			}
+			// double delta_x = x - lastDragX;
+			// double delta_y = y - lastDragY;
+			// lastDragX = x;
+			// lastDragY = y;
+			// if (canvas) {
+			// 	canvas->center.first  += delta_x / (canvas->magic * canvas->scale / canvas->getFactor());
+			// 	canvas->center.second += delta_y / (canvas->magic * canvas->scale / canvas->getFactor());
+			// }
 		});
 		glArea.add_controller(drag);
 

@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "client/RichPresence.h"
 #include "client/ServerWrapper.h"
+#include "game/ClientGame.h"
 #include "net/Server.h"
 #include "net/Sock.h"
 #include "scripting/ScriptEngine.h"
@@ -267,16 +268,21 @@ int main(int argc, char **argv) {
 		return 2;
 	}
 
-	Window window(*glfw_window);
-
 	glfwMakeContextCurrent(glfw_window);
+	glfwSwapInterval(1);
+
+	auto window = std::make_shared<Window>(*glfw_window);
 
 	while (!glfwWindowShouldClose(glfw_window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
+		window->tick();
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
 	}
 
+	INFO("Closing.");
+	window->closeGame();
+	INFO("Closed.");
 	glfwTerminate();
 	const int out = 0;
 #else

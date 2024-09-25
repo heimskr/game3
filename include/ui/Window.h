@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/ClientSettings.h"
+#include "client/ServerWrapper.h"
 #include "data/Identifier.h"
 #include "graphics/BatchSpriteRenderer.h"
 #include "graphics/CircleRenderer.h"
@@ -21,6 +22,7 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 
 struct GLFWwindow;
 
@@ -34,7 +36,7 @@ namespace Game3 {
 	struct Position;
 	struct RendererContext;
 
-	class Window {
+	class Window: public std::enable_shared_from_this<Window> {
 		public:
 			GLFWwindow *glfwWindow = nullptr;
 			std::shared_ptr<ClientGame> game;
@@ -43,7 +45,6 @@ namespace Game3 {
 			double scale{};
 			float magic = 8;
 			double sizeDivisor = 1.0;
-			MTQueue<std::function<void(Window &)>> functionQueue;
 			std::shared_ptr<OmniDialog> omniDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
@@ -63,6 +64,9 @@ namespace Game3 {
 			Window(GLFWwindow &);
 
 			void queue(std::function<void(Window &)>);
+			/* If the given function returns false, it won't be removed from the queue. */
+			void queueBool(std::function<bool(Window &)>);
+			void delay(std::function<void(Window &)>, uint32_t count = 1);
 
 			int getWidth() const;
 			int getHeight() const;
@@ -100,9 +104,21 @@ namespace Game3 {
 			bool inBounds(const Position &) const;
 			RendererContext getRendererContext();
 
+			void tick();
 			void drawGL();
+			void closeGame();
 
 		private:
+			MTQueue<std::function<void(Window &)>> functionQueue;
+			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
 			GL::Texture scratchTexture;
+			ServerWrapper serverWrapper;
+
+			void keyCallback(int key, int scancode, int action, int mods);
+			void onGameLoaded();
+			bool connect(const std::string &hostname, uint16_t port);
+			void autoConnect();
+			void playLocally();
+			void continueLocalConnection();
 	};
 }

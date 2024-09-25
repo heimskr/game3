@@ -28,7 +28,7 @@ namespace Game3 {
 #else
 		sock = std::make_shared<Sock>(hostname, port);
 #endif
-		sock->connect(false);
+		sock->connect(true);
 	}
 
 	void LocalClient::read() {
