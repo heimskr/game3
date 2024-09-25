@@ -277,13 +277,13 @@ namespace Game3 {
 
 #ifdef USE_SSL
 	void LocalClient::doRead() {
-		asio::post(strand, [this] {
+		asio::post(strand, [this, shared = shared_from_this()] {
 			if (!isReady()) {
 				return;
 			}
 
 			reading = true;
-			sslSock.async_read_some(asio::buffer(array), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, std::size_t length) {
+			sslSock.async_read_some(asio::buffer(array), asio::bind_executor(strand, [this, shared](const asio::error_code &errc, std::size_t length) {
 				if (errc && errc.value() != 2) {
 					ERROR("LocalClient::doRead: {} ({})", errc.message(), errc.value());
 					close();
