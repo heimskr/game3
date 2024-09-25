@@ -1,3 +1,6 @@
+#include "Options.h"
+
+#ifndef HIDE_SOCK
 #include "Log.h"
 #include "net/DisconnectedError.h"
 #include "net/NetError.h"
@@ -226,3 +229,4 @@ namespace Game3 {
 		}
 	}
 }
+#endif

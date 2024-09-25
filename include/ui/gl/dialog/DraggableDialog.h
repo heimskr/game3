@@ -40,7 +40,6 @@ namespace Game3 {
 			const UString & getTitle() const override;
 			void setTitle(UString);
 
-
 		private:
 			UString title;
 	};

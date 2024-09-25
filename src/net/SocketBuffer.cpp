@@ -1,3 +1,6 @@
+#include "Options.h"
+
+#ifndef HIDE_SOCK
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
@@ -68,3 +71,4 @@ namespace Game3 {
 		source->close(false);
 	}
 }
+#endif

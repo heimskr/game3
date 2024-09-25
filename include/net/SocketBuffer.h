@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Options.h"
+
+#ifndef HIDE_SOCK
 #include <iostream>
 #include <memory>
 
@@ -26,3 +29,4 @@ namespace Game3 {
 			void close();
 	};
 }
+#endif

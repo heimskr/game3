@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Options.h"
+
+#ifndef HIDE_SOCK
+#include "net/Sock.h"
+
 #include <cerrno>
 #include <cstring>
 #include <netdb.h>
@@ -10,7 +15,6 @@
 #include <thread>
 #include <unistd.h>
 
-#include "net/Sock.h"
 
 namespace Game3 {
 	class SSLSock: public Sock {
@@ -31,3 +35,4 @@ namespace Game3 {
 			std::optional<std::thread::id> threadID;
 	};
 }
+#endif

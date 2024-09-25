@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Options.h"
+
+#ifndef HIDE_SOCK
 #include <atomic>
 #include <netdb.h>
 #include <shared_mutex>
@@ -60,3 +63,4 @@ namespace Game3 {
 			void addToBuffer(const void *, size_t);
 	};
 }
+#endif

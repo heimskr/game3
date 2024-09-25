@@ -183,7 +183,9 @@ namespace Game3 {
 	}
 
 	void LocalClient::setBuffering(bool new_value) {
-#ifndef USE_SSL
+#ifdef USE_SSL
+		(void) new_value;
+#else
 		assert(sock);
 		if (new_value)
 			sock->startBuffering();
@@ -216,7 +218,7 @@ namespace Game3 {
 			auto lock = outbox.uniqueLock();
 			message = std::move(outbox.front());
 		}
-		asio::async_write(sslSock, asio::buffer(message), strand.wrap([this, shared = shared_from_this()](const asio::error_code &errc, size_t size) {
+		asio::async_write(sslSock, asio::buffer(message), strand.wrap([this, shared = shared_from_this()](const asio::error_code &errc, std::size_t) {
 			bool empty{};
 			{
 				auto lock = outbox.uniqueLock();
@@ -235,6 +237,7 @@ namespace Game3 {
 
 	void LocalClient::send(const void *data, std::size_t size, bool force) {
 #ifdef USE_SSL
+		(void) force;
 		{
 			auto lock = outbox.uniqueLock();
 			outbox.emplace_back(reinterpret_cast<const char *>(data), size);
@@ -249,6 +252,7 @@ namespace Game3 {
 
 	void LocalClient::send(std::string message, bool force) {
 #ifdef USE_SSL
+		(void) force;
 		{
 			auto lock = outbox.uniqueLock();
 			outbox.emplace_back(std::move(message));
