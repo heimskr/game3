@@ -16,7 +16,7 @@
 #include "packet/LoginPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "realm/Overworld.h"
-#include "ui/gl/OmniDialog.h"
+#include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"

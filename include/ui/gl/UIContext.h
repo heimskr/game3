@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphics/ScissorStack.h"
-#include "ui/gl/Dialog.h"
+#include "ui/gl/dialog/Dialog.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/Modifiers.h"
 
@@ -32,7 +32,6 @@ namespace Game3 {
 			UIContext(Window &);
 
 			void render(float mouse_x, float mouse_y);
-			void addDialog(std::shared_ptr<Dialog>);
 			std::shared_ptr<ClientGame> getGame() const;
 			void onResize(int x, int y);
 			void reset();
@@ -64,6 +63,10 @@ namespace Game3 {
 			bool anyDragUpdaters() const;
 			void setContextMenu(std::shared_ptr<ContextMenu>);
 			std::shared_ptr<ContextMenu> getContextMenu() const;
+			int getWidth() const;
+			int getHeight() const;
+			void removeDialog(const DialogPtr &);
+			void addDialog(DialogPtr);
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 
@@ -78,7 +81,7 @@ namespace Game3 {
 			}
 
 			template <typename T, typename... Args>
-			void addDialog(Args &&...args) {
+			void emplaceDialog(Args &&...args) {
 				dialogs.emplace_back(std::make_shared<T>(*this, std::forward<Args>(args)...));
 			}
 

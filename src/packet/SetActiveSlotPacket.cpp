@@ -9,7 +9,7 @@
 #include "ui/Window.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/Constants.h"
-#include "ui/gl/OmniDialog.h"
+#include "ui/gl/dialog/OmniDialog.h"
 
 namespace Game3 {
 	void SetActiveSlotPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {

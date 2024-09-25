@@ -12,7 +12,8 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
-#include "ui/gl/OmniDialog.h"
+#include "ui/gl/dialog/DraggableDialog.h"
+#include "ui/gl/dialog/OmniDialog.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
 #include "ui/Window.h"
@@ -178,11 +179,19 @@ namespace Game3 {
 	}
 
 	void Window::removeModule() {
-		getOmniDialog()->inventoryTab->removeModule();
+		if (omniDialog) {
+			omniDialog->inventoryTab->removeModule();
+		}
 	}
 
 	void Window::alert(const UString &message, bool queue, bool modal, bool use_markup) {
 		(void) queue; (void) modal; (void) use_markup;
+
+		auto dialog = std::make_shared<DraggableDialog>(uiContext, 600, 400);
+		dialog->init();
+		dialog->setTitle(message);
+		uiContext.addDialog(std::move(dialog));
+
 		INFO("Alert: {}", message);
 	}
 
@@ -756,6 +765,8 @@ namespace Game3 {
 
 		activateContext();
 		onGameLoaded();
+
+		alert("Connected.");
 
 		if (settings.alertOnConnection) {
 			SUCCESS("Connected.");

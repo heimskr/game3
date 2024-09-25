@@ -6,6 +6,7 @@
 #include "ui/Modifiers.h"
 
 #include <array>
+#include <memory>
 #include <string_view>
 
 namespace Game3 {
@@ -13,7 +14,7 @@ namespace Game3 {
 	struct Color;
 	struct RendererContext;
 
-	class Dialog {
+	class Dialog: public std::enable_shared_from_this<Dialog> {
 		protected:
 			UIContext &ui;
 			Dialog(UIContext &ui);
@@ -23,6 +24,8 @@ namespace Game3 {
 
 			virtual void render(const RendererContext &) = 0;
 			virtual Rectangle getPosition() const = 0;
+
+			virtual void init();
 			virtual void onClose();
 			virtual bool click(int button, int x, int y);
 			virtual bool dragStart(int x, int y);

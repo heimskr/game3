@@ -1,18 +1,19 @@
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
-#include <atomic>
-#include <memory>
-#include <stdexcept>
-#include <unordered_map>
-#include <utility>
-
 #include "Log.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/TextRenderer.h"
 #include "realm/Realm.h"
+#include "types/UString.h"
 #include "ui/Window.h"
 #include "util/FS.h"
+
+#include <atomic>
+#include <memory>
+#include <stdexcept>
+#include <unordered_map>
+#include <utility>
 
 namespace Game3 {
 	constexpr float LINE_HEIGHT = 1.5;
@@ -62,7 +63,7 @@ namespace Game3 {
 		characters.clear();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); CHECKGL
 
-		auto register_glyph = [&](gunichar ch) {
+		auto register_glyph = [&](uint32_t ch) {
 			// Load character glyph
 			if (FT_Load_Char(face, ch, FT_LOAD_RENDER))
 				throw std::runtime_error("Failed to load glyph " + std::to_string(static_cast<uint32_t>(ch)));
@@ -86,7 +87,7 @@ namespace Game3 {
 				face->glyph->advance.x);
 		};
 
-		for (gunichar ch = 32; ch < 127; ++ch) {
+		for (uint32_t ch = 32; ch < 127; ++ch) {
 			register_glyph(ch);
 		}
 
@@ -120,7 +121,7 @@ namespace Game3 {
 		}
 	}
 
-	void TextRenderer::drawOnMap(const Glib::ustring &text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
+	void TextRenderer::drawOnMap(const UString &text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
 		drawOnMap(text, TextRenderOptions {
 			.x = x,
 			.y = y,
@@ -132,7 +133,7 @@ namespace Game3 {
 		});
 	}
 
-	void TextRenderer::drawOnMap(const Glib::ustring &text, TextRenderOptions options) {
+	void TextRenderer::drawOnMap(const UString &text, TextRenderOptions options) {
 		if (!initialized)
 			initRenderData();
 
@@ -227,7 +228,7 @@ namespace Game3 {
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 	}
 
-	void TextRenderer::drawOnScreen(const Glib::ustring &text, TextRenderOptions options) {
+	void TextRenderer::drawOnScreen(const UString &text, TextRenderOptions options) {
 		if (!initialized)
 			initRenderData();
 
@@ -282,7 +283,7 @@ namespace Game3 {
 
 		float highest_on_first_line = 0;
 
-		for (const gunichar ch: text) {
+		for (const uint32_t ch: text) {
 			if (!options.ignoreNewline && ch == '\n') {
 				next_line();
 				continue;
@@ -336,29 +337,29 @@ namespace Game3 {
 		}
 	}
 
-	void TextRenderer::operator()(const Glib::ustring &text, const TextRenderOptions &options) {
+	void TextRenderer::operator()(const UString &text, const TextRenderOptions &options) {
 		drawOnScreen(text, options);
 	}
 
-	float TextRenderer::textWidth(gunichar character, float scale) const {
+	float TextRenderer::textWidth(uint32_t character, float scale) const {
 		return scale * (getCharacter(character).advance >> 6);
 	}
 
-	float TextRenderer::textWidth(const Glib::ustring &text, float scale) const {
+	float TextRenderer::textWidth(const UString &text, float scale) const {
 		float out = 0.f;
 		for (const auto ch: text)
 			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
-	float TextRenderer::textHeight(const Glib::ustring &text, float scale) const {
+	float TextRenderer::textHeight(const UString &text, float scale) const {
 		float out = 0.f;
 		for (const auto ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;
 	}
 
-	float TextRenderer::textHeight(const Glib::ustring &text, float scale, float wrap_width) const {
+	float TextRenderer::textHeight(const UString &text, float scale, float wrap_width) const {
 		const auto i_height = getCharacter('I').size.y * scale;
 		float x = 0;
 		float y = 0;
@@ -370,7 +371,7 @@ namespace Game3 {
 
 		float highest_on_first_line = 0;
 
-		for (const gunichar ch: text) {
+		for (const uint32_t ch: text) {
 			if (ch == '\n') {
 				next_line();
 				continue;
@@ -397,7 +398,7 @@ namespace Game3 {
 		return getCharacter('I').size.y * scale;
 	}
 
-	const TextRenderer::Character & TextRenderer::getCharacter(gunichar ch) const {
+	const TextRenderer::Character & TextRenderer::getCharacter(uint32_t ch) const {
 		if (auto iter = characters.find(ch); iter != characters.end())
 			return iter->second;
 		return characters.at('?');

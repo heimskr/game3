@@ -110,11 +110,11 @@ namespace Game3 {
 		return lastUpdater.lock().get() == &widget;
 	}
 
-	void Tooltip::setText(Glib::ustring new_text) {
+	void Tooltip::setText(UString new_text) {
 		text = std::move(new_text);
 	}
 
-	bool Tooltip::setText(Glib::ustring new_text, const Widget &updater) {
+	bool Tooltip::setText(UString new_text, const Widget &updater) {
 		return updateField(std::move(new_text), &Tooltip::text, updater);
 	}
 

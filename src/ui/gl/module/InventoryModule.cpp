@@ -22,6 +22,7 @@ namespace Game3 {
 		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
 
 	void InventoryModule::init() {
+		assert(inventoryGetter);
 		InventoryPtr inventory = inventoryGetter->get();
 		auto inventory_lock = inventory->sharedLock();
 		const Slot slot_count = inventory->getSlotCount();

@@ -12,7 +12,7 @@
 #include "ui/gl/tab/Tab.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
-#include "ui/gl/OmniDialog.h"
+#include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
 
@@ -32,8 +32,9 @@ namespace Game3 {
 		activeTab = inventoryTab;
 		tabRectangles.resize(tabs.size());
 
-		for (const TabPtr &tab: tabs)
+		for (const TabPtr &tab: tabs) {
 			tab->init();
+		}
 	}
 
 	void OmniDialog::render(const RendererContext &renderers) {

@@ -8,7 +8,7 @@
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
-#include "ui/gl/Dialog.h"
+#include "ui/gl/dialog/Dialog.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
@@ -35,7 +35,7 @@ namespace Game3 {
 				hotbar->render(context, (window.getWidth() * factor - width) / 2, window.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 			}
 		} else {
-			for (const std::shared_ptr<Dialog> &dialog: dialogs) {
+			for (const DialogPtr &dialog: dialogs) {
 				scissorStack = internalScissorStack;
 				dialog->render(context);
 			}
@@ -62,10 +62,6 @@ namespace Game3 {
 		}
 	}
 
-	void UIContext::addDialog(std::shared_ptr<Dialog> dialog) {
-		dialogs.emplace_back(std::move(dialog));
-	}
-
 	std::shared_ptr<ClientGame> UIContext::getGame() const {
 		return window.game;
 	}
@@ -90,7 +86,7 @@ namespace Game3 {
 		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y))
 			return true;
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const DialogPtr &dialog: reverse(dialogs))
 			if (dialog->click(button, x, y))
 				return true;
 
@@ -107,7 +103,7 @@ namespace Game3 {
 		unfocus();
 		dragOrigin.emplace(x, y);
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const DialogPtr &dialog: reverse(dialogs))
 			if (dialog->dragStart(x, y))
 				return true;
 
@@ -128,7 +124,7 @@ namespace Game3 {
 			if (widget->dragUpdate(x, y))
 				return true;
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const DialogPtr &dialog: reverse(dialogs))
 			if (dialog->dragUpdate(x, y))
 				return true;
 
@@ -154,7 +150,7 @@ namespace Game3 {
 
 		bool out = false;
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs)) {
+		for (const DialogPtr &dialog: reverse(dialogs)) {
 			if (dialog->dragEnd(x, y)) {
 				out = true;
 				break;
@@ -182,7 +178,7 @@ namespace Game3 {
 			return true;
 		}
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs)) {
+		for (const DialogPtr &dialog: reverse(dialogs)) {
 			if (dialog->scroll(x_delta, y_delta, x, y)) {
 				return true;
 			}
@@ -200,7 +196,7 @@ namespace Game3 {
 			if (context_menu->keyPressed(character, modifiers))
 				return true;
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
+		for (const DialogPtr &dialog: reverse(dialogs))
 			if (dialog->keyPressed(character, modifiers))
 				return true;
 
@@ -308,6 +304,27 @@ namespace Game3 {
 
 	std::shared_ptr<ContextMenu> UIContext::getContextMenu() const {
 		return contextMenu;
+	}
+
+	int UIContext::getWidth() const {
+		return internalScissorStack.getBase().width;
+	}
+
+	int UIContext::getHeight() const {
+		return internalScissorStack.getBase().height;
+	}
+
+	void UIContext::removeDialog(const DialogPtr &dialog) {
+		for (auto iter = dialogs.begin(); iter != dialogs.end(); ++iter) {
+			if (*iter == dialog) {
+				dialogs.erase(iter);
+				return;
+			}
+		}
+	}
+
+	void UIContext::addDialog(DialogPtr dialog) {
+		dialogs.emplace_back(std::move(dialog));
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {

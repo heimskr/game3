@@ -2,12 +2,14 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
-#include "ui/gl/Dialog.h"
+#include "ui/gl/dialog/Dialog.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	Dialog::Dialog(UIContext &ui):
 		ui(ui) {}
+
+	void Dialog::init() {}
 
 	void Dialog::onClose() {}
 

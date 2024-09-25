@@ -2,6 +2,7 @@
 
 #include "entity/Entity.h"
 #include "graphics/TextRenderer.h"
+#include "types/UString.h"
 
 namespace Game3 {
 	class TextParticle: public Entity {
@@ -29,14 +30,14 @@ namespace Game3 {
 			void decode(Buffer &) override;
 
 		private:
-			Glib::ustring text;
+			UString text;
 			Color color;
 			double lingerTime = DEFAULT_LINGER_TIME;
 			TextAlign align = DEFAULT_ALIGN;
 			double age = 0;
 
 			TextParticle();
-			TextParticle(Glib::ustring, Color = {1, 1, 1, 1}, double linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
+			TextParticle(UString, Color = {1, 1, 1, 1}, double linger_time = DEFAULT_LINGER_TIME, TextAlign = DEFAULT_ALIGN);
 
 		friend class Entity;
 	};

@@ -16,10 +16,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-// TODO!: replace Glib::ustring
-#include <glibmm/ustring.h>
-
 namespace Game3 {
+	class UString;
 	class Window;
 
 	enum class TextAlign {Left, Center, Right};
@@ -55,7 +53,7 @@ namespace Game3 {
 				FT_Pos     advance;   // Offset to advance to next glyph
 			};
 
-			std::unordered_map<gunichar, Character> characters;
+			std::unordered_map<uint32_t, Character> characters;
 
 			TextRenderer(Window &, uint32_t font_scale = 96);
 			~TextRenderer();
@@ -64,14 +62,14 @@ namespace Game3 {
 			void update(const Window &) override;
 			void update(int width, int height) override;
 
-			void drawOnMap(const Glib::ustring &text, float x, float y, TextAlign align, float scale, float angle, float alpha);
-			void drawOnMap(const Glib::ustring &text, TextRenderOptions = {});
-			void drawOnScreen(const Glib::ustring &text, TextRenderOptions = {});
-			void operator()(const Glib::ustring &text, const TextRenderOptions & = {});
-			float textWidth(gunichar character, float scale = 1.f) const;
-			float textWidth(const Glib::ustring &text, float scale = 1.f) const;
-			float textHeight(const Glib::ustring &text, float scale = 1.f) const;
-			float textHeight(const Glib::ustring &text, float scale, float wrap_width) const;
+			void drawOnMap(const UString &text, float x, float y, TextAlign align, float scale, float angle, float alpha);
+			void drawOnMap(const UString &text, TextRenderOptions = {});
+			void drawOnScreen(const UString &text, TextRenderOptions = {});
+			void operator()(const UString &text, const TextRenderOptions & = {});
+			float textWidth(uint32_t character, float scale = 1.f) const;
+			float textWidth(const UString &text, float scale = 1.f) const;
+			float textHeight(const UString &text, float scale = 1.f) const;
+			float textHeight(const UString &text, float scale, float wrap_width) const;
 			float getIHeight(float scale) const;
 
 			void reset();
@@ -101,6 +99,6 @@ namespace Game3 {
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;
 
 			void initRenderData();
-			const Character & getCharacter(gunichar) const;
+			const Character & getCharacter(uint32_t) const;
 	};
 }

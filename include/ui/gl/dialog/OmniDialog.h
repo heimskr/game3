@@ -3,7 +3,7 @@
 #include "graphics/Rectangle.h"
 #include "threading/LockableSharedPtr.h"
 #include "types/Types.h"
-#include "ui/gl/Dialog.h"
+#include "ui/gl/dialog/Dialog.h"
 
 #include <memory>
 #include <vector>

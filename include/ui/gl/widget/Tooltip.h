@@ -2,11 +2,12 @@
 
 #include "graphics/Color.h"
 #include "types/Types.h"
+#include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
 
-#include <glibmm/ustring.h>
-
+#include <memory>
 #include <optional>
+#include <utility>
 
 namespace Game3 {
 	class Tooltip: public Widget {
@@ -30,8 +31,8 @@ namespace Game3 {
 
 			bool wasUpdatedBy(const Widget &) const;
 
-			void setText(Glib::ustring);
-			bool setText(Glib::ustring, const Widget &updater);
+			void setText(UString);
+			bool setText(UString, const Widget &updater);
 
 			void setMaxWidth(float);
 			bool setMaxWidth(float, const Widget &updater);
@@ -48,7 +49,7 @@ namespace Game3 {
 			void setPositionOverride(std::optional<std::pair<float, float>>);
 
 		private:
-			Glib::ustring text;
+			UString text;
 			float maxWidth{};
 			bool visible = false;
 			Color backgroundColor;
