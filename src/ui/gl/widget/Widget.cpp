@@ -45,6 +45,22 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Widget::mouseDown(int button, int x, int y) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->contains(x, y) && child->mouseDown(button, x, y))
+				return true;
+
+		return false;
+	}
+
+	bool Widget::mouseUp(int button, int x, int y) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+			if (child->contains(x, y) && child->mouseUp(button, x, y))
+				return true;
+
+		return false;
+	}
+
 	bool Widget::dragStart(int x, int y) {
 		dragOrigin.emplace(x, y);
 

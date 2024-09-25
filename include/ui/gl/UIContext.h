@@ -37,6 +37,8 @@ namespace Game3 {
 			void reset();
 			/** Returns true iff the click accomplished something. */
 			bool click(int button, int x, int y);
+			bool mouseDown(int button, int x, int y);
+			bool mouseUp(int button, int x, int y);
 			bool dragStart(int x, int y);
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);

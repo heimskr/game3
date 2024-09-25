@@ -99,6 +99,37 @@ namespace Game3 {
 		return dialogs.empty() && hotbar->contains(x, y) && hotbar->click(button, x, y);
 	}
 
+	bool UIContext::mouseDown(int button, int x, int y) {
+		if (contextMenu && contextMenu->mouseDown(button, x, y))
+			return true;
+
+		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y))
+			return true;
+
+		for (const DialogPtr &dialog: reverse(dialogs))
+			if (dialog->mouseDown(button, x, y))
+				return true;
+
+		return dialogs.empty() && hotbar->contains(x, y) && hotbar->mouseDown(button, x, y);
+	}
+
+	bool UIContext::mouseUp(int button, int x, int y) {
+		if (contextMenu && contextMenu->mouseUp(button, x, y))
+			return true;
+
+		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y))
+			return true;
+
+		if (auto pressed = getPressedWidget())
+			return pressed->mouseUp(button, x, y);
+
+		for (const DialogPtr &dialog: reverse(dialogs))
+			if (dialog->mouseUp(button, x, y))
+				return true;
+
+		return dialogs.empty() && hotbar->contains(x, y) && hotbar->mouseUp(button, x, y);
+	}
+
 	bool UIContext::dragStart(int x, int y) {
 		if (contextMenu && contextMenu->dragStart(x, y))
 			return true;

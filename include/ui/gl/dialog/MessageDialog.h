@@ -20,12 +20,6 @@ namespace Game3 {
 			void render(const RendererContext &) override;
 
 			void init() override;
-			bool click(int button, int x, int y) override;
-			bool dragStart(int x, int y) override;
-			bool dragUpdate(int x, int y) override;
-			bool dragEnd(int x, int y) override;
-			bool scroll(float x_delta, float y_delta, int x, int y) override;
-			bool keyPressed(uint32_t character, Modifiers) override;
 
 			void setChild(WidgetPtr);
 

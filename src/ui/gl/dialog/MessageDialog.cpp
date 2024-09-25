@@ -22,7 +22,10 @@ namespace Game3 {
 		DraggableDialog::init();
 
 		vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
+		vbox->insertAtEnd(shared_from_this());
+
 		buttonBox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 2, 0, Color{});
+		vbox->append(buttonBox);
 
 		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
 		spacer->setHorizontalExpand(true);
@@ -59,48 +62,6 @@ namespace Game3 {
 		}
 	}
 
-	bool MessageDialog::click(int button, int x, int y) {
-		if (DraggableDialog::click(button, x, y))
-			return true;
-
-		return vbox->contains(x, y) && vbox->click(button, x, y);
-	}
-
-	bool MessageDialog::dragStart(int x, int y) {
-		if (DraggableDialog::dragStart(x, y))
-			return true;
-
-		return vbox->contains(x, y) && vbox->dragStart(x, y);
-	}
-
-	bool MessageDialog::dragUpdate(int x, int y) {
-		if (DraggableDialog::dragUpdate(x, y))
-			return true;
-
-		return vbox->contains(x, y) && vbox->dragUpdate(x, y);
-	}
-
-	bool MessageDialog::dragEnd(int x, int y) {
-		if (DraggableDialog::dragEnd(x, y))
-			return true;
-
-		return vbox->contains(x, y) && vbox->dragEnd(x, y);
-	}
-
-	bool MessageDialog::scroll(float x_delta, float y_delta, int x, int y) {
-		if (DraggableDialog::scroll(x_delta, y_delta, x, y))
-			return true;
-
-		return vbox->contains(x, y) && vbox->scroll(x_delta, y_delta, x, y);
-	}
-
-	bool MessageDialog::keyPressed(uint32_t character, Modifiers modifiers) {
-		if (DraggableDialog::keyPressed(character, modifiers))
-			return true;
-
-		return vbox->keyPressed(character, modifiers);
-	}
-
 	void MessageDialog::setChild(WidgetPtr new_child) {
 		child = std::move(new_child);
 		vbox->clearChildren();
@@ -122,11 +83,12 @@ namespace Game3 {
 
 	void MessageDialog::submit(bool response) {
 		onSubmit(response);
-		ui.removeDialog(shared_from_this());
+		ui.removeDialog(getSelf());
 	}
 
 	std::function<bool(Widget &, int, int, int)> MessageDialog::makeSubmit(bool response) {
 		return [this, response](Widget &, int button, int, int) {
+			INFO("Button: {}", button);
 			if (button != LEFT_BUTTON)
 				return false;
 			submit(response);

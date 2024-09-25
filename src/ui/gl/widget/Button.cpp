@@ -6,6 +6,7 @@
 #include "graphics/TextRenderer.h"
 #include "threading/ThreadContext.h"
 #include "ui/gl/widget/Button.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 #include <cassert>
@@ -107,20 +108,25 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Button::dragStart(int, int) {
+	bool Button::mouseDown(int button, int, int) {
+		if (button != LEFT_BUTTON)
+			return false;
+
 		pressed = true;
 		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
 		ui.setPressedWidget(shared_from_this());
 		return true;
 	}
 
-	bool Button::dragEnd(int x, int y) {
+	bool Button::mouseUp(int button, int x, int y) {
+		if (button != LEFT_BUTTON)
+			return false;
+
 		if (pressed) {
 			pressed = false;
 			ui.unpress();
-			if (lastRectangle.contains(x, y)) {
-				if (onClick)
-					onClick(*this, 1, x - lastRectangle.x, y - lastRectangle.y);
+			if (lastRectangle.contains(x, y) && onClick) {
+				onClick(*this, LEFT_BUTTON, x - lastRectangle.x, y - lastRectangle.y);
 			}
 		}
 

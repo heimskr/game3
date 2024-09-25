@@ -69,22 +69,22 @@ namespace Game3 {
 			if (button != LEFT_BUTTON)
 				return false;
 
-			ui.removeDialog(shared_from_this());
+			ui.removeDialog(getSelf());
 			return true;
 		});
 	}
 
 	bool BaseDraggableDialog::click(int button, int x, int y) {
-		if (!Dialog::click(button, x, y)) {
-			return false;
+		if (Dialog::click(button, x, y)) {
+			return true;
 		}
 
 		return closeButton->contains(x, y) && closeButton->click(button, x, y);
 	}
 
 	bool BaseDraggableDialog::dragStart(int x, int y) {
-		if (!Dialog::dragStart(x, y)) {
-			return false;
+		if (Dialog::dragStart(x, y)) {
+			return true;
 		}
 
 		if (titleRectangle.contains(x, y)) {
@@ -112,7 +112,7 @@ namespace Game3 {
 
 	bool BaseDraggableDialog::keyPressed(uint32_t character, Modifiers) {
 		if (character == GLFW_KEY_ESCAPE) {
-			ui.removeDialog(shared_from_this());
+			ui.removeDialog(getSelf());
 			return true;
 		}
 

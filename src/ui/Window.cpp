@@ -190,7 +190,7 @@ namespace Game3 {
 	void Window::alert(const UString &message, bool queue, bool modal, bool use_markup) {
 		(void) queue; (void) modal; (void) use_markup;
 
-		uiContext.addDialog(MessageDialog::create(uiContext, message));
+		uiContext.addDialog(MessageDialog::create(uiContext, message, ButtonsType::None));
 
 		INFO("Alert: {}", message);
 	}
@@ -198,7 +198,7 @@ namespace Game3 {
 	void Window::error(const UString &message, bool queue, bool modal, bool use_markup) {
 		(void) queue; (void) modal; (void) use_markup;
 
-		auto dialog = MessageDialog::create(uiContext, message);
+		auto dialog = MessageDialog::create(uiContext, message, ButtonsType::None);
 		dialog->setTitle("Error");
 		uiContext.addDialog(std::move(dialog));
 
@@ -599,12 +599,16 @@ namespace Game3 {
 		if (action == GLFW_PRESS) {
 			heldMouseButton = button;
 
+			uiContext.mouseDown(button, x, y);
+
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
 				dragStarted = false;
 				clickPosition.emplace(x, y);
 			}
 		} else if (action == GLFW_RELEASE) {
 			heldMouseButton.reset();
+
+			uiContext.mouseUp(button, x, y);
 
 			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
 				uiContext.click(button, x, y);

@@ -40,6 +40,8 @@ namespace Game3 {
 			virtual WidgetPtr getDragStartWidget();
 			/** `x` and `y` are absolute, not relative to the top left corner of the widget. */
 			virtual bool click(int button, int x, int y);
+			virtual bool mouseDown(int button, int x, int y);
+			virtual bool mouseUp(int button, int x, int y);
 			virtual bool dragStart(int x, int y);
 			virtual bool dragUpdate(int x, int y);
 			virtual bool dragEnd(int x, int y);
