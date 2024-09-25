@@ -5,6 +5,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/Autocompleter.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
@@ -87,7 +88,7 @@ namespace Game3 {
 			auto label = std::make_shared<Label>(ui, scale);
 			label->setText(suggestion);
 			label->setOnClick([this, weak = std::weak_ptr(label)](Widget &, int button, int, int) {
-				if (auto label = weak.lock(); label && button == 1)
+				if (auto label = weak.lock(); label && button == LEFT_BUTTON)
 					choose(label->getText());
 				return true;
 			});

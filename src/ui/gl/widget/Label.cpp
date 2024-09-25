@@ -1,10 +1,10 @@
-#include "ui/Window.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Texture.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/Types.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	Label::Label(UIContext &ui, float scale):

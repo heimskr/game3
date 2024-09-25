@@ -122,8 +122,8 @@ namespace Game3 {
 	}
 
 	bool Scroller::scroll(float x_delta, float y_delta, int, int) {
-		xOffset += (getNatural()? x_delta : -x_delta) * SCROLL_SPEED;
-		yOffset += (getNatural()? y_delta : -y_delta) * SCROLL_SPEED;
+		xOffset += (getNatural()? -x_delta : x_delta) * SCROLL_SPEED;
+		yOffset += (getNatural()? -y_delta : y_delta) * SCROLL_SPEED;
 		xOffset = std::min(0.f, xOffset);
 		yOffset = fixYOffset(yOffset);
 		updateVerticalRectangle();

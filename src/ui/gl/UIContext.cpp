@@ -52,12 +52,12 @@ namespace Game3 {
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
-			const int width = window.getWidth() * factor * factor;
-			const int height = window.getHeight() * factor * factor;
+			const int width = window.getWidth() * factor;
+			const int height = window.getHeight() * factor;
 			GL::Viewport(0, 0, width, height);
 			context.updateSize(width, height);
 			renderingDraggedWidget = true;
-			draggedWidget->render(context, mouse_x * factor, mouse_y * factor + height / factor, -1, -1);
+			draggedWidget->render(context, mouse_x * factor, mouse_y * factor, -1, -1);
 			renderingDraggedWidget = false;
 		}
 	}

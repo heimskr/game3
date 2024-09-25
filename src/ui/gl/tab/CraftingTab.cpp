@@ -33,7 +33,7 @@ namespace Game3 {
 		});
 
 		input->setOnClick([this](Widget &input, int button, int mouse_x, int mouse_y) {
-			if (button != 3)
+			if (button != RIGHT_BUTTON)
 				return false;
 
 			auto menu = std::make_shared<ContextMenu>(ui, scale, input.shared_from_this(), mouse_x, mouse_y);

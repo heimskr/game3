@@ -1,3 +1,4 @@
+#include "graphics/OpenGL.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "threading/ThreadContext.h"
@@ -15,7 +16,6 @@
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Window.h"
 #include "ui/Window.h"
 #include "util/Util.h"
 

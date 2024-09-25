@@ -18,8 +18,6 @@
 #include "types/UString.h"
 #include "ui/gl/UIContext.h"
 
-#include <GLFW/glfw3.h>
-
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -122,8 +120,15 @@ namespace Game3 {
 			GL::Texture scratchTexture;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
+			std::pair<int, int> lastWindowSize{-1, -1};
+			Modifiers lastModifiers;
+			std::optional<std::pair<int, int>> clickPosition;
+			std::optional<int> heldMouseButton;
 
 			void keyCallback(int key, int scancode, int action, int mods);
+			void mouseButtonCallback(int button, int action, int mods);
+			void mousePositionCallback(int x, int y);
+			void scrollCallback(double x_delta, double y_delta);
 			void onGameLoaded();
 			bool connect(const std::string &hostname, uint16_t port);
 			void autoConnect();

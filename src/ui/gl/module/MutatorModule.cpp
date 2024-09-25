@@ -10,6 +10,7 @@
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
 #include "ui/gl/widget/Label.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -46,7 +47,7 @@ namespace Game3 {
 		mutateButton->setFixedHeight(10 * scale);
 		mutateButton->setVerticalAlignment(Alignment::Center);
 		mutateButton->setOnClick([this](Widget &, int button, int, int) {
-			if (button != 1)
+			if (button != LEFT_BUTTON)
 				return false;
 			mutate();
 			return true;

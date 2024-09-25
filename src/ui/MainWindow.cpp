@@ -180,7 +180,8 @@ namespace Game3 {
 			lastDragX = lastDragY = 0;
 			autofocus = false;
 		});
-		drag->signal_drag_update().connect([this](double x, double y) {
+		drag->signal_drag_update().connect([](double x, double y) {
+			(void) x; (void) y;
 			// double delta_x = x - lastDragX;
 			// double delta_y = y - lastDragY;
 			// lastDragX = x;
@@ -268,6 +269,7 @@ namespace Game3 {
 		auto scroll = Gtk::EventControllerScroll::create();
 		scroll->set_flags(Gtk::EventControllerScroll::Flags::VERTICAL);
 		scroll->signal_scroll().connect([this](double x, double y) {
+			(void) x; (void) y;
 			if (!canvas)
 				return true;
 
@@ -630,7 +632,7 @@ namespace Game3 {
 
 	void MainWindow::addYield(Gtk::Widget &widget) {
 		auto controller = Gtk::EventControllerKey::create();
-		controller->signal_key_pressed().connect([this](guint keyval, guint, Gdk::ModifierType) {
+		controller->signal_key_pressed().connect([](guint keyval, guint, Gdk::ModifierType) {
 			if (keyval == GDK_KEY_Escape) {
 				// game->getWindow()->yieldFocus();
 				return true;
@@ -713,7 +715,7 @@ namespace Game3 {
 		// canvas->uiContext.removeDialogs<OmniDialog>();
 	}
 
-	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
+	void MainWindow::showFluids(const std::shared_ptr<HasFluids> &) {
 		// getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(canvas->uiContext, has_fluids));
 	}
 

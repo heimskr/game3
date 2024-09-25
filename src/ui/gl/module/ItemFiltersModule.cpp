@@ -35,7 +35,7 @@ namespace Game3 {
 		copy_button->setAlignment(Alignment::Center);
 		copy_button->setFixedHeight(12 * scale);
 		copy_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button == 1)
+			if (button == LEFT_BUTTON)
 				copy();
 			return true;
 		});
@@ -54,7 +54,7 @@ namespace Game3 {
 		paste_button->setAlignment(Alignment::Center);
 		paste_button->setFixedHeight(12 * scale);
 		paste_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button == 1)
+			if (button == LEFT_BUTTON)
 				paste();
 			return true;
 		});
@@ -74,7 +74,7 @@ namespace Game3 {
 		whitelist_label->setHorizontalExpand(true);
 		whitelist_label->insertAtEnd(secondHBox);
 		whitelist_label->setOnClick([this](Widget &, int button, int, int) -> bool {
-			if (button != 1)
+			if (button != LEFT_BUTTON)
 				return false;
 			const bool whitelist = !whitelistCheckbox->getChecked();
 			whitelistCheckbox->setChecked(whitelist);
@@ -92,7 +92,7 @@ namespace Game3 {
 		strict_label->setText("Strict");
 		strict_label->insertAtEnd(secondHBox);
 		strict_label->setOnClick([this](Widget &, int button, int, int) -> bool {
-			if (button != 1)
+			if (button != LEFT_BUTTON)
 				return false;
 			const bool strict = !strictCheckbox->getChecked();
 			strictCheckbox->setChecked(strict);
@@ -280,7 +280,7 @@ namespace Game3 {
 			button->setText("~");
 
 		button->setOnClick([this, id = id, config = config](Widget &, int button, int, int) {
-			if (button != 1)
+			if (button != LEFT_BUTTON)
 				return false;
 			setFilter();
 			{
@@ -341,7 +341,7 @@ namespace Game3 {
 		auto button = std::make_shared<IconButton>(ui, scale);
 		button->setIconTexture(cacheTexture("resources/gui/minus.png"));
 		button->setOnClick([this, stack = stack->copy()](Widget &, int button, int, int) {
-			if (button != 1)
+			if (button != LEFT_BUTTON)
 				return false;
 			setFilter();
 			if (filter) {

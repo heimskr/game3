@@ -1731,6 +1731,8 @@ namespace Game3 {
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {
+		(void) x; (void) y;
+
 		if (getSide() != Side::Client)
 			return false;
 

@@ -54,7 +54,7 @@ namespace Game3 {
 		onSelect(std::move(on_select)) {
 			setText(std::move(text));
 			setOnClick([this](Widget &, int button, int, int) {
-				if (button != 1)
+				if (button != LEFT_BUTTON)
 					return false;
 				onSelect();
 				this->ui.setContextMenu(nullptr); // TODO: is this safe?

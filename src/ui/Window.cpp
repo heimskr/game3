@@ -67,8 +67,23 @@ namespace Game3 {
 		glfwWindow(&glfw_window),
 		scale(8) {
 			glfwSetWindowUserPointer(glfwWindow, this);
+
 			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
 				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->keyCallback(key, scancode, action, mods);
+			});
+
+			glfwSetMouseButtonCallback(glfwWindow, +[](GLFWwindow *glfw_window, int button, int action, int mods) {
+				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->mouseButtonCallback(button, action, mods);
+			});
+
+			glfwSetCursorPosCallback(glfwWindow, +[](GLFWwindow *glfw_window, double x_pos, double y_pos) {
+				const auto x = static_cast<int>(std::floor(x_pos));
+				const auto y = static_cast<int>(std::floor(y_pos));
+				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->mousePositionCallback(x, y);
+			});
+
+			glfwSetScrollCallback(glfwWindow, +[](GLFWwindow *glfw_window, double x, double y) {
+				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->scrollCallback(x, y);
 			});
 
 			if (std::filesystem::exists("settings.json"))
@@ -113,19 +128,21 @@ namespace Game3 {
 	}
 
 	int Window::getMouseX() const {
-		double x;
+		double x{};
 		glfwGetCursorPos(glfwWindow, &x, nullptr);
-		return static_cast<int>(x);
+		return static_cast<int>(std::floor(x));
 	}
 
 	int Window::getMouseY() const {
-		double y;
+		double y{};
 		glfwGetCursorPos(glfwWindow, nullptr, &y);
-		return static_cast<int>(y);
+		return static_cast<int>(std::floor(y));
 	}
 
 	std::pair<double, double> Window::getMouseCoordinates() const {
-		return {static_cast<double>(getMouseX()), static_cast<double>(getMouseY())};
+		double x{}, y{};
+		glfwGetCursorPos(glfwWindow, &x, &y);
+		return {x, y};
 	}
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
@@ -165,15 +182,17 @@ namespace Game3 {
 	}
 
 	void Window::alert(const UString &message, bool queue, bool modal, bool use_markup) {
+		(void) queue; (void) modal; (void) use_markup;
 		INFO("Alert: {}", message);
 	}
 
 	void Window::error(const UString &message, bool queue, bool modal, bool use_markup) {
+		(void) queue; (void) modal; (void) use_markup;
 		ERROR("Error: {}", message);
 	}
 
 	Modifiers Window::getModifiers() const {
-		return {};
+		return lastModifiers;
 	}
 
 	Position Window::getHoveredPosition() const {
@@ -238,6 +257,13 @@ namespace Game3 {
 	}
 
 	void Window::tick() {
+		int width{}, height{};
+		glfwGetWindowSize(glfwWindow, &width, &height);
+		if (width != lastWindowSize.first || height != lastWindowSize.second) {
+			uiContext.onResize(width, height);
+			lastWindowSize = {width, height};
+		}
+
 		handleKeys();
 
 		for (const auto &function: functionQueue.steal())
@@ -415,6 +441,8 @@ namespace Game3 {
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
 		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
 
+		lastModifiers = modifiers;
+
 		if (action == GLFW_PRESS) {
 			if (auto iter = keyTimes.find(key); iter != keyTimes.end()) {
 				iter->second.modifiers = modifiers;
@@ -541,6 +569,43 @@ namespace Game3 {
 		}
 	}
 
+	void Window::mouseButtonCallback(int button, int action, int mods) {
+		lastModifiers = Modifiers(mods);
+
+		double x_pos{}, y_pos{};
+		glfwGetCursorPos(glfwWindow, &x_pos, &y_pos);
+		const auto x = static_cast<int>(std::floor(x_pos));
+		const auto y = static_cast<int>(std::floor(y_pos));
+
+		if (action == GLFW_PRESS) {
+			heldMouseButton = button;
+
+			if (button == GLFW_MOUSE_BUTTON_LEFT) {
+				uiContext.dragStart(x, y);
+				clickPosition.emplace(x, y);
+			}
+		} else if (action == GLFW_RELEASE) {
+			heldMouseButton.reset();
+
+			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
+				uiContext.click(button, x, y);
+			} else {
+				uiContext.dragEnd(x, y);
+			}
+		}
+	}
+
+	void Window::mousePositionCallback(int x, int y) {
+		if (heldMouseButton == GLFW_MOUSE_BUTTON_LEFT) {
+			uiContext.dragUpdate(x, y);
+		}
+	}
+
+	void Window::scrollCallback(double x_delta, double y_delta) {
+		const auto [x, y] = getMouseCoordinates();
+		uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y));
+	}
+
 	void Window::closeGame() {
 		if (game == nullptr)
 			return;
@@ -584,7 +649,7 @@ namespace Game3 {
 			}
 		});
 
-		game->signalPlayerMoneyUpdate().connect([this](const PlayerPtr &player) {
+		game->signalPlayerMoneyUpdate().connect([](const PlayerPtr &) {
 			// updateMoneyLabel(player->getMoney());
 		});
 

@@ -262,7 +262,7 @@ int main(int argc, char **argv) {
 	if (!glfwInit())
 		return 1;
 
-	GLFWwindow *glfw_window = glfwCreateWindow(1280, 960, "Game3", nullptr, nullptr);
+	GLFWwindow *glfw_window = glfwCreateWindow(1600, 1000, "Game3", nullptr, nullptr);
 	if (!glfw_window) {
 		glfwTerminate();
 		return 2;
@@ -283,6 +283,8 @@ int main(int argc, char **argv) {
 	INFO("Closing.");
 	window->closeGame();
 	INFO("Closed.");
+	window.reset();
+
 	glfwTerminate();
 	const int out = 0;
 #else

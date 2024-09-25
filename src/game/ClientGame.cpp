@@ -18,7 +18,7 @@
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
 #include "threading/ThreadContext.h"
-#include "ui/Window.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "util/Util.h"
 
@@ -61,9 +61,9 @@ namespace Game3 {
 
 		auto client = getClient();
 
-		if (button == 1)
+		if (button == LEFT_BUTTON)
 			client->send(ClickPacket(translated, fractional_x, fractional_y, modifiers));
-		else if (button == 3 && getPlayer() && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
+		else if (button == RIGHT_BUTTON && getPlayer() && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
 			client->send(TeleportSelfPacket(realm->id, translated));
 	}
 

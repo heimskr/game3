@@ -100,7 +100,7 @@ namespace Game3 {
 		if (Widget::click(button, x, y))
 			return true;
 
-		if (button == 1) {
+		if (button == LEFT_BUTTON) {
 			ui.focusWidget(shared_from_this());
 			return true;
 		}

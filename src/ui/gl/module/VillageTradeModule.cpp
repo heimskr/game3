@@ -10,6 +10,7 @@
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Util.h"
 
@@ -71,7 +72,7 @@ namespace Game3 {
 		sellButton->setVerticalAlignment(Alignment::Center);
 		sellButton->setFixedHeight(10 * scale);
 		sellButton->setOnClick([this](Widget &, int button, int, int) {
-			if (button == 1)
+			if (button == LEFT_BUTTON)
 				sell();
 			return true;
 		});
@@ -264,7 +265,7 @@ namespace Game3 {
 		weakGame(game),
 		villageID(village_id),
 		resource(item.identifier),
-		basePrice(item.basePrice),
+		// basePrice(item.basePrice),
 		amount(amount_) {}
 
 	void VillageTradeRow::init() {
@@ -295,7 +296,7 @@ namespace Game3 {
 		});
 
 		buyButton->setOnClick([this](Widget &, int button, int, int) {
-			if (button == 1) {
+			if (button == LEFT_BUTTON) {
 				if (ClientGamePtr game = weakGame.lock()) {
 					const std::string &amount_text = transferAmount->getText().raw();
 					ItemCount amount{};

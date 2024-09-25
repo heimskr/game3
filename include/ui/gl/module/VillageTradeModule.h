@@ -25,7 +25,7 @@ namespace Game3 {
 			VillageID villageID{};
 			Identifier resource;
 			std::shared_ptr<ItemSlot> itemSlot;
-			double basePrice{};
+			// double basePrice{};
 			double amount{};
 			std::shared_ptr<Label> quantityLabel;
 			std::shared_ptr<TextInput> transferAmount;
