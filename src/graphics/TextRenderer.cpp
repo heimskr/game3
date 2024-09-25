@@ -401,6 +401,15 @@ namespace Game3 {
 	const TextRenderer::Character & TextRenderer::getCharacter(uint32_t ch) const {
 		if (auto iter = characters.find(ch); iter != characters.end())
 			return iter->second;
+		assert(initialized);
+		return characters.at('?');
+	}
+
+	const TextRenderer::Character & TextRenderer::getCharacter(uint32_t ch) {
+		if (!initialized)
+			initRenderData();
+		if (auto iter = characters.find(ch); iter != characters.end())
+			return iter->second;
 		return characters.at('?');
 	}
 }

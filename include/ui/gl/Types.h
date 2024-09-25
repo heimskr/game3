@@ -3,9 +3,10 @@
 #include <format>
 
 namespace Game3 {
-	enum class Orientation: char {Vertical, Horizontal};
-	enum class SizeRequestMode: char {HeightForWidth, WidthForHeight, ConstantSize, Expansive};
-	enum class Alignment: char {Start, Center, End};
+	enum class Orientation {Vertical, Horizontal};
+	enum class SizeRequestMode {HeightForWidth, WidthForHeight, ConstantSize, Expansive};
+	enum class Alignment {Start, Center, End};
+	enum class ButtonsType {Cancel, Okay, CancelOkay, No, Yes, NoYes};
 }
 
 template <>

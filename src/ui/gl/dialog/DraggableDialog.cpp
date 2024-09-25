@@ -27,10 +27,16 @@ namespace Game3 {
 		constexpr auto scale = UI_SCALE;
 
 		titleRectangle = position + Rectangle(scale, scale, position.width - 9 * scale, 7 * scale);
+		bodyRectangle = position + Rectangle(scale, 9 * scale, position.width - 2 * scale, position.height - 10 * scale);
 
 		rectangler.drawOnScreen(BORDER_COLOR, position);
 		rectangler.drawOnScreen(TITLE_BACKGROUND_COLOR, titleRectangle);
-		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, position + Rectangle(scale, 9 * scale, position.width - 2 * scale, position.height - 10 * scale));
+		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, bodyRectangle);
+
+		bodyRectangle.x += scale;
+		bodyRectangle.y += scale;
+		bodyRectangle.width -= 2 * scale;
+		bodyRectangle.height -= 2 * scale;
 
 		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 

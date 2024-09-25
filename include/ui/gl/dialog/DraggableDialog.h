@@ -28,6 +28,7 @@ namespace Game3 {
 		protected:
 			Rectangle position;
 			Rectangle titleRectangle;
+			Rectangle bodyRectangle;
 			std::shared_ptr<Icon> closeButton;
 			std::optional<std::pair<int, int>> dragOffset;
 	};

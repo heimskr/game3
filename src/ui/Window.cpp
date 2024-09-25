@@ -13,6 +13,7 @@
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
 #include "ui/gl/dialog/DraggableDialog.h"
+#include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
@@ -91,6 +92,8 @@ namespace Game3 {
 				settings = nlohmann::json::parse(readFile("settings.json"));
 
 			settings.apply();
+
+			textRenderer.initRenderData();
 		}
 
 	void Window::queue(std::function<void(Window &)> function) {
@@ -187,16 +190,18 @@ namespace Game3 {
 	void Window::alert(const UString &message, bool queue, bool modal, bool use_markup) {
 		(void) queue; (void) modal; (void) use_markup;
 
-		auto dialog = std::make_shared<DraggableDialog>(uiContext, 600, 400);
-		dialog->init();
-		dialog->setTitle(message);
-		uiContext.addDialog(std::move(dialog));
+		uiContext.addDialog(MessageDialog::create(uiContext, message));
 
 		INFO("Alert: {}", message);
 	}
 
 	void Window::error(const UString &message, bool queue, bool modal, bool use_markup) {
 		(void) queue; (void) modal; (void) use_markup;
+
+		auto dialog = MessageDialog::create(uiContext, message);
+		dialog->setTitle("Error");
+		uiContext.addDialog(std::move(dialog));
+
 		ERROR("Error: {}", message);
 	}
 

@@ -73,6 +73,7 @@ namespace Game3 {
 			float getIHeight(float scale) const;
 
 			void reset();
+			void initRenderData();
 
 		private:
 			struct FreeLibrary {
@@ -98,7 +99,7 @@ namespace Game3 {
 			std::unique_ptr<FT_Library, FreeLibrary> freetypeLibrary;
 			std::unique_ptr<FT_Face, FreeFace> freetypeFace;
 
-			void initRenderData();
 			const Character & getCharacter(uint32_t) const;
+			const Character & getCharacter(uint32_t);
 	};
 }
