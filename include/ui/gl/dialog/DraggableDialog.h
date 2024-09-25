@@ -12,9 +12,10 @@ namespace Game3 {
 		public:
 			BaseDraggableDialog(UIContext &, int width, int height);
 
-			void init() override;
 			void render(const RendererContext &) override;
 			Rectangle getPosition() const override;
+			void init() override;
+			bool click(int button, int x, int y) override;
 
 			virtual float getTitleScale() const = 0;
 			virtual const UString & getTitle() const = 0;

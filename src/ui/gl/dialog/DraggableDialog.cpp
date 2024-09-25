@@ -26,13 +26,19 @@ namespace Game3 {
 		closeButton->setFixedSize(3.5 * UI_SCALE);
 		closeButton->init();
 		closeButton->setOnClick([this](Widget &, int button, int, int) {
-			INFO("closeButton clicked with mouse button {}", button);
 			if (button != LEFT_BUTTON)
 				return false;
 
 			ui.removeDialog(shared_from_this());
 			return true;
 		});
+	}
+
+	bool BaseDraggableDialog::click(int button, int x, int y) {
+		if (!Dialog::click(button, x, y))
+			return false;
+
+		return closeButton->contains(x, y) && closeButton->click(button, x, y);
 	}
 
 	void BaseDraggableDialog::render(const RendererContext &renderers) {

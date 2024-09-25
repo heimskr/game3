@@ -33,6 +33,7 @@ namespace Game3 {
 			virtual bool dragEnd(int x, int y);
 			virtual bool scroll(float x_delta, float y_delta, int x, int y);
 			virtual bool keyPressed(uint32_t character, Modifiers);
+			virtual bool hidesHotbar() const;
 	};
 
 	using DialogPtr = std::shared_ptr<Dialog>;

@@ -36,4 +36,8 @@ namespace Game3 {
 	bool Dialog::keyPressed(uint32_t, Modifiers) {
 		return false;
 	}
+
+	bool Dialog::hidesHotbar() const {
+		return false;
+	}
 }

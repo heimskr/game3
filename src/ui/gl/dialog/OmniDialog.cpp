@@ -188,6 +188,10 @@ namespace Game3 {
 		return true;
 	}
 
+	bool OmniDialog::hidesHotbar() const {
+		return true;
+	}
+
 	void OmniDialog::updateModule() {
 		std::unique_lock<DefaultMutex> lock;
 
