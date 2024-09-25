@@ -20,6 +20,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <string>
@@ -60,6 +61,7 @@ namespace Game3 {
 			GL::Texture dynamicLightingTexture;
 			GL::FBO fbo;
 			Rectangle realmBounds;
+			bool autofocus = true;
 
 			Window(GLFWwindow &);
 
@@ -109,10 +111,17 @@ namespace Game3 {
 			void closeGame();
 
 		private:
+			struct KeyInfo {
+				int code;
+				Modifiers modifiers;
+				std::chrono::system_clock::time_point lastProcessed;
+			};
+
 			MTQueue<std::function<void(Window &)>> functionQueue;
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
 			GL::Texture scratchTexture;
 			ServerWrapper serverWrapper;
+			std::map<int, KeyInfo> keyTimes;
 
 			void keyCallback(int key, int scancode, int action, int mods);
 			void onGameLoaded();
@@ -120,5 +129,6 @@ namespace Game3 {
 			void autoConnect();
 			void playLocally();
 			void continueLocalConnection();
+			void handleKeys();
 	};
 }

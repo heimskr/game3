@@ -6,6 +6,7 @@
 #include "net/LocalClient.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/LoginPacket.h"
+#include "packet/SetHeldItemPacket.h"
 #include "types/Position.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
@@ -21,6 +22,47 @@
 #include <fstream>
 
 namespace Game3 {
+	namespace {
+		constexpr std::chrono::milliseconds KEY_REPEAT_TIME{100};
+		constexpr std::chrono::milliseconds ARROW_TIME{100};
+		constexpr std::chrono::milliseconds INTERACT_TIME{250};
+		constexpr std::chrono::milliseconds JUMP_TIME{50};
+		constexpr std::chrono::milliseconds SLOW_TIME{1'000};
+		constexpr std::chrono::milliseconds FOREVER{1'000'000'000};
+
+		std::map<guint, std::chrono::milliseconds> CUSTOM_KEY_REPEAT_TIMES{
+			{GDK_KEY_Up,           ARROW_TIME},
+			{GDK_KEY_Down,         ARROW_TIME},
+			{GDK_KEY_Left,         ARROW_TIME},
+			{GDK_KEY_Right,        ARROW_TIME},
+			{GDK_KEY_q,            INTERACT_TIME},
+			{GDK_KEY_Q,            INTERACT_TIME},
+			{GDK_KEY_e,            INTERACT_TIME},
+			{GDK_KEY_E,            INTERACT_TIME},
+			{GDK_KEY_bracketleft,  INTERACT_TIME},
+			{GDK_KEY_bracketright, INTERACT_TIME},
+			{GDK_KEY_r,            INTERACT_TIME},
+			{GDK_KEY_R,            INTERACT_TIME},
+			{GDK_KEY_o,            INTERACT_TIME},
+			{GDK_KEY_Return,       INTERACT_TIME},
+			{GDK_KEY_space,        JUMP_TIME},
+			{GDK_KEY_g,            SLOW_TIME},
+			{GDK_KEY_0,            SLOW_TIME},
+			{GDK_KEY_1,            SLOW_TIME},
+			{GDK_KEY_2,            SLOW_TIME},
+			{GDK_KEY_3,            SLOW_TIME},
+			{GDK_KEY_4,            SLOW_TIME},
+			{GDK_KEY_5,            SLOW_TIME},
+			{GDK_KEY_6,            SLOW_TIME},
+			{GDK_KEY_7,            SLOW_TIME},
+			{GDK_KEY_8,            SLOW_TIME},
+			{GDK_KEY_9,            SLOW_TIME},
+			{GDK_KEY_braceleft,    SLOW_TIME},
+			{GDK_KEY_braceright,   SLOW_TIME},
+			{GDK_KEY_Escape,       FOREVER},
+		};
+	}
+
 	Window::Window(GLFWwindow &glfw_window):
 		glfwWindow(&glfw_window),
 		scale(8) {
@@ -196,8 +238,16 @@ namespace Game3 {
 	}
 
 	void Window::tick() {
+		handleKeys();
+
 		for (const auto &function: functionQueue.steal())
 			function(*this);
+
+		if (autofocus && game) {
+			if (ClientPlayerPtr player = game->getPlayer()) {
+				player->focus(*this, true);
+			}
+		}
 
 		{
 			auto lock = boolFunctions.uniqueLock();
@@ -363,14 +413,20 @@ namespace Game3 {
 	}
 
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
-		Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
+		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
 
 		if (action == GLFW_PRESS) {
-			INFO("key[{}], scancode[{}], action[{}], mods[{}]", key, scancode, action, modifiers);
+			if (auto iter = keyTimes.find(key); iter != keyTimes.end()) {
+				iter->second.modifiers = modifiers;
+			} else if (!modifiers.ctrl) {
+				keyTimes.try_emplace(key, scancode, modifiers, getTime());
+			}
 
-			if (modifiers.onlyCtrl() && key == 'P') {
-				playLocally();
-				return;
+			if (modifiers.onlyCtrl()) {
+				if (key == GLFW_KEY_P) {
+					playLocally();
+					return;
+				}
 			}
 		}
 
@@ -385,6 +441,7 @@ namespace Game3 {
 
 						if (!player->isMoving())
 							player->setContinuousInteraction(modifiers.shift, Modifiers(modifiers));
+
 						if (!player->isMoving(direction))
 							player->startMoving(direction);
 
@@ -395,12 +452,68 @@ namespace Game3 {
 						return;
 					}
 				}
+
+				if (key == GLFW_KEY_SPACE) {
+					player->jump();
+					return;
+				}
+
+				if (key == GLFW_KEY_E) {
+					if (uiContext.hasDialog<OmniDialog>()) {
+						uiContext.removeDialogs<OmniDialog>();
+					} else {
+						game->interactNextTo(modifiers, Hand::Right);
+					}
+					return;
+				}
+
+				if (key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER) {
+					game->interactNextTo(Modifiers(modifiers), Hand::Right);
+					return;
+				}
+
+				if (key == GLFW_KEY_Q) {
+					game->interactNextTo(modifiers, Hand::Left);
+					return;
+				}
+
+				if (key == GLFW_KEY_LEFT_BRACKET) {
+					player->send(SetHeldItemPacket(true, player->getActiveSlot()));
+					return;
+				}
+
+				if (key == GLFW_KEY_RIGHT_BRACKET) {
+					player->send(SetHeldItemPacket(false, player->getActiveSlot()));
+					return;
+				}
+
+				if (key == GLFW_KEY_R) {
+					game->interactOn(Modifiers(modifiers));
+					return;
+				}
 			}
 
-			if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+			if (action == GLFW_PRESS) {
 				if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
-					if (player->isMoving())
+					if (player->isMoving()) {
 						player->send(ContinuousInteractionPacket(player->continuousInteractionModifiers));
+					}
+					return;
+				}
+
+				if (key == GLFW_KEY_F) {
+					if (modifiers.onlyCtrl()) {
+						autofocus = !autofocus;
+					} else if (modifiers.empty()) {
+						player->focus(*this, false);
+					}
+					return;
+				}
+
+				if (key == GLFW_KEY_ESCAPE) {
+					if (uiContext.removeDialogs<OmniDialog>() == 0) {
+						uiContext.addDialog(getOmniDialog());
+					}
 					return;
 				}
 			}
@@ -431,6 +544,7 @@ namespace Game3 {
 	void Window::closeGame() {
 		if (game == nullptr)
 			return;
+
 		// richPresence.setActivityDetails("Idling");
 
 		// uiContext.removeDialogs();
@@ -440,22 +554,20 @@ namespace Game3 {
 
 		removeModule();
 		game->stopThread();
-		// canvas->game = nullptr;
 		game.reset();
 
 		omniDialog.reset();
-		// canvas->uiContext.reset();
+		uiContext.reset();
 	}
 
 	void Window::onGameLoaded() {
 		// richPresence.setActivityStartTime(false);
 		// richPresence.setActivityDetails("Playing", true);
 
-		// canvas->uiContext.reset();
+		uiContext.reset();
 
 		// debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
-		// canvas->game = game;
 		settings.apply(*game);
 
 		game->signalOtherInventoryUpdate().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
@@ -652,5 +764,22 @@ namespace Game3 {
 		// 		client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name));
 		// });
 		// queueDialog(std::move(login_dialog));
+	}
+
+	void Window::handleKeys() {
+		std::erase_if(keyTimes, [this](const std::pair<int, KeyInfo> &pair) {
+			return glfwGetKey(glfwWindow, pair.first) == GLFW_RELEASE;
+		});
+
+		for (auto &[key, info]: keyTimes) {
+			auto &[keycode, modifiers, time] = info;
+			auto repeat_time = KEY_REPEAT_TIME;
+			if (auto iter = CUSTOM_KEY_REPEAT_TIMES.find(key); iter != CUSTOM_KEY_REPEAT_TIMES.end())
+				repeat_time = iter->second;
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeDifference(time)) < repeat_time)
+				continue;
+			time = getTime();
+			keyCallback(key, keycode, GLFW_REPEAT, static_cast<uint8_t>(modifiers));
+		}
 	}
 }
