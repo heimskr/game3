@@ -6,6 +6,7 @@
 #include "ui/gl/dialog/Dialog.h"
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace Game3 {
@@ -25,6 +26,8 @@ namespace Game3 {
 			Rectangle getPosition() const final;
 			void onClose() final;
 			bool click(int button, int x, int y) final;
+			bool mouseDown(int button, int x, int y) final;
+			bool mouseUp(int button, int x, int y) final;
 			bool dragStart(int x, int y) final;
 			bool dragUpdate(int x, int y) final;
 			bool dragEnd(int x, int y) final;
@@ -53,6 +56,7 @@ namespace Game3 {
 		private:
 			Lockable<std::vector<std::shared_ptr<Tab>>> tabs;
 			std::vector<Rectangle> tabRectangles;
+			std::optional<std::pair<int, int>> mouseDownPosition;
 
 			template <typename T>
 			static bool tabMatcher(const std::shared_ptr<Tab> &tab) {

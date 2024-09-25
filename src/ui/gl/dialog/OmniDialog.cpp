@@ -128,64 +128,91 @@ namespace Game3 {
 	}
 
 	bool OmniDialog::click(int button, int x, int y) {
-		for (size_t i = 0; i < tabRectangles.size(); ++i) {
-			if (tabRectangles[i].contains(x, y)) {
-				const TabPtr &clicked_tab = tabs.at(i);
-				if (clicked_tab != activeTab) {
-					activeTab->onBlur();
-					activeTab = clicked_tab;
+		if (!getPosition().contains(x, y))
+			return false;
+
+		if (activeTab && activeTab->click(button, x, y))
+			return true;
+
+		return Dialog::click(button, x, y);
+	}
+
+	bool OmniDialog::mouseDown(int button, int x, int y) {
+		mouseDownPosition.emplace(x, y);
+
+		if (!getPosition().contains(x, y))
+			return false;
+
+		if (activeTab && activeTab->mouseDown(button, x, y))
+			return true;
+
+		return Dialog::mouseDown(button, x, y);
+	}
+
+	bool OmniDialog::mouseUp(int button, int x, int y) {
+		if (mouseDownPosition) {
+			const auto [mouse_down_x, mouse_down_y] = *mouseDownPosition;
+			mouseDownPosition.reset();
+
+			for (size_t i = 0; i < tabRectangles.size(); ++i) {
+				if (tabRectangles[i].contains(x, y) && tabRectangles[i].contains(mouse_down_x, mouse_down_y)) {
+					const TabPtr &clicked_tab = tabs.at(i);
+					if (clicked_tab != activeTab) {
+						activeTab->onBlur();
+						activeTab = clicked_tab;
+					}
+					return true;
 				}
-				return true;
 			}
 		}
 
-		if (!Dialog::click(button, x, y))
+		if (!getPosition().contains(x, y))
 			return false;
 
-		if (activeTab)
-			activeTab->click(button, x, y);
+		if (activeTab && activeTab->mouseUp(button, x, y))
+			return true;
 
-		return true;
+		return Dialog::mouseUp(button, x, y);
 	}
 
 	bool OmniDialog::dragStart(int x, int y) {
-		if (!Dialog::dragStart(x, y))
+		if (!getPosition().contains(x, y))
 			return false;
 
-		if (activeTab)
-			activeTab->dragStart(x, y);
+		if (activeTab && activeTab->dragStart(x, y))
+			return true;
 
-		return true;
+		return Dialog::dragStart(x, y);
 	}
 
 	bool OmniDialog::dragUpdate(int x, int y) {
-		if (!Dialog::dragUpdate(x, y))
+		if (!getPosition().contains(x, y))
 			return false;
 
-		if (activeTab)
-			activeTab->dragUpdate(x, y);
+		if (activeTab && activeTab->dragUpdate(x, y))
+			return true;
 
-		return true;
+		return Dialog::dragUpdate(x, y);
 	}
 
 	bool OmniDialog::dragEnd(int x, int y) {
-		if (!Dialog::dragEnd(x, y))
+		if (!getPosition().contains(x, y))
 			return false;
 
-		if (activeTab)
-			activeTab->dragEnd(x, y);
+		if (activeTab && activeTab->dragEnd(x, y))
+			return true;
 
-		return true;
+		return Dialog::dragEnd(x, y);
 	}
 
 	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y) {
-		if (!Dialog::scroll(x_delta, y_delta, x, y))
+		if (!getPosition().contains(x, y))
 			return false;
 
-		if (activeTab)
-			activeTab->scroll(x_delta, y_delta, x, y);
+		if (activeTab && activeTab->scroll(x_delta, y_delta, x, y))
+			return true;
 
-		return true;
+		return Dialog::scroll(x_delta, y_delta, x, y);
 	}
 
 	bool OmniDialog::hidesHotbar() const {
