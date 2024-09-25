@@ -222,15 +222,19 @@ namespace Game3 {
 	}
 
 	void ClientGame::interactOn(Modifiers modifiers, Hand hand) {
-		auto client = getClient();
-		assert(client);
-		client->send(InteractPacket(true, hand, modifiers, {}, getPlayer()->direction));
+		if (ClientPlayerPtr player = getPlayer()) {
+			auto client = getClient();
+			assert(client);
+			client->send(InteractPacket(true, hand, modifiers, {}, player->direction));
+		}
 	}
 
 	void ClientGame::interactNextTo(Modifiers modifiers, Hand hand) {
-		auto client = getClient();
-		assert(client);
-		client->send(InteractPacket(false, hand, modifiers, {}, getPlayer()->direction));
+		if (ClientPlayerPtr player = getPlayer()) {
+			auto client = getClient();
+			assert(client);
+			client->send(InteractPacket(false, hand, modifiers, {}, player->direction));
+		}
 	}
 
 	void ClientGame::putInLimbo(EntityPtr entity, RealmID next_realm_id, const Position &next_position) {
