@@ -41,14 +41,20 @@ namespace Game3 {
 			dialog->render(context);
 		}
 
-		if (autocompleteDropdown)
-			autocompleteDropdown->render(context, -1, -1, -1, -1); // The dropdown is responsible for knowing where to render.
+		if (autocompleteDropdown) {
+			// The dropdown is responsible for knowing where to render.
+			autocompleteDropdown->render(context, -1, -1, -1, -1);
+		}
 
-		if (contextMenu)
-			contextMenu->render(context, -1, -1, -1, -1); // Same here.
+		if (contextMenu) {
+			// Same here.
+			contextMenu->render(context, -1, -1, -1, -1);
+		}
 
-		if (tooltip)
+		if (tooltip) {
+			// The tooltip knows its size but needs to be told its position.
 			tooltip->render(context, mouse_x * factor, mouse_y * factor, -1, -1);
+		}
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
@@ -325,6 +331,10 @@ namespace Game3 {
 
 	void UIContext::addDialog(DialogPtr dialog) {
 		dialogs.emplace_back(std::move(dialog));
+	}
+
+	const std::optional<std::pair<int, int>> & UIContext::getDragOrigin() const {
+		return dragOrigin;
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {

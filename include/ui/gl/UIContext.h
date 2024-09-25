@@ -67,6 +67,7 @@ namespace Game3 {
 			int getHeight() const;
 			void removeDialog(const DialogPtr &);
 			void addDialog(DialogPtr);
+			const std::optional<std::pair<int, int>> & getDragOrigin() const;
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 

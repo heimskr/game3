@@ -124,6 +124,7 @@ namespace Game3 {
 			Modifiers lastModifiers;
 			std::optional<std::pair<int, int>> clickPosition;
 			std::optional<int> heldMouseButton;
+			bool dragStarted = false;
 
 			void keyCallback(int key, int scancode, int action, int mods);
 			void mouseButtonCallback(int button, int action, int mods);

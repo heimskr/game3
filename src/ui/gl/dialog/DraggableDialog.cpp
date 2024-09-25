@@ -20,27 +20,6 @@ namespace Game3 {
 		Dialog(ui),
 		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height) {}
 
-	void BaseDraggableDialog::init() {
-		closeButton = std::make_shared<Icon>(ui, UI_SCALE);
-		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
-		closeButton->setFixedSize(3.5 * UI_SCALE);
-		closeButton->init();
-		closeButton->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
-				return false;
-
-			ui.removeDialog(shared_from_this());
-			return true;
-		});
-	}
-
-	bool BaseDraggableDialog::click(int button, int x, int y) {
-		if (!Dialog::click(button, x, y))
-			return false;
-
-		return closeButton->contains(x, y) && closeButton->click(button, x, y);
-	}
-
 	void BaseDraggableDialog::render(const RendererContext &renderers) {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
@@ -53,7 +32,7 @@ namespace Game3 {
 		rectangler.drawOnScreen(TITLE_BACKGROUND_COLOR, titleRectangle);
 		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, position + Rectangle(scale, 9 * scale, position.width - 2 * scale, position.height - 10 * scale));
 
-		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 2.75 * scale, 3.5 * scale, 3.5 * scale));
+		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 
 		auto saver = ui.scissorStack.pushRelative(titleRectangle, renderers);
 		const auto text_scale = static_cast<double>(getTitleScale());
@@ -73,6 +52,65 @@ namespace Game3 {
 
 	Rectangle BaseDraggableDialog::getPosition() const {
 		return position;
+	}
+
+	void BaseDraggableDialog::init() {
+		closeButton = std::make_shared<Icon>(ui, UI_SCALE);
+		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
+		closeButton->setFixedSize(3.5 * UI_SCALE);
+		closeButton->init();
+		closeButton->setOnClick([this](Widget &, int button, int, int) {
+			if (button != LEFT_BUTTON)
+				return false;
+
+			ui.removeDialog(shared_from_this());
+			return true;
+		});
+	}
+
+	bool BaseDraggableDialog::click(int button, int x, int y) {
+		if (!Dialog::click(button, x, y)) {
+			return false;
+		}
+
+		return closeButton->contains(x, y) && closeButton->click(button, x, y);
+	}
+
+	bool BaseDraggableDialog::dragStart(int x, int y) {
+		if (!Dialog::dragStart(x, y)) {
+			return false;
+		}
+
+		if (titleRectangle.contains(x, y)) {
+			dragOffset.emplace(x - position.x, y - position.y);
+			return true;
+		}
+
+		return false;
+	}
+
+	bool BaseDraggableDialog::dragUpdate(int x, int y) {
+		if (dragOffset) {
+			position.x = x - dragOffset->first;
+			position.y = y - dragOffset->second;
+			return true;
+		}
+
+		return Dialog::dragUpdate(x, y);
+	}
+
+	bool BaseDraggableDialog::dragEnd(int x, int y) {
+		dragOffset.reset();
+		return Dialog::dragEnd(x, y);
+	}
+
+	bool BaseDraggableDialog::keyPressed(uint32_t character, Modifiers) {
+		if (character == GLFW_KEY_ESCAPE) {
+			ui.removeDialog(shared_from_this());
+			return true;
+		}
+
+		return false;
 	}
 
 	float DraggableDialog::getTitleScale() const {

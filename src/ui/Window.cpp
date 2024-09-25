@@ -595,7 +595,7 @@ namespace Game3 {
 			heldMouseButton = button;
 
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
-				uiContext.dragStart(x, y);
+				dragStarted = false;
 				clickPosition.emplace(x, y);
 			}
 		} else if (action == GLFW_RELEASE) {
@@ -605,13 +605,19 @@ namespace Game3 {
 				uiContext.click(button, x, y);
 			} else {
 				uiContext.dragEnd(x, y);
+				dragStarted = false;
 			}
 		}
 	}
 
 	void Window::mousePositionCallback(int x, int y) {
 		if (heldMouseButton == GLFW_MOUSE_BUTTON_LEFT) {
-			uiContext.dragUpdate(x, y);
+			if (dragStarted) {
+				uiContext.dragUpdate(x, y);
+			} else {
+				uiContext.dragStart(x, y);
+				dragStarted = true;
+			}
 		}
 	}
 
@@ -771,16 +777,8 @@ namespace Game3 {
 		activateContext();
 		onGameLoaded();
 
-		alert("Connected.");
-
 		if (settings.alertOnConnection) {
-			SUCCESS("Connected.");
-			// auto success_dialog = std::make_unique<ConnectionSuccessDialog>(*this);
-			// success_dialog->signal_submit().connect([this](bool checked) {
-			// 	auto lock = settings.uniqueLock();
-			// 	settings.alertOnConnection = !checked;
-			// });
-			// queueDialog(std::move(success_dialog));
+			alert("Connected.");
 		}
 
 		return true;

@@ -4,6 +4,7 @@
 #include "ui/gl/dialog/Dialog.h"
 
 #include <memory>
+#include <optional>
 
 namespace Game3 {
 	class Icon;
@@ -16,6 +17,10 @@ namespace Game3 {
 			Rectangle getPosition() const override;
 			void init() override;
 			bool click(int button, int x, int y) override;
+			bool dragStart(int x, int y) override;
+			bool dragUpdate(int x, int y) override;
+			bool dragEnd(int x, int y) override;
+			bool keyPressed(uint32_t character, Modifiers) override;
 
 			virtual float getTitleScale() const = 0;
 			virtual const UString & getTitle() const = 0;
@@ -24,6 +29,7 @@ namespace Game3 {
 			Rectangle position;
 			Rectangle titleRectangle;
 			std::shared_ptr<Icon> closeButton;
+			std::optional<std::pair<int, int>> dragOffset;
 	};
 
 	class DraggableDialog: public BaseDraggableDialog {
