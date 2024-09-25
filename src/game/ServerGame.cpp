@@ -76,11 +76,11 @@ namespace Game3 {
 			if (auto client = weak_client.lock())
 				handlePacket(*client, *packet);
 
-		const std::size_t max_jobs = realms.size() * 2;
+		// const std::size_t max_jobs = realms.size() * 2;
 
 		for (auto &[id, realm]: realms) {
-			if (max_jobs <= pool.jobCount())
-				break;
+			// if (max_jobs <= pool.jobCount())
+			// 	break;
 			// pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, std::size_t) {
 			// 	if (RealmPtr realm = weak_realm.lock())
 					realm->tick(delta);

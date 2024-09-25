@@ -1,5 +1,17 @@
 #pragma once
 
+#include "Options.h"
+#include "types/Types.h"
+#include "net/Buffer.h"
+#include "net/Sock.h"
+#include "threading/Lockable.h"
+#include "threading/MTQueue.h"
+#include "threading/Waiter.h"
+#include "util/Math.h"
+
+#include <asio.hpp>
+#include <asio/ssl.hpp>
+
 #include <atomic>
 #include <deque>
 #include <filesystem>
@@ -9,12 +21,7 @@
 #include <optional>
 #include <shared_mutex>
 #include <string>
-
-#include "types/Types.h"
-#include "net/Buffer.h"
-#include "net/Sock.h"
-#include "threading/Lockable.h"
-#include "util/Math.h"
+#include <thread>
 
 namespace Game3 {
 	class ClientGame;
@@ -32,7 +39,7 @@ namespace Game3 {
 			Lockable<std::map<PacketID, size_t>> receivedPacketCounts;
 			Lockable<std::map<PacketID, size_t>> sentPacketCounts;
 
-			LocalClient() = default;
+			LocalClient();
 
 			~LocalClient();
 
@@ -49,27 +56,51 @@ namespace Game3 {
 			bool hasHostname() const;
 			const std::string & getHostname() const;
 			void setBuffering(bool);
-			bool isReady() const { return sock->isReady(); }
+			bool isReady() const;
+			void queueForConnect(std::function<void()>);
 
 		private:
 			enum class State {Begin, Data};
+
 			std::array<char, 16'384> array{};
 			State state = State::Begin;
 			Buffer buffer{Side::Client};
 			uint16_t packetType = 0;
 			uint32_t payloadSize = 0;
-			std::shared_ptr<Sock> sock;
 			std::deque<uint8_t> headerBytes;
 			std::map<std::string, std::map<std::string, Token>> tokenDatabase;
 			std::optional<std::filesystem::path> tokenDatabasePath;
 			std::mutex packetMutex;
 			std::atomic_bool reading = false;
+			MTQueue<std::function<void()>> connectionActions;
+#ifdef USE_SSL
+			asio::io_context ioContext;
+			asio::ssl::context sslContext;
+			asio::executor_work_guard<asio::io_context::executor_type> workGuard;
+			asio::ssl::stream<asio::ip::tcp::socket> sslSock;
+			asio::io_context::strand strand;
+			Lockable<std::deque<std::string>, std::shared_mutex> outbox;
+			std::string lastHostname;
+			bool sslReady = false;
+			std::thread sslThread;
+			Waiter sslWaiter{1};
+
+			void doRead();
+			void write();
+#else
+			std::shared_ptr<Sock> sock;
+#endif
+
+			void handleInput(std::string_view);
+			void send(const void *, std::size_t, bool force);
+			void send(std::string, bool force);
+			void close();
 
 			template <std::integral T>
 			void sendRaw(T value) {
 				T little = toLittle(value);
 				bytesWritten += sizeof(T);
-				sock->send(&little, sizeof(little), false);
+				send(&little, sizeof(little), false);
 			}
 
 			void printHeaderBytes() const;

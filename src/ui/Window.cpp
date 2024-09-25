@@ -470,6 +470,10 @@ namespace Game3 {
 		if (game) {
 			ClientPlayerPtr player = game->getPlayer();
 
+			if (player == nullptr) {
+				return;
+			}
+
 			if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 				if (modifiers.empty() || modifiers.onlyShift()) {
 					auto handle = [&](int movement_key, Direction direction) {
@@ -491,7 +495,8 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_SPACE) {
-					player->jump();
+					if (player != nullptr)
+						player->jump();
 					return;
 				}
 
@@ -853,14 +858,11 @@ namespace Game3 {
 		assert(game != nullptr);
 		LocalClientPtr client = game->getClient();
 
-		client->send(LoginPacket(settings.username, serverWrapper.getOmnitoken(), "Heimskr"));
-
-		// auto login_dialog = std::make_unique<LoginDialog>(*this, settings.username);
-		// login_dialog->signal_submit().connect([this, weak_client = std::weak_ptr(client)](const Glib::ustring &username, const Glib::ustring &display_name) {
-		// 	if (LocalClientPtr client = weak_client.lock())
-		// 		client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name));
-		// });
-		// queueDialog(std::move(login_dialog));
+		client->queueForConnect([this, weak = std::weak_ptr(client)] {
+			if (LocalClientPtr client = weak.lock()) {
+				client->send(LoginPacket(settings.username, serverWrapper.getOmnitoken(), "Heimskr"));
+			}
+		});
 	}
 
 	void Window::handleKeys() {

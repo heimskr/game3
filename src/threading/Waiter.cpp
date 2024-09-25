@@ -12,7 +12,9 @@ namespace Game3 {
 
 	void Waiter::wait() {
 		std::unique_lock lock(mutex);
-		condition.wait(lock, [this] { return remaining == 0; });
+		if (remaining > 0) {
+			condition.wait(lock, [this] { return remaining == 0; });
+		}
 	}
 
 	bool Waiter::isDone() const noexcept {

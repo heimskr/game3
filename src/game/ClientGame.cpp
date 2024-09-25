@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "Options.h"
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
 #include "entity/EntityFactory.h"
@@ -175,7 +176,9 @@ namespace Game3 {
 			garbageCollect();
 		}
 
+#ifndef USE_SSL
 		getClient()->read();
+#endif
 
 		for (const auto &packet: packetQueue.steal()) {
 			try {

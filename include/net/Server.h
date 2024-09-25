@@ -3,6 +3,9 @@
 #include "types/Types.h"
 #include "threading/Lockable.h"
 
+#include <asio.hpp>
+#include <asio/ssl.hpp>
+
 #include <atomic>
 #include <condition_variable>
 #include <filesystem>
@@ -20,9 +23,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <asio.hpp>
-#include <asio/ssl.hpp>
-
 namespace Game3 {
 	class RemoteClient;
 	using RemoteClientPtr = std::shared_ptr<RemoteClient>;
@@ -35,7 +35,6 @@ namespace Game3 {
 			std::string ip;
 			int port;
 			size_t chunkSize;
-			int sock = -1;
 			bool connected = false;
 			std::atomic_bool closed {false};
 			std::string secret;
