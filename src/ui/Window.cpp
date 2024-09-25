@@ -400,14 +400,14 @@ namespace Game3 {
 				ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
 				const auto [static_y, static_x] = chunk.topLeft();
 				singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
-					.x = double(static_x),
-					.y = double(static_y),
+					.x = static_cast<double>(static_x),
+					.y = static_cast<double>(static_y),
 					.sizeX = -1,
 					.sizeY = -1,
 					.scaleX = 1. / factor,
 					.scaleY = 1. / factor,
-					.viewportX = -double(factor),
-					.viewportY = -double(factor),
+					.viewportX = -static_cast<double>(factor),
+					.viewportY = -static_cast<double>(factor),
 				});
 
 				binder.undo();
@@ -603,7 +603,28 @@ namespace Game3 {
 
 	void Window::scrollCallback(double x_delta, double y_delta) {
 		const auto [x, y] = getMouseCoordinates();
-		uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y));
+
+		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y)))
+			return;
+
+		const auto factor = getFactor();
+		const auto old_scale = scale;
+
+		if (y_delta < 0)
+			scale /= 1.08 * -y_delta;
+		else if (y_delta > 0)
+			scale *= 1.08 * y_delta;
+
+		const float width = lastWindowSize.first;
+		const float height = lastWindowSize.second;
+
+		const auto difference_x = width / old_scale - width / scale;
+		const auto side_ratio_x = (x - width / 2.f) / width;
+		center.first -= difference_x * side_ratio_x / 8.f * factor;
+
+		const auto difference_y = height / old_scale - height / scale;
+		const auto side_ratio_y = (y - height / 2.f) / height;
+		center.second -= difference_y * side_ratio_y / 8.f * factor;
 	}
 
 	void Window::closeGame() {

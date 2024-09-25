@@ -174,15 +174,19 @@ namespace Game3 {
 	}
 
 	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
-		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y))
+		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y)) {
 			return true;
+		}
 
-		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs))
-			if (dialog->scroll(x_delta, y_delta, x, y))
+		for (const std::shared_ptr<Dialog> &dialog: reverse(dialogs)) {
+			if (dialog->scroll(x_delta, y_delta, x, y)) {
 				return true;
+			}
+		}
 
 		return dialogs.empty() && hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
 	}
