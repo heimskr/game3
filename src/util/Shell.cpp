@@ -1,3 +1,6 @@
+#ifdef _WIN32
+#warning "util/Shell is currently unimplemented for Windows."
+#else
 #include "Log.h"
 #include "util/PipeWrapper.h"
 #include "util/Shell.h"
@@ -199,3 +202,4 @@ namespace Game3 {
 		return {stdout_stream.str(), stderr_stream.str()};
 	}
 }
+#endif

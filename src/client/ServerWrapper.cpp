@@ -2,12 +2,12 @@
 #include "client/ServerWrapper.h"
 #include "game/ServerGame.h"
 #include "game/SimulationOptions.h"
+#include "net/CertGen.h"
 #include "net/Server.h"
 #include "realm/Overworld.h"
 #include "realm/ShadowRealm.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
-#include "util/Shell.h"
 #include "util/Timer.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/ShadowRealm.h"
@@ -269,9 +269,12 @@ namespace Game3 {
 	}
 
 	bool ServerWrapper::generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path) {
-		runCommand("openssl", {
-			"req", "-x509", "-newkey", "rsa:4096", "-keyout", key_path.string(), "-out", certificate_path.string(), "-sha256", "-days", "36500", "-nodes", "-subj", "/C=/ST=/L=/O=/OU=/CN=",
-		});
+		try {
+			generateCertPair(certificate_path, key_path);
+		} catch (const std::runtime_error &error) {
+			ERROR("Certificate generation failed: {}", error.what());
+			return false;
+		}
 
 		return std::filesystem::exists(certificate_path) && std::filesystem::exists(key_path);
 	}
