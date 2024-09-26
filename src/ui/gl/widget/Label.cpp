@@ -7,8 +7,10 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	Label::Label(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+	Label::Label(UIContext &ui, float scale, UString text):
+		Widget(ui, scale) {
+			setText(std::move(text));
+		}
 
 	void Label::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (lastRectangle.width != static_cast<int>(width)) {

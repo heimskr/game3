@@ -70,6 +70,7 @@ namespace Game3 {
 
 			int getWidth() const;
 			int getHeight() const;
+			std::pair<int, int> getDimensions() const;
 			int getFactor() const;
 			int getMouseX() const;
 			int getMouseY() const;

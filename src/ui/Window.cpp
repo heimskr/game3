@@ -116,15 +116,21 @@ namespace Game3 {
 	}
 
 	int Window::getWidth() const {
-		int width;
+		int width{};
 		glfwGetWindowSize(glfwWindow, &width, nullptr);
 		return width;
 	}
 
 	int Window::getHeight() const {
-		int height;
+		int height{};
 		glfwGetWindowSize(glfwWindow, nullptr, &height);
 		return height;
+	}
+
+	std::pair<int, int> Window::getDimensions() const {
+		int width{}, height{};
+		glfwGetWindowSize(glfwWindow, &width, &height);
+		return {width, height};
 	}
 
 	int Window::getFactor() const {
@@ -472,6 +478,14 @@ namespace Game3 {
 			}
 		}
 
+		if (action == GLFW_PRESS) {
+			if (WidgetPtr focused = uiContext.getFocusedWidget()) {
+				if (focused->keyPressed(key, modifiers)) {
+					return;
+				}
+			}
+		}
+
 		if (game) {
 			ClientPlayerPtr player = game->getPlayer();
 
@@ -585,6 +599,10 @@ namespace Game3 {
 					return;
 				}
 			}
+		}
+
+		if (action == GLFW_PRESS) {
+			uiContext.keyPressed(key, modifiers);
 		}
 	}
 

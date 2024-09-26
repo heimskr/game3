@@ -85,7 +85,9 @@ namespace Game3 {
 
 			template <typename T, typename... Args>
 			void emplaceDialog(Args &&...args) {
-				dialogs.emplace_back(std::make_shared<T>(*this, std::forward<Args>(args)...));
+				auto dialog = std::make_shared<T>(*this, std::forward<Args>(args)...);
+				dialog->init();
+				dialogs.emplace_back(dialog);
 			}
 
 		private:

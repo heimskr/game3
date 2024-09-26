@@ -20,6 +20,7 @@ namespace Game3 {
 			sigc::signal<void(TextInput &, const UString &)> onSubmit;
 			sigc::signal<void(TextInput &, const UString &)> onChange;
 			sigc::signal<void(TextInput &, const UString &)> onAcceptSuggestion;
+			std::function<bool(uint32_t, const UString::iterator &)> characterFilter;
 
 			TextInput(UIContext &, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
 			TextInput(UIContext &, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
@@ -46,7 +47,7 @@ namespace Game3 {
 			const UString & getText() const;
 			void setText(UString);
 			UString clear();
-			void insert(gunichar);
+			void insert(uint32_t);
 			void eraseWord();
 			void eraseCharacter();
 			void eraseForward();

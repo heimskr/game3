@@ -111,7 +111,7 @@ namespace Game3 {
 	bool TextInput::keyPressed(uint32_t character, Modifiers modifiers) {
 		if (modifiers.ctrl) {
 			switch (character) {
-				case GDK_KEY_BackSpace:
+				case GLFW_KEY_BACKSPACE:
 					eraseWord();
 					changed();
 					break;
@@ -125,59 +125,63 @@ namespace Game3 {
 		}
 
 		switch (character) {
-			case GDK_KEY_BackSpace:
+			case GLFW_KEY_BACKSPACE:
 				eraseCharacter();
 				changed();
 				return true;
 
-			case GDK_KEY_Delete:
+			case GLFW_KEY_DELETE:
 				eraseForward();
 				changed();
 				return true;
 
-			case GDK_KEY_Left:
+			case GLFW_KEY_LEFT:
 				goLeft();
 				return true;
 
-			case GDK_KEY_Right:
+			case GLFW_KEY_RIGHT:
 				goRight();
 				return true;
 
-			case GDK_KEY_Home:
-			case GDK_KEY_Up:
+			case GLFW_KEY_HOME:
+			case GLFW_KEY_UP:
 				goStart();
 				return true;
 
-			case GDK_KEY_End:
-			case GDK_KEY_Down:
+			case GLFW_KEY_END:
+			case GLFW_KEY_DOWN:
 				goEnd();
 				return true;
 
-			case GDK_KEY_Shift_L:
-			case GDK_KEY_Shift_R:
-			case GDK_KEY_Control_L:
-			case GDK_KEY_Control_R:
-			case GDK_KEY_Alt_L:
-			case GDK_KEY_Alt_R:
-			case GDK_KEY_Super_L:
-			case GDK_KEY_Super_R:
-			case GDK_KEY_Menu:
+			case GLFW_KEY_LEFT_SHIFT:
+			case GLFW_KEY_RIGHT_SHIFT:
+			case GLFW_KEY_LEFT_CONTROL:
+			case GLFW_KEY_RIGHT_CONTROL:
+			case GLFW_KEY_LEFT_ALT:
+			case GLFW_KEY_RIGHT_ALT:
+			case GLFW_KEY_LEFT_SUPER:
+			case GLFW_KEY_RIGHT_SUPER:
+			case GLFW_KEY_MENU:
 				return true;
 
-			case GDK_KEY_Escape:
+			case GLFW_KEY_ESCAPE:
 				if (ownsDropdown())
 					hideDropdown();
 				else
 					ui.unfocus();
 				return true;
 
-			case GDK_KEY_Return:
-			case GDK_KEY_KP_Enter:
+			case GLFW_KEY_ENTER:
+			case GLFW_KEY_KP_ENTER:
 				onSubmit(*this, text);
 				return true;
 
 			default:
 				break;
+		}
+
+		if (modifiers.empty() && ('A' <= character && character <= 'Z')) {
+			character += 'a' - 'A';
 		}
 
 		insert(static_cast<gunichar>(character));
@@ -278,7 +282,11 @@ namespace Game3 {
 		return out;
 	}
 
-	void TextInput::insert(gunichar character) {
+	void TextInput::insert(uint32_t character) {
+		if (characterFilter && !characterFilter(character, cursorIterator)) {
+			return;
+		}
+
 		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
 		++cursor;
