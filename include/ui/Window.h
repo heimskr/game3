@@ -110,6 +110,7 @@ namespace Game3 {
 			void closeGame();
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port);
+			void playLocally();
 
 		private:
 			struct KeyInfo {
@@ -135,7 +136,6 @@ namespace Game3 {
 			void scrollCallback(double x_delta, double y_delta);
 			void onGameLoaded();
 			void autoConnect();
-			void playLocally();
 			void continueLocalConnection();
 			void handleKeys();
 	};

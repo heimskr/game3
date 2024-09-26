@@ -45,10 +45,19 @@ namespace Game3 {
 		vbox->append(std::move(grid));
 		vbox->insertAtEnd(shared_from_this());
 
-		auto hbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 0, 0, Color{});
+		auto hbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 2, 0, Color{});
 
 		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
 		spacer->setHorizontalExpand(true);
+
+		auto local_button = std::make_shared<Button>(ui, UI_SCALE);
+		local_button->setText("Local Play");
+		local_button->setOnClick([this](Widget &, int button, int, int) {
+			if (button != LEFT_BUTTON)
+				return false;
+			playLocally();
+			return true;
+		});
 
 		auto connect_button = std::make_shared<Button>(ui, UI_SCALE);
 		connect_button->setText("Connect");
@@ -60,6 +69,7 @@ namespace Game3 {
 		});
 
 		hbox->append(std::move(spacer));
+		hbox->append(std::move(local_button));
 		hbox->append(std::move(connect_button));
 		vbox->append(std::move(hbox));
 
@@ -100,5 +110,9 @@ namespace Game3 {
 		}
 
 		ui.window.connect(hostInput->getText().raw(), port);
+	}
+
+	void ConnectionDialog::playLocally() {
+		ui.window.playLocally();
 	}
 }

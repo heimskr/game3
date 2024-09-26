@@ -20,5 +20,6 @@ namespace Game3 {
 			std::shared_ptr<TextInput> hostInput;
 			std::shared_ptr<IntegerInput> portInput;
 			void submit();
+			void playLocally();
 	};
 }
