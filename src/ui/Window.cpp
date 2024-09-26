@@ -657,9 +657,7 @@ namespace Game3 {
 		} else if (action == GLFW_RELEASE) {
 			heldMouseButton.reset();
 
-			bool result = false;
-
-			result = uiContext.mouseUp(button, x, y) || result;
+			bool result = uiContext.mouseUp(button, x, y);
 
 			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
 				result = uiContext.click(button, x, y) || result;

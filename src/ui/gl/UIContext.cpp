@@ -361,6 +361,7 @@ namespace Game3 {
 	}
 
 	void UIContext::addDialog(DialogPtr dialog) {
+		unfocus();
 		dialogs.emplace_back(std::move(dialog));
 	}
 

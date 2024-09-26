@@ -62,6 +62,15 @@ namespace Game3 {
 		}
 	}
 
+	bool MessageDialog::keyPressed(uint32_t character, Modifiers modifiers) {
+		if (character == GLFW_KEY_ESCAPE && modifiers.empty()) {
+			submit(false);
+			return true;
+		}
+
+		return false;
+	}
+
 	void MessageDialog::setChild(WidgetPtr new_child) {
 		child = std::move(new_child);
 		vbox->clearChildren();
