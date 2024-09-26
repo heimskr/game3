@@ -5,7 +5,6 @@
 #include "graphics/Tileset.h"
 #include "item/Item.h"
 #include "tools/Flasker.h"
-#include "ui/App.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -65,7 +64,7 @@ namespace Game3 {
 		std::filesystem::create_directory(base);
 
 		// Necessary for Gdk::Pixbuf::getImage to work.
-		auto app = Game3::App::create();
+		// auto app = Game3::App::create();
 
 		for (const auto &[id, item]: game->registry<ItemRegistry>()) {
 			std::filesystem::path dir = base / id.getPostPath();

@@ -11,7 +11,6 @@
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
-#include "ui/App.h"
 #include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"
@@ -30,8 +29,6 @@
 #include <iostream>
 #include <random>
 #include <vector>
-
-#define USE_GLFW
 
 namespace Game3 {
 	void test();
@@ -257,7 +254,6 @@ int main(int argc, char **argv) {
 	richPresence.init();
 	richPresence.initActivity();
 
-#ifdef USE_GLFW
 	if (!glfwInit())
 		return 1;
 
@@ -288,13 +284,8 @@ int main(int argc, char **argv) {
 	window.reset();
 
 	glfwTerminate();
-	const int out = 0;
-#else
-	auto app = App::create();
-	const int out = app->run(argc, argv);
-#endif
 
 	Timer::summary();
 	richPresence.reset();
-	return out;
+	return 0;
 }
