@@ -642,6 +642,17 @@ namespace Game3 {
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
 				dragStarted = false;
 				clickPosition.emplace(x, y);
+			} else if (button == GLFW_MOUSE_BUTTON_4 || button == GLFW_MOUSE_BUTTON_5) {
+				if (game) {
+					if (ClientPlayerPtr player = game->getPlayer()) {
+						InventoryPtr inventory = player->getInventory(0);
+						if (button == GLFW_MOUSE_BUTTON_4) {
+							inventory->prevSlot();
+						} else {
+							inventory->nextSlot();
+						}
+					}
+				}
 			}
 		} else if (action == GLFW_RELEASE) {
 			heldMouseButton.reset();
