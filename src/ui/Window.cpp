@@ -473,6 +473,28 @@ namespace Game3 {
 			}
 
 			realmBounds = game->getVisibleRealmBounds();
+		} else {
+			static float hue = 0;
+			static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
+
+			singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
+				.x = static_cast<double>(getMouseX()),
+				.y = static_cast<double>(getMouseY()),
+				.scaleX = 16,
+				.scaleY = 16,
+				.invertY = false,
+			});
+
+			textRenderer.drawOnScreen("game3", TextRenderOptions{
+				.x = getWidth() / 2.0,
+				.y = 64.0,
+				.scaleX = 2.5,
+				.scaleY = 2.5,
+				.color = OKHsv{hue += 0.001, 1, 1, 1}.convert<Color>(),
+				.align = TextAlign::Center,
+				.alignTop = true,
+				.shadow{1, 1, 1, 1},
+			});
 		}
 
 		uiContext.render(getMouseX(), getMouseY());
