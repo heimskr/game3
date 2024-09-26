@@ -1,3 +1,4 @@
+#include "Log.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
@@ -7,6 +8,8 @@
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Window.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	ConnectionDialog::ConnectionDialog(UIContext &ui):
@@ -18,19 +21,49 @@ namespace Game3 {
 		auto grid = std::make_shared<Grid>(ui, UI_SCALE);
 		grid->setRowSpacing(5);
 
-		grid->attach(std::make_shared<Label>(ui, UI_SCALE, "Host"), 0, 0);
-		grid->attach(std::make_shared<Label>(ui, UI_SCALE, "Port"), 1, 0);
+		auto make_label = [&](UString text) {
+			auto label = std::make_shared<Label>(ui, UI_SCALE, std::move(text));
+			label->setVerticalAlignment(Alignment::Center);
+			return label;
+		};
 
-		auto host_entry = std::make_shared<TextInput>(ui, UI_SCALE);
-		host_entry->setHorizontalExpand(true);
-		grid->attach(std::move(host_entry), 0, 1);
+		grid->attach(make_label("Host"), 0, 0);
+		grid->attach(make_label("Port"), 1, 0);
 
-		auto port_entry = std::make_shared<IntegerInput>(ui, UI_SCALE);
-		port_entry->setHorizontalExpand(true);
-		grid->attach(std::move(port_entry), 1, 1);
+		hostInput = std::make_shared<TextInput>(ui, UI_SCALE);
+		hostInput->setText(ui.window.settings.hostname);
+		hostInput->setHorizontalExpand(true);
+		hostInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
+		grid->attach(hostInput, 0, 1);
+
+		portInput = std::make_shared<IntegerInput>(ui, UI_SCALE);
+		portInput->setText(std::to_string(ui.window.settings.port));
+		portInput->setHorizontalExpand(true);
+		portInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
+		grid->attach(portInput, 1, 1);
 
 		vbox->append(std::move(grid));
 		vbox->insertAtEnd(shared_from_this());
+
+		auto hbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 0, 0, Color{});
+
+		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
+		spacer->setHorizontalExpand(true);
+
+		auto connect_button = std::make_shared<Button>(ui, UI_SCALE);
+		connect_button->setText("Connect");
+		connect_button->setOnClick([this](Widget &, int button, int, int) {
+			if (button != LEFT_BUTTON)
+				return false;
+			submit();
+			return true;
+		});
+
+		hbox->append(std::move(spacer));
+		hbox->append(std::move(connect_button));
+		vbox->append(std::move(hbox));
+
+		ui.focusWidget(hostInput);
 	}
 
 	void ConnectionDialog::render(const RendererContext &renderers) {
@@ -51,8 +84,21 @@ namespace Game3 {
 	}
 
 	Rectangle ConnectionDialog::getPosition() const {
-		constexpr int width = 400;
-		constexpr int height = 400;
+		constexpr int width = 600;
+		constexpr int height = 284;
 		return Rectangle((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height);
+	}
+
+	void ConnectionDialog::submit() {
+		uint16_t port{};
+
+		try {
+			port = parseNumber<uint16_t>(portInput->getText().raw());
+		} catch (const std::invalid_argument &) {
+			ui.window.error("Invalid port number.");
+			return;
+		}
+
+		ui.window.connect(hostInput->getText().raw(), port);
 	}
 }

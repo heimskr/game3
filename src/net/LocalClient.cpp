@@ -60,9 +60,12 @@ namespace Game3 {
 
 		asio::post(strand, [this, endpoint] {
 			sslSock.lowest_layer().async_connect(endpoint, asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc) {
-				asio::detail::throw_error(errc, "LocalClient async_connect");
+				if (reportError(errc))
+					return;
+
 				sslSock.async_handshake(asio::ssl::stream_base::client, [this](const asio::error_code &errc) {
-					asio::detail::throw_error(errc, "LocalClient async_handshake");
+					if (reportError(errc))
+						return;
 					sslReady = true;
 					for (const std::function<void()> &action: connectionActions.steal())
 						action();
@@ -229,6 +232,16 @@ namespace Game3 {
 				write();
 			}
 		}));
+	}
+
+	bool LocalClient::reportError(const asio::error_code &errc) {
+		if (errc) {
+			if (onError)
+				onError(errc);
+			return true;
+		}
+
+		return false;
 	}
 #endif
 

@@ -29,7 +29,9 @@ namespace Game3 {
 	}
 
 	ClientGame::ClientGame(const std::shared_ptr<Window> &window):
-		Game(), weakWindow(window) {}
+		Game(),
+		weakWindow(window),
+		tickThreadLaunchWaiter(1) {}
 
 	ClientGame::~ClientGame() {
 		INFO(3, "\e[31m~ClientGame\e[39m({})", reinterpret_cast<void *>(this));
@@ -298,6 +300,8 @@ namespace Game3 {
 
 		stoppedByError = false;
 
+		tickThreadLaunchWaiter.reset(1, true);
+
 		tickThread = std::thread([this] {
 			while (active) {
 				try {
@@ -318,10 +322,16 @@ namespace Game3 {
 				errorCallback();
 		});
 
+		--tickThreadLaunchWaiter;
+
 		return true;
 	}
 
 	void ClientGame::stopThread() {
+		if (!tickThread.joinable()) {
+			tickThreadLaunchWaiter.wait();
+		}
+
 		if (tickThread.joinable()) {
 			active = false;
 			tickThread.join();

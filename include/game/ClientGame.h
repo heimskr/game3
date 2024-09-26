@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "graphics/Rectangle.h"
 #include "threading/Atomic.h"
+#include "threading/Waiter.h"
 #include "ui/Modifiers.h"
 #include "ui/Sound.h"
 
@@ -101,6 +102,7 @@ namespace Game3 {
 			sigc::signal<void(const std::shared_ptr<Village> &)> signal_village_update;
 			std::atomic_bool active{false};
 			std::thread tickThread;
+			Waiter tickThreadLaunchWaiter;
 			std::optional<Position> lastDragPosition;
 			float lastGarbageCollection = 0;
 

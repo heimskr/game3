@@ -72,7 +72,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<MessageDialog> MessageDialog::create(UIContext &ui, UString text, ButtonsType buttons_type) {
-		auto dialog = std::make_shared<MessageDialog>(ui, 600, 400, buttons_type);
+		auto dialog = std::make_shared<MessageDialog>(ui, 750, 300, buttons_type);
 		dialog->init();
 		auto label = std::make_shared<Label>(ui, UI_SCALE);
 		label->setExpand(true, true);
@@ -88,7 +88,6 @@ namespace Game3 {
 
 	std::function<bool(Widget &, int, int, int)> MessageDialog::makeSubmit(bool response) {
 		return [this, response](Widget &, int button, int, int) {
-			INFO("Button: {}", button);
 			if (button != LEFT_BUTTON)
 				return false;
 			submit(response);

@@ -13,7 +13,7 @@ namespace Game3 {
 			Waiter & operator--() noexcept;
 			void wait();
 			bool isDone() const noexcept;
-			void reset(size_t);
+			void reset(size_t, bool force = false);
 
 		private:
 			std::condition_variable condition;

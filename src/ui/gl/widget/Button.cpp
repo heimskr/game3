@@ -113,7 +113,8 @@ namespace Game3 {
 			return false;
 
 		pressed = true;
-		ui.getGame()->playSound("base:sound/click", threadContext.getPitch(1.25));
+		if (ClientGamePtr game = ui.getGame())
+			game->playSound("base:sound/click", threadContext.getPitch(1.25));
 		ui.setPressedWidget(shared_from_this());
 		return true;
 	}

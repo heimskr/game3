@@ -83,11 +83,11 @@ namespace Game3 {
 			void openModule(const Identifier &, const std::any &);
 			void removeModule();
 
-			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay(). */
-			void alert(const UString &message, bool queue = true, bool modal = true, bool use_markup = false);
+			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay or queue. */
+			void alert(const UString &message, bool do_queue = true, bool use_markup = false);
 
 			/** Displays an error message. (See alert.) */
-			void error(const UString &message, bool queue = true, bool modal = true, bool use_markup = false);
+			void error(const UString &message, bool do_queue = true, bool use_markup = false);
 
 			Modifiers getModifiers() const;
 			Position getHoveredPosition() const;
@@ -108,6 +108,8 @@ namespace Game3 {
 			void tick();
 			void drawGL();
 			void closeGame();
+			void goToTitle();
+			bool connect(const std::string &hostname, uint16_t port);
 
 		private:
 			struct KeyInfo {
@@ -132,7 +134,6 @@ namespace Game3 {
 			void mousePositionCallback(int x, int y);
 			void scrollCallback(double x_delta, double y_delta);
 			void onGameLoaded();
-			bool connect(const std::string &hostname, uint16_t port);
 			void autoConnect();
 			void playLocally();
 			void continueLocalConnection();

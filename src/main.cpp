@@ -11,7 +11,6 @@
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
-#include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/App.h"
 #include "ui/Window.h"
 #include "util/Crypto.h"
@@ -275,11 +274,11 @@ int main(int argc, char **argv) {
 	auto window = std::make_shared<Window>(*glfw_window);
 
 	window->delay([](Window &window) {
-		window.uiContext.emplaceDialog<ConnectionDialog>();
+		window.goToTitle();
 	}, 4);
 
 	while (!glfwWindowShouldClose(glfw_window)) {
-		glClear(GL_COLOR_BUFFER_BIT);
+		GL::clear(0, 0, 0);
 		window->tick();
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();

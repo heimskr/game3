@@ -216,11 +216,12 @@ namespace Game3 {
 		markDirty();
 	}
 
-	void Grid::attach(WidgetPtr child, std::size_t row, std::size_t column) {
+	WidgetPtr Grid::attach(WidgetPtr child, std::size_t row, std::size_t column) {
 		child->insertAtEnd(shared_from_this());
 		detach(row, column);
 		widgetContainer[row, column] = child.get();
 		markDirty();
+		return child;
 	}
 
 	void Grid::detach(std::size_t row, std::size_t column) {

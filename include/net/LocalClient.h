@@ -35,6 +35,7 @@ namespace Game3 {
 			std::weak_ptr<ClientGame> weakGame;
 			std::atomic_size_t bytesRead = 0;
 			std::atomic_size_t bytesWritten = 0;
+			std::function<void(const asio::error_code &)> onError;
 
 			Lockable<std::map<PacketID, size_t>> receivedPacketCounts;
 			Lockable<std::map<PacketID, size_t>> sentPacketCounts;
@@ -87,6 +88,8 @@ namespace Game3 {
 
 			void doRead();
 			void write();
+			/** Returns whether the error was reported. */
+			bool reportError(const asio::error_code &);
 #else
 			std::shared_ptr<Sock> sock;
 #endif

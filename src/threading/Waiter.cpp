@@ -21,8 +21,8 @@ namespace Game3 {
 		return remaining == 0;
 	}
 
-	void Waiter::reset(size_t new_remaining) {
-		if (remaining.exchange(new_remaining) != 0)
+	void Waiter::reset(size_t new_remaining, bool force) {
+		if (remaining.exchange(new_remaining) != 0 && !force)
 			throw std::runtime_error("Reset an unfinished Waiter");
 	}
 }

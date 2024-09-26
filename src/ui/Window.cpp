@@ -8,13 +8,14 @@
 #include "packet/LoginPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "types/Position.h"
+#include "ui/gl/dialog/ConnectionDialog.h"
+#include "ui/gl/dialog/DraggableDialog.h"
+#include "ui/gl/dialog/MessageDialog.h"
+#include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
-#include "ui/gl/dialog/DraggableDialog.h"
-#include "ui/gl/dialog/MessageDialog.h"
-#include "ui/gl/dialog/OmniDialog.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
 #include "ui/Window.h"
@@ -93,6 +94,7 @@ namespace Game3 {
 
 			settings.apply();
 
+			fbo.init();
 			textRenderer.initRenderData();
 		}
 
@@ -193,20 +195,38 @@ namespace Game3 {
 		}
 	}
 
-	void Window::alert(const UString &message, bool queue, bool modal, bool use_markup) {
-		(void) queue; (void) modal; (void) use_markup;
+	void Window::alert(const UString &message, bool do_queue, bool use_markup) {
+		(void) use_markup;
 
-		uiContext.addDialog(MessageDialog::create(uiContext, message, ButtonsType::None));
+		auto action = [message](Window &window) mutable {
+			window.activateContext();
+			window.uiContext.addDialog(MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None));
+		};
+
+		if (do_queue) {
+			queue(std::move(action));
+		} else {
+			action(*this);
+		}
 
 		INFO("Alert: {}", message);
 	}
 
-	void Window::error(const UString &message, bool queue, bool modal, bool use_markup) {
-		(void) queue; (void) modal; (void) use_markup;
+	void Window::error(const UString &message, bool do_queue, bool use_markup) {
+		(void) use_markup;
 
-		auto dialog = MessageDialog::create(uiContext, message, ButtonsType::None);
-		dialog->setTitle("Error");
-		uiContext.addDialog(std::move(dialog));
+		auto action = [message](Window &window) mutable {
+			window.activateContext();
+			auto dialog = MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None);
+			dialog->setTitle("Error");
+			window.uiContext.addDialog(std::move(dialog));
+		};
+
+		if (do_queue) {
+			queue(std::move(action));
+		} else {
+			action(*this);
+		}
 
 		ERROR("Error: {}", message);
 	}
@@ -689,8 +709,13 @@ namespace Game3 {
 		game->stopThread();
 		game.reset();
 
+		goToTitle();
+	}
+
+	void Window::goToTitle() {
 		omniDialog.reset();
 		uiContext.reset();
+		uiContext.emplaceDialog<ConnectionDialog>();
 	}
 
 	void Window::onGameLoaded() {
@@ -781,6 +806,10 @@ namespace Game3 {
 		closeGame();
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this()));
 		auto client = std::make_shared<LocalClient>();
+		client->onError = [this](const asio::error_code &errc) {
+			closeGame();
+			error(std::format("{} ({})", errc.message(), errc.value()));
+		};
 		game->setClient(client);
 		try {
 			client->connect(hostname, port);

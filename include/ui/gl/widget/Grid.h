@@ -21,7 +21,7 @@ namespace Game3 {
 			void remove(WidgetPtr child) final;
 			void clearChildren() final;
 
-			void attach(WidgetPtr, std::size_t row, std::size_t column);
+			WidgetPtr attach(WidgetPtr, std::size_t row, std::size_t column);
 			void detach(std::size_t row, std::size_t column);
 
 			float getRowSpacing() const;
