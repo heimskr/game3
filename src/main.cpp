@@ -268,6 +268,7 @@ int main(int argc, char **argv) {
 		return 2;
 	}
 
+	glfwMaximizeWindow(glfw_window);
 	glfwMakeContextCurrent(glfw_window);
 	glfwSwapInterval(1);
 
@@ -280,9 +281,7 @@ int main(int argc, char **argv) {
 		glfwPollEvents();
 	}
 
-	INFO("Closing.");
 	window->closeGame();
-	INFO("Closed.");
 	window.reset();
 
 	glfwTerminate();
