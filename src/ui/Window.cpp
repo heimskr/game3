@@ -646,13 +646,19 @@ namespace Game3 {
 		} else if (action == GLFW_RELEASE) {
 			heldMouseButton.reset();
 
-			uiContext.mouseUp(button, x, y);
+			bool result = false;
+
+			result = uiContext.mouseUp(button, x, y) || result;
 
 			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
-				uiContext.click(button, x, y);
+				result = uiContext.click(button, x, y) || result;
 			} else {
-				uiContext.dragEnd(x, y);
+				result = uiContext.dragEnd(x, y) || result;
 				dragStarted = false;
+			}
+
+			if (!result && game) {
+				game->click(button, 1, x_pos, y_pos, lastModifiers);
 			}
 		}
 	}
@@ -700,11 +706,6 @@ namespace Game3 {
 
 		// richPresence.setActivityDetails("Idling");
 
-		// uiContext.removeDialogs();
-
-		// if (dialog)
-		// 	dialog->close();
-
 		removeModule();
 		game->stopThread();
 		game.reset();
@@ -724,7 +725,6 @@ namespace Game3 {
 
 		uiContext.reset();
 
-		// debugAction->set_state(Glib::Variant<bool>::create(game->debugMode));
 		game->initInteractionSets();
 		settings.apply(*game);
 
@@ -793,9 +793,8 @@ namespace Game3 {
 				return;
 
 			queue([](Window &window) {
-				// get_display()->beep();
-				window.error("Game disconnected.");
 				window.closeGame();
+				window.error("Game disconnected.");
 			});
 		};
 
@@ -825,10 +824,11 @@ namespace Game3 {
 		settings.hostname = hostname;
 		settings.port = port;
 
-		if (std::filesystem::exists("tokens.json"))
+		if (std::filesystem::exists("tokens.json")) {
 			client->readTokens("tokens.json");
-		else
+		} else {
 			client->saveTokens("tokens.json");
+		}
 
 		activateContext();
 		onGameLoaded();
