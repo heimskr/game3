@@ -11,8 +11,8 @@
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
+#include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/App.h"
-#include "ui/Window.h"
 #include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"
@@ -273,6 +273,10 @@ int main(int argc, char **argv) {
 	glfwSwapInterval(1);
 
 	auto window = std::make_shared<Window>(*glfw_window);
+
+	window->delay([](Window &window) {
+		window.uiContext.emplaceDialog<ConnectionDialog>();
+	}, 4);
 
 	while (!glfwWindowShouldClose(glfw_window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
