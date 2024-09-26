@@ -33,7 +33,6 @@
 namespace Game3 {
 	void test();
 	void testBuffer2();
-	void splitter();
 	void omniOptOut();
 	void filterTest();
 	bool chemskrTest(int, char **);
@@ -122,11 +121,6 @@ int main(int argc, char **argv) {
 			const auto attacker_luck = parseNumber<double>(argv[5]);
 			const auto defender_luck = parseNumber<double>(argv[6]);
 			damageTest(weapon_damage, defense, variability, attacker_luck, defender_luck);
-			return 0;
-		}
-
-		if (arg1 == "--split") {
-			splitter();
 			return 0;
 		}
 
