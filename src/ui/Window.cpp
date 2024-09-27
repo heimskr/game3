@@ -619,6 +619,11 @@ namespace Game3 {
 					}
 					return;
 				}
+
+				if (GLFW_KEY_0 <= key && key <= GLFW_KEY_9) {
+					player->getInventory(0)->setActive(key == GLFW_KEY_0? 9 : key - GLFW_KEY_1);
+					return;
+				}
 			}
 
 			if (action == GLFW_RELEASE) {
