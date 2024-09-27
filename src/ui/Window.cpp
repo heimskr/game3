@@ -657,8 +657,6 @@ namespace Game3 {
 						return false;
 
 					player->stopMoving(direction);
-					player->stopContinuousInteraction();
-
 					return true;
 				};
 
