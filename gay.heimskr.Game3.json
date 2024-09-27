@@ -333,6 +333,16 @@
 			}]
 		},
 		{
+			"name": "glfw3",
+			"buildsystem": "cmake",
+			"builddir": false,
+			"sources": [{
+				"type": "archive",
+				"url": "https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip",
+				"sha256": "b5ec004b2712fd08e8861dc271428f048775200a2df719ccf575143ba749a3e9"
+			}]
+		},
+		{
 			"name": "game3-data",
 			"buildsystem": "simple",
 			"build-commands": [
