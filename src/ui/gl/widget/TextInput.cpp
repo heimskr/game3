@@ -58,16 +58,18 @@ namespace Game3 {
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		const float original_height = height;
 
-		if (0 < fixedHeight)
+		if (0 < fixedHeight) {
 			height = fixedHeight;
+		}
 
 		adjustCoordinate(Orientation::Horizontal, x, width, width);
 		adjustCoordinate(Orientation::Vertical, y, original_height, height);
 
 		Widget::render(renderers, x, y, width, height);
 
-		if (cursorFixQueued)
+		if (cursorFixQueued) {
 			fixCursorOffset();
+		}
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
@@ -165,10 +167,11 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_ESCAPE:
-				if (ownsDropdown())
+				if (ownsDropdown()) {
 					hideDropdown();
-				else
+				} else {
 					ui.unfocus();
+				}
 				return true;
 
 			case GLFW_KEY_ENTER:
@@ -304,8 +307,9 @@ namespace Game3 {
 				eraseCharacter();
 			} while (cursorIterator != text.begin() && isWhitespace(cursorIterator));
 
-			while (cursorIterator != text.begin() && !isStopChar(cursorIterator))
+			while (cursorIterator != text.begin() && !isStopChar(cursorIterator)) {
 				eraseCharacter();
+			}
 
 			return;
 		}
@@ -322,21 +326,24 @@ namespace Game3 {
 			eraseCharacter();
 		} while (cursorIterator != text.begin() && !isStopChar(cursorIterator));
 
-		while (cursorIterator != text.begin() && isWhitespace(cursorIterator))
+		while (cursorIterator != text.begin() && isWhitespace(cursorIterator)) {
 			eraseCharacter();
+		}
 	}
 
 	void TextInput::eraseCharacter() {
-		if (cursor == 0)
+		if (cursor == 0) {
 			return;
+		}
 
 		adjustCursorOffset(-ui.getRenderers().text.textWidth(text.substr(--cursor, 1)));
 		cursorIterator = text.erase(--cursorIterator);
 	}
 
 	void TextInput::eraseForward() {
-		if (!text.empty() && cursorIterator != text.end())
+		if (!text.empty() && cursorIterator != text.end()) {
 			cursorIterator = text.erase(cursorIterator);
+		}
 	}
 
 	void TextInput::goLeft(size_t count) {
@@ -415,10 +422,11 @@ namespace Game3 {
 		const float visual = getCursorPosition();
 		const float boundary = getBoundary();
 
-		if (visual > boundary)
+		if (visual > boundary) {
 			xOffset += (visual - boundary + getXPadding() * 2) / scale;
-		else if (visual < getXPadding())
+		} else if (visual < getXPadding()) {
 			xOffset -= (getXPadding() - visual) / scale;
+		}
 
 		cursorFixQueued = false;
 	}

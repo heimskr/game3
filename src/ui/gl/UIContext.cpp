@@ -28,10 +28,10 @@ namespace Game3 {
 
 		const int factor = window.getFactor();
 
-		if (std::ranges::none_of(dialogs, +[](const DialogPtr &dialog) { return dialog->hidesHotbar(); })) {
-			scissorStack = internalScissorStack;
-			constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-			if (getGame() != nullptr) {
+		if (ClientGamePtr game = getGame(); game != nullptr && game->getActiveRealm() != nullptr) {
+			if (std::ranges::none_of(dialogs, +[](const DialogPtr &dialog) { return dialog->hidesHotbar(); })) {
+				scissorStack = internalScissorStack;
+				constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
 				hotbar->render(context, (window.getWidth() * factor - width) / 2, window.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 			}
 		}
@@ -354,6 +354,7 @@ namespace Game3 {
 	void UIContext::removeDialog(const DialogPtr &dialog) {
 		for (auto iter = dialogs.begin(); iter != dialogs.end(); ++iter) {
 			if (*iter == dialog) {
+				(*iter)->onClose();
 				dialogs.erase(iter);
 				return;
 			}
@@ -361,7 +362,6 @@ namespace Game3 {
 	}
 
 	void UIContext::addDialog(DialogPtr dialog) {
-		unfocus();
 		dialogs.emplace_back(std::move(dialog));
 	}
 

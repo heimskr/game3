@@ -10,6 +10,7 @@
 #include "types/Position.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/dialog/DraggableDialog.h"
+#include "ui/gl/dialog/LoginDialog.h"
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/module/FluidsModule.h"
@@ -396,83 +397,82 @@ namespace Game3 {
 				do_lighting = settings.renderLighting;
 			}
 
-			if (!realm)
-				return;
-
-			if (do_lighting) {
-				GL::FBOBinder binder = fbo.getBinder();
-				mainTexture.useInFB();
-				glViewport(0, 0, width, height); CHECKGL
-				GL::clear(.2, .2, .2);
-				RendererContext context = getRendererContext();
-				context.updateSize(width, height);
-
-				if (realm->prerender()) {
+			if (realm) {
+				if (do_lighting) {
+					GL::FBOBinder binder = fbo.getBinder();
 					mainTexture.useInFB();
-					batchSpriteRenderer.update(*this);
-					singleSpriteRenderer.update(*this);
-					recolor.update(*this);
-					textRenderer.update(*this);
-					context.updateSize(getWidth(), getHeight());
 					glViewport(0, 0, width, height); CHECKGL
-					// Skip a frame to avoid glitchiness
-					return;
-				}
-
-				realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-				dynamicLightingTexture.useInFB();
-
-				realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-				scratchTexture.useInFB();
-				GL::clear(1, 1, 1);
-
-				singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
-					.x = 0,
-					.y = 0,
-					.sizeX = -1,
-					.sizeY = -1,
-					.scaleX = 1,
-					.scaleY = 1,
-				});
-
-				ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
-				const auto [static_y, static_x] = chunk.topLeft();
-				singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
-					.x = static_cast<double>(static_x),
-					.y = static_cast<double>(static_y),
-					.sizeX = -1,
-					.sizeY = -1,
-					.scaleX = 1. / factor,
-					.scaleY = 1. / factor,
-					.viewportX = -static_cast<double>(factor),
-					.viewportY = -static_cast<double>(factor),
-				});
-
-				binder.undo();
-
-				context.updateSize(width, height);
-				glViewport(0, 0, width, height); CHECKGL
-				multiplier(mainTexture, scratchTexture);
-			} else {
-				RendererContext context = getRendererContext();
-				glViewport(0, 0, width, height); CHECKGL
-				GL::clear(.2, .2, .2);
-				context.updateSize(width, height);
-
-				if (realm->prerender()) {
-					batchSpriteRenderer.update(*this);
-					singleSpriteRenderer.update(*this);
-					recolor.update(*this);
-					textRenderer.update(*this);
+					GL::clear(.2, .2, .2);
+					RendererContext context = getRendererContext();
 					context.updateSize(width, height);
+
+					if (realm->prerender()) {
+						mainTexture.useInFB();
+						batchSpriteRenderer.update(*this);
+						singleSpriteRenderer.update(*this);
+						recolor.update(*this);
+						textRenderer.update(*this);
+						context.updateSize(getWidth(), getHeight());
+						glViewport(0, 0, width, height); CHECKGL
+						// Skip a frame to avoid glitchiness
+						return;
+					}
+
+					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
+
+					dynamicLightingTexture.useInFB();
+
+					realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
+
+					scratchTexture.useInFB();
+					GL::clear(1, 1, 1);
+
+					singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
+						.x = 0,
+						.y = 0,
+						.sizeX = -1,
+						.sizeY = -1,
+						.scaleX = 1,
+						.scaleY = 1,
+					});
+
+					ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
+					const auto [static_y, static_x] = chunk.topLeft();
+					singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
+						.x = static_cast<double>(static_x),
+						.y = static_cast<double>(static_y),
+						.sizeX = -1,
+						.sizeY = -1,
+						.scaleX = 1. / factor,
+						.scaleY = 1. / factor,
+						.viewportX = -static_cast<double>(factor),
+						.viewportY = -static_cast<double>(factor),
+					});
+
+					binder.undo();
+
+					context.updateSize(width, height);
+					glViewport(0, 0, width, height); CHECKGL
+					multiplier(mainTexture, scratchTexture);
+				} else {
+					RendererContext context = getRendererContext();
+					glViewport(0, 0, width, height); CHECKGL
+					GL::clear(.2, .2, .2);
+					context.updateSize(width, height);
+
+					if (realm->prerender()) {
+						batchSpriteRenderer.update(*this);
+						singleSpriteRenderer.update(*this);
+						recolor.update(*this);
+						textRenderer.update(*this);
+						context.updateSize(width, height);
+					}
+
+					realm->render(width, height, center, scale, context, 1.f); CHECKGL
 				}
 
-				realm->render(width, height, center, scale, context, 1.f); CHECKGL
+				realmBounds = game->getVisibleRealmBounds();
 			}
-
-			realmBounds = game->getVisibleRealmBounds();
 		} else {
 			static float hue = 0;
 			static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
@@ -763,7 +763,6 @@ namespace Game3 {
 		removeModule();
 		game->stopThread();
 		game.reset();
-
 		goToTitle();
 	}
 
@@ -874,9 +873,10 @@ namespace Game3 {
 		client->weakGame = game;
 		game->initEntities();
 
-		// It's assumed that the caller already owns a unique lock on the settings.
-		settings.hostname = hostname;
-		settings.port = port;
+		settings.withUnique([&](auto &) {
+			settings.hostname = hostname;
+			settings.port = port;
+		});
 
 		if (std::filesystem::exists("tokens.json")) {
 			client->readTokens("tokens.json");
@@ -968,7 +968,24 @@ namespace Game3 {
 
 		client->queueForConnect([this, weak = std::weak_ptr(client)] {
 			if (LocalClientPtr client = weak.lock()) {
-				client->send(LoginPacket(settings.username, serverWrapper.getOmnitoken(), "Heimskr"));
+				queue([this, client](Window &) {
+					activateContext();
+					auto dialog = std::make_shared<LoginDialog>(uiContext);
+
+					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
+						INFO("send login: {}, {}", username, display_name);
+						client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
+					});
+
+					dialog->signalDismiss.connect([this] {
+						queue([this](Window &) {
+							closeGame();
+						});
+					});
+
+					dialog->init();
+					uiContext.addDialog(std::move(dialog));
+				});
 			}
 		});
 	}

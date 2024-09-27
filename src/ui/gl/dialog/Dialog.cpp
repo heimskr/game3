@@ -19,7 +19,9 @@ namespace Game3 {
 		minimum = natural = orientation == Orientation::Horizontal? position.width : position.height;
 	}
 
-	void Dialog::onClose() {}
+	void Dialog::onClose() {
+		signalClose();
+	}
 
 	bool Dialog::click(int button, int x, int y) {
 		return getPosition().contains(x, y) && Widget::click(button, x, y);

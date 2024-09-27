@@ -69,6 +69,7 @@ namespace Game3 {
 			if (button != LEFT_BUTTON)
 				return false;
 
+			signalDismiss();
 			ui.removeDialog(getSelf());
 			return true;
 		});
@@ -112,6 +113,7 @@ namespace Game3 {
 
 	bool BaseDraggableDialog::keyPressed(uint32_t character, Modifiers) {
 		if (character == GLFW_KEY_ESCAPE) {
+			signalDismiss();
 			ui.removeDialog(getSelf());
 			return true;
 		}

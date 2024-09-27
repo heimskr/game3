@@ -6,6 +6,8 @@
 #include "ui/Modifiers.h"
 #include "ui/gl/widget/Widget.h"
 
+#include <sigc++/sigc++.h>
+
 #include <array>
 #include <memory>
 #include <string_view>
@@ -20,6 +22,8 @@ namespace Game3 {
 			Dialog(UIContext &);
 
 		public:
+			sigc::signal<void()> signalClose;
+
 			virtual ~Dialog() = default;
 
 			SizeRequestMode getRequestMode() const override;

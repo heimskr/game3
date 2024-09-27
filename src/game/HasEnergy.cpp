@@ -2,8 +2,6 @@
 #include "game/HasEnergy.h"
 #include "net/Buffer.h"
 
-#include <mutex>
-
 namespace Game3 {
 	HasEnergy::HasEnergy(std::shared_ptr<EnergyContainer> container):
 		energyContainer(std::move(container)) {}

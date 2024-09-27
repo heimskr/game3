@@ -3,6 +3,8 @@
 #include "types/UString.h"
 #include "ui/gl/dialog/Dialog.h"
 
+#include <sigc++/sigc++.h>
+
 #include <memory>
 #include <optional>
 
@@ -11,6 +13,8 @@ namespace Game3 {
 
 	class BaseDraggableDialog: public Dialog {
 		public:
+			sigc::signal<void()> signalDismiss;
+
 			BaseDraggableDialog(UIContext &, int width, int height);
 
 			void render(const RendererContext &) override;
