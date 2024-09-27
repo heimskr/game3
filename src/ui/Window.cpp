@@ -209,7 +209,7 @@ namespace Game3 {
 			action(*this);
 		}
 
-		INFO("Alert: {}", message);
+		INFO("{}", message);
 	}
 
 	void Window::error(const UString &message, bool do_queue, bool use_markup) {
