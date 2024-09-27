@@ -22,7 +22,7 @@ namespace Game3 {
 		bool alertOnConnection = true;
 		double sizeDivisor = 1.0;
 		Tick tickFrequency = DEFAULT_CLIENT_TICK_FREQUENCY;
-		bool renderLighting = true;
+		bool renderLighting = false;
 		bool hideTimers = true;
 		int logLevel = 1;
 
