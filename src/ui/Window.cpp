@@ -624,6 +624,26 @@ namespace Game3 {
 					player->getInventory(0)->setActive(key == GLFW_KEY_0? 9 : key - GLFW_KEY_1);
 					return;
 				}
+
+				if (key == GLFW_KEY_UP) {
+					player->face(Direction::Up);
+					return;
+				}
+
+				if (key == GLFW_KEY_RIGHT) {
+					player->face(Direction::Right);
+					return;
+				}
+
+				if (key == GLFW_KEY_DOWN) {
+					player->face(Direction::Down);
+					return;
+				}
+
+				if (key == GLFW_KEY_LEFT) {
+					player->face(Direction::Left);
+					return;
+				}
 			}
 
 			if (action == GLFW_RELEASE) {
