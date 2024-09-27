@@ -113,10 +113,15 @@ namespace Game3 {
 	}
 
 	void VillageTradeModule::update() {
+		if (!village)
+			return;
 		villageName->setText(village->getName());
 		laborLabel->setText(std::format("Available labor: {:.2f}", village->getLabor()));
-		if (ItemStackPtr stack = sellSlot->getStack())
-			updateSell(stack);
+		if (sellSlot) {
+			if (ItemStackPtr stack = sellSlot->getStack()) {
+				updateSell(stack);
+			}
+		}
 		populate();
 	}
 
