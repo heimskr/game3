@@ -87,11 +87,9 @@ namespace Game3 {
 				face->glyph->advance.x);
 		};
 
-		for (uint32_t ch = 32; ch < 127; ++ch) {
+		for (uint32_t ch = 32; ch < 0x400; ++ch) {
 			register_glyph(ch);
 		}
-
-		register_glyph(U'🗸');
 
 		glGenVertexArrays(1, &vao); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL
