@@ -23,7 +23,10 @@ namespace Game3 {
 
 			void reset();
 
+			const std::optional<float> & getLastY() const;
+
 		private:
 			std::vector<std::shared_ptr<ItemSlot>> slotWidgets;
+			std::optional<float> lastY;
 	};
 }

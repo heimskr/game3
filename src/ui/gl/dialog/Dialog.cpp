@@ -23,36 +23,44 @@ namespace Game3 {
 		signalClose();
 	}
 
+	bool Dialog::hidesHotbar() const {
+		return false;
+	}
+
 	bool Dialog::click(int button, int x, int y) {
-		return getPosition().contains(x, y) && Widget::click(button, x, y);
+		return contains(x, y) && Widget::click(button, x, y);
 	}
 
 	bool Dialog::mouseDown(int button, int x, int y) {
-		return getPosition().contains(x, y) && Widget::mouseDown(button, x, y);
+		return contains(x, y) && Widget::mouseDown(button, x, y);
 	}
 
 	bool Dialog::mouseUp(int button, int x, int y) {
-		return getPosition().contains(x, y) && Widget::mouseUp(button, x, y);
+		return contains(x, y) && Widget::mouseUp(button, x, y);
 	}
 
 	bool Dialog::dragStart(int x, int y) {
-		return getPosition().contains(x, y) && Widget::dragStart(x, y);
+		return contains(x, y) && Widget::dragStart(x, y);
 	}
 
 	bool Dialog::dragUpdate(int x, int y) {
-		return getPosition().contains(x, y) && Widget::dragUpdate(x, y);
+		return contains(x, y) && Widget::dragUpdate(x, y);
 	}
 
 	bool Dialog::dragEnd(int x, int y) {
-		return getPosition().contains(x, y) && Widget::dragEnd(x, y);
+		return contains(x, y) && Widget::dragEnd(x, y);
 	}
 
 	bool Dialog::scroll(float x_delta, float y_delta, int x, int y) {
-		return getPosition().contains(x, y) && Widget::scroll(x_delta, y_delta, x, y);
+		return contains(x, y) && Widget::scroll(x_delta, y_delta, x, y);
 	}
 
-	bool Dialog::hidesHotbar() const {
-		return false;
+	bool Dialog::contains(int x, int y) const {
+		return getPosition().contains(x, y);
+	}
+
+	bool Dialog::isFocused() const {
+		return ui.getFocusedDialog().get() == this;
 	}
 
 	std::shared_ptr<Dialog> Dialog::getSelf() {
@@ -70,5 +78,4 @@ namespace Game3 {
 	void Dialog::render(const RendererContext &, const Rectangle &) {
 		throw std::logic_error("Dialogs must be rendered with only a RendererContext argument");
 	}
-
 }

@@ -27,6 +27,7 @@ struct GLFWwindow;
 
 namespace Game3 {
 	class Agent;
+	class ChatDialog;
 	class ClientInventory;
 	class HasFluids;
 	class OmniDialog;
@@ -45,6 +46,7 @@ namespace Game3 {
 			float magic = 8;
 			double sizeDivisor = 1.0;
 			std::shared_ptr<OmniDialog> omniDialog;
+			std::shared_ptr<ChatDialog> chatDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
 			SingleSpriteRenderer singleSpriteRenderer{*this};
@@ -77,6 +79,7 @@ namespace Game3 {
 			std::pair<double, double> getMouseCoordinates() const;
 
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
+			const std::shared_ptr<ChatDialog> & getChatDialog();
 			void showOmniDialog();
 			void closeOmniDialog();
 

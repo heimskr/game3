@@ -47,11 +47,6 @@ namespace Game3 {
 	}
 
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
-		auto window = getWindow();
-
-		if (window->uiContext.click(button, pos_x * window->getFactor(), pos_y * window->getFactor()))
-			return;
-
 		RealmPtr realm = activeRealm;
 
 		if (!realm)

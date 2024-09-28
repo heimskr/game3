@@ -50,6 +50,8 @@ namespace Game3 {
 			RendererContext getRenderers() const;
 			void focusWidget(const WidgetPtr &);
 			WidgetPtr getFocusedWidget() const;
+			void focusDialog(const DialogPtr &);
+			DialogPtr getFocusedDialog() const;
 			void unfocus();
 			void setPressedWidget(const WidgetPtr &);
 			WidgetPtr getPressedWidget() const;
@@ -64,12 +66,15 @@ namespace Game3 {
 			void addDragUpdater(WidgetPtr);
 			bool anyDragUpdaters() const;
 			void setContextMenu(std::shared_ptr<ContextMenu>);
-			std::shared_ptr<ContextMenu> getContextMenu() const;
 			int getWidth() const;
 			int getHeight() const;
 			void removeDialog(const DialogPtr &);
 			void addDialog(DialogPtr);
 			const std::optional<std::pair<int, int>> & getDragOrigin() const;
+
+			std::shared_ptr<ContextMenu> getContextMenu() const;
+			std::shared_ptr<Hotbar> getHotbar() const;
+
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
 
@@ -100,9 +105,12 @@ namespace Game3 {
 			std::shared_ptr<Tooltip> tooltip;
 			std::shared_ptr<AutocompleteDropdown> autocompleteDropdown;
 			std::shared_ptr<ContextMenu> contextMenu;
-			WeakWidgetPtr focusedWidget;
-			WeakWidgetPtr pressedWidget;
+			WidgetPtr focusedWidget;
+			WidgetPtr pressedWidget;
+			DialogPtr focusedDialog;
 			std::set<WidgetPtr> extraDragUpdaters;
+
+			void refocusDialogs(int x, int y);
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {

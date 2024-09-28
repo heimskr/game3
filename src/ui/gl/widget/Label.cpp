@@ -7,8 +7,9 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	Label::Label(UIContext &ui, float scale, UString text):
-		Widget(ui, scale) {
+	Label::Label(UIContext &ui, float scale, UString text, Color text_color):
+		Widget(ui, scale),
+		textColor(text_color) {
 			setText(std::move(text));
 		}
 
@@ -49,7 +50,7 @@ namespace Game3 {
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.wrapWidth = wrapped? 0 : getWrapWidth(width),
-			.color{0, 0, 0, 1},
+			.color = textColor,
 			.alignTop = align_top,
 			.shadow{0, 0, 0, 0},
 		});
@@ -109,6 +110,14 @@ namespace Game3 {
 
 	const UString & Label::getText() const {
 		return text;
+	}
+
+	void Label::setTextColor(const Color &color) {
+		textColor = color;
+	}
+
+	const Color & Label::getTextColor() const {
+		return textColor;
 	}
 
 	float Label::getTextScale() const {

@@ -8,6 +8,7 @@
 #include "packet/LoginPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "types/Position.h"
+#include "ui/gl/dialog/ChatDialog.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/dialog/DraggableDialog.h"
 #include "ui/gl/dialog/LoginDialog.h"
@@ -157,9 +158,19 @@ namespace Game3 {
 	}
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
-		if (!omniDialog)
+		if (!omniDialog) {
 			omniDialog = std::make_shared<OmniDialog>(uiContext);
+			omniDialog->init();
+		}
 		return omniDialog;
+	}
+
+	const std::shared_ptr<ChatDialog> & Window::getChatDialog() {
+		if (!chatDialog) {
+			chatDialog = std::make_shared<ChatDialog>(uiContext);
+			chatDialog->init();
+		}
+		return chatDialog;
 	}
 
 	void Window::showOmniDialog() {
@@ -775,6 +786,7 @@ namespace Game3 {
 		// richPresence.setActivityDetails("Playing", true);
 
 		uiContext.reset();
+		uiContext.addDialog(getChatDialog());
 
 		game->initInteractionSets();
 		settings.apply(*game);

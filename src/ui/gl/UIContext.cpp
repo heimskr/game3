@@ -86,6 +86,8 @@ namespace Game3 {
 	}
 
 	bool UIContext::click(int button, int x, int y) {
+		refocusDialogs(x, y);
+
 		if (contextMenu && contextMenu->click(button, x, y))
 			return true;
 
@@ -100,6 +102,8 @@ namespace Game3 {
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y) {
+		refocusDialogs(x, y);
+
 		if (contextMenu && contextMenu->mouseDown(button, x, y))
 			return true;
 
@@ -257,13 +261,11 @@ namespace Game3 {
 	}
 
 	void UIContext::focusWidget(const WidgetPtr &to_focus) {
-		auto locked = focusedWidget.lock();
-
-		if (to_focus == locked)
+		if (to_focus == focusedWidget)
 			return;
 
-		if (locked)
-			locked->onBlur();
+		if (focusedWidget)
+			focusedWidget->onBlur();
 
 		focusedWidget = to_focus;
 
@@ -272,13 +274,31 @@ namespace Game3 {
 	}
 
 	WidgetPtr UIContext::getFocusedWidget() const {
-		return focusedWidget.lock();
+		return focusedWidget;
+	}
+
+	void UIContext::focusDialog(const DialogPtr &to_focus) {
+		if (to_focus == focusedDialog)
+			return;
+
+		if (focusedDialog)
+			focusedDialog->onBlur();
+
+		focusedDialog = to_focus;
+
+		if (to_focus)
+			to_focus->onFocus();
+	}
+
+	DialogPtr UIContext::getFocusedDialog() const {
+		return focusedDialog;
 	}
 
 	void UIContext::unfocus() {
-		if (auto widget = focusedWidget.lock())
-			widget->onBlur();
-		focusedWidget.reset();
+		if (focusedWidget) {
+			focusedWidget->onBlur();
+			focusedWidget.reset();
+		}
 	}
 
 	void UIContext::setPressedWidget(const WidgetPtr &new_pressed) {
@@ -286,7 +306,7 @@ namespace Game3 {
 	}
 
 	WidgetPtr UIContext::getPressedWidget() const {
-		return pressedWidget.lock();
+		return pressedWidget;
 	}
 
 	void UIContext::setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown> new_dropdown) {
@@ -339,10 +359,6 @@ namespace Game3 {
 		contextMenu = std::move(new_context_menu);
 	}
 
-	std::shared_ptr<ContextMenu> UIContext::getContextMenu() const {
-		return contextMenu;
-	}
-
 	int UIContext::getWidth() const {
 		return internalScissorStack.getBase().width;
 	}
@@ -367,6 +383,14 @@ namespace Game3 {
 
 	const std::optional<std::pair<int, int>> & UIContext::getDragOrigin() const {
 		return dragOrigin;
+	}
+
+	std::shared_ptr<ContextMenu> UIContext::getContextMenu() const {
+		return contextMenu;
+	}
+
+	std::shared_ptr<Hotbar> UIContext::getHotbar() const {
+		return hotbar;
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
@@ -468,6 +492,24 @@ namespace Game3 {
 
 		if (interior.alpha > 0) {
 			renderers.rectangle.drawOnScreen(interior, left->width * scale, top->height * scale, rectangle.width - (left->width + right->width) * scale, rectangle.height - (top->height + bottom->height) * scale);
+		}
+	}
+
+	void UIContext::refocusDialogs(int x, int y) {
+		bool any_clicked = false;
+
+		for (const DialogPtr &dialog: reverse(dialogs)) {
+			if (dialog->contains(x, y)) {
+				if (focusedDialog != dialog) {
+					focusDialog(dialog);
+				}
+				any_clicked = true;
+				break;
+			}
+		}
+
+		if (!any_clicked) {
+			focusDialog(nullptr);
 		}
 	}
 }

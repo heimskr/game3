@@ -33,14 +33,18 @@ namespace Game3 {
 			virtual Rectangle getPosition() const = 0;
 
 			virtual void onClose();
-			virtual bool click(int button, int x, int y) override;
-			virtual bool mouseDown(int button, int x, int y) override;
-			virtual bool mouseUp(int button, int x, int y) override;
-			virtual bool dragStart(int x, int y) override;
-			virtual bool dragUpdate(int x, int y) override;
-			virtual bool dragEnd(int x, int y) override;
-			virtual bool scroll(float x_delta, float y_delta, int x, int y) override;
 			virtual bool hidesHotbar() const;
+
+			bool click(int button, int x, int y) override;
+			bool mouseDown(int button, int x, int y) override;
+			bool mouseUp(int button, int x, int y) override;
+			bool dragStart(int x, int y) override;
+			bool dragUpdate(int x, int y) override;
+			bool dragEnd(int x, int y) override;
+			bool scroll(float x_delta, float y_delta, int x, int y) override;
+			bool contains(int x, int y) const override;
+
+			bool isFocused() const;
 
 		protected:
 			std::shared_ptr<Dialog> getSelf();

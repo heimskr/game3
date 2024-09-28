@@ -32,6 +32,7 @@ namespace Game3 {
 		width -= offset * 2;
 		height -= offset * 2;
 		renderers.rectangle.drawOnScreen(Color{0.88, 0.77, 0.55, 1}, x, y, width, height);
+		lastY = y;
 
 		PlayerPtr player = ui.getPlayer();
 
@@ -78,5 +79,9 @@ namespace Game3 {
 	void Hotbar::reset() {
 		for (const std::shared_ptr<ItemSlot> &item_slot: slotWidgets)
 			item_slot->setStack(nullptr);
+	}
+
+	const std::optional<float> & Hotbar::getLastY() const {
+		return lastY;
 	}
 }
