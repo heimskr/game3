@@ -9,23 +9,7 @@
 #include <random>
 
 namespace Game3 {
-	Lockable<std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>>> ChemicalItem::imageCache{};
 	Lockable<std::unordered_map<std::string, TexturePtr>> ChemicalItem::textureCache{};
-
-	Glib::RefPtr<Gdk::Pixbuf> ChemicalItem::getImage(const Game &game, const ConstItemStackPtr &stack) const {
-		const std::string formula = getFormula(*stack);
-
-		{
-			auto shared_lock = imageCache.sharedLock();
-			if (auto iter = imageCache.find(formula); iter != imageCache.end())
-				return iter->second;
-		}
-
-		auto unique_lock = imageCache.uniqueLock();
-		Glib::RefPtr<Gdk::Pixbuf> image = makeImage(game, stack);
-		imageCache.emplace(formula, image);
-		return image;
-	}
 
 	TexturePtr ChemicalItem::getTexture(const Game &game, const ConstItemStackPtr &stack) const {
 		const std::string formula = getFormula(*stack);

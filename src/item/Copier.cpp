@@ -251,6 +251,7 @@ namespace Game3 {
 		}
 	}
 
+	/*
 	bool Copier::populateMenu(const InventoryPtr &inventory, Slot slot, const ItemStackPtr &stack, Glib::RefPtr<Gio::Menu> menu, Glib::RefPtr<Gio::SimpleActionGroup> group) const {
 		std::weak_ptr<Player> weak_player(stack->getGame()->toClient().getPlayer());
 
@@ -280,6 +281,7 @@ namespace Game3 {
 
 		return true;
 	}
+	*/
 
 	std::optional<Position> Copier::computeMinimums(const std::unordered_set<Position> &positions) {
 		if (positions.empty())

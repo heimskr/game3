@@ -14,7 +14,6 @@
 #include "lib/stb/stb_image.h"
 #endif
 
-#include <gtkmm.h>
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
@@ -63,13 +62,6 @@ namespace Game3 {
 			glActiveTexture(GL_TEXTURE0 + bind_id); CHECKGL
 		}
 		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
-	}
-
-	Glib::RefPtr<Gdk::Pixbuf> Texture::toPixbuf() const {
-		constexpr int doublings = 3;
-
-		return Gdk::Pixbuf::create_from_data(data.get(), Gdk::Colorspace::RGB, alpha, 8, width, height, int(alpha? 4 * width : 3 * width))
-		       ->scale_simple(width << doublings, height << doublings, Gdk::InterpType::NEAREST);
 	}
 
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;

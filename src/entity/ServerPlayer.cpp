@@ -238,7 +238,7 @@ namespace Game3 {
 		subscribedVillage = village;
 	}
 
-	void ServerPlayer::showText(const Glib::ustring &text, const Glib::ustring &name) {
+	void ServerPlayer::showText(const UString &text, const UString &name) {
 		send(DisplayTextPacket(name.raw(), text.raw(), true));
 	}
 }

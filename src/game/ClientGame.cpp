@@ -147,7 +147,7 @@ namespace Game3 {
 		getWindow()->activateContext();
 	}
 
-	void ClientGame::setText(const Glib::ustring &text) {
+	void ClientGame::setText(const UString &text) {
 		auto window = getWindow();
 		window->showOmniDialog();
 		window->openModule("base:module/text", std::any(text.raw()));

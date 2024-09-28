@@ -281,7 +281,7 @@ namespace Game3 {
 		send(MovePlayerPacket(position, new_direction, new_direction));
 	}
 
-	void ClientPlayer::showText(const Glib::ustring &text, const Glib::ustring &name) {
+	void ClientPlayer::showText(const UString &text, const UString &name) {
 		(void) name;
 		getGame()->toClient().getWindow()->openModule("base:module/text", std::any(text.raw()));
 	}

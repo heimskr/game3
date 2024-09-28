@@ -36,7 +36,7 @@ namespace Game3 {
 	}
 
 	bool ContextMenu::keyPressed(uint32_t character, Modifiers) {
-		if (character == GDK_KEY_Escape) {
+		if (character == GLFW_KEY_ESCAPE) {
 			ui.setContextMenu(nullptr);
 			return true;
 		}

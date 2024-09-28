@@ -7,6 +7,8 @@
 #include "ui/Modifiers.h"
 #include "ui/Sound.h"
 
+#include <sigc++/sigc++.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <functional>
@@ -43,7 +45,7 @@ namespace Game3 {
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
 			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
 			void activateContext();
-			void setText(const Glib::ustring &text);
+			void setText(const UString &text);
 			void runCommand(const std::string &);
 			bool tick() final;
 			void queuePacket(std::shared_ptr<Packet>);

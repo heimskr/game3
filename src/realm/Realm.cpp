@@ -1745,6 +1745,7 @@ namespace Game3 {
 		if (!overlap && !adjacent)
 			return false;
 
+		/*
 		auto gmenu = Gio::Menu::create();
 		auto group = Gio::SimpleActionGroup::create();
 
@@ -1784,6 +1785,7 @@ namespace Game3 {
 			// menu.popup();
 			return true;
 		}
+		*/
 
 		return false;
 	}

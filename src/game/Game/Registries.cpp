@@ -32,7 +32,6 @@ namespace Game3 {
 		registries.add<CropRegistry>();
 		registries.add<CentrifugeRecipeRegistry>();
 		registries.add<GeothermalRecipeRegistry>();
-		registries.add<GTKModuleFactoryRegistry>();
 		registries.add<ModuleFactoryRegistry>();
 		registries.add<ItemSetRegistry>();
 		registries.add<DissolverRecipeRegistry>();

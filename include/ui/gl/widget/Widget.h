@@ -8,6 +8,9 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
+#include <set>
+#include <string>
 
 namespace Game3 {
 	class UIContext;

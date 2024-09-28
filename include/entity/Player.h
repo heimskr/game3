@@ -1,11 +1,12 @@
 #pragma once
 
-#include <optional>
-
 #include "data/Identifier.h"
 #include "entity/Entity.h"
 #include "entity/LivingEntity.h"
+#include "types/UString.h"
 #include "ui/Modifiers.h"
+
+#include <optional>
 
 namespace Game3 {
 	class ClientPlayer;
@@ -59,7 +60,7 @@ namespace Game3 {
 			float getMovementSpeed() const override;
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
-			virtual void showText(const Glib::ustring &text, const Glib::ustring &name) = 0;
+			virtual void showText(const UString &text, const UString &name) = 0;
 			std::string getName() const override { return "Player"; }
 			void give(const ItemStackPtr &, Slot start = -1);
 			Place getPlace() override;

@@ -42,8 +42,6 @@ namespace Game3 {
 
 			void notifyOwner() override;
 
-			inline Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &game, Slot slot) { return storage.at(slot)->getImage(game); }
-
 		private:
 			void send(const Packet &);
 

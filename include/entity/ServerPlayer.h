@@ -35,7 +35,7 @@ namespace Game3 {
 			void unsubscribeVillages();
 			void subscribeVillage(const std::shared_ptr<Village> &);
 
-			void showText(const Glib::ustring &text, const Glib::ustring &name) final;
+			void showText(const UString &text, const UString &name) final;
 
 		private:
 			std::weak_ptr<Village> subscribedVillage;

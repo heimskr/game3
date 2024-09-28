@@ -14,14 +14,6 @@ namespace Game3 {
 		alt  (alt_  ),
 		super(super_) {}
 
-#ifndef GAME3_SERVER_ONLY
-	Modifiers::Modifiers(Gdk::ModifierType gdk):
-		shift(static_cast<int>(gdk & Gdk::ModifierType::SHIFT_MASK  ) != 0),
-		ctrl (static_cast<int>(gdk & Gdk::ModifierType::CONTROL_MASK) != 0),
-		alt  (static_cast<int>(gdk & Gdk::ModifierType::ALT_MASK    ) != 0),
-		super(static_cast<int>(gdk & Gdk::ModifierType::SUPER_MASK  ) != 0) {}
-#endif
-
 	Modifiers::operator uint8_t() const {
 		return (shift? 1 : 0) | (ctrl? 2 : 0) | (alt? 4 : 0) | (super? 8 : 0);
 	}

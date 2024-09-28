@@ -7,8 +7,6 @@
 #include "types/ChunkPosition.h"
 #include "ui/Modifiers.h"
 
-#include <gtkmm.h>
-
 namespace Game3 {
 	class Game;
 	class ItemStack;
@@ -40,7 +38,7 @@ namespace Game3 {
 			/** Handles when the player interacts with the tile in front of them and that tile contains this agent. Returns whether anything interesting happened. */
 			virtual bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand);
 
-			virtual bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) { (void) overlap; (void) id; return false; }
+			// virtual bool populateMenu(const PlayerPtr &, bool overlap, const std::string &id, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) { (void) overlap; (void) id; return false; }
 
 			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data);
 			virtual void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data);

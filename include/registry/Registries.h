@@ -6,7 +6,6 @@
 namespace Game3 {
 	class Crop;
 	class EntityFactory;
-	class GTKModuleFactory;
 	class Item;
 	class ItemSet;
 	class ItemStack;
@@ -110,11 +109,6 @@ namespace Game3 {
 	struct CropRegistry: NamedRegistry<Crop> {
 		static Identifier ID() { return {"base", "registry/crop"}; }
 		CropRegistry(): NamedRegistry(ID()) {}
-	};
-
-	struct GTKModuleFactoryRegistry: NamedRegistry<GTKModuleFactory> {
-		static Identifier ID() { return {"base", "registry/gtk_module_factory"}; }
-		GTKModuleFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 
 	struct ItemSetRegistry: NamedRegistry<ItemSet> {

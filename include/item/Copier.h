@@ -14,7 +14,7 @@ namespace Game3 {
 			bool use(Slot, const ItemStackPtr &, const std::shared_ptr<Player> &, Modifiers) override;
 			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers) override;
 			void renderEffects(const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const override;
-			bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const override;
+			// bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const override;
 
 			static std::string getString(const ItemStackPtr &, const std::shared_ptr<Realm> &);
 

@@ -12,14 +12,12 @@ namespace Game3 {
 
 			using Item::Item;
 
-			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ConstItemStackPtr &) const override;
 			TexturePtr getTexture(const Game &, const ConstItemStackPtr &) const override;
 			TexturePtr makeTexture(const Game &, const ConstItemStackPtr &) const override;
 
 			std::string getTooltip(const ConstItemStackPtr &) override;
 
 		private:
-			static Lockable<std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>>> imageCache;
 			static Lockable<std::unordered_map<std::string, TexturePtr>> textureCache;
 
 			static std::string getFormula(const ItemStack &);

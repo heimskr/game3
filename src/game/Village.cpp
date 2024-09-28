@@ -10,6 +10,8 @@
 
 #include "NameGen.h"
 
+#include <sigc++/sigc++.h>
+
 namespace Game3 {
 	namespace {
 		constexpr std::chrono::seconds PERIOD{1};

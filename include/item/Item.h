@@ -6,7 +6,6 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
-#include <gtkmm.h>
 #include <nlohmann/json.hpp>
 
 #include <format>
@@ -45,8 +44,6 @@ namespace Game3 {
 
 			virtual bool isTextureCacheable() const { return true; }
 
-			virtual Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &, const ConstItemStackPtr &) const;
-			virtual Glib::RefPtr<Gdk::Pixbuf> makeImage(const Game &, const ConstItemStackPtr &) const;
 			virtual TexturePtr getTexture(const Game &, const ConstItemStackPtr &) const;
 			virtual TexturePtr makeTexture(const Game &, const ConstItemStackPtr &) const;
 			virtual Identifier getTextureIdentifier(const ConstItemStackPtr &) const;
@@ -77,11 +74,10 @@ namespace Game3 {
 
 			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
 
-			virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
+			// virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
 		protected:
 			mutable std::shared_ptr<uint8_t[]> rawImage;
-			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 			mutable std::shared_ptr<ItemTexture> cachedItemTexture;
 			mutable TexturePtr cachedTexture;
 	};
@@ -106,8 +102,6 @@ namespace Game3 {
 				return stack;
 			}
 
-			Glib::RefPtr<Gdk::Pixbuf> getImage() const;
-			Glib::RefPtr<Gdk::Pixbuf> getImage(const Game &) const;
 			TexturePtr getTexture() const;
 			TexturePtr getTexture(const Game &) const;
 
@@ -167,7 +161,6 @@ namespace Game3 {
 
 		private:
 			std::weak_ptr<Game> weakGame;
-			mutable Glib::RefPtr<Gdk::Pixbuf> cachedImage;
 			mutable TexturePtr cachedTexture;
 
 			ItemStack() = default;
