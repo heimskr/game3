@@ -102,8 +102,6 @@ namespace Game3 {
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y) {
-		refocusDialogs(x, y);
-
 		if (contextMenu && contextMenu->mouseDown(button, x, y))
 			return true;
 
@@ -135,13 +133,15 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragStart(int x, int y) {
+		refocusDialogs(x, y);
+
 		if (contextMenu && contextMenu->dragStart(x, y))
 			return true;
 
 		if (autocompleteDropdown && autocompleteDropdown->dragStart(x, y))
 			return true;
 
-		unfocus();
+		unfocusWidget();
 		dragOrigin.emplace(x, y);
 
 		for (const DialogPtr &dialog: reverse(dialogs))
@@ -228,20 +228,20 @@ namespace Game3 {
 		return dialogs.empty() && hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
 	}
 
-	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers) {
+	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers, bool is_repeat) {
 		if (auto focused = getFocusedWidget())
-			if (focused->keyPressed(character, modifiers))
+			if (focused->keyPressed(character, modifiers, is_repeat))
 				return true;
 
 		if (auto context_menu = getContextMenu())
-			if (context_menu->keyPressed(character, modifiers))
+			if (context_menu->keyPressed(character, modifiers, is_repeat))
 				return true;
 
 		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->keyPressed(character, modifiers))
+			if (dialog->keyPressed(character, modifiers, is_repeat))
 				return true;
 
-		return dialogs.empty() && hotbar->keyPressed(character, modifiers);
+		return dialogs.empty() && hotbar->keyPressed(character, modifiers, is_repeat);
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
@@ -277,6 +277,12 @@ namespace Game3 {
 		return focusedWidget;
 	}
 
+	void UIContext::unfocusWidget(const WidgetPtr &widget) {
+		if (focusedWidget == widget) {
+			unfocusWidget();
+		}
+	}
+
 	void UIContext::focusDialog(const DialogPtr &to_focus) {
 		if (to_focus == focusedDialog)
 			return;
@@ -294,7 +300,7 @@ namespace Game3 {
 		return focusedDialog;
 	}
 
-	void UIContext::unfocus() {
+	void UIContext::unfocusWidget() {
 		if (focusedWidget) {
 			focusedWidget->onBlur();
 			focusedWidget.reset();

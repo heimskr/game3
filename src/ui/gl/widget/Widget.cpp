@@ -103,7 +103,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::keyPressed(uint32_t, Modifiers) {
+	bool Widget::keyPressed(uint32_t, Modifiers, bool) {
 		return false;
 	}
 

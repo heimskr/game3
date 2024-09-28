@@ -20,7 +20,7 @@ namespace Game3 {
 			void render(const RendererContext &) override;
 
 			void init() override;
-			bool keyPressed(uint32_t character, Modifiers) override;
+			bool keyPressed(uint32_t character, Modifiers, bool is_repeat) override;
 
 			void setChild(WidgetPtr);
 

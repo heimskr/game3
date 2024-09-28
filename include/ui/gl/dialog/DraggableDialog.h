@@ -24,7 +24,7 @@ namespace Game3 {
 			bool dragStart(int x, int y) override;
 			bool dragUpdate(int x, int y) override;
 			bool dragEnd(int x, int y) override;
-			bool keyPressed(uint32_t character, Modifiers) override;
+			bool keyPressed(uint32_t character, Modifiers, bool is_repeat) override;
 
 			virtual float getTitleScale() const = 0;
 			virtual const UString & getTitle() const = 0;

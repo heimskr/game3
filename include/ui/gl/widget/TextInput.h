@@ -10,6 +10,7 @@
 
 #include <sigc++/sigc++.h>
 
+#include <chrono>
 #include <functional>
 #include <optional>
 #include <vector>
@@ -29,7 +30,7 @@ namespace Game3 {
 
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			bool click(int button, int x, int y) final;
-			bool keyPressed(uint32_t character, Modifiers) final;
+			bool keyPressed(uint32_t character, Modifiers, bool is_repeat) final;
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 			void onFocus() final;
@@ -75,6 +76,7 @@ namespace Game3 {
 			bool focused = false;
 			std::optional<std::vector<UString>> suggestions;
 			std::optional<UString> deferredText;
+			std::optional<std::pair<uint32_t, std::chrono::system_clock::time_point>> lastPress;
 
 			float getTextScale() const;
 			float getXPadding() const;

@@ -7,12 +7,15 @@
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/gl/Util.h"
+#include "util/Util.h"
 
 namespace {
 	constexpr Game3::Color DEFAULT_BORDER_COLOR{"#926641"};
 	constexpr Game3::Color DEFAULT_TEXT_COLOR{"#341903"};
 	constexpr Game3::Color DEFAULT_CURSOR_COLOR{"#927a66"};
 	constexpr float DEFAULT_THICKNESS = 1;
+	constexpr std::chrono::milliseconds KEY_REPEAT_DELAY{500};
 
 	bool isStopChar(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
@@ -56,6 +59,11 @@ namespace Game3 {
 		TextInput(ui, scale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		if (width < -1 || height < -1) {
+			Widget::render(renderers, x, y, width, height);
+			return;
+		}
+
 		const float original_height = height;
 
 		if (0 < fixedHeight) {
@@ -110,7 +118,17 @@ namespace Game3 {
 		return false;
 	}
 
-	bool TextInput::keyPressed(uint32_t character, Modifiers modifiers) {
+	bool TextInput::keyPressed(uint32_t character, Modifiers modifiers, bool is_repeat) {
+		if (!is_repeat) {
+			lastPress = {character, getTime()};
+		} else if (lastPress && ((lastPress->first == character && getTime() - lastPress->second < KEY_REPEAT_DELAY) || (lastPress->first != character))) {
+			if (lastPress->first != character && !isModifierKey(character)) {
+				lastPress = {character, getTime()};
+			}
+
+			return true;
+		}
+
 		if (modifiers.ctrl) {
 			switch (character) {
 				case GLFW_KEY_BACKSPACE:
@@ -155,14 +173,6 @@ namespace Game3 {
 				goEnd();
 				return true;
 
-			case GLFW_KEY_LEFT_SHIFT:
-			case GLFW_KEY_RIGHT_SHIFT:
-			case GLFW_KEY_LEFT_CONTROL:
-			case GLFW_KEY_RIGHT_CONTROL:
-			case GLFW_KEY_LEFT_ALT:
-			case GLFW_KEY_RIGHT_ALT:
-			case GLFW_KEY_LEFT_SUPER:
-			case GLFW_KEY_RIGHT_SUPER:
 			case GLFW_KEY_MENU:
 				return true;
 
@@ -170,7 +180,7 @@ namespace Game3 {
 				if (ownsDropdown()) {
 					hideDropdown();
 				} else {
-					ui.unfocus();
+					ui.unfocusWidget(shared_from_this());
 				}
 				return true;
 
@@ -180,10 +190,14 @@ namespace Game3 {
 				return true;
 
 			default:
+				if (isModifierKey(character)) {
+					return true;
+				}
+
 				break;
 		}
 
-		if (modifiers.empty() && ('A' <= character && character <= 'Z')) {
+		if (!modifiers.shift && ('A' <= character && character <= 'Z')) {
 			character += 'a' - 'A';
 		}
 

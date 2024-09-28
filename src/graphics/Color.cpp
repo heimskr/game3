@@ -69,6 +69,10 @@ namespace Game3 {
 		return ok.convert<Color>();
 	}
 
+	Color Color::withAlpha(float new_alpha) const {
+		return {red, green, blue, new_alpha};
+	}
+
 	Color Color::fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
 		return Color{red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f};
 	}

@@ -1,11 +1,11 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "ui/gl/dialog/ChatDialog.h"
-#include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/Scroller.h"
+#include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
@@ -13,21 +13,38 @@ namespace Game3 {
 	namespace {
 		constexpr Color CHAT_SCROLLBAR_COLOR{"#ffffffa0"};
 		constexpr Color CHAT_BACKGROUND_COLOR{"#000000a0"};
+		constexpr Color CHAT_FOCUSED_TEXT_COLOR{"#ffffff"};
+		constexpr Color CHAT_UNFOCUSED_TEXT_COLOR{"#000000a0"};
+		constexpr int CHAT_TOGGLER_SIZE = 64;
 	}
 
 	ChatDialog::ChatDialog(UIContext &ui):
 		Dialog(ui) {}
 
 	void ChatDialog::init() {
-		auto scroller = std::make_shared<Scroller>(ui, scale, CHAT_SCROLLBAR_COLOR);
-		auto aligner = std::make_shared<Aligner>(ui, Orientation::Vertical, Alignment::End);
-
+		scroller = std::make_shared<Scroller>(ui, scale, CHAT_SCROLLBAR_COLOR);
 		messageBox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
+		toggler = std::make_shared<Label>(ui, scale, "<<", CHAT_FOCUSED_TEXT_COLOR);
 
-		// aligner->setChild(messageBox);
-		// scroller->setChild(std::move(aligner));
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+
+		toggler->setOnClick([this](Widget &, int button, int, int) {
+			INFO("toggler onClick");
+			if (button != LEFT_BUTTON)
+				return false;
+			toggle();
+			return true;
+		});
+
+		messageInput = std::make_shared<TextInput>(ui, scale, Color{"#"}, Color{"#"}, CHAT_FOCUSED_TEXT_COLOR, CHAT_FOCUSED_TEXT_COLOR, 0);
+
 		scroller->setChild(messageBox);
-		scroller->insertAtEnd(shared_from_this());
+		scroller->setExpand(true, true);
+		messageInput->setFixedHeight(8 * scale);
+		vbox->append(scroller);
+		vbox->append(messageInput);
+		vbox->insertAtEnd(shared_from_this());
+		toggler->insertAtEnd(shared_from_this());
 
 		addMessage("Hello there.");
 		addMessage("<Heimskr> test");
@@ -36,19 +53,41 @@ namespace Game3 {
 	}
 
 	void ChatDialog::render(const RendererContext &renderers) {
-		const Rectangle position = getPosition();
+		Rectangle position = getPosition();
+		position.width -= CHAT_TOGGLER_SIZE;
 
-		if (isFocused()) {
-			renderers.rectangle.drawOnScreen(CHAT_BACKGROUND_COLOR, position);
+		Rectangle toggler_position = position;
+		toggler_position.y = position.y + position.height - CHAT_TOGGLER_SIZE;
+		toggler_position.width = CHAT_TOGGLER_SIZE;
+		toggler_position.height = CHAT_TOGGLER_SIZE;
+
+		if (!isHidden) {
+			if (isFocused()) {
+				renderers.rectangle.drawOnScreen(CHAT_BACKGROUND_COLOR, position);
+			}
+
+			vbox->render(renderers, position);
+			toggler_position.x += position.width;
+		} else {
+			vbox->render(renderers, Rectangle{0, 0, -2, -2});
 		}
 
-		firstChild->render(renderers, position);
+		if (isFocused() || isHidden) {
+			renderers.rectangle.drawOnScreen(CHAT_BACKGROUND_COLOR, toggler_position);
+		}
+
+		toggler->render(renderers, toggler_position);
 	}
 
 	Rectangle ChatDialog::getPosition() const {
 		if (const std::optional<float> &last_y = ui.getHotbar()->getLastY()) {
 			constexpr int height = 400;
-			return Rectangle(0, *last_y - height - 64, ui.getWidth() / 2, height);
+			Rectangle out(0, *last_y - height - 64, isHidden? CHAT_TOGGLER_SIZE : ui.getWidth() / 2, height);
+			if (isHidden) {
+				out.y += out.height - CHAT_TOGGLER_SIZE;
+				out.height = CHAT_TOGGLER_SIZE;
+			}
+			return out;
 		}
 
 		return Rectangle(0, 0, -1, -1);
@@ -69,7 +108,7 @@ namespace Game3 {
 	void ChatDialog::onFocus() {
 		for (WidgetPtr child = messageBox->getFirstChild(); child; child = child->getNextSibling()) {
 			if (auto label = std::dynamic_pointer_cast<Label>(child)) {
-				label->setTextColor(Color{"#ffffff"});
+				label->setTextColor(CHAT_FOCUSED_TEXT_COLOR);
 			}
 		}
 	}
@@ -77,7 +116,7 @@ namespace Game3 {
 	void ChatDialog::onBlur() {
 		for (WidgetPtr child = messageBox->getFirstChild(); child; child = child->getNextSibling()) {
 			if (auto label = std::dynamic_pointer_cast<Label>(child)) {
-				label->setTextColor(Color{"#000000a0"});
+				label->setTextColor(CHAT_UNFOCUSED_TEXT_COLOR);
 			}
 		}
 	}
@@ -86,5 +125,18 @@ namespace Game3 {
 		assert(messageBox != nullptr);
 		auto label = std::make_shared<Label>(ui, scale, std::move(message));
 		messageBox->append(std::move(label));
+	}
+
+	void ChatDialog::toggle() {
+		isHidden = !isHidden;
+
+		if (isHidden) {
+			toggler->setText(">>");
+			ui.focusDialog(nullptr);
+			ui.unfocusWidget(messageInput);
+		} else {
+			toggler->setText("<<");
+			ui.focusDialog(getSelf());
+		}
 	}
 }

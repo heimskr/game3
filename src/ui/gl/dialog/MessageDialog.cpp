@@ -62,7 +62,7 @@ namespace Game3 {
 		}
 	}
 
-	bool MessageDialog::keyPressed(uint32_t character, Modifiers modifiers) {
+	bool MessageDialog::keyPressed(uint32_t character, Modifiers modifiers, bool) {
 		if (character == GLFW_KEY_ESCAPE && modifiers.empty()) {
 			submit(false);
 			return true;

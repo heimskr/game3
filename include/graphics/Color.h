@@ -55,6 +55,12 @@ namespace Game3 {
 			if (str[0] == '#')
 				str.remove_prefix(1);
 
+			if (str.empty()) {
+				// "#" -> transparent black
+				alpha = 0;
+				return;
+			}
+
 			if (str.size() != 6 && str.size() != 8)
 				throw std::invalid_argument("Invalid size for color string");
 
@@ -69,6 +75,7 @@ namespace Game3 {
 		Color multiplyValue(float multiplier) const;
 		Color invertValue() const;
 		Color desaturate() const;
+		Color withAlpha(float) const;
 
 		static Color fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255);
 	};

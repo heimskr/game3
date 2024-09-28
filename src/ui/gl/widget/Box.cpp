@@ -20,6 +20,11 @@ namespace Game3 {
 		Box(ui, scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
 
 	void Box::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		if (width < -1 || height < -1) {
+			ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
+			return;
+		}
+
 		maybeRemeasure(renderers, width, height);
 		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
 
@@ -64,8 +69,8 @@ namespace Game3 {
 					child_height = pair.second;
 					to_add = vertical? child_height : child_width;
 					if (to_add < 0) {
-						ERROR("to_add for {} in {} is {}", child->describe(), describe(), to_add);
-						assert(0 <= to_add);
+						ERROR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
+						// assert(0 <= to_add);
 					}
 				}
 
@@ -93,7 +98,11 @@ namespace Game3 {
 				to_add = child_natural;
 			}
 
-			assert(0 <= to_add);
+			if (to_add < 0) {
+				ERROR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
+				to_add = 0;
+				// assert(0 <= to_add);
+			}
 
 			coordinate += to_add;
 			size -= to_add;

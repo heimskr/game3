@@ -28,25 +28,22 @@
 
 namespace Game3 {
 	namespace {
-		constexpr std::chrono::milliseconds KEY_REPEAT_TIME{100};
+		constexpr std::chrono::milliseconds KEY_REPEAT_INTERVAL{100};
 		constexpr std::chrono::milliseconds ARROW_TIME{100};
 		constexpr std::chrono::milliseconds INTERACT_TIME{250};
 		constexpr std::chrono::milliseconds JUMP_TIME{50};
 		constexpr std::chrono::milliseconds SLOW_TIME{1'000};
 		constexpr std::chrono::milliseconds FOREVER{1'000'000'000};
 
-		std::map<guint, std::chrono::milliseconds> CUSTOM_KEY_REPEAT_TIMES{
+		std::map<guint, std::chrono::milliseconds> CUSTOM_KEY_REPEAT_INTERVALS{
 			{GLFW_KEY_UP,            ARROW_TIME},
 			{GLFW_KEY_DOWN,          ARROW_TIME},
 			{GLFW_KEY_LEFT,          ARROW_TIME},
 			{GLFW_KEY_RIGHT,         ARROW_TIME},
 			{GLFW_KEY_Q,             INTERACT_TIME},
-			{GLFW_KEY_Q,             INTERACT_TIME},
-			{GLFW_KEY_E,             INTERACT_TIME},
 			{GLFW_KEY_E,             INTERACT_TIME},
 			{GLFW_KEY_LEFT_BRACKET,  INTERACT_TIME},
 			{GLFW_KEY_RIGHT_BRACKET, INTERACT_TIME},
-			{GLFW_KEY_R,             INTERACT_TIME},
 			{GLFW_KEY_R,             INTERACT_TIME},
 			{GLFW_KEY_O,             INTERACT_TIME},
 			{GLFW_KEY_ENTER,         INTERACT_TIME},
@@ -64,6 +61,12 @@ namespace Game3 {
 			{GLFW_KEY_9,             SLOW_TIME},
 			{GLFW_KEY_ESCAPE,        FOREVER},
 		};
+
+		constexpr int CUSTOM_REPEAT = 666;
+
+		constexpr bool IS_REPEAT(int action) {
+			return action == GLFW_REPEAT || action == CUSTOM_REPEAT;
+		}
 	}
 
 	Window::Window(GLFWwindow &glfw_window):
@@ -514,14 +517,14 @@ namespace Game3 {
 
 		lastModifiers = modifiers;
 
-		if (action == GLFW_PRESS) {
+		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 			if (auto iter = keyTimes.find(key); iter != keyTimes.end()) {
 				iter->second.modifiers = modifiers;
-			} else if (!modifiers.ctrl) {
+			} else if (!modifiers.ctrl && action == GLFW_PRESS) {
 				keyTimes.try_emplace(key, scancode, modifiers, getTime());
 			}
 
-			if (modifiers.onlyCtrl()) {
+			if (modifiers.onlyCtrl() && action == GLFW_PRESS) {
 				if (key == GLFW_KEY_P) {
 					playLocally();
 					return;
@@ -529,11 +532,11 @@ namespace Game3 {
 			}
 		}
 
-		if (action == GLFW_PRESS) {
-			if (WidgetPtr focused = uiContext.getFocusedWidget()) {
-				if (focused->keyPressed(key, modifiers)) {
-					return;
-				}
+		if (action == GLFW_RELEASE) {
+			keyTimes.erase(key);
+		} else if (WidgetPtr focused = uiContext.getFocusedWidget()) {
+			if (focused->keyPressed(key, modifiers, IS_REPEAT(action))) {
+				return;
 			}
 		}
 
@@ -544,7 +547,7 @@ namespace Game3 {
 				return;
 			}
 
-			if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+			if (action == GLFW_PRESS || action == CUSTOM_REPEAT) {
 				if (modifiers.empty() || modifiers.onlyShift()) {
 					auto handle = [&](int movement_key, Direction direction) {
 						if (key != movement_key)
@@ -653,6 +656,11 @@ namespace Game3 {
 					player->face(Direction::Left);
 					return;
 				}
+
+				if (key == GLFW_KEY_SLASH) {
+					getChatDialog()->toggle();
+					return;
+				}
 			}
 
 			if (action == GLFW_RELEASE) {
@@ -676,7 +684,7 @@ namespace Game3 {
 		}
 
 		if (action == GLFW_PRESS) {
-			uiContext.keyPressed(key, modifiers);
+			uiContext.keyPressed(key, modifiers, false);
 		}
 	}
 
@@ -1007,13 +1015,18 @@ namespace Game3 {
 
 		for (auto &[key, info]: keyTimes) {
 			auto &[keycode, modifiers, time] = info;
-			auto repeat_time = KEY_REPEAT_TIME;
-			if (auto iter = CUSTOM_KEY_REPEAT_TIMES.find(key); iter != CUSTOM_KEY_REPEAT_TIMES.end())
-				repeat_time = iter->second;
-			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeDifference(time)) < repeat_time)
+
+			auto repeat_interval = KEY_REPEAT_INTERVAL;
+			if (auto iter = CUSTOM_KEY_REPEAT_INTERVALS.find(key); iter != CUSTOM_KEY_REPEAT_INTERVALS.end()) {
+				repeat_interval = iter->second;
+			}
+
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeDifference(time)) < repeat_interval) {
 				continue;
+			}
+
 			time = getTime();
-			keyCallback(key, keycode, GLFW_REPEAT, static_cast<uint8_t>(modifiers));
+			keyCallback(key, keycode, CUSTOM_REPEAT, static_cast<uint8_t>(modifiers));
 		}
 	}
 }

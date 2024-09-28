@@ -20,7 +20,7 @@ namespace Game3 {
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
-			bool keyPressed(uint32_t character, Modifiers) final;
+			bool keyPressed(uint32_t character, Modifiers, bool is_repeat) final;
 
 			void addItem(std::shared_ptr<ContextMenuItem>);
 

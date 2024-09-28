@@ -111,7 +111,7 @@ namespace Game3 {
 		return Dialog::dragEnd(x, y);
 	}
 
-	bool BaseDraggableDialog::keyPressed(uint32_t character, Modifiers) {
+	bool BaseDraggableDialog::keyPressed(uint32_t character, Modifiers, bool) {
 		if (character == GLFW_KEY_ESCAPE) {
 			signalDismiss();
 			ui.removeDialog(getSelf());

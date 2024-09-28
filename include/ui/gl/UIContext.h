@@ -43,16 +43,18 @@ namespace Game3 {
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);
 			bool scroll(float x_delta, float y_delta, int x, int y);
-			bool keyPressed(uint32_t character, Modifiers);
+			bool keyPressed(uint32_t character, Modifiers, bool is_repeat);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
 			RendererContext getRenderers() const;
 			void focusWidget(const WidgetPtr &);
 			WidgetPtr getFocusedWidget() const;
+			/** Unfocuses if the currently focused widget is the given widget. */
+			void unfocusWidget(const WidgetPtr &);
 			void focusDialog(const DialogPtr &);
 			DialogPtr getFocusedDialog() const;
-			void unfocus();
+			void unfocusWidget();
 			void setPressedWidget(const WidgetPtr &);
 			WidgetPtr getPressedWidget() const;
 			void setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown>);
