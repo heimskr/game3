@@ -48,6 +48,20 @@
 	],
 	"modules": [
 		{
+			"name": "mm-common",
+			"buildsystem": "meson",
+			"config-opts": [
+				"--buildtype=debugoptimized",
+				"--wrap-mode=nodownload",
+				"-Duse-network=false"
+			],
+			"sources": [{
+				"type": "archive",
+				"url": "https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.5.tar.xz",
+				"sha256": "705c6d29f4116a29bde4e36cfc1b046c92b6ef8c6dae4eaec85018747e6da5aa"
+			}]
+		},
+		{
 			"name": "sigc++-3.0",
 			"buildsystem": "meson",
 			"config-opts": [
