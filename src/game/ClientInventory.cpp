@@ -108,9 +108,9 @@ namespace Game3 {
 			game->getWindow()->queue([game, weak = weakOwner, index = index.load()](Window &) {
 				if (AgentPtr owner = weak.lock()) {
 					if (auto player = std::dynamic_pointer_cast<Player>(owner))
-						game->signalPlayerInventoryUpdate().emit(player);
+						game->signalPlayerInventoryUpdate(player);
 					else
-						game->signalOtherInventoryUpdate().emit(owner, index);
+						game->signalOtherInventoryUpdate(owner, index);
 					return;
 				}
 

@@ -33,5 +33,7 @@ namespace Game3 {
 			std::shared_ptr<TextInput> messageInput;
 			std::shared_ptr<Label> toggler;
 			bool isHidden = false;
+
+			Color getTextColor() const;
 	};
 }

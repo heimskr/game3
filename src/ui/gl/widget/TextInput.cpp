@@ -206,7 +206,7 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
+	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		const float border = 2 * thickness * scale;
 
 		if (orientation == Orientation::Horizontal) {
@@ -214,14 +214,14 @@ namespace Game3 {
 				minimum = natural = fixedWidth;
 			} else {
 				minimum = border;
-				natural = border + renderers.text.textWidth(text, getTextScale());
+				natural = std::min(for_width, border + renderers.text.textWidth(text, getTextScale()));
 			}
 		} else {
 			if (0 < fixedHeight) {
 				minimum = natural = fixedHeight;
 			} else {
 				minimum = border;
-				natural = border + renderers.text.textHeight(text, getTextScale(), for_width - border);
+				natural = std::min(for_height, border + renderers.text.textHeight(text, getTextScale(), for_width - border));
 			}
 		}
 	}

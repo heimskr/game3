@@ -126,7 +126,7 @@ namespace Game3 {
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color = {0.f, 0.f, 0.f, alpha},
+			.color{0, 0, 0, alpha},
 			.align = align,
 		});
 	}
@@ -201,13 +201,13 @@ namespace Game3 {
 
 			// Update VBO for each character
 			const float vertices[6][4] = {
-				{xpos,     ypos + h, 0.0f, 0.0f},
-				{xpos,     ypos,     0.0f, 1.0f},
-				{xpos + w, ypos,     1.0f, 1.0f},
+				{xpos,     ypos + h, 0, 0},
+				{xpos,     ypos,     0, 1},
+				{xpos + w, ypos,     1, 1},
 
-				{xpos,     ypos + h, 0.0f, 0.0f},
-				{xpos + w, ypos,     1.0f, 1.0f},
-				{xpos + w, ypos + h, 1.0f, 0.0f}
+				{xpos,     ypos + h, 0, 0},
+				{xpos + w, ypos,     1, 1},
+				{xpos + w, ypos + h, 1, 0}
 			};
 
 			// Render glyph texture over quad
@@ -344,14 +344,14 @@ namespace Game3 {
 	}
 
 	float TextRenderer::textWidth(const UString &text, float scale) const {
-		float out = 0.f;
+		float out = 0;
 		for (const auto ch: text)
 			out += scale * (getCharacter(ch).advance >> 6);
 		return out;
 	}
 
 	float TextRenderer::textHeight(const UString &text, float scale) const {
-		float out = 0.f;
+		float out = 0;
 		for (const auto ch: text)
 			out = std::max(out, getCharacter(ch).size.y * scale);
 		return out;

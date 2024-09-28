@@ -4,6 +4,7 @@
 #include "graphics/Rectangle.h"
 #include "threading/Atomic.h"
 #include "threading/Waiter.h"
+#include "types/UString.h"
 #include "ui/Modifiers.h"
 #include "ui/Sound.h"
 
@@ -31,6 +32,14 @@ namespace Game3 {
 			SoundEngine sounds;
 			bool suppressDisconnectionMessage = false;
 
+			sigc::signal<void(const PlayerPtr &)> signalPlayerInventoryUpdate;
+			sigc::signal<void(const PlayerPtr &)> signalPlayerMoneyUpdate;
+			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signalOtherInventoryUpdate;
+			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signalFluidUpdate;
+			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signalEnergyUpdate;
+			sigc::signal<void(const std::shared_ptr<Village> &)> signalVillageUpdate;
+			sigc::signal<void(const PlayerPtr &, const UString &)> signalChatReceived;
+
 			ClientGame(const std::shared_ptr<Window> &);
 
 			~ClientGame() override;
@@ -57,6 +66,7 @@ namespace Game3 {
 			/** Returns whether a sound was found with the given ID. */
 			bool playSound(const Identifier &, float pitch = 1.f);
 			UIContext & getUIContext() const;
+			void handleChat(const PlayerPtr &, const UString &message);
 
 			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
 
@@ -64,13 +74,6 @@ namespace Game3 {
 			void moduleMessage(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Args &&...args) {
 				moduleMessageBuffer(module_id, source, name, Buffer{std::forward<Args>(args)...});
 			}
-
-			auto signalPlayerInventoryUpdate() const { return signal_player_inventory_update; }
-			auto signalPlayerMoneyUpdate()     const { return signal_player_money_update;     }
-			auto signalOtherInventoryUpdate()  const { return signal_other_inventory_update;  }
-			auto signalFluidUpdate()           const { return signal_fluid_update;            }
-			auto signalEnergyUpdate()          const { return signal_energy_update;           }
-			auto signalVillageUpdate()         const { return signal_village_update;          }
 
 			Side getSide() const final { return Side::Client; }
 
@@ -96,12 +99,6 @@ namespace Game3 {
 			ClientPlayerPtr player;
 			std::shared_ptr<LocalClient> client;
 			RealmPtr activeRealm;
-			sigc::signal<void(const PlayerPtr &)> signal_player_inventory_update;
-			sigc::signal<void(const PlayerPtr &)> signal_player_money_update;
-			sigc::signal<void(const std::shared_ptr<Agent> &, InventoryID)> signal_other_inventory_update;
-			sigc::signal<void(const std::shared_ptr<HasFluids> &)> signal_fluid_update;
-			sigc::signal<void(const std::shared_ptr<HasEnergy> &)> signal_energy_update;
-			sigc::signal<void(const std::shared_ptr<Village> &)> signal_village_update;
 			std::atomic_bool active{false};
 			std::thread tickThread;
 			Waiter tickThreadLaunchWaiter;

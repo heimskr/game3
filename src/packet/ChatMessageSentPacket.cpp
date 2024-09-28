@@ -12,6 +12,7 @@ namespace Game3 {
 		}
 
 		INFO("[{}] {}", player->displayName, message);
+		game->handleChat(player, message);
 		player->setLastMessage(std::move(message));
 	}
 }

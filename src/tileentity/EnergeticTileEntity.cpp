@@ -44,7 +44,7 @@ namespace Game3 {
 			queueBroadcast();
 		} else {
 			GamePtr game = realm->getGame();
-			game->toClient().signalEnergyUpdate().emit(std::dynamic_pointer_cast<HasEnergy>(shared_from_this()));
+			game->toClient().signalEnergyUpdate(std::dynamic_pointer_cast<HasEnergy>(shared_from_this()));
 		}
 	}
 

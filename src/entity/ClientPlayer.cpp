@@ -199,7 +199,7 @@ namespace Game3 {
 		GamePtr game = getGame();
 		ClientGame &client_game = game->toClient();
 		if (client_game.getPlayer() == shared) {
-			client_game.signalPlayerMoneyUpdate().emit(getShared());
+			client_game.signalPlayerMoneyUpdate(getShared());
 		}
 	}
 

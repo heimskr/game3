@@ -273,6 +273,10 @@ namespace Game3 {
 		return getWindow()->uiContext;
 	}
 
+	void ClientGame::handleChat(const PlayerPtr &player, const UString &message) {
+		signalChatReceived(player, message);
+	}
+
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
 		getWindow()->moduleMessageBuffer(module_id, source, name, std::move(data));
 	}

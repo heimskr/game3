@@ -816,7 +816,7 @@ namespace Game3 {
 		game->initInteractionSets();
 		settings.apply(*game);
 
-		game->signalOtherInventoryUpdate().connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
+		game->signalOtherInventoryUpdate.connect([this](const std::shared_ptr<Agent> &owner, InventoryID inventory_id) {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
 				queue([owner, client_inventory](Window &window) {
@@ -830,11 +830,11 @@ namespace Game3 {
 			}
 		});
 
-		game->signalPlayerMoneyUpdate().connect([](const PlayerPtr &) {
+		game->signalPlayerMoneyUpdate.connect([](const PlayerPtr &) {
 			// updateMoneyLabel(player->getMoney());
 		});
 
-		game->signalFluidUpdate().connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
+		game->signalFluidUpdate.connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([has_fluids](Window &window) mutable {
 				if (!window.omniDialog)
 					return;
@@ -848,7 +848,7 @@ namespace Game3 {
 			});
 		});
 
-		game->signalEnergyUpdate().connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
+		game->signalEnergyUpdate.connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([has_energy](Window &window) mutable {
 				if (!window.omniDialog)
 					return;
@@ -862,7 +862,7 @@ namespace Game3 {
 			});
 		});
 
-		game->signalVillageUpdate().connect([this](const VillagePtr &village) {
+		game->signalVillageUpdate.connect([this](const VillagePtr &village) {
 			queue([village](Window &window) mutable {
 				if (!window.omniDialog)
 					return;
@@ -874,6 +874,10 @@ namespace Game3 {
 					module_->handleMessage({}, "VillageUpdate", data);
 				}
 			});
+		});
+
+		game->signalChatReceived.connect([this](const PlayerPtr &player, const UString &message) {
+			getChatDialog()->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
 		});
 
 		game->errorCallback = [this] {

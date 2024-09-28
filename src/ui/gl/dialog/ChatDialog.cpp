@@ -1,5 +1,8 @@
+#include "game/ClientGame.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
+#include "net/LocalClient.h"
+#include "packet/SendChatMessagePacket.h"
 #include "ui/gl/dialog/ChatDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Hotbar.h"
@@ -36,6 +39,21 @@ namespace Game3 {
 		});
 
 		messageInput = std::make_shared<TextInput>(ui, scale, Color{"#"}, Color{"#"}, CHAT_FOCUSED_TEXT_COLOR, CHAT_FOCUSED_TEXT_COLOR, 0);
+		messageInput->onSubmit.connect([this](TextInput &input, const UString &text) {
+			if (text.empty()) {
+				return;
+			}
+
+			if (ClientGamePtr game = ui.getGame()) {
+				if (text[0] == '/') {
+					game->runCommand(text.raw().substr(1));
+				} else {
+					game->getClient()->send(SendChatMessagePacket(text.raw()));
+				}
+
+				input.clear();
+			}
+		});
 
 		scroller->setChild(messageBox);
 		scroller->setExpand(true, true);
@@ -44,9 +62,6 @@ namespace Game3 {
 		vbox->append(messageInput);
 		vbox->insertAtEnd(shared_from_this());
 		toggler->insertAtEnd(shared_from_this());
-
-		addMessage("Hello there.");
-		addMessage("<Heimskr> test");
 
 		onBlur();
 	}
@@ -131,8 +146,10 @@ namespace Game3 {
 
 	void ChatDialog::addMessage(UString message) {
 		assert(messageBox != nullptr);
-		auto label = std::make_shared<Label>(ui, scale, std::move(message));
+		auto label = std::make_shared<Label>(ui, scale, std::move(message), getTextColor());
 		messageBox->append(std::move(label));
+		// TODO: this is a temporary hack to fix the scrollbar. It's not otherwise informed that its child's height changed.
+		scroller->lastChildHeight = -1;
 	}
 
 	void ChatDialog::toggle(bool affect_focus) {
@@ -159,5 +176,9 @@ namespace Game3 {
 			toggler->setText("<<");
 			ui.focusDialog(getSelf());
 		}
+	}
+
+	Color ChatDialog::getTextColor() const {
+		return isFocused()? CHAT_FOCUSED_TEXT_COLOR : CHAT_UNFOCUSED_TEXT_COLOR;
 	}
 }

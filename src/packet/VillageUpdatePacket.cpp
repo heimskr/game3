@@ -32,6 +32,6 @@ namespace Game3 {
 		village->setResources(std::move(resources));
 		village->setLabor(labor);
 		village->setGreed(greed);
-		game->signalVillageUpdate().emit(village);
+		game->signalVillageUpdate(village);
 	}
 }
