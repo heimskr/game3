@@ -63,11 +63,11 @@ namespace Game3 {
 		return ui.getFocusedDialog().get() == this;
 	}
 
-	std::shared_ptr<Dialog> Dialog::getSelf() {
+	DialogPtr Dialog::getSelf() {
 		return std::static_pointer_cast<Dialog>(shared_from_this());
 	}
 
-	std::shared_ptr<const Dialog> Dialog::getSelf() const {
+	ConstDialogPtr Dialog::getSelf() const {
 		return std::static_pointer_cast<const Dialog>(shared_from_this());
 	}
 

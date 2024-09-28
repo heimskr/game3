@@ -43,7 +43,7 @@ namespace Game3 {
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);
 			bool scroll(float x_delta, float y_delta, int x, int y);
-			bool keyPressed(uint32_t character, Modifiers, bool is_repeat);
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			bool charPressed(uint32_t character, Modifiers);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
@@ -53,9 +53,12 @@ namespace Game3 {
 			WidgetPtr getFocusedWidget() const;
 			/** Unfocuses if the currently focused widget is the given widget. */
 			void unfocusWidget(const WidgetPtr &);
+			void unfocusWidget();
 			void focusDialog(const DialogPtr &);
 			DialogPtr getFocusedDialog() const;
-			void unfocusWidget();
+			/** Unfocuses if the currently focused dialog is the given dialog. */
+			void unfocusDialog(const DialogPtr &);
+			void unfocusDialog();
 			void setPressedWidget(const WidgetPtr &);
 			WidgetPtr getPressedWidget() const;
 			void setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown>);
@@ -108,9 +111,9 @@ namespace Game3 {
 			std::shared_ptr<Tooltip> tooltip;
 			std::shared_ptr<AutocompleteDropdown> autocompleteDropdown;
 			std::shared_ptr<ContextMenu> contextMenu;
-			WidgetPtr focusedWidget;
-			WidgetPtr pressedWidget;
-			DialogPtr focusedDialog;
+			WeakWidgetPtr focusedWidget;
+			WeakWidgetPtr pressedWidget;
+			WeakDialogPtr focusedDialog;
 			std::set<WidgetPtr> extraDragUpdaters;
 
 			void refocusDialogs(int x, int y);

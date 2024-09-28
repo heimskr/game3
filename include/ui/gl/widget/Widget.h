@@ -49,7 +49,7 @@ namespace Game3 {
 			virtual bool dragUpdate(int x, int y);
 			virtual bool dragEnd(int x, int y);
 			virtual bool scroll(float x_delta, float y_delta, int x, int y);
-			virtual bool keyPressed(uint32_t character, Modifiers, bool is_repeat);
+			virtual bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			virtual bool charPressed(uint32_t codepoint, Modifiers);
 			virtual SizeRequestMode getRequestMode() const = 0;
 			virtual void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) = 0;

@@ -118,19 +118,19 @@ namespace Game3 {
 		return false;
 	}
 
-	bool TextInput::keyPressed(uint32_t character, Modifiers modifiers, bool is_repeat) {
+	bool TextInput::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
 		if (!is_repeat) {
-			lastPress = {character, getTime()};
-		} else if (lastPress && ((lastPress->first == character && getTime() - lastPress->second < KEY_REPEAT_DELAY) || (lastPress->first != character))) {
-			if (lastPress->first != character && !isModifierKey(character)) {
-				lastPress = {character, getTime()};
+			lastPress = {key, getTime()};
+		} else if (lastPress && ((lastPress->first == key && getTime() - lastPress->second < KEY_REPEAT_DELAY) || (lastPress->first != key))) {
+			if (lastPress->first != key && !isModifierKey(key)) {
+				lastPress = {key, getTime()};
 			}
 
 			return true;
 		}
 
 		if (modifiers.ctrl) {
-			switch (character) {
+			switch (key) {
 				case GLFW_KEY_BACKSPACE:
 					eraseWord();
 					changed();
@@ -144,7 +144,7 @@ namespace Game3 {
 			return true;
 		}
 
-		switch (character) {
+		switch (key) {
 			case GLFW_KEY_BACKSPACE:
 				eraseCharacter();
 				changed();

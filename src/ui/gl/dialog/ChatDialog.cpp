@@ -29,10 +29,9 @@ namespace Game3 {
 		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
 
 		toggler->setOnClick([this](Widget &, int button, int, int) {
-			INFO("toggler onClick");
 			if (button != LEFT_BUTTON)
 				return false;
-			toggle();
+			toggle(false);
 			return true;
 		});
 
@@ -105,6 +104,15 @@ namespace Game3 {
 		return Dialog::scroll(x_delta, y_delta, x, y);
 	}
 
+	bool ChatDialog::keyPressed(uint32_t key, Modifiers, bool) {
+		if (key == GLFW_KEY_ESCAPE && !isHidden && ui.getFocusedWidget() != messageInput) {
+			setHidden(true);
+			return true;
+		}
+
+		return false;
+	}
+
 	void ChatDialog::onFocus() {
 		for (WidgetPtr child = messageBox->getFirstChild(); child; child = child->getNextSibling()) {
 			if (auto label = std::dynamic_pointer_cast<Label>(child)) {
@@ -127,8 +135,21 @@ namespace Game3 {
 		messageBox->append(std::move(label));
 	}
 
-	void ChatDialog::toggle() {
-		isHidden = !isHidden;
+	void ChatDialog::toggle(bool affect_focus) {
+		setHidden(!isHidden);
+
+		if (affect_focus) {
+			if (isHidden) {
+				ui.unfocusWidget(messageInput);
+				ui.unfocusDialog(getSelf());
+			} else {
+				ui.focusWidget(messageInput);
+			}
+		}
+	}
+
+	void ChatDialog::setHidden(bool hidden) {
+		isHidden = hidden;
 
 		if (isHidden) {
 			toggler->setText(">>");

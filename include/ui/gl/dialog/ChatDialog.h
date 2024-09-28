@@ -18,11 +18,13 @@ namespace Game3 {
 			Rectangle getPosition() const override;
 			bool click(int button, int x, int y) override;
 			bool scroll(float x_delta, float y_delta, int x, int y) override;
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 			void onFocus() override;
 			void onBlur() override;
 
 			void addMessage(UString);
-			void toggle();
+			void toggle(bool affect_focus);
+			void setHidden(bool);
 
 		private:
 			std::shared_ptr<Scroller> scroller;

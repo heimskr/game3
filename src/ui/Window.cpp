@@ -518,7 +518,6 @@ namespace Game3 {
 
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
 		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
-
 		lastModifiers = modifiers;
 
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
@@ -539,6 +538,10 @@ namespace Game3 {
 		if (action == GLFW_RELEASE) {
 			keyTimes.erase(key);
 		} else if (WidgetPtr focused = uiContext.getFocusedWidget()) {
+			if (focused->keyPressed(key, modifiers, IS_REPEAT(action))) {
+				return;
+			}
+		} else if (DialogPtr focused = uiContext.getFocusedDialog()) {
 			if (focused->keyPressed(key, modifiers, IS_REPEAT(action))) {
 				return;
 			}
@@ -662,7 +665,11 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_SLASH) {
-					getChatDialog()->toggle();
+					queue([](Window &window) {
+						// Queueing prevents the issue where the char callback for the / press happens immediately after the key callback,
+						// causing the newly focused TextInput to receive a char event for the / press.
+						window.getChatDialog()->toggle(true);
+					});
 					return;
 				}
 			}
@@ -693,9 +700,8 @@ namespace Game3 {
 	}
 
 	void Window::charCallback(uint32_t codepoint, int raw_modifiers) {
-		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
 		if (WidgetPtr focused = uiContext.getFocusedWidget()) {
-			focused->charPressed(codepoint, modifiers);
+			focused->charPressed(codepoint, Modifiers(static_cast<uint8_t>(raw_modifiers)));
 		}
 	}
 
@@ -1002,7 +1008,6 @@ namespace Game3 {
 					auto dialog = std::make_shared<LoginDialog>(uiContext);
 
 					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
-						INFO("send login: {}, {}", username, display_name);
 						client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
 					});
 

@@ -17,6 +17,11 @@ namespace Game3 {
 	struct Color;
 	struct RendererContext;
 
+	class Dialog;
+	using DialogPtr = std::shared_ptr<Dialog>;
+	using ConstDialogPtr = std::shared_ptr<const Dialog>;
+	using WeakDialogPtr = std::weak_ptr<Dialog>;
+
 	class Dialog: public Widget {
 		protected:
 			Dialog(UIContext &);
@@ -47,13 +52,11 @@ namespace Game3 {
 			bool isFocused() const;
 
 		protected:
-			std::shared_ptr<Dialog> getSelf();
-			std::shared_ptr<const Dialog> getSelf() const;
+			DialogPtr getSelf();
+			ConstDialogPtr getSelf() const;
 
 		private:
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void render(const RendererContext &, const Rectangle &) final;
 	};
-
-	using DialogPtr = std::shared_ptr<Dialog>;
 }

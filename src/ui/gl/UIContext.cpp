@@ -228,20 +228,25 @@ namespace Game3 {
 		return dialogs.empty() && hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
 	}
 
-	bool UIContext::keyPressed(uint32_t character, Modifiers modifiers, bool is_repeat) {
+	bool UIContext::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
 		if (auto focused = getFocusedWidget())
-			if (focused->keyPressed(character, modifiers, is_repeat))
+			if (focused->keyPressed(key, modifiers, is_repeat))
 				return true;
 
 		if (auto context_menu = getContextMenu())
-			if (context_menu->keyPressed(character, modifiers, is_repeat))
+			if (context_menu->keyPressed(key, modifiers, is_repeat))
 				return true;
 
-		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->keyPressed(character, modifiers, is_repeat))
+		if (auto dialog = focusedDialog.lock()) {
+			if (dialog->keyPressed(key, modifiers, is_repeat))
 				return true;
+		} else {
+			for (const DialogPtr &dialog: reverse(dialogs))
+				if (dialog->keyPressed(key, modifiers, is_repeat))
+					return true;
+		}
 
-		return dialogs.empty() && hotbar->keyPressed(character, modifiers, is_repeat);
+		return dialogs.empty() && hotbar->keyPressed(key, modifiers, is_repeat);
 	}
 
 	bool UIContext::charPressed(uint32_t codepoint, Modifiers modifiers) {
@@ -253,9 +258,14 @@ namespace Game3 {
 			if (context_menu->charPressed(codepoint, modifiers))
 				return true;
 
-		for (const DialogPtr &dialog: reverse(dialogs))
+		if (auto dialog = focusedDialog.lock()) {
 			if (dialog->charPressed(codepoint, modifiers))
 				return true;
+		} else {
+			for (const DialogPtr &dialog: reverse(dialogs))
+				if (dialog->charPressed(codepoint, modifiers))
+					return true;
+		}
 
 		return dialogs.empty() && hotbar->charPressed(codepoint, modifiers);
 	}
@@ -277,11 +287,13 @@ namespace Game3 {
 	}
 
 	void UIContext::focusWidget(const WidgetPtr &to_focus) {
-		if (to_focus == focusedWidget)
+		auto locked = focusedWidget.lock();
+
+		if (to_focus == locked)
 			return;
 
-		if (focusedWidget)
-			focusedWidget->onBlur();
+		if (locked)
+			locked->onBlur();
 
 		focusedWidget = to_focus;
 
@@ -290,21 +302,31 @@ namespace Game3 {
 	}
 
 	WidgetPtr UIContext::getFocusedWidget() const {
-		return focusedWidget;
+		return focusedWidget.lock();
 	}
 
 	void UIContext::unfocusWidget(const WidgetPtr &widget) {
-		if (focusedWidget == widget) {
+		if (focusedWidget.lock() == widget) {
 			unfocusWidget();
 		}
 	}
 
+	void UIContext::unfocusWidget() {
+		if (auto locked = focusedWidget.lock()) {
+			locked->onBlur();
+		}
+
+		focusedWidget.reset();
+	}
+
 	void UIContext::focusDialog(const DialogPtr &to_focus) {
-		if (to_focus == focusedDialog)
+		auto locked = focusedDialog.lock();
+
+		if (to_focus == locked)
 			return;
 
-		if (focusedDialog)
-			focusedDialog->onBlur();
+		if (locked)
+			locked->onBlur();
 
 		focusedDialog = to_focus;
 
@@ -313,14 +335,21 @@ namespace Game3 {
 	}
 
 	DialogPtr UIContext::getFocusedDialog() const {
-		return focusedDialog;
+		return focusedDialog.lock();
 	}
 
-	void UIContext::unfocusWidget() {
-		if (focusedWidget) {
-			focusedWidget->onBlur();
-			focusedWidget.reset();
+	void UIContext::unfocusDialog(const DialogPtr &dialog) {
+		if (focusedDialog.lock() == dialog) {
+			unfocusDialog();
 		}
+	}
+
+	void UIContext::unfocusDialog() {
+		if (auto locked = focusedDialog.lock()) {
+			locked->onBlur();
+		}
+
+		focusedDialog.reset();
 	}
 
 	void UIContext::setPressedWidget(const WidgetPtr &new_pressed) {
@@ -328,7 +357,7 @@ namespace Game3 {
 	}
 
 	WidgetPtr UIContext::getPressedWidget() const {
-		return pressedWidget;
+		return pressedWidget.lock();
 	}
 
 	void UIContext::setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown> new_dropdown) {
@@ -522,7 +551,7 @@ namespace Game3 {
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
 			if (dialog->contains(x, y)) {
-				if (focusedDialog != dialog) {
+				if (focusedDialog.lock() != dialog) {
 					focusDialog(dialog);
 				}
 				any_clicked = true;
