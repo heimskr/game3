@@ -1,5 +1,6 @@
 #include "graphics/Texture.h"
 #include "ui/gl/dialog/LoginDialog.h"
+#include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/IntegerInput.h"
@@ -24,7 +25,7 @@ namespace Game3 {
 	void LoginDialog::init() {
 		DraggableDialog::init();
 
-		vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
+		auto vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
 
 		auto grid = std::make_shared<Grid>(ui, UI_SCALE);
 		grid->setRowSpacing(5);
@@ -54,19 +55,15 @@ namespace Game3 {
 
 		vbox->append(std::move(grid));
 
-		buttonBox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 2, 0, Color{});
-
-		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
-		spacer->setHorizontalExpand(true);
+		auto aligner = std::make_shared<Aligner>(ui, Orientation::Horizontal, Alignment::End);
 
 		auto yes_icon = std::make_shared<Icon>(ui, UI_SCALE);
 		yes_icon->setIconTexture(cacheTexture("resources/gui/yes.png"));
 		yes_icon->setFixedSize(8 * UI_SCALE, 8 * UI_SCALE);
 		yes_icon->setOnClick(makeSubmit(true));
 
-		buttonBox->append(std::move(spacer));
-		buttonBox->append(std::move(yes_icon));
-		vbox->append(buttonBox);
+		aligner->setChild(std::move(yes_icon));
+		vbox->append(std::move(aligner));
 		vbox->insertAtEnd(shared_from_this());
 
 		ui.focusWidget(usernameInput);

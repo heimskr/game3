@@ -12,12 +12,12 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
-#include <array>
-#include <iostream>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <array>
+#include <iostream>
 
 namespace Game3 {
 	namespace {
@@ -101,7 +101,6 @@ namespace Game3 {
 		vao.bind();
 		vbo.bind();
 		ebo.bind();
-		// Try commenting this out, it's kinda funny
 		texture->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);

@@ -10,12 +10,12 @@
 #include "util/FS.h"
 #include "util/Timer.h"
 
-#include <array>
-#include <cassert>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <array>
+#include <cassert>
 
 namespace Game3 {
 	namespace {
@@ -26,8 +26,8 @@ namespace Game3 {
 
 	UpperRenderer::UpperRenderer() = default;
 
-	UpperRenderer::UpperRenderer(Realm &realm_):
-		realm(&realm_) {}
+	UpperRenderer::UpperRenderer(Realm &realm):
+		realm(&realm) {}
 
 	UpperRenderer::~UpperRenderer() {
 		reset();
@@ -95,7 +95,6 @@ namespace Game3 {
 		vao.bind();
 		vbo.bind();
 		ebo.bind();
-		// Try commenting this out, it's kinda funny
 		texture->bind(0);
 		shader.set("texture0", 0);
 		shader.set("projection", projection);

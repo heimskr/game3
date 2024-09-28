@@ -63,7 +63,10 @@ namespace Game3 {
 					child_width = pair.first;
 					child_height = pair.second;
 					to_add = vertical? child_height : child_width;
-					assert(0 <= to_add);
+					if (to_add < 0) {
+						ERROR("to_add for {} in {} is {}", child->describe(), describe(), to_add);
+						assert(0 <= to_add);
+					}
 				}
 
 				if (0 <= to_add) {
