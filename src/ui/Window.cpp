@@ -666,9 +666,7 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_SLASH) {
 					queue([](Window &window) {
-						// Queueing prevents the issue where the char callback for the / press happens immediately after the key callback,
-						// causing the newly focused TextInput to receive a char event for the / press.
-						window.getChatDialog()->toggle(true);
+						window.getChatDialog()->toggle(false);
 					});
 					return;
 				}
