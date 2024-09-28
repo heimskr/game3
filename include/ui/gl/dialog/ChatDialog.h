@@ -25,6 +25,7 @@ namespace Game3 {
 			void addMessage(UString);
 			void toggle(bool affect_focus);
 			void setHidden(bool);
+			void focusInput();
 
 		private:
 			std::shared_ptr<Scroller> scroller;

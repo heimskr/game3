@@ -672,6 +672,12 @@ namespace Game3 {
 					});
 					return;
 				}
+
+				if (key == GLFW_KEY_BACKSLASH) {
+					queue([](Window &window) {
+						window.getChatDialog()->focusInput();
+					});
+				}
 			}
 
 			if (action == GLFW_RELEASE) {
