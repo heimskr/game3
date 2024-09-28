@@ -11,8 +11,7 @@ miniaudio = subproject('miniaudio')
 
 game3_deps = [
 	cxx.find_library('m'),
-	dependency('gtk4'),
-	dependency('gtkmm-4.0'),
+	dependency('glibmm-2.68'),
 	dependency('threads'),
 	dependency('eigen3'),
 	dependency('openssl'),
@@ -27,7 +26,6 @@ game3_deps = [
 	dependency('glfw3'),
 	dependency('boost'),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
-	dependency('vte-2.91-gtk4'),
 	dependency('sigc++-3.0'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
@@ -48,11 +46,6 @@ if build_machine.system() == 'linux'
 	game3_deps += dependency('glu')
 	link_args += '-lX11'
 endif
-
-game3_sources += gnome.compile_resources('game3-resources',
-	'game3.gresource.xml',
-	c_name: 'game3',
-	source_dir: '..' / 'resources')
 
 inc_dirs = [
 	include_directories('..' / 'include'),
