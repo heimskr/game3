@@ -677,6 +677,7 @@ namespace Game3 {
 					queue([](Window &window) {
 						window.getChatDialog()->focusInput();
 					});
+					return;
 				}
 			}
 

@@ -150,6 +150,7 @@ namespace Game3 {
 		messageBox->append(std::move(label));
 		// TODO: this is a temporary hack to fix the scrollbar. It's not otherwise informed that its child's height changed.
 		scroller->lastChildHeight = -1;
+		messageBox->maybeRemeasure(ui.getRenderers(), -1, -1);
 	}
 
 	void ChatDialog::toggle(bool affect_focus) {
