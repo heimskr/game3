@@ -134,6 +134,7 @@ namespace Game3 {
 			bool dragStarted = false;
 
 			void keyCallback(int key, int scancode, int action, int mods);
+			void charCallback(uint32_t codepoint, int mods);
 			void mouseButtonCallback(int button, int action, int mods);
 			void mousePositionCallback(int x, int y);
 			void scrollCallback(double x_delta, double y_delta);

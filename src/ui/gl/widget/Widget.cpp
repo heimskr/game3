@@ -107,6 +107,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Widget::charPressed(uint32_t, Modifiers) {
+		return false;
+	}
+
 	float Widget::getScale() const {
 		return scale;
 	}

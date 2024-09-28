@@ -190,18 +190,14 @@ namespace Game3 {
 				return true;
 
 			default:
-				if (isModifierKey(character)) {
-					return true;
-				}
-
 				break;
 		}
 
-		if (!modifiers.shift && ('A' <= character && character <= 'Z')) {
-			character += 'a' - 'A';
-		}
+		return true;
+	}
 
-		insert(static_cast<gunichar>(character));
+	bool TextInput::charPressed(uint32_t codepoint, Modifiers) {
+		insert(static_cast<gunichar>(codepoint));
 		changed();
 		return true;
 	}

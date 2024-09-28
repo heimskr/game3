@@ -244,6 +244,22 @@ namespace Game3 {
 		return dialogs.empty() && hotbar->keyPressed(character, modifiers, is_repeat);
 	}
 
+	bool UIContext::charPressed(uint32_t codepoint, Modifiers modifiers) {
+		if (auto focused = getFocusedWidget())
+			if (focused->charPressed(codepoint, modifiers))
+				return true;
+
+		if (auto context_menu = getContextMenu())
+			if (context_menu->charPressed(codepoint, modifiers))
+				return true;
+
+		for (const DialogPtr &dialog: reverse(dialogs))
+			if (dialog->charPressed(codepoint, modifiers))
+				return true;
+
+		return dialogs.empty() && hotbar->charPressed(codepoint, modifiers);
+	}
+
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
 		draggedWidget = std::move(new_dragged_widget);
 	}

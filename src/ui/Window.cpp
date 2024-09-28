@@ -78,6 +78,10 @@ namespace Game3 {
 				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->keyCallback(key, scancode, action, mods);
 			});
 
+			glfwSetCharModsCallback(glfwWindow, +[](GLFWwindow *glfw_window, uint32_t codepoint, int mods) {
+				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->charCallback(codepoint, mods);
+			});
+
 			glfwSetMouseButtonCallback(glfwWindow, +[](GLFWwindow *glfw_window, int button, int action, int mods) {
 				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->mouseButtonCallback(button, action, mods);
 			});
@@ -685,6 +689,13 @@ namespace Game3 {
 
 		if (action == GLFW_PRESS) {
 			uiContext.keyPressed(key, modifiers, false);
+		}
+	}
+
+	void Window::charCallback(uint32_t codepoint, int raw_modifiers) {
+		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
+		if (WidgetPtr focused = uiContext.getFocusedWidget()) {
+			focused->charPressed(codepoint, modifiers);
 		}
 	}
 

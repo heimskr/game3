@@ -44,6 +44,7 @@ namespace Game3 {
 			bool dragEnd(int x, int y);
 			bool scroll(float x_delta, float y_delta, int x, int y);
 			bool keyPressed(uint32_t character, Modifiers, bool is_repeat);
+			bool charPressed(uint32_t character, Modifiers);
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
