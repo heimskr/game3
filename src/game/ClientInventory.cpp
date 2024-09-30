@@ -99,7 +99,7 @@ namespace Game3 {
 			send(SetActiveSlotPacket(new_active));
 	}
 
-	void ClientInventory::notifyOwner() {
+	void ClientInventory::notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) {
 		if (AgentPtr owner = weakOwner.lock()) {
 			owner->inventoryUpdated(index);
 
@@ -107,10 +107,11 @@ namespace Game3 {
 
 			game->getWindow()->queue([game, weak = weakOwner, index = index.load()](Window &) {
 				if (AgentPtr owner = weak.lock()) {
-					if (auto player = std::dynamic_pointer_cast<Player>(owner))
+					if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
 						game->signalPlayerInventoryUpdate(player);
-					else
+					} else {
 						game->signalOtherInventoryUpdate(owner, index);
+					}
 					return;
 				}
 

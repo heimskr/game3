@@ -43,7 +43,7 @@ namespace Game3 {
 				if (stack->reduceDurability())
 					inventory->erase(slot);
 				player.give(equivalent);
-				inventory->notifyOwner();
+				inventory->notifyOwner({});
 				return true;
 			}
 		}

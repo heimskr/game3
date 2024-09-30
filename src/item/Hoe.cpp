@@ -17,7 +17,7 @@ namespace Game3 {
 		if (std::optional<TileID> tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/tillable"_id)) {
 			if (stack->reduceDurability())
 				place.player->getInventory(0)->erase(slot);
-			place.player->getInventory(0)->notifyOwner();
+			place.player->getInventory(0)->notifyOwner({});
 			place.set(Layer::Terrain, "base:tile/farmland"_id);
 			return true;
 		}

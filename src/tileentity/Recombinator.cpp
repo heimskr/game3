@@ -125,7 +125,7 @@ namespace Game3 {
 		if (was_empty)
 			inventory->add(output, 2);
 
-		inventory->notifyOwner();
+		inventory->notifyOwner(output);
 		return any_from_first || any_from_second;
 	}
 

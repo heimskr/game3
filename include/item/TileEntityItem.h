@@ -30,7 +30,7 @@ namespace Game3 {
 
 					realm.queueDestruction(existing);
 					inventory->add(stack->withCount(1));
-					inventory->notifyOwner();
+					inventory->notifyOwner(stack);
 					return true;
 				}
 
@@ -41,7 +41,7 @@ namespace Game3 {
 					game->toServer().tileEntitySpawned(tile_entity);
 					if (--stack->count == 0)
 						inventory->erase(slot);
-					inventory->notifyOwner();
+					inventory->notifyOwner({});
 					return true;
 				}
 

@@ -84,7 +84,7 @@ namespace Game3 {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
 				for (InventoryID i = 0, max = has_inventory->getInventoryCount(); i < max; ++i)
 					if (InventoryPtr inventory = has_inventory->getInventory(i))
-						inventory->notifyOwner();
+						inventory->notifyOwner({});
 		}
 	}
 }

@@ -54,6 +54,7 @@ namespace Game3 {
 		auto second_inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(second_has_inventory);
 
 		std::function<void()> first_action, second_action;
+		std::optional<std::variant<ItemStackPtr, Slot>> first_notify_argument, second_notify_argument;
 
 		{
 			auto first_lock  = first_inventory.uniqueLock();
@@ -93,6 +94,8 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
 					second_action = second_inventory.onMove(second_inventory, secondSlot, first_inventory, firstSlot, true);
 
+				first_notify_argument = second_stack;
+
 				first_inventory.add(second_stack, firstSlot);
 				second_inventory.erase(secondSlot);
 
@@ -109,6 +112,8 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onMove)
 					second_action = second_inventory.onMove(first_inventory, firstSlot, second_inventory, secondSlot, true);
 
+				second_notify_argument = first_stack;
+
 				second_inventory.add(first_stack, secondSlot);
 				first_inventory.erase(firstSlot);
 
@@ -120,13 +125,16 @@ namespace Game3 {
 				if (&first_inventory != &second_inventory && second_inventory.onSwap)
 					second_action = second_inventory.onSwap(second_inventory, secondSlot, first_inventory, firstSlot);
 
+				first_notify_argument = second_stack;
+				second_notify_argument = first_stack;
+
 				std::swap(*first_stack, *second_stack);
 
 			}
 		}
 
-		first_inventory.notifyOwner();
-		second_inventory.notifyOwner();
+		first_inventory.notifyOwner(std::move(first_notify_argument));
+		second_inventory.notifyOwner(std::move(second_notify_argument));
 
 		if (first_action)
 			first_action();

@@ -33,7 +33,7 @@ namespace Game3 {
 
 		if (held_item->reduceDurability())
 			inventory->erase(player->getHeldSlot(hand));
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 
 		player->give(stack);
 

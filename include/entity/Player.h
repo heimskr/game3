@@ -84,11 +84,14 @@ namespace Game3 {
 			int getZIndex() const override { return 1; }
 			float getAttackPeriod() const;
 			bool canAttack() const;
+			/** Returns whether the item was added (i.e., not already in the set). */
+			bool addKnownItem(const ItemStackPtr &);
 
 			inline std::string getUsername() const { return username.copyBase(); }
 
 		protected:
 			Lockable<std::unordered_set<RealmID>> knownRealms;
+			Lockable<std::set<Identifier>> knownItems;
 
 			Player();
 

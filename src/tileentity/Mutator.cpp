@@ -68,7 +68,7 @@ namespace Game3 {
 		}
 		gene->mutate(strength);
 		gene->toJSON(*data_iter);
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 	}
 
 	std::unique_ptr<Gene> Mutator::getGene() const {

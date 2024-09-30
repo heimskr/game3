@@ -213,7 +213,7 @@ namespace Game3 {
 		inventory_copy->weakOwner = shared_from_this();
 		suppressor.cancel();
 		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 
 		return true;
 	}

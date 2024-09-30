@@ -40,7 +40,7 @@ namespace Game3 {
 
 			void setActive(Slot, bool force) override;
 
-			void notifyOwner() override;
+			void notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) override;
 
 		private:
 			void send(const Packet &);

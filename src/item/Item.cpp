@@ -8,6 +8,7 @@
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "util/Cast.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -329,17 +330,15 @@ namespace Game3 {
 
 	Buffer & operator>>(Buffer &buffer, ItemStackPtr &stack) {
 		if (!stack) {
-			GamePtr game = std::dynamic_pointer_cast<Game>(buffer.context.lock());
-			assert(game);
-			stack = ItemStack::create(game);
+			stack = ItemStack::create(safeDynamicCast<Game>(buffer.context.lock()));
 		}
 
-		const auto type = buffer.popType();
+		const std::string type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(stack, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemStack)");
 		}
-		const auto item_id = buffer.take<Identifier>();
+		const Identifier item_id = buffer.take<Identifier>();
 		stack->count = buffer.take<ItemCount>();
 		stack->data = buffer.take<nlohmann::json>();
 		stack->item = stack->getGame()->registry<ItemRegistry>().at(item_id);

@@ -21,7 +21,7 @@ namespace Game3 {
 			assert(inventory);
 			inventory->decrease(stack, slot, 1, true);
 			player->give(ItemStack::create(game, fluid_name, 1), slot);
-			inventory->notifyOwner();
+			inventory->notifyOwner({});
 		};
 
 		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); tile && (FluidTile::FULL <= tile->level || tile->isInfinite())) {

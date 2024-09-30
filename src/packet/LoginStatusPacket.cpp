@@ -48,6 +48,6 @@ namespace Game3 {
 		game->setActiveRealm(realm);
 		realm->add(player, player->getPosition());
 		realm->addPlayer(player);
-		player->getInventory(0)->notifyOwner();
+		player->getInventory(0)->notifyOwner({});
 	}
 }

@@ -34,6 +34,6 @@ namespace Game3 {
 			}
 		}
 
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 	}
 }

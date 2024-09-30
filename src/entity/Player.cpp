@@ -103,9 +103,9 @@ namespace Game3 {
 
 		if (0.f < tooldown) {
 			tooldown -= delta;
-			if (tooldown < 0.f) {
+			if (tooldown <= 0.f) {
 				tooldown = 0;
-				getInventory(0)->notifyOwner();
+				getInventory(0)->notifyOwner({});
 			}
 		}
 
@@ -207,6 +207,7 @@ namespace Game3 {
 	}
 
 	void Player::give(const ItemStackPtr &stack, Slot start) {
+		addKnownItem(stack);
 		const InventoryPtr inventory = getInventory(0);
 		auto lock = inventory->uniqueLock();
 		if (ItemStackPtr leftover = inventory->add(stack, start)) {
@@ -248,6 +249,9 @@ namespace Game3 {
 		buffer << spawnRealmID;
 		buffer << spawnPosition;
 		buffer << timeSinceAttack;
+		if (buffer.target == Side::Server) {
+			buffer << knownItems;
+		}
 	}
 
 	void Player::decode(Buffer &buffer) {
@@ -261,6 +265,9 @@ namespace Game3 {
 		buffer >> spawnRealmID;
 		buffer >> spawnPosition;
 		buffer >> timeSinceAttack;
+		if (buffer.target == Side::Server) {
+			buffer >> knownItems;
+		}
 		resetEphemeral();
 	}
 
@@ -365,6 +372,11 @@ namespace Game3 {
 
 	bool Player::canAttack() const {
 		return getAttackPeriod() <= timeSinceAttack;
+	}
+
+	bool Player::addKnownItem(const ItemStackPtr &stack) {
+		auto lock = knownItems.uniqueLock();
+		return knownItems.emplace(stack->getID()).second;
 	}
 
 	void Player::resetEphemeral() {

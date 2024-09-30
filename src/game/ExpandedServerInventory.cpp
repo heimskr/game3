@@ -47,7 +47,7 @@ namespace Game3 {
 		}
 
 		if (done) {
-			notifyOwner();
+			notifyOwner(stack);
 			return nullptr;
 		}
 

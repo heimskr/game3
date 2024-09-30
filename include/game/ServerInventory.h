@@ -34,7 +34,7 @@ namespace Game3 {
 
 			void setActive(Slot, bool force) override;
 
-			void notifyOwner() override;
+			void notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) override;
 
 			static ServerInventory fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, const std::shared_ptr<Agent> &);
 

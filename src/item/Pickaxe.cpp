@@ -21,7 +21,7 @@ namespace Game3 {
 				auto lock = inventory->uniqueLock();
 				if (stack->reduceDurability())
 					inventory->erase(slot);
-				inventory->notifyOwner();
+				inventory->notifyOwner({});
 			}
 			place.set(Layer::Terrain, findDirtTilename(place));
 			return true;

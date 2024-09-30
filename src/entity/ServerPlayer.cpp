@@ -215,7 +215,7 @@ namespace Game3 {
 				return false;
 			});
 			inventory->clear();
-			inventory->notifyOwner();
+			inventory->notifyOwner({});
 		}
 
 		setHealth(getMaxHealth());

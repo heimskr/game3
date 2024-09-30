@@ -255,8 +255,8 @@ namespace Game3 {
 			inventory->setActive(slot, force);
 	}
 
-	void InventoryWrapper::notifyOwner() {
-		inventory->notifyOwner();
+	void InventoryWrapper::notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>> variant) {
+		inventory->notifyOwner(std::move(variant));
 	}
 
 	bool InventoryWrapper::empty() const {

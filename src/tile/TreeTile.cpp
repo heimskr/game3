@@ -35,7 +35,7 @@ namespace Game3 {
 						if (ItemStackPtr leftover = inventory->add(stack))
 							leftover->spawn(Place{place.position, place.realm});
 
-				inventory->notifyOwner();
+				inventory->notifyOwner({});
 				return true;
 			}
 		}

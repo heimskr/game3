@@ -212,7 +212,7 @@ namespace Game3 {
 			}
 		}
 
-		place.player->getInventory(0)->notifyOwner();
+		place.player->getInventory(0)->notifyOwner({});
 		return true;
 	}
 

@@ -101,7 +101,7 @@ namespace Game3 {
 
 		ContainmentOrb::saveToJSON(entity, orb->data, false);
 		fluid_iter->second -= FLUID_PER_ACTION;
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 	}
 
 	void Incubator::toJSON(nlohmann::json &json) const {

@@ -39,7 +39,7 @@ namespace Game3 {
 			if (std::uniform_int_distribution(1, 10)(threadContext.rng) <= 2)
 				player->give(ItemStack::create(game, "base:item/moss"));
 
-			inventory->notifyOwner();
+			inventory->notifyOwner({});
 			return true;
 		}
 

@@ -1,3 +1,4 @@
+#include "entity/Player.h"
 #include "game/Inventory.h"
 #include "recipe/CraftingRecipe.h"
 
@@ -49,6 +50,8 @@ namespace Game3 {
 		if (!inventory_in || !inventory_out || !canCraft(input_container))
 			return false;
 
+		PlayerPtr out_player = std::dynamic_pointer_cast<Player>(inventory_out->getOwner());
+
 		// We need to check whether the output inventory has enough space to hold the outputs.
 		// How we do this depends on the number of outputs as well as whether the input and output inventory are the same.
 
@@ -64,6 +67,11 @@ namespace Game3 {
 					return false;
 
 			inventory_in->replace(std::move(*copy));
+
+			if (out_player)
+				for (const ItemStackPtr &stack: output)
+					out_player->addKnownItem(stack);
+
 			return true;
 		}
 
@@ -75,6 +83,9 @@ namespace Game3 {
 			for (const CraftingRequirement &requirement: input)
 				inventory_in->remove(requirement);
 
+			if (out_player)
+				out_player->addKnownItem(output[0]);
+
 			inventory_out->add(output[0]);
 			return true;
 		}
@@ -83,13 +94,17 @@ namespace Game3 {
 		// Make a copy of the output inventory and try to insert all the outputs in it.
 		// If that succeeds, proceed to remove the ingredients from the input inventory and replace
 		// the output inventory with the copy.
-		auto out_copy = inventory_out->copy();
+		std::unique_ptr<Inventory> out_copy = inventory_out->copy();
 		for (const ItemStackPtr &stack: output)
 			if (out_copy->add(stack))
 				return false;
 
 		for (const CraftingRequirement &requirement: input)
 			inventory_in->remove(requirement);
+
+		if (out_player)
+			for (const ItemStackPtr &stack: output)
+				out_player->addKnownItem(stack);
 
 		inventory_out->replace(std::move(*out_copy));
 		return true;

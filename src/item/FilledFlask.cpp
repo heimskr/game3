@@ -30,7 +30,7 @@ namespace Game3 {
 			}
 
 			player->give(ItemStack::create(realm.getGame(), "base:item/flask", 1), slot);
-			inventory->notifyOwner();
+			inventory->notifyOwner({});
 			return true;
 		}
 

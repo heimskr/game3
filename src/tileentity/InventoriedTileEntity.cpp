@@ -70,7 +70,7 @@ namespace Game3 {
 				stack = stack->withCount(max);
 			}
 
-			inventory->notifyOwner();
+			inventory->notifyOwner({});
 			return stack;
 		}
 
@@ -109,7 +109,7 @@ namespace Game3 {
 		else
 			inventory->add(stack, predicate);
 
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 		return true;
 	}
 

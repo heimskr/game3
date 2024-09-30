@@ -88,7 +88,7 @@ namespace Game3 {
 		const bool removed = energyContainer->remove(ENERGY_PER_ACTION);
 		assert(removed);
 
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 	}
 
 	void Sequencer::toJSON(nlohmann::json &json) const {

@@ -62,7 +62,7 @@ namespace Game3 {
 					continue;
 				const ssize_t storable = ssize_t(stored->item->maxCount) - ssize_t(stored->count);
 				if (0 < storable) {
-					const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
+					const ItemCount to_store = std::min<ItemCount>(remaining, storable);
 					stored->count += to_store;
 					remaining -= to_store;
 					if (remaining <= 0)
@@ -75,7 +75,7 @@ namespace Game3 {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
 				if (storage.contains(slot) || !predicate(slot))
 					continue;
-				const ItemCount to_store = std::min(ItemCount(remaining), stack->item->maxCount);
+				const ItemCount to_store = std::min(static_cast<ItemCount>(remaining), stack->item->maxCount);
 				storage.emplace(slot, ItemStack::create(stack->getGame(), stack->item, to_store, stack->data));
 				remaining -= to_store;
 				if (remaining <= 0)
@@ -83,10 +83,10 @@ namespace Game3 {
 			}
 		}
 
-		if (remaining != ssize_t(stack->count))
-			notifyOwner();
+		if (remaining != static_cast<ssize_t>(stack->count))
+			notifyOwner(stack);
 
-		if (remaining < 0 || ssize_t(stack->count) < remaining)
+		if (remaining < 0 || static_cast<ssize_t>(stack->count) < remaining)
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
 
 		if (remaining == 0)
@@ -106,12 +106,12 @@ namespace Game3 {
 		auto realm = owner->getRealm();
 		realm->spawn<ItemEntity>(owner->getPosition(), storage.at(slot));
 		erase(slot);
-		notifyOwner();
+		notifyOwner({});
 	}
 
 	void ServerInventory::discard(Slot slot) {
 		erase(slot);
-		notifyOwner();
+		notifyOwner({});
 	}
 
 	void ServerInventory::swap(Slot source, Slot destination) {
@@ -142,7 +142,7 @@ namespace Game3 {
 		if (action)
 			action();
 
-		notifyOwner();
+		notifyOwner({});
 	}
 
 	void ServerInventory::erase(Slot slot) {
@@ -189,7 +189,7 @@ namespace Game3 {
 		});
 
 		if (0 < removed)
-			notifyOwner();
+			notifyOwner({});
 
 		return removed;
 	}
@@ -218,7 +218,7 @@ namespace Game3 {
 		});
 
 		if (0 < removed)
-			notifyOwner();
+			notifyOwner({});
 
 		return removed;
 	}
@@ -241,7 +241,7 @@ namespace Game3 {
 		if ((stack->count -= to_remove) == 0)
 			storage.erase(slot);
 
-		notifyOwner();
+		notifyOwner({});
 		return to_remove;
 	}
 
@@ -280,10 +280,10 @@ namespace Game3 {
 		auto player = safeDynamicCast<Player>(owner);
 		activeSlot = new_active;
 		player->send(SetActiveSlotPacket(new_active));
-		notifyOwner();
+		notifyOwner({});
 	}
 
-	void ServerInventory::notifyOwner() {
+	void ServerInventory::notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>> variant) {
 		AgentPtr owner = weakOwner.lock();
 
 		if (owner) {
@@ -297,6 +297,15 @@ namespace Game3 {
 				tile_entity->queueBroadcast();
 			} else if (auto server_player = std::dynamic_pointer_cast<ServerPlayer>(owner)) {
 				server_player->inventoryUpdated = true;
+				if (variant) {
+					if (std::holds_alternative<Slot>(*variant)) {
+						if (ItemStackPtr stack = (*this)[std::get<Slot>(*variant)]) {
+							server_player->addKnownItem(stack);
+						}
+					} else if (ItemStackPtr stack = std::get<ItemStackPtr>(*variant)) {
+						server_player->addKnownItem(stack);
+					}
+				}
 			}
 		}
 	}

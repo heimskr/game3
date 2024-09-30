@@ -55,7 +55,7 @@ namespace Game3 {
 			std::optional<Slot> findAttribute(const Identifier &, const Predicate &) const override;
 			ItemStackPtr getActive() const override;
 			void setActive(Slot, bool force) override;
-			void notifyOwner() override;
+			void notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) override;
 			bool empty() const override;
 			Slot slotsOccupied() const override;
 			void replace(const Inventory &) override;

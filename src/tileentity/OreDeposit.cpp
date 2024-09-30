@@ -89,7 +89,7 @@ namespace Game3 {
 					if (active_stack->reduceDurability())
 						inventory->erase(active_slot);
 
-					inventory->notifyOwner();
+					inventory->notifyOwner(ore.stack);
 					increaseUpdateCounter();
 					queueBroadcast();
 					return true;

@@ -42,7 +42,7 @@ namespace Game3 {
 				return true;
 
 			saveToJSON(selected, stack->data, true);
-			player->getInventory(0)->notifyOwner();
+			player->getInventory(0)->notifyOwner(stack);
 
 			return true;
 		}
@@ -61,7 +61,7 @@ namespace Game3 {
 			realm->queueEntityInit(std::move(entity), place.position);
 		}
 		stack->data.clear();
-		player->getInventory(0)->notifyOwner();
+		player->getInventory(0)->notifyOwner(stack);
 		return true;
 	}
 

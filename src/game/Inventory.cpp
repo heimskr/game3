@@ -84,7 +84,7 @@ namespace Game3 {
 			}
 		}
 
-		notifyOwner();
+		notifyOwner({});
 		return erased;
 	}
 

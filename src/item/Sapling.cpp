@@ -35,7 +35,7 @@ namespace Game3 {
 		if (stack->count == 0) {
 			auto lock = inventory->uniqueLock();
 			inventory->erase(slot);
-			inventory->notifyOwner();
+			inventory->notifyOwner({});
 			return false;
 		}
 

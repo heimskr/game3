@@ -71,7 +71,7 @@ namespace Game3 {
 					if (stack->reduceDurability())
 						inventory->erase(inventory->activeSlot);
 					// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-					inventory->notifyOwner();
+					inventory->notifyOwner({});
 					return true;
 				}
 			}

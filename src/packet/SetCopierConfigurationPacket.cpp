@@ -33,6 +33,6 @@ namespace Game3 {
 		}
 
 		stack->data["includeTileEntities"] = includeTileEntities;
-		inventory->notifyOwner();
+		inventory->notifyOwner({});
 	}
 }

@@ -19,7 +19,7 @@ namespace Game3 {
 		if (PlayerPtr player = game->getPlayer()) {
 			inventory->weakOwner = player;
 			player->setInventory(inventory, 0);
-			player->getInventory(0)->notifyOwner();
+			player->getInventory(0)->notifyOwner({});
 		} else {
 			ERROR("InventoryPacket::handle: player is missing");
 			assert(player);

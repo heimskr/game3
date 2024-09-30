@@ -12,6 +12,7 @@
 #include <map>
 #include <mutex>
 #include <optional>
+#include <variant>
 
 namespace Game3 {
 	class Agent;
@@ -165,7 +166,8 @@ namespace Game3 {
 			virtual void prevSlot();
 			virtual void nextSlot();
 
-			virtual void notifyOwner() = 0;
+			/** The argument represents an item stack that might be new to the owner of the inventory. */
+			virtual void notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) = 0;
 
 			/** Returns the number of times a recipe can be crafted with the inventory's items.
 			 *  Doesn't take the output of the recipe into account. */
@@ -205,7 +207,7 @@ namespace Game3 {
 					active = false;
 					parent.suppressInventoryNotifications = false;
 					if (notify)
-						parent.notifyOwner();
+						parent.notifyOwner({});
 				}
 			};
 
