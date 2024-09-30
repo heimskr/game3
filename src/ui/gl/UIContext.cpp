@@ -98,7 +98,7 @@ namespace Game3 {
 			if (dialog->click(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->contains(x, y) && hotbar->click(button, x, y);
+		return hotbar->contains(x, y) && hotbar->click(button, x, y);
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y) {
@@ -112,7 +112,7 @@ namespace Game3 {
 			if (dialog->mouseDown(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->contains(x, y) && hotbar->mouseDown(button, x, y);
+		return hotbar->contains(x, y) && hotbar->mouseDown(button, x, y);
 	}
 
 	bool UIContext::mouseUp(int button, int x, int y) {
@@ -129,7 +129,7 @@ namespace Game3 {
 			if (dialog->mouseUp(button, x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->contains(x, y) && hotbar->mouseUp(button, x, y);
+		return hotbar->contains(x, y) && hotbar->mouseUp(button, x, y);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
@@ -148,7 +148,7 @@ namespace Game3 {
 			if (dialog->dragStart(x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragStart(x, y);
+		return hotbar->contains(x, y) && hotbar->dragStart(x, y);
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
@@ -169,7 +169,7 @@ namespace Game3 {
 			if (dialog->dragUpdate(x, y))
 				return true;
 
-		return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragUpdate(x, y);
+		return hotbar->contains(x, y) && hotbar->dragUpdate(x, y);
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
@@ -205,7 +205,7 @@ namespace Game3 {
 		}
 
 		if (!out)
-			return dialogs.empty() && hotbar->contains(x, y) && hotbar->dragEnd(x, y);
+			return hotbar->contains(x, y) && hotbar->dragEnd(x, y);
 
 		return true;
 	}
@@ -225,7 +225,7 @@ namespace Game3 {
 			}
 		}
 
-		return dialogs.empty() && hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
+		return hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
 	}
 
 	bool UIContext::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
@@ -246,7 +246,7 @@ namespace Game3 {
 					return true;
 		}
 
-		return dialogs.empty() && hotbar->keyPressed(key, modifiers, is_repeat);
+		return hotbar->keyPressed(key, modifiers, is_repeat);
 	}
 
 	bool UIContext::charPressed(uint32_t codepoint, Modifiers modifiers) {
@@ -267,7 +267,7 @@ namespace Game3 {
 					return true;
 		}
 
-		return dialogs.empty() && hotbar->charPressed(codepoint, modifiers);
+		return hotbar->charPressed(codepoint, modifiers);
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {

@@ -16,6 +16,13 @@ namespace Game3 {
 		}
 	}
 
+	void Hotbar::init() {
+		WidgetPtr self = shared_from_this();
+		for (const std::shared_ptr<ItemSlot> &item_slot: slotWidgets) {
+			item_slot->insertAtEnd(self);
+		}
+	}
+
 	void Hotbar::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		const float original_width = width;
 		const float original_height = height;
@@ -50,18 +57,6 @@ namespace Game3 {
 				widget->render(renderers, x + scale * (SLOT_PADDING + OUTER_SLOT_SIZE * slot), y + scale * SLOT_PADDING, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
 			}
 		}
-	}
-
-	bool Hotbar::click(int button, int x, int y) {
-		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->contains(x, y) && widget->click(button, x, y))
-				break;
-
-		return true;
-	}
-
-	bool Hotbar::dragStart(int, int) {
-		return true;
 	}
 
 	SizeRequestMode Hotbar::getRequestMode() const {
