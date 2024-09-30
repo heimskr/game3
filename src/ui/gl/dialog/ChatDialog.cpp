@@ -18,6 +18,7 @@ namespace Game3 {
 		constexpr Color CHAT_BACKGROUND_COLOR{"#000000a0"};
 		constexpr Color CHAT_FOCUSED_TEXT_COLOR{"#ffffff"};
 		constexpr Color CHAT_UNFOCUSED_TEXT_COLOR{"#000000a0"};
+		constexpr Color CHAT_SEPARATOR_COLOR{"#ffffffa0"};
 		constexpr int CHAT_TOGGLER_SIZE = 64;
 	}
 
@@ -29,7 +30,7 @@ namespace Game3 {
 		messageBox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
 		toggler = std::make_shared<Label>(ui, scale, "<<", CHAT_FOCUSED_TEXT_COLOR);
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0.5, CHAT_SEPARATOR_COLOR);
 
 		toggler->setOnClick([this](Widget &, int button, int, int) {
 			if (button != LEFT_BUTTON)
@@ -78,6 +79,9 @@ namespace Game3 {
 		if (!isHidden) {
 			if (isFocused()) {
 				renderers.rectangle.drawOnScreen(CHAT_BACKGROUND_COLOR, position);
+				vbox->setSeparatorColor(CHAT_SEPARATOR_COLOR);
+			} else {
+				vbox->setSeparatorColor(Color{"#"});
 			}
 
 			vbox->render(renderers, position);

@@ -3,7 +3,6 @@
 #include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Icon.h"
-#include "ui/gl/widget/IntegerInput.h"
 #include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
@@ -44,7 +43,7 @@ namespace Game3 {
 		usernameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(usernameInput, 0, 1);
 
-		displayNameInput = std::make_shared<IntegerInput>(ui, UI_SCALE);
+		displayNameInput = std::make_shared<TextInput>(ui, UI_SCALE);
 		displayNameInput->setHorizontalExpand(true);
 		displayNameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(displayNameInput, 1, 1);
