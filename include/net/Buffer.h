@@ -195,19 +195,16 @@ namespace Game3 {
 			std::weak_ptr<BufferContext> context;
 
 			Buffer() = delete;
-			Buffer(Side target);
+			explicit Buffer(Side target);
+			Buffer(std::vector<uint8_t> bytes, std::weak_ptr<BufferContext>, Side target);
+			Buffer(std::weak_ptr<BufferContext>, Side target);
+			Buffer(std::vector<uint8_t> bytes, Side target);
 
 			Buffer(const Buffer &) = default;
 			Buffer(Buffer &&) noexcept;
 
 			Buffer & operator=(const Buffer &) = default;
 			Buffer & operator=(Buffer &&) noexcept;
-
-			explicit Buffer(std::weak_ptr<BufferContext> context_):
-				context(std::move(context_)) {}
-
-			explicit Buffer(decltype(bytes) bytes_):
-				bytes(std::move(bytes_)) {}
 
 			template <typename... Args>
 			explicit Buffer(Side target, Args &&...args): target(target) {
@@ -236,6 +233,8 @@ namespace Game3 {
 			void popMany(size_t);
 			void limitTo(size_t);
 			void debug() const;
+			size_t getSkip() const;
+			void setSkip(size_t);
 
 			nlohmann::json popJSON();
 			nlohmann::json popAllJSON();

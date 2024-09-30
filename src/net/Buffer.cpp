@@ -18,6 +18,15 @@ namespace Game3 {
 	Buffer::Buffer(Side target):
 		target(target) {}
 
+	Buffer::Buffer(std::vector<uint8_t> bytes, std::weak_ptr<BufferContext> context, Side target):
+		bytes(std::move(bytes)), target(target), context(std::move(context)) {}
+
+	Buffer::Buffer(std::weak_ptr<BufferContext> context, Side target):
+		target(target), context(std::move(context)) {}
+
+	Buffer::Buffer(std::vector<uint8_t> bytes, Side target):
+		bytes(std::move(bytes)), target(target) {}
+
 	Buffer::Buffer(Buffer &&other) noexcept:
 		bytes(std::move(other.bytes)),
 		skip(std::exchange(other.skip, 0)),
@@ -291,6 +300,18 @@ namespace Game3 {
 			INFO("Buffer: {}", hexString(bytes, true));
 		else
 			INFO("Buffer: \e[2m{}\e[22m {}", hexString(std::span(bytes.begin(), bytes.begin() + skip), true), hexString(std::span(bytes.begin() + skip, bytes.end()), true));
+	}
+
+	size_t Buffer::getSkip() const {
+		return skip;
+	}
+
+	void Buffer::setSkip(size_t new_skip) {
+		if (new_skip > bytes.size()) {
+			throw std::out_of_range(std::format("New skip value {} too high (must not exceed {})", new_skip, bytes.size()));
+		}
+
+		skip = new_skip;
 	}
 
 	namespace {

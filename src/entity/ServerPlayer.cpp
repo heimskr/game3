@@ -72,6 +72,13 @@ namespace Game3 {
 		return out;
 	}
 
+	std::shared_ptr<ServerPlayer> ServerPlayer::fromBuffer(const GamePtr &game, Buffer &buffer) {
+		auto out = Entity::create<ServerPlayer>();
+		out->weakGame = game;
+		out->decode(buffer);
+		return out;
+	}
+
 	bool ServerPlayer::ensureEntity(const std::shared_ptr<Entity> &entity) {
 		auto client = weakClient.lock();
 		if (!client)

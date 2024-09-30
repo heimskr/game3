@@ -17,6 +17,7 @@ namespace Game3 {
 
 			static std::shared_ptr<ServerPlayer> create(const std::shared_ptr<Game> &);
 			static std::shared_ptr<ServerPlayer> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<ServerPlayer> fromBuffer(const std::shared_ptr<Game> &, Buffer &);
 
 			/** Returns true if the entity had to be sent. */
 			bool ensureEntity(const std::shared_ptr<Entity> &);

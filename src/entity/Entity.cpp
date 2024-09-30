@@ -37,11 +37,23 @@ namespace Game3 {
 		textureID(std::move(texture_id)),
 		variety(variety_) {}
 
-	std::shared_ptr<Entity> Entity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	EntityPtr Entity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
 		auto factory = game->registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
 		assert(factory);
 		auto out = (*factory)(game, json);
 		out->absorbJSON(game, json);
+		return out;
+	}
+
+	EntityPtr Entity::fromBuffer(const GamePtr &game, Buffer &buffer) {
+		const size_t skip = buffer.getSkip();
+		EntityType type = buffer.take<EntityType>();
+		buffer.setSkip(skip);
+
+		auto factory = game->registry<EntityFactoryRegistry>().at(type);
+		assert(factory);
+		EntityPtr out = (*factory)(game);
+		out->decode(buffer);
 		return out;
 	}
 
@@ -776,7 +788,7 @@ namespace Game3 {
 		return std::format("Entity[type={}, position={}, realm={}, direction={}]", type, position, realmID, direction);
 	}
 
-	void Entity::queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)> function) {
+	void Entity::queueForMove(std::function<bool(const EntityPtr &, bool)> function) {
 		auto lock = moveQueue.uniqueLock();
 		moveQueue.push_back(std::move(function));
 	}
@@ -1175,8 +1187,11 @@ namespace Game3 {
 		GamePtr game = getGame();
 		const bool is_client = game->getSide() == Side::Client;
 
-		if (!is_client)
-			game->toServer().broadcast({position, getRealm(), nullptr}, HeldItemSetPacket(getRealm()->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
+		if (!is_client) {
+			if (RealmPtr realm = weakRealm.lock()) {
+				game->toServer().broadcast({position, realm, nullptr}, HeldItemSetPacket(realm->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
+			}
+		}
 
 		if (new_value < 0) {
 			held.slot = -1;
@@ -1306,7 +1321,7 @@ namespace Game3 {
 		offset.z = 0.;
 	}
 
-	std::shared_ptr<Entity> Entity::getSelf() {
+	EntityPtr Entity::getSelf() {
 		return std::static_pointer_cast<Entity>(shared_from_this());
 	}
 

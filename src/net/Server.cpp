@@ -155,12 +155,7 @@ namespace Game3 {
 		database.writeUsers(game->players);
 
 		for (const ServerPlayerPtr &player: game->players) {
-			nlohmann::json json;
-			{
-				auto player_lock = player->sharedLock();
-				player->toJSON(json);
-			}
-			database.writeUser(player->username, json, std::nullopt);
+			database.writeUser(*player);
 		}
 	}
 
@@ -169,9 +164,9 @@ namespace Game3 {
 			return nullptr;
 
 		{
-			nlohmann::json json;
-			if (game->getDatabase().readUser(std::string(username), nullptr, &json, nullptr))
-				return ServerPlayer::fromJSON(game, json);
+			Buffer buffer{game, Side::Server};
+			if (game->getDatabase().readUser(std::string(username), nullptr, &buffer, nullptr))
+				return ServerPlayer::fromBuffer(game, buffer);
 		}
 
 		RealmPtr overworld = game->getRealm(1);

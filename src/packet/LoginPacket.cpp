@@ -15,7 +15,7 @@ namespace Game3 {
 		if (!client.getPlayer()) {
 			auto server = game->getServer();
 			std::string display_name;
-			nlohmann::json json;
+			Buffer buffer{game, Side::Server};
 			std::optional<Place> release_place;
 
 			GameDB &database = game->getDatabase();
@@ -32,8 +32,8 @@ namespace Game3 {
 				return;
 			}
 
-			if (database.readUser(username, &display_name, &json, &release_place)) {
-				auto player = ServerPlayer::fromJSON(game, json);
+			if (database.readUser(username, &display_name, &buffer, &release_place)) {
+				auto player = ServerPlayer::fromBuffer(game, buffer);
 				player->username = username;
 				client.setPlayer(player);
 				game->addPlayer(player);

@@ -62,9 +62,9 @@ namespace Game3 {
 
 			std::optional<ChunkSet> getChunk(RealmID, ChunkPosition);
 
-			bool readUser(const std::string &username, std::string *display_name_out, nlohmann::json *json_out, std::optional<Place> *release_place);
-			void writeUser(const std::string &username, const nlohmann::json &, const std::optional<Place> &release_place);
-			void writeUser(const Player &);
+			bool readUser(const std::string &username, std::string *display_name_out, Buffer *buffer_out, std::optional<Place> *release_place);
+			void writeUser(const std::string &username, const std::string &display_name, const Buffer &, const std::optional<Place> &release_place);
+			void writeUser(Player &);
 			void writeReleasePlace(const std::string &username, const std::optional<Place> &release_place);
 			bool hasName(const std::string &username, const std::string &display_name);
 			std::optional<Place> readReleasePlace(const std::string &username);

@@ -99,6 +99,7 @@ namespace Game3 {
 			}
 
 			static std::shared_ptr<Entity> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<Entity> fromBuffer(const std::shared_ptr<Game> &, Buffer &);
 
 			static std::string getSQL();
 

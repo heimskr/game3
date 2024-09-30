@@ -55,7 +55,7 @@ namespace Game3 {
 			CREATE TABLE IF NOT EXISTS users (
 				username VARCHAR(32) PRIMARY KEY,
 				displayName VARCHAR(64),
-				json MEDIUMTEXT,
+				encoded MEDIUMTEXT,
 				releasePosition VARCHAR(42),
 				releaseRealm INT
 			);
@@ -430,7 +430,7 @@ namespace Game3 {
 
 				tile_entity->setRealm(realm);
 
-				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
+				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size), Side::Server);
 				buffer.context = game;
 				tile_entity->init(*game);
 				tile_entity->decode(*game, buffer);
@@ -457,8 +457,7 @@ namespace Game3 {
 
 				entity->setRealm(realm);
 
-				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size));
-				buffer.context = game;
+				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size), game, Side::Server);
 				entity->decode(buffer);
 				entity->init(game);
 
@@ -530,11 +529,11 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	bool GameDB::readUser(const std::string &username, std::string *display_name_out, nlohmann::json *json_out, std::optional<Place> *release_place) {
+	bool GameDB::readUser(const std::string &username, std::string *display_name_out, Buffer *buffer_out, std::optional<Place> *release_place) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
-		SQLite::Statement query{*database, "SELECT displayName, json, releasePosition, releaseRealm FROM users WHERE username = ? LIMIT 1"};
+		SQLite::Statement query{*database, "SELECT displayName, encoded, releasePosition, releaseRealm FROM users WHERE username = ? LIMIT 1"};
 
 		query.bind(1, username);
 
@@ -542,8 +541,11 @@ namespace Game3 {
 			if (display_name_out != nullptr)
 				*display_name_out = std::string(query.getColumn(0));
 
-			if (json_out != nullptr)
-				*json_out = nlohmann::json::parse(std::string(query.getColumn(1)));
+			if (buffer_out != nullptr) {
+				SQLite::Column column = query.getColumn(1);
+				const auto *blob = reinterpret_cast<const uint8_t *>(column.getBlob());
+				*buffer_out = Buffer(std::vector<uint8_t>(blob, blob + column.getBytes()), getGame(), Side::Server);
+			}
 
 			if (release_place != nullptr) {
 				if (query.isColumnNull(2) || query.isColumnNull(3)) {
@@ -560,7 +562,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void GameDB::writeUser(const std::string &username, const nlohmann::json &json, const std::optional<Place> &release_place) {
+	void GameDB::writeUser(const std::string &username, const std::string &display_name, const Buffer &buffer, const std::optional<Place> &release_place) {
 		assert(database);
 		auto db_lock = database.uniqueLock();
 
@@ -568,8 +570,8 @@ namespace Game3 {
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO users VALUES (?, ?, ?, ?, ?)"};
 
 		statement.bind(1, username);
-		statement.bind(2, json.at("displayName").get<std::string>());
-		statement.bind(3, json.dump());
+		statement.bind(2, display_name);
+		statement.bind(3, buffer.bytes.data(), buffer.bytes.size());
 		if (release_place) {
 			statement.bind(4, release_place->position.simpleString());
 			statement.bind(5, release_place->realm->id);
@@ -582,10 +584,10 @@ namespace Game3 {
 		transaction.commit();
 	}
 
-	void GameDB::writeUser(const Player &player) {
-		nlohmann::json json;
-		player.toJSON(json);
-		writeUser(player.username.copyBase(), json, std::nullopt);
+	void GameDB::writeUser(Player &player) {
+		Buffer buffer{Side::Server};
+		player.encode(buffer);
+		writeUser(player.username.copyBase(), player.displayName, buffer, std::nullopt);
 	}
 
 	void GameDB::writeReleasePlace(const std::string &username, const std::optional<Place> &release_place) {
@@ -826,7 +828,9 @@ namespace Game3 {
 	void GameDB::bind(SQLite::Statement &statement, const PlayerPtr &player) {
 		statement.bind(1, player->username);
 		statement.bind(2, player->displayName);
-		statement.bind(3, nlohmann::json(*player).dump());
+		Buffer buffer{Side::Server};
+		player->encode(buffer);
+		statement.bind(3, buffer.bytes.data(), buffer.bytes.size());
 		statement.bind(4);
 		statement.bind(5);
 	}
