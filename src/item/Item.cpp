@@ -319,7 +319,7 @@ namespace Game3 {
 		buffer.appendType(stack, false);
 		buffer << stack->item->identifier;
 		buffer << stack->count;
-		buffer << stack->data.dump(); // TODO: Buffer::operator+= for json
+		buffer << stack->data;
 		return buffer;
 	}
 
@@ -341,8 +341,7 @@ namespace Game3 {
 		}
 		const auto item_id = buffer.take<Identifier>();
 		stack->count = buffer.take<ItemCount>();
-		const auto raw_json = buffer.take<std::string>(); // TODO: popBuffer for json
-		stack->data = nlohmann::json::parse(raw_json);
+		stack->data = buffer.take<nlohmann::json>();
 		stack->item = stack->getGame()->registry<ItemRegistry>().at(item_id);
 		return buffer;
 	}
