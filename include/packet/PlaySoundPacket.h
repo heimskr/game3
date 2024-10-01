@@ -2,7 +2,6 @@
 
 #include "net/Buffer.h"
 #include "packet/Packet.h"
-#include "types/Direction.h"
 #include "types/Position.h"
 
 namespace Game3 {

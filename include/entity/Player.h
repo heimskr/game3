@@ -86,8 +86,12 @@ namespace Game3 {
 			bool canAttack() const;
 			/** Returns whether the item was added (i.e., not already in the set). */
 			bool addKnownItem(const ItemStackPtr &);
+			/** Returns whether the item was added (i.e., not already in the set). */
+			bool addKnownItem(const Identifier &);
+			void setKnownItems(std::set<Identifier>);
 
 			inline std::string getUsername() const { return username.copyBase(); }
+			inline const auto & getKnownItems() const { return knownItems; }
 
 		protected:
 			Lockable<std::unordered_set<RealmID>> knownRealms;

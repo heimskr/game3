@@ -62,6 +62,8 @@
 #include "packet/EntityRiddenPacket.h"
 #include "packet/SetCopierConfigurationPacket.h"
 #include "packet/PlaySoundPacket.h"
+#include "packet/KnownItemsPacket.h"
+#include "packet/AddKnownItemPacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -134,5 +136,7 @@ namespace Game3 {
 		add(PacketFactory::create<EntityRiddenPacket>());
 		add(PacketFactory::create<SetCopierConfigurationPacket>());
 		add(PacketFactory::create<PlaySoundPacket>());
+		add(PacketFactory::create<KnownItemsPacket>());
+		add(PacketFactory::create<AddKnownItemPacket>());
 	}
 }

@@ -433,6 +433,14 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `Position` Origin
 	- `f32` Pitch
 
+64. **Known Items**: tells a client which items it has ever seen.
+
+	- `list<string>` Item IDs
+
+65. **Add Known Item**: tells a client to add an item to its known items set.
+
+	- `string` Item ID
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

@@ -13,6 +13,7 @@
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
+#include "packet/AddKnownItemPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "realm/Realm.h"
@@ -375,8 +376,25 @@ namespace Game3 {
 	}
 
 	bool Player::addKnownItem(const ItemStackPtr &stack) {
-		auto lock = knownItems.uniqueLock();
-		return knownItems.emplace(stack->getID()).second;
+		return addKnownItem(stack->getID());
+	}
+
+	bool Player::addKnownItem(const Identifier &item_id) {
+		bool inserted{};
+		{
+			auto lock = knownItems.uniqueLock();
+			inserted = knownItems.emplace(item_id).second;
+		}
+
+		if (inserted && getSide() == Side::Server) {
+			send(AddKnownItemPacket(item_id));
+		}
+
+		return inserted;
+	}
+
+	void Player::setKnownItems(std::set<Identifier> item_ids) {
+		knownItems = item_ids;
 	}
 
 	void Player::resetEphemeral() {
