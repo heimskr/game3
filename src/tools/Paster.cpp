@@ -7,7 +7,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	class RemoteClient;
+	class GenericClient;
 
 	Paster::Paster(std::string_view string) {
 		ingest(string);
@@ -156,7 +156,7 @@ namespace Game3 {
 		for (ChunkPosition chunk: chunks)
 			provider.updateChunk(chunk);
 
-		std::unordered_set<std::shared_ptr<RemoteClient>> clients;
+		std::unordered_set<std::shared_ptr<GenericClient>> clients;
 
 		{
 			const auto &player_set = realm->getPlayers();

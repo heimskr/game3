@@ -20,7 +20,7 @@ namespace Game3 {
 	class Game;
 	class Player;
 	class Realm;
-	class RemoteClient;
+	class GenericClient;
 	class SpriteRenderer;
 	struct Place;
 	struct RendererContext;
@@ -104,7 +104,7 @@ namespace Game3 {
 			/** More work needs to be done after this to initialize weakRealm. */
 			virtual void decode(Game &, Buffer &);
 
-			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
+			void sendTo(GenericClient &, UpdateCounter threshold = 0);
 			using Broadcastable::queueBroadcast;
 			void queueBroadcast(bool force) override;
 			void tryBroadcast();

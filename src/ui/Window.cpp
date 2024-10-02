@@ -4,6 +4,7 @@
 #include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Tileset.h"
+#include "net/DirectLocalClient.h"
 #include "net/LocalClient.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/LoginPacket.h"
@@ -955,15 +956,22 @@ namespace Game3 {
 		game->startThread();
 	}
 
-	bool Window::connect(const std::string &hostname, uint16_t port) {
+	bool Window::connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> client) {
 		closeGame();
+
 		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this()));
-		auto client = std::make_shared<LocalClient>();
+
+		if (client == nullptr) {
+			client = std::make_shared<LocalClient>();
+		}
+
 		client->onError = [this](const asio::error_code &errc) {
 			closeGame();
 			error(std::format("{} ({})", errc.message(), errc.value()));
 		};
+
 		game->setClient(client);
+
 		try {
 			client->connect(hostname, port);
 		} catch (const std::exception &err) {
@@ -971,7 +979,9 @@ namespace Game3 {
 			error(err.what());
 			return false;
 		}
+
 		client->weakGame = game;
+
 		game->initEntities();
 
 		settings.withUnique([&](auto &) {
@@ -1039,6 +1049,7 @@ namespace Game3 {
 			}
 		}
 
+
 		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
@@ -1056,6 +1067,43 @@ namespace Game3 {
 		} else {
 			continueLocalConnection();
 		}
+	}
+
+	void Window::continueLocalConnection() {
+		auto client = std::make_shared<DirectLocalClient>();
+
+		if (!connect("::1", serverWrapper.getPort(), client)) {
+			error("Failed to connect to local server.");
+			return;
+		}
+
+		assert(game != nullptr);
+
+		// Tie the loop. Or whatever the expression is.
+		// What I'm trying to say is that we're doing a funny thing where we make both Direct*Clients point at each other.
+		client->setRemote(serverWrapper.getDirectRemoteClient(client));
+
+		client->queueForConnect([this, weak = std::weak_ptr(client)] {
+			if (LocalClientPtr client = weak.lock()) {
+				queue([this, client](Window &) {
+					activateContext();
+					auto dialog = std::make_shared<LoginDialog>(uiContext);
+
+					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
+						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
+					});
+
+					dialog->signalDismiss.connect([this] {
+						queue([this](Window &) {
+							closeGame();
+						});
+					});
+
+					dialog->init();
+					uiContext.addDialog(std::move(dialog));
+				});
+			}
+		});
 	}
 
 	void Window::feedFPS(double fps) {
@@ -1082,38 +1130,6 @@ namespace Game3 {
 		}
 
 		runningFPS = runningSum / fpses.size();
-	}
-
-	void Window::continueLocalConnection() {
-		if (!connect("::1", serverWrapper.getPort())) {
-			error("Failed to connect to local server.");
-			return;
-		}
-
-		assert(game != nullptr);
-		LocalClientPtr client = game->getClient();
-
-		client->queueForConnect([this, weak = std::weak_ptr(client)] {
-			if (LocalClientPtr client = weak.lock()) {
-				queue([this, client](Window &) {
-					activateContext();
-					auto dialog = std::make_shared<LoginDialog>(uiContext);
-
-					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
-						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
-					});
-
-					dialog->signalDismiss.connect([this] {
-						queue([this](Window &) {
-							closeGame();
-						});
-					});
-
-					dialog->init();
-					uiContext.addDialog(std::move(dialog));
-				});
-			}
-		});
 	}
 
 	void Window::handleKeys() {

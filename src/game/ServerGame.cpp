@@ -65,12 +65,12 @@ namespace Game3 {
 		if (!Game::tick())
 			return false;
 
-		std::unordered_map<Player *, RemoteClient::BufferGuard> guards;
+		std::unordered_map<Player *, std::unique_ptr<BufferGuard>> guards;
 		guards.reserve(players.size());
 
 		for (const auto &player: players)
 			if (auto client = player->toServer()->weakClient.lock())
-				guards.emplace(player.get(), client);
+				guards.emplace(player.get(), client->bufferGuard());
 
 		for (const auto &[weak_client, packet]: packetQueue.steal())
 			if (auto client = weak_client.lock())
@@ -244,7 +244,7 @@ namespace Game3 {
 		assert(server);
 		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
-		for (const RemoteClientPtr &client: clients)
+		for (const GenericClientPtr &client: clients)
 			client->send(packet);
 	}
 
@@ -285,7 +285,7 @@ namespace Game3 {
 			std::shared_ptr<Server> server = getServer();
 			auto &clients = server->getClients();
 			auto lock = clients.sharedLock();
-			for (const RemoteClientPtr &client: clients)
+			for (const GenericClientPtr &client: clients)
 				client->send(packet);
 		} else {
 			auto lock = players.sharedLock();

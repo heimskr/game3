@@ -50,28 +50,9 @@ namespace Game3 {
 		stop();
 	}
 
-	void Server::handleMessage(RemoteClient &client, std::string_view message) {
+	void Server::handleMessage(GenericClient &client, std::string_view message) {
 		if (onMessage)
 			onMessage(client, message);
-	}
-
-	void Server::send(RemoteClient &client, std::string message, bool force) {
-		if (message.empty())
-			return;
-
-		if (!force && client.isBuffering()) {
-			SendBuffer &buffer = client.sendBuffer;
-			auto lock = buffer.uniqueLock();
-			buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
-			return;
-		}
-
-		std::weak_ptr weak_client(std::static_pointer_cast<RemoteClient>(client.shared_from_this()));
-
-		client.strand.post([weak_client, message = std::move(message)]() mutable {
-			if (std::shared_ptr<RemoteClient> client = weak_client.lock())
-				client->queue(std::move(message));
-		});
 	}
 
 	void Server::accept() {
@@ -120,31 +101,12 @@ namespace Game3 {
 		game.reset();
 	}
 
-	bool Server::close(RemoteClientPtr client) {
+	bool Server::close(GenericClientPtr client) {
 		if (client->isClosed())
 			return false;
 
 		client->setClosed();
-		std::string ip = client->ip;
-
-		try {
-			asio::ssl::stream<asio::ip::tcp::socket> &socket = client->socket;
-			socket.async_shutdown([client = std::move(client)](const asio::error_code &errc) {
-				if (errc) {
-					if (errc.value() == 1) // 1 corresponds to stream truncated, a very common error that I don't really consider an error
-						SUCCESS("Mostly managed to shut down client {}.", client->id);
-					else
-						ERROR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
-				} else {
-					client->socket.lowest_layer().close();
-					SUCCESS("Managed to shut down client {}.", client->id);
-				}
-			});
-		} catch (const asio::system_error &err) {
-			// Who really cares if SSL doesn't shut down properly?
-			// Who decided that the client is worthy of a proper shutdown?
-			ERROR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
-		}
+		client->close();
 
 		return true;
 	}
@@ -200,11 +162,11 @@ namespace Game3 {
 		return computeSHA3_512<Token>(secret + '/' + username);
 	}
 
-	void Server::setupPlayer(RemoteClient &client) {
+	void Server::setupPlayer(GenericClient &client) {
 		auto player = client.getPlayer();
 		auto realm = player->getRealm();
 		INFO(2, "Setting up player");
-		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+		player->weakClient = client.weak_from_this();
 		player->notifyOfRealm(*realm);
 		auto guard = client.bufferGuard();
 		client.send(make<EntityMoneyChangedPacket>(*player));
@@ -351,5 +313,9 @@ namespace Game3 {
 		save_thread.join();
 
 		return 0;
+	}
+
+	void Server::send(GenericClient &client, std::string message, bool force) {
+		client.send(std::move(message), force);
 	}
 }

@@ -15,6 +15,33 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	RemoteClient::RemoteClient(Server &server, std::string_view ip, int id, asio::ip::tcp::socket &&socket):
+		GenericClient(server, ip, id),
+		socket(std::move(socket), server.sslContext),
+		strand(server.context),
+		bufferSize(server.getChunkSize()),
+		buffer(std::make_unique<char[]>(bufferSize)) {}
+
+	RemoteClient::~RemoteClient() {
+		auto lock = outbox.uniqueLock();
+		outbox.clear();
+	}
+
+	void RemoteClient::queue(std::string message) {
+		{
+			auto lock = outbox.uniqueLock();
+			outbox.push_back(std::move(message));
+			if (1 < outbox.size())
+				return;
+		}
+
+		write();
+	}
+
+	void RemoteClient::start() {
+		doHandshake();
+	}
+
 	void RemoteClient::handleInput(std::string_view string) {
 		if (string.empty())
 			return;
@@ -119,29 +146,26 @@ namespace Game3 {
 		to_send.append(reinterpret_cast<const char *>(&packet_id), sizeof(packet_id));
 		to_send.append(reinterpret_cast<const char *>(&size), sizeof(size));
 		to_send.append(span.begin(), span.end());
-		send(to_send);
+		send(std::move(to_send), false);
 		return true;
 	}
 
-	void RemoteClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {
-		assert(server.game);
-
-		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold)
+	void RemoteClient::send(std::string message, bool force) {
+		if (message.empty())
 			return;
 
-		try {
-			realm.sendToOne(*this, chunk_position);
-		} catch (const std::out_of_range &) {
-			if (!can_request)
-				throw;
-			realm.requestChunk(chunk_position, std::static_pointer_cast<RemoteClient>(shared_from_this()));
+		if (!force && isBuffering()) {
+			SendBuffer &buffer = sendBuffer;
+			auto lock = buffer.uniqueLock();
+			buffer.bytes.insert(buffer.bytes.end(), message.begin(), message.end());
+			return;
 		}
-	}
 
-	template <typename T>
-	requires (!IsPacketPtr<T>)
-	void RemoteClient::send(T value) {
-		server.send(*this, std::move(value));
+		std::weak_ptr weak_client(std::static_pointer_cast<GenericClient>(shared_from_this()));
+
+		strand.post([this, message = std::move(message)]() mutable {
+			queue(std::move(message));
+		});
 	}
 
 	void RemoteClient::startBuffering() {
@@ -158,8 +182,7 @@ namespace Game3 {
 				return;
 			moved_buffer = std::move(sendBuffer.bytes);
 		}
-		std::unique_lock network_lock(networkMutex);
-		server.send(*this, std::move(moved_buffer), true);
+		send(std::move(moved_buffer), true);
 	}
 
 	void RemoteClient::stopBuffering() {
@@ -169,6 +192,33 @@ namespace Game3 {
 
 	bool RemoteClient::isBuffering() const {
 		return sendBuffer.active();
+	}
+
+	void RemoteClient::close() {
+		std::string ip = ip;
+
+		try {
+			asio::ssl::stream<asio::ip::tcp::socket> &socket = socket;
+			socket.async_shutdown([weak_client = std::weak_ptr(getSelf())](const asio::error_code &errc) {
+				if (auto client = weak_client.lock()) {
+					if (errc) {
+						if (errc.value() == 1) // 1 corresponds to stream truncated, a very common error that I don't really consider an error
+							SUCCESS("Mostly managed to shut down client {}.", client->id);
+						else
+							ERROR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
+					} else {
+						client->socket.lowest_layer().close();
+						SUCCESS("Managed to shut down client {}.", client->id);
+					}
+				} else {
+					ERROR("Couldn't lock client during shutdown.");
+				}
+			});
+		} catch (const asio::system_error &err) {
+			// Who really cares if SSL doesn't shut down properly?
+			// Who decided that the client is worthy of a proper shutdown?
+			ERROR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
+		}
 	}
 
 	void RemoteClient::removeSelf() {
@@ -194,5 +244,58 @@ namespace Game3 {
 		WARN("Telling {} to go perish.", ip);
 		asio::write(socket, asio::buffer(message));
 		server.close(std::static_pointer_cast<RemoteClient>(shared_from_this()));
+	}
+
+	void RemoteClient::write() {
+		auto lock = outbox.uniqueLock();
+		const std::string &message = outbox.front();
+		asio::async_write(socket, asio::buffer(message), strand.wrap([shared = getSelf()](const asio::error_code &errc, size_t size) {
+			shared->writeHandler(errc, size);
+		}));
+	}
+
+	void RemoteClient::writeHandler(const asio::error_code &errc, size_t) {
+		bool empty{};
+		{
+			auto lock = outbox.uniqueLock();
+			outbox.pop_front();
+			empty = outbox.empty();
+		}
+
+		if (errc) {
+			ERROR("Client write ({}): {} ({})", ip, errc.message(), errc.value());
+			return;
+		}
+
+		if (!empty)
+			write();
+	}
+
+	void RemoteClient::doHandshake() {
+		socket.async_handshake(asio::ssl::stream_base::server, [this, shared = shared_from_this()](const asio::error_code &errc) {
+			if (errc) {
+				ERROR("Client handshake ({}): {}", ip, errc.message());
+				return;
+			}
+
+			INFO("Handshake succeeded for {}", ip);
+			doRead();
+		});
+	}
+
+	void RemoteClient::doRead() {
+		asio::post(strand, [this] {
+			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, size_t length) {
+				if (errc) {
+					if (errc.value() != 1) // "stream truncated"
+						ERROR("Client read ({}): {} ({})", ip, errc.message(), errc.value());
+					removeSelf();
+					return;
+				}
+
+				handleInput(std::string_view(buffer.get(), length));
+				doRead();
+			}));
+		});
 	}
 }

@@ -244,7 +244,7 @@ namespace Game3 {
 		cachedTile = -1;
 	}
 
-	void TileEntity::sendTo(RemoteClient &client, UpdateCounter threshold) {
+	void TileEntity::sendTo(GenericClient &client, UpdateCounter threshold) {
 		assert(getSide() == Side::Server);
 		if (threshold == 0 || getUpdateCounter() < threshold) {
 			client.send(make<TileEntityPacket>(getSelf()));

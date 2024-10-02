@@ -15,7 +15,7 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
 #include "net/Buffer.h"
-#include "net/RemoteClient.h"
+#include "net/GenericClient.h"
 #include "packet/EntityPacket.h"
 #include "packet/EntityRiddenPacket.h"
 #include "packet/EntitySetPathPacket.h"
@@ -1167,7 +1167,7 @@ namespace Game3 {
 				player->send(packet);
 	}
 
-	void Entity::sendTo(RemoteClient &client, UpdateCounter threshold) {
+	void Entity::sendTo(GenericClient &client, UpdateCounter threshold) {
 		if (threshold == 0 || getUpdateCounter() < threshold) {
 			RealmPtr realm = getRealm();
 			client.getPlayer()->notifyOfRealm(*realm);

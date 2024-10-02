@@ -83,7 +83,7 @@ namespace Game3 {
 				auto lock = players.sharedLock();
 				for (const ServerPlayerPtr &player: players)
 					if (player->canSee(place.realm->id, place.position))
-						if (std::shared_ptr<RemoteClient> client = player->toServer()->weakClient.lock())
+						if (auto client = player->toServer()->weakClient.lock())
 							client->send(packet);
 			}
 

@@ -40,7 +40,7 @@ namespace Game3 {
 
 	class Entity;
 	class Game;
-	class RemoteClient;
+	class GenericClient;
 	struct RendererContext;
 
 	using EntityPtr = std::shared_ptr<Entity>;
@@ -192,8 +192,8 @@ namespace Game3 {
 			std::set<ChunkPosition> getMissingChunks() const;
 			void addPlayer(const PlayerPtr &);
 			void removePlayer(const PlayerPtr &);
-			void sendTo(RemoteClient &);
-			void requestChunk(ChunkPosition, const std::shared_ptr<RemoteClient> &);
+			void sendTo(GenericClient &);
+			void requestChunk(ChunkPosition, const std::shared_ptr<GenericClient> &);
 			/** Removes an entity from entitiesByChunk. */
 			void detach(const EntityPtr &, ChunkPosition);
 			/** Removes an entity from entitiesByChunk based on the entity's current chunk position. */
@@ -207,8 +207,8 @@ namespace Game3 {
 			/** Adds a tile entity to tileEntitiesByChunk. */
 			void attach(const TileEntityPtr &);
 			std::shared_ptr<Lockable<std::unordered_set<TileEntityPtr>>> getTileEntities(ChunkPosition);
-			void sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &, ChunkPosition);
-			void sendToOne(RemoteClient &, ChunkPosition);
+			void sendToMany(const std::unordered_set<std::shared_ptr<GenericClient>> &, ChunkPosition);
+			void sendToOne(GenericClient &, ChunkPosition);
 			void recalculateVisibleChunks();
 			void queueReupload();
 			void autotile(const Position &, Layer, TileUpdateContext = {});
@@ -356,7 +356,7 @@ namespace Game3 {
 			Lockable<std::unordered_set<VillagePtr>> villages;
 			ChunkPosition lastPlayerChunk{INT32_MIN, INT32_MIN};
 
-			Lockable<std::map<ChunkPosition, WeakSet<RemoteClient>>> chunkRequests;
+			Lockable<std::map<ChunkPosition, WeakSet<GenericClient>>> chunkRequests;
 
 			SharedRecursiveMutex tileEntityMutex;
 

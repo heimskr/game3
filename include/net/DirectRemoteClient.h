@@ -12,15 +12,18 @@ namespace Game3 {
 	class DirectLocalClient;
 
 	/** A direct client is one that is connected to the server through local play and exchanges packets directly in memory and not through a socket. */
-	class DirectRemoteClient: public RemoteClient {
+	class DirectRemoteClient: public GenericClient {
 		public:
-			DirectRemoteClient() = delete;
+			DirectRemoteClient(Server &);
 
-			using RemoteClient::RemoteClient;
-
-			void handleInput(std::string_view) override;
+			void start() final;
 			bool send(const PacketPtr &) final;
-			bool isBuffering() const override;
+			void send(std::string, bool force) final;
+			void handleInput(std::string_view) final;
+			bool isBuffering() const final;
+			void close() final;
+			void removeSelf() final;
+			std::unique_ptr<BufferGuard> bufferGuard() final;
 
 			void receive(const PacketPtr &);
 

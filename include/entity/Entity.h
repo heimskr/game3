@@ -42,7 +42,7 @@ namespace Game3 {
 	class Inventory;
 	class Player;
 	class Realm;
-	class RemoteClient;
+	class GenericClient;
 	class TileEntity;
 	class Window;
 	struct RendererContext;
@@ -215,7 +215,7 @@ namespace Game3 {
 			virtual void setMoney(MoneyCount);
 			virtual void broadcastMoney();
 
-			void sendTo(RemoteClient &, UpdateCounter threshold = 0);
+			void sendTo(GenericClient &, UpdateCounter threshold = 0);
 			void sendToVisible();
 
 			template <template <typename...> typename T>

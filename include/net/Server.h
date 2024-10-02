@@ -24,8 +24,8 @@
 #include <vector>
 
 namespace Game3 {
-	class RemoteClient;
-	using RemoteClientPtr = std::shared_ptr<RemoteClient>;
+	class GenericClient;
+	using GenericClientPtr = std::shared_ptr<GenericClient>;
 
 	class ServerGame;
 	class ServerPlayer;
@@ -42,7 +42,7 @@ namespace Game3 {
 			size_t threadCount = 0;
 			std::atomic_int lastID = 0;
 
-			Lockable<std::unordered_set<RemoteClientPtr>> allClients;
+			Lockable<std::unordered_set<GenericClientPtr>> allClients;
 
 			void accept();
 
@@ -55,9 +55,9 @@ namespace Game3 {
 			std::shared_ptr<ServerGame> game;
 			std::function<void()> onStop;
 
-			std::function<void(RemoteClient &, std::string_view message)> onMessage;
-			std::function<void(RemoteClient &)> onClose;
-			std::function<void(RemoteClient &)> onAdd;
+			std::function<void(GenericClient &, std::string_view message)> onMessage;
+			std::function<void(GenericClient &)> onClose;
+			std::function<void(GenericClient &)> onAdd;
 
 			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size = 8192);
 			Server(const Server &) = delete;
@@ -67,26 +67,25 @@ namespace Game3 {
 			virtual ~Server();
 
 			[[nodiscard]] inline int getPort() const { return port; }
-			void handleMessage(RemoteClient &, std::string_view);
+			void handleMessage(GenericClient &, std::string_view);
 			void mainLoop();
-			void send(RemoteClient &, std::string, bool force = false);
 			void run();
 			void stop();
-			bool close(RemoteClientPtr);
+			bool close(GenericClientPtr);
 
 			/** Writes every player's full data to the database. */
 			void saveUserData();
 			std::shared_ptr<ServerPlayer> loadPlayer(std::string_view username, std::string_view display_name);
 			Token generateToken(const std::string &username) const;
-			void setupPlayer(RemoteClient &);
+			void setupPlayer(GenericClient &);
 
 			static bool validateUsername(std::string_view);
 			static int main(int argc, char **argv);
 
 			template <std::integral T>
-			void send(RemoteClient &client, T value) {
+			void send(GenericClient &client, T value) {
 				const T little = toLittle(value);
-				send(client, std::string(reinterpret_cast<const char *>(&little), sizeof(T)));
+				send(client, std::string(reinterpret_cast<const char *>(&little), sizeof(T)), true);
 			}
 
 			[[nodiscard]]
@@ -97,5 +96,10 @@ namespace Game3 {
 
 			[[nodiscard]]
 			inline const auto & getClients() const { return allClients; }
+
+		private:
+			void send(GenericClient &, std::string, bool force);
+
+		friend class ServerWrapper;
 	};
 }

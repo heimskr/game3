@@ -14,6 +14,8 @@
 #include <thread>
 
 namespace Game3 {
+	class DirectLocalClient;
+	class DirectRemoteClient;
 	class Server;
 	class ServerGame;
 
@@ -33,10 +35,12 @@ namespace Game3 {
 			inline uint16_t getPort() const { return port; }
 			Token getOmnitoken() const;
 			void save();
+			std::shared_ptr<DirectRemoteClient> getDirectRemoteClient(const std::shared_ptr<DirectLocalClient> &);
 
 		private:
 			std::shared_ptr<Server> server;
 			std::shared_ptr<ServerGame> game;
+			std::shared_ptr<DirectRemoteClient> directRemoteClient;
 			std::optional<PipeWrapper> logDataPipe;
 			PipeWrapper logControlPipe;
 			CloningFDWrapper logFDWrapper;

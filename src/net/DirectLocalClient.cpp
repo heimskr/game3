@@ -9,10 +9,19 @@ namespace Game3 {
 		std::shared_ptr<DirectRemoteClient> remote = getRemote();
 
 		if (!remote) {
-			throw std::runtime_error("Can't send packet to DirectRemoteClient: remote counterpart is missing");
+			// We're probably shutting down and the remote side has died before the local side.
+			return;
 		}
 
 		remote->receive(packet);
+	}
+
+	void DirectLocalClient::connect(std::string_view, uint16_t) {
+		// Connection requests go into a black hole. We're effectively already connected through shared memory.
+	}
+
+	bool DirectLocalClient::isConnected() const {
+		return getRemote() != nullptr;
 	}
 
 	void DirectLocalClient::receive(const PacketPtr &packet) {

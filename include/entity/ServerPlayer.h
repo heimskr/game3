@@ -5,12 +5,13 @@
 #include "container/WeakSet.h"
 
 namespace Game3 {
+	class GenericClient;
 	class Village;
 
 	class ServerPlayer: public Player {
 		public:
 			Lockable<WeakSet<Entity>> knownEntities;
-			std::weak_ptr<RemoteClient> weakClient;
+			std::weak_ptr<GenericClient> weakClient;
 			bool inventoryUpdated = false;
 
 			~ServerPlayer() override;
@@ -21,7 +22,7 @@ namespace Game3 {
 
 			/** Returns true if the entity had to be sent. */
 			bool ensureEntity(const std::shared_ptr<Entity> &);
-			std::shared_ptr<RemoteClient> getClient() const;
+			std::shared_ptr<GenericClient> getClient() const;
 
 			void tick(const TickArgs &) final;
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;

@@ -12,7 +12,7 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Tileset.h"
-#include "net/RemoteClient.h"
+#include "net/GenericClient.h"
 #include "packet/ErrorPacket.h"
 #include "packet/InteractPacket.h"
 #include "packet/PlaySoundPacket.h"
@@ -469,7 +469,7 @@ namespace Game3 {
 		const TickArgs args{game, game->getCurrentTick(), delta};
 
 		if (isServer()) {
-			std::vector<RemoteClient::BufferGuard> guards;
+			std::vector<std::unique_ptr<BufferGuard>> guards;
 
 			{
 				auto lock = players.sharedLock();
@@ -477,7 +477,7 @@ namespace Game3 {
 				for (const auto &weak_player: players) {
 					if (auto player = weak_player.lock()) {
 						if (auto client = player->toServer()->weakClient.lock())
-							guards.emplace_back(client);
+							guards.emplace_back(client->bufferGuard());
 
 						if (!player->ticked && player->tryInitialTick()) {
 							player->ticked = true;
@@ -580,7 +580,7 @@ namespace Game3 {
 					remakePathMap(chunk_position);
 					auto lock = chunkRequests.uniqueLock();
 					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
-						std::unordered_set<std::shared_ptr<RemoteClient>> strong;
+						std::unordered_set<std::shared_ptr<GenericClient>> strong;
 						for (const auto &weak: iter->second)
 							if (auto locked = weak.lock())
 								strong.insert(locked);
@@ -1458,7 +1458,7 @@ namespace Game3 {
 			recalculateVisibleChunks();
 	}
 
-	void Realm::sendTo(RemoteClient &client) {
+	void Realm::sendTo(GenericClient &client) {
 		auto player = client.getPlayer();
 		assert(player);
 
@@ -1484,7 +1484,7 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::requestChunk(ChunkPosition chunk_position, const std::shared_ptr<RemoteClient> &client) {
+	void Realm::requestChunk(ChunkPosition chunk_position, const std::shared_ptr<GenericClient> &client) {
 		assert(isServer());
 		tileProvider.generationQueue.push(chunk_position);
 		auto lock = chunkRequests.uniqueLock();
@@ -1574,7 +1574,7 @@ namespace Game3 {
 		return {};
 	}
 
-	void Realm::sendToMany(const std::unordered_set<std::shared_ptr<RemoteClient>> &clients, ChunkPosition chunk_position) {
+	void Realm::sendToMany(const std::unordered_set<std::shared_ptr<GenericClient>> &clients, ChunkPosition chunk_position) {
 		assert(getSide() == Side::Server);
 
 		if (clients.empty())
@@ -1599,7 +1599,7 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::sendToOne(RemoteClient &client, ChunkPosition chunk_position) {
+	void Realm::sendToOne(GenericClient &client, ChunkPosition chunk_position) {
 		if (ServerPlayerPtr player = client.getPlayer()) {
 			const auto [chunk_tiles, entity_packets, tile_entity_packets] = getChunkPackets(chunk_position);
 			player->notifyOfRealm(*this);

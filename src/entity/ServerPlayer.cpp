@@ -102,7 +102,7 @@ namespace Game3 {
 		return true;
 	}
 
-	std::shared_ptr<RemoteClient> ServerPlayer::getClient() const {
+	std::shared_ptr<GenericClient> ServerPlayer::getClient() const {
 		auto locked = weakClient.lock();
 		assert(locked);
 		return locked;

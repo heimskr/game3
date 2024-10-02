@@ -36,11 +36,16 @@ namespace Game3 {
 
 	LocalClient::~LocalClient() {
 		INFO(3, "\e[31m~LocalClient\e[39m({})", reinterpret_cast<void *>(this));
+
+		const bool ssl_was_ready = sslReady;
+
 		close();
 
-		sslWaiter.wait();
-		if (sslThread.joinable())
-			sslThread.join();
+		if (ssl_was_ready) {
+			sslWaiter.wait();
+			if (sslThread.joinable())
+				sslThread.join();
+		}
 	}
 
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
@@ -275,7 +280,7 @@ namespace Game3 {
 
 	void LocalClient::close() {
 #ifdef USE_TLS
-		if (isReady()) {
+		if (sslReady) {
 			sslSock.shutdown();
 			sslReady = false;
 		}

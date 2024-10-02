@@ -13,7 +13,15 @@
 #include <asio/ssl.hpp>
 
 namespace Game3 {
+	class Realm;
 	class Server;
+	class ServerPlayer;
+	struct ChunkPosition;
+
+	class BufferGuard {
+		public:
+			virtual ~BufferGuard() = default;
+	};
 
 	class GenericClient: public std::enable_shared_from_this<GenericClient> {
 		public:
@@ -21,42 +29,39 @@ namespace Game3 {
 			int id = -1;
 			std::string ip;
 			SendBuffer sendBuffer;
-			std::mutex networkMutex;
-			asio::ssl::stream<asio::ip::tcp::socket> socket;
-			asio::io_context::strand strand;
-			Lockable<std::deque<std::string>, std::shared_mutex> outbox;
 
-			GenericClient() = delete;
 			GenericClient(const GenericClient &) = delete;
 			GenericClient(GenericClient &&) = delete;
-			GenericClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
+			GenericClient(Server &server, std::string_view ip, int id);
 
 			virtual ~GenericClient();
 
 			GenericClient & operator=(const GenericClient &) = delete;
 			GenericClient & operator=(GenericClient &&) = delete;
 
-			void start();
-			void queue(std::string);
-
+			virtual void start() = 0;
 			virtual bool send(const PacketPtr &) = 0;
-
 			virtual void handleInput(std::string_view) = 0;
-			virtual void onMaxLineSizeExceeded() {}
-
+			virtual bool isBuffering() const = 0;
+			virtual void close() = 0;
 			virtual void removeSelf() = 0;
+			virtual void send(std::string, bool force) = 0;
+			virtual std::unique_ptr<BufferGuard> bufferGuard() = 0;
+
+			void sendChunk(Realm &, ChunkPosition, bool can_request = true, uint64_t counter_threshold = 0);
+
+			inline auto getPlayer() const { return weakPlayer.lock(); }
+			inline void setPlayer(const std::shared_ptr<ServerPlayer> &shared) { weakPlayer = shared; }
 
 			inline void setClosed() { closed = true; }
 			inline bool isClosed() const { return closed; }
 
-		private:
-			size_t bufferSize;
-			std::unique_ptr<char[]> buffer;
+		protected:
+			std::weak_ptr<ServerPlayer> weakPlayer;
 			bool closed = false;
 
-			void write();
-			void writeHandler(const asio::error_code &, size_t);
-			void doHandshake();
-			void doRead();
+			GenericClient(Server &);
 	};
+
+	using GenericClientPtr = std::shared_ptr<GenericClient>;
 }

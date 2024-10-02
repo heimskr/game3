@@ -3,6 +3,8 @@
 #include "game/ServerGame.h"
 #include "game/SimulationOptions.h"
 #include "net/CertGen.h"
+#include "net/DirectLocalClient.h"
+#include "net/DirectRemoteClient.h"
 #include "net/Server.h"
 #include "realm/Overworld.h"
 #include "realm/ShadowRealm.h"
@@ -266,6 +268,20 @@ namespace Game3 {
 	void ServerWrapper::save() {
 		forceSave = true;
 		saveCV.notify_all();
+	}
+
+	std::shared_ptr<DirectRemoteClient> ServerWrapper::getDirectRemoteClient(const std::shared_ptr<DirectLocalClient> &local) {
+		if (directRemoteClient == nullptr) {
+			assert(local != nullptr);
+			assert(server != nullptr);
+			directRemoteClient = std::make_shared<DirectRemoteClient>(*server);
+			directRemoteClient->setLocal(local);
+			server->allClients.withUnique([this](std::unordered_set<GenericClientPtr> &all_clients) {
+				all_clients.insert(directRemoteClient);
+			});
+		}
+
+		return directRemoteClient;
 	}
 
 	bool ServerWrapper::generateCertificate(const std::filesystem::path &certificate_path, const std::filesystem::path &key_path) {

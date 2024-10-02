@@ -12,6 +12,9 @@ namespace Game3 {
 			DirectLocalClient();
 
 			void send(const PacketPtr &) final;
+			void connect(std::string_view hostname, uint16_t port) final;
+			bool isConnected() const final;
+
 			void receive(const PacketPtr &);
 
 			inline auto getRemote() const { return weakRemote.lock(); }

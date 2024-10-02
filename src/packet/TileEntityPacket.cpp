@@ -14,19 +14,23 @@ namespace Game3 {
 		tileEntity(std::move(tile_entity)),
 		identifier(tileEntity->getID()),
 		globalID(tileEntity->getGID()),
-		realmID(tileEntity->realmID) {}
+		realmID(tileEntity->realmID) {
+			storedBuffer.context = tileEntity->getGame()->weak_from_this();
+			tileEntity->encode(*tileEntity->getGame(), storedBuffer);
+		}
 
-	void TileEntityPacket::decode(Game &, Buffer &buffer) {
+	void TileEntityPacket::decode(Game &game, Buffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
 		assert(globalID != GlobalID(-1));
 		assert(globalID != GlobalID(0));
 		storedBuffer = std::move(buffer);
+		storedBuffer.context = game.weak_from_this();
+		buffer.context = storedBuffer.context;
 	}
 
-	void TileEntityPacket::encode(Game &game, Buffer &buffer) const {
+	void TileEntityPacket::encode(Game &, Buffer &buffer) const {
 		assert(tileEntity);
-		buffer << globalID << identifier << realmID;
-		tileEntity->encode(game, buffer);
+		buffer << globalID << identifier << realmID << storedBuffer;
 	}
 
 	void TileEntityPacket::handle(const ClientGamePtr &game) {

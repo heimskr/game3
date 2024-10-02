@@ -31,6 +31,7 @@ namespace Game3 {
 	class ChatDialog;
 	class ClientInventory;
 	class HasFluids;
+	class LocalClient;
 	class OmniDialog;
 	class Window;
 	struct Modifiers;
@@ -117,7 +118,7 @@ namespace Game3 {
 			void drawGL();
 			void closeGame();
 			void goToTitle();
-			bool connect(const std::string &hostname, uint16_t port);
+			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
 			void playLocally();
 			void feedFPS(double);
 
