@@ -3,7 +3,6 @@
 #include "Options.h"
 #include "types/Types.h"
 #include "net/Buffer.h"
-#include "net/Sock.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "threading/Waiter.h"
@@ -91,7 +90,7 @@ namespace Game3 {
 			/** Returns whether the error was reported. */
 			bool reportError(const asio::error_code &);
 #else
-			std::shared_ptr<Sock> sock;
+#error "Non-SSL sockets are currently unsupported"
 #endif
 
 			void handleInput(std::string_view);

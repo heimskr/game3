@@ -1,10 +1,10 @@
 #include "config.h"
 #include "Log.h"
+#include "Options.h"
 #include "client/RichPresence.h"
 #include "client/ServerWrapper.h"
 #include "game/ClientGame.h"
 #include "net/Server.h"
-#include "net/Sock.h"
 #include "scripting/ScriptEngine.h"
 #include "tools/Flasker.h"
 #include "tools/ItemStitcher.h"
@@ -29,10 +29,6 @@
 #include <iostream>
 #include <random>
 #include <vector>
-
-namespace {
-	constexpr bool SHOW_FPS_EVERY_FRAME = false;
-}
 
 namespace Game3 {
 	void test();

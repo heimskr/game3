@@ -2,8 +2,6 @@
 #include "game/ClientGame.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
-#include "net/SocketBuffer.h"
-#include "net/SSLSock.h"
 #include "packet/Packet.h"
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
