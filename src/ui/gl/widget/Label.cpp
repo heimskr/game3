@@ -2,6 +2,7 @@
 #include "graphics/TextRenderer.h"
 #include "graphics/Texture.h"
 #include "ui/gl/widget/Label.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Types.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
@@ -54,6 +55,20 @@ namespace Game3 {
 			.alignTop = align_top,
 			.shadow{0, 0, 0, 0},
 		});
+
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
+
+		if (const std::optional<UString> &tooltip_text = getTooltipText()) {
+			if (!ui.anyDragUpdaters() && ui.checkMouse(lastRectangle)) {
+				tooltip->setText(*tooltip_text);
+				tooltip->setRegion(std::nullopt);
+				tooltip->setPositionOverride(std::nullopt);
+				tooltip->show(*this);
+				return;
+			}
+		}
+
+		tooltip->hide(*this);
 	}
 
 	SizeRequestMode Label::getRequestMode() const {

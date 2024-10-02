@@ -166,23 +166,31 @@ namespace Game3 {
 
 		++row;
 
-		auto add_slider = [&](UString label_text) {
+		auto add_slider = [&](UString label_text, UString tooltip = {}) {
 			auto label = std::make_shared<Label>(ui, scale);
 			label->setText(std::move(label_text));
 			label->setVerticalAlignment(Alignment::Center);
 			grid->attach(label, row, 0);
 
+			if (!tooltip.empty()) {
+				label->setTooltipText(std::move(tooltip));
+			}
+
 			auto slider = std::make_shared<Slider>(ui, scale);
 			slider->setFixedSize(100 * scale, 8 * scale);
-			grid->attach(slider, row, 1);
 
 			auto value_label = std::make_shared<Label>(ui, scale);
 			value_label->setVerticalAlignment(Alignment::Center);
-			grid->attach(value_label, row, 2);
+
+			auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 0, 0, Color{});
+			hbox->append(slider);
+			hbox->append(value_label);
+			grid->attach(hbox, row, 1);
 
 			slider->onValueUpdate.connect([weak_label = std::weak_ptr(value_label)](Slider &slider, double) {
-				if (auto label = weak_label.lock())
+				if (auto label = weak_label.lock()) {
 					label->setText(slider.getTooltipText());
+				}
 			});
 
 			++row;
@@ -205,6 +213,15 @@ namespace Game3 {
 		frequency_slider->setValue(settings.tickFrequency);
 		frequency_slider->onValueUpdate.connect([&](Slider &, double value) {
 			applySetting(&ClientSettings::tickFrequency, value);
+		});
+
+		auto smoothing_slider = add_slider("FPS Accumulation", "Affects the FPS counter,\nnot the FPS itself.");
+		smoothing_slider->setRange(1, 1000);
+		smoothing_slider->setStep(1);
+		smoothing_slider->setDisplayDigits(0);
+		smoothing_slider->setValue(settings.fpsSmoothing);
+		smoothing_slider->onValueUpdate.connect([&](Slider &, double value) {
+			applySetting(&ClientSettings::fpsSmoothing, value);
 		});
 
 		auto save_button = std::make_shared<Button>(ui, scale);

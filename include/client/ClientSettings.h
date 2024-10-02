@@ -24,6 +24,7 @@ namespace Game3 {
 		bool renderLighting = false;
 		bool hideTimers = true;
 		int logLevel = 1;
+		std::size_t fpsSmoothing = 200;
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;

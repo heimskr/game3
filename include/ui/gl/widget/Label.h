@@ -5,9 +5,10 @@
 #include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasExpand.h"
 #include "ui/gl/HasFixedSize.h"
+#include "ui/gl/HasTooltipText.h"
 
 namespace Game3 {
-	class Label: public Widget, public HasAlignment, public HasFixedSize {
+	class Label: public Widget, public HasAlignment, public HasFixedSize, public HasTooltipText {
 		public:
 			Label(UIContext &, float scale, UString text = {}, Color = {0, 0, 0, 1});
 

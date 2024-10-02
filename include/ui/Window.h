@@ -119,6 +119,7 @@ namespace Game3 {
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port);
 			void playLocally();
+			void feedFPS(double);
 
 		private:
 			struct KeyInfo {
@@ -137,6 +138,10 @@ namespace Game3 {
 			std::optional<std::pair<int, int>> clickPosition;
 			std::optional<int> heldMouseButton;
 			bool dragStarted = false;
+			int fpsCountup = 0;
+			std::deque<double> fpses;
+			double runningSum = 0;
+			double runningFPS = 0;
 
 			void keyCallback(int key, int scancode, int action, int mods);
 			void charCallback(uint32_t codepoint, int mods);

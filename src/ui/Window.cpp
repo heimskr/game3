@@ -1,3 +1,4 @@
+#include "Options.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
@@ -371,8 +372,7 @@ namespace Game3 {
 	void Window::drawGL() {
 		const float x_factor = getXFactor();
 		const float y_factor = getYFactor();
-		int width  = getWidth();
-		int height = getHeight();
+		auto [width, height] = getDimensions();
 
 		activateContext();
 		batchSpriteRenderer.update(*this);
@@ -551,6 +551,21 @@ namespace Game3 {
 		}
 
 		uiContext.render(getMouseX(), getMouseY());
+
+#ifdef SHOW_FPS
+		if (runningFPS > 0) {
+			textRenderer.drawOnScreen(std::format("{:.1f} FPS", runningFPS), TextRenderOptions{
+				.x = static_cast<double>(width - 10),
+				.y = static_cast<double>(height - 10),
+				.scaleX = 0.5,
+				.scaleY = 0.5,
+				.color = Color{"#ffffff"},
+				.align = TextAlign::Right,
+				.alignTop = false,
+				.shadow = Color{"#000000"},
+			});
+		}
+#endif
 	}
 
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
@@ -1042,6 +1057,33 @@ namespace Game3 {
 		} else {
 			continueLocalConnection();
 		}
+	}
+
+	void Window::feedFPS(double fps) {
+#ifndef SHOW_FPS
+		(void) fps;
+#else
+		fpses.push_back(fps);
+		runningSum += fps;
+
+		if (const std::size_t smoothing = settings.fpsSmoothing; smoothing < fpses.size()) {
+			if (smoothing + 1 == fpses.size()) {
+				runningSum -= fpses.front();
+				fpses.pop_front();
+			} else {
+				auto end = fpses.begin() + fpses.size() - smoothing;
+				runningSum -= std::reduce(fpses.begin(), end);
+				fpses.erase(fpses.begin(), end);
+			}
+		}
+
+		// To prevent floating point inaccuracy from accumulating too much.
+		if (++fpsCountup >= 1'000) {
+			runningSum = std::reduce(fpses.begin(), fpses.end());
+		}
+
+		runningFPS = runningSum / fpses.size();
+#endif
 	}
 
 	void Window::continueLocalConnection() {
