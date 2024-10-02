@@ -30,6 +30,10 @@
 #include <random>
 #include <vector>
 
+namespace {
+	constexpr bool SHOW_FPS_EVERY_FRAME = false;
+}
+
 namespace Game3 {
 	void test();
 	void testBuffer2();
@@ -259,6 +263,7 @@ int main(int argc, char **argv) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	GLFWwindow *glfw_window = glfwCreateWindow(1600, 1000, "Game3", nullptr, nullptr);
+
 	if (!glfw_window) {
 		const char *message = "???";
 		int code = glfwGetError(&message);
@@ -277,11 +282,24 @@ int main(int argc, char **argv) {
 		window.goToTitle();
 	}, 4);
 
+	SystemTimePoint time = getTime();
+
 	while (!glfwWindowShouldClose(glfw_window)) {
 		GL::clear(0, 0, 0);
 		window->tick();
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
+
+		if constexpr (SHOW_FPS_EVERY_FRAME) {
+			SystemTimePoint old_time = time;
+			time = getTime();
+			auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
+			if (diff == 0) {
+				INFO("∞ FPS");
+			} else {
+				INFO("{} FPS", 1e6 / diff);
+			}
+		}
 	}
 
 	window->closeGame();

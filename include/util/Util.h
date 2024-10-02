@@ -164,12 +164,14 @@ namespace Game3 {
 #endif
 	}
 
-	inline std::chrono::system_clock::time_point getTime() {
+	using SystemTimePoint = std::chrono::system_clock::time_point;
+
+	inline SystemTimePoint getTime() {
 		return std::chrono::system_clock::now();
 	}
 
 	template <typename T = std::chrono::nanoseconds>
-	inline T timeDifference(std::chrono::system_clock::time_point old_time) {
+	inline T timeDifference(SystemTimePoint old_time) {
 		return std::chrono::duration_cast<T>(getTime() - old_time);
 	}
 
