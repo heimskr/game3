@@ -35,6 +35,8 @@ namespace Game3 {
 			settings.logLevel = *iter;
 		if (auto iter = json.find("fpsSmoothing"); iter != json.end())
 			settings.fpsSmoothing = *iter;
+		if (auto iter = json.find("showFPS"); iter != json.end())
+			settings.showFPS = *iter;
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
@@ -48,5 +50,6 @@ namespace Game3 {
 		json["hideTimers"] = settings.hideTimers;
 		json["logLevel"] = settings.logLevel;
 		json["fpsSmoothing"] = settings.fpsSmoothing;
+		json["showFPS"] = settings.showFPS;
 	}
 }

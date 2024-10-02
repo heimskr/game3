@@ -552,8 +552,7 @@ namespace Game3 {
 
 		uiContext.render(getMouseX(), getMouseY());
 
-#ifdef SHOW_FPS
-		if (runningFPS > 0) {
+		if (settings.showFPS && runningFPS > 0) {
 			textRenderer.drawOnScreen(std::format("{:.1f} FPS", runningFPS), TextRenderOptions{
 				.x = static_cast<double>(width - 10),
 				.y = static_cast<double>(height - 10),
@@ -563,9 +562,9 @@ namespace Game3 {
 				.align = TextAlign::Right,
 				.alignTop = false,
 				.shadow = Color{"#000000"},
+				.shadowOffset{6, 6},
 			});
 		}
-#endif
 	}
 
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
@@ -1060,9 +1059,9 @@ namespace Game3 {
 	}
 
 	void Window::feedFPS(double fps) {
-#ifndef SHOW_FPS
-		(void) fps;
-#else
+		if (!settings.showFPS)
+			return;
+
 		fpses.push_back(fps);
 		runningSum += fps;
 
@@ -1083,7 +1082,6 @@ namespace Game3 {
 		}
 
 		runningFPS = runningSum / fpses.size();
-#endif
 	}
 
 	void Window::continueLocalConnection() {

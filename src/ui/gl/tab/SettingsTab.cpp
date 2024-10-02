@@ -166,6 +166,21 @@ namespace Game3 {
 
 		++row;
 
+		auto fps_label = std::make_shared<Label>(ui, scale);
+		fps_label->setText("Display FPS");
+		fps_label->setVerticalAlignment(Alignment::Center);
+		grid->attach(fps_label, row, 0);
+
+		auto fps_checkbox = std::make_shared<Checkbox>(ui, scale);
+		fps_checkbox->setChecked(settings.showFPS);
+		fps_checkbox->setFixedSize(scale * 8);
+		fps_checkbox->onCheck.connect([this](bool checked) {
+			applySetting(&ClientSettings::showFPS, checked);
+		});
+		grid->attach(fps_checkbox, row, 1);
+
+		++row;
+
 		auto add_slider = [&](UString label_text, UString tooltip = {}) {
 			auto label = std::make_shared<Label>(ui, scale);
 			label->setText(std::move(label_text));

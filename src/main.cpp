@@ -286,25 +286,20 @@ int main(int argc, char **argv) {
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
 
-#ifdef SHOW_FPS
 		SystemTimePoint old_time = time;
 		time = getTime();
 		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
 		if (diff != 0) {
 			window->feedFPS(1e6 / diff);
 		}
-#else
+
 		if constexpr (SHOW_FPS_EVERY_FRAME) {
-			SystemTimePoint old_time = time;
-			time = getTime();
-			auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
 			if (diff == 0) {
 				INFO("∞ FPS");
 			} else {
 				INFO("{} FPS", 1e6 / diff);
 			}
 		}
-#endif
 	}
 
 	window->closeGame();
