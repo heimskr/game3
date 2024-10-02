@@ -17,6 +17,7 @@
 #include "threading/MTQueue.h"
 #include "types/UString.h"
 #include "ui/gl/UIContext.h"
+#include "util/Concepts.h"
 
 #include <chrono>
 #include <functional>
@@ -78,7 +79,9 @@ namespace Game3 {
 			float getYFactor() const;
 			int getMouseX() const;
 			int getMouseY() const;
-			std::pair<double, double> getMouseCoordinates() const;
+
+			template <Numeric T>
+			std::pair<T, T> getMouseCoordinates() const;
 
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();

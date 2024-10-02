@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	void ClientSettings::apply(ClientGame &game) const {
+	void ClientSettings::apply(ClientGame &) const {
 		apply();
 	}
 

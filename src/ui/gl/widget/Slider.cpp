@@ -40,7 +40,7 @@ namespace Game3 {
 
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
-		if (isDragging() || (!ui.anyDragUpdaters() && ui.checkMouseAbsolute(lastRectangle))) {
+		if (isDragging() || (!ui.anyDragUpdaters() && ui.checkMouse(lastRectangle))) {
 			tooltip->setText(getTooltipText());
 			tooltip->setRegion(std::nullopt);
 			handle_rectangle = ui.scissorStack.getTop().rectangle + handle_rectangle;

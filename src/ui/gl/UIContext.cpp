@@ -376,25 +376,13 @@ namespace Game3 {
 		pressedWidget.reset();
 	}
 
-	std::pair<double, double> UIContext::getAbsoluteMouseCoordinates() const {
-		const auto [x, y] = window.getMouseCoordinates();
-		return {x * window.getXFactor(), y * window.getYFactor()};
+	std::pair<double, double> UIContext::getMouseCoordinates() const {
+		return window.getMouseCoordinates<double>();
 	}
 
-	std::pair<double, double> UIContext::getRelativeMouseCoordinates() const {
-		const auto [x, y] = getAbsoluteMouseCoordinates();
-		const Rectangle top = scissorStack.getTop().rectangle;
-		return {x - top.x, y - top.y};
-	}
-
-	bool UIContext::checkMouseRelative(const Rectangle &rectangle) const {
-		const auto [x, y] = getRelativeMouseCoordinates();
-		return rectangle.contains(static_cast<int>(x), static_cast<int>(y));
-	}
-
-	bool UIContext::checkMouseAbsolute(const Rectangle &rectangle) const {
-		const auto [x, y] = getAbsoluteMouseCoordinates();
-		return rectangle.contains(static_cast<int>(x), static_cast<int>(y));
+	bool UIContext::checkMouse(const Rectangle &rectangle) const {
+		const auto [x, y] = window.getMouseCoordinates<int>();
+		return rectangle.contains(x, y);
 	}
 
 	std::shared_ptr<Tooltip> UIContext::getTooltip() const {

@@ -36,7 +36,7 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
-		if (ui.checkMouseAbsolute(lastRectangle)) {
+		if (ui.checkMouse(lastRectangle)) {
 			if (progress != lastReportedProgress || !tooltip->wasUpdatedBy(*this)) {
 				lastReportedProgress = progress;
 				tooltip->setText(std::format("{:.1f}%", progress * 100));

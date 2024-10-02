@@ -65,10 +65,8 @@ namespace Game3 {
 			void setAutocompleteDropdown(std::shared_ptr<AutocompleteDropdown>);
 			std::shared_ptr<AutocompleteDropdown> getAutocompleteDropdown() const;
 			void unpress();
-			std::pair<double, double> getAbsoluteMouseCoordinates() const;
-			std::pair<double, double> getRelativeMouseCoordinates() const;
-			bool checkMouseRelative(const Rectangle &) const;
-			bool checkMouseAbsolute(const Rectangle &) const;
+			std::pair<double, double> getMouseCoordinates() const;
+			bool checkMouse(const Rectangle &) const;
 			std::shared_ptr<Tooltip> getTooltip() const;
 			void addDragUpdater(WidgetPtr);
 			bool anyDragUpdaters() const;

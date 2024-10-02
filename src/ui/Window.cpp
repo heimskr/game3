@@ -87,9 +87,10 @@ namespace Game3 {
 			});
 
 			glfwSetCursorPosCallback(glfwWindow, +[](GLFWwindow *glfw_window, double x_pos, double y_pos) {
-				const auto x = static_cast<int>(std::floor(x_pos));
-				const auto y = static_cast<int>(std::floor(y_pos));
-				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->mousePositionCallback(x, y);
+				Window &window = *reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+				const auto x = static_cast<int>(std::floor(x_pos * window.xScale));
+				const auto y = static_cast<int>(std::floor(y_pos * window.yScale));
+				window.mousePositionCallback(x, y);
 			});
 
 			glfwSetScrollCallback(glfwWindow, +[](GLFWwindow *glfw_window, double x, double y) {
@@ -168,6 +169,21 @@ namespace Game3 {
 		return static_cast<int>(std::floor(y * yScale));
 	}
 
+	template <>
+	std::pair<int, int> Window::getMouseCoordinates() const {
+		double x{}, y{};
+		glfwGetCursorPos(glfwWindow, &x, &y);
+		return {static_cast<int>(std::floor(x * xScale)), static_cast<int>(std::floor(y * yScale))};
+	}
+
+	template <>
+	std::pair<float, float> Window::getMouseCoordinates() const {
+		double x{}, y{};
+		glfwGetCursorPos(glfwWindow, &x, &y);
+		return {static_cast<float>(x * xScale), static_cast<float>(y * yScale)};
+	}
+
+	template <>
 	std::pair<double, double> Window::getMouseCoordinates() const {
 		double x{}, y{};
 		glfwGetCursorPos(glfwWindow, &x, &y);
@@ -506,7 +522,7 @@ namespace Game3 {
 			static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
 			static bool has_been_nonzero = false;
 
-			const auto [mouse_x, mouse_y] = getMouseCoordinates();
+			const auto [mouse_x, mouse_y] = getMouseCoordinates<double>();
 
 			if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
 				singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
@@ -734,7 +750,7 @@ namespace Game3 {
 	void Window::mouseButtonCallback(int button, int action, int mods) {
 		lastModifiers = Modifiers(mods);
 
-		const auto [x_pos, y_pos] = getMouseCoordinates();
+		const auto [x_pos, y_pos] = getMouseCoordinates<double>();
 		const auto x = static_cast<int>(std::floor(x_pos));
 		const auto y = static_cast<int>(std::floor(y_pos));
 
@@ -788,10 +804,11 @@ namespace Game3 {
 	}
 
 	void Window::scrollCallback(double x_delta, double y_delta) {
-		const auto [x, y] = getMouseCoordinates();
+		const auto [x, y] = getMouseCoordinates<double>();
 
-		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y)))
+		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y))) {
 			return;
+		}
 
 		const auto x_factor = getXFactor();
 		const auto y_factor = getYFactor();

@@ -54,7 +54,7 @@ namespace Game3 {
 
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
-		if (ui.checkMouseAbsolute(lastRectangle)) {
+		if (ui.checkMouse(lastRectangle)) {
 			if (!tooltip->wasUpdatedBy(*this)) {
 				tooltip->setText(stack->getTooltip());
 				tooltip->setRegion(lastRectangle);
