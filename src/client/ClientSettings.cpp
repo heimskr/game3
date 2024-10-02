@@ -7,10 +7,8 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	void ClientSettings::apply(ClientGame &game) const {
-		game.getWindow()->queue([cap = capFPS](Window &) {
-			glfwSwapInterval(cap? 1 : 0);
-		});
+	void ClientSettings::apply(ClientGame &) const {
+		glfwSwapInterval(capFPS? 1 : 0);
 		apply();
 	}
 
