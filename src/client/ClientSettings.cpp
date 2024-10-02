@@ -7,7 +7,10 @@
 #include <nlohmann/json.hpp>
 
 namespace Game3 {
-	void ClientSettings::apply(ClientGame &) const {
+	void ClientSettings::apply(ClientGame &game) const {
+		game.getWindow()->queue([cap = capFPS](Window &) {
+			glfwSwapInterval(cap? 1 : 0);
+		});
 		apply();
 	}
 
@@ -37,6 +40,8 @@ namespace Game3 {
 			settings.fpsSmoothing = *iter;
 		if (auto iter = json.find("showFPS"); iter != json.end())
 			settings.showFPS = *iter;
+		if (auto iter = json.find("capFPS"); iter != json.end())
+			settings.capFPS = *iter;
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
@@ -51,5 +56,6 @@ namespace Game3 {
 		json["logLevel"] = settings.logLevel;
 		json["fpsSmoothing"] = settings.fpsSmoothing;
 		json["showFPS"] = settings.showFPS;
+		json["capFPS"] = settings.capFPS;
 	}
 }

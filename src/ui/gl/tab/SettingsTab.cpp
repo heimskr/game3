@@ -49,6 +49,56 @@ namespace Game3 {
 
 		std::size_t row = 0;
 
+		auto add_checkbox = [&](UString label_text, bool ClientSettings::*member, bool invert = false) {
+			auto label = std::make_shared<Label>(ui, scale, std::move(label_text));
+			label->setVerticalAlignment(Alignment::Center);
+			grid->attach(label, row, 0);
+
+			auto checkbox = std::make_shared<Checkbox>(ui, scale);
+			checkbox->setChecked(invert? !(settings.*member) : settings.*member);
+			checkbox->setFixedSize(scale * 8);
+			checkbox->onCheck.connect([this, member, invert](bool checked) {
+				applySetting(member, invert? !checked : checked);
+			});
+			grid->attach(checkbox, row, 1);
+
+			++row;
+
+			return checkbox;
+		};
+
+		auto add_slider = [&](UString label_text, UString tooltip = {}) {
+			auto label = std::make_shared<Label>(ui, scale);
+			label->setText(std::move(label_text));
+			label->setVerticalAlignment(Alignment::Center);
+			grid->attach(label, row, 0);
+
+			if (!tooltip.empty()) {
+				label->setTooltipText(std::move(tooltip));
+			}
+
+			auto slider = std::make_shared<Slider>(ui, scale);
+			slider->setFixedSize(100 * scale, 8 * scale);
+
+			auto value_label = std::make_shared<Label>(ui, scale);
+			value_label->setVerticalAlignment(Alignment::Center);
+
+			auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 0, 0, Color{});
+			hbox->append(slider);
+			hbox->append(value_label);
+			grid->attach(hbox, row, 1);
+
+			slider->onValueUpdate.connect([weak_label = std::weak_ptr(value_label)](Slider &slider, double) {
+				if (auto label = weak_label.lock()) {
+					label->setText(slider.getTooltipText());
+				}
+			});
+
+			++row;
+
+			return slider;
+		};
+
 		auto hostname_label = std::make_shared<Label>(ui, scale);
 		hostname_label->setText("Default Hostname");
 		hostname_label->setVerticalAlignment(Alignment::Center);
@@ -121,97 +171,11 @@ namespace Game3 {
 
 		++row;
 
-		auto alert_label = std::make_shared<Label>(ui, scale);
-		alert_label->setText("Alert on Connect");
-		alert_label->setVerticalAlignment(Alignment::Center);
-		grid->attach(alert_label, row, 0);
-
-		auto alert_checkbox = std::make_shared<Checkbox>(ui, scale);
-		alert_checkbox->setChecked(settings.alertOnConnection);
-		alert_checkbox->setFixedSize(scale * 8);
-		alert_checkbox->onCheck.connect([this](bool checked) {
-			applySetting(&ClientSettings::alertOnConnection, checked);
-		});
-		grid->attach(alert_checkbox, row, 1);
-
-		++row;
-
-		auto lighting_label = std::make_shared<Label>(ui, scale);
-		lighting_label->setText("Render Lighting");
-		lighting_label->setVerticalAlignment(Alignment::Center);
-		grid->attach(lighting_label, row, 0);
-
-		auto lighting_checkbox = std::make_shared<Checkbox>(ui, scale);
-		lighting_checkbox->setChecked(settings.renderLighting);
-		lighting_checkbox->setFixedSize(scale * 8);
-		lighting_checkbox->onCheck.connect([this](bool checked) {
-			applySetting(&ClientSettings::renderLighting, checked);
-		});
-		grid->attach(lighting_checkbox, row, 1);
-
-		++row;
-
-		auto timer_label = std::make_shared<Label>(ui, scale);
-		timer_label->setText("Enable Timers");
-		timer_label->setVerticalAlignment(Alignment::Center);
-		grid->attach(timer_label, row, 0);
-
-		auto timer_checkbox = std::make_shared<Checkbox>(ui, scale);
-		timer_checkbox->setChecked(!settings.hideTimers);
-		timer_checkbox->setFixedSize(scale * 8);
-		timer_checkbox->onCheck.connect([this](bool checked) {
-			applySetting(&ClientSettings::hideTimers, !checked);
-		});
-		grid->attach(timer_checkbox, row, 1);
-
-		++row;
-
-		auto fps_label = std::make_shared<Label>(ui, scale);
-		fps_label->setText("Display FPS");
-		fps_label->setVerticalAlignment(Alignment::Center);
-		grid->attach(fps_label, row, 0);
-
-		auto fps_checkbox = std::make_shared<Checkbox>(ui, scale);
-		fps_checkbox->setChecked(settings.showFPS);
-		fps_checkbox->setFixedSize(scale * 8);
-		fps_checkbox->onCheck.connect([this](bool checked) {
-			applySetting(&ClientSettings::showFPS, checked);
-		});
-		grid->attach(fps_checkbox, row, 1);
-
-		++row;
-
-		auto add_slider = [&](UString label_text, UString tooltip = {}) {
-			auto label = std::make_shared<Label>(ui, scale);
-			label->setText(std::move(label_text));
-			label->setVerticalAlignment(Alignment::Center);
-			grid->attach(label, row, 0);
-
-			if (!tooltip.empty()) {
-				label->setTooltipText(std::move(tooltip));
-			}
-
-			auto slider = std::make_shared<Slider>(ui, scale);
-			slider->setFixedSize(100 * scale, 8 * scale);
-
-			auto value_label = std::make_shared<Label>(ui, scale);
-			value_label->setVerticalAlignment(Alignment::Center);
-
-			auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 0, 0, Color{});
-			hbox->append(slider);
-			hbox->append(value_label);
-			grid->attach(hbox, row, 1);
-
-			slider->onValueUpdate.connect([weak_label = std::weak_ptr(value_label)](Slider &slider, double) {
-				if (auto label = weak_label.lock()) {
-					label->setText(slider.getTooltipText());
-				}
-			});
-
-			++row;
-
-			return slider;
-		};
+		add_checkbox("Alert on Connect", &ClientSettings::alertOnConnection);
+		add_checkbox("Render Lighting", &ClientSettings::renderLighting);
+		add_checkbox("Enable Timers", &ClientSettings::hideTimers, true);
+		add_checkbox("Display FPS", &ClientSettings::showFPS);
+		add_checkbox("Cap FPS", &ClientSettings::capFPS);
 
 		auto level_slider = add_slider("Log Level");
 		level_slider->setRange(0, 3);

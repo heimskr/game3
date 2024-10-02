@@ -26,6 +26,7 @@ namespace Game3 {
 		int logLevel = 1;
 		std::size_t fpsSmoothing = 200;
 		bool showFPS = true;
+		bool capFPS = true;
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;
