@@ -18,28 +18,23 @@ namespace Game3 {
 	}
 
 	void from_json(const nlohmann::json &json, ClientSettings &settings) {
-		if (auto iter = json.find("hostname"); iter != json.end())
-			settings.hostname = *iter;
-		if (auto iter = json.find("port"); iter != json.end())
-			settings.port = *iter;
-		if (auto iter = json.find("username"); iter != json.end())
-			settings.username = *iter;
-		if (auto iter = json.find("alertOnConnection"); iter != json.end())
-			settings.alertOnConnection = *iter;
-		if (auto iter = json.find("tickFrequency"); iter != json.end())
-			settings.tickFrequency = *iter;
-		if (auto iter = json.find("renderLighting"); iter != json.end())
-			settings.renderLighting = *iter;
-		if (auto iter = json.find("hideTimers"); iter != json.end())
-			settings.hideTimers = *iter;
-		if (auto iter = json.find("logLevel"); iter != json.end())
-			settings.logLevel = *iter;
-		if (auto iter = json.find("fpsSmoothing"); iter != json.end())
-			settings.fpsSmoothing = *iter;
-		if (auto iter = json.find("showFPS"); iter != json.end())
-			settings.showFPS = *iter;
-		if (auto iter = json.find("capFPS"); iter != json.end())
-			settings.capFPS = *iter;
+		auto get = [&](const char *key, auto member) {
+			if (auto iter = json.find(key); iter != json.end()) {
+				settings.*member = *iter;
+			}
+		};
+
+		get("hostname", &ClientSettings::hostname);
+		get("port", &ClientSettings::port);
+		get("username", &ClientSettings::username);
+		get("alertOnConnection", &ClientSettings::alertOnConnection);
+		get("tickFrequency", &ClientSettings::tickFrequency);
+		get("renderLighting", &ClientSettings::renderLighting);
+		get("hideTimers", &ClientSettings::hideTimers);
+		get("logLevel", &ClientSettings::logLevel);
+		get("fpsSmoothing", &ClientSettings::fpsSmoothing);
+		get("showFPS", &ClientSettings::showFPS);
+		get("capFPS", &ClientSettings::capFPS);
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
