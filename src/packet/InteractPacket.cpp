@@ -25,7 +25,7 @@ namespace Game3 {
 					else
 						agent->onInteractNextTo(player, modifiers, held_item, hand);
 				} else {
-					client.send(ErrorPacket("Can't interact: agent " + std::to_string(*globalID) + " not found"));
+					client.send(make<ErrorPacket>("Can't interact: agent " + std::to_string(*globalID) + " not found"));
 				}
 			} else if (direct) {
 				player->interactOn(modifiers, held_item, hand);

@@ -24,6 +24,6 @@ namespace Game3 {
 			return;
 		}
 
-		client.send(ErrorPacket("Can't move: no player"));
+		client.send(make<ErrorPacket>("Can't move: no player"));
 	}
 }

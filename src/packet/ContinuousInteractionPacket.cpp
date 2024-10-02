@@ -15,6 +15,6 @@ namespace Game3 {
 			return;
 		}
 
-		client.send(ErrorPacket("Can't set continuous interaction: no player"));
+		client.send(make<ErrorPacket>("Can't set continuous interaction: no player"));
 	}
 }

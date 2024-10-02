@@ -204,7 +204,7 @@ namespace Game3 {
 		if (subscribedPlayers.empty())
 			return;
 
-		const VillageUpdatePacket packet(*this);
+		const auto packet = make<VillageUpdatePacket>(*this);
 
 		for (const PlayerPtr &player: subscribedPlayers)
 			player->send(packet);

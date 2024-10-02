@@ -83,10 +83,10 @@ namespace Game3 {
 	void FluidHoldingTileEntity::addObserver(const PlayerPtr &player, bool silent) {
 		Observable::addObserver(player, silent);
 
-		player->send(TileEntityPacket(getSelf()));
+		player->send(make<TileEntityPacket>(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(FluidsModule::ID(), getGID(), true));
+			player->send(make<OpenModuleForAgentPacket>(FluidsModule::ID(), getGID(), true));
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())
@@ -117,10 +117,10 @@ namespace Game3 {
 		if (force)
 			TileEntity::broadcast(true);
 		else
-			broadcast(TileEntityPacket(getSelf()));
+			broadcast(make<TileEntityPacket>(getSelf()));
 	}
 
-	void FluidHoldingTileEntity::broadcast(const TileEntityPacket &packet) {
+	void FluidHoldingTileEntity::broadcast(const std::shared_ptr<TileEntityPacket> &packet) {
 		assert(getSide() == Side::Server);
 		auto lock = observers.uniqueLock();
 

@@ -99,7 +99,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MultiModule<Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		player->send(make<OpenModuleForAgentPacket>(MultiModule<Substance::Energy, Substance::Fluid>::ID(), getGID()));
 		FluidHoldingTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 
@@ -135,7 +135,7 @@ namespace Game3 {
 			return;
 		}
 
-		const TileEntityPacket packet(getSelf());
+		const auto packet = make<TileEntityPacket>(getSelf());
 
 		auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
 

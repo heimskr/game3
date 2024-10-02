@@ -257,17 +257,17 @@ namespace Game3 {
 
 		group->add_action("copier_copy", [slot, weak_player] {
 			if (PlayerPtr player = weak_player.lock())
-				player->send(UseItemPacket(slot, Modifiers{}));
+				player->send(make<UseItemPacket>(slot, Modifiers{}));
 		});
 
 		group->add_action("copier_include_tile_entities", [slot, weak_player] {
 			if (PlayerPtr player = weak_player.lock())
-				player->send(SetCopierConfigurationPacket(slot, true));
+				player->send(make<SetCopierConfigurationPacket>(slot, true));
 		});
 
 		group->add_action("copier_exclude_tile_entities", [slot, weak_player] {
 			if (PlayerPtr player = weak_player.lock())
-				player->send(SetCopierConfigurationPacket(slot, false));
+				player->send(make<SetCopierConfigurationPacket>(slot, false));
 		});
 
 		if (inventory == stack->getGame()->toClient().getPlayer()->getInventory(0)) {

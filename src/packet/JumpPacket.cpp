@@ -11,7 +11,7 @@ namespace Game3 {
 		if (auto player = client.getPlayer()) {
 			player->jump();
 		} else {
-			client.send(ErrorPacket("No player."));
+			client.send(make<ErrorPacket>("No player."));
 		}
 	}
 }

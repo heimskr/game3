@@ -10,14 +10,14 @@ namespace Game3 {
 		const InventoryPtr inventory = client.getPlayer()->getInventory(0);
 
 		if (!inventory) {
-			client.send(ErrorPacket("Can't drop/discard item: no inventory"));
+			client.send(make<ErrorPacket>("Can't drop/discard item: no inventory"));
 			return;
 		}
 
 		auto inventory_lock = inventory->uniqueLock();
 
 		if (!inventory->hasSlot(slot)) {
-			client.send(ErrorPacket("Can't drop/discard item: invalid slot"));
+			client.send(make<ErrorPacket>("Can't drop/discard item: invalid slot"));
 			return;
 		}
 

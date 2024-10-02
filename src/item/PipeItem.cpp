@@ -23,7 +23,7 @@ namespace Game3 {
 			const auto [x, y] = offsets;
 			const Direction direction = toDirection(getQuadrant(x, y));
 
-			player->send(OpenItemFiltersPacket(place.realm->id, place.position, direction));
+			player->send(make<OpenItemFiltersPacket>(place.realm->id, place.position, direction));
 			return true;
 		}
 

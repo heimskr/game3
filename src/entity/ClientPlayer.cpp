@@ -129,16 +129,16 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::stopContinuousInteraction() {
-		send(ContinuousInteractionPacket());
+		send(make<ContinuousInteractionPacket>());
 	}
 
 	void ClientPlayer::setContinuousInteraction(bool on, Modifiers modifiers) {
 		if (on != continuousInteraction) {
 			continuousInteraction = on;
 			if (on)
-				send(ContinuousInteractionPacket(modifiers));
+				send(make<ContinuousInteractionPacket>(modifiers));
 			else
-				send(ContinuousInteractionPacket());
+				send(make<ContinuousInteractionPacket>());
 		}
 
 		continuousInteractionModifiers = modifiers;
@@ -163,7 +163,7 @@ namespace Game3 {
 			game->toClient().playSound("base:sound/jump", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
 			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
 				tile_entity->onOverlapEnd(getSelf());
-			send(JumpPacket());
+			send(make<JumpPacket>());
 		}
 	}
 
@@ -174,7 +174,7 @@ namespace Game3 {
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {
 		if (Entity::move(direction, context)) {
-			send(MovePlayerPacket(position, direction, context.facingDirection, offset));
+			send(make<MovePlayerPacket>(position, direction, context.facingDirection, offset));
 			return true;
 		}
 
@@ -237,13 +237,13 @@ namespace Game3 {
 			}
 
 			if (!chunk_requests.empty())
-				send(ChunkRequestPacket(*realm, chunk_requests));
+				send(make<ChunkRequestPacket>(*realm, chunk_requests));
 
 			if (!entity_requests.empty())
-				send(EntityRequestPacket(realm->id, std::move(entity_requests)));
+				send(make<EntityRequestPacket>(realm->id, std::move(entity_requests)));
 
 			if (!tile_entity_requests.empty())
-				send(TileEntityRequestPacket(realm->id, std::move(tile_entity_requests)));
+				send(make<TileEntityRequestPacket>(realm->id, std::move(tile_entity_requests)));
 		}
 
 		Entity::movedToNewChunk(old_position);
@@ -264,7 +264,7 @@ namespace Game3 {
 		assert(destination);
 		if (auto *buffer = std::any_cast<Buffer>(&data)) {
 			GamePtr game = getGame();
-			game->toClient().getClient()->send(AgentMessagePacket(destination->getGID(), name, *buffer));
+			game->toClient().getClient()->send(make<AgentMessagePacket>(destination->getGID(), name, *buffer));
 		} else
 			throw std::runtime_error("Expected data to be a Buffer in ClientPlayer::sendMessage");
 	}
@@ -278,7 +278,7 @@ namespace Game3 {
 		if (direction.exchange(new_direction) == new_direction)
 			return;
 
-		send(MovePlayerPacket(position, new_direction, new_direction));
+		send(make<MovePlayerPacket>(position, new_direction, new_direction));
 	}
 
 	void ClientPlayer::showText(const UString &text, const UString &name) {

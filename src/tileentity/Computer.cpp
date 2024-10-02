@@ -280,7 +280,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(ComputerModule::ID(), getGID()));
+		player->send(make<OpenModuleForAgentPacket>(ComputerModule::ID(), getGID()));
 
 		return false;
 	}

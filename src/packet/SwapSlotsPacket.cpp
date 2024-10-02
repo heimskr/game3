@@ -14,19 +14,19 @@ namespace Game3 {
 			return;
 
 		if (!Agent::validateGID(firstGID) || !Agent::validateGID(secondGID)) {
-			client.send(ErrorPacket("Can't move slots: invalid GID(s)"));
+			client.send(make<ErrorPacket>("Can't move slots: invalid GID(s)"));
 			return;
 		}
 
 		AgentPtr first_agent = game->getAgent(firstGID);
 		if (!first_agent) {
-			client.send(ErrorPacket("Can't swap slots: first agent not found"));
+			client.send(make<ErrorPacket>("Can't swap slots: first agent not found"));
 			return;
 		}
 
 		auto first_has_inventory = std::dynamic_pointer_cast<HasInventory>(first_agent);
 		if (!first_has_inventory) {
-			client.send(ErrorPacket("Can't swap slots: first agent doesn't have an inventory"));
+			client.send(make<ErrorPacket>("Can't swap slots: first agent doesn't have an inventory"));
 			return;
 		}
 
@@ -37,13 +37,13 @@ namespace Game3 {
 
 		AgentPtr second_agent = game->getAgent(secondGID);
 		if (!second_agent) {
-			client.send(ErrorPacket("Can't swap slots: second agent not found"));
+			client.send(make<ErrorPacket>("Can't swap slots: second agent not found"));
 			return;
 		}
 
 		auto second_has_inventory = std::dynamic_pointer_cast<HasInventory>(second_agent);
 		if (!second_has_inventory) {
-			client.send(ErrorPacket("Can't swap slots: second agent doesn't have an inventory"));
+			client.send(make<ErrorPacket>("Can't swap slots: second agent doesn't have an inventory"));
 			return;
 		}
 
@@ -65,18 +65,18 @@ namespace Game3 {
 			ItemStackPtr second_stack = second_inventory[secondSlot];
 
 			if (first_stack == nullptr && second_stack == nullptr) {
-				client.send(ErrorPacket("Can't swap slots: both slots are invalid or empty"));
+				client.send(make<ErrorPacket>("Can't swap slots: both slots are invalid or empty"));
 				return;
 			}
 
 #ifdef CHECK_SLOT_COMPATIBILITY
 			if (first_stack != nullptr && first_inventoried && !first_inventoried->canExtractItem(Direction::Invalid, firstSlot)) {
-				client.send(ErrorPacket("Can't move slots: first slot isn't extractable"));
+				client.send(make<ErrorPacket>("Can't move slots: first slot isn't extractable"));
 				return;
 			}
 
 			if (second_stack != nullptr && second_inventoried && !second_inventoried->canInsertItem(*second_stack, Direction::Invalid, secondSlot)) {
-				client.send(ErrorPacket("Can't move slots: second slot isn't insertable"));
+				client.send(make<ErrorPacket>("Can't move slots: second slot isn't insertable"));
 				return;
 			}
 #endif
@@ -84,7 +84,7 @@ namespace Game3 {
 			if (!first_stack) {
 
 				if (!first_inventory.hasSlot(firstSlot)) {
-					client.send(ErrorPacket("Can't swap slots: first slot is invalid"));
+					client.send(make<ErrorPacket>("Can't swap slots: first slot is invalid"));
 					return;
 				}
 
@@ -102,7 +102,7 @@ namespace Game3 {
 			} else if (!second_stack) {
 
 				if (!second_inventory.hasSlot(secondSlot)) {
-					client.send(ErrorPacket("Can't swap slots: second slot is invalid"));
+					client.send(make<ErrorPacket>("Can't swap slots: second slot is invalid"));
 					return;
 				}
 

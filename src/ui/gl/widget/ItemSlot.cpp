@@ -94,7 +94,7 @@ namespace Game3 {
 
 	bool ItemSlot::click(int, int, int) {
 		if (inventory && inventory->getOwner() == ui.getPlayer())
-			ui.getGame()->getPlayer()->send(SetActiveSlotPacket(slot));
+			ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
 		return true;
 	}
 

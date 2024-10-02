@@ -9,7 +9,7 @@ namespace Game3 {
 	void UseItemPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
 		ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
-			client.send(ErrorPacket("No player."));
+			client.send(make<ErrorPacket>("No player."));
 			return;
 		}
 
@@ -19,7 +19,7 @@ namespace Game3 {
 		ItemStackPtr stack = (*inventory)[slot];
 
 		if (!stack) {
-			client.send(ErrorPacket("Can't use empty slot."));
+			client.send(make<ErrorPacket>("Can't use empty slot."));
 			return;
 		}
 

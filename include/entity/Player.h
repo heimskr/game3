@@ -72,7 +72,7 @@ namespace Game3 {
 			void startMoving(Direction);
 			void stopMoving();
 			void stopMoving(Direction);
-			bool send(const Packet &);
+			bool send(const PacketPtr &);
 			void addStationType(Identifier);
 			void removeStationType(const Identifier &);
 			std::shared_ptr<Player> getShared();

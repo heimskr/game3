@@ -165,7 +165,7 @@ namespace Game3 {
 			return;
 		}
 
-		getGame()->getPlayer()->send(SetItemFiltersPacket(pipe->getGID(), place.direction, *filter_to_use));
+		getGame()->getPlayer()->send(make<SetItemFiltersPacket>(pipe->getGID(), place.direction, *filter_to_use));
 	}
 
 	bool ItemFiltersModule::setFilter() {

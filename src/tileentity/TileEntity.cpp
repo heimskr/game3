@@ -247,7 +247,7 @@ namespace Game3 {
 	void TileEntity::sendTo(RemoteClient &client, UpdateCounter threshold) {
 		assert(getSide() == Side::Server);
 		if (threshold == 0 || getUpdateCounter() < threshold) {
-			client.send(TileEntityPacket(getSelf()));
+			client.send(make<TileEntityPacket>(getSelf()));
 			onSend(client.getPlayer());
 		}
 	}
@@ -270,7 +270,7 @@ namespace Game3 {
 		assert(getSide() == Side::Server);
 
 		RealmPtr realm = getRealm();
-		TileEntityPacket packet(getSelf());
+		auto packet = make<TileEntityPacket>(getSelf());
 
 		ChunkRange(getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities = realm->getEntities(chunk_position)) {

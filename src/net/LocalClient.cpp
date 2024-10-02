@@ -100,22 +100,22 @@ namespace Game3 {
 		reading = false;
 	}
 
-	void LocalClient::send(const Packet &packet) {
+	void LocalClient::send(const PacketPtr &packet) {
 		Buffer send_buffer{Side::Server};
 		auto game = getGame();
 		send_buffer.context = game;
-		packet.encode(*game, send_buffer);
+		packet->encode(*game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		const auto str = send_buffer.str();
 		{
 			std::unique_lock lock(packetMutex);
-			sendRaw(packet.getID());
+			sendRaw(packet->getID());
 			sendRaw(static_cast<uint32_t>(send_buffer.size()));
 			send(str.data(), str.size(), false);
 		}
 		bytesWritten += 6 + str.size();
 		auto lock = sentPacketCounts.uniqueLock();
-		++sentPacketCounts[packet.getID()];
+		++sentPacketCounts[packet->getID()];
 	}
 
 	bool LocalClient::isConnected() const {

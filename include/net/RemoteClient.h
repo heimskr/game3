@@ -44,26 +44,26 @@ namespace Game3 {
 			using GenericClient::GenericClient;
 
 			void handleInput(std::string_view) override;
-			bool send(const Packet &);
+			bool send(const PacketPtr &) override;
 			void sendChunk(Realm &, ChunkPosition, bool can_request = true, uint64_t counter_threshold = 0);
 			inline auto getPlayer() const { return weakPlayer.lock(); }
 			inline void setPlayer(const std::shared_ptr<ServerPlayer> &shared) { weakPlayer = shared; }
 			inline auto bufferGuard() { return BufferGuard(*this); }
 
 			template <typename T>
-			requires (!std::derived_from<T, Packet>)
-			void send(const T &value);
+			requires (!IsPacketPtr<T>)
+			void send(T value);
 
 			void startBuffering();
 			void flushBuffer(bool force = false);
 			void stopBuffering();
-			bool isBuffering() const;
+			virtual bool isBuffering() const;
 
 			void removeSelf() override;
 
 			template <typename... Args>
 			void sendError(const char *format, Args &&...args) {
-				send(ErrorPacket(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
+				send(make<ErrorPacket>(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
 			}
 
 		private:

@@ -155,10 +155,10 @@ namespace Game3 {
 	void InventoriedTileEntity::addObserver(const PlayerPtr &player, bool silent) {
 		Observable::addObserver(player, silent);
 
-		player->send(TileEntityPacket(getSelf()));
+		player->send(make<TileEntityPacket>(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(InventoryModule::ID(), getGID()));
+			player->send(make<OpenModuleForAgentPacket>(InventoryModule::ID(), getGID()));
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())
@@ -181,10 +181,10 @@ namespace Game3 {
 		if (force)
 			TileEntity::broadcast(true);
 		else
-			broadcast(TileEntityPacket(getSelf()));
+			broadcast(make<TileEntityPacket>(getSelf()));
 	}
 
-	void InventoriedTileEntity::broadcast(const TileEntityPacket &packet) {
+	void InventoriedTileEntity::broadcast(const std::shared_ptr<TileEntityPacket> &packet) {
 		assert(getSide() == Side::Server);
 		auto lock = observers.uniqueLock();
 

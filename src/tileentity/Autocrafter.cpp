@@ -105,7 +105,7 @@ namespace Game3 {
 		if (modifiers.onlyShift()) {
 			EnergeticTileEntity::addObserver(player, false);
 		} else {
-			player->send(OpenModuleForAgentPacket(AutocrafterModule::ID(), getGID()));
+			player->send(make<OpenModuleForAgentPacket>(AutocrafterModule::ID(), getGID()));
 			InventoriedTileEntity::addObserver(player, true);
 		}
 
@@ -259,8 +259,8 @@ namespace Game3 {
 			return;
 		}
 
-		const TileEntityPacket packet(getSelf());
-		const SetTileEntityEnergyPacket energy_packet = makeEnergyPacket();
+		const auto packet = make<TileEntityPacket>(getSelf());
+		const auto energy_packet = makeEnergyPacket();
 
 		{
 			auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();

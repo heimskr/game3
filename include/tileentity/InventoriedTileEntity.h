@@ -51,6 +51,6 @@ namespace Game3 {
 			void broadcast(bool force) override;
 
 		protected:
-			void broadcast(const TileEntityPacket &);
+			void broadcast(const std::shared_ptr<TileEntityPacket> &);
 	};
 }

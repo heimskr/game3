@@ -301,7 +301,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Player::send(const Packet &packet) {
+	bool Player::send(const PacketPtr &packet) {
 		if (getSide() == Side::Server) {
 			if (auto locked = toServer()->weakClient.lock()) {
 				locked->send(packet);
@@ -322,7 +322,7 @@ namespace Game3 {
 				return;
 			stationTypes.insert(std::move(station_type));
 		}
-		send(SetPlayerStationTypesPacket(stationTypes, true));
+		send(make<SetPlayerStationTypesPacket>(stationTypes, true));
 	}
 
 	void Player::removeStationType(const Identifier &station_type) {
@@ -333,7 +333,7 @@ namespace Game3 {
 			else
 				return;
 		}
-		send(SetPlayerStationTypesPacket(stationTypes, false));
+		send(make<SetPlayerStationTypesPacket>(stationTypes, false));
 	}
 
 	PlayerPtr Player::getShared() {
@@ -361,7 +361,7 @@ namespace Game3 {
 	void Player::notifyOfRealm(Realm &realm) {
 		if (knowsRealm(realm.id))
 			return;
-		send(RealmNoticePacket(realm));
+		send(make<RealmNoticePacket>(realm));
 		addKnownRealm(realm.id);
 	}
 
@@ -387,7 +387,7 @@ namespace Game3 {
 		}
 
 		if (inserted && getSide() == Side::Server) {
-			send(AddKnownItemPacket(item_id));
+			send(make<AddKnownItemPacket>(item_id));
 		}
 
 		return inserted;

@@ -1307,21 +1307,21 @@ namespace Game3 {
 	}
 
 	Realm::ChunkPackets Realm::getChunkPackets(ChunkPosition chunk_position) {
-		ChunkTilesPacket chunk_tiles(*this, chunk_position);
-		std::vector<EntityPacket> entity_packets;
-		std::vector<TileEntityPacket> tile_entity_packets;
+		auto chunk_tiles = make<ChunkTilesPacket>(*this, chunk_position);
+		std::vector<std::shared_ptr<EntityPacket>> entity_packets;
+		std::vector<std::shared_ptr<TileEntityPacket>> tile_entity_packets;
 
 		if (auto entities_ptr = getEntities(chunk_position)) {
 			entity_packets.reserve(entities_ptr->size());
 			for (const WeakEntityPtr &weak_entity: *entities_ptr)
 				if (EntityPtr entity = weak_entity.lock())
-					entity_packets.emplace_back(entity);
+					entity_packets.emplace_back(make<EntityPacket>(entity));
 		}
 
 		if (auto tile_entities_ptr = getTileEntities(chunk_position)) {
 			tile_entity_packets.reserve(tile_entities_ptr->size());
 			for (const auto &tile_entity: *tile_entities_ptr)
-				tile_entity_packets.emplace_back(tile_entity);
+				tile_entity_packets.emplace_back(make<TileEntityPacket>(tile_entity));
 		}
 
 		return {std::move(chunk_tiles), std::move(entity_packets), std::move(tile_entity_packets)};
@@ -1592,7 +1592,7 @@ namespace Game3 {
 					client->send(packet);
 			}
 		} catch (const std::out_of_range &) {
-			const ErrorPacket packet("Chunk " + static_cast<std::string>(chunk_position) + " not present in realm " + std::to_string(id));
+			const auto packet = make<ErrorPacket>("Chunk " + static_cast<std::string>(chunk_position) + " not present in realm " + std::to_string(id));
 			for (const auto &client: clients)
 				client->send(packet);
 			return;
@@ -1722,7 +1722,7 @@ namespace Game3 {
 
 	void Realm::playSound(const Position &position, const Identifier &id, float pitch) const {
 		assert(getSide() == Side::Server);
-		PlaySoundPacket packet(id, position, pitch);
+		const auto packet = make<PlaySoundPacket>(id, position, pitch);
 		getPlayers().withShared([&](const WeakSet<Player> &set) {
 			for (const auto &weak_player: set)
 				if (auto player = weak_player.lock())
@@ -1759,7 +1759,7 @@ namespace Game3 {
 				// TODO: Can you escape underscores?
 				gmenu->append(agent->getName(), "agent_menu.agent" + std::to_string(i));
 				group->add_action("agent" + std::to_string(i), [agent, overlap, player] {
-					player->send(InteractPacket(overlap, Hand::None, Modifiers{}, agent->getGID(), player->direction));
+					player->send(make<InteractPacket>(overlap, Hand::None, Modifiers{}, agent->getGID(), player->direction));
 				});
 			}
 
@@ -1809,7 +1809,7 @@ namespace Game3 {
 		if (getSide() == Side::Server) {
 			auto lock = entity->visiblePlayers.sharedLock();
 			if (!entity->visiblePlayers.empty()) {
-				const EntityPacket packet(entity);
+				const auto packet = make<EntityPacket>(entity);
 				for (const auto &weak_player: entity->visiblePlayers) {
 					if (auto player = weak_player.lock()) {
 						player->notifyOfRealm(*this);

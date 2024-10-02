@@ -109,7 +109,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MicroscopeModule<1, Substance::Energy>::ID(), getGID()));
+		player->send(make<OpenModuleForAgentPacket>(MicroscopeModule<1, Substance::Energy>::ID(), getGID()));
 		InventoriedTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 

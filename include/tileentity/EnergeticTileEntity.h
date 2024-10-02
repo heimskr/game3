@@ -32,10 +32,10 @@ namespace Game3 {
 			void decode(Game &, Buffer &) override;
 			void broadcast(bool force) override;
 
-			SetTileEntityEnergyPacket makeEnergyPacket() const;
+			std::shared_ptr<SetTileEntityEnergyPacket> makeEnergyPacket() const;
 
 		protected:
-			void broadcast(const SetTileEntityEnergyPacket &);
+			void broadcast(const std::shared_ptr<SetTileEntityEnergyPacket> &);
 			using HasEnergy::addEnergy;
 			using HasEnergy::getEnergy;
 	};

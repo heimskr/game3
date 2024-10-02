@@ -47,17 +47,17 @@ namespace Game3 {
 	}
 
 	void ClientInventory::drop(Slot slot) {
-		send(DropItemPacket(slot, false));
+		send(make<DropItemPacket>(slot, false));
 	}
 
 	void ClientInventory::discard(Slot slot) {
-		send(DropItemPacket(slot, true));
+		send(make<DropItemPacket>(slot, true));
 	}
 
 	void ClientInventory::swap(Slot source, Slot destination) {
 		if (auto owner = weakOwner.lock()) {
 			GlobalID gid = owner->getGID();
-			send(SwapSlotsPacket(gid, gid, source, destination, index, index));
+			send(make<SwapSlotsPacket>(gid, gid, source, destination, index, index));
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace Game3 {
 		if (force)
 			activeSlot = new_active;
 		else
-			send(SetActiveSlotPacket(new_active));
+			send(make<SetActiveSlotPacket>(new_active));
 	}
 
 	void ClientInventory::notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) {
@@ -120,15 +120,17 @@ namespace Game3 {
 		}
 	}
 
-	void ClientInventory::send(const Packet &packet) {
-		auto owner = weakOwner.lock();
-		if (!owner)
+	void ClientInventory::send(const PacketPtr &packet) {
+		AgentPtr owner = weakOwner.lock();
+		if (!owner) {
 			throw std::logic_error("ClientInventory is missing an owner");
+		}
 
-		if (auto player = std::dynamic_pointer_cast<Player>(owner))
+		if (auto player = std::dynamic_pointer_cast<Player>(owner)) {
 			player->send(packet);
-		else
+		} else {
 			throw std::runtime_error("Can't send packets from a non-player-owned ClientInventory");
+		}
 	}
 
 	template <>

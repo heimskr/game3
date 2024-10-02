@@ -7,6 +7,6 @@ namespace Game3 {
 	void RegisterCommand::operator()(LocalClient &client) {
 		if (pieces.size() < 3)
 			throw CommandError("\"register\" command requires 2 arguments: username, display name");
-		client.send(RegisterPlayerPacket(pieces.at(1), join(std::span(pieces).subspan(2), " ")));
+		client.send(make<RegisterPlayerPacket>(pieces.at(1), join(std::span(pieces).subspan(2), " ")));
 	}
 }

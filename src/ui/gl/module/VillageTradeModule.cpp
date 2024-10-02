@@ -215,7 +215,7 @@ namespace Game3 {
 		}
 
 		assert(stack);
-		game->getPlayer()->send(DoVillageTradePacket(village->getID(), stack->getID(), sell_count, true));
+		game->getPlayer()->send(make<DoVillageTradePacket>(village->getID(), stack->getID(), sell_count, true));
 	}
 
 	void VillageTradeModule::showSell() {
@@ -353,10 +353,10 @@ namespace Game3 {
 	}
 
 	void VillageTradeRow::buy(const ClientGamePtr &game, ItemCount amount) {
-		game->getPlayer()->send(DoVillageTradePacket(villageID, resource, amount, false));
+		game->getPlayer()->send(make<DoVillageTradePacket>(villageID, resource, amount, false));
 	}
 
 	void VillageTradeRow::sell(const ClientGamePtr &game, ItemCount amount) {
-		game->getPlayer()->send(DoVillageTradePacket(villageID, resource, amount, true));
+		game->getPlayer()->send(make<DoVillageTradePacket>(villageID, resource, amount, true));
 	}
 }

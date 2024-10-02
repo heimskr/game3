@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net/SendBuffer.h"
+#include "packet/Packet.h"
 #include "threading/Lockable.h"
 
 #include <condition_variable>
@@ -12,7 +13,6 @@
 #include <asio/ssl.hpp>
 
 namespace Game3 {
-	class Packet;
 	class Server;
 
 	class GenericClient: public std::enable_shared_from_this<GenericClient> {
@@ -38,6 +38,8 @@ namespace Game3 {
 
 			void start();
 			void queue(std::string);
+
+			virtual bool send(const PacketPtr &) = 0;
 
 			virtual void handleInput(std::string_view) = 0;
 			virtual void onMaxLineSizeExceeded() {}

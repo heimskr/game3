@@ -21,14 +21,14 @@ namespace Game3 {
 			GameDB &database = game->getDatabase();
 
 			if (game->hasPlayer(username)) {
-				client.send(LoginStatusPacket(false));
+				client.send(make<LoginStatusPacket>(false));
 				return;
 			}
 
 			const bool was_omnitoken = server->game->compareToken(token);
 
 			if (!was_omnitoken && server->generateToken(username) != token) {
-				client.send(LoginStatusPacket(false));
+				client.send(make<LoginStatusPacket>(false));
 				return;
 			}
 
@@ -43,7 +43,7 @@ namespace Game3 {
 				player->notifyOfRealm(*realm);
 				SUCCESS("Player {} logged in \e[2m(GID {})\e[22m", username, player->globalID);
 				player->init(game);
-				client.send(LoginStatusPacket(true, player->globalID, username, display_name, player));
+				client.send(make<LoginStatusPacket>(true, player->globalID, username, display_name, player));
 				server->setupPlayer(client);
 				realm->addPlayer(player);
 				if (release_place) {
@@ -61,19 +61,19 @@ namespace Game3 {
 
 				auto player = server->loadPlayer(username, *displayName);
 				SUCCESS("Automatically registered user {} with token {}.", username, player->token);
-				client.send(RegistrationStatusPacket(username, *displayName, player->token));
+				client.send(make<RegistrationStatusPacket>(username, *displayName, player->token));
 				client.setPlayer(player);
 				auto realm = player->getRealm();
 				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 				player->notifyOfRealm(*realm);
 				INFO("Player {}'s GID is {}", username, player->globalID);
-				client.send(LoginStatusPacket(true, player->globalID, username, *displayName, player));
+				client.send(make<LoginStatusPacket>(true, player->globalID, username, *displayName, player));
 				server->setupPlayer(client);
 				realm->addPlayer(player);
 				return;
 			}
 		}
 
-		client.send(LoginStatusPacket(false));
+		client.send(make<LoginStatusPacket>(false));
 	}
 }

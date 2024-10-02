@@ -57,7 +57,7 @@ namespace Game3 {
 	void EntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
-			client.send(ErrorPacket("Invalid realm"));
+			client.send(make<ErrorPacket>("Invalid realm"));
 			return;
 		}
 
@@ -78,7 +78,7 @@ namespace Game3 {
 					// missing from Realm::entitiesByGID but still exists in the realm somehow. I encountered the bug
 					// by teleporting around a lot.
 					INFO("Telling player {} to destroy entity {} ({})", client.getPlayer()->username, entity_id, entity->getName());
-					client.send(DestroyEntityPacket(entity_id, realm->id));
+					client.send(make<DestroyEntityPacket>(entity_id, realm->id));
 				}
 			}
 		}

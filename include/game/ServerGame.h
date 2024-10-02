@@ -57,7 +57,7 @@ namespace Game3 {
 			bool hasPlayer(const std::string &username) const;
 			void queueRemoval(const ServerPlayerPtr &);
 			void openDatabase(std::filesystem::path);
-			void broadcast(const Packet &, bool include_non_players = false);
+			void broadcast(const PacketPtr &, bool include_non_players = false);
 			void releasePlayer(const std::string &username, const Place &);
 			void setRule(const std::string &, ssize_t);
 			std::optional<ssize_t> getRule(const std::string &) const;
@@ -79,8 +79,7 @@ namespace Game3 {
 				return *database;
 			}
 
-			template <typename P>
-			void broadcast(const Place &place, const P &packet) {
+			void broadcast(const Place &place, const PacketPtr &packet) {
 				auto lock = players.sharedLock();
 				for (const ServerPlayerPtr &player: players)
 					if (player->canSee(place.realm->id, place.position))

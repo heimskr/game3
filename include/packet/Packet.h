@@ -13,13 +13,13 @@ namespace Game3 {
 		public:
 			Packet() = default;
 
-			Packet(const Packet &) = default;
-			Packet(Packet &&) noexcept = default;
+			Packet(const Packet &) = delete;
+			Packet(Packet &&) noexcept = delete;
 
 			virtual ~Packet() = default;
 
-			Packet & operator=(const Packet &) = default;
-			Packet & operator=(Packet &&) noexcept = default;
+			Packet & operator=(const Packet &) = delete;
+			Packet & operator=(Packet &&) noexcept = delete;
 
 			bool valid = true;
 
@@ -34,5 +34,19 @@ namespace Game3 {
 			virtual void handle(const std::shared_ptr<ClientGame> &) {
 				throw std::runtime_error("Packet " + std::to_string(getID()) + " cannot be handled client-side");
 			}
+	};
+
+	using PacketPtr = std::shared_ptr<Packet>;
+
+	template <typename P, typename... Args>
+	requires std::derived_from<P, Packet>
+	inline std::shared_ptr<P> make(Args &&...args) {
+		return std::make_shared<P>(std::forward<Args>(args)...);
+	}
+
+	template <typename T>
+	concept IsPacketPtr = requires {
+		requires std::convertible_to<T, std::shared_ptr<Packet>>;
+		requires std::derived_from<typename T::element_type, Packet>;
 	};
 }

@@ -23,8 +23,8 @@ namespace Game3 {
 
 		RealmPtr realm = game->getRealm(village->getRealmID());
 		player->notifyOfRealm(*realm);
-		player->send(VillageUpdatePacket(*village));
-		player->send(OpenVillageTradePacket(villageID));
+		player->send(make<VillageUpdatePacket>(*village));
+		player->send(make<OpenVillageTradePacket>(villageID));
 
 		server_player->queueForMove([](const EntityPtr &entity, bool) {
 			safeDynamicCast<ServerPlayer>(entity)->unsubscribeVillages();

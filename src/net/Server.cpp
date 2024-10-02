@@ -207,13 +207,13 @@ namespace Game3 {
 		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
 		player->notifyOfRealm(*realm);
 		auto guard = client.bufferGuard();
-		client.send(EntityMoneyChangedPacket(*player));
-		client.send(SelfTeleportedPacket(realm->id, player->getPosition()));
-		client.send(TimePacket(game->time));
-		client.send(RecipeListPacket(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>()));
-		client.send(KnownItemsPacket(*player));
+		client.send(make<EntityMoneyChangedPacket>(*player));
+		client.send(make<SelfTeleportedPacket>(realm->id, player->getPosition()));
+		client.send(make<TimePacket>(game->time));
+		client.send(make<RecipeListPacket>(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>()));
+		client.send(make<KnownItemsPacket>(*player));
 		auto lock = game->players.sharedLock();
-		const EntityPacket packet(player);
+		const auto packet = make<EntityPacket>(player);
 		for (const auto &other_player: game->players) {
 			if (other_player != player) {
 				other_player->notifyOfRealm(*realm);

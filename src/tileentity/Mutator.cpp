@@ -128,7 +128,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(OpenModuleForAgentPacket(MutatorModule::ID(), getGID()));
+		player->send(make<OpenModuleForAgentPacket>(MutatorModule::ID(), getGID()));
 		FluidHoldingTileEntity::addObserver(player, true);
 		InventoriedTileEntity::addObserver(player, true);
 

@@ -91,8 +91,13 @@ namespace Game3 {
 		}
 	}
 
-	bool RemoteClient::send(const Packet &packet) {
-		if (!packet.valid) {
+	bool RemoteClient::send(const PacketPtr &packet) {
+		if (packet == nullptr) {
+			ERROR("Dropping null packet");
+			return false;
+		}
+
+		if (!packet->valid) {
 			WARN("Dropping invalid packet of type {}", DEMANGLE(packet));
 			return false;
 		}
@@ -103,10 +108,10 @@ namespace Game3 {
 		}
 
 		Buffer send_buffer{Side::Client};
-		packet.encode(*server.game, send_buffer);
+		packet->encode(*server.game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
-		const auto packet_id = toLittle(packet.getID());
+		const auto packet_id = toLittle(packet->getID());
 
 		std::span span = send_buffer.getSpan();
 		std::string to_send;
@@ -134,9 +139,9 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	requires (!std::derived_from<T, Packet>)
-	void RemoteClient::send(const T &value) {
-		server.send(*this, value);
+	requires (!IsPacketPtr<T>)
+	void RemoteClient::send(T value) {
+		server.send(*this, std::move(value));
 	}
 
 	void RemoteClient::startBuffering() {

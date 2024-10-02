@@ -87,10 +87,10 @@ namespace Game3 {
 			// });
 		}
 
-		std::optional<TimePacket> time_packet;
+		std::shared_ptr<TimePacket> time_packet;
 		timeSinceTimeUpdate += delta;
 		if (10. <= timeSinceTimeUpdate) {
-			time_packet.emplace(time);
+			time_packet = make<TimePacket>(time);
 			timeSinceTimeUpdate = 0.;
 		}
 
@@ -98,10 +98,10 @@ namespace Game3 {
 			player->ticked = false;
 
 			if (time_packet)
-				player->send(*time_packet);
+				player->send(time_packet);
 
 			if (player->inventoryUpdated) {
-				player->send(InventoryPacket(player->getInventory(0)));
+				player->send(make<InventoryPacket>(player->getInventory(0)));
 				player->inventoryUpdated = false;
 			}
 		}
@@ -152,11 +152,11 @@ namespace Game3 {
 	}
 
 	void ServerGame::broadcastTileUpdate(RealmID realm_id, Layer layer, const Position &position, TileID tile_id) {
-		broadcast({position, realms.at(realm_id), nullptr}, TileUpdatePacket(realm_id, layer, position, tile_id));
+		broadcast({position, realms.at(realm_id), nullptr}, make<TileUpdatePacket>(realm_id, layer, position, tile_id));
 	}
 
 	void ServerGame::broadcastFluidUpdate(RealmID realm_id, const Position &position, FluidTile tile) {
-		broadcast({position, realms.at(realm_id), nullptr}, FluidUpdatePacket(realm_id, position, tile));
+		broadcast({position, realms.at(realm_id), nullptr}, make<FluidUpdatePacket>(realm_id, position, tile));
 	}
 
 	void ServerGame::queuePacket(std::shared_ptr<RemoteClient> client, std::shared_ptr<Packet> packet) {
@@ -165,14 +165,14 @@ namespace Game3 {
 
 	void ServerGame::runCommand(RemoteClient &client, const std::string &command, GlobalID command_id) {
 		auto [success, message] = commandHelper(client, command);
-		client.send(CommandResultPacket(command_id, success, std::move(message)));
+		client.send(make<CommandResultPacket>(command_id, success, std::move(message)));
 	}
 
 	void ServerGame::entityChangingRealms(Entity &entity, const RealmPtr &new_realm, const Position &new_position) {
-		const EntityChangingRealmsPacket changing_packet(entity.getGID(), new_realm->id, new_position);
-		EntityMovedPacket moved_packet(entity);
-		moved_packet.arguments.position = new_position;
-		moved_packet.arguments.isTeleport = true;
+		const auto changing_packet = make<EntityChangingRealmsPacket>(entity.getGID(), new_realm->id, new_position);
+		const auto moved_packet = make<EntityMovedPacket>(entity);
+		moved_packet->arguments.position = new_position;
+		moved_packet->arguments.isTeleport = true;
 
 		auto lock = players.sharedLock();
 		for (const auto &player: players) {
@@ -187,12 +187,13 @@ namespace Game3 {
 		if (entity.spawning)
 			return;
 
-		EntityMovedPacket packet(entity);
-		packet.arguments.isTeleport = context.isTeleport;
+		const auto packet = make<EntityMovedPacket>(entity);
+		packet->arguments.isTeleport = context.isTeleport;
 
 		// Actual teleportation (rather than regular movement between adjacent tiles) should be instant.
-		if (context.isTeleport)
-			packet.arguments.adjustOffset = false;
+		if (context.isTeleport) {
+			packet->arguments.adjustOffset = false;
+		}
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
 			if (context.excludePlayer != cast_player->getGID())
@@ -213,7 +214,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
-		const DestroyEntityPacket packet(entity, false);
+		const auto packet = make<DestroyEntityPacket>(entity, false);
 		auto server = weakServer.lock();
 		assert(server);
 		auto &clients = server->getClients();
@@ -223,7 +224,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::tileEntitySpawned(const TileEntityPtr &tile_entity) {
-		const TileEntityPacket packet(tile_entity);
+		const auto packet = make<TileEntityPacket>(tile_entity);
 		auto realm = tile_entity->getRealm();
 		realm->updateNeighbors(tile_entity->getPosition(), Layer::Submerged);
 		realm->updateNeighbors(tile_entity->getPosition(), Layer::Objects);
@@ -238,7 +239,7 @@ namespace Game3 {
 	}
 
 	void ServerGame::tileEntityDestroyed(const TileEntity &tile_entity) {
-		const DestroyTileEntityPacket packet(tile_entity);
+		const auto packet = make<DestroyTileEntityPacket>(tile_entity);
 		auto server = weakServer.lock();
 		assert(server);
 		auto &clients = server->getClients();
@@ -279,7 +280,7 @@ namespace Game3 {
 		database->open(std::move(path));
 	}
 
-	void ServerGame::broadcast(const Packet &packet, bool include_non_players) {
+	void ServerGame::broadcast(const PacketPtr &packet, bool include_non_players) {
 		if (include_non_players) {
 			std::shared_ptr<Server> server = getServer();
 			auto &clients = server->getClients();
@@ -373,7 +374,7 @@ namespace Game3 {
 					message.remove_prefix(1);
 
 				INFO("[{}] {}", player->username, message);
-				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
+				broadcast(make<ChatMessageSentPacket>(player->getGID(), std::string(message)), true);
 				return {true, ""};
 			}
 
@@ -564,7 +565,7 @@ namespace Game3 {
 			if (first == "say") {
 				std::string_view message = std::string_view(command).substr(first.size() + 1);
 				INFO("[{}] {}", player->username, message);
-				broadcast(ChatMessageSentPacket{player->getGID(), std::string(message)}, true);
+				broadcast(make<ChatMessageSentPacket>(player->getGID(), std::string(message)), true);
 				return {true, ""};
 			}
 

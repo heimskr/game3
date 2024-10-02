@@ -651,12 +651,12 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_LEFT_BRACKET) {
-					player->send(SetHeldItemPacket(true, player->getActiveSlot()));
+					player->send(make<SetHeldItemPacket>(true, player->getActiveSlot()));
 					return;
 				}
 
 				if (key == GLFW_KEY_RIGHT_BRACKET) {
-					player->send(SetHeldItemPacket(false, player->getActiveSlot()));
+					player->send(make<SetHeldItemPacket>(false, player->getActiveSlot()));
 					return;
 				}
 
@@ -669,7 +669,7 @@ namespace Game3 {
 			if (action == GLFW_PRESS) {
 				if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
 					if (player->isMoving()) {
-						player->send(ContinuousInteractionPacket(player->continuousInteractionModifiers));
+						player->send(make<ContinuousInteractionPacket>(player->continuousInteractionModifiers));
 					}
 					return;
 				}
@@ -1011,7 +1011,7 @@ namespace Game3 {
 		if (std::optional<Token> token = client->getToken(hostname, settings.username)) {
 			queueBool([client, token, hostname, username = settings.username](Window &window) {
 				if (window.game && client && client->isReady()) {
-					client->send(LoginPacket(username, *token));
+					client->send(make<LoginPacket>(username, *token));
 					return true;
 				}
 
@@ -1100,7 +1100,7 @@ namespace Game3 {
 					auto dialog = std::make_shared<LoginDialog>(uiContext);
 
 					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
-						client->send(LoginPacket(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
+						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
 					});
 
 					dialog->signalDismiss.connect([this] {

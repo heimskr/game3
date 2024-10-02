@@ -10,13 +10,13 @@
 namespace Game3 {
 	void AgentMessagePacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		if (!Agent::validateGID(globalID)) {
-			client.send(ErrorPacket("Can't send message to agent: invalid GID"));
+			client.send(make<ErrorPacket>("Can't send message to agent: invalid GID"));
 			return;
 		}
 
 		AgentPtr destination = game->getAgent(globalID);
 		if (!destination) {
-			client.send(ErrorPacket("Can't send message to agent: agent not found"));
+			client.send(make<ErrorPacket>("Can't send message to agent: agent not found"));
 			return;
 		}
 

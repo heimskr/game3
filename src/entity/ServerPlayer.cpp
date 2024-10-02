@@ -92,7 +92,7 @@ namespace Game3 {
 
 		RealmPtr realm = entity->getRealm();
 		client->getPlayer()->notifyOfRealm(*realm);
-		client->send(EntityPacket(entity));
+		client->send(make<EntityPacket>(entity));
 
 		{
 			auto lock = knownEntities.uniqueLock();
@@ -126,7 +126,7 @@ namespace Game3 {
 	void ServerPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		assert(source);
 		if (auto *buffer = std::any_cast<Buffer>(&data))
-			send(AgentMessagePacket(source->getGID(), name, std::move(*buffer)));
+			send(make<AgentMessagePacket>(source->getGID(), name, std::move(*buffer)));
 		else
 			throw std::runtime_error("Expected data to be a Buffer in ServerPlayer::handleMessage");
 	}
@@ -141,7 +141,7 @@ namespace Game3 {
 					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
 						// INFO("Late sending EntitySetPathPacket (Player)");
 						toServer()->ensureEntity(visible);
-						send(EntitySetPathPacket(*visible));
+						send(make<EntitySetPathPacket>(*visible));
 						visible->setSeenPath(shared);
 					}
 
@@ -196,7 +196,7 @@ namespace Game3 {
 
 	void ServerPlayer::broadcastMoney() {
 		Entity::broadcastMoney();
-		send(EntityMoneyChangedPacket(*this));
+		send(make<EntityMoneyChangedPacket>(*this));
 	}
 
 	void ServerPlayer::kill() {
@@ -246,6 +246,6 @@ namespace Game3 {
 	}
 
 	void ServerPlayer::showText(const UString &text, const UString &name) {
-		send(DisplayTextPacket(name.raw(), text.raw(), true));
+		send(make<DisplayTextPacket>(name.raw(), text.raw(), true));
 	}
 }

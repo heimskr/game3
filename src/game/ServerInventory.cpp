@@ -279,7 +279,7 @@ namespace Game3 {
 		auto owner = getOwner();
 		auto player = safeDynamicCast<Player>(owner);
 		activeSlot = new_active;
-		player->send(SetActiveSlotPacket(new_active));
+		player->send(make<SetActiveSlotPacket>(new_active));
 		notifyOwner({});
 	}
 

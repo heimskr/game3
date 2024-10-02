@@ -49,7 +49,7 @@ namespace Game3 {
 				if (text[0] == '/') {
 					game->runCommand(text.raw().substr(1));
 				} else {
-					game->getClient()->send(SendChatMessagePacket(text.raw()));
+					game->getClient()->send(make<SendChatMessagePacket>(text.raw()));
 				}
 
 				input.clear();

@@ -56,7 +56,7 @@ namespace Game3 {
 	void TileEntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
-			client.send(ErrorPacket("Invalid realm"));
+			client.send(make<ErrorPacket>("Invalid realm"));
 			return;
 		}
 
@@ -69,7 +69,7 @@ namespace Game3 {
 			if (auto iter = realm->tileEntitiesByGID.find(tile_entity_id); iter != realm->tileEntitiesByGID.end())
 				iter->second->sendTo(client, threshold);
 			else
-				client.send(DestroyTileEntityPacket(tile_entity_id));
+				client.send(make<DestroyTileEntityPacket>(tile_entity_id));
 		}
 	}
 }

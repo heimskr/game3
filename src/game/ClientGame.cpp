@@ -60,9 +60,9 @@ namespace Game3 {
 		auto client = getClient();
 
 		if (button == LEFT_BUTTON)
-			client->send(ClickPacket(translated, fractional_x, fractional_y, modifiers));
+			client->send(make<ClickPacket>(translated, fractional_x, fractional_y, modifiers));
 		else if (button == RIGHT_BUTTON && getPlayer() && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
-			client->send(TeleportSelfPacket(realm->id, translated));
+			client->send(make<TeleportSelfPacket>(realm->id, translated));
 	}
 
 	void ClientGame::dragStart(double x, double y, Modifiers modifiers) {
@@ -70,7 +70,7 @@ namespace Game3 {
 			return;
 		Position position = translateCanvasCoordinates(x, y);
 		lastDragPosition = position;
-		getClient()->send(DragPacket(DragPacket::Action::Start, position, modifiers));
+		getClient()->send(make<DragPacket>(DragPacket::Action::Start, position, modifiers));
 	}
 
 	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
@@ -79,7 +79,7 @@ namespace Game3 {
 		Position position = translateCanvasCoordinates(x, y);
 		if (lastDragPosition && *lastDragPosition != position) {
 			lastDragPosition = position;
-			getClient()->send(DragPacket(DragPacket::Action::Update, position, modifiers));
+			getClient()->send(make<DragPacket>(DragPacket::Action::Update, position, modifiers));
 		}
 	}
 
@@ -89,7 +89,7 @@ namespace Game3 {
 		if (lastDragPosition) {
 			Position position = translateCanvasCoordinates(x, y);
 			lastDragPosition.reset();
-			getClient()->send(DragPacket(DragPacket::Action::End, position, modifiers));
+			getClient()->send(make<DragPacket>(DragPacket::Action::End, position, modifiers));
 		}
 	}
 
@@ -159,7 +159,7 @@ namespace Game3 {
 			command->pieces = std::move(pieces);
 			(*command)(*getClient());
 		} else {
-			getClient()->send(CommandPacket(threadContext.rng(), command));
+			getClient()->send(make<CommandPacket>(threadContext.rng(), command));
 		}
 	}
 
@@ -203,7 +203,7 @@ namespace Game3 {
 				missingChunks = std::move(new_missing_chunks);
 				missing_chunks_lock.lock();
 				if (!missingChunks.empty())
-					getClient()->send(ChunkRequestPacket(*realm, missingChunks, true));
+					getClient()->send(make<ChunkRequestPacket>(*realm, missingChunks, true));
 			}
 		} else {
 			WARN("No realm");
@@ -225,7 +225,7 @@ namespace Game3 {
 		if (ClientPlayerPtr player = getPlayer()) {
 			auto client = getClient();
 			assert(client);
-			client->send(InteractPacket(true, hand, modifiers, {}, player->direction));
+			client->send(make<InteractPacket>(true, hand, modifiers, std::nullopt, player->direction));
 		}
 	}
 
@@ -233,7 +233,7 @@ namespace Game3 {
 		if (ClientPlayerPtr player = getPlayer()) {
 			auto client = getClient();
 			assert(client);
-			client->send(InteractPacket(false, hand, modifiers, {}, player->direction));
+			client->send(make<InteractPacket>(false, hand, modifiers, std::nullopt, player->direction));
 		}
 	}
 
@@ -256,7 +256,7 @@ namespace Game3 {
 			// Safe in the sense that we aren't erasing something we shouldn't erase.
 			entityLimbo.erase(iter);
 			lock.unlock();
-			getPlayer()->send(EntityRequestPacket(realm_id, std::move(requests)));
+			getPlayer()->send(make<EntityRequestPacket>(realm_id, std::move(requests)));
 		}
 	}
 

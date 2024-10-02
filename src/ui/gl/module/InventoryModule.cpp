@@ -134,7 +134,7 @@ namespace Game3 {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget != dragged && widget->contains(x, y)) {
 				ClientPlayerPtr player = ui.getPlayer();
-				player->send(MoveSlotsPacket(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
+				player->send(make<MoveSlotsPacket>(dragged->getOwnerGID(), widget->getOwnerGID(), dragged->getSlot(), widget->getSlot(), dragged->getInventory()->index, widget->getInventory()->index));
 				ui.setDraggedWidget(nullptr);
 				break;
 			}

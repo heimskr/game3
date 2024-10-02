@@ -10,12 +10,12 @@ namespace Game3 {
 	void TilesetRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
 		RealmPtr realm = game->getRealm(realmID);
 		if (!realm) {
-			client.send(ErrorPacket("Invalid realm ID"));
+			client.send(make<ErrorPacket>("Invalid realm ID"));
 			return;
 		}
 
 		Tileset &tileset = realm->getTileset();
 		const auto &names = tileset.getNames();
-		client.send(TilesetResponsePacket(realmID, {names.begin(), names.end()}));
+		client.send(make<TilesetResponsePacket>(realmID, std::map{names.begin(), names.end()}));
 	}
 }

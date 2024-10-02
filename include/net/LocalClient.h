@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Options.h"
-#include "types/Types.h"
 #include "net/Buffer.h"
+#include "packet/Packet.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "threading/Waiter.h"
+#include "types/Types.h"
 #include "util/Math.h"
 
 #include <asio.hpp>
@@ -24,7 +25,6 @@
 
 namespace Game3 {
 	class ClientGame;
-	class Packet;
 
 	class LocalClient: public std::enable_shared_from_this<LocalClient> {
 		public:
@@ -41,11 +41,12 @@ namespace Game3 {
 
 			LocalClient();
 
-			~LocalClient();
+			virtual ~LocalClient();
+
+			virtual void send(const PacketPtr &);
 
 			void connect(std::string_view hostname, uint16_t port);
 			void read();
-			void send(const Packet &);
 			bool isConnected() const;
 			std::shared_ptr<ClientGame> getGame() const;
 			void setToken(const std::string &hostname, const std::string &username, Token);
@@ -107,7 +108,7 @@ namespace Game3 {
 
 			void printHeaderBytes() const;
 
-			friend struct UsageCommand;
+		friend struct UsageCommand;
 	};
 
 	using LocalClientPtr = std::shared_ptr<LocalClient>;

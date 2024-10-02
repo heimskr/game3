@@ -335,9 +335,9 @@ namespace Game3 {
 
 		private:
 			struct ChunkPackets {
-				ChunkTilesPacket tilePacket;
-				std::vector<EntityPacket> entityPackets;
-				std::vector<TileEntityPacket> tileEntityPackets;
+				std::shared_ptr<ChunkTilesPacket> tilePacket;
+				std::vector<std::shared_ptr<EntityPacket>> entityPackets;
+				std::vector<std::shared_ptr<TileEntityPacket>> tileEntityPackets;
 			};
 
 			std::weak_ptr<Game> weakGame;

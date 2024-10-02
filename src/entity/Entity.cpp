@@ -291,7 +291,7 @@ namespace Game3 {
 		GamePtr game = getGame();
 
 		if (game->getSide() == Side::Server)
-			game->toServer().broadcast(EntityRiddenPacket(rider, *this));
+			game->toServer().broadcast(make<EntityRiddenPacket>(rider, *this));
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
@@ -842,7 +842,7 @@ namespace Game3 {
 		if (out == PathResult::Success && getSide() == Side::Server) {
 			increaseUpdateCounter();
 			auto shared = getSelf();
-			const EntitySetPathPacket packet(*this);
+			const auto packet = make<EntitySetPathPacket>(*this);
 			auto lock = visiblePlayers.sharedLock();
 			for (const auto &weak_player: visiblePlayers) {
 				if (auto player = weak_player.lock()) {
@@ -1046,7 +1046,7 @@ namespace Game3 {
 
 			if (!visiblePlayers.empty()) {
 				auto shared = getSelf();
-				const EntitySetPathPacket packet(*this);
+				const auto packet = make<EntitySetPathPacket>(*this);
 				for (const auto &weak_player: visiblePlayers) {
 					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
 						// INFO("Late sending EntitySetPathPacket (Entity)");
@@ -1161,7 +1161,7 @@ namespace Game3 {
 		if (visiblePlayers.empty())
 			return;
 
-		EntityMoneyChangedPacket packet(*this);
+		const auto packet = make<EntityMoneyChangedPacket>(*this);
 		for (const auto &weak_player: visiblePlayers)
 			if (PlayerPtr player = weak_player.lock())
 				player->send(packet);
@@ -1171,7 +1171,7 @@ namespace Game3 {
 		if (threshold == 0 || getUpdateCounter() < threshold) {
 			RealmPtr realm = getRealm();
 			client.getPlayer()->notifyOfRealm(*realm);
-			client.send(EntityPacket(getSelf()));
+			client.send(make<EntityPacket>(getSelf()));
 			onSend(client.getPlayer());
 		}
 	}
@@ -1189,7 +1189,7 @@ namespace Game3 {
 
 		if (!is_client) {
 			if (RealmPtr realm = weakRealm.lock()) {
-				game->toServer().broadcast({position, realm, nullptr}, HeldItemSetPacket(realm->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
+				game->toServer().broadcast(Place{position, realm, nullptr}, make<HeldItemSetPacket>(realm->id, getGID(), held.isLeft, new_value, increaseUpdateCounter()));
 			}
 		}
 

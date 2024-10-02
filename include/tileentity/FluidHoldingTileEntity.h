@@ -42,6 +42,6 @@ namespace Game3 {
 			using HasFluids::canInsertFluid;
 			using HasFluids::addFluid;
 			using HasFluids::fluidInsertable;
-			void broadcast(const TileEntityPacket &);
+			void broadcast(const std::shared_ptr<TileEntityPacket> &);
 	};
 }

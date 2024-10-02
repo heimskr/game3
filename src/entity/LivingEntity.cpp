@@ -123,7 +123,7 @@ namespace Game3 {
 				kill();
 			} else {
 				GamePtr game = getGame();
-				game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+				game->toServer().broadcast(make<LivingEntityHealthChangedPacket>(*this));
 			}
 		}
 
@@ -169,7 +169,7 @@ namespace Game3 {
 		}
 
 		GamePtr game = realm->getGame();
-		game->toServer().broadcast(LivingEntityHealthChangedPacket(*this));
+		game->toServer().broadcast(make<LivingEntityHealthChangedPacket>(*this));
 		return false;
 	}
 

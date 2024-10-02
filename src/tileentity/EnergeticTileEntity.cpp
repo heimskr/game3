@@ -51,10 +51,10 @@ namespace Game3 {
 	void EnergeticTileEntity::addObserver(const PlayerPtr &player, bool silent) {
 		Observable::addObserver(player, silent);
 
-		player->send(TileEntityPacket(getSelf()));
+		player->send(make<TileEntityPacket>(getSelf()));
 
 		if (!silent)
-			player->send(OpenModuleForAgentPacket(EnergyModule::ID(), getGID(), true));
+			player->send(make<OpenModuleForAgentPacket>(EnergyModule::ID(), getGID(), true));
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())
@@ -101,17 +101,17 @@ namespace Game3 {
 			broadcast(makeEnergyPacket());
 	}
 
-	SetTileEntityEnergyPacket EnergeticTileEntity::makeEnergyPacket() const {
+	std::shared_ptr<SetTileEntityEnergyPacket> EnergeticTileEntity::makeEnergyPacket() const {
 		const GlobalID gid = getGID();
 		EnergyAmount energy{};
 		{
 			auto lock = energyContainer->sharedLock();
 			energy = energyContainer->energy;
 		}
-		return {gid, energy};
+		return make<SetTileEntityEnergyPacket>(gid, energy);
 	}
 
-	void EnergeticTileEntity::broadcast(const SetTileEntityEnergyPacket &packet) {
+	void EnergeticTileEntity::broadcast(const std::shared_ptr<SetTileEntityEnergyPacket> &packet) {
 		assert(getSide() == Side::Server);
 		auto lock = observers.uniqueLock();
 
