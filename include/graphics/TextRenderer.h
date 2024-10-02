@@ -70,7 +70,7 @@ namespace Game3 {
 			float textWidth(const UString &text, float scale = 1.f) const;
 			float textHeight(const UString &text, float scale = 1.f) const;
 			float textHeight(const UString &text, float scale, float wrap_width) const;
-			float getIHeight(float scale) const;
+			float getIHeight() const;
 
 			void reset();
 			void initRenderData();
@@ -93,6 +93,7 @@ namespace Game3 {
 			GLuint vao = 0;
 			GLuint vbo = 0;
 			bool initialized = false;
+			mutable std::optional<float> cachedIHeight;
 
 			glm::mat4 projection;
 

@@ -191,7 +191,7 @@ namespace Game3 {
 	}
 
 	float Button::getTextScale(const RendererContext &renderers, float height) const {
-		return height / renderers.text.getIHeight(scale / 8);
+		return height / (renderers.text.getIHeight() * scale / 8);
 	}
 
 	void Button::setColors(Color top, Color bottom, Color text_color) {

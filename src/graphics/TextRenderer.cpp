@@ -306,13 +306,13 @@ namespace Game3 {
 
 			// Update VBO for each character
 			const float vertices[6][4] = {
-				{xpos,     ypos + h, 0.0f, 0.0f},
-				{xpos,     ypos,     0.0f, 1.0f},
-				{xpos + w, ypos,     1.0f, 1.0f},
+				{xpos,     ypos + h, 0, 0},
+				{xpos,     ypos,     0, 1},
+				{xpos + w, ypos,     1, 1},
 
-				{xpos,     ypos + h, 0.0f, 0.0f},
-				{xpos + w, ypos,     1.0f, 1.0f},
-				{xpos + w, ypos + h, 1.0f, 0.0f}
+				{xpos,     ypos + h, 0, 0},
+				{xpos + w, ypos,     1, 1},
+				{xpos + w, ypos + h, 1, 0}
 			};
 
 			// Render glyph texture over quad
@@ -358,7 +358,7 @@ namespace Game3 {
 	}
 
 	float TextRenderer::textHeight(const UString &text, float scale, float wrap_width) const {
-		const auto i_height = getCharacter('I').size.y * scale;
+		const auto i_height = getIHeight() * scale;
 		float x = 0;
 		float y = 0;
 
@@ -392,8 +392,12 @@ namespace Game3 {
 		return -y + highest_on_first_line;
 	}
 
-	float TextRenderer::getIHeight(float scale) const {
-		return getCharacter('I').size.y * scale;
+	float TextRenderer::getIHeight() const {
+		if (cachedIHeight) {
+			return *cachedIHeight;
+		}
+
+		return cachedIHeight.emplace(getCharacter('I').size.y);
 	}
 
 	const TextRenderer::Character & TextRenderer::getCharacter(uint32_t ch) const {
