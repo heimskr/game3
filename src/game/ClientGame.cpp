@@ -173,7 +173,7 @@ namespace Game3 {
 			garbageCollect();
 		}
 
-#ifndef USE_SSL
+#ifndef USE_TLS
 		getClient()->read();
 #endif
 

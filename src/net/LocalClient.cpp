@@ -14,7 +14,7 @@
 #include <fstream>
 
 namespace Game3 {
-#ifdef USE_SSL
+#ifdef USE_TLS
 	namespace {
 		asio::ssl::context makeSSLContext() {
 			asio::ssl::context context(asio::ssl::context::tls_client);
@@ -45,7 +45,7 @@ namespace Game3 {
 
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
 		assert(!isReady());
-#ifdef USE_SSL
+#ifdef USE_TLS
 		asio::io_service io_service;
 		asio::ip::tcp::resolver resolver(io_service);
 
@@ -91,7 +91,7 @@ namespace Game3 {
 			if (ClientGamePtr game = getGame())
 				buffer.context = game;
 
-#ifndef USE_SSL
+#ifndef USE_TLS
 		assert(!reading.exchange(true));
 		const auto byte_count = sock->recv(array.data(), array.size());
 		handleInput(std::string_view(array.data(), byte_count));
@@ -119,7 +119,7 @@ namespace Game3 {
 	}
 
 	bool LocalClient::isConnected() const {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		return sslReady;
 #else
 		return sock->isConnected();
@@ -161,7 +161,7 @@ namespace Game3 {
 	}
 
 	bool LocalClient::hasHostname() const {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		return isConnected();
 #else
 		return sock && !sock->hostname.empty();
@@ -169,7 +169,7 @@ namespace Game3 {
 	}
 
 	const std::string & LocalClient::getHostname() const {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		if (!isConnected())
 			throw std::runtime_error("Client not connected");
 		return lastHostname;
@@ -181,7 +181,7 @@ namespace Game3 {
 	}
 
 	void LocalClient::setBuffering(bool new_value) {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		(void) new_value;
 #else
 		assert(sock);
@@ -193,7 +193,7 @@ namespace Game3 {
 	}
 
 	bool LocalClient::isReady() const {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		return isConnected();
 #else
 		return sock->isReady();
@@ -208,7 +208,7 @@ namespace Game3 {
 		}
 	}
 
-#ifdef USE_SSL
+#ifdef USE_TLS
 	void LocalClient::write() {
 		assert(isReady());
 		std::string message;
@@ -244,7 +244,7 @@ namespace Game3 {
 #endif
 
 	void LocalClient::send(const void *data, std::size_t size, bool force) {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		(void) force;
 		{
 			auto lock = outbox.uniqueLock();
@@ -259,7 +259,7 @@ namespace Game3 {
 	}
 
 	void LocalClient::send(std::string message, bool force) {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		(void) force;
 		{
 			auto lock = outbox.uniqueLock();
@@ -274,7 +274,7 @@ namespace Game3 {
 	}
 
 	void LocalClient::close() {
-#ifdef USE_SSL
+#ifdef USE_TLS
 		if (isReady()) {
 			sslSock.shutdown();
 			sslReady = false;
@@ -287,7 +287,7 @@ namespace Game3 {
 #endif
 	}
 
-#ifdef USE_SSL
+#ifdef USE_TLS
 	void LocalClient::doRead() {
 		asio::post(strand, [this, shared = shared_from_this()] {
 			if (!isReady()) {

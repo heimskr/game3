@@ -73,7 +73,7 @@ namespace Game3 {
 			std::mutex packetMutex;
 			std::atomic_bool reading = false;
 			MTQueue<std::function<void()>> connectionActions;
-#ifdef USE_SSL
+#ifdef USE_TLS
 			asio::io_context ioContext;
 			asio::ssl::context sslContext;
 			asio::executor_work_guard<asio::io_context::executor_type> workGuard;

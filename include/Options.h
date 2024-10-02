@@ -1,7 +1,6 @@
 #pragma once
 
-#define USE_SSL
-#define HIDE_SOCK
+#define USE_TLS
 
 namespace {
 	constexpr bool SHOW_FPS_EVERY_FRAME = true;
