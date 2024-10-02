@@ -198,15 +198,6 @@ namespace Game3 {
 			applySetting(&ClientSettings::logLevel, value);
 		});
 
-		auto divisor_slider = add_slider("Size Divisor");
-		divisor_slider->setRange(-.5, 4);
-		divisor_slider->setStep(.1);
-		divisor_slider->setValue(settings.sizeDivisor);
-		divisor_slider->setDisplayDigits(1);
-		divisor_slider->onValueUpdate.connect([this](Slider &, double value) {
-			applySetting(&ClientSettings::sizeDivisor, value);
-		});
-
 		auto frequency_slider = add_slider("Tick Frequency");
 		frequency_slider->setRange(1, 240);
 		frequency_slider->setStep(1);

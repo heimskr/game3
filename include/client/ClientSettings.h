@@ -20,7 +20,6 @@ namespace Game3 {
 		uint16_t port = 12255;
 		std::string username;
 		bool alertOnConnection = true;
-		double sizeDivisor = 1.0;
 		Tick tickFrequency = DEFAULT_CLIENT_TICK_FREQUENCY;
 		bool renderLighting = false;
 		bool hideTimers = true;

@@ -46,7 +46,5 @@ namespace Game3 {
 			std::unique_ptr<InventoryGetter> inventoryGetter;
 			Slot previousActive = -1;
 			float topPadding = 0;
-
-			static std::shared_ptr<ClientInventory> getInventory(const std::any &);
 	};
 }

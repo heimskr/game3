@@ -35,6 +35,8 @@ namespace Game3 {
 		for (const TabPtr &tab: tabs) {
 			tab->init();
 		}
+
+		activeTab->onFocus();
 	}
 
 	void OmniDialog::render(const RendererContext &renderers) {
@@ -160,6 +162,7 @@ namespace Game3 {
 					if (clicked_tab != activeTab) {
 						activeTab->onBlur();
 						activeTab = clicked_tab;
+						activeTab->onFocus();
 					}
 					return true;
 				}

@@ -18,15 +18,16 @@ namespace Game3 {
 		assert(place.realm->isClient());
 		const size_t tile_size = place.realm->getTileset().getTileSize();
 		const float radius = 64 * tile_size;
-		const int factor = context.factor;
+		const float x_factor = 1;
+		const float y_factor = 1;
 
 		const ChunkPosition chunk = place.player->getChunk() - ChunkPosition(1, 1);
 		auto [top, left] = place.position - chunk.topLeft();
 
-		left *= tile_size * factor;
-		left += 8 * factor;
-		top  *= tile_size * factor;
-		top  += 8 * factor;
+		left *= tile_size * x_factor;
+		left += 8 * x_factor;
+		top  *= tile_size * y_factor;
+		top  += 8 * y_factor;
 
 		context.circle.drawOnScreen(Color{1, 1, 0.5, 1}, left, top, radius, radius, 0.2);
 	}

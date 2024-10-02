@@ -18,21 +18,12 @@ namespace {
 }
 
 namespace Game3 {
-	namespace {
-		std::shared_ptr<InventoryModule> makePlayerInventoryModule(UIContext &ui) {
-			if (ClientPlayerPtr player = ui.getPlayer())
-				return std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
-
-			return std::make_shared<InventoryModule>(ui, std::shared_ptr<ClientInventory>{});
-		}
-	}
-
 	InventoryTab::InventoryTab(UIContext &ui):
 		Tab(ui) {}
 
 	void InventoryTab::init() {
 		assert(!playerInventoryModule);
-		playerInventoryModule = makePlayerInventoryModule(ui);
+		playerInventoryModule = ui.makePlayerInventoryModule();
 		playerInventoryModule->setTopPadding(SLOT_PADDING);
 		playerInventoryModule->init();
 

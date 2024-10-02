@@ -13,14 +13,15 @@
 #include <vector>
 
 namespace Game3 {
-	class Window;
+	class AutocompleteDropdown;
 	class ClientGame;
 	class ClientPlayer;
 	class ContextMenu;
-	class AutocompleteDropdown;
 	class Hotbar;
+	class InventoryModule;
 	class Texture;
 	class Tooltip;
+	class Window;
 	struct RendererContext;
 
 	class UIContext {
@@ -77,9 +78,9 @@ namespace Game3 {
 			void removeDialog(const DialogPtr &);
 			void addDialog(DialogPtr);
 			const std::optional<std::pair<int, int>> & getDragOrigin() const;
-
 			std::shared_ptr<ContextMenu> getContextMenu() const;
 			std::shared_ptr<Hotbar> getHotbar() const;
+			std::shared_ptr<InventoryModule> makePlayerInventoryModule();
 
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});

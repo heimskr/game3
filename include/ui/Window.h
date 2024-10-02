@@ -44,7 +44,8 @@ namespace Game3 {
 			std::pair<double, double> center{0, 0};
 			double scale{};
 			float magic = 8;
-			double sizeDivisor = 1.0;
+			float xScale = 1.0;
+			float yScale = 1.0;
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
 			UIContext uiContext{*this};
@@ -73,7 +74,8 @@ namespace Game3 {
 			int getWidth() const;
 			int getHeight() const;
 			std::pair<int, int> getDimensions() const;
-			int getFactor() const;
+			float getXFactor() const;
+			float getYFactor() const;
 			int getMouseX() const;
 			int getMouseY() const;
 			std::pair<double, double> getMouseCoordinates() const;
@@ -138,6 +140,7 @@ namespace Game3 {
 			void mouseButtonCallback(int button, int action, int mods);
 			void mousePositionCallback(int x, int y);
 			void scrollCallback(double x_delta, double y_delta);
+			void contentScaleCallback(float x_scale, float y_scale);
 			void onGameLoaded();
 			void autoConnect();
 			void continueLocalConnection();

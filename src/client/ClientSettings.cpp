@@ -8,7 +8,6 @@
 
 namespace Game3 {
 	void ClientSettings::apply(ClientGame &game) const {
-		game.getWindow()->sizeDivisor = sizeDivisor;
 		apply();
 	}
 
@@ -26,8 +25,6 @@ namespace Game3 {
 			settings.username = *iter;
 		if (auto iter = json.find("alertOnConnection"); iter != json.end())
 			settings.alertOnConnection = *iter;
-		if (auto iter = json.find("sizeDivisor"); iter != json.end())
-			settings.sizeDivisor = *iter;
 		if (auto iter = json.find("tickFrequency"); iter != json.end())
 			settings.tickFrequency = *iter;
 		if (auto iter = json.find("renderLighting"); iter != json.end())
@@ -44,7 +41,6 @@ namespace Game3 {
 		if (!settings.username.empty())
 			json["username"] = settings.username;
 		json["alertOnConnection"] = settings.alertOnConnection;
-		json["sizeDivisor"] = settings.sizeDivisor;
 		json["tickFrequency"] = settings.tickFrequency;
 		json["renderLighting"] = settings.renderLighting;
 		json["hideTimers"] = settings.hideTimers;

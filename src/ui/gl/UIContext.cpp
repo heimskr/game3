@@ -1,14 +1,17 @@
 #include "Options.h"
+#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "types/Types.h"
+#include "ui/gl/dialog/Dialog.h"
+#include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
-#include "ui/gl/dialog/Dialog.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
@@ -26,13 +29,14 @@ namespace Game3 {
 	void UIContext::render(float mouse_x, float mouse_y) {
 		RendererContext context = window.getRendererContext();
 
-		const int factor = window.getFactor();
+		const int x_factor = window.getXFactor();
+		const int y_factor = window.getYFactor();
 
 		if (ClientGamePtr game = getGame(); game != nullptr && game->getActiveRealm() != nullptr) {
 			if (std::ranges::none_of(dialogs, +[](const DialogPtr &dialog) { return dialog->hidesHotbar(); })) {
 				scissorStack = internalScissorStack;
 				constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-				hotbar->render(context, (window.getWidth() * factor - width) / 2, window.getHeight() * factor - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
+				hotbar->render(context, (window.getWidth() - width) / 2, window.getHeight() - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 			}
 		}
 
@@ -53,17 +57,17 @@ namespace Game3 {
 
 		if (tooltip) {
 			// The tooltip knows its size but needs to be told its position.
-			tooltip->render(context, mouse_x * factor, mouse_y * factor, -1, -1);
+			tooltip->render(context, mouse_x * x_factor, mouse_y * y_factor, -1, -1);
 		}
 
 		if (draggedWidget && draggedWidgetActive) {
 			scissorStack = internalScissorStack;
-			const int width = window.getWidth() * factor;
-			const int height = window.getHeight() * factor;
+			const int width = window.getWidth();
+			const int height = window.getHeight();
 			GL::Viewport(0, 0, width, height);
 			context.updateSize(width, height);
 			renderingDraggedWidget = true;
-			draggedWidget->render(context, mouse_x * factor, mouse_y * factor, -1, -1);
+			draggedWidget->render(context, mouse_x * x_factor, mouse_y * y_factor, -1, -1);
 			renderingDraggedWidget = false;
 		}
 	}
@@ -374,8 +378,7 @@ namespace Game3 {
 
 	std::pair<double, double> UIContext::getAbsoluteMouseCoordinates() const {
 		const auto [x, y] = window.getMouseCoordinates();
-		const auto factor = window.getFactor();
-		return {x * factor, y * factor};
+		return {x * window.getXFactor(), y * window.getYFactor()};
 	}
 
 	std::pair<double, double> UIContext::getRelativeMouseCoordinates() const {
@@ -442,6 +445,13 @@ namespace Game3 {
 
 	std::shared_ptr<Hotbar> UIContext::getHotbar() const {
 		return hotbar;
+	}
+
+	std::shared_ptr<InventoryModule> UIContext::makePlayerInventoryModule() {
+		if (ClientPlayerPtr player = getPlayer())
+			return std::make_shared<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+
+		return std::make_shared<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {

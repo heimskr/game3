@@ -96,6 +96,12 @@ namespace Game3 {
 				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->scrollCallback(x, y);
 			});
 
+			glfwSetWindowContentScaleCallback(glfwWindow, +[](GLFWwindow *glfw_window, float x_scale, float y_scale) {
+				reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window))->contentScaleCallback(x_scale, y_scale);
+			});
+
+			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
+
 			if (std::filesystem::exists("settings.json"))
 				settings = nlohmann::json::parse(readFile("settings.json"));
 
@@ -127,41 +133,45 @@ namespace Game3 {
 	int Window::getWidth() const {
 		int width{};
 		glfwGetWindowSize(glfwWindow, &width, nullptr);
-		return width;
+		return width * xScale;
 	}
 
 	int Window::getHeight() const {
 		int height{};
 		glfwGetWindowSize(glfwWindow, nullptr, &height);
-		return height;
+		return height * yScale;
 	}
 
 	std::pair<int, int> Window::getDimensions() const {
 		int width{}, height{};
 		glfwGetWindowSize(glfwWindow, &width, &height);
-		return {width, height};
+		return {static_cast<int>(width * xScale), static_cast<int>(height * yScale)};
 	}
 
-	int Window::getFactor() const {
-		return 1;
+	float Window::getXFactor() const {
+		return xScale;
+	}
+
+	float Window::getYFactor() const {
+		return yScale;
 	}
 
 	int Window::getMouseX() const {
 		double x{};
 		glfwGetCursorPos(glfwWindow, &x, nullptr);
-		return static_cast<int>(std::floor(x));
+		return static_cast<int>(std::floor(x * xScale));
 	}
 
 	int Window::getMouseY() const {
 		double y{};
 		glfwGetCursorPos(glfwWindow, nullptr, &y);
-		return static_cast<int>(std::floor(y));
+		return static_cast<int>(std::floor(y * yScale));
 	}
 
 	std::pair<double, double> Window::getMouseCoordinates() const {
 		double x{}, y{};
 		glfwGetCursorPos(glfwWindow, &x, &y);
-		return {x, y};
+		return {x * xScale, y * yScale};
 	}
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
@@ -310,12 +320,12 @@ namespace Game3 {
 	}
 
 	RendererContext Window::getRendererContext() {
-		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, recolor, settings, getFactor()};
+		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, recolor, settings, getXFactor(), getYFactor()};
 	}
 
 	void Window::tick() {
-		int width{}, height{};
-		glfwGetWindowSize(glfwWindow, &width, &height);
+		const auto [width, height] = getDimensions();
+
 		if (width != lastWindowSize.first || height != lastWindowSize.second) {
 			uiContext.onResize(width, height);
 			lastWindowSize = {width, height};
@@ -343,9 +353,10 @@ namespace Game3 {
 	}
 
 	void Window::drawGL() {
-		const int factor = getFactor();
-		int width  = getWidth()  * factor;
-		int height = getHeight() * factor;
+		const float x_factor = getXFactor();
+		const float y_factor = getYFactor();
+		int width  = getWidth();
+		int height = getHeight();
 
 		activateContext();
 		batchSpriteRenderer.update(*this);
@@ -390,11 +401,12 @@ namespace Game3 {
 			if (realm)
 				tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
 
-			const auto static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * factor);
+			const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
+			const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
 
 			if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
 				mainTexture.initRGBA(width, height, GL_NEAREST);
-				staticLightingTexture.initRGBA(static_size, static_size, GL_NEAREST);
+				staticLightingTexture.initRGBA(x_static_size, y_static_size, GL_NEAREST);
 				dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
 				scratchTexture.initRGBA(width, height, GL_NEAREST);
 
@@ -459,10 +471,10 @@ namespace Game3 {
 						.y = static_cast<double>(static_y),
 						.sizeX = -1,
 						.sizeY = -1,
-						.scaleX = 1. / factor,
-						.scaleY = 1. / factor,
-						.viewportX = -static_cast<double>(factor),
-						.viewportY = -static_cast<double>(factor),
+						.scaleX = 1. / x_factor,
+						.scaleY = 1. / y_factor,
+						.viewportX = -static_cast<double>(x_factor),
+						.viewportY = -static_cast<double>(y_factor),
 					});
 
 					binder.undo();
@@ -492,14 +504,23 @@ namespace Game3 {
 		} else {
 			static float hue = 0;
 			static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
+			static bool has_been_nonzero = false;
 
-			singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
-				.x = static_cast<double>(getMouseX()),
-				.y = static_cast<double>(getMouseY()),
-				.scaleX = 16,
-				.scaleY = 16,
-				.invertY = false,
-			});
+			const auto [mouse_x, mouse_y] = getMouseCoordinates();
+
+			if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
+				singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
+					.x = mouse_x,
+					.y = mouse_y,
+					.scaleX = 16,
+					.scaleY = 16,
+					.invertY = false,
+				});
+			}
+
+			if (!has_been_nonzero && (mouse_x != 0 || mouse_y != 0)) {
+				has_been_nonzero = true;
+			}
 
 			textRenderer.drawOnScreen("game3", TextRenderOptions{
 				.x = getWidth() / 2.0,
@@ -713,8 +734,7 @@ namespace Game3 {
 	void Window::mouseButtonCallback(int button, int action, int mods) {
 		lastModifiers = Modifiers(mods);
 
-		double x_pos{}, y_pos{};
-		glfwGetCursorPos(glfwWindow, &x_pos, &y_pos);
+		const auto [x_pos, y_pos] = getMouseCoordinates();
 		const auto x = static_cast<int>(std::floor(x_pos));
 		const auto y = static_cast<int>(std::floor(y_pos));
 
@@ -773,7 +793,8 @@ namespace Game3 {
 		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y)))
 			return;
 
-		const auto factor = getFactor();
+		const auto x_factor = getXFactor();
+		const auto y_factor = getYFactor();
 		const auto old_scale = scale;
 
 		if (y_delta < 0)
@@ -786,11 +807,16 @@ namespace Game3 {
 
 		const auto difference_x = width / old_scale - width / scale;
 		const auto side_ratio_x = (x - width / 2.f) / width;
-		center.first -= difference_x * side_ratio_x / 8.f * factor;
+		center.first -= difference_x * side_ratio_x / 8.f * x_factor;
 
 		const auto difference_y = height / old_scale - height / scale;
 		const auto side_ratio_y = (y - height / 2.f) / height;
-		center.second -= difference_y * side_ratio_y / 8.f * factor;
+		center.second -= difference_y * side_ratio_y / 8.f * y_factor;
+	}
+
+	void Window::contentScaleCallback(float x_scale, float y_scale) {
+		xScale = x_scale;
+		yScale = y_scale;
 	}
 
 	void Window::closeGame() {

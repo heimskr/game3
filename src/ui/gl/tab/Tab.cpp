@@ -2,15 +2,25 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
+#include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/tab/Tab.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	Tab::Tab(UIContext &ui):
 		Widget(ui, UI_SCALE) {}
 
 	void Tab::renderIcon(const RendererContext &) {}
+
+	SizeRequestMode Tab::getRequestMode() const {
+		return SizeRequestMode::Expansive;
+	}
+
+	void Tab::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		minimum = natural = orientation == Orientation::Vertical? for_height : for_width;
+	}
 
 	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
@@ -24,11 +34,7 @@ namespace Game3 {
 		});
 	}
 
-	SizeRequestMode Tab::getRequestMode() const {
-		return SizeRequestMode::Expansive;
-	}
-
-	void Tab::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
-		minimum = natural = orientation == Orientation::Vertical? for_height : for_width;
+	bool Tab::isActive() const {
+		return ui.window.getOmniDialog()->activeTab.get() == this;
 	}
 }

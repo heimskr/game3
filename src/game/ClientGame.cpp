@@ -96,7 +96,7 @@ namespace Game3 {
 	Rectangle ClientGame::getVisibleRealmBounds() const {
 		auto window = getWindow();
 		const auto [top,     left] = translateCanvasCoordinates(0, 0);
-		const auto [bottom, right] = translateCanvasCoordinates(window->getWidth() * window->sizeDivisor, window->getHeight() * window->sizeDivisor);
+		const auto [bottom, right] = translateCanvasCoordinates(window->getWidth(), window->getHeight());
 		return {
 			static_cast<int>(left),
 			static_cast<int>(top),
@@ -111,22 +111,22 @@ namespace Game3 {
 		if (!realm)
 			return {};
 
-		auto window = getWindow();
+		std::shared_ptr<Window> window = getWindow();
 
 		const int width = window->getWidth();
 		const int height = window->getHeight();
 
-		const auto scale = window->scale / window->getFactor() * window->sizeDivisor;
+		const auto scale = window->scale;
 		const auto tile_size = realm->getTileset().getTileSize();
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
-		x -= width  / 2. * window->sizeDivisor - (map_length * tile_size / 4.) * scale + window->center.first  * window->magic * scale;
-		y -= height / 2. * window->sizeDivisor - (map_length * tile_size / 4.) * scale + window->center.second * window->magic * scale;
+		x -= width  / 2. - (map_length * tile_size / 4.) * scale + window->center.first  * window->magic * scale;
+		y -= height / 2. - (map_length * tile_size / 4.) * scale + window->center.second * window->magic * scale;
 		const double sub_x = x < 0.? 1. : 0.;
 		const double sub_y = y < 0.? 1. : 0.;
 		x /= tile_size * scale / 2.;
 		y /= tile_size * scale / 2.;
 
-		double intpart = 0.;
+		double intpart{};
 
 		// The math here is bizarre. Probably tied to the getQuadrant silliness.
 		if (x_offset_out)

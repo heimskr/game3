@@ -21,10 +21,11 @@ namespace Game3 {
 		CircleRenderer &circle;
 		Recolor &recolor;
 		Lockable<ClientSettings> &settings;
-		int factor;
+		float xFactor;
+		float yFactor;
 
-		RendererContext(RectangleRenderer &rectangle_, SingleSpriteRenderer &single_sprite, BatchSpriteRenderer &batch_sprite, TextRenderer &text_, CircleRenderer &circle_, Recolor &recolor_, Lockable<ClientSettings> &settings_, int factor_):
-			rectangle(rectangle_), singleSprite(single_sprite), batchSprite(batch_sprite), text(text_), circle(circle_), recolor(recolor_), settings(settings_), factor(factor_) {}
+		RendererContext(RectangleRenderer &rectangle, SingleSpriteRenderer &single_sprite, BatchSpriteRenderer &batch_sprite, TextRenderer &text, CircleRenderer &circle, Recolor &recolor, Lockable<ClientSettings> &settings, float x_factor, float y_factor):
+			rectangle(rectangle), singleSprite(single_sprite), batchSprite(batch_sprite), text(text), circle(circle), recolor(recolor), settings(settings), xFactor(x_factor), yFactor(y_factor) {}
 
 		void pushSize() const;
 		void popSize() const;

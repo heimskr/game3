@@ -21,6 +21,7 @@ namespace Game3 {
 
 		protected:
 			void renderIconTexture(const RendererContext &, const std::shared_ptr<Texture> &);
+			bool isActive() const;
 	};
 
 	using TabPtr = std::shared_ptr<Tab>;

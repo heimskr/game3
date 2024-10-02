@@ -15,6 +15,23 @@ namespace {
 }
 
 namespace Game3 {
+	namespace {
+		ClientInventoryPtr getInventory(const std::any &any) {
+			const InventoryModule::Argument *argument = std::any_cast<InventoryModule::Argument>(&any);
+			if (!argument) {
+				const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
+				if (!agent)
+					throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
+				auto has_inventory = std::dynamic_pointer_cast<HasInventory>(*agent);
+				if (!has_inventory)
+					throw std::invalid_argument("Agent supplied to InventoryModule isn't castable to HasInventory");
+				return std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(0));
+			}
+			const auto [agent, index] = *argument;
+			return std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(agent)->getInventory(index));
+		}
+	}
+
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument):
 		InventoryModule(ui, getInventory(argument)) {}
 
@@ -149,20 +166,5 @@ namespace Game3 {
 
 	float InventoryModule::getTopPadding() const {
 		return topPadding;
-	}
-
-	ClientInventoryPtr InventoryModule::getInventory(const std::any &any) {
-		const Argument *argument = std::any_cast<Argument>(&any);
-		if (!argument) {
-			const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
-			if (!agent)
-				throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
-			auto has_inventory = std::dynamic_pointer_cast<HasInventory>(*agent);
-			if (!has_inventory)
-				throw std::invalid_argument("Agent supplied to InventoryModule isn't castable to HasInventory");
-			return std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(0));
-		}
-		const auto [agent, index] = *argument;
-		return std::dynamic_pointer_cast<ClientInventory>(std::dynamic_pointer_cast<HasInventory>(agent)->getInventory(index));
 	}
 }
