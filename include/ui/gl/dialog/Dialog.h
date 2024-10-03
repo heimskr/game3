@@ -5,6 +5,7 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 #include "ui/gl/widget/Widget.h"
+#include "util/Concepts.h"
 
 #include <sigc++/sigc++.h>
 
@@ -59,4 +60,12 @@ namespace Game3 {
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void render(const RendererContext &, const Rectangle &) final;
 	};
+
+	template <typename T, typename... Args>
+	requires std::derived_from<T, Dialog>
+	std::shared_ptr<T> make(Args &&...args) {
+		auto dialog = std::make_shared<T>(std::forward<Args>(args)...);
+		dialog->init();
+		return dialog;
+	}
 }

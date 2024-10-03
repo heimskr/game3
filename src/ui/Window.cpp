@@ -8,6 +8,7 @@
 #include "net/LocalClient.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/LoginPacket.h"
+#include "packet/RegisterPlayerPacket.h"
 #include "packet/SetHeldItemPacket.h"
 #include "types/Position.h"
 #include "ui/gl/dialog/ChatDialog.h"
@@ -1087,7 +1088,7 @@ namespace Game3 {
 			if (LocalClientPtr client = weak.lock()) {
 				queue([this, client](Window &) {
 					activateContext();
-					auto dialog = std::make_shared<LoginDialog>(uiContext);
+					auto dialog = make<LoginDialog>(uiContext);
 
 					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
 						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
@@ -1099,7 +1100,6 @@ namespace Game3 {
 						});
 					});
 
-					dialog->init();
 					uiContext.addDialog(std::move(dialog));
 				});
 			}
@@ -1130,6 +1130,43 @@ namespace Game3 {
 		}
 
 		runningFPS = runningSum / fpses.size();
+	}
+
+	void Window::showLoginAndRegisterDialogs(const std::string &hostname) {
+		if (!game) {
+			return;
+		}
+
+		LocalClientPtr client = game->getClient();
+
+		if (!client) {
+			return;
+		}
+
+		activateContext();
+		auto dialog = make<LoginDialog>(uiContext);
+
+		dialog->signalSubmit.connect([this, client, hostname](const UString &username, const UString &display_name) {
+			if (std::optional<Token> token = client->getToken(hostname, username.raw())) {
+				client->send(make<LoginPacket>(username.raw(), *token));
+			} else if (display_name.empty()) {
+				queue([this, username](Window &) {
+					closeGame();
+					goToTitle();
+					error(std::format("Token not found for user {} and no display name given.", username));
+				});
+			} else {
+				client->send(make<RegisterPlayerPacket>(username.raw(), display_name.raw()));
+			}
+		});
+
+		dialog->signalDismiss.connect([this] {
+			queue([this](Window &) {
+				closeGame();
+			});
+		});
+
+		uiContext.addDialog(std::move(dialog));
 	}
 
 	void Window::handleKeys() {

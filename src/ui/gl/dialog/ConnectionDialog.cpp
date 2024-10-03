@@ -109,12 +109,16 @@ namespace Game3 {
 			return;
 		}
 
+		const std::string &hostname = hostInput->getText().raw();
+
 		try {
-			ui.window.connect(hostInput->getText().raw(), port);
+			ui.window.connect(hostname, port);
 		} catch (const std::exception &err) {
 			ui.window.error(err.what());
 			return;
 		}
+
+		ui.window.showLoginAndRegisterDialogs(hostname);
 	}
 
 	void ConnectionDialog::playLocally() {
