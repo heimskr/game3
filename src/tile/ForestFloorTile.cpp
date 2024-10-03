@@ -68,7 +68,7 @@ namespace Game3 {
 		if (!place.isPathable())
 			return;
 
-		static std::vector<const char *> mushrooms {
+		std::vector<const char *> mushrooms {
 			"base:item/saffron_milkcap",
 			"base:item/saffron_milkcap",
 			"base:item/saffron_milkcap",

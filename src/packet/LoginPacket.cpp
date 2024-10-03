@@ -12,7 +12,7 @@
 
 namespace Game3 {
 	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
-		if (!client.getPlayer()) {
+		if (ServerPlayerPtr player = client.getPlayer(); !player) {
 			auto server = game->getServer();
 			std::string display_name;
 			Buffer buffer{game, Side::Server};
@@ -72,6 +72,8 @@ namespace Game3 {
 				realm->addPlayer(player);
 				return;
 			}
+		} else {
+			WARN("Client already has player. Display name: {}", player->displayName);
 		}
 
 		client.send(make<LoginStatusPacket>(false));

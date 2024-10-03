@@ -109,7 +109,7 @@ namespace Game3 {
 			return;
 		}
 
-		const std::string &hostname = hostInput->getText().raw();
+		std::string hostname = hostInput->getText().raw();
 
 		try {
 			ui.window.connect(hostname, port);

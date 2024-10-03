@@ -55,7 +55,7 @@ namespace Game3 {
 			CREATE TABLE IF NOT EXISTS users (
 				username VARCHAR(32) PRIMARY KEY,
 				displayName VARCHAR(64),
-				encoded MEDIUMTEXT,
+				encoded MEDIUMBLOB,
 				releasePosition VARCHAR(42),
 				releaseRealm INT
 			);
@@ -558,6 +558,8 @@ namespace Game3 {
 
 			return true;
 		}
+
+		ERROR("Couldn't read user: {}", query.getErrorMsg());
 
 		return false;
 	}

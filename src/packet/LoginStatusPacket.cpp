@@ -27,11 +27,17 @@ namespace Game3 {
 	}
 
 	void LoginStatusPacket::handle(const ClientGamePtr &game) {
-		if (!success)
+		auto window = game->getWindow();
+
+		if (!success) {
+			window->queue([](Window &window) {
+				window.closeGame();
+				window.goToTitle();
+			});
 			throw AuthenticationError("Login failed");
+		}
 
 		SUCCESS(2, "Login succeeded");
-		auto window = game->getWindow();
 		{
 			auto lock = window->settings.uniqueLock();
 			window->settings.username = username;
