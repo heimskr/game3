@@ -43,8 +43,15 @@ namespace Game3 {
 
 		if (ssl_was_ready) {
 			sslWaiter.wait();
-			if (sslThread.joinable())
+		}
+
+		if (sslThread.joinable()) {
+			if (std::this_thread::get_id() == sslThread.get_id()) {
+				// I guess???
+				sslThread.detach();
+			} else {
 				sslThread.join();
+			}
 		}
 	}
 
@@ -61,8 +68,8 @@ namespace Game3 {
 		auto endpoint = resolved->endpoint();
 		endpoint.port(port);
 
-		asio::post(strand, [this, endpoint] {
-			sslSock.lowest_layer().async_connect(endpoint, asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc) {
+		asio::post(strand, [this, endpoint, shared = shared_from_this()] {
+			sslSock.lowest_layer().async_connect(endpoint, asio::bind_executor(strand, [this, shared](const asio::error_code &errc) {
 				if (reportError(errc))
 					return;
 
