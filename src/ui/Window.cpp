@@ -1050,7 +1050,6 @@ namespace Game3 {
 			}
 		}
 
-
 		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
@@ -1152,7 +1151,6 @@ namespace Game3 {
 			} else if (display_name.empty()) {
 				queue([this, username](Window &) {
 					closeGame();
-					goToTitle();
 					error(std::format("Token not found for user {} and no display name given.", username));
 				});
 			} else {
