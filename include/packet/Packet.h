@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types/Types.h"
+#include "util/Concepts.h"
 
 namespace Game3 {
 	class Buffer;
@@ -45,8 +46,5 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	concept IsPacketPtr = requires {
-		requires std::convertible_to<T, std::shared_ptr<Packet>>;
-		requires std::derived_from<typename T::element_type, Packet>;
-	};
+	concept IsPacketPtr = IsDerivedPtr<T, Packet>;
 }

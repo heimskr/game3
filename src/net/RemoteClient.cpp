@@ -195,25 +195,20 @@ namespace Game3 {
 	}
 
 	void RemoteClient::close() {
-		std::string ip = ip;
-
 		try {
-			asio::ssl::stream<asio::ip::tcp::socket> &socket = socket;
-			socket.async_shutdown([weak_client = std::weak_ptr(getSelf())](const asio::error_code &errc) {
-				if (auto client = weak_client.lock()) {
-					if (errc) {
-						if (errc.value() == 1) // 1 corresponds to stream truncated, a very common error that I don't really consider an error
-							SUCCESS("Mostly managed to shut down client {}.", client->id);
-						else
-							ERROR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
-					} else {
-						client->socket.lowest_layer().close();
-						SUCCESS("Managed to shut down client {}.", client->id);
-					}
+			asio::error_code errc;
+			socket.shutdown(errc);
+			if (errc) {
+				if (errc.value() == 1 ) {
+					// 1 corresponds to stream truncated, a very common error that I don't really consider an error
+					SUCCESS("Mostly managed to shut down client {}.", id);
 				} else {
-					ERROR("Couldn't lock client during shutdown.");
+					ERROR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
 				}
-			});
+			} else {
+				socket.lowest_layer().close();
+				SUCCESS("Managed to shut down client {}.", id);
+			}
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?

@@ -39,8 +39,9 @@ namespace Game3 {
 	context(thread_count),
 	acceptor(context, asio::ip::tcp::endpoint(asio::ip::address::from_string(ip), port)),
 	workGuard(asio::make_work_guard(context)) {
-		if (thread_count < 1)
+		if (thread_count < 1) {
 			throw std::invalid_argument("Cannot instantiate a Server with a thread count of zero");
+		}
 
 		sslContext.use_certificate_chain_file(certificate_path);
 		sslContext.use_private_key_file(key_path, asio::ssl::context::pem);
@@ -51,8 +52,9 @@ namespace Game3 {
 	}
 
 	void Server::handleMessage(GenericClient &client, std::string_view message) {
-		if (onMessage)
+		if (onMessage) {
 			onMessage(client, message);
+		}
 	}
 
 	void Server::accept() {
@@ -63,10 +65,13 @@ namespace Game3 {
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
 				auto client = std::make_shared<RemoteClient>(*this, ip, ++lastID, std::move(socket));
-				allClients.insert(client);
+				allClients.withUnique([&](auto &) {
+					allClients.insert(client);
+				});
 				client->start();
-				if (onAdd)
+				if (onAdd) {
 					onAdd(*client);
+				}
 			}
 
 			accept();
@@ -81,33 +86,34 @@ namespace Game3 {
 
 	void Server::stop() {
 		// Game already stopped.
-		if (!game)
+		if (!game) {
 			return;
+		}
 
-		{
-			auto lock = allClients.uniqueLock();
+		allClients.withUnique([&](auto &) {
 			while (!allClients.empty()) {
 				auto iter = allClients.begin();
 				close(*iter);
 				allClients.erase(iter);
 			}
-		}
+		});
 
 		workGuard.reset();
 		context.stop();
 		game->stop();
-		if (onStop)
+		if (onStop) {
 			onStop();
+		}
 		game.reset();
 	}
 
 	bool Server::close(GenericClientPtr client) {
-		if (client->isClosed())
+		if (client->isClosed()) {
 			return false;
+		}
 
 		client->setClosed();
 		client->close();
-
 		return true;
 	}
 
@@ -123,8 +129,9 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ServerPlayer> Server::loadPlayer(std::string_view username, std::string_view display_name) {
-		if (!validateUsername(username))
+		if (!validateUsername(username)) {
 			return nullptr;
+		}
 
 		{
 			Buffer buffer{game, Side::Server};
@@ -193,21 +200,26 @@ namespace Game3 {
 	}
 
 	bool Server::validateUsername(std::string_view username) {
-		if (username.empty() || 20 < username.size())
+		if (username.empty() || 20 < username.size()) {
 			return false;
-		for (const char ch: username)
+		}
+
+		for (const char ch: username) {
 			if (!std::isalnum(ch) && ch != '_')
 				return false;
+		}
+
 		return true;
 	}
 
 	int Server::main(int argc, char **argv) {
 		std::string secret;
 
-		if (std::filesystem::exists(".secret"))
+		if (std::filesystem::exists(".secret")) {
 			secret = readFile(".secret");
-		else
+		} else {
 			std::ofstream(".secret") << (secret = generateSecret(8));
+		}
 
 		uint16_t port = 12255;
 		if (3 <= argc) {
@@ -218,8 +230,9 @@ namespace Game3 {
 
 		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 2);
 
-		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
+		}
 
 		std::thread stop_thread([] {
 			std::unique_lock lock(stopMutex);
@@ -227,8 +240,9 @@ namespace Game3 {
 			global_server->stop();
 		});
 
-		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); saveCV.notify_all(); }) == SIG_ERR)
+		if (signal(SIGINT, +[](int) { running = false; stopCV.notify_all(); saveCV.notify_all(); }) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGINT handler");
+		}
 
 		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(global_server, size_t(8))));
 
@@ -239,8 +253,9 @@ namespace Game3 {
 		};
 
 		const char *world_path = "world.db";
-		if (4 <= argc)
+		if (4 <= argc) {
 			world_path = argv[3];
+		}
 
 		const bool database_existed = std::filesystem::exists(world_path);
 		game->openDatabase(world_path);

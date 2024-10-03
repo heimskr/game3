@@ -54,6 +54,12 @@ namespace Game3 {
 		requires std::is_same_v<std::invoke_result_t<T, Args...>, R>;
 	};
 
+	template <typename T, typename Base>
+	concept IsDerivedPtr = requires {
+		requires std::convertible_to<T, std::shared_ptr<Base>>;
+		requires std::derived_from<typename T::element_type, Base>;
+	};
+
 	// Credit: https://stackoverflow.com/a/77263021
 	template <typename>
 	struct is_chrono_duration: std::false_type {};
