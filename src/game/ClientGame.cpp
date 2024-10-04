@@ -345,6 +345,14 @@ namespace Game3 {
 		return window;
 	}
 
+	bool ClientGame::isConnectedLocally() const {
+		if (!cachedIsConnectedLocally) {
+			cachedIsConnectedLocally = getWindow()->isConnectedLocally();
+		}
+
+		return *cachedIsConnectedLocally;
+	}
+
 	void ClientGame::garbageCollect() {
 		sounds.cleanup();
 	}

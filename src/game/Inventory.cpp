@@ -21,8 +21,8 @@
 namespace Game3 {
 	Inventory::Inventory() = default;
 
-	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot active_slot, InventoryID index_):
-		weakOwner(owner), activeSlot(active_slot), index(index_) {}
+	Inventory::Inventory(std::shared_ptr<Agent> owner, Slot active_slot, InventoryID index):
+		activeSlot(active_slot), index(index), weakOwner(std::move(owner)) {}
 
 	Inventory & Inventory::operator=(const Inventory &other) {
 		if (this == &other)
@@ -99,13 +99,15 @@ namespace Game3 {
 	}
 
 	void Inventory::prevSlot() {
-		if (0 < activeSlot)
+		if (0 < activeSlot) {
 			setActive(activeSlot - 1, false);
+		}
 	}
 
 	void Inventory::nextSlot() {
-		if (activeSlot < getSlotCount() - 1)
+		if (activeSlot < getSlotCount() - 1) {
 			setActive(activeSlot + 1, false);
+		}
 	}
 
 	ItemCount Inventory::craftable(const CraftingRecipe &recipe) const {
@@ -126,6 +128,23 @@ namespace Game3 {
 
 	std::unique_ptr<InventoryGetter> Inventory::getGetter() const {
 		return std::make_unique<InventoryGetter>(*this);
+	}
+
+	void Inventory::setOwner(std::weak_ptr<Agent> owner) {
+		if (auto locked_new = owner.lock()) {
+			if (auto locked_old = weakOwner.lock()) {
+				if (locked_new->getSide() != locked_old->getSide()) {
+					WARN("Replacing inventory side with {}, which isn't the original {} side", locked_new->getSide(), locked_old->getSide());
+					raise(SIGTRAP);
+				}
+			}
+		}
+
+		weakOwner = std::move(owner);
+	}
+
+	bool Inventory::hasOwner() const {
+		return !weakOwner.expired();
 	}
 
 	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStackPtr> storage) {

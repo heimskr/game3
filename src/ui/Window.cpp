@@ -1074,10 +1074,12 @@ namespace Game3 {
 
 		if (!connect("::1", serverWrapper.getPort(), client)) {
 			error("Failed to connect to local server.");
+			closeGame();
 			return;
 		}
 
 		assert(game != nullptr);
+		connectedLocally = true;
 
 		// Tie the loop. Or whatever the expression is.
 		// What I'm trying to say is that we're doing a funny thing where we make both Direct*Clients point at each other.
@@ -1165,6 +1167,10 @@ namespace Game3 {
 		});
 
 		uiContext.addDialog(std::move(dialog));
+	}
+
+	bool Window::isConnectedLocally() const {
+		return connectedLocally;
 	}
 
 	void Window::handleKeys() {

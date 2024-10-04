@@ -13,12 +13,15 @@
 
 namespace Game3 {
 	void SetActiveSlotPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
-		if (slot < 0 || slot >= HOTBAR_SIZE)
+		if (slot < 0 || slot >= HOTBAR_SIZE) {
 			return;
+		}
 
-		if (const PlayerPtr player = client.getPlayer())
-			if (const InventoryPtr inventory = player->getInventory(0))
+		if (const PlayerPtr player = client.getPlayer()) {
+			if (const InventoryPtr inventory = player->getInventory(0)) {
 				inventory->setActive(slot);
+			}
+		}
 	}
 
 	void SetActiveSlotPacket::handle(const ClientGamePtr &game) {

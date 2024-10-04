@@ -7,13 +7,13 @@
 namespace Game3 {
 	const std::shared_ptr<Inventory> & HasInventory::getInventory(InventoryID inventory_id) const {
 		if (inventory_id != 0)
-			throw std::invalid_argument("Couldn't retrieve inventory with index " + std::to_string(inventory_id));
+			throw std::invalid_argument(std::format("Couldn't retrieve inventory with index {}", inventory_id));
 		return inventory;
 	}
 
 	void HasInventory::setInventory(std::shared_ptr<Inventory> new_inventory, InventoryID inventory_id) {
 		if (inventory_id != 0)
-			throw std::invalid_argument("Couldn't retrieve inventory with index " + std::to_string(inventory_id));
+			throw std::invalid_argument(std::format("Couldn't set inventory with index {}", inventory_id));
 		inventory = std::move(new_inventory);
 	}
 
@@ -24,15 +24,17 @@ namespace Game3 {
 			server_inventory = std::dynamic_pointer_cast<ServerInventory>(subinventory);
 			assert(server_inventory);
 			buffer << subinventory->getSlotCount();
-		} else
-			buffer << Slot(-1);
+		} else {
+			buffer << static_cast<Slot>(-1);
+		}
 		buffer << server_inventory;
 	}
 
 	void HasInventory::decode(Buffer &buffer, InventoryID index) {
-		if (getSharedAgent()->getSide() == Side::Client)
+		if (getSharedAgent()->getSide() == Side::Client) {
 			decodeSpecific<ClientInventory>(buffer, index);
-		else
+		} else {
 			decodeSpecific<ServerInventory>(buffer, index);
+		}
 	}
 }

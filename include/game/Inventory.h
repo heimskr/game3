@@ -29,7 +29,6 @@ namespace Game3 {
 			using SlotPredicate = std::function<bool(Slot)>;
 			using Predicate = std::function<bool(const ItemStackPtr &, Slot)>;
 
-			std::weak_ptr<Agent> weakOwner;
 			Atomic<Slot> activeSlot = 0;
 			Atomic<InventoryID> index = -1;
 			/** Called before the swap occurs. The first argument always refers to this object.
@@ -180,14 +179,18 @@ namespace Game3 {
 
 			virtual std::unique_ptr<InventoryGetter> getGetter() const;
 
+			void setOwner(std::weak_ptr<Agent>);
+			bool hasOwner() const;
+
 			static std::shared_ptr<Inventory> create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStackPtr> storage = {});
 			static std::shared_ptr<Inventory> create(std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index = 0, Slot active_slot = 0, std::map<Slot, ItemStackPtr> storage = {});
 
 		protected:
+			Atomic<bool> suppressInventoryNotifications{false};
+			std::weak_ptr<Agent> weakOwner;
+
 			/** Removes every slot whose item count is zero from the storage map. */
 			virtual void compact() = 0;
-
-			Atomic<bool> suppressInventoryNotifications{false};
 
 		public:
 			struct Suppressor {

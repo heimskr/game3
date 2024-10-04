@@ -93,10 +93,11 @@ namespace Game3 {
 		if (!std::dynamic_pointer_cast<Player>(weakOwner.lock()))
 			throw std::runtime_error("Can't set the active slot of a non-player inventory");
 
-		if (force)
+		if (force) {
 			activeSlot = new_active;
-		else
+		} else {
 			send(make<SetActiveSlotPacket>(new_active));
+		}
 	}
 
 	void ClientInventory::notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) {
@@ -140,10 +141,11 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &buffer, const ClientInventory &inventory) {
 		buffer.appendType(inventory, false);
-		if (auto locked = inventory.weakOwner.lock())
-			buffer += locked->getGID();
-		else
+		if (inventory.hasOwner()) {
+			buffer += inventory.getOwner()->getGID();
+		} else {
 			buffer += static_cast<GlobalID>(-1);
+		}
 		buffer += inventory.getSlotCount();
 		buffer += inventory.activeSlot.load();
 		buffer += inventory.index.load();
@@ -166,8 +168,8 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}
 		const auto gid = buffer.take<GlobalID>();
-		if (auto locked = inventory.weakOwner.lock())
-			locked->setGID(gid);
+		if (inventory.hasOwner())
+			inventory.getOwner()->setGID(gid);
 		inventory.setSlotCount(buffer.take<Slot>());
 		inventory.activeSlot = buffer.take<Slot>();
 		inventory.index = buffer.take<InventoryID>();

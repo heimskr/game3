@@ -230,7 +230,7 @@ namespace Game3 {
 		// Silly.
 		auto storage_inventory = std::dynamic_pointer_cast<StorageInventory>(inventory);
 		assert(storage_inventory);
-		inventory_copy->weakOwner = shared_from_this();
+		inventory_copy->setOwner(weak_from_this());
 		suppressor.cancel();
 		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
 		inventory->notifyOwner({});

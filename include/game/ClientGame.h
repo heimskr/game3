@@ -94,6 +94,8 @@ namespace Game3 {
 
 			std::shared_ptr<Window> getWindow() const;
 
+			bool isConnectedLocally() const;
+
 		private:
 			std::weak_ptr<Window> weakWindow;
 			ClientPlayerPtr player;
@@ -104,6 +106,7 @@ namespace Game3 {
 			Waiter tickThreadLaunchWaiter;
 			std::optional<Position> lastDragPosition;
 			float lastGarbageCollection = 0;
+			mutable std::optional<bool> cachedIsConnectedLocally;
 
 			Lockable<std::set<ChunkPosition>> missingChunks;
 			MTQueue<std::shared_ptr<Packet>> packetQueue;
