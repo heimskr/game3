@@ -81,44 +81,44 @@ namespace Game3 {
 
 		template <typename Fn>
 		requires std::invocable<Fn>
-		void withShared(Fn &&function) const {
+		decltype(auto) withShared(Fn &&function) const {
 			auto lock = sharedLock();
-			function();
+			return function();
 		}
 
 		template <typename Fn>
-		requires std::invocable<Fn, Lockable<T, M> &>
-		void withShared(Fn &&function) {
+		requires std::invocable<Fn, const T &>
+		decltype(auto) withShared(Fn &&function) const {
 			auto lock = sharedLock();
-			function(*this);
+			return function(getBase());
 		}
 
 		template <typename Fn>
-		requires std::invocable<Fn, const Lockable<T, M> &>
-		void withShared(Fn &&function) const {
+		requires (std::invocable<Fn, T &> && !std::invocable<Fn, const T &>)
+		decltype(auto) withShared(Fn &&function) {
 			auto lock = sharedLock();
-			function(*this);
+			return function(getBase());
 		}
 
 		template <typename Fn>
 		requires std::invocable<Fn>
-		void withUnique(Fn &&function) const {
+		decltype(auto) withUnique(Fn &&function) const {
 			auto lock = uniqueLock();
-			function();
+			return function();
 		}
 
 		template <typename Fn>
-		requires std::invocable<Fn, Lockable<T, M> &>
-		void withUnique(Fn &&function) {
+		requires std::invocable<Fn, const T &>
+		decltype(auto) withUnique(Fn &&function) const {
 			auto lock = uniqueLock();
-			function(*this);
+			return function(getBase());
 		}
 
 		template <typename Fn>
-		requires std::invocable<Fn, const Lockable<T, M> &>
-		void withUnique(Fn &&function) const {
+		requires (std::invocable<Fn, T &> && !std::invocable<Fn, const T &>)
+		decltype(auto) withUnique(Fn &&function) {
 			auto lock = uniqueLock();
-			function(*this);
+			return function(getBase());
 		}
 
 		inline T copyBase() const {

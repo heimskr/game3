@@ -361,12 +361,11 @@ namespace Game3 {
 			}
 		}
 
-		{
-			auto lock = boolFunctions.uniqueLock();
-			std::erase_if(boolFunctions, [this](const auto &function) {
+		boolFunctions.withUnique([this](std::list<std::function<bool (Game3::Window &)>> &bool_functions) {
+			std::erase_if(bool_functions, [this](const auto &function) {
 				return function(*this);
 			});
-		}
+		});
 
 		drawGL();
 	}
@@ -389,35 +388,45 @@ namespace Game3 {
 
 		if (game != nullptr) {
 			game->iterateRealms([](const RealmPtr &realm) {
-				if (!realm->renderersReady)
+				if (!realm->renderersReady) {
 					return;
+				}
 
 				if (realm->wakeupPending.exchange(false)) {
-					for (auto &row: *realm->baseRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->baseRenderers) {
+						for (auto &renderer: row) {
 							renderer.wakeUp();
+						}
+					}
 
-					for (auto &row: *realm->upperRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->upperRenderers) {
+						for (auto &renderer: row) {
 							renderer.wakeUp();
+						}
+					}
 
 					realm->reupload();
 				} else if (realm->snoozePending.exchange(false)) {
-					for (auto &row: *realm->baseRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->baseRenderers) {
+						for (auto &renderer: row) {
 							renderer.snooze();
+						}
+					}
 
-					for (auto &row: *realm->upperRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->upperRenderers) {
+						for (auto &renderer: row) {
 							renderer.snooze();
+						}
+					}
 				}
 			});
 
 			GLsizei tile_size = 16;
 			RealmPtr realm = game->getActiveRealm();
 
-			if (realm)
+			if (realm) {
 				tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
+			}
 
 			const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
 			const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
@@ -437,11 +446,9 @@ namespace Game3 {
 				}
 			}
 
-			bool do_lighting{};
-			{
-				auto lock = settings.sharedLock();
-				do_lighting = settings.renderLighting;
-			}
+			bool do_lighting = settings.withShared([&](auto &settings) {
+				return settings.renderLighting;
+			});
 
 			if (realm) {
 				if (do_lighting) {
@@ -610,14 +617,17 @@ namespace Game3 {
 			if (action == GLFW_PRESS || action == CUSTOM_REPEAT) {
 				if (modifiers.empty() || modifiers.onlyShift()) {
 					auto handle = [&](int movement_key, Direction direction) {
-						if (key != movement_key)
+						if (key != movement_key) {
 							return false;
+						}
 
-						if (!player->isMoving())
+						if (!player->isMoving()) {
 							player->setContinuousInteraction(modifiers.shift, Modifiers(modifiers));
+						}
 
-						if (!player->isMoving(direction))
+						if (!player->isMoving(direction)) {
 							player->startMoving(direction);
+						}
 
 						return true;
 					};
@@ -628,8 +638,9 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_SPACE) {
-					if (player != nullptr)
+					if (player != nullptr) {
 						player->jump();
+					}
 					return;
 				}
 
@@ -739,8 +750,9 @@ namespace Game3 {
 				}
 
 				auto handle = [&](int released_key, Direction direction) {
-					if (key != released_key)
+					if (key != released_key) {
 						return false;
+					}
 
 					player->stopMoving(direction);
 					return true;
@@ -830,10 +842,11 @@ namespace Game3 {
 		const auto y_factor = getYFactor();
 		const auto old_scale = scale;
 
-		if (y_delta < 0)
+		if (y_delta < 0) {
 			scale /= 1.08 * -y_delta;
-		else if (y_delta > 0)
+		} else if (y_delta > 0) {
 			scale *= 1.08 * y_delta;
+		}
 
 		const float width = lastWindowSize.first;
 		const float height = lastWindowSize.second;
@@ -900,8 +913,9 @@ namespace Game3 {
 
 		game->signalFluidUpdate.connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([has_fluids](Window &window) mutable {
-				if (!window.omniDialog)
+				if (!window.omniDialog) {
 					return;
+				}
 
 				std::unique_lock<DefaultMutex> lock;
 
@@ -914,8 +928,9 @@ namespace Game3 {
 
 		game->signalEnergyUpdate.connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([has_energy](Window &window) mutable {
-				if (!window.omniDialog)
+				if (!window.omniDialog) {
 					return;
+				}
 
 				std::unique_lock<DefaultMutex> lock;
 
@@ -928,8 +943,9 @@ namespace Game3 {
 
 		game->signalVillageUpdate.connect([this](const VillagePtr &village) {
 			queue([village](Window &window) mutable {
-				if (!window.omniDialog)
+				if (!window.omniDialog) {
 					return;
+				}
 
 				std::unique_lock<DefaultMutex> lock;
 
@@ -945,8 +961,9 @@ namespace Game3 {
 		});
 
 		game->errorCallback = [this] {
-			if (game->suppressDisconnectionMessage)
+			if (game->suppressDisconnectionMessage) {
 				return;
+			}
 
 			queue([](Window &window) {
 				window.closeGame();
@@ -1014,8 +1031,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (!connect(settings.hostname, settings.port))
+		if (!connect(settings.hostname, settings.port)) {
 			return;
+		}
 
 		LocalClientPtr client = game->getClient();
 		const std::string &hostname = client->getHostname();
@@ -1034,11 +1052,11 @@ namespace Game3 {
 	}
 
 	void Window::playLocally() {
-		const bool was_running = serverWrapper.isRunning();
-
 		if (game) {
 			game->suppressDisconnectionMessage = true;
 		}
+
+		closeGame();
 
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {
@@ -1058,15 +1076,7 @@ namespace Game3 {
 		}
 
 		serverWrapper.save();
-
-		if (was_running) {
-			// Ugly hack!
-			delay([](Window &window) {
-				window.continueLocalConnection();
-			}, DEFAULT_CLIENT_TICK_FREQUENCY * 2);
-		} else {
-			continueLocalConnection();
-		}
+		continueLocalConnection();
 	}
 
 	void Window::continueLocalConnection() {
@@ -1108,8 +1118,9 @@ namespace Game3 {
 	}
 
 	void Window::feedFPS(double fps) {
-		if (!settings.showFPS)
+		if (!settings.showFPS) {
 			return;
+		}
 
 		fpses.push_back(fps);
 		runningSum += fps;

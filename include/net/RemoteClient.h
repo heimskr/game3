@@ -40,7 +40,7 @@ namespace Game3 {
 			asio::io_context::strand strand;
 			Lockable<std::deque<std::string>, std::shared_mutex> outbox;
 
-			RemoteClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
+			RemoteClient(const std::shared_ptr<Server> &, std::string_view ip, int id_, asio::ip::tcp::socket &&socket);
 
 			~RemoteClient() override;
 

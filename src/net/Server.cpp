@@ -64,7 +64,7 @@ namespace Game3 {
 				ERROR("Server accept: {}", errc.message());
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
-				auto client = std::make_shared<RemoteClient>(*this, ip, ++lastID, std::move(socket));
+				auto client = std::make_shared<RemoteClient>(shared_from_this(), ip, ++lastID, std::move(socket));
 				allClients.withUnique([&](auto &) {
 					allClients.insert(client);
 				});
@@ -228,7 +228,7 @@ namespace Game3 {
 			} catch (const std::invalid_argument &) {}
 		}
 
-		global_server = std::make_shared<Server>("::0", port, "private.crt", "private.key", secret, 2);
+		global_server = Server::create("::0", port, "private.crt", "private.key", secret, 2);
 
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
