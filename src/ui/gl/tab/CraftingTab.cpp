@@ -127,6 +127,7 @@ namespace Game3 {
 				} else {
 					auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
 					item_slot->setStack(ItemStack::create(game, items.at(item_id->get()), attribute_requirement.count));
+					item_slot->setTooltipText(std::format("Any {}", attribute));
 					attach(std::move(item_slot), 0, column);
 				}
 			}

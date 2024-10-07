@@ -56,7 +56,11 @@ namespace Game3 {
 
 		if (ui.checkMouse(lastRectangle)) {
 			if (!tooltip->wasUpdatedBy(*this)) {
-				tooltip->setText(stack->getTooltip());
+				if (tooltipText) {
+					tooltip->setText(*tooltipText);
+				} else {
+					tooltip->setText(stack->getTooltip());
+				}
 				tooltip->setRegion(lastRectangle);
 				tooltip->show(*this);
 			}

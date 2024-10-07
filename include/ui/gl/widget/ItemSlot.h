@@ -2,6 +2,7 @@
 
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasAlignment.h"
+#include "ui/gl/HasTooltipText.h"
 
 #include <memory>
 #include <sigc++/sigc++.h>
@@ -10,7 +11,7 @@ namespace Game3 {
 	class Inventory;
 	class ItemStack;
 
-	class ItemSlot: public Widget, public HasAlignment {
+	class ItemSlot: public Widget, public HasAlignment, public HasTooltipText {
 		public:
 			sigc::signal<void(ItemSlot &self, const WidgetPtr &dragged)> onDrop;
 
