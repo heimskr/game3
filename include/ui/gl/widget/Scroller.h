@@ -46,6 +46,7 @@ namespace Game3 {
 			float recalculateXOffset(float horizontal_offset) const;
 			float fixYOffset(float) const;
 			void updateVerticalRectangle();
+			void maybeRemeasureChildHeight();
 
 		friend class ChatDialog;
 	};

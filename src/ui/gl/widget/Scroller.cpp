@@ -25,9 +25,9 @@ namespace Game3 {
 			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
 		}
 
-		if (firstChild && static_cast<int>(width) != lastRectangle.width) {
-			firstChild->measure(renderers, Orientation::Horizontal, width, height, dummy, dummy);
-		}
+		// if (firstChild && static_cast<int>(width) != lastRectangle.width) {
+		// 	firstChild->measure(renderers, Orientation::Horizontal, width, height, dummy, dummy);
+		// }
 
 		maybeRemeasure(renderers, width, height);
 
@@ -97,7 +97,9 @@ namespace Game3 {
 
 	bool Scroller::dragUpdate(int x, int y) {
 		if (lastVerticalScrollMouse) {
-			if (ALLOW_VERTICAL_OVERSCROLL || (lastChildHeight > lastRectangle.height)) {
+			maybeRemeasureChildHeight();
+
+			if (ALLOW_VERTICAL_OVERSCROLL || lastChildHeight > lastRectangle.height) {
 				const auto start_y = *lastVerticalScrollMouse;
 				const float last_y = lastRectangle.y;
 				const float new_vertical_offset = getVerticalOffset() + (y - last_y - start_y) * (reverseScroll? -0.5 : 1.0);
@@ -134,7 +136,9 @@ namespace Game3 {
 		xOffset += (getNatural()? -x_delta : x_delta) * SCROLL_SPEED;
 		xOffset = std::min(0.f, xOffset);
 
-		if (ALLOW_VERTICAL_OVERSCROLL || (lastChildHeight > lastRectangle.height)) {
+		maybeRemeasureChildHeight();
+
+		if (ALLOW_VERTICAL_OVERSCROLL || lastChildHeight > lastRectangle.height) {
 			yOffset += (getNatural()? -y_delta : y_delta) * SCROLL_SPEED;
 			yOffset = fixYOffset(yOffset);
 		} else {
@@ -189,6 +193,7 @@ namespace Game3 {
 
 		xOffset = 0;
 		yOffset = 0;
+		lastChildHeight = -1;
 	}
 
 	bool Scroller::getNatural() const {
@@ -243,6 +248,13 @@ namespace Game3 {
 		if (!std::isinf(vertical_height)) {
 			const float bar_thickness = getBarThickness();
 			lastVerticalScrollbarRectangle.emplace(x + width - bar_thickness, y + getVerticalOffset(), bar_thickness, vertical_height);
+		}
+	}
+
+	void Scroller::maybeRemeasureChildHeight() {
+		if (!ALLOW_VERTICAL_OVERSCROLL && firstChild != nullptr && lastChildHeight <= 0) {
+			float dummy{};
+			firstChild->measure(ui.getRenderers(), Orientation::Vertical, lastRectangle.width, lastRectangle.height, dummy, lastChildHeight);
 		}
 	}
 }
