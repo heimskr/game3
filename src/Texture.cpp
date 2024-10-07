@@ -50,23 +50,24 @@ namespace Game3 {
 		width = data_width;
 		height = data_height;
 		data = std::move(new_data);
-		glGenTextures(1, &id); FORCE_CHECKGL
-		glBindTexture(GL_TEXTURE_2D, id); FORCE_CHECKGL
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); FORCE_CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); FORCE_CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); FORCE_CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); FORCE_CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); FORCE_CHECKGL
-		glBindTexture(GL_TEXTURE_2D, 0); FORCE_CHECKGL
+		glGenTextures(1, &id); CHECKGL
+		assert(id != 0);
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 		valid = true;
 	}
 
 	void Texture::bind(int bind_id) {
 		init();
 		if (0 <= bind_id) {
-			glActiveTexture(GL_TEXTURE0 + bind_id); FORCE_CHECKGL
+			glActiveTexture(GL_TEXTURE0 + bind_id); CHECKGL
 		}
-		glBindTexture(GL_TEXTURE_2D, id); FORCE_CHECKGL
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
 	}
 
 	void Texture::dump(const std::filesystem::path &dump_path) {
@@ -79,8 +80,9 @@ namespace Game3 {
 
 	std::shared_ptr<Texture> cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
 		auto canonical = std::filesystem::canonical(path).string();
-		if (textureCache.contains(canonical))
+		if (textureCache.contains(canonical)) {
 			return textureCache.at(canonical);
+		}
 		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), path, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
 	}
 
@@ -90,8 +92,9 @@ namespace Game3 {
 
 	std::shared_ptr<Texture> cacheTexture(const nlohmann::json &json) {
 		const std::string path = json.at(0);
-		if (auto iter = textureCache.find(path); iter != textureCache.end())
+		if (auto iter = textureCache.find(path); iter != textureCache.end()) {
 			return iter->second;
+		}
 		return textureCache.try_emplace(path, json.get<TexturePtr>()).first->second;
 	}
 
@@ -106,11 +109,13 @@ namespace Game3 {
 	}
 
 	int Texture::stringToFilter(const std::string &string) {
-		if (string == "nearest")
+		if (string == "nearest") {
 			return GL_NEAREST;
+		}
 
-		if (string == "linear")
+		if (string == "linear") {
 			return GL_LINEAR;
+		}
 
 		throw std::runtime_error(std::format("Unrecognized filter: {}", string));
 	}

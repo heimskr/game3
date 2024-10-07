@@ -14,6 +14,7 @@
 #include "lib/stb/stb_image_write.h"
 
 #define HIDE_CHECKGL
+
 #define FORCE_CHECKGL do { GL::checkGL(glGetError(), __FILE__, __LINE__); } while(0);
 #define FORCE_CHECKGL_SET GLenum gl_err = glGetError(); GL::checkGL(gl_err, __FILE__, __LINE__);
 

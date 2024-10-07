@@ -14,6 +14,8 @@ namespace Game3 {
 
 	void KnownItemsPacket::handle(const ClientGamePtr &game) {
 		game->getPlayer()->setKnownItems(itemIDs);
-		game->getWindow()->getOmniDialog()->craftingTab->reset();
+		game->getWindow()->queue([](Window &window) {
+			window.getOmniDialog()->craftingTab->reset();
+		});
 	}
 }

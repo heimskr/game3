@@ -14,7 +14,7 @@ namespace Game3 {
 
 	void Rectangle::viewport(int outer_height) const {
 		// `outer_height - y - height` to transform upper left corner to lower left corner
-		glViewport(x, outer_height - y - height, static_cast<GLsizei>(width), static_cast<GLsizei>(height)); CHECKGL
+		glViewport(x, outer_height - y - height, static_cast<GLsizei>(std::max(0, width)), static_cast<GLsizei>(std::max(0, height))); CHECKGL
 	}
 
 	bool Rectangle::contains(int x, int y) const {
