@@ -68,6 +68,8 @@ namespace Game3 {
 	void CraftingTab::reset() {
 		SPAM("CraftingTab::reset()");
 
+		recipeList->clearChildren();
+
 		ClientPlayerPtr player = ui.getPlayer();
 		if (!player) {
 			return;
