@@ -866,11 +866,13 @@ namespace Game3 {
 	}
 
 	void Window::closeGame() {
-		if (game == nullptr)
+		if (game == nullptr) {
 			return;
+		}
 
 		// richPresence.setActivityDetails("Idling");
 
+		connected = false;
 		removeModule();
 		game->stopThread();
 		game.reset();
@@ -887,6 +889,7 @@ namespace Game3 {
 		// richPresence.setActivityStartTime(false);
 		// richPresence.setActivityDetails("Playing", true);
 
+		connected = true;
 		uiContext.reset();
 		uiContext.addDialog(getChatDialog());
 
@@ -1182,6 +1185,10 @@ namespace Game3 {
 
 	bool Window::isConnectedLocally() const {
 		return connectedLocally;
+	}
+
+	bool Window::isConnected() const {
+		return connected;
 	}
 
 	void Window::handleKeys() {

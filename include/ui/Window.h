@@ -123,6 +123,7 @@ namespace Game3 {
 			void feedFPS(double);
 			void showLoginAndRegisterDialogs(const std::string &hostname);
 			bool isConnectedLocally() const;
+			bool isConnected() const;
 
 		private:
 			struct KeyInfo {
@@ -146,6 +147,7 @@ namespace Game3 {
 			double runningSum = 0;
 			double runningFPS = 0;
 			bool connectedLocally = false;
+			bool connected = false;
 
 			void keyCallback(int key, int scancode, int action, int mods);
 			void charCallback(uint32_t codepoint, int mods);
