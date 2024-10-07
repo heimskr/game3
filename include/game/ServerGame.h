@@ -4,7 +4,7 @@
 #include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
-#include "net/RemoteClient.h"
+#include "net/GenericClient.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "threading/ThreadPool.h"
@@ -19,8 +19,8 @@
 #include <utility>
 
 namespace Game3 {
+	class GenericClient;
 	class Packet;
-	class RemoteClient;
 	class Server;
 
 	class ServerGame: public Game {
@@ -45,8 +45,8 @@ namespace Game3 {
 			void broadcastTileUpdate(RealmID, Layer, const Position &, TileID);
 			void broadcastFluidUpdate(RealmID, const Position &, FluidTile);
 			Side getSide() const override { return Side::Server; }
-			void queuePacket(std::shared_ptr<RemoteClient>, std::shared_ptr<Packet>);
-			void runCommand(RemoteClient &, const std::string &, GlobalID);
+			void queuePacket(std::shared_ptr<GenericClient>, std::shared_ptr<Packet>);
+			void runCommand(GenericClient &, const std::string &, GlobalID);
 			void entityChangingRealms(Entity &, const RealmPtr &new_realm, const Position &new_position);
 			void entityTeleported(Entity &, MovementContext);
 			void entityDestroyed(const Entity &);
@@ -90,15 +90,15 @@ namespace Game3 {
 			static Token generateRandomToken();
 
 		private:
-			MTQueue<std::pair<std::weak_ptr<RemoteClient>, std::shared_ptr<Packet>>> packetQueue;
+			MTQueue<std::pair<std::weak_ptr<GenericClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0;
 			ThreadPool pool;
 			std::unique_ptr<GameDB> database;
 			Token omnitoken = generateRandomToken();
 
-			void handlePacket(RemoteClient &, Packet &);
-			std::tuple<bool, std::string> commandHelper(RemoteClient &, const std::string &);
+			void handlePacket(GenericClient &, Packet &);
+			std::tuple<bool, std::string> commandHelper(GenericClient &, const std::string &);
 	};
 
 	using ServerGamePtr = std::shared_ptr<ServerGame>;

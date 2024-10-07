@@ -11,7 +11,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (ServerPlayerPtr player = client.getPlayer(); !player) {
 			auto server = game->getServer();
 			std::string display_name;
@@ -39,7 +39,7 @@ namespace Game3 {
 				game->addPlayer(player);
 				RealmPtr realm = game->getRealm(player->realmID);
 				player->setRealm(realm);
-				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+				player->weakClient = client.weak_from_this();
 				player->notifyOfRealm(*realm);
 				SUCCESS("Player {} logged in \e[2m(GID {})\e[22m", username, player->globalID);
 				player->init(game);
@@ -64,7 +64,7 @@ namespace Game3 {
 				client.send(make<RegistrationStatusPacket>(username, *displayName, player->token));
 				client.setPlayer(player);
 				auto realm = player->getRealm();
-				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+				player->weakClient = client.weak_from_this();
 				player->notifyOfRealm(*realm);
 				INFO("Player {}'s GID is {}", username, player->globalID);
 				client.send(make<LoginStatusPacket>(true, player->globalID, username, *displayName, player));

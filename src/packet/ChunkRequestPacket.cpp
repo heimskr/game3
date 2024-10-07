@@ -50,7 +50,7 @@ namespace Game3 {
 		}
 	}
 
-	void ChunkRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void ChunkRequestPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (generateMissing) {
 			for (const ChunkRequest &request: requests)
 				client.sendChunk(*game->getRealm(realmID), request.position, true, request.counterThreshold);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net/SendBuffer.h"
+#include "packet/ErrorPacket.h"
 #include "packet/Packet.h"
 #include "threading/Lockable.h"
 
@@ -57,6 +58,11 @@ namespace Game3 {
 			inline bool isClosed() const { return closed; }
 
 			inline std::shared_ptr<Server> getServer() { return weakServer.lock(); }
+
+			template <typename... Args>
+			void sendError(const char *format, Args &&...args) {
+				send(make<ErrorPacket>(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
+			}
 
 		protected:
 			std::weak_ptr<ServerPlayer> weakPlayer;

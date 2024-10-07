@@ -6,7 +6,7 @@
 #include "packet/SetHeldItemPacket.h"
 
 namespace Game3 {
-	void SetHeldItemPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void SetHeldItemPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		const ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.send(make<ErrorPacket>("Can't set held item: no player"));

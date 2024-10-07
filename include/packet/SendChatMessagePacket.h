@@ -18,6 +18,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << message; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> message; }
 
-		void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) override;
+		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
 	};
 }

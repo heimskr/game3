@@ -12,7 +12,7 @@
 #include "ui/gl/dialog/OmniDialog.h"
 
 namespace Game3 {
-	void SetActiveSlotPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void SetActiveSlotPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		if (slot < 0 || slot >= HOTBAR_SIZE) {
 			return;
 		}

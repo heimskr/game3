@@ -42,7 +42,7 @@ namespace Game3 {
 		auto right_scroller = make<Scroller>(ui, scale);
 		right_scroller->setChild(rightPane);
 		right_scroller->setHorizontalExpand(true);
-		hbox->append(right_scroller);
+		// hbox->append(right_scroller);
 
 		hbox->insertAtEnd(shared_from_this());
 	}

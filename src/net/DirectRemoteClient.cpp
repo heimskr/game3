@@ -51,6 +51,6 @@ namespace Game3 {
 			return;
 		}
 
-		server->game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
+		server->game->queuePacket(shared_from_this(), packet);
 	}
 }

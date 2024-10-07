@@ -7,7 +7,7 @@
 #include "packet/DragPacket.h"
 
 namespace Game3 {
-	void DragPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void DragPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		if (action != Action::Start && action != Action::Update)
 			return;
 

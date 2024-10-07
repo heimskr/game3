@@ -8,7 +8,7 @@
 #include "packet/AgentMessagePacket.h"
 
 namespace Game3 {
-	void AgentMessagePacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void AgentMessagePacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (!Agent::validateGID(globalID)) {
 			client.send(make<ErrorPacket>("Can't send message to agent: invalid GID"));
 			return;

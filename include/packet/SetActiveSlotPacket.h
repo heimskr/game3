@@ -18,7 +18,7 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const final { buffer << slot; }
 		void decode(Game &, Buffer &buffer)       final { buffer >> slot; }
 
-		void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) final;
+		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) final;
 		void handle(const std::shared_ptr<ClientGame> &) final;
 	};
 }

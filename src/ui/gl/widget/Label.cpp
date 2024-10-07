@@ -24,8 +24,9 @@ namespace Game3 {
 		tryWrap(renderers.text, width);
 		const UString &string = wrapped? wrapped.value() : text;
 
-		if (0 <= lastUnwrappedTextWidth)
+		if (0 <= lastUnwrappedTextWidth) {
 			adjustCoordinate(Orientation::Horizontal, x, width, std::min(width, lastUnwrappedTextWidth));
+		}
 
 		Widget::render(renderers, x, y, width, height);
 
@@ -35,8 +36,9 @@ namespace Game3 {
 		if (verticalAlignment == Alignment::End) {
 			align_top = false;
 			y_pos -= padding;
-			if (0 <= height)
+			if (0 <= height) {
 				y_pos += height;
+			}
 		} else if (verticalAlignment == Alignment::Center) {
 			y_pos -= padding;
 			if (0 < lastTextHeight) {

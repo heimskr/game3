@@ -159,11 +159,11 @@ namespace Game3 {
 		broadcast({position, realms.at(realm_id), nullptr}, make<FluidUpdatePacket>(realm_id, position, tile));
 	}
 
-	void ServerGame::queuePacket(std::shared_ptr<RemoteClient> client, std::shared_ptr<Packet> packet) {
+	void ServerGame::queuePacket(std::shared_ptr<GenericClient> client, std::shared_ptr<Packet> packet) {
 		packetQueue.emplace(std::move(client), std::move(packet));
 	}
 
-	void ServerGame::runCommand(RemoteClient &client, const std::string &command, GlobalID command_id) {
+	void ServerGame::runCommand(GenericClient &client, const std::string &command, GlobalID command_id) {
 		auto [success, message] = commandHelper(client, command);
 		client.send(make<CommandResultPacket>(command_id, success, std::move(message)));
 	}
@@ -184,8 +184,9 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityTeleported(Entity &entity, MovementContext context) {
-		if (entity.spawning)
+		if (entity.spawning) {
 			return;
+		}
 
 		const auto packet = make<EntityMovedPacket>(entity);
 		packet->arguments.isTeleport = context.isTeleport;
@@ -196,21 +197,28 @@ namespace Game3 {
 		}
 
 		if (auto cast_player = dynamic_cast<Player *>(&entity)) {
-			if (context.excludePlayer != cast_player->getGID())
+			if (context.excludePlayer != cast_player->getGID()) {
 				cast_player->send(packet);
+			}
 			auto lock = players.sharedLock();
-			for (const auto &player: players)
-				if (player.get() != cast_player && player->getRealm() && player->canSee(entity))
-					if (auto client = player->toServer()->weakClient.lock())
+			for (const auto &player: players) {
+				if (player.get() != cast_player && player->getRealm() && player->canSee(entity)) {
+					if (auto client = player->toServer()->weakClient.lock()) {
 						client->send(packet);
+					}
+				}
+			}
 			return;
 		}
 
 		auto lock = players.sharedLock();
-		for (const auto &player: players)
-			if (player->getRealm() && player->canSee(entity) && player->getGID() != context.excludePlayer)
-				if (auto client = player->toServer()->weakClient.lock())
+		for (const auto &player: players) {
+			if (player->getRealm() && player->canSee(entity) && player->getGID() != context.excludePlayer) {
+				if (auto client = player->toServer()->weakClient.lock()) {
 					client->send(packet);
+				}
+			}
+		}
 	}
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
@@ -219,8 +227,9 @@ namespace Game3 {
 		assert(server);
 		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
-		for (const auto &client: clients)
-			std::static_pointer_cast<RemoteClient>(client)->send(packet);
+		for (const auto &client: clients) {
+			client->send(packet);
+		}
 	}
 
 	void ServerGame::tileEntitySpawned(const TileEntityPtr &tile_entity) {
@@ -231,9 +240,11 @@ namespace Game3 {
 		ChunkRange(tile_entity->getChunk()).iterate([&](ChunkPosition chunk_position) {
 			if (auto entities = realm->getEntities(chunk_position)) {
 				auto lock = entities->sharedLock();
-				for (const WeakEntityPtr &weak_entity: *entities)
-					if (EntityPtr entity = weak_entity.lock(); entity && entity->isPlayer())
+				for (const WeakEntityPtr &weak_entity: *entities) {
+					if (EntityPtr entity = weak_entity.lock(); entity && entity->isPlayer()) {
 						safeDynamicCast<ServerPlayer>(entity)->send(packet);
+					}
+				}
 			}
 		});
 	}
@@ -347,11 +358,11 @@ namespace Game3 {
 		return omnitoken;
 	}
 
-	void ServerGame::handlePacket(RemoteClient &client, Packet &packet) {
+	void ServerGame::handlePacket(GenericClient &client, Packet &packet) {
 		packet.handle(getSelf(), client);
 	}
 
-	std::tuple<bool, std::string> ServerGame::commandHelper(RemoteClient &client, const std::string &command) {
+	std::tuple<bool, std::string> ServerGame::commandHelper(GenericClient &client, const std::string &command) {
 		if (command.empty())
 			return {false, "Command is empty."};
 

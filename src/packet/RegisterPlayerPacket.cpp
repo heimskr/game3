@@ -9,7 +9,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void RegisterPlayerPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void RegisterPlayerPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		auto server = game->getServer();
 
 		if (username.empty() || displayName.empty()) {
@@ -28,7 +28,7 @@ namespace Game3 {
 		client.send(make<RegistrationStatusPacket>(username, displayName, player->token));
 		client.setPlayer(player);
 		auto realm = player->getRealm();
-		player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+		player->weakClient = client.weak_from_this();
 		player->notifyOfRealm(*realm);
 		INFO("Player GID is {}", player->globalID);
 		client.send(make<LoginStatusPacket>(true, player->globalID, username, displayName, player));

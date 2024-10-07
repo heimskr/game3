@@ -12,7 +12,7 @@ namespace Game3 {
 		facingDirection(facing_direction),
 		offset(offset_) {}
 
-	void MovePlayerPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void MovePlayerPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		if (auto player = client.getPlayer()) {
 			player->path.clear();
 

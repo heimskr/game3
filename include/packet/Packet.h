@@ -7,7 +7,7 @@ namespace Game3 {
 	class Buffer;
 	class ClientGame;
 	class Game;
-	class RemoteClient;
+	class GenericClient;
 	class ServerGame;
 
 	class Packet {
@@ -28,7 +28,7 @@ namespace Game3 {
 			virtual void decode(Game &, Buffer &) = 0;
 			virtual PacketID getID() const = 0;
 
-			virtual void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) {
+			virtual void handle(const std::shared_ptr<ServerGame> &, GenericClient &) {
 				throw std::runtime_error("Packet " + std::to_string(getID()) + " cannot be handled server-side");
 			}
 

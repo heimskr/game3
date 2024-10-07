@@ -6,7 +6,7 @@
 #include "packet/DropItemPacket.h"
 
 namespace Game3 {
-	void DropItemPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void DropItemPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		const InventoryPtr inventory = client.getPlayer()->getInventory(0);
 
 		if (!inventory) {

@@ -5,7 +5,7 @@
 #include "packet/ErrorPacket.h"
 
 namespace Game3 {
-	void ContinuousInteractionPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void ContinuousInteractionPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		if (auto player = client.getPlayer()) {
 			if (modifiers) {
 				player->continuousInteraction = true;

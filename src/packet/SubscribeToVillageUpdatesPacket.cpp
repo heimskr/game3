@@ -6,7 +6,7 @@
 #include "packet/SubscribeToVillageUpdatesPacket.h"
 
 namespace Game3 {
-	void SubscribeToVillageUpdatesPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void SubscribeToVillageUpdatesPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.send(make<ErrorPacket>("No player."));

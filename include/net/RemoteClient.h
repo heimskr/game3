@@ -5,7 +5,6 @@
 
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
-#include "packet/ErrorPacket.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
@@ -60,11 +59,6 @@ namespace Game3 {
 
 			void close() final;
 			void removeSelf() override;
-
-			template <typename... Args>
-			void sendError(const char *format, Args &&...args) {
-				send(make<ErrorPacket>(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
-			}
 
 		protected:
 			using GenericClient::GenericClient;

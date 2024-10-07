@@ -54,7 +54,7 @@ namespace Game3 {
 			requests.emplace_back(data[i], data[i + 1]);
 	}
 
-	void EntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void EntityRequestPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
 			client.send(make<ErrorPacket>("Invalid realm"));

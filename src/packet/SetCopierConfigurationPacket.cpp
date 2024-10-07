@@ -8,7 +8,7 @@
 #include "packet/SetCopierConfigurationPacket.h"
 
 namespace Game3 {
-	void SetCopierConfigurationPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void SetCopierConfigurationPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.sendError("No player.");

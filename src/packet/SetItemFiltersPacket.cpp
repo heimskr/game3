@@ -8,7 +8,7 @@
 #include "tileentity/Pipe.h"
 
 namespace Game3 {
-	void SetItemFiltersPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void SetItemFiltersPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (!validateDirection(direction)) {
 			client.send(make<ErrorPacket>("Can't set item filters: invalid direction"));
 			return;

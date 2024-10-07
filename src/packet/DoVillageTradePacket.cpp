@@ -9,7 +9,7 @@
 #include "packet/DoVillageTradePacket.h"
 
 namespace Game3 {
-	void DoVillageTradePacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void DoVillageTradePacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		// Validate player
 
 		ServerPlayerPtr player = client.getPlayer();

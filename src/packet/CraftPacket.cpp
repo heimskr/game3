@@ -7,7 +7,7 @@
 #include "recipe/CraftingRecipe.h"
 
 namespace Game3 {
-	void CraftPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void CraftPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (count == 0)
 			return;
 
