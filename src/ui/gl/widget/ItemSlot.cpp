@@ -61,9 +61,9 @@ namespace Game3 {
 				} else {
 					tooltip->setText(stack->getTooltip());
 				}
-				tooltip->setRegion(lastRectangle);
-				tooltip->show(*this);
 			}
+			tooltip->setRegion(lastRectangle);
+			tooltip->show(*this);
 		} else {
 			tooltip->hide(*this);
 		}
