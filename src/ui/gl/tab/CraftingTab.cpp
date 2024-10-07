@@ -9,6 +9,7 @@
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/Icon.h"
+#include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
@@ -89,35 +90,50 @@ namespace Game3 {
 		recipe(std::move(recipe)) {}
 
 	void RecipeRow::init() {
+		setRowSpacing(2 * scale);
+		setColumnSpacing(2 * scale);
 		attach(make<Label>(ui, scale, "In:"), 0, 0);
 		attach(make<Label>(ui, scale, "Out:"), 1, 0);
 
-		GamePtr game = parent.getUI().getGame();
+		GamePtr game = ui.getGame();
 		auto &exemplars = game->registry<AttributeExemplarRegistry>();
 		auto &items = game->registry<ItemRegistry>();
 
 		std::size_t column = 1;
 
-		for (const CraftingRequirement &requirement: recipe->getInput(game)) {
-			auto icon = make<Icon>(ui, scale);
-			icon->setFixedSize(8 * scale, 8 * scale);
+		const std::vector<CraftingRequirement> inputs = recipe->getInput(game);
+		constexpr int icon_scale = 8;
+
+		for (const CraftingRequirement &requirement: inputs) {
 			if (requirement.is<ItemStackPtr>()) {
-				const ItemStackPtr &stack = requirement.get<ItemStackPtr>();
-				TexturePtr texture = stack->getTexture();
-				icon->setIconTexture(texture);
+				auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
+				item_slot->setStack(requirement.get<ItemStackPtr>());
+				attach(std::move(item_slot), 0, column);
 			} else {
-				const Identifier &attribute = requirement.get<AttributeRequirement>().attribute;
+				const AttributeRequirement &attribute_requirement = requirement.get<AttributeRequirement>();
+				const Identifier &attribute = attribute_requirement.attribute;
 				std::shared_ptr<RegisterableIdentifier> item_id = exemplars.maybe(attribute);
 				if (item_id == nullptr) {
+					auto icon = make<Icon>(ui, scale);
+					icon->setFixedSize(icon_scale * scale, icon_scale * scale);
 					icon->setIconTexture(cacheTexture("resources/gui/question_mark.png"));
+					attach(std::move(icon), 0, column);
 				} else {
-					auto stack = ItemStack::create(game, items.at(item_id->get()));
-					icon->setIconTexture(stack->getTexture(*game));
+					auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
+					item_slot->setStack(ItemStack::create(game, items.at(item_id->get()), attribute_requirement.count));
+					attach(std::move(item_slot), 0, column);
 				}
 			}
-			attach(icon, 0, column++);
+
+			++column;
 		}
 
 		column = 1;
+
+		for (const ItemStackPtr &output: recipe->getOutput(inputs, game)) {
+			auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
+			item_slot->setStack(output);
+			attach(std::move(item_slot), 1, column++);
+		}
 	}
 }
