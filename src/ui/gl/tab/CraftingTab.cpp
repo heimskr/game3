@@ -21,24 +21,30 @@
 namespace Game3 {
 	void CraftingTab::init() {
 		auto tab = shared_from_this();
-		auto scroller = make<Scroller>(ui, scale);
-		scroller->insertAtEnd(tab);
 
 		inventoryModule = ui.makePlayerInventoryModule();
 		hbox = make<Box>(ui, scale, Orientation::Horizontal, 0);
 		recipeList = make<Box>(ui, scale, Orientation::Vertical);
 		rightPane = make<Box>(ui, scale, Orientation::Vertical);
 
-		inventoryModule->setHorizontalExpand(true);
-		recipeList->setHorizontalExpand(true);
-		rightPane->setHorizontalExpand(true);
 		hbox->setHorizontalExpand(true);
 
-		hbox->append(inventoryModule);
-		hbox->append(recipeList);
-		hbox->append(rightPane);
+		auto inventory_scroller = make<Scroller>(ui, scale);
+		inventory_scroller->setChild(inventoryModule);
+		inventory_scroller->setHorizontalExpand(true);
+		hbox->append(inventory_scroller);
 
-		scroller->setChild(hbox);
+		auto recipe_scroller = make<Scroller>(ui, scale);
+		recipe_scroller->setChild(recipeList);
+		recipe_scroller->setHorizontalExpand(true);
+		hbox->append(recipe_scroller);
+
+		auto right_scroller = make<Scroller>(ui, scale);
+		right_scroller->setChild(rightPane);
+		right_scroller->setHorizontalExpand(true);
+		hbox->append(right_scroller);
+
+		hbox->insertAtEnd(shared_from_this());
 	}
 
 	void CraftingTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
