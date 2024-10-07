@@ -33,13 +33,15 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
-		if (!firstChild)
+		if (!firstChild) {
 			return;
+		}
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
-		if (lastChildHeight < 0)
+		if (lastChildHeight < 0) {
 			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight);
+		}
 
 		firstChild->render(renderers, xOffset, yOffset, width, lastChildHeight);
 
@@ -53,8 +55,9 @@ namespace Game3 {
 	}
 
 	bool Scroller::click(int button, int x, int y) {
-		if (lastVerticalScrollMouse || lastHorizontalScrollMouse)
+		if (lastVerticalScrollMouse || lastHorizontalScrollMouse) {
 			return false;
+		}
 
 		return firstChild && firstChild->click(button, x, y);
 	}
@@ -82,8 +85,9 @@ namespace Game3 {
 			}
 		}
 
-		if (firstChild && firstChild->dragStart(x, y))
+		if (firstChild && firstChild->dragStart(x, y)) {
 			return true;
+		}
 
 		lastVerticalScrollMouse = y - last_y;
 		ui.addDragUpdater(shared_from_this());
@@ -162,10 +166,16 @@ namespace Game3 {
 	}
 
 	void Scroller::setChild(WidgetPtr new_child) {
-		if (new_child)
+		if (new_child == firstChild) {
+			return;
+		}
+
+		if (new_child) {
 			new_child->insertAtStart(shared_from_this());
-		else if (firstChild)
+		} else if (firstChild) {
 			remove(firstChild);
+		}
+
 		xOffset = 0;
 		yOffset = 0;
 	}
@@ -180,7 +190,7 @@ namespace Game3 {
 
 	float Scroller::getVerticalOffset() const {
 		const float height = lastRectangle.height;
-		const float vertical_fraction = height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight);
+		const float vertical_fraction = replaceNaN(height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight), 0);
 		const float vertical_height = vertical_fraction * height;
 		return yOffset / lastChildHeight * (vertical_height - height);
 	}
@@ -192,7 +202,7 @@ namespace Game3 {
 
 	float Scroller::recalculateYOffset(float vertical_offset) const {
 		const float height = lastRectangle.height;
-		const float vertical_fraction = height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight);
+		const float vertical_fraction = replaceNaN(height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight), 0);
 		const float vertical_height = vertical_fraction * height;
 		return vertical_offset * lastChildHeight / (vertical_height - height);
 	}
@@ -204,15 +214,16 @@ namespace Game3 {
 
 	float Scroller::fixYOffset(float y_offset) const {
 		y_offset = std::min(0.f, y_offset);
-		if (lastChildHeight > 0)
+		if (lastChildHeight > 0) {
 			y_offset = std::max(y_offset, -lastChildHeight);
+		}
 		return y_offset;
 	}
 
 	void Scroller::updateVerticalRectangle() {
 		const auto [x, y, width, height] = lastRectangle;
 		const float bar_thickness = getBarThickness();
-		const float vertical_height = height * height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight);
+		const float vertical_height = replaceNaN(height * height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight), 0);
 		lastVerticalScrollbarRectangle.emplace(x + width - bar_thickness, y + getVerticalOffset(), bar_thickness, vertical_height);
 	}
 }
