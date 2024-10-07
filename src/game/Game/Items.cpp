@@ -393,7 +393,7 @@ namespace Game3 {
 			for (const char *color: {"red", "orange", "yellow", "green", "blue", "purple", "white", "black"}) {
 				std::string name = std::string(color) + " Flower";
 				name[0] = std::toupper(name[0]);
-				std::string post = "flower" + std::to_string(i) + "_" + color;
+				std::string post = std::format("flower{}_{}", i, color);
 				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10);
 				flower->addAttribute(Identifier("base:attribute/flower_" + std::string(color)));
 				add(flower);

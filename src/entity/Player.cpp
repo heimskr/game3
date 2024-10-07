@@ -397,6 +397,11 @@ namespace Game3 {
 		knownItems = item_ids;
 	}
 
+	bool Player::hasKnownItem(const Identifier &item_id) const {
+		auto lock = knownItems.sharedLock();
+		return knownItems.contains(item_id);
+	}
+
 	void Player::resetEphemeral() {
 		stopMoving();
 		continuousInteraction = false;

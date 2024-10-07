@@ -1,0 +1,27 @@
+{
+	"name": "base_attribute_exemplars",
+	"dependencies": [],
+	"data": [
+		["base:attribute_exemplar_map", {
+			"base:attribute/flower_red": "base:item/flower4_red",
+			"base:attribute/flower_orange": "base:item/flower4_orange",
+			"base:attribute/flower_yellow": "base:item/flower4_yellow",
+			"base:attribute/flower_green": "base:item/flower4_green",
+			"base:attribute/flower_blue": "base:item/flower4_blue",
+			"base:attribute/flower_purple": "base:item/flower4_purple",
+			"base:attribute/flower_white": "base:item/flower4_white",
+			"base:attribute/flower_black": "base:item/flower4_black",
+			"base:attribute/flower": "base:item/flower2_green",
+			"base:attribute/hammer": "base:item/iron_hammer",
+			"base:attribute/pickaxe": "base:item/iron_pickaxe",
+			"base:attribute/shovel": "base:item/iron_shovel",
+			"base:attribute/axe": "base:item/iron_axe",
+			"base:attribute/hoe": "base:item/iron_hoe",
+			"base:attribute/plantable": "base:item/sapling",
+			"base:attribute/melee_weapon": "base:item/iron_sword",
+			"base:attribute/weapon": "base:item/diamond_sword",
+			"base:attribute/void_pickaxe": "base:item/void_pickaxe",
+			"base:attribute/wrench": "base:item/wrench"
+		}]
+	]
+}

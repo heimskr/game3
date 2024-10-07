@@ -55,6 +55,8 @@ namespace Game3 {
 		const ptrdiff_t channels = texture->format == GL_RGBA? 4 : 3;
 		const size_t row_size = channels * width;
 
+		auto lock = rawImage.uniqueLock();
+
 		if (!rawImage || !isTextureCacheable()) {
 			rawImage = std::make_shared<uint8_t[]>(channels * width * height);
 			uint8_t *raw_pointer = rawImage.get();
@@ -91,14 +93,24 @@ namespace Game3 {
 		}
 	}
 
-	Item & Item::addAttribute(Identifier attribute) {
+	Item & Item::addAttribute(Identifier attribute) & {
 		attributes.insert(std::move(attribute));
 		return *this;
 	}
 
+	Item && Item::addAttribute(Identifier attribute) && {
+		attributes.insert(std::move(attribute));
+		return std::move(*this);
+	}
+
+	bool Item::hasAttribute(const Identifier &attribute) const {
+		return attributes.contains(attribute);
+	}
+
 	std::shared_ptr<ItemTexture> Item::getItemTexture(const ConstItemStackPtr &stack) {
-		if (isTextureCacheable() && cachedItemTexture)
+		if (isTextureCacheable() && cachedItemTexture) {
 			return cachedItemTexture;
+		}
 
 		GamePtr game = stack->getGame();
 		return cachedItemTexture = game->registry<ItemTextureRegistry>().at(identifier);
@@ -147,30 +159,34 @@ namespace Game3 {
 		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_, nlohmann::json data_):
-	item(game->registry<ItemRegistry>().at(id)), count(count_), data(std::move(data_)), weakGame(game) {
-		assert(item);
-		item->initStack(*game, *this);
-	}
+	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count, nlohmann::json data):
+		item(game->registry<ItemRegistry>().at(id)), count(count), data(std::move(data)), weakGame(game) {
+			assert(item != nullptr);
+			item->initStack(*game, *this);
+		}
 
 	TexturePtr ItemStack::getTexture() const {
 		GamePtr game = getGame();
 		return getTexture(*game);
 	}
 
-	TexturePtr ItemStack::getTexture(const Game &game_) const {
-		if (!(item && !item->isTextureCacheable()) && cachedTexture)
+	TexturePtr ItemStack::getTexture(const Game &game) const {
+		if (!(item && !item->isTextureCacheable()) && cachedTexture) {
 			return cachedTexture;
+		}
 
-		if (item)
-			return cachedTexture = item->getTexture(game_, shared_from_this());
+		if (item) {
+			return cachedTexture = item->getTexture(game, shared_from_this());
+		}
 
 		return {};
 	}
 
 	bool ItemStack::canMerge(const ItemStack &other) const {
-		if (!item || !other.item)
+		if (!item || !other.item) {
 			return false;
+		}
+
 		return *item == *other.item && data == other.data;
 	}
 
@@ -189,8 +205,10 @@ namespace Game3 {
 	}
 
 	bool ItemStack::reduceDurability(Durability amount) {
-		if (!hasDurability())
+		if (!hasDurability()) {
 			return false;
+		}
+
 		return (data["durability"].at(0) = std::max(0, data["durability"].at(0).get<Durability>() - amount)) == 0;
 	}
 
@@ -199,14 +217,17 @@ namespace Game3 {
 	}
 
 	bool ItemStack::hasDurability() const {
-		if (auto iter = data.find("durability"); iter != data.end())
+		if (auto iter = data.find("durability"); iter != data.end()) {
 			return 0 <= iter->get<std::pair<double, double>>().second;
+		}
+
 		return false;
 	}
 
 	double ItemStack::getDurabilityFraction() const {
-		if (!hasDurability())
+		if (!hasDurability()) {
 			return 1.;
+		}
 
 		const std::pair<double, double> &pair = data.at("durability");
 		return pair.first / pair.second;
@@ -250,8 +271,9 @@ namespace Game3 {
 
 	std::vector<ItemStackPtr> ItemStack::manyFromJSON(const GamePtr &game, const nlohmann::json &json) {
 		std::vector<ItemStackPtr> out;
-		for (const auto &item: json)
+		for (const auto &item: json) {
 			out.push_back(fromJSON(game, item));
+		}
 		return out;
 	}
 
@@ -348,8 +370,9 @@ namespace Game3 {
 	void to_json(nlohmann::json &json, const ItemStack &stack) {
 		json[0] = stack.item->identifier;
 		json[1] = stack.count;
-		if (!stack.data.empty())
+		if (!stack.data.empty()) {
 			json[2] = stack.data;
+		}
 	}
 
 	template <>

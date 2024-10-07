@@ -1,12 +1,25 @@
 #pragma once
 
 #include "ui/gl/tab/Tab.h"
+#include "ui/gl/widget/Grid.h"
 
 #include <memory>
 
 namespace Game3 {
 	class Box;
+	class CraftingTab;
 	class InventoryModule;
+
+	class RecipeRow: public Grid {
+		public:
+			RecipeRow(CraftingTab &, CraftingRecipePtr);
+
+			void init() final;
+
+		private:
+			CraftingTab &parent;
+			CraftingRecipePtr recipe;
+	};
 
 	class CraftingTab: public Tab {
 		public:

@@ -3,6 +3,9 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "packet/KnownItemsPacket.h"
+#include "ui/gl/dialog/OmniDialog.h"
+#include "ui/gl/tab/CraftingTab.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -11,5 +14,6 @@ namespace Game3 {
 
 	void KnownItemsPacket::handle(const ClientGamePtr &game) {
 		game->getPlayer()->setKnownItems(itemIDs);
+		game->getWindow()->getOmniDialog()->craftingTab->reset();
 	}
 }

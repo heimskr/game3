@@ -30,38 +30,49 @@ namespace Game3 {
 		path(std::move(path)) {}
 
 	void Texture::init() {
-		if (!valid) {
-			int channels = 0;
-			uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
-			if (raw == nullptr)
-				throw std::runtime_error("Couldn't load image from " + path.string());
-			init(std::shared_ptr<uint8_t[]>(raw, stbi_image_free), width, height);
+		if (valid) {
+			return;
 		}
+
+		int channels = 0;
+		uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
+		if (raw == nullptr) {
+			throw std::runtime_error("Couldn't load image from " + path.string());
+		}
+		init(std::shared_ptr<uint8_t[]>(raw, stbi_image_free), width, height);
 	}
 
 	void Texture::init(std::shared_ptr<uint8_t[]> new_data, int data_width, int data_height) {
-		if (!valid) {
-			width = data_width;
-			height = data_height;
-			data = std::move(new_data);
-			glGenTextures(1, &id); CHECKGL
-			glBindTexture(GL_TEXTURE_2D, id); CHECKGL
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
-			glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
-			valid = true;
+		if (valid) {
+			return;
 		}
+
+		width = data_width;
+		height = data_height;
+		data = std::move(new_data);
+		glGenTextures(1, &id); FORCE_CHECKGL
+		glBindTexture(GL_TEXTURE_2D, id); FORCE_CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); FORCE_CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); FORCE_CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); FORCE_CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); FORCE_CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); FORCE_CHECKGL
+		glBindTexture(GL_TEXTURE_2D, 0); FORCE_CHECKGL
+		valid = true;
 	}
 
 	void Texture::bind(int bind_id) {
 		init();
 		if (0 <= bind_id) {
-			glActiveTexture(GL_TEXTURE0 + bind_id); CHECKGL
+			glActiveTexture(GL_TEXTURE0 + bind_id); FORCE_CHECKGL
 		}
-		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, id); FORCE_CHECKGL
+	}
+
+	void Texture::dump(const std::filesystem::path &dump_path) {
+		assert(valid);
+		const int channels = alpha? 4 : 3;
+		stbi_write_png(dump_path.c_str(), width, height, channels, data.get(), width * channels);
 	}
 
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
@@ -81,7 +92,7 @@ namespace Game3 {
 		const std::string path = json.at(0);
 		if (auto iter = textureCache.find(path); iter != textureCache.end())
 			return iter->second;
-		return textureCache.try_emplace(path, std::make_shared<Texture>(json.get<Texture>())).first->second;
+		return textureCache.try_emplace(path, json.get<TexturePtr>()).first->second;
 	}
 
 	std::string Texture::filterToString(int filter) {
@@ -89,7 +100,8 @@ namespace Game3 {
 		switch (filter) {
 			case GL_NEAREST: return "nearest";
 			case GL_LINEAR:  return "linear";
-			default: throw std::runtime_error("Unrecognized filter: " + std::to_string(filter));
+			default:
+				throw std::runtime_error(std::format("Unrecognized filter: {}", filter));
 		}
 	}
 
@@ -100,18 +112,18 @@ namespace Game3 {
 		if (string == "linear")
 			return GL_LINEAR;
 
-		throw std::runtime_error("Unrecognized filter: " + string);
+		throw std::runtime_error(std::format("Unrecognized filter: {}", string));
 	}
 
-	void to_json(nlohmann::json &json, const Texture &texture) {
-		json[0] = texture.path;
-		json[1] = texture.alpha;
-		json[2] = Texture::filterToString(texture.filter);
+	void to_json(nlohmann::json &json, const TexturePtr &texture) {
+		json[0] = texture->path;
+		json[1] = texture->alpha;
+		json[2] = Texture::filterToString(texture->filter);
 	}
 
-	void from_json(const nlohmann::json &json, Texture &texture) {
+	void from_json(const nlohmann::json &json, TexturePtr &texture) {
 		bool alpha = 1 < json.size()? json.at(1).get<bool>() : true;
 		int filter = 2 < json.size()? Texture::stringToFilter(json.at(2)) : GL_NEAREST;
-		texture = *cacheTexture(json.at(0), alpha, filter);
+		texture = cacheTexture(json.at(0), alpha, filter);
 	}
 }

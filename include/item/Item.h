@@ -48,7 +48,9 @@ namespace Game3 {
 			virtual TexturePtr makeTexture(const Game &, const ConstItemStackPtr &) const;
 			virtual Identifier getTextureIdentifier(const ConstItemStackPtr &) const;
 			virtual void getOffsets(const Game &, std::shared_ptr<Texture> &, float &x_offset, float &y_offset);
-			Item & addAttribute(Identifier);
+			virtual Item & addAttribute(Identifier) &;
+			virtual Item && addAttribute(Identifier) &&;
+			virtual bool hasAttribute(const Identifier &) const;
 			virtual std::shared_ptr<ItemTexture> getItemTexture(const ConstItemStackPtr &);
 			virtual std::string getTooltip(const ConstItemStackPtr &);
 
@@ -77,7 +79,7 @@ namespace Game3 {
 			// virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
 		protected:
-			mutable std::shared_ptr<uint8_t[]> rawImage;
+			mutable Lockable<std::shared_ptr<uint8_t[]>> rawImage;
 			mutable std::shared_ptr<ItemTexture> cachedItemTexture;
 			mutable TexturePtr cachedTexture;
 	};

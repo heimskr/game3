@@ -42,5 +42,6 @@ namespace Game3 {
 		registries.add<ConsumptionRuleRegistry>();
 		registries.add<LiquefierRecipeRegistry>();
 		registries.add<BiomassLiquefierRecipeRegistry>();
+		registries.add<AttributeExemplarRegistry>();
 	}
 }

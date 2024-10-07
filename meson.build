@@ -3,7 +3,6 @@ project('game3', 'cpp', version: '0.41.0',
 	default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++23'])
 
 i18n = import('i18n')
-gnome = import('gnome')
 cxx = meson.get_compiler('cpp')
 
 config_h = configuration_data()
@@ -50,13 +49,3 @@ endforeach
 add_project_arguments(project_cpp_args, language: 'cpp')
 
 subdir('src')
-
-if build_machine.system() == 'linux'
-	subdir('data')
-	subdir('po')
-	gnome.post_install(
-		glib_compile_schemas: true,
-		gtk_update_icon_cache: true,
-		update_desktop_database: true,
-	)
-endif
