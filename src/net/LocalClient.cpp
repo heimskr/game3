@@ -294,6 +294,7 @@ namespace Game3 {
 
 		workGuard.reset();
 		ioContext.stop();
+		ioContext.poll_one();
 #else
 		sock->close(false);
 #endif

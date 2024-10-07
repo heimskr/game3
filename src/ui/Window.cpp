@@ -987,8 +987,10 @@ namespace Game3 {
 		}
 
 		client->onError = [this](const asio::error_code &errc) {
-			closeGame();
-			error(std::format("{} ({})", errc.message(), errc.value()));
+			queue([errc](Window &window) {
+				window.closeGame();
+				window.error(std::format("{} ({})", errc.message(), errc.value()));
+			});
 		};
 
 		game->setClient(client);
