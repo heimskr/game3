@@ -7,7 +7,7 @@
 
 namespace {
 	constexpr float SCROLL_SPEED = 64;
-	constexpr bool ALLOW_VERTICAL_OVERSCROLL = true;
+	constexpr bool ALLOW_VERTICAL_OVERSCROLL = false;
 	constexpr Game3::Color DEFAULT_SCROLLBAR_COLOR{"#49120080"};
 }
 
@@ -97,11 +97,16 @@ namespace Game3 {
 
 	bool Scroller::dragUpdate(int x, int y) {
 		if (lastVerticalScrollMouse) {
-			const auto start_y = *lastVerticalScrollMouse;
-			const float last_y = lastRectangle.y;
-			const float new_vertical_offset = getVerticalOffset() + (y - last_y - start_y) * (reverseScroll? -0.5 : 1.0);
-			yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
-			lastVerticalScrollMouse = y - last_y;
+			if (ALLOW_VERTICAL_OVERSCROLL || (lastChildHeight > lastRectangle.height)) {
+				const auto start_y = *lastVerticalScrollMouse;
+				const float last_y = lastRectangle.y;
+				const float new_vertical_offset = getVerticalOffset() + (y - last_y - start_y) * (reverseScroll? -0.5 : 1.0);
+				yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
+				lastVerticalScrollMouse = y - last_y;
+			} else {
+				yOffset = 0;
+				lastVerticalScrollMouse = 0;
+			}
 			updateVerticalRectangle();
 			return true;
 		}
@@ -127,11 +132,17 @@ namespace Game3 {
 
 	bool Scroller::scroll(float x_delta, float y_delta, int, int) {
 		xOffset += (getNatural()? -x_delta : x_delta) * SCROLL_SPEED;
-		yOffset += (getNatural()? -y_delta : y_delta) * SCROLL_SPEED;
 		xOffset = std::min(0.f, xOffset);
-		yOffset = fixYOffset(yOffset);
+
+		if (ALLOW_VERTICAL_OVERSCROLL || (lastChildHeight > lastRectangle.height)) {
+			yOffset += (getNatural()? -y_delta : y_delta) * SCROLL_SPEED;
+			yOffset = fixYOffset(yOffset);
+		} else {
+			yOffset = 0;
+		}
+
 		updateVerticalRectangle();
-		static_assert(ALLOW_VERTICAL_OVERSCROLL); // TODO
+		// static_assert(ALLOW_VERTICAL_OVERSCROLL); // TODO
 		return true;
 	}
 
@@ -192,7 +203,7 @@ namespace Game3 {
 		const float height = lastRectangle.height;
 		const float vertical_fraction = replaceNaN(height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight), 0);
 		const float vertical_height = vertical_fraction * height;
-		return yOffset / lastChildHeight * (vertical_height - height);
+		return replaceNaN(yOffset / lastChildHeight * ((ALLOW_VERTICAL_OVERSCROLL? vertical_height : 0) - height), 0);
 	}
 
 	float Scroller::getHorizontalOffset() const {
@@ -204,7 +215,7 @@ namespace Game3 {
 		const float height = lastRectangle.height;
 		const float vertical_fraction = replaceNaN(height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight), 0);
 		const float vertical_height = vertical_fraction * height;
-		return vertical_offset * lastChildHeight / (vertical_height - height);
+		return replaceNaN(vertical_offset * lastChildHeight / ((ALLOW_VERTICAL_OVERSCROLL? vertical_height : 0) - height), 0);
 	}
 
 	float Scroller::recalculateXOffset(float) const {
@@ -214,16 +225,24 @@ namespace Game3 {
 
 	float Scroller::fixYOffset(float y_offset) const {
 		y_offset = std::min(0.f, y_offset);
-		if (lastChildHeight > 0) {
-			y_offset = std::max(y_offset, -lastChildHeight);
+		if constexpr (ALLOW_VERTICAL_OVERSCROLL) {
+			if (lastChildHeight > 0) {
+				y_offset = std::max(y_offset, -lastChildHeight);
+			}
+		} else {
+			if (lastChildHeight - lastRectangle.height > 0) {
+				y_offset = std::max(y_offset, lastRectangle.height - lastChildHeight);
+			}
 		}
 		return y_offset;
 	}
 
 	void Scroller::updateVerticalRectangle() {
 		const auto [x, y, width, height] = lastRectangle;
-		const float bar_thickness = getBarThickness();
 		const float vertical_height = replaceNaN(height * height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight : lastChildHeight), 0);
-		lastVerticalScrollbarRectangle.emplace(x + width - bar_thickness, y + getVerticalOffset(), bar_thickness, vertical_height);
+		if (!std::isinf(vertical_height)) {
+			const float bar_thickness = getBarThickness();
+			lastVerticalScrollbarRectangle.emplace(x + width - bar_thickness, y + getVerticalOffset(), bar_thickness, vertical_height);
+		}
 	}
 }
