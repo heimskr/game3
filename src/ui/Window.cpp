@@ -548,16 +548,25 @@ namespace Game3 {
 				has_been_nonzero = true;
 			}
 
-			textRenderer.drawOnScreen("game3", TextRenderOptions{
-				.x = getWidth() / 2.0,
-				.y = 64.0,
-				.scaleX = 2.5,
-				.scaleY = 2.5,
-				.color = OKHsv{hue += 0.001, 1, 1, 1}.convert<Color>(),
-				.align = TextAlign::Center,
-				.alignTop = true,
-				.shadow{1, 1, 1, 1},
-			});
+			OKHsv hsv{hue += 0.001, 1, 1, 1};
+			constexpr int i_max = 32;
+			constexpr double offset_factor = 2;
+			constexpr double x_offset = offset_factor * i_max;
+
+			for (int i = 0; i < i_max; ++i) {
+				const double offset = offset_factor * (i_max - i);
+				textRenderer.drawOnScreen("game3", TextRenderOptions{
+					.x = getWidth() / 2.0 + (offset - x_offset) / 2,
+					.y = 64.0 + offset / 2,
+					.scaleX = 2.5,
+					.scaleY = 2.5,
+					.color = hsv.convert<Color>(),
+					.align = TextAlign::Center,
+					.alignTop = true,
+				});
+
+				hsv.hue += 0.5 / i_max;
+			}
 		}
 
 		uiContext.render(getMouseX(), getMouseY());

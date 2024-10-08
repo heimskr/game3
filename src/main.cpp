@@ -4,6 +4,7 @@
 #include "client/RichPresence.h"
 #include "client/ServerWrapper.h"
 #include "game/ClientGame.h"
+#include "graphics/Texture.h"
 #include "net/Server.h"
 #include "scripting/ScriptEngine.h"
 #include "tools/Flasker.h"
@@ -11,6 +12,7 @@
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"
@@ -280,8 +282,29 @@ int main(int argc, char **argv) {
 
 	SystemTimePoint time = getTime();
 
+	constexpr std::array paths{
+		"resources/gui/stone.png",
+		"resources/gui/dirt.png",
+		"resources/gui/grass.png",
+		"resources/gui/grimrubble.png",
+	};
+
+	TexturePtr stone = cacheTexture(choose(paths, std::random_device{}));
+
 	while (!glfwWindowShouldClose(glfw_window)) {
 		GL::clear(0, 0, 0);
+		if (!window->game) {
+			constexpr float strength = 0.3;
+			window->singleSpriteRenderer.drawOnScreen(stone, RenderOptions{
+				.sizeX = static_cast<double>(window->getWidth()),
+				.sizeY = static_cast<double>(window->getHeight()),
+				.scaleX = 2 * UI_SCALE,
+				.scaleY = 2 * UI_SCALE,
+				.color{strength, strength, strength, 1},
+				.invertY = false,
+				.wrapMode = GL_REPEAT,
+			});
+		}
 		window->tick();
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
