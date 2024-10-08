@@ -52,4 +52,8 @@ namespace Game3 {
 	Rectangle Rectangle::operator-(const Rectangle &other) const {
 		return {x - other.x, y - other.y, width, height};
 	}
+
+	Rectangle::operator bool() const {
+		return width > 0 && height > 0;
+	}
 }

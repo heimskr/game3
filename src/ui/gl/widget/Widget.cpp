@@ -355,7 +355,7 @@ namespace Game3 {
 	}
 
 	bool Widget::shouldCull() const {
-		return lastRectangle.width <= 0 || lastRectangle.height <= 0;
+		return !ui.scissorStack.getTop().rectangle.intersection(lastRectangle);
 	}
 
 	bool Widget::findAttributeUp(const std::string &attribute, int depth_limit) const {

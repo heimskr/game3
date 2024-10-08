@@ -32,6 +32,9 @@ namespace Game3 {
 
 		/** Ignores the width/height of the RHS and uses the width/height of the LHS. */
 		Rectangle operator-(const Rectangle &) const;
+
+		/** Returns whether both the height and width of the rectangle are positive. */
+		operator bool() const;
 	};
 }
 
