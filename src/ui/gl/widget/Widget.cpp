@@ -36,28 +36,35 @@ namespace Game3 {
 	}
 
 	bool Widget::click(int button, int x, int y) {
-		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick)
+		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick) {
 			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
+		}
 
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->click(button, x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->click(button, x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
 
 	bool Widget::mouseDown(int button, int x, int y) {
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->mouseDown(button, x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->mouseDown(button, x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
 
 	bool Widget::mouseUp(int button, int x, int y) {
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->mouseUp(button, x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->mouseUp(button, x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -68,9 +75,11 @@ namespace Game3 {
 		if (onDragStart && onDragStart(*this, x - lastRectangle.x, y - lastRectangle.y))
 			return true;
 
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->dragStart(x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->dragStart(x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -79,9 +88,11 @@ namespace Game3 {
 		if (onDragUpdate && onDragUpdate(*this, x - lastRectangle.x, y - lastRectangle.y))
 			return true;
 
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->dragUpdate(x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->dragUpdate(x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -89,17 +100,21 @@ namespace Game3 {
 	bool Widget::dragEnd(int x, int y) {
 		dragOrigin.reset();
 
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->dragEnd(x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->dragEnd(x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
 
 	bool Widget::scroll(float x_delta, float y_delta, int x, int y) {
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y))
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -123,8 +138,9 @@ namespace Game3 {
 	void Widget::onFocus() {}
 
 	void Widget::onBlur() {
-		for (WidgetPtr child = firstChild; child; child = child->nextSibling)
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
 			child->onBlur();
+		}
 	}
 
 	void Widget::maybeRemeasure(const RendererContext &renderers, int width, int height) {
@@ -165,20 +181,23 @@ namespace Game3 {
 
 		WidgetPtr self = shared_from_this();
 
-		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent) {
 			old_parent->remove(self);
-		else
+		} else {
 			weakParent = parent;
+		}
 
 		auto next = sibling->nextSibling;
 		previousSibling = sibling;
 		nextSibling = next;
-		if (next)
+		if (next) {
 			next->previousSibling = self;
+		}
 		sibling->nextSibling = self;
 
-		if (parent->lastChild == sibling)
+		if (parent->lastChild == sibling) {
 			parent->lastChild = self;
+		}
 
 		++parent->childCount;
 
@@ -191,20 +210,23 @@ namespace Game3 {
 
 		WidgetPtr self = shared_from_this();
 
-		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent) {
 			old_parent->remove(self);
-		else
+		} else {
 			weakParent = parent;
+		}
 
 		auto previous = sibling->previousSibling.lock();
 		previousSibling = previous;
 		nextSibling = sibling;
-		if (previous)
+		if (previous) {
 			previous->nextSibling = self;
+		}
 		sibling->previousSibling = self;
 
-		if (parent->firstChild == sibling)
+		if (parent->firstChild == sibling) {
 			parent->firstChild = self;
+		}
 
 		++parent->childCount;
 
@@ -216,19 +238,22 @@ namespace Game3 {
 
 		WidgetPtr self = shared_from_this();
 
-		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent) {
 			old_parent->remove(self);
-		else
+		} else {
 			weakParent = parent;
+		}
 
 		nextSibling = parent->firstChild;
-		if (nextSibling)
+		if (nextSibling) {
 			nextSibling->previousSibling = self;
+		}
 
 		parent->firstChild = self;
 
-		if (!parent->lastChild)
+		if (!parent->lastChild) {
 			parent->lastChild = self;
+		}
 
 		++parent->childCount;
 
@@ -240,18 +265,22 @@ namespace Game3 {
 
 		WidgetPtr self = shared_from_this();
 
-		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent)
+		if (WidgetPtr old_parent = weakParent.lock(); old_parent == parent) {
 			old_parent->remove(self);
-		weakParent = parent;
+		} else {
+			weakParent = parent;
+		}
 
 		previousSibling = parent->lastChild;
-		if (auto previous = previousSibling.lock())
+		if (auto previous = previousSibling.lock()) {
 			previous->nextSibling = self;
+		}
 
 		parent->lastChild = self;
 
-		if (!parent->firstChild)
+		if (!parent->firstChild) {
 			parent->firstChild = self;
+		}
 
 		++parent->childCount;
 
@@ -262,17 +291,21 @@ namespace Game3 {
 		assert(child);
 		assert(child->getParent().get() == this);
 
-		if (firstChild == child)
+		if (firstChild == child) {
 			firstChild = child->nextSibling;
+		}
 
-		if (lastChild == child)
+		if (lastChild == child) {
 			lastChild = child->previousSibling.lock();
+		}
 
-		if (auto previous = child->previousSibling.lock())
+		if (auto previous = child->previousSibling.lock()) {
 			previous->nextSibling = child->nextSibling;
+		}
 
-		if (child->nextSibling)
+		if (child->nextSibling) {
 			child->nextSibling->previousSibling = child->previousSibling;
+		}
 
 		child->weakParent.reset();
 		child->previousSibling.reset();
@@ -306,8 +339,10 @@ namespace Game3 {
 	}
 
 	std::string Widget::describe() const {
-		if (name.empty())
+		if (name.empty()) {
 			return DEMANGLE(*this);
+		}
+
 		return std::format("{}(name=\"{}\")", DEMANGLE(*this), name);
 	}
 
@@ -319,20 +354,33 @@ namespace Game3 {
 		return !suppressChildUpdates;
 	}
 
+	bool Widget::shouldCull() const {
+		return lastRectangle.width <= 0 || lastRectangle.height <= 0;
+	}
+
 	bool Widget::findAttributeUp(const std::string &attribute, int depth_limit) const {
-		for (std::shared_ptr<const Widget> widget = shared_from_this(); widget && depth_limit >= 0; --depth_limit, widget = widget->getParent())
-			if (widget->hasAttribute(attribute))
+		for (std::shared_ptr<const Widget> widget = shared_from_this(); widget && depth_limit >= 0; --depth_limit, widget = widget->getParent()) {
+			if (widget->hasAttribute(attribute)) {
 				return true;
+			}
+		}
+
 		return false;
 	}
 
 	bool Widget::findAttributeDown(const std::string &attribute, int depth_limit) const {
-		if (hasAttribute(attribute))
+		if (hasAttribute(attribute)) {
 			return true;
-		if (depth_limit > 0)
-			for (WidgetPtr child = firstChild; child; child = child->nextSibling)
-				if (child->findAttributeDown(attribute, depth_limit - 1))
+		}
+
+		if (depth_limit > 0) {
+			for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+				if (child->findAttributeDown(attribute, depth_limit - 1)) {
 					return true;
+				}
+			}
+		}
+
 		return false;
 	}
 
@@ -349,13 +397,13 @@ namespace Game3 {
 	}
 
 	void Widget::setOnClick(std::function<bool(Widget &)> new_onclick) {
-		onClick = [this, new_onclick = std::move(new_onclick)](Widget &widget, int button, int, int) -> bool {
+		onClick = [new_onclick = std::move(new_onclick)](Widget &widget, int button, int, int) -> bool {
 			return button == LEFT_BUTTON && new_onclick(widget);
 		};
 	}
 
 	void Widget::setOnClick(std::function<void(Widget &)> new_onclick) {
-		onClick = [this, new_onclick = std::move(new_onclick)](Widget &widget, int button, int, int) -> bool {
+		onClick = [new_onclick = std::move(new_onclick)](Widget &widget, int button, int, int) -> bool {
 			if (button != LEFT_BUTTON) {
 				return false;
 			}

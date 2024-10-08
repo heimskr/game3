@@ -11,6 +11,10 @@ namespace Game3 {
 
 		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		const float original_x = x;
 
 		for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {

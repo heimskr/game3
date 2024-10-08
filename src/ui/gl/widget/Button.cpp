@@ -46,6 +46,10 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		RectangleRenderer &rectangler = renderers.rectangle;
 		const Color &top_color = pressed? topBorderColorPressed : topBorderColor;
 		const Color &bottom_color = pressed? bottomBorderColorPressed : bottomBorderColor;

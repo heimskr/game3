@@ -31,6 +31,10 @@ namespace Game3 {
 		maybeRemeasure(renderers, width, height);
 		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		RectangleRenderer &rectangler = renderers.rectangle;
 
 		const bool vertical = orientation == Orientation::Vertical;

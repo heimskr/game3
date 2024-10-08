@@ -109,6 +109,8 @@ namespace Game3 {
 			/** Returns false if updates are suppressed. */
 			virtual bool onChildrenUpdated();
 
+			virtual bool shouldCull() const;
+
 		public:
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnClick(std::function<bool(Widget &)>);

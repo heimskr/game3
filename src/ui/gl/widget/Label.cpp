@@ -30,6 +30,10 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		float y_pos = y + padding;
 		bool align_top = true;
 

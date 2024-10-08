@@ -20,7 +20,7 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
-		if (!iconTexture) {
+		if (!iconTexture || shouldCull()) {
 			return;
 		}
 

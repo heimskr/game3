@@ -26,8 +26,9 @@ namespace Game3 {
 		x += handle_size / 2;
 		width -= handle_size;
 
-		if (width <= 0 || height <= 0)
+		if (width <= 0 || height <= 0) {
 			return;
+		}
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		const float bar_height = getBarHeight();
@@ -60,8 +61,9 @@ namespace Game3 {
 	bool Slider::dragUpdate(int x, int y) {
 		Widget::dragUpdate(x, y);
 
-		if (!isDragging())
+		if (!isDragging()) {
 			return false;
+		}
 
 		const float difference = std::min(lastRectangle.width, x - lastRectangle.x);
 
@@ -108,8 +110,9 @@ namespace Game3 {
 				if (const std::size_t period = text.find('.'); period != UString::npos) {
 					if (displayDigits == 0) {
 						text.erase(period);
-						if (!text.empty() && text[0] == '-')
+						if (!text.empty() && text[0] == '-') {
 							text.erase(0, 1);
+						}
 					} else if (period + 1 + displayDigits < text.length()) {
 						text.erase(period + 1 + displayDigits);
 					}
@@ -154,8 +157,9 @@ namespace Game3 {
 	}
 
 	void Slider::setValue(double new_value) {
-		if (step > 0)
+		if (step > 0) {
 			new_value -= std::remainder(new_value - minimum, step);
+		}
 
 		if (value != new_value) {
 			tooltipText.reset();
