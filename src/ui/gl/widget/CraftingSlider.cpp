@@ -30,6 +30,7 @@ namespace Game3 {
 		valueSlider->setRange(1.0, static_cast<double>(getMaximum()));
 		valueSlider->setStep(1.0);
 		valueSlider->setDisplayDigits(0);
+		valueSlider->setValue(1.0);
 		valueSlider->onValueUpdate.connect([this](Slider &, double new_value) {
 			setValue(static_cast<std::size_t>(new_value));
 		});
