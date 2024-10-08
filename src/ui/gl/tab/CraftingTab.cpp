@@ -149,10 +149,5 @@ namespace Game3 {
 
 		auto slider = make<CraftingSlider>(ui, scale * 0.75);
 		append(slider);
-
-		// auto hbox = make<Box>(ui, scale, Orientation::Horizontal, 0);
-		// auto pb = make<ProgressBar>(ui, scale, 0.5);
-		// hbox->append(pb);
-		// append(hbox);
 	}
 }
