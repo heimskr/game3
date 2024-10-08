@@ -111,6 +111,8 @@ namespace Game3 {
 
 		public:
 			virtual void setOnClick(decltype(onClick));
+			virtual void setOnClick(std::function<bool(Widget &)>);
+			virtual void setOnClick(std::function<void(Widget &)>);
 			virtual void setOnDragStart(decltype(onDragStart));
 			virtual void setOnDragUpdate(decltype(onDragUpdate));
 

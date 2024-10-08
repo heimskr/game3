@@ -106,8 +106,9 @@ namespace Game3 {
 
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
 
-			if (std::filesystem::exists("settings.json"))
+			try {
 				settings = nlohmann::json::parse(readFile("settings.json"));
+			} catch (const std::ios_base::failure &) {}
 
 			settings.apply();
 

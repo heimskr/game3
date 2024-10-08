@@ -196,6 +196,10 @@ namespace Game3 {
 		bool out = false;
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
+			if (dialog->contains(x, y)) {
+				out = true;
+			}
+
 			if (dialog->dragEnd(x, y)) {
 				out = true;
 				break;
@@ -208,8 +212,9 @@ namespace Game3 {
 			setDraggedWidget(nullptr);
 		}
 
-		if (!out)
+		if (!out) {
 			return hotbar->contains(x, y) && hotbar->dragEnd(x, y);
+		}
 
 		return true;
 	}

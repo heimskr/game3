@@ -2,6 +2,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "ui/gl/widget/Widget.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Defer.h"
 #include "util/Demangle.h"
@@ -345,6 +346,23 @@ namespace Game3 {
 
 	void Widget::setOnClick(decltype(onClick) new_onclick) {
 		onClick = std::move(new_onclick);
+	}
+
+	void Widget::setOnClick(std::function<bool(Widget &)> new_onclick) {
+		onClick = [this, new_onclick = std::move(new_onclick)](Widget &widget, int button, int, int) -> bool {
+			return button == LEFT_BUTTON && new_onclick(widget);
+		};
+	}
+
+	void Widget::setOnClick(std::function<void(Widget &)> new_onclick) {
+		onClick = [this, new_onclick = std::move(new_onclick)](Widget &widget, int button, int, int) -> bool {
+			if (button != LEFT_BUTTON) {
+				return false;
+			}
+
+			new_onclick(widget);
+			return true;
+		};
 	}
 
 	void Widget::setOnDragStart(decltype(onDragStart) new_ondragstart) {

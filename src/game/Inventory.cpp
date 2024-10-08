@@ -135,7 +135,7 @@ namespace Game3 {
 			if (auto locked_old = weakOwner.lock()) {
 				if (locked_new->getSide() != locked_old->getSide()) {
 					WARN("Replacing inventory side with {}, which isn't the original {} side", locked_new->getSide(), locked_old->getSide());
-					raise(SIGTRAP);
+					// raise(SIGTRAP);
 				}
 			}
 		}

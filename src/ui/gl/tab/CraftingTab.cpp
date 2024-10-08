@@ -8,15 +8,16 @@
 #include "ui/gl/tab/CraftingTab.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/ContextMenu.h"
+#include "ui/gl/widget/CraftingSlider.h"
+#include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/ItemSlot.h"
+#include "ui/gl/widget/ProgressBar.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "util/Util.h"
-
-#include <cassert>
 
 namespace Game3 {
 	void CraftingTab::init() {
@@ -25,7 +26,6 @@ namespace Game3 {
 		inventoryModule = ui.makePlayerInventoryModule();
 		hbox = make<Box>(ui, scale, Orientation::Horizontal, 0);
 		recipeList = make<Box>(ui, scale, Orientation::Vertical);
-		rightPane = make<Box>(ui, scale, Orientation::Vertical);
 
 		hbox->setHorizontalExpand(true);
 
@@ -38,11 +38,6 @@ namespace Game3 {
 		recipe_scroller->setChild(recipeList);
 		recipe_scroller->setHorizontalExpand(true);
 		hbox->append(recipe_scroller);
-
-		auto right_scroller = make<Scroller>(ui, scale);
-		right_scroller->setChild(rightPane);
-		right_scroller->setHorizontalExpand(true);
-		// hbox->append(right_scroller);
 
 		hbox->insertAtEnd(shared_from_this());
 	}
@@ -93,15 +88,16 @@ namespace Game3 {
 	}
 
 	RecipeRow::RecipeRow(CraftingTab &parent, CraftingRecipePtr recipe):
-		Grid(parent.getUI(), parent.getScale()),
+		Box(parent.getUI(), parent.getScale(), Orientation::Vertical, 0),
 		parent(parent),
 		recipe(std::move(recipe)) {}
 
 	void RecipeRow::init() {
-		setRowSpacing(2 * scale);
-		setColumnSpacing(2 * scale);
-		attach(make<Label>(ui, scale, "In:"), 0, 0);
-		attach(make<Label>(ui, scale, "Out:"), 1, 0);
+		auto grid = make<Grid>(ui, scale);
+		grid->setRowSpacing(2 * scale);
+		grid->setColumnSpacing(2 * scale);
+		grid->attach(make<Label>(ui, scale, "In:"), 0, 0);
+		grid->attach(make<Label>(ui, scale, "Out:"), 1, 0);
 
 		GamePtr game = ui.getGame();
 		auto &exemplars = game->registry<AttributeExemplarRegistry>();
@@ -116,7 +112,7 @@ namespace Game3 {
 			if (requirement.is<ItemStackPtr>()) {
 				auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
 				item_slot->setStack(requirement.get<ItemStackPtr>());
-				attach(std::move(item_slot), 0, column);
+				grid->attach(std::move(item_slot), 0, column);
 			} else {
 				const AttributeRequirement &attribute_requirement = requirement.get<AttributeRequirement>();
 				const Identifier &attribute = attribute_requirement.attribute;
@@ -125,12 +121,12 @@ namespace Game3 {
 					auto icon = make<Icon>(ui, scale);
 					icon->setFixedSize(icon_scale * scale, icon_scale * scale);
 					icon->setIconTexture(cacheTexture("resources/gui/question_mark.png"));
-					attach(std::move(icon), 0, column);
+					grid->attach(std::move(icon), 0, column);
 				} else {
 					auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
 					item_slot->setStack(ItemStack::create(game, items.at(item_id->get()), attribute_requirement.count));
 					item_slot->setTooltipText(std::format("Any {}", attribute.getPostPath()));
-					attach(std::move(item_slot), 0, column);
+					grid->attach(std::move(item_slot), 0, column);
 				}
 			}
 
@@ -142,7 +138,21 @@ namespace Game3 {
 		for (const ItemStackPtr &output: recipe->getOutput(inputs, game)) {
 			auto item_slot = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2);
 			item_slot->setStack(output);
-			attach(std::move(item_slot), 1, column++);
+			grid->attach(std::move(item_slot), 1, column++);
 		}
+
+		append(grid);
+
+		if (recipe->stationType) {
+			append(make<Label>(ui, scale * 0.75, std::format("Station: {}", recipe->stationType.getPostPath())));
+		}
+
+		auto slider = make<CraftingSlider>(ui, scale * 0.75);
+		append(slider);
+
+		// auto hbox = make<Box>(ui, scale, Orientation::Horizontal, 0);
+		// auto pb = make<ProgressBar>(ui, scale, 0.5);
+		// hbox->append(pb);
+		// append(hbox);
 	}
 }
