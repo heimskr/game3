@@ -10,5 +10,6 @@ namespace Game3 {
 			GrassTile();
 
 			void randomTick(const Place &) override;
+			bool interact(const Place &, Layer, const ItemStackPtr &used_item, Hand) override;
 	};
 }
