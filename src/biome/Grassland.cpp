@@ -1,6 +1,4 @@
-#include <unordered_set>
-
-#include "graphics/Tileset.h"
+#include "Options.h"
 #include "biome/Grassland.h"
 #include "entity/Chicken.h"
 #include "entity/Cyclops.h"
@@ -8,6 +6,7 @@
 #include "entity/Pig.h"
 #include "entity/Sheep.h"
 #include "game/Game.h"
+#include "graphics/Tileset.h"
 #include "item/Item.h"
 #include "lib/noise.h"
 #include "realm/Realm.h"
@@ -130,8 +129,10 @@ namespace Game3 {
 			generateLilypad(Place({row, column}, realm.shared_from_this()), lilypad_rand <= 2);
 
 		if (grassSet.contains(tile1) && realm.middleEmpty({row, column})) {
-			if (std::uniform_int_distribution(1, 100)(rng) <= 2)
-				realm.setTile(Layer::Submerged, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
+			if constexpr (SPAWN_BIG_FLOWERS) {
+				if (std::uniform_int_distribution(1, 100)(rng) <= 2)
+					realm.setTile(Layer::Submerged, {row, column}, choose(tileset.getCategoryIDs("base:category/flowers"), rng), false);
+			}
 
 			std::shared_ptr<LivingEntity> spawned_entity;
 
