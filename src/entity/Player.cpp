@@ -336,6 +336,11 @@ namespace Game3 {
 		send(make<SetPlayerStationTypesPacket>(stationTypes, false));
 	}
 
+	bool Player::hasStationType(const Identifier &station_type) const {
+		auto lock = stationTypes.sharedLock();
+		return stationTypes.contains(station_type);
+	}
+
 	PlayerPtr Player::getShared() {
 		return safeDynamicCast<Player>(shared_from_this());
 	}

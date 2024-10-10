@@ -76,6 +76,7 @@ namespace Game3 {
 			bool send(const PacketPtr &);
 			void addStationType(Identifier);
 			void removeStationType(const Identifier &);
+			bool hasStationType(const Identifier &) const;
 			std::shared_ptr<Player> getShared();
 			std::shared_ptr<ClientPlayer> toClient();
 			std::shared_ptr<ServerPlayer> toServer();

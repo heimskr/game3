@@ -22,6 +22,10 @@ namespace Game3 {
 			return;
 		}
 
+		if (recipe->stationType && !player->hasStationType(recipe->stationType)) {
+			return;
+		}
+
 		const InventoryPtr inventory = player->getInventory(0);
 		RealmPtr realm = player->getRealm();
 		std::optional<std::vector<ItemStackPtr>> leftovers;
