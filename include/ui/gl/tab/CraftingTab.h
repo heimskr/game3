@@ -11,12 +11,11 @@ namespace Game3 {
 
 	class RecipeRow: public Box {
 		public:
-			RecipeRow(CraftingTab &, CraftingRecipePtr);
+			RecipeRow(UIContext &, float scale, CraftingRecipePtr);
 
 			void init() final;
 
 		private:
-			CraftingTab &parent;
 			CraftingRecipePtr recipe;
 	};
 

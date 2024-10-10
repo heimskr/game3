@@ -72,7 +72,7 @@ namespace Game3 {
 
 		for (const std::vector<CraftingRecipePtr> *set: {&known.full, &known.partial}) {
 			for (const CraftingRecipePtr &recipe: *set) {
-				recipeList->append(make<RecipeRow>(*this, recipe));
+				recipeList->append(make<RecipeRow>(ui, scale, recipe));
 			}
 		}
 	}
@@ -85,9 +85,8 @@ namespace Game3 {
 		}
 	}
 
-	RecipeRow::RecipeRow(CraftingTab &parent, CraftingRecipePtr recipe):
-		Box(parent.getUI(), parent.getScale(), Orientation::Vertical, 0),
-		parent(parent),
+	RecipeRow::RecipeRow(UIContext &ui, float scale, CraftingRecipePtr recipe):
+		Box(ui, scale, Orientation::Horizontal, 0),
 		recipe(std::move(recipe)) {}
 
 	void RecipeRow::init() {
@@ -139,13 +138,19 @@ namespace Game3 {
 			grid->attach(std::move(item_slot), 1, column++);
 		}
 
-		append(grid);
-
 		if (recipe->stationType) {
-			append(make<Label>(ui, scale * 0.75, std::format("Station: {}", recipe->stationType.getPostPath())));
+			auto vbox = make<Box>(ui, scale, Orientation::Vertical, 0);
+			vbox->append(grid);
+			vbox->append(make<Label>(ui, scale * 0.75, std::format("Station: {}", recipe->stationType.getPostPath())));
+			append(std::move(vbox));
+		} else {
+			append(grid);
 		}
 
-		auto slider = make<CraftingSlider>(ui, scale * 0.75, recipe);
-		append(slider);
+		auto spacer = make<Label>(ui, scale);
+		spacer->setHorizontalExpand(true);
+		append(std::move(spacer));
+
+		append(make<CraftingSlider>(ui, scale * 0.75, recipe));
 	}
 }
