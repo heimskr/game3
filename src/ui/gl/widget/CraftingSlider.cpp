@@ -1,5 +1,8 @@
 #include "Log.h"
+#include "entity/ClientPlayer.h"
 #include "graphics/Texture.h"
+#include "packet/CraftPacket.h"
+#include "recipe/CraftingRecipe.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
 #include "ui/gl/widget/CraftingSlider.h"
@@ -8,9 +11,13 @@
 #include "ui/gl/widget/IntegerInput.h"
 #include "ui/gl/widget/Slider.h"
 #include "ui/gl/Constants.h"
+#include "ui/gl/UIContext.h"
 #include "util/Util.h"
 
 namespace Game3 {
+	CraftingSlider::CraftingSlider(UIContext &ui, float scale, CraftingRecipePtr recipe):
+		Grid(ui, scale), recipe(std::move(recipe)) {}
+
 	void CraftingSlider::init() {
 		clearChildren();
 
@@ -53,6 +60,7 @@ namespace Game3 {
 
 		valueInput = make<IntegerInput>(ui, scale);
 		valueInput->setFixedWidth(16 * scale);
+		valueInput->setText(std::format("{}", value));
 		valueInput->onChange.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
 				value = 1;
@@ -75,7 +83,7 @@ namespace Game3 {
 		hbox->append(std::move(craft_button));
 
 		auto max_button = make<Button>(ui, scale);
-		max_button->setText("Max");
+		max_button->setText(std::format("{}", getMaximum()));
 		max_button->setOnClick([this](Widget &) {
 			setValue(getMaximum());
 		});
@@ -97,7 +105,8 @@ namespace Game3 {
 	}
 
 	void CraftingSlider::craft() {
-		INFO("Crafting {}", value);
+		static size_t nextID = 1;
+		ui.getPlayer()->send(make<CraftPacket>(nextID++, recipe->registryID, value));
 	}
 
 	std::size_t CraftingSlider::getMaximum() const {

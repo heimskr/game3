@@ -7,14 +7,16 @@
 namespace Game3 {
 	class IntegerInput;
 	class Slider;
+	struct CraftingRecipe;
 
 	class CraftingSlider: public Grid {
 		public:
-			using Grid::Grid;
+			CraftingSlider(UIContext &, float scale, std::shared_ptr<CraftingRecipe> recipe);
 
 			void init() final;
 
 		private:
+			std::shared_ptr<CraftingRecipe> recipe;
 			std::shared_ptr<IntegerInput> valueInput;
 			std::shared_ptr<Slider> valueSlider;
 			std::size_t value = 1;

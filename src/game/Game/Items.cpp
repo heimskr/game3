@@ -252,7 +252,7 @@ namespace Game3 {
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
 		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",    "Iron Sword",    150, 3, 1, 128));
-		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Iron Sword",    400, 8, 3,  64));
+		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Gold Sword",    400, 8, 3,  64));
 		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
 		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
 

@@ -8,28 +8,33 @@
 
 namespace Game3 {
 	void CraftPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
-		if (count == 0)
+		if (count == 0) {
 			return;
+		}
 
 		auto player = client.getPlayer();
-		if (!player)
+		if (!player) {
 			return;
+		}
 
 		auto recipe = game->registry<CraftingRecipeRegistry>().maybe(recipeIndex);
-		if (!recipe)
+		if (!recipe) {
 			return;
+		}
 
 		const InventoryPtr inventory = player->getInventory(0);
 		RealmPtr realm = player->getRealm();
 		std::optional<std::vector<ItemStackPtr>> leftovers;
 
 		for (size_t i = 0; i < count; ++i) {
-			if (!recipe->craft(game, inventory, inventory, leftovers))
+			if (!recipe->craft(game, inventory, inventory, leftovers)) {
 				break;
+			}
 
 			if (leftovers) {
-				for (const ItemStackPtr &leftover: *leftovers)
+				for (const ItemStackPtr &leftover: *leftovers) {
 					leftover->spawn(player->getPlace());
+				}
 				leftovers.reset();
 			}
 		}

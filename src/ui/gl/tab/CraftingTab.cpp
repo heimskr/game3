@@ -145,7 +145,7 @@ namespace Game3 {
 			append(make<Label>(ui, scale * 0.75, std::format("Station: {}", recipe->stationType.getPostPath())));
 		}
 
-		auto slider = make<CraftingSlider>(ui, scale * 0.75);
+		auto slider = make<CraftingSlider>(ui, scale * 0.75, recipe);
 		append(slider);
 	}
 }
