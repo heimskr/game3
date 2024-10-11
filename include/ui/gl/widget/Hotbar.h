@@ -25,6 +25,8 @@ namespace Game3 {
 
 		private:
 			std::vector<std::shared_ptr<ItemSlot>> slotWidgets;
+			std::shared_ptr<ItemSlot> heldLeft;
+			std::shared_ptr<ItemSlot> heldRight;
 			std::optional<float> lastY;
 	};
 }

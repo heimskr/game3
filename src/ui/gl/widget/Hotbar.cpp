@@ -4,23 +4,28 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
+#include "graphics/TextRenderer.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Hotbar::Hotbar(UIContext &ui, float scale): Widget(ui, scale) {
-		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-			slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
-		}
-	}
+	Hotbar::Hotbar(UIContext &ui, float scale):
+		Widget(ui, scale) {}
 
 	void Hotbar::init() {
 		WidgetPtr self = shared_from_this();
-		for (const std::shared_ptr<ItemSlot> &item_slot: slotWidgets) {
-			item_slot->insertAtEnd(self);
+
+		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
+			slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false))->insertAtEnd(self);
 		}
+
+		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
+		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
+
+		heldLeft->insertAtEnd(self);
+		heldRight->insertAtEnd(self);
 	}
 
 	void Hotbar::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -32,13 +37,18 @@ namespace Game3 {
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
 		Widget::render(renderers, x, y, width, height);
 
+		RectangleRenderer &rectangler = renderers.rectangle;
+		TextRenderer &texter = renderers.text;
+
 		const float offset = SLOT_PADDING * scale / 3;
-		renderers.rectangle.drawOnScreen(Color{0.7, 0.5, 0, 1}, x, y, width, height);
+		constexpr Color outer_color{0.7, 0.5, 0, 1};
+		constexpr Color inner_color{0.88, 0.77, 0.55, 1};
+		rectangler.drawOnScreen(outer_color, x, y, width, height);
 		x += offset;
 		y += offset;
 		width -= offset * 2;
 		height -= offset * 2;
-		renderers.rectangle.drawOnScreen(Color{0.88, 0.77, 0.55, 1}, x, y, width, height);
+		rectangler.drawOnScreen(inner_color, x, y, width, height);
 		lastY = y;
 
 		PlayerPtr player = ui.getPlayer();
@@ -56,6 +66,59 @@ namespace Game3 {
 				widget->setActive(slot == active_slot);
 				widget->render(renderers, x + scale * (SLOT_PADDING + OUTER_SLOT_SIZE * slot), y + scale * SLOT_PADDING, INNER_SLOT_SIZE * scale, INNER_SLOT_SIZE * scale);
 			}
+
+			heldLeft->setInventory(inventory);
+			heldRight->setInventory(inventory);
+
+			Slot left_slot  = player->getHeldLeft();
+			Slot right_slot = player->getHeldRight();
+
+			if (left_slot >= 0) {
+				heldLeft->setStack((*inventory)[left_slot]);
+			} else {
+				heldLeft->setStack(nullptr);
+			}
+
+			if (right_slot >= 0) {
+				heldRight->setStack((*inventory)[right_slot]);
+			} else {
+				heldRight->setStack(nullptr);
+			}
+
+			const float held_size = INNER_SLOT_SIZE * heldLeft->getScale();
+			const float held_padding = SLOT_PADDING * heldLeft->getScale();
+			const float text_scale = heldLeft->getScale() / 8;
+			const float rectangle_size = held_size + 2 * held_padding;
+
+			x += width + 2 * offset;
+			rectangler.drawOnScreen(outer_color, x,          y - offset, rectangle_size + 2 * offset, height + offset * 2);
+			rectangler.drawOnScreen(inner_color, x + offset, y,          rectangle_size,              height);
+
+			x += offset + held_padding;
+			y += held_padding;
+
+			TextRenderOptions options{
+				.x = x + held_padding + held_size / 4, // Idk honestly. This is what makes it look nice.
+				.y = y + held_padding,
+				.scaleX = text_scale,
+				.scaleY = text_scale,
+				.color = Color{"#00000080"},
+				.align = TextAlign::Center,
+				.alignTop = true,
+				.shadow{0, 0, 0, 0},
+			};
+
+			if (left_slot < 0) {
+				texter.drawOnScreen("L", options);
+			}
+
+			if (right_slot < 0) {
+				options.y += 2 * held_padding + held_size;
+				texter.drawOnScreen("R", options);
+			}
+
+			heldLeft ->render(renderers, x, y,                                held_size, held_size);
+			heldRight->render(renderers, x, y + 2 * held_padding + held_size, held_size, held_size);
 		}
 	}
 
@@ -72,8 +135,9 @@ namespace Game3 {
 	}
 
 	void Hotbar::reset() {
-		for (const std::shared_ptr<ItemSlot> &item_slot: slotWidgets)
+		for (const std::shared_ptr<ItemSlot> &item_slot: slotWidgets) {
 			item_slot->setStack(nullptr);
+		}
 	}
 
 	const std::optional<float> & Hotbar::getLastY() const {
