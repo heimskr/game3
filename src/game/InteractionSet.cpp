@@ -1,12 +1,12 @@
-#include "types/Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Flower.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	bool StandardInteractions::interact(const Place &place, Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) const {
@@ -20,8 +20,9 @@ namespace Game3 {
 		const auto terrain_tile   = place.getName(Layer::Terrain);
 		const auto submerged_tile = place.getName(Layer::Submerged);
 
-		if (!terrain_tile || !submerged_tile)
+		if (!terrain_tile || !submerged_tile) {
 			return false;
+		}
 
 		auto inventory_lock = inventory->uniqueLock();
 
@@ -31,8 +32,9 @@ namespace Game3 {
 
 		if (!used_item) {
 			if (ItemStackPtr active = get_active()) {
-				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, active, place, modifiers, {0.f, 0.f}))
+				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, active, place, modifiers, {0.f, 0.f})) {
 					return true;
+				}
 
 				if (active->hasAttribute("base:attribute/shovel"_id)) {
 					if (*submerged_tile == "base:tile/ash"_id) {
@@ -64,16 +66,15 @@ namespace Game3 {
 			attribute.emplace("base:attribute/shovel"_id);
 		}
 
-		if (!used_item && item && attribute && !player->hasTooldown()) {
-			if (ItemStackPtr stack = get_active()) {
-				if (stack->hasAttribute(*attribute) && !inventory->add(ItemStack::create(game, *item, 1))) {
-					player->setTooldown(1.f);
-					if (stack->reduceDurability())
-						inventory->erase(inventory->activeSlot);
-					// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-					inventory->notifyOwner({});
-					return true;
+		if (used_item && item && attribute && !player->hasTooldown()) {
+			if (used_item->hasAttribute(*attribute) && !inventory->add(ItemStack::create(game, *item, 1))) {
+				player->setTooldown(1.f);
+				if (used_item->reduceDurability()) {
+					inventory->erase(player->getHeldSlot(hand));
 				}
+				// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
+				inventory->notifyOwner({});
+				return true;
 			}
 		}
 
@@ -96,10 +97,11 @@ namespace Game3 {
 		const Tileset &tileset = place.realm->getTileset();
 
 		if (const auto submerged = place.get(Layer::Submerged); submerged && tileset.isInCategory(*submerged, "base:category/trees")) {
-			if (std::uniform_real_distribution(0., 1.)(threadContext.rng) < M_PI / 10.)
+			if (threadContext.random(0.0, 1.0) < M_PI / 10.) {
 				place.set(Layer::Objects, "base:tile/charred_stump");
-			else
+			} else {
 				ItemStack::spawn(place, place.getGame(), "base:item/wood");
+			}
 
 			place.set(Layer::Submerged, "base:tile/ash");
 		}
