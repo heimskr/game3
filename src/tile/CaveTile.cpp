@@ -15,7 +15,7 @@ namespace Game3 {
 			return false;
 		}
 
-		if (auto terrain = place.get(Layer::Terrain); terrain != 0) {
+		if (auto terrain = place.get(Layer::Terrain); !terrain || *terrain == 0) {
 			place.set(Layer::Terrain, floor);
 		}
 
