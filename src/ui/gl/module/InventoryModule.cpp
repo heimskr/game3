@@ -68,12 +68,15 @@ namespace Game3 {
 		const Slot active_slot = inventory->activeSlot;
 
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
+			for (const auto &slot_widget: slotWidgets) {
+				remove(slot_widget);
+			}
 			slotWidgets.clear();
-			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
+			init();
 		} else {
-			for (Slot slot = 0; slot < slot_count; ++slot)
+			for (Slot slot = 0; slot < slot_count; ++slot) {
 				slotWidgets[slot]->setStack((*inventory)[slot]);
+			}
 
 			if (is_player) {
 				if (0 <= previousActive) {

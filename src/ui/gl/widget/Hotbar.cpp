@@ -21,7 +21,6 @@ namespace Game3 {
 
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
 			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
-			slot_widget->setName(std::format("Slot{}", slot));
 			slot_widget->onDrop.connect([this](ItemSlot &self, const WidgetPtr &widget) {
 				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(widget); dragged && dragged.get() != &self) {
 					ClientPlayerPtr player = ui.getPlayer();
@@ -33,12 +32,6 @@ namespace Game3 {
 
 		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
 		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
-
-		heldLeft->setName("HeldLeft");
-		heldRight->setName("HeldRight");
-
-		heldLeft->bestowAttribute("HeldSlot");
-		heldRight->bestowAttribute("HeldSlot");
 
 		heldLeft->insertAtEnd(self);
 		heldRight->insertAtEnd(self);

@@ -22,8 +22,6 @@
 
 namespace Game3 {
 	void CraftingTab::init() {
-		auto tab = shared_from_this();
-
 		inventoryModule = ui.makePlayerInventoryModule();
 		// Prevent shift clicking trying to move from the inventory to itself.
 		inventoryModule->setOnSlotClick([](Slot, Modifiers) { return true; });
