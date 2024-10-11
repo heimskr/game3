@@ -19,14 +19,15 @@ namespace Game3 {
 			return;
 		}
 
-		if (!inventory->hasSlot(slot)) {
+		if (!inventory->hasSlot(slot) && slot != -1) {
 			client.send(make<ErrorPacket>("Can't set held item: invalid slot"));
 			return;
 		}
 
-		if (leftHand)
+		if (leftHand) {
 			player->setHeldLeft(player->getHeldLeft() == slot? -1 : slot);
-		else
+		} else {
 			player->setHeldRight(player->getHeldRight() == slot? -1 : slot);
+		}
 	}
 }

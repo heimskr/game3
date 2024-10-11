@@ -100,21 +100,23 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlot::click(int, int, int) {
-		if (inventory && inventory->getOwner() == ui.getPlayer()) {
+	bool ItemSlot::click(int button, int x, int y) {
+		if (button == LEFT_BUTTON && slot >= 0 && inventory && inventory->getOwner() == ui.getPlayer()) {
 			ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
+			return true;
 		}
-		return true;
+
+		return Widget::click(button, x, y);
 	}
 
-	bool ItemSlot::dragStart(int, int) {
+	bool ItemSlot::dragStart(int x, int y) {
 		WidgetPtr dragged_widget = getDragStartWidget();
 		const bool out = dragged_widget != nullptr;
 		ui.setDraggedWidget(std::move(dragged_widget));
-		return out;
+		return Widget::dragStart(x, y) || out;
 	}
 
-	bool ItemSlot::dragEnd(int, int) {
+	bool ItemSlot::dragEnd(int x, int y) {
 		if (!onDrop.empty()) {
 			if (WidgetPtr dragged = ui.getDraggedWidget()) {
 				if (dragged.get() == this) {
@@ -126,7 +128,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return Widget::dragEnd(x, y);
 	}
 
 	SizeRequestMode ItemSlot::getRequestMode() const {

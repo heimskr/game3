@@ -37,6 +37,9 @@ namespace Game3 {
 		heldLeft->setName("HeldLeft");
 		heldRight->setName("HeldRight");
 
+		heldLeft->bestowAttribute("HeldSlot");
+		heldRight->bestowAttribute("HeldSlot");
+
 		heldLeft->insertAtEnd(self);
 		heldRight->insertAtEnd(self);
 
@@ -56,6 +59,15 @@ namespace Game3 {
 
 		heldLeft->onDrop.connect(make_held_drop(true));
 		heldRight->onDrop.connect(make_held_drop(false));
+
+		auto make_held_click = [this](bool is_left) {
+			return [this, is_left](Widget &) {
+				ui.getPlayer()->send(make<SetHeldItemPacket>(is_left, -1));
+			};
+		};
+
+		heldLeft->setOnClick(make_held_click(true));
+		heldRight->setOnClick(make_held_click(false));
 	}
 
 	void Hotbar::render(const RendererContext &renderers, float x, float y, float width, float height) {
