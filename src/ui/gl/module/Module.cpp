@@ -28,6 +28,10 @@ namespace Game3 {
 		return {};
 	}
 
+	bool Module::handleShiftClick(std::shared_ptr<Inventory>, Slot) {
+		return false;
+	}
+
 	ClientGamePtr Module::getGame() const {
 		if (auto game = weakGame.lock())
 			return game;

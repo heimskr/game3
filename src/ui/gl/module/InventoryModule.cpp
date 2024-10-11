@@ -1,10 +1,12 @@
 #include "entity/ClientPlayer.h"
+#include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "packet/MoveSlotsPacket.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Window.h"
 #include "util/Defer.h"
 #include "util/Math.h"
 
@@ -16,7 +18,7 @@ namespace {
 
 namespace Game3 {
 	namespace {
-		ClientInventoryPtr getInventory(const std::any &any) {
+		ClientInventoryPtr getInventoryArgument(const std::any &any) {
 			const InventoryModule::Argument *argument = std::any_cast<InventoryModule::Argument>(&any);
 			if (!argument) {
 				const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
@@ -33,7 +35,7 @@ namespace Game3 {
 	}
 
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument):
-		InventoryModule(ui, getInventory(argument)) {}
+		InventoryModule(ui, getInventoryArgument(argument)) {}
 
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):
 		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
@@ -105,9 +107,21 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::click(int button, int x, int y) {
-		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->contains(x, y) && widget->click(button, x, y))
+		const Modifiers modifiers = ui.window.getModifiers();
+
+		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
+			if (!widget->contains(x, y)) {
+				continue;
+			}
+
+			if (clickSlot(widget->getSlot(), modifiers)) {
 				return true;
+			}
+
+			if (widget->click(button, x, y)) {
+				return true;
+			}
+		}
 
 		return false;
 	}
@@ -128,8 +142,9 @@ namespace Game3 {
 	bool InventoryModule::dragEnd(int x, int y) {
 		auto dragged = std::dynamic_pointer_cast<ItemSlot>(ui.getDraggedWidget());
 
-		if (!dragged)
+		if (!dragged) {
 			return false;
+		}
 
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget != dragged && widget->contains(x, y)) {
@@ -170,5 +185,31 @@ namespace Game3 {
 
 	float InventoryModule::getTopPadding() const {
 		return topPadding;
+	}
+
+	InventoryPtr InventoryModule::getInventory() const {
+		assert(inventoryGetter != nullptr);
+		return inventoryGetter->get();
+	}
+
+	void InventoryModule::setOnSlotClick(std::function<bool(Slot, Modifiers)> function) {
+		onSlotClick = std::move(function);
+	}
+
+	bool InventoryModule::clickSlot(Slot slot, Modifiers modifiers) {
+		if (onSlotClick && onSlotClick(slot, modifiers)) {
+			return true;
+		}
+
+		if (modifiers.onlyShift()) {
+			ClientPlayerPtr player = ui.getPlayer();
+			assert(player != nullptr);
+			InventoryPtr inventory = *inventoryGetter;
+			assert(inventory != nullptr);
+			player->send(make<MoveSlotsPacket>(inventory->getOwner()->getGID(), player->getGID(), slot, -1, inventory->index, 0));
+			return true;
+		}
+
+		return false;
 	}
 }

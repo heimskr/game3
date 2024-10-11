@@ -34,5 +34,7 @@ namespace Game3 {
 
 			std::shared_ptr<Scroller> makePlayerScroller();
 			std::shared_ptr<Scroller> makeModuleScroller();
+
+			bool onSlotClick(Slot, Modifiers);
 	};
 }

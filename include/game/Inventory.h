@@ -117,6 +117,7 @@ namespace Game3 {
 
 			virtual bool hasSlot(Slot) const = 0;
 
+			/** Either returns a non-null pointer or throws an exception. */
 			std::shared_ptr<Agent> getOwner() const;
 
 			virtual ItemStackPtr front() const = 0;

@@ -25,8 +25,9 @@ namespace Game3 {
 		activeSlot(active_slot), index(index), weakOwner(std::move(owner)) {}
 
 	Inventory & Inventory::operator=(const Inventory &other) {
-		if (this == &other)
+		if (this == &other) {
 			return *this;
+		}
 
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
@@ -41,8 +42,9 @@ namespace Game3 {
 	}
 
 	Inventory & Inventory::operator=(Inventory &&other) noexcept {
-		if (this == &other)
+		if (this == &other) {
 			return *this;
+		}
 
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
@@ -58,8 +60,9 @@ namespace Game3 {
 	}
 
 	bool Inventory::operator==(const Inventory &other) const {
-		if (this == &other)
+		if (this == &other) {
 			return true;
+		}
 
 		auto owner = weakOwner.lock();
 		return owner && index != InventoryID(-1) && owner == other.weakOwner.lock() && index == other.index;
@@ -93,8 +96,10 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Agent> Inventory::getOwner() const {
-		if (auto owner = weakOwner.lock())
+		if (auto owner = weakOwner.lock()) {
 			return owner;
+		}
+
 		throw std::runtime_error("Couldn't lock inventory owner");
 	}
 
@@ -148,10 +153,14 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Inventory> Inventory::create(Side side, std::shared_ptr<Agent> owner, Slot slot_count, InventoryID index, Slot active_slot, std::map<Slot, ItemStackPtr> storage) {
-		if (side == Side::Server)
+		if (side == Side::Server) {
 			return std::make_shared<ServerInventory>(owner, slot_count, active_slot, index, std::move(storage));
-		if (side == Side::Client)
+		}
+
+		if (side == Side::Client) {
 			return std::make_shared<ClientInventory>(owner, slot_count, active_slot, index, std::move(storage));
+		}
+
 		throw std::invalid_argument("Can't create inventory for side " + std::to_string(static_cast<int>(side)));
 	}
 

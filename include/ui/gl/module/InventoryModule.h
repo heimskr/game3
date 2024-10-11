@@ -6,6 +6,7 @@
 #include "ui/gl/widget/ItemSlot.h"
 
 #include <any>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -43,10 +44,17 @@ namespace Game3 {
 			void setTopPadding(float);
 			float getTopPadding() const;
 
+			InventoryPtr getInventory() const;
+			void setOnSlotClick(std::function<bool(Slot, Modifiers)>);
+
 		private:
 			std::vector<std::shared_ptr<ItemSlot>> slotWidgets;
 			std::unique_ptr<InventoryGetter> inventoryGetter;
+			/** Returns true to override the default click behavior. */
+			std::function<bool(Slot, Modifiers)> onSlotClick;
 			Slot previousActive = -1;
 			float topPadding = 0;
+
+			bool clickSlot(Slot, Modifiers);
 	};
 }

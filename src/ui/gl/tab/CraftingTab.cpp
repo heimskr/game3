@@ -25,6 +25,8 @@ namespace Game3 {
 		auto tab = shared_from_this();
 
 		inventoryModule = ui.makePlayerInventoryModule();
+		// Prevent shift clicking trying to move from the inventory to itself.
+		inventoryModule->setOnSlotClick([](Slot, Modifiers) { return true; });
 		hbox = make<Box>(ui, scale, Orientation::Horizontal, 0);
 		recipeList = make<Box>(ui, scale, Orientation::Vertical);
 
