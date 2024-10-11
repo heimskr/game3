@@ -285,8 +285,8 @@ namespace Game3 {
 		return buffer.data();
 	}
 
-	template <typename T, typename R, template <typename...> typename M = std::map, std::floating_point F = double>
-	const T & weightedChoice(const M<T, F> &map, R &rng) {
+	template <typename T, typename R, template <typename...> typename M = std::map, std::floating_point F = double, typename... E>
+	const T & weightedChoice(const M<T, F, E...> &map, R &rng) {
 		F sum{};
 		for (const auto &[item, weight]: map)
 			sum += weight;
