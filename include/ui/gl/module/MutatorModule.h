@@ -36,6 +36,7 @@ namespace Game3 {
 
 			void setInventory(std::shared_ptr<ClientInventory>) final;
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final;
 
 		private:
 			std::shared_ptr<Mutator> mutator;

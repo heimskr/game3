@@ -123,4 +123,8 @@ namespace Game3 {
 
 		return std::nullopt;
 	}
+
+	std::shared_ptr<InventoryModule> MutatorModule::getPrimaryInventoryModule() {
+		return inventoryModule;
+	}
 }

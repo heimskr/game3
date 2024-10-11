@@ -38,6 +38,8 @@ namespace Game3 {
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final;
+
 			void setTopPadding(float);
 			float getTopPadding() const;
 

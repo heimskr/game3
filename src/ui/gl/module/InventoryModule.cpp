@@ -160,6 +160,10 @@ namespace Game3 {
 		}
 	}
 
+	std::shared_ptr<InventoryModule> InventoryModule::getPrimaryInventoryModule() {
+		return std::static_pointer_cast<InventoryModule>(shared_from_this());
+	}
+
 	void InventoryModule::setTopPadding(float new_top_padding) {
 		topPadding = new_top_padding;
 	}

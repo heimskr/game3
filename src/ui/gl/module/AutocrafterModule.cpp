@@ -128,6 +128,10 @@ namespace Game3 {
 		}
 	}
 
+	std::shared_ptr<InventoryModule> AutocrafterModule::getPrimaryInventoryModule() {
+		return inventoryModule;
+	}
+
 	void AutocrafterModule::setTarget(const std::string &target) {
 		if (autocrafter) {
 			ClientGamePtr game = getGame();

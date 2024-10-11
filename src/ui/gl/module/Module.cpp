@@ -24,6 +24,10 @@ namespace Game3 {
 		return {};
 	}
 
+	std::shared_ptr<InventoryModule> Module::getPrimaryInventoryModule() {
+		return {};
+	}
+
 	ClientGamePtr Module::getGame() const {
 		if (auto game = weakGame.lock())
 			return game;
