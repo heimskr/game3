@@ -6,6 +6,7 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "packet/MoveSlotsPacket.h"
+#include "packet/SetHeldItemPacket.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/Constants.h"
@@ -21,11 +22,10 @@ namespace Game3 {
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
 			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
 			slot_widget->setName(std::format("Slot{}", slot));
-			slot_widget->onDrop.connect([this, slot_widget = slot_widget.get()](ItemSlot &self, const WidgetPtr &dragged_widget) {
-				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(dragged_widget); dragged && dragged.get() != &self) {
+			slot_widget->onDrop.connect([this](ItemSlot &self, const WidgetPtr &widget) {
+				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(widget); dragged && dragged.get() != &self) {
 					ClientPlayerPtr player = ui.getPlayer();
 					player->send(make<MoveSlotsPacket>(dragged->getOwnerGID(), self.getOwnerGID(), dragged->getSlot(), self.getSlot(), dragged->getInventory()->index, self.getInventory()->index));
-					ui.setDraggedWidget(nullptr);
 				}
 			});
 			slot_widget->insertAtEnd(self);
@@ -39,6 +39,23 @@ namespace Game3 {
 
 		heldLeft->insertAtEnd(self);
 		heldRight->insertAtEnd(self);
+
+		auto make_held_drop = [this](bool is_left) {
+			return [this, is_left](ItemSlot &self, const WidgetPtr &widget) {
+				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(widget)) {
+					if (*dragged->getInventory() != *self.getInventory()) {
+						return;
+					}
+
+					if (Slot slot = dragged->getSlot(); slot >= 0) {
+						ui.getPlayer()->send(make<SetHeldItemPacket>(is_left, slot));
+					}
+				}
+			};
+		};
+
+		heldLeft->onDrop.connect(make_held_drop(true));
+		heldRight->onDrop.connect(make_held_drop(false));
 	}
 
 	void Hotbar::render(const RendererContext &renderers, float x, float y, float width, float height) {
