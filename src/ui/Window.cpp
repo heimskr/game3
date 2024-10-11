@@ -17,6 +17,7 @@
 #include "ui/gl/dialog/LoginDialog.h"
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
+#include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
@@ -196,27 +197,42 @@ namespace Game3 {
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
 		if (!omniDialog) {
-			omniDialog = std::make_shared<OmniDialog>(uiContext);
-			omniDialog->init();
+			omniDialog = make<OmniDialog>(uiContext);
 		}
 		return omniDialog;
 	}
 
 	const std::shared_ptr<ChatDialog> & Window::getChatDialog() {
 		if (!chatDialog) {
-			chatDialog = std::make_shared<ChatDialog>(uiContext);
-			chatDialog->init();
+			chatDialog = make<ChatDialog>(uiContext);
 		}
 		return chatDialog;
 	}
 
-	void Window::showOmniDialog() {
-		if (!uiContext.hasDialog<OmniDialog>())
-			uiContext.addDialog(getOmniDialog());
+	const std::shared_ptr<TopDialog> & Window::getTopDialog() {
+		if (!topDialog) {
+			topDialog = make<TopDialog>(uiContext);
+		}
+		return topDialog;
 	}
 
-	void Window::closeOmniDialog() {
-		uiContext.removeDialogs<OmniDialog>();
+	void Window::showOmniDialog() {
+		if (!uiContext.hasDialog<OmniDialog>()) {
+			uiContext.addDialog(getOmniDialog());
+			uiContext.addDialog(getTopDialog());
+		}
+	}
+
+	void Window::hideOmniDialog() {
+		uiContext.removeDialogs<OmniDialog, TopDialog>();
+	}
+
+	void Window::toggleOmniDialog() {
+		if (uiContext.hasDialog<OmniDialog>()) {
+			hideOmniDialog();
+		} else {
+			showOmniDialog();
+		}
 	}
 
 	void Window::openModule(const Identifier &module_id, const std::any &argument) {
@@ -228,8 +244,7 @@ namespace Game3 {
 			getOmniDialog();
 			omniDialog->inventoryTab->setModule((*factory)(game, argument));
 			omniDialog->activeTab = omniDialog->inventoryTab;
-			if (!uiContext.hasDialog<OmniDialog>())
-				uiContext.addDialog(omniDialog);
+			showOmniDialog();
 			return;
 		}
 
@@ -707,9 +722,7 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_ESCAPE) {
-					if (uiContext.removeDialogs<OmniDialog>() == 0) {
-						uiContext.addDialog(getOmniDialog());
-					}
+					toggleOmniDialog();
 					return;
 				}
 
@@ -1210,6 +1223,14 @@ namespace Game3 {
 
 	bool Window::isConnected() const {
 		return connected;
+	}
+
+	void Window::disconnect() {
+		if (isConnectedLocally()) {
+			serverWrapper.stop();
+		}
+
+		closeGame();
 	}
 
 	void Window::handleKeys() {

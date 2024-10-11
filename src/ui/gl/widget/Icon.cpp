@@ -2,6 +2,8 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
 #include "ui/gl/widget/Icon.h"
+#include "ui/gl/widget/Tooltip.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	Icon::Icon(UIContext &ui, float scale):
@@ -33,6 +35,19 @@ namespace Game3 {
 			.scaleY = height / iconTexture->height,
 			.invertY = false,
 		});
+
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
+
+		if (tooltipText && !ui.anyDragUpdaters() && ui.checkMouse(lastRectangle)) {
+			if (!tooltip->wasUpdatedBy(*this) || tooltipTextChanged) {
+				tooltipTextChanged = false;
+				tooltip->setText(*tooltipText);
+			}
+			tooltip->setRegion(std::nullopt);
+			tooltip->show(*this);
+		} else {
+			tooltip->hide(*this);
+		}
 	}
 
 	SizeRequestMode Icon::getRequestMode() const {

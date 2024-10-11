@@ -21,7 +21,7 @@ namespace Game3 {
 			game->getPlayer()->queueForMove([&window](const auto &, bool) {
 				window->queue([](Window &window) {
 					window.removeModule();
-					window.closeOmniDialog();
+					window.hideOmniDialog();
 				});
 				return true;
 			});

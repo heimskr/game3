@@ -6,6 +6,7 @@
 #include "graphics/Texture.h"
 #include "types/Types.h"
 #include "ui/gl/dialog/Dialog.h"
+#include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/ContextMenu.h"
@@ -90,6 +91,7 @@ namespace Game3 {
 		}
 		dialogs.clear();
 		hotbar->reset();
+		tooltip->hide();
 	}
 
 	bool UIContext::click(int button, int x, int y) {

@@ -33,6 +33,7 @@ namespace Game3 {
 	class HasFluids;
 	class LocalClient;
 	class OmniDialog;
+	class TopDialog;
 	class Window;
 	struct Modifiers;
 	struct Position;
@@ -50,6 +51,7 @@ namespace Game3 {
 			float yScale = 1.0;
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
+			std::shared_ptr<TopDialog> topDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
 			SingleSpriteRenderer singleSpriteRenderer{*this};
@@ -86,8 +88,10 @@ namespace Game3 {
 
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();
+			const std::shared_ptr<TopDialog> & getTopDialog();
 			void showOmniDialog();
-			void closeOmniDialog();
+			void hideOmniDialog();
+			void toggleOmniDialog();
 
 			void openModule(const Identifier &, const std::any &);
 			void removeModule();
@@ -124,6 +128,7 @@ namespace Game3 {
 			void showLoginAndRegisterDialogs(const std::string &hostname);
 			bool isConnectedLocally() const;
 			bool isConnected() const;
+			void disconnect();
 
 		private:
 			struct KeyInfo {
