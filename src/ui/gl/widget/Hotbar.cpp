@@ -5,6 +5,7 @@
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
+#include "packet/MoveSlotsPacket.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/Constants.h"
@@ -18,11 +19,23 @@ namespace Game3 {
 		WidgetPtr self = shared_from_this();
 
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-			slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false))->insertAtEnd(self);
+			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
+			slot_widget->setName(std::format("Slot{}", slot));
+			slot_widget->onDrop.connect([this, slot_widget = slot_widget.get()](ItemSlot &self, const WidgetPtr &dragged_widget) {
+				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(dragged_widget); dragged && dragged.get() != &self) {
+					ClientPlayerPtr player = ui.getPlayer();
+					player->send(make<MoveSlotsPacket>(dragged->getOwnerGID(), self.getOwnerGID(), dragged->getSlot(), self.getSlot(), dragged->getInventory()->index, self.getInventory()->index));
+					ui.setDraggedWidget(nullptr);
+				}
+			});
+			slot_widget->insertAtEnd(self);
 		}
 
 		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
 		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
+
+		heldLeft->setName("HeldLeft");
+		heldRight->setName("HeldRight");
 
 		heldLeft->insertAtEnd(self);
 		heldRight->insertAtEnd(self);
@@ -35,12 +48,13 @@ namespace Game3 {
 
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
-		Widget::render(renderers, x, y, width, height);
+		const float offset = SLOT_PADDING * scale / 3;
+		const float held_scale = heldLeft->getScale();
+		Widget::render(renderers, x, y, width + 2 * offset + INNER_SLOT_SIZE * held_scale + 2 * SLOT_PADDING * held_scale, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		const float offset = SLOT_PADDING * scale / 3;
 		constexpr Color outer_color{0.7, 0.5, 0, 1};
 		constexpr Color inner_color{0.88, 0.77, 0.55, 1};
 		rectangler.drawOnScreen(outer_color, x, y, width, height);

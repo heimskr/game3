@@ -107,9 +107,20 @@ namespace Game3 {
 		return true;
 	}
 
+	bool ItemSlot::dragStart(int, int) {
+		WidgetPtr dragged_widget = getDragStartWidget();
+		const bool out = dragged_widget != nullptr;
+		ui.setDraggedWidget(std::move(dragged_widget));
+		return out;
+	}
+
 	bool ItemSlot::dragEnd(int, int) {
 		if (!onDrop.empty()) {
 			if (WidgetPtr dragged = ui.getDraggedWidget()) {
+				if (dragged.get() == this) {
+					return false;
+				}
+
 				onDrop(*this, dragged);
 				return true;
 			}

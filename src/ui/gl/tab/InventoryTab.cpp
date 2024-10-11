@@ -83,8 +83,9 @@ namespace Game3 {
 	}
 
 	bool InventoryTab::dragStart(int x, int y) {
-		if (playerScroller->contains(x, y) && playerScroller->dragStart(x, y))
+		if (playerScroller->contains(x, y) && playerScroller->dragStart(x, y)) {
 			return true;
+		}
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock)) {

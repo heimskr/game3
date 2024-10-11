@@ -24,6 +24,7 @@ namespace Game3 {
 
 			std::shared_ptr<Widget> getDragStartWidget() final;
 			bool click(int button, int x, int y) final;
+			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;

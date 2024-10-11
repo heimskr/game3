@@ -72,8 +72,9 @@ namespace Game3 {
 	bool Widget::dragStart(int x, int y) {
 		dragOrigin.emplace(x, y);
 
-		if (onDragStart && onDragStart(*this, x - lastRectangle.x, y - lastRectangle.y))
+		if (onDragStart && onDragStart(*this, x - lastRectangle.x, y - lastRectangle.y)) {
 			return true;
+		}
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
 			if (child->contains(x, y) && child->dragStart(x, y)) {
