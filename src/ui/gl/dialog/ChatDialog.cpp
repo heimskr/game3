@@ -188,6 +188,10 @@ namespace Game3 {
 		ui.focusWidget(messageInput);
 	}
 
+	void ChatDialog::setSlash() {
+		messageInput->setText("/");
+	}
+
 	Color ChatDialog::getTextColor() const {
 		return isFocused()? CHAT_FOCUSED_TEXT_COLOR : CHAT_UNFOCUSED_TEXT_COLOR;
 	}

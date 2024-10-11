@@ -160,4 +160,6 @@ namespace Game3 {
 			void continueLocalConnection();
 			void handleKeys();
 	};
+
+	using WindowPtr = std::shared_ptr<Window>;
 }

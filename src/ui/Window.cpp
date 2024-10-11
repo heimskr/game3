@@ -746,8 +746,12 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_BACKSLASH) {
-					queue([](Window &window) {
-						window.getChatDialog()->focusInput();
+					queue([slash = modifiers.onlyShift()](Window &window) {
+						std::shared_ptr<ChatDialog> chat = window.getChatDialog();
+						chat->focusInput();
+						if (slash) {
+							chat->setSlash();
+						}
 					});
 					return;
 				}
@@ -970,7 +974,12 @@ namespace Game3 {
 		});
 
 		game->signalChatReceived.connect([this](const PlayerPtr &player, const UString &message) {
-			getChatDialog()->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
+			auto dialog = getChatDialog();
+			if (player == nullptr) {
+				dialog->addMessage(message);
+			} else {
+				dialog->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
+			}
 		});
 
 		game->errorCallback = [this] {
