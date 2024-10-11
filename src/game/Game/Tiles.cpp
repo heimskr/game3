@@ -6,6 +6,7 @@
 #include "tile/DirtTile.h"
 #include "tile/FarmlandTile.h"
 #include "tile/FenceGateTile.h"
+#include "tile/FoodTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
@@ -47,6 +48,8 @@ namespace Game3 {
 		reg.add("base:tile/grim_diamond",  std::make_shared<CaveTile>("base:tile/grim_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
+
+		reg.add("base:tile/cake", std::make_shared<FoodTile>("base:tile/cake", "base:item/cake"));
 
 		static const std::array rares {
 			"apatite",

@@ -8,6 +8,7 @@
 #include "item/AutofarmerItem.h"
 #include "item/BasicFood.h"
 #include "item/BiomassLiquefierItem.h"
+#include "item/Cake.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
 #include "item/ChemicalItem.h"
@@ -88,6 +89,8 @@ namespace Game3 {
 		add(std::make_shared<BasicFood>("base:item/bleach",      "Bleach",         16, -8));
 
 		add(std::make_shared<BiomassLiquefierItem>("base:item/biomass_liquefier", "Biomass Liquefier", 999, 64)); // TODO: cost
+
+		add(std::make_shared<Cake>("base:item/cake", "Cake", 999, 16)); // TODO: cost
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 

@@ -113,6 +113,10 @@ namespace Game3 {
 		return luckStat;
 	}
 
+	bool LivingEntity::atFullHealth() const {
+		return getHealth() == getMaxHealth();
+	}
+
 	bool LivingEntity::setHealth(HitPoints new_health) {
 		new_health = std::min(getMaxHealth(), new_health);
 		const bool changed = new_health != health;

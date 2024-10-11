@@ -108,9 +108,12 @@ namespace Game3 {
 			}
 
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final {
-				for (const ModulePtr &submodule: submodules)
-					if (std::optional<Buffer> buffer = submodule->handleMessage(source, name, data))
+				for (const ModulePtr &submodule: submodules) {
+					if (std::optional<Buffer> buffer = submodule->handleMessage(source, name, data)) {
 						return buffer;
+					}
+				}
+
 				return std::nullopt;
 			}
 
