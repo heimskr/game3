@@ -5,7 +5,6 @@
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Types.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	Label::Label(UIContext &ui, float scale, UString text, Color text_color):

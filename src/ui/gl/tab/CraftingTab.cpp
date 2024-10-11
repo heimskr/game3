@@ -14,6 +14,7 @@
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/ProgressBar.h"
 #include "ui/gl/widget/Scroller.h"
+#include "ui/gl/widget/Spacer.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -147,10 +148,7 @@ namespace Game3 {
 			append(grid);
 		}
 
-		auto spacer = make<Label>(ui, scale);
-		spacer->setHorizontalExpand(true);
-		append(std::move(spacer));
-
+		append(make<Spacer>(ui, Orientation::Horizontal));
 		append(make<CraftingSlider>(ui, scale * 0.75, recipe));
 	}
 }

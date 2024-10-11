@@ -3,7 +3,6 @@
 #include "types/UString.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasAlignment.h"
-#include "ui/gl/HasExpand.h"
 #include "ui/gl/HasFixedSize.h"
 #include "ui/gl/HasTooltipText.h"
 
