@@ -22,7 +22,7 @@
 namespace Game3 {
 	UIContext::UIContext(Window &window):
 		window(window),
-		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE)),
+		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE / window.xScale)),
 		tooltip(std::make_shared<Tooltip>(*this, UI_SCALE)) {
 			hotbar->setName("Hotbar");
 			hotbar->init();
@@ -105,13 +105,16 @@ namespace Game3 {
 			return true;
 		}
 
+		bool contained = false;
+
 		for (const DialogPtr &dialog: reverse(dialogs)) {
+			contained = contained || dialog->contains(x, y);
 			if (dialog->click(button, x, y)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->click(button, x, y);
+		return (hotbar->contains(x, y) && hotbar->click(button, x, y)) || contained;
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y) {
@@ -168,13 +171,29 @@ namespace Game3 {
 		unfocusWidget();
 		dragOrigin.emplace(x, y);
 
+		bool contained = false;
+
 		for (const DialogPtr &dialog: reverse(dialogs)) {
+			contained = contained || dialog->contains(x, y);
 			if (dialog->dragStart(x, y)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->dragStart(x, y);
+		if (contained) {
+			return true;
+		}
+
+		if (hotbar->contains(x, y)) {
+			return hotbar->dragStart(x, y);
+		}
+
+		if (ClientGamePtr game = getGame()) {
+			game->dragStart(x, y, window.getModifiers());
+			return true;
+		}
+
+		return false;
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
@@ -196,13 +215,29 @@ namespace Game3 {
 			}
 		}
 
+		bool contained = false;
+
 		for (const DialogPtr &dialog: reverse(dialogs)) {
+			contained = contained || dialog->contains(x, y);
 			if (dialog->dragUpdate(x, y)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->dragUpdate(x, y);
+		if (contained) {
+			return true;
+		}
+
+		if (hotbar->contains(x, y)) {
+			return hotbar->dragUpdate(x, y);
+		}
+
+		if (ClientGamePtr game = getGame()) {
+			game->dragUpdate(x, y, window.getModifiers());
+			return true;
+		}
+
+		return false;
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
@@ -487,10 +522,10 @@ namespace Game3 {
 
 	std::shared_ptr<InventoryModule> UIContext::makePlayerInventoryModule() {
 		if (ClientPlayerPtr player = getPlayer()) {
-			return std::make_shared<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+			return make<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
 		}
 
-		return std::make_shared<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
+		return make<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
