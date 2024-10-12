@@ -115,6 +115,11 @@
 				"station": "base:station/furnace"
 			}],
 			["base:registry/crafting_recipe", {
+				"input":  [["base:item/gold_ore", 1], ["base:item/coal", 2]],
+				"output": [["base:item/gold_bar", 1]],
+				"station": "base:station/furnace"
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/copper_ore", 1], ["base:item/coal", 1]],
 				"output": [["base:item/copper_bar", 1]],
 				"station": "base:station/furnace"
@@ -137,11 +142,6 @@
 			["base:registry/crafting_recipe", {
 				"input":  [["base:item/sand", 1]],
 				"output": [["base:item/glass", 1]],
-				"station": "base:station/furnace"
-			}],
-			["base:registry/crafting_recipe", {
-				"input":  [["base:item/gold_ore", 1], ["base:item/coal", 2]],
-				"output": [["base:item/gold_bar", 1]],
 				"station": "base:station/furnace"
 			}],
 			["base:registry/crafting_recipe", {
@@ -185,6 +185,10 @@
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/electronics", 4], ["base:item/gold_bar", 16]],
 				"output": [["base:item/combiner", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/electronics", 4], ["base:item/iron_bar", 16], ["base:item/gold_bar", 16], ["base:item/diamond", 8]],
+				"output": [["base:item/disruptor", 1]]
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/electronics", 8], ["base:item/iron_bar", 20], ["base:item/gold_bar", 20], ["base:item/diamond", 4], ["base:item/chemical", 64, {"formula": "U"}]],
@@ -322,6 +326,10 @@
 			["base:registry/crafting_recipe", {
 				"input":  [["base:item/plank", 8], ["base:item/iron_bar", 2]],
 				"output": [["base:item/chest", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/plank", 16]],
+				"output": [["base:item/crate", 1]]
 			}],
 			["base:registry/crafting_recipe", {"input": [["base:attribute/flower_red",    1]], "output": [["base:item/red_dye",    1]]}],
 			["base:registry/crafting_recipe", {"input": [["base:attribute/flower_orange", 1]], "output": [["base:item/orange_dye", 1]]}],
