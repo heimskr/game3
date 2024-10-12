@@ -59,23 +59,20 @@ namespace Game3 {
 
 		auto client = getClient();
 
-		if (button == LEFT_BUTTON)
+		if (button == LEFT_BUTTON) {
 			client->send(make<ClickPacket>(translated, fractional_x, fractional_y, modifiers));
-		else if (button == RIGHT_BUTTON && getPlayer() && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected())
+		} else if (button == RIGHT_BUTTON && getPlayer() && !realm->rightClick(translated, pos_x, pos_y) && debugMode && client && client->isConnected()) {
 			client->send(make<TeleportSelfPacket>(realm->id, translated));
+		}
 	}
 
 	void ClientGame::dragStart(double x, double y, Modifiers modifiers) {
-		if (getWindow()->uiContext.dragStart(x * 2, y * 2))
-			return;
 		Position position = translateCanvasCoordinates(x, y);
 		lastDragPosition = position;
 		getClient()->send(make<DragPacket>(DragPacket::Action::Start, position, modifiers));
 	}
 
 	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
-		if (getWindow()->uiContext.dragUpdate(x * 2, y * 2))
-			return;
 		Position position = translateCanvasCoordinates(x, y);
 		if (lastDragPosition && *lastDragPosition != position) {
 			lastDragPosition = position;
@@ -84,8 +81,6 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragEnd(double x, double y, Modifiers modifiers) {
-		if (getWindow()->uiContext.dragEnd(x * 2, y * 2))
-			return;
 		if (lastDragPosition) {
 			Position position = translateCanvasCoordinates(x, y);
 			lastDragPosition.reset();

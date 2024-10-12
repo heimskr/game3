@@ -22,6 +22,7 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
 #include "ui/Window.h"
@@ -197,7 +198,7 @@ namespace Game3 {
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
 		if (!omniDialog) {
-			omniDialog = make<OmniDialog>(uiContext);
+			omniDialog = make<OmniDialog>(uiContext, UI_SCALE);
 		}
 		return omniDialog;
 	}
@@ -671,7 +672,7 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_E) {
 					if (uiContext.hasDialog<OmniDialog>()) {
-						uiContext.removeDialogs<OmniDialog>();
+						hideOmniDialog();
 					} else {
 						game->interactNextTo(modifiers, Hand::Right);
 					}

@@ -85,7 +85,9 @@ namespace Game3 {
 		});
 
 		sslThread = std::thread([this] {
-#if defined(__linux__) || defined(__APPLE__)
+#ifdef __APPLE__
+			pthread_setname_np("LocalClient ioContext");
+#elif defined(__linux__)
 			pthread_setname_np(pthread_self(), "LocalClient ioContext");
 #endif
 			ioContext.run();

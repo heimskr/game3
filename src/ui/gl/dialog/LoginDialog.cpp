@@ -45,7 +45,6 @@ namespace Game3 {
 
 		displayNameInput = std::make_shared<TextInput>(ui, UI_SCALE);
 		displayNameInput->setHorizontalExpand(true);
-		displayNameInput->setText("Heimskr");
 		displayNameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(displayNameInput, 1, 1);
 

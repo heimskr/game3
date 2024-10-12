@@ -94,8 +94,8 @@ namespace Game3 {
 	}
 
 	Rectangle ConnectionDialog::getPosition() const {
-		constexpr int width = 600;
-		constexpr int height = 284;
+		constexpr int width = 600 * UI_SCALE / 8;
+		constexpr int height = 284 * UI_SCALE / 8;
 		return Rectangle((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height);
 	}
 
