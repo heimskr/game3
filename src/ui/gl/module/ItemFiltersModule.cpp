@@ -1,5 +1,6 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
+#include "graphics/RendererContext.h"
 #include "packet/SetItemFiltersPacket.h"
 #include "pipes/ItemFilter.h"
 #include "tileentity/Pipe.h"
@@ -12,8 +13,10 @@
 #include "ui/gl/widget/IconButton.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Label.h"
+#include "ui/gl/widget/Spacer.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
+#include "ui/gl/UIContext.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -24,24 +27,24 @@ namespace Game3 {
 		Module(ui, game), place(place) {}
 
 	void ItemFiltersModule::init() {
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
+		vbox = make<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
+		vbox->setName("ItemFiltersModule::vbox");
 
-		topHBox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
-		topHBox->insertAtEnd(vbox);
+		topHBox = make<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		topHBox->setName("ItemFiltersModule::topHBox");
+		vbox->append(topHBox);
 
-		auto copy_button = std::make_shared<Button>(ui, scale);
+		auto copy_button = make<Button>(ui, scale);
 		copy_button->setText("Copy");
 		copy_button->setAlignment(Alignment::Center);
 		copy_button->setFixedHeight(12 * scale);
-		copy_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button == LEFT_BUTTON)
-				copy();
-			return true;
+		copy_button->setOnClick([this](Widget &) {
+			copy();
 		});
 		copy_button->insertAtEnd(topHBox);
 
-		dropSlot = std::make_shared<ItemSlot>(ui);
+		dropSlot = make<ItemSlot>(ui);
 		dropSlot->setHorizontalExpand(true);
 		dropSlot->setAlignment(Alignment::Center);
 		dropSlot->insertAtEnd(topHBox);
@@ -49,55 +52,48 @@ namespace Game3 {
 			onDrop(widget);
 		});
 
-		auto paste_button = std::make_shared<Button>(ui, scale);
+		auto paste_button = make<Button>(ui, scale);
 		paste_button->setText("Paste");
 		paste_button->setAlignment(Alignment::Center);
 		paste_button->setFixedHeight(12 * scale);
-		paste_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button == LEFT_BUTTON)
-				paste();
-			return true;
+		paste_button->setOnClick([this](Widget &) {
+			paste();
 		});
 		paste_button->insertAtEnd(topHBox);
 
-		secondHBox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
-		secondHBox->insertAtEnd(vbox);
+		secondHBox = make<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		secondHBox->setName("SecondHbox");
+		vbox->append(secondHBox);
 
-		whitelistCheckbox = std::make_shared<Checkbox>(ui, scale);
+		whitelistCheckbox = make<Checkbox>(ui, scale);
 		whitelistCheckbox->setFixedSize(8 * scale);
 		whitelistCheckbox->insertAtEnd(secondHBox);
 		if (filter)
 			whitelistCheckbox->setChecked(filter->isAllowMode());
 
-		auto whitelist_label = std::make_shared<Label>(ui, scale);
+		auto whitelist_label = make<Label>(ui, scale);
 		whitelist_label->setText("Whitelist");
 		whitelist_label->setHorizontalExpand(true);
 		whitelist_label->insertAtEnd(secondHBox);
-		whitelist_label->setOnClick([this](Widget &, int button, int, int) -> bool {
-			if (button != LEFT_BUTTON)
-				return false;
+		whitelist_label->setOnClick([this](Widget &) {
 			const bool whitelist = !whitelistCheckbox->getChecked();
 			whitelistCheckbox->setChecked(whitelist);
 			setWhitelist(whitelist);
-			return true;
 		});
 
-		strictCheckbox = std::make_shared<Checkbox>(ui, scale);
+		strictCheckbox = make<Checkbox>(ui, scale);
 		strictCheckbox->setFixedSize(8 * scale);
 		strictCheckbox->insertAtEnd(secondHBox);
 		if (filter)
 			strictCheckbox->setChecked(filter->isStrict());
 
-		auto strict_label = std::make_shared<Label>(ui, scale);
+		auto strict_label = make<Label>(ui, scale);
 		strict_label->setText("Strict");
 		strict_label->insertAtEnd(secondHBox);
-		strict_label->setOnClick([this](Widget &, int button, int, int) -> bool {
-			if (button != LEFT_BUTTON)
-				return false;
+		strict_label->setOnClick([this](Widget &) {
 			const bool strict = !strictCheckbox->getChecked();
 			strictCheckbox->setChecked(strict);
 			setStrict(strict);
-			return true;
 		});
 
 		populate();
@@ -154,11 +150,12 @@ namespace Game3 {
 	}
 
 	void ItemFiltersModule::upload(ItemFilterPtr filter_to_use) {
-		if (!filter_to_use)
+		if (!filter_to_use) {
 			filter_to_use = filter;
-
-		if (!filter_to_use)
-			return;
+			if (!filter_to_use) {
+				return;
+			}
+		}
 
 		if (!pipe) {
 			WARN("Pipe is missing in ItemFiltersModule::upload");
@@ -169,38 +166,45 @@ namespace Game3 {
 	}
 
 	bool ItemFiltersModule::setFilter() {
-		if (!setPipe())
+		if (!setPipe()) {
 			return false;
+		}
 
 		auto &filter_ref = pipe->itemFilters[place.direction];
 
-		if (!filter_ref)
+		if (!filter_ref) {
 			filter_ref = std::make_shared<ItemFilter>();
+		}
 
-		if (filter != filter_ref)
+		if (filter != filter_ref) {
 			filter = filter_ref;
+		}
 
 		return true;
 	}
 
 	bool ItemFiltersModule::saveFilter() {
-		if (!setPipe())
+		if (!setPipe()) {
 			return false;
+		}
 
 		pipe->itemFilters[place.direction] = filter;
 		return true;
 	}
 
 	bool ItemFiltersModule::setPipe() {
-		if (!pipe)
+		if (!pipe) {
 			pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity());
+		}
+
 		return pipe != nullptr;
 	}
 
 	void ItemFiltersModule::onDrop(const WidgetPtr &source) {
 		auto item_slot = std::dynamic_pointer_cast<ItemSlot>(source);
-		if (!item_slot)
+		if (!item_slot) {
 			return;
+		}
 
 		if (ItemStackPtr stack = item_slot->getStack()) {
 			setFilter();
@@ -226,15 +230,22 @@ namespace Game3 {
 
 		std::shared_lock<DefaultMutex> configs_lock;
 		auto &configs = filter_to_use->getConfigs(configs_lock);
-		for (const auto &[id, set]: configs)
-			for (const ItemFilter::Config &config: set)
-				addHBox(id, config);
+		int i = 0;
+		for (const auto &[id, set]: configs) {
+			for (const ItemFilter::Config &config: set) {
+				addHBox(id, config)->setName(std::format("ItemFiltersModule::hbox{}", i++));
+			}
+		}
+
+		if (WidgetPtr parent = getParent()) {
+			parent->onChildrenUpdated();
+		}
 	}
 
-	void ItemFiltersModule::addHBox(const Identifier &id, const ItemFilter::Config &config) {
+	std::shared_ptr<Box> ItemFiltersModule::addHBox(const Identifier &id, const ItemFilter::Config &config) {
 		ClientGamePtr game = getGame();
 		ItemStackPtr stack = ItemStack::create(game, id, 1, config.data);
-		auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		auto hbox = make<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
 		auto image = makeImage(*stack);
 		auto label = makeLabel(*stack);
 		auto comparator = makeComparator(id, config);
@@ -246,48 +257,47 @@ namespace Game3 {
 		if (threshold) {
 			hbox->append(threshold);
 		} else {
-			auto spacer = std::make_shared<Label>(ui, scale);
-			spacer->setHorizontalExpand(true);
-			hbox->append(spacer);
+			hbox->append(make<Spacer>(ui, Orientation::Horizontal));
 		}
 		hbox->append(button);
 		vbox->append(hbox);
+		return hbox;
 	}
 
 	std::shared_ptr<Icon> ItemFiltersModule::makeImage(ItemStack &stack) {
 		ClientGamePtr game = getGame();
-		auto image = std::make_shared<Icon>(ui, scale);
+		auto image = make<Icon>(ui, scale);
 		image->setFixedSize(8 * scale);
 		image->setIconTexture(stack.getTexture(*game));
 		return image;
 	}
 
 	std::shared_ptr<Label> ItemFiltersModule::makeLabel(const ItemStack &stack) {
-		auto label = std::make_shared<Label>(ui, scale);
+		auto label = make<Label>(ui, scale);
 		label->setText(stack.getTooltip());
 		return label;
 	}
 
 	std::shared_ptr<Button> ItemFiltersModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
-		auto button = std::make_shared<Button>(ui, scale);
+		auto button = make<Button>(ui, scale);
 		button->setExpand(false, false);
 
-		if (config.comparator == ItemFilter::Comparator::Less)
+		if (config.comparator == ItemFilter::Comparator::Less) {
 			button->setText("<");
-		else if (config.comparator == ItemFilter::Comparator::Greater)
+		} else if (config.comparator == ItemFilter::Comparator::Greater) {
 			button->setText(">");
-		else
+		} else {
 			button->setText("~");
+		}
 
-		button->setOnClick([this, id = id, config = config](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
-				return false;
+		button->setOnClick([this, id = id, config = config](Widget &) {
 			setFilter();
 			{
 				std::unique_lock<DefaultMutex> lock;
 				auto &configs = filter->getConfigs(lock);
 				auto &set = configs[id];
-				ItemFilter::Config new_config = std::move(set.extract(config).value());
+				auto extracted = set.extract(config);
+				ItemFilter::Config &new_config = extracted.value();
 
 				if (new_config.comparator == ItemFilter::Comparator::Less) {
 					new_config.comparator = ItemFilter::Comparator::None;
@@ -297,21 +307,21 @@ namespace Game3 {
 					new_config.comparator = ItemFilter::Comparator::Greater;
 				}
 
-				set.insert(std::move(new_config));
+				set.insert(std::move(extracted));
 			}
 			populate();
 			upload();
-			return true;
 		});
 
 		return button;
 	}
 
 	std::shared_ptr<TextInput> ItemFiltersModule::makeThreshold(const Identifier &id, const ItemFilter::Config &config) {
-		if (config.comparator == ItemFilter::Comparator::None)
+		if (config.comparator == ItemFilter::Comparator::None) {
 			return {};
+		}
 
-		auto threshold = std::make_shared<TextInput>(ui, scale);
+		auto threshold = make<TextInput>(ui, scale);
 		threshold->setHorizontalExpand(true);
 		threshold->setFixedHeight(10 * scale);
 		threshold->setText(std::to_string(config.count));
@@ -338,18 +348,15 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Button> ItemFiltersModule::makeButton(const ItemStackPtr &stack) {
-		auto button = std::make_shared<IconButton>(ui, scale);
+		auto button = make<IconButton>(ui, scale);
 		button->setIconTexture(cacheTexture("resources/gui/minus.png"));
-		button->setOnClick([this, stack = stack->copy()](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
-				return false;
+		button->setOnClick([this, stack = stack->copy()](Widget &) {
 			setFilter();
 			if (filter) {
 				filter->removeItem(stack);
 				populate();
 				upload();
 			}
-			return true;
 		});
 		return button;
 	}

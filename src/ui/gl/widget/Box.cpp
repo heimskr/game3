@@ -218,8 +218,9 @@ namespace Game3 {
 	}
 
 	bool Box::onChildrenUpdated() {
-		if (!ChildDependentExpandingWidget<Widget>::onChildrenUpdated())
+		if (!ChildDependentExpandingWidget<Widget>::onChildrenUpdated()) {
 			return false;
+		}
 
 		childMeasurements.clear();
 		return true;

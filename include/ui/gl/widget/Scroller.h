@@ -24,12 +24,13 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			void clearChildren() final;
+			bool onChildrenUpdated() final;
 
 			void setChild(WidgetPtr);
 
 		private:
 			Color scrollbarColor;
-			float lastChildHeight = -1;
+			std::optional<float> lastChildHeight;
 			float xOffset = 0;
 			float yOffset = 0;
 			bool reverseScroll = false;

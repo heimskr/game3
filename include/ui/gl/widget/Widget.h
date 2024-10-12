@@ -106,12 +106,12 @@ namespace Game3 {
 			/** Mouse X and Y coordinates are relative to the top left corner of the widget. Return value indicates whether to stop propagation. */
 			std::function<bool(Widget &, int mouse_x, int mouse_y)> onDragUpdate;
 
-			/** Returns false if updates are suppressed. */
-			virtual bool onChildrenUpdated();
-
 			virtual bool shouldCull() const;
 
 		public:
+			/** Returns false if updates are suppressed. */
+			virtual bool onChildrenUpdated();
+
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnClick(std::function<bool(Widget &)>);
 			virtual void setOnClick(std::function<void(Widget &)>);

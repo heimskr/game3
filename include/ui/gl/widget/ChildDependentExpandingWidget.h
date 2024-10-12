@@ -61,8 +61,9 @@ namespace Game3 {
 			}
 
 			bool onChildrenUpdated() override {
-				if (!Base::onChildrenUpdated())
+				if (!Base::onChildrenUpdated()) {
 					return false;
+				}
 
 				markExpansionDirty();
 				return true;
