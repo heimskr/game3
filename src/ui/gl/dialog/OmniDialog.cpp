@@ -93,8 +93,8 @@ namespace Game3 {
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,
-					.scaleX = scale / 6,
-					.scaleY = scale / 6,
+					.scaleX = 1,
+					.scaleY = 1,
 					.invertY = false,
 				});
 
@@ -103,8 +103,8 @@ namespace Game3 {
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,
-					.scaleX = scale / 6,
-					.scaleY = scale / 6,
+					.scaleX = 1,
+					.scaleY = 1,
 					.invertY = false,
 				});
 			}
