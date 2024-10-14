@@ -18,13 +18,13 @@ namespace Game3 {
 		};
 	}
 
-	void Desert::init(Realm &realm, int noise_seed) {
+	void Desert::init(const std::shared_ptr<Realm> &realm, int noise_seed) {
 		Biome::init(realm, noise_seed);
 		forestNoise.setSeed(-noise_seed * 3);
 	}
 
 	double Desert::generate(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &, const WorldGenParams &params, double suggested_noise) {
-		Realm &realm = *getRealm();
+		RealmPtr realm = getRealm();
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
 
@@ -33,25 +33,28 @@ namespace Game3 {
 		static const Identifier water = "base:fluid/water"_id;
 
 		if (suggested_noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-			realm.setFluid({row, column}, water, params.getFluidLevel(suggested_noise, 0.3), true);
+			realm->setTile(Layer::Terrain, {row, column}, sand, false);
+			realm->setFluid({row, column}, water, params.getFluidLevel(suggested_noise, 0.3), true);
 		} else if (suggested_noise < wetness + 0.4) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false);
+			realm->setTile(Layer::Terrain, {row, column}, sand, false);
 		} else if (stoneLevel < suggested_noise) {
-			realm.setTile(Layer::Terrain, {row, column}, stone, false);
+			realm->setTile(Layer::Terrain, {row, column}, stone, false);
 		} else {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false);
+			realm->setTile(Layer::Terrain, {row, column}, sand, false);
 			const double forest_noise = forestNoise(row / params.noiseZoom, column / params.noiseZoom, 0.5);
 			if (params.forestThreshold - 0.2 < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
 				std::uniform_int_distribution hundred{0, 99};
-				if (hundred(tree_rng) < 75)
+				if (hundred(tree_rng) < 75) {
 					return suggested_noise;
+				}
 				uint8_t mod = abs(column) % 2;
-				if (hundred(tree_rng) < 50)
+				if (hundred(tree_rng) < 50) {
 					mod = 1 - mod;
-				if ((abs(row) % 2) == mod)
-					realm.setTile(Layer::Submerged, {row, column}, choose(cactuses, rng), false);
+				}
+				if ((abs(row) % 2) == mod) {
+					realm->setTile(Layer::Submerged, {row, column}, choose(cactuses, rng), false);
+				}
 			}
 		}
 
@@ -59,11 +62,13 @@ namespace Game3 {
 	}
 
 	void Desert::postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &noisegen, const WorldGenParams &params) {
-		Realm &realm = *getRealm();
+		RealmPtr realm = getRealm();
 		constexpr double factor = 10;
 
-		if (params.antiforestThreshold > noisegen(row / params.noiseZoom * factor, column / params.noiseZoom * factor, 0.))
-			if (auto tile = realm.tryTile(Layer::Submerged, {row, column}); tile && cactuses.contains(realm.getTileset()[*tile]))
-				realm.setTile(Layer::Submerged, {row, column}, 0, false);
+		if (params.antiforestThreshold > noisegen(row / params.noiseZoom * factor, column / params.noiseZoom * factor, 0.)) {
+			if (std::optional<TileID> tile = realm->tryTile(Layer::Submerged, {row, column}); tile && cactuses.contains(realm->getTileset()[*tile])) {
+				realm->setTile(Layer::Submerged, {row, column}, 0, false);
+			}
+		}
 	}
 }

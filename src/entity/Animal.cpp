@@ -13,7 +13,6 @@ namespace Game3 {
 
 	namespace {
 		constexpr HitPoints MAX_HEALTH   = 40;
-		constexpr size_t    PATHFIND_MAX = 256;
 	}
 
 	std::uniform_real_distribution<float> Animal::getWanderDistribution() {

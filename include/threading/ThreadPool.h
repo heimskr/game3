@@ -26,6 +26,7 @@ namespace Game3 {
 
 			void start();
 			void join();
+			/** Returns true if the pool is active and added the job, or false if the pool is inactive. */
 			bool add(const Function &);
 
 			size_t jobCount() const;
