@@ -2,14 +2,13 @@
 
 #include <format>
 #include <iostream>
-#include <mutex>
 #include <print>
 #include <string>
+#include <syncstream>
 
 // #define NO_LOGS
 
 namespace Game3::Logger {
-	extern std::mutex mutex;
 	extern int level;
 	std::string getTimestamp();
 }
@@ -35,68 +34,73 @@ namespace Game3 {
 #define LOG_SUCCESS_MIDDLE "\x1b[22;2m]\x1b[22m (\x1b[22;1;32m🗸\x1b[22;39m)\x1b[2m :: \x1b[22;32m"
 	template <typename... Args>
 	void INFO(std::format_string<Args...> format, Args &&...args) {
-		std::unique_lock lock(Game3::Logger::mutex);
-		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_INFO_MIDDLE);
-		std::println(std::cerr, format, std::forward<Args>(args)...);
+		std::osyncstream synced{std::cerr};
+		std::print(synced, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_INFO_MIDDLE);
+		std::println(synced, format, std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
 	void INFO(int level, std::format_string<Args...> format, Args &&...args) {
-		if (level <= Logger::level)
+		if (level <= Logger::level) {
 			INFO(format, std::forward<Args>(args)...);
+		}
 	}
 
 	template <typename... Args>
 	void WARN(std::format_string<Args...> format, Args &&...args) {
-		std::unique_lock lock(Game3::Logger::mutex);
-		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_WARN_MIDDLE);
-		std::println(std::cerr, format, std::forward<Args>(args)...);
+		std::osyncstream synced{std::cerr};
+		std::print(synced, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_WARN_MIDDLE);
+		std::println(synced, format, std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
 	void WARN(int level, std::format_string<Args...> format, Args &&...args) {
-		if (level <= Logger::level)
+		if (level <= Logger::level) {
 			WARN(format, std::forward<Args>(args)...);
+		}
 	}
 
 	template <typename... Args>
 	void ERROR(std::format_string<Args...> format, Args &&...args) {
-		std::unique_lock lock(Game3::Logger::mutex);
-		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_ERROR_MIDDLE);
-		std::println(std::cerr, format, std::forward<Args>(args)...);
+		std::osyncstream synced{std::cerr};
+		std::print(synced, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_ERROR_MIDDLE);
+		std::println(synced, format, std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
 	void ERROR(int level, std::format_string<Args...> format, Args &&...args) {
-		if (level <= Logger::level)
+		if (level <= Logger::level) {
 			ERROR(format, std::forward<Args>(args)...);
+		}
 	}
 
 	template <typename... Args>
 	void SPAM(std::format_string<Args...> format, Args &&...args) {
-		std::unique_lock lock(Game3::Logger::mutex);
-		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SPAM_MIDDLE);
-		std::println(std::cerr, format, std::forward<Args>(args)...);
+		std::osyncstream synced{std::cerr};
+		std::print(synced, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SPAM_MIDDLE);
+		std::println(synced, format, std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
 	void SPAM(int level, std::format_string<Args...> format, Args &&...args) {
-		if (level <= Logger::level)
+		if (level <= Logger::level) {
 			SPAM(format, std::forward<Args>(args)...);
+		}
 	}
 
 	template <typename... Args>
 	void SUCCESS(std::format_string<Args...> format, Args &&...args) {
-		std::unique_lock lock(Game3::Logger::mutex);
-		std::print(std::cerr, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SUCCESS_MIDDLE);
-		std::print(std::cerr, format, std::forward<Args>(args)...);
-		std::println(std::cerr, "\x1b[39m");
+		std::osyncstream synced{std::cerr};
+		std::print(synced, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SUCCESS_MIDDLE);
+		std::print(synced, format, std::forward<Args>(args)...);
+		std::println(synced, "\x1b[39m");
 	}
 
 	template <typename... Args>
 	void SUCCESS(int level, std::format_string<Args...> format, Args &&...args) {
-		if (level <= Logger::level)
+		if (level <= Logger::level) {
 			SUCCESS(format, std::forward<Args>(args)...);
+		}
 	}
 #endif
 }
