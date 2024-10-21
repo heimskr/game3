@@ -33,7 +33,7 @@ namespace Game3 {
 		TextAlign align = TextAlign::Left;
 		bool alignTop = false;
 		Color shadow{0, 0, 0, 1};
-		Vector2f shadowOffset{.025f, .025f};
+		Vector2d shadowOffset{.025, .025};
 		float *heightOut = nullptr;
 		bool ignoreNewline = false;
 	};

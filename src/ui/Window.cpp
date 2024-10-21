@@ -29,6 +29,8 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
+#include "minigame/Breakout.h"
+
 #include <fstream>
 
 namespace Game3 {
@@ -387,6 +389,13 @@ namespace Game3 {
 		drawGL();
 	}
 
+	Breakout breakout = [] {
+		Breakout out;
+		out.setSize(600, 600);
+		out.reset();
+		return out;
+	}();
+
 	void Window::drawGL() {
 		const float x_factor = getXFactor();
 		const float y_factor = getYFactor();
@@ -586,6 +595,12 @@ namespace Game3 {
 		}
 
 		uiContext.render(getMouseX(), getMouseY());
+
+		{
+			auto renderers = uiContext.getRenderers();
+			auto saver = uiContext.scissorStack.pushAbsolute(Rectangle((getWidth() - breakout.gameWidth) / 2, (getHeight() - breakout.gameHeight) / 2, breakout.gameWidth, breakout.gameHeight), renderers);
+			breakout.render(uiContext, renderers);
+		}
 
 		if (settings.showFPS && runningFPS > 0) {
 			textRenderer.drawOnScreen(std::format("{:.1f} FPS", runningFPS), TextRenderOptions{

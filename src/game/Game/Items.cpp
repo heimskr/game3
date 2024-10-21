@@ -337,6 +337,7 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/fence_gate",       "Fence Gate ",       10, Layer::Submerged, "base:tile/gate_horizontal"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",      "Wooden Wall",       9, Layer::Objects,   "base:tile/wooden_wall",      "base:autotile/wooden_walls"));
+		add(Furniture::createMarchable("base:item/concrete_wall",    "Concrete Wall",     9, Layer::Objects,   "base:tile/concrete_wall",    "base:autotile/concrete_walls"));
 		add(Furniture::createMarchable("base:item/tall_wooden_wall", "Tall Wooden Wall",  9, Layer::Objects,   "base:tile/tall_wooden_wall", "base:autotile/tall_wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",            "Tower",            10, Layer::Objects,   "base:tile/tower",            "base:autotile/towers"));
 		add(Furniture::createMarchable("base:item/kitchen_counter",  "Kitchen Counter",  10, Layer::Objects,   "base:tile/kitchen_counter",  "base:autotile/kitchen_counters"));

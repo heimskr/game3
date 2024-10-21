@@ -12,6 +12,7 @@
 		"base:autotile/item_extractors":   "base:tile/item_extractors",
 		"base:autotile/towers":            "base:tile/tower",
 		"base:autotile/wooden_walls":      "base:category/wooden_walls",
+		"base:autotile/concrete_walls":    "base:category/concrete_walls",
 		"base:autotile/town_dirt":         "base:tile/town_dirt",
 		"base:autotile/stone":             "base:tile/stone",
 		"base:autotile/kitchen_counters":  "base:tile/kitchen_counter",

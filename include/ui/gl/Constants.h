@@ -10,7 +10,7 @@
 namespace Game3 {
 	constexpr double X_FRACTION = 0.2;
 	constexpr double Y_FRACTION = 0.2;
-	constexpr double UI_SCALE = 8;
+	constexpr double UI_SCALE = 4;
 	constexpr double SLOT_SCALE = UI_SCALE;
 	constexpr double UNSCALE = 1.6;
 	constexpr float TEXT_INPUT_HEIGHT_FACTOR = 11;
@@ -20,7 +20,7 @@ namespace Game3 {
 	constexpr int OUTER_SLOT_SIZE = INNER_SLOT_SIZE * 5 / 4;
 	constexpr int SLOT_PADDING = OUTER_SLOT_SIZE - INNER_SLOT_SIZE;
 	constexpr Slot HOTBAR_SIZE = 10;
-	constexpr float HOTBAR_SCALE = 6;
+	constexpr float HOTBAR_SCALE = UI_SCALE * 6 / 8;
 	constexpr float HOTBAR_BORDER = SLOT_PADDING * HOTBAR_SCALE / 3;
 	constexpr Color DEFAULT_TEXTINPUT_INTERIOR_COLOR{"#fdeed3"};
 	constexpr Color DEFAULT_BACKGROUND_COLOR{0.88, 0.77, 0.55};
