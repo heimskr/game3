@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types/Position.h"
+
 #include <format>
 
 namespace Game3 {
@@ -16,6 +18,12 @@ namespace Game3 {
 
 		Rectangle(int x, int y):
 			Rectangle(x, y, 0, 0) {}
+
+		Rectangle(Vector2d pos, int size):
+			Rectangle(pos.x, pos.y, size, size) {}
+
+		Rectangle(Vector2i pos, int size):
+			Rectangle(pos.x, pos.y, size, size) {}
 
 		int area() const;
 		void scissor(int outer_height) const;

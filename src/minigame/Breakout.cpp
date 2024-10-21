@@ -13,37 +13,17 @@ namespace Game3 {
 		constexpr Color BREAKOUT_BACKGROUND{"#ffffce"};
 		constexpr double BREAKOUT_CHECK_TIME = 0.05;
 		constexpr std::size_t BREAKOUT_BLOCK_SCORE = 500;
-
-		template <typename V>
-		bool checkCircleRectangleIntersection(const V &circle, int radius, const Rectangle &rectangle) {
-			// https://stackoverflow.com/a/402010
-
-			const Vector2d circle_distance{
-				std::abs(circle.x - (rectangle.x + rectangle.width / 2)),
-				std::abs(circle.y - (rectangle.y + rectangle.height / 2)),
-			};
-
-			if (circle_distance.x > rectangle.width / 2 + radius || circle_distance.y > rectangle.height / 2 + radius) {
-				return false;
-			}
-
-			if (circle_distance.x <= rectangle.width / 2 || circle_distance.y <= rectangle.height / 2) {
-				return true;
-			}
-
-			return sqr(circle_distance.x - rectangle.width / 2) + sqr(circle_distance.y - rectangle.height / 2) <= sqr(radius);
-		}
 	}
 
 	Breakout::Breakout():
-		ballSize(20),
+		ballSize(30),
 		blockWidth(50),
-		blockHeight(20),
+		blockHeight(30),
 		blockPadding(10),
-		paddleWidth(160),
+		paddleWidth(100),
 		paddleHeight(30),
 		paddleSpeed(8),
-		rowCount(10) {}
+		rowCount(6) {}
 
 	void Breakout::tick(UIContext &ui, double delta) {
 		accumulatedTime += delta;
@@ -56,80 +36,74 @@ namespace Game3 {
 		ballPosition.x += ballVelocity.x;
 		ballPosition.y += ballVelocity.y;
 
-		if (checkCircleRectangleIntersection(ballPosition, ballSize, paddle)) {
-			// if (ballPosition.y + ballSize <= paddle.y) {
-			if (paddle.contains(ballPosition.x, ballPosition.y + ballSize)) {
-				// https://gamedev.stackexchange.com/a/21048
-				bounceY();
-				ballPosition.y = paddle.y - ballSize - 1;
-				const int paddle_center = paddle.x + paddle.width / 2;
-				const double pos_x = (ballPosition.x - paddle_center) / (paddle.width / 2.0);
-				constexpr double influence = 0.9;
-				ballVelocity.x = ballSpeed * pos_x * influence;
-				normalizeVelocity();
-			}
-		}
-
 		if (ballPosition.x + ballSize >= gameWidth) {
 			ballPosition.x = gameWidth - ballSize;
 			bounceX();
-		} else if (ballPosition.x - ballSize <= 0) {
-			ballPosition.x = ballSize;
+		} else if (ballPosition.x <= 0) {
+			ballPosition.x = 0;
 			bounceX();
 		}
 
-		if (ballPosition.y - ballSize >= gameHeight) {
+		if (ballPosition.y >= gameHeight) {
 			ballLost();
-		} else if (ballPosition.y - ballSize <= 0) {
-			ballPosition.y = ballSize;
+		} else if (ballPosition.y <= 0) {
+			ballPosition.y = 0;
 			bounceY();
 		}
 
-		const decltype(ballPosition) top    = {ballPosition.x, ballPosition.y - ballSize};
-		const decltype(ballPosition) bottom = {ballPosition.x, ballPosition.y + ballSize};
-		const decltype(ballPosition) left   = {ballPosition.x - ballSize, ballPosition.y};
-		const decltype(ballPosition) right  = {ballPosition.x + ballSize, ballPosition.y};
+		Rectangle ball(ballPosition, ballSize);
+
+		if (paddle.intersection(ball) && paddle.y <= ballPosition.y + ballSize && ballPosition.y + ballSize <= paddle.y + paddle.height) {
+			// https://gamedev.stackexchange.com/a/21048
+			bounceY();
+			ballPosition.y = paddle.y - ballSize - 1;
+			const int paddle_center = paddle.x + paddle.width / 2;
+			const double pos_x = (ballPosition.x + ballSize / 2 - paddle_center) / (paddle.width / 2.0);
+			constexpr double influence = 0.75;
+			ballVelocity.x = ballSpeed * pos_x * influence;
+			normalizeVelocity();
+		}
 
 		const bool left_held = ui.window.isKeyHeld(GLFW_KEY_LEFT);
 		const bool right_held = ui.window.isKeyHeld(GLFW_KEY_RIGHT);
 
+
 		if (left_held) {
 			Rectangle new_paddle = paddle;
 			new_paddle.x = std::max(0, new_paddle.x - paddleSpeed);
-			if (new_paddle.contains(right.x, right.y)) {
+			const int right = ballPosition.x + ballSize;
+			if (new_paddle.intersection(ball) && new_paddle.x <= right && right <= new_paddle.x + new_paddle.width) {
 				bounceX();
-				new_paddle.x = right.x;
+				new_paddle.x = right;
 			}
 			paddle = new_paddle;
 		} else if (right_held) {
 			Rectangle new_paddle = paddle;
 			new_paddle.x = std::min(gameWidth - paddle.width, new_paddle.x + paddleSpeed);
-			if (new_paddle.contains(left.x, left.y)) {
+			const int left = ballPosition.x;
+			if (new_paddle.intersection(ball) && new_paddle.x <= left && left <= new_paddle.x + new_paddle.width) {
 				bounceX();
-				new_paddle.x = left.x - paddle.width;
+				new_paddle.x = left - paddle.width;
 			}
 			paddle = new_paddle;
 		}
 
 		auto iter = getBlockIntersection();
 		if (iter != blocks.end()) {
-			Rectangle block = *iter;
+			Rectangle intersection = Rectangle(ballPosition, ballSize).intersection(*iter);
 
-			bool bounced = false;
+			const auto comparison = intersection.width <=> intersection.height;
 
-			if (block.contains(left.x, left.y) || block.contains(right.x, right.y)) {
+			if (comparison == std::strong_ordering::less) {
 				bounceX();
-				bounced = true;
-			}
-
-			if (block.contains(top.x, top.y) || block.contains(bottom.x, bottom.y)) {
+			} else if (comparison == std::strong_ordering::greater) {
 				bounceY();
-				bounced = true;
+			} else {
+				bounceX();
+				bounceY();
 			}
 
-			if (bounced) {
-				breakBlock(iter);
-			}
+			breakBlock(iter);
 		}
 	}
 
@@ -143,8 +117,7 @@ namespace Game3 {
 		}
 
 		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, paddle);
-
-		renderers.circle.drawOnScreen(BREAKOUT_FOREGROUND, ballPosition.x, ballPosition.y, ballSize, ballSize);
+		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, Rectangle(ballPosition, ballSize));
 	}
 
 	void Breakout::setSize(float width, float height) {
@@ -166,18 +139,18 @@ namespace Game3 {
 		}
 
 		blocksBottom = rowCount * (blockHeight + blockPadding) + blockPadding + ballSize;
-		ballPosition.x = ballSize;
-		ballPosition.y = blocksBottom;
-		ballVelocity = {1, 1};
+		resetBallPosition();
+		ballVelocity = {0, 1};
 		ballSpeed = 3;
-		paddle = {blockPadding, gameHeight - blockPadding - paddleHeight, paddleWidth, paddleHeight};
+		paddle = {(gameWidth - paddleWidth) / 2, gameHeight - blockPadding - paddleHeight, paddleWidth, paddleHeight};
 		normalizeVelocity();
 	}
 
 	std::list<Rectangle>::iterator Breakout::getBlockIntersection() {
-		if (ballPosition.y - ballSize <= blocksBottom) {
+		if (ballPosition.y <= blocksBottom) {
+			Rectangle ball(ballPosition, ballSize);
 			for (auto iter = blocks.begin(), end = blocks.end(); iter != end; ++iter) {
-				if (checkCircleRectangleIntersection(ballPosition, ballSize, *iter)) {
+				if (ball.intersection(*iter)) {
 					return iter;
 				}
 			}
@@ -201,8 +174,9 @@ namespace Game3 {
 
 	void Breakout::ballLost() {
 		INFO("Ball lost");
-		ballPosition.x = gameWidth / 2;
-		ballPosition.y = gameHeight / 2;
+		resetBallPosition();
+		ballVelocity = {0, 1};
+		normalizeVelocity();
 	}
 
 	void Breakout::bounceX() {
@@ -211,5 +185,9 @@ namespace Game3 {
 
 	void Breakout::bounceY() {
 		ballVelocity.y *= -1;
+	}
+
+	void Breakout::resetBallPosition() {
+		ballPosition = Vector2d((gameWidth - ballSize) / 2, blocksBottom);
 	}
 }

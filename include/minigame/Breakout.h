@@ -39,5 +39,6 @@ namespace Game3 {
 			void ballLost();
 			void bounceX();
 			void bounceY();
+			void resetBallPosition();
 	};
 }
