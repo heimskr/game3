@@ -36,6 +36,8 @@ namespace Game3 {
 
 		int channels = 0;
 		uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
+		alpha = channels == 4;
+		format = alpha? GL_RGBA : GL_RGB;
 		if (raw == nullptr) {
 			throw std::runtime_error("Couldn't load image from " + path.string());
 		}

@@ -287,6 +287,7 @@ int main(int argc, char **argv) {
 		"resources/gui/dirt.png",
 		"resources/gui/grass.png",
 		"resources/gui/grimrubble.png",
+		"resources/tileset/lava/tile.png",
 	};
 
 	TexturePtr stone = cacheTexture(choose(paths, std::random_device{}));
