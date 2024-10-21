@@ -77,7 +77,7 @@ namespace Game3 {
 		return result;
 	}
 
-	template <std::integral I>
+	template <typename I>
 	I sqr(I n) {
 		return n * n;
 	}

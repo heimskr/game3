@@ -11,13 +11,10 @@ namespace Game3 {
 		public:
 			Breakout();
 
-			void tick(double delta) final;
+			void tick(UIContext &, double delta) final;
 			void render(UIContext &, const RendererContext &) final;
 			void setSize(float width, float height) final;
 			void reset();
-
-			int gameWidth{};
-			int gameHeight{};
 
 		private:
 			int ballSize{};
@@ -26,16 +23,21 @@ namespace Game3 {
 			int blockPadding{};
 			int paddleWidth{};
 			int paddleHeight{};
+			int paddleSpeed{};
 			int rowCount{};
-			Vector2i ballPosition{};
-			Vector2i ballVelocity{};
+			int blocksBottom{};
+			Vector2d ballPosition{};
+			Vector2d ballVelocity{};
 			Rectangle paddle{};
 			double ballSpeed{};
 			double accumulatedTime{};
 			std::list<Rectangle> blocks;
 
-			std::list<Rectangle>::iterator getBlockIntersection(Vector2i position);
+			std::list<Rectangle>::iterator getBlockIntersection();
 			void normalizeVelocity();
 			void breakBlock(std::list<Rectangle>::iterator);
+			void ballLost();
+			void bounceX();
+			void bounceY();
 	};
 }

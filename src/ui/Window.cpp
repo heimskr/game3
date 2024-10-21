@@ -599,6 +599,11 @@ namespace Game3 {
 		{
 			auto renderers = uiContext.getRenderers();
 			auto saver = uiContext.scissorStack.pushAbsolute(Rectangle((getWidth() - breakout.gameWidth) / 2, (getHeight() - breakout.gameHeight) / 2, breakout.gameWidth, breakout.gameHeight), renderers);
+
+			static auto last_time = getTime();
+			auto delta = (getTime() - last_time).count() / 1e9;
+
+			breakout.tick(uiContext, delta);
 			breakout.render(uiContext, renderers);
 		}
 
@@ -620,6 +625,12 @@ namespace Game3 {
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
 		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
 		lastModifiers = modifiers;
+
+		if (action == GLFW_PRESS) {
+			heldKeys.insert(key);
+		} else if (action == GLFW_RELEASE) {
+			heldKeys.erase(key);
+		}
 
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 			if (auto iter = keyTimes.find(key); iter != keyTimes.end()) {
@@ -1247,6 +1258,10 @@ namespace Game3 {
 		}
 
 		closeGame();
+	}
+
+	bool Window::isKeyHeld(int key) const {
+		return heldKeys.contains(key);
 	}
 
 	void Window::handleKeys() {

@@ -22,6 +22,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <set>
 #include <string>
 
 struct GLFWwindow;
@@ -67,6 +68,7 @@ namespace Game3 {
 			GL::FBO fbo;
 			Rectangle realmBounds;
 			bool autofocus = true;
+			std::set<int> heldKeys;
 
 			Window(GLFWwindow &);
 
@@ -129,6 +131,7 @@ namespace Game3 {
 			bool isConnectedLocally() const;
 			bool isConnected() const;
 			void disconnect();
+			bool isKeyHeld(int key) const;
 
 		private:
 			struct KeyInfo {
