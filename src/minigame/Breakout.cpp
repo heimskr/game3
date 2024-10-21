@@ -137,14 +137,13 @@ namespace Game3 {
 			.color = BREAKOUT_FOREGROUND,
 		});
 
-		texter(std::format("{}", lives), TextRenderOptions{
-			.x = static_cast<double>(gameWidth - blockPadding),
-			.y = static_cast<double>(gameHeight - blockPadding),
-			.scaleX = 0.5,
-			.scaleY = 0.5,
-			.color = BREAKOUT_FOREGROUND,
-			.align = TextAlign::Right,
-		});
+		int shrunk = ballSize * 0.5;
+		int x = gameWidth - shrunk - blockPadding;
+
+		for (int i = 0; i < lives; ++i) {
+			rectangler.drawOnScreen(BREAKOUT_FOREGROUND, x, gameHeight - blockPadding - shrunk, shrunk, shrunk);
+			x -= shrunk + blockPadding;
+		}
 	}
 
 	void Breakout::setSize(float width, float height) {
