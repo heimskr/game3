@@ -12,7 +12,8 @@ namespace Game3 {
 		constexpr Color BREAKOUT_FOREGROUND{"#425229"};
 		constexpr Color BREAKOUT_BACKGROUND{"#ffffce"};
 		constexpr double BREAKOUT_CHECK_TIME = 0.05;
-		constexpr std::size_t BREAKOUT_BLOCK_SCORE = 500;
+		constexpr std::size_t BREAKOUT_BLOCK_SCORE = 100;
+		constexpr int BREAKOUT_INITIAL_LIVES = 3;
 	}
 
 	Breakout::Breakout():
@@ -32,6 +33,10 @@ namespace Game3 {
 		}
 
 		accumulatedTime = 0;
+
+		if (isGameOver) {
+			return;
+		}
 
 		ballPosition.x += ballVelocity.x;
 		ballPosition.y += ballVelocity.y;
@@ -64,11 +69,7 @@ namespace Game3 {
 			normalizeVelocity();
 		}
 
-		const bool left_held = ui.window.isKeyHeld(GLFW_KEY_LEFT);
-		const bool right_held = ui.window.isKeyHeld(GLFW_KEY_RIGHT);
-
-
-		if (left_held) {
+		if (ui.window.isKeyHeld(GLFW_KEY_LEFT)) {
 			Rectangle new_paddle = paddle;
 			new_paddle.x = std::max(0, new_paddle.x - paddleSpeed);
 			const int right = ballPosition.x + ballSize;
@@ -77,7 +78,7 @@ namespace Game3 {
 				new_paddle.x = right;
 			}
 			paddle = new_paddle;
-		} else if (right_held) {
+		} else if (ui.window.isKeyHeld(GLFW_KEY_RIGHT)) {
 			Rectangle new_paddle = paddle;
 			new_paddle.x = std::min(gameWidth - paddle.width, new_paddle.x + paddleSpeed);
 			const int left = ballPosition.x;
@@ -91,7 +92,6 @@ namespace Game3 {
 		auto iter = getBlockIntersection();
 		if (iter != blocks.end()) {
 			Rectangle intersection = Rectangle(ballPosition, ballSize).intersection(*iter);
-
 			const auto comparison = intersection.width <=> intersection.height;
 
 			if (comparison == std::strong_ordering::less) {
@@ -108,9 +108,19 @@ namespace Game3 {
 	}
 
 	void Breakout::render(UIContext &ui, const RendererContext &renderers) {
+		TextRenderer &texter = renderers.text;
 		RectangleRenderer &rectangler = renderers.rectangle;
-
 		rectangler.drawOnScreen(BREAKOUT_BACKGROUND, 0, 0, gameWidth, gameHeight);
+
+		if (isGameOver) {
+			texter("GAME OVER", TextRenderOptions{
+				.x = static_cast<double>(gameWidth / 2),
+				.y = static_cast<double>(gameHeight / 2),
+				.color = BREAKOUT_FOREGROUND,
+				.align = TextAlign::Center,
+			});
+			return;
+		}
 
 		for (const Rectangle &block: blocks) {
 			rectangler.drawOnScreen(BREAKOUT_FOREGROUND, block);
@@ -118,6 +128,23 @@ namespace Game3 {
 
 		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, paddle);
 		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, Rectangle(ballPosition, ballSize));
+
+		texter(std::format("{}", score), TextRenderOptions{
+			.x = static_cast<double>(blockPadding),
+			.y = static_cast<double>(gameHeight - blockPadding),
+			.scaleX = 0.5,
+			.scaleY = 0.5,
+			.color = BREAKOUT_FOREGROUND,
+		});
+
+		texter(std::format("{}", lives), TextRenderOptions{
+			.x = static_cast<double>(gameWidth - blockPadding),
+			.y = static_cast<double>(gameHeight - blockPadding),
+			.scaleX = 0.5,
+			.scaleY = 0.5,
+			.color = BREAKOUT_FOREGROUND,
+			.align = TextAlign::Right,
+		});
 	}
 
 	void Breakout::setSize(float width, float height) {
@@ -126,6 +153,7 @@ namespace Game3 {
 	}
 
 	void Breakout::reset() {
+		lives = BREAKOUT_INITIAL_LIVES;
 		blocks.clear();
 
 		const int count_x = (gameWidth - blockPadding) / (blockPadding + blockWidth);
@@ -142,7 +170,7 @@ namespace Game3 {
 		resetBallPosition();
 		ballVelocity = {0, 1};
 		ballSpeed = 3;
-		paddle = {(gameWidth - paddleWidth) / 2, gameHeight - blockPadding - paddleHeight, paddleWidth, paddleHeight};
+		paddle = {(gameWidth - paddleWidth) / 2, gameHeight - blockPadding - paddleHeight - 40, paddleWidth, paddleHeight};
 		normalizeVelocity();
 	}
 
@@ -174,9 +202,14 @@ namespace Game3 {
 
 	void Breakout::ballLost() {
 		INFO("Ball lost");
-		resetBallPosition();
-		ballVelocity = {0, 1};
-		normalizeVelocity();
+
+		if (--lives == 0) {
+			gameOver();
+		} else {
+			resetBallPosition();
+			ballVelocity = {0, 1};
+			normalizeVelocity();
+		}
 	}
 
 	void Breakout::bounceX() {
@@ -189,5 +222,9 @@ namespace Game3 {
 
 	void Breakout::resetBallPosition() {
 		ballPosition = Vector2d((gameWidth - ballSize) / 2, blocksBottom);
+	}
+
+	void Breakout::gameOver() {
+		isGameOver = true;
 	}
 }

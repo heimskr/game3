@@ -17,6 +17,7 @@ namespace Game3 {
 			void reset();
 
 		private:
+			int lives{};
 			int ballSize{};
 			int blockWidth{};
 			int blockHeight{};
@@ -32,6 +33,7 @@ namespace Game3 {
 			double ballSpeed{};
 			double accumulatedTime{};
 			std::list<Rectangle> blocks;
+			bool isGameOver = false;
 
 			std::list<Rectangle>::iterator getBlockIntersection();
 			void normalizeVelocity();
@@ -40,5 +42,6 @@ namespace Game3 {
 			void bounceX();
 			void bounceY();
 			void resetBallPosition();
+			void gameOver();
 	};
 }
