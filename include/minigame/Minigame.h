@@ -18,7 +18,7 @@ namespace Game3 {
 			virtual void setSize(float width, float height) = 0;
 
 		protected:
-			std::size_t score;
+			std::size_t score{};
 
 			virtual void increaseScore(std::size_t);
 	};

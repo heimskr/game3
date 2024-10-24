@@ -9,6 +9,8 @@
 namespace Game3 {
 	class Breakout: public Minigame {
 		public:
+			static std::string_view getName() { return "Breakout"; }
+
 			Breakout();
 
 			void tick(UIContext &, double delta) final;

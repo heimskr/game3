@@ -11,7 +11,7 @@ namespace Game3 {
 	namespace {
 		constexpr Color BREAKOUT_FOREGROUND{"#425229"};
 		constexpr Color BREAKOUT_BACKGROUND{"#ffffce"};
-		constexpr double BREAKOUT_CHECK_TIME = 0.05;
+		constexpr double BREAKOUT_CHECK_TIME = 0.005;
 		constexpr std::size_t BREAKOUT_BLOCK_SCORE = 100;
 		constexpr int BREAKOUT_INITIAL_LIVES = 3;
 	}
@@ -200,8 +200,6 @@ namespace Game3 {
 	}
 
 	void Breakout::ballLost() {
-		INFO("Ball lost");
-
 		if (--lives == 0) {
 			gameOver();
 		} else {

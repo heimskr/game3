@@ -16,6 +16,7 @@
 #include "ui/gl/dialog/DraggableDialog.h"
 #include "ui/gl/dialog/LoginDialog.h"
 #include "ui/gl/dialog/MessageDialog.h"
+#include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/FluidsModule.h"
@@ -342,8 +343,9 @@ namespace Game3 {
 			std::unique_lock<DefaultMutex> lock;
 			if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 				std::any empty;
-				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
+				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty)) {
 					return response->take<GlobalID>();
+				}
 			}
 		}
 
@@ -596,15 +598,15 @@ namespace Game3 {
 
 		uiContext.render(getMouseX(), getMouseY());
 
-		{
-			auto renderers = uiContext.getRenderers();
-			auto saver = uiContext.scissorStack.pushAbsolute(Rectangle((getWidth() - breakout.gameWidth) / 2, (getHeight() - breakout.gameHeight) / 2, breakout.gameWidth, breakout.gameHeight), renderers);
+		static std::shared_ptr<MinigameDialog<Breakout, 600, 600>> mgdiag;
 
-			static auto last_time = getTime();
-			auto delta = (getTime() - last_time).count() / 1e9;
+		if (!mgdiag) {
+			mgdiag = std::make_shared<MinigameDialog<Breakout, 600, 600>>(uiContext);
+			mgdiag->init();
+		}
 
-			// breakout.tick(uiContext, delta);
-			// breakout.render(uiContext, renderers);
+		if (!uiContext.hasDialog<MinigameDialog<Breakout, 600, 600>>()) {
+			uiContext.addDialog(mgdiag);
 		}
 
 		if (settings.showFPS && runningFPS > 0) {

@@ -16,6 +16,14 @@ namespace Game3 {
 		constexpr Color INTERIOR_BACKGROUND_COLOR{"#ffc07e"};
 	}
 
+	int BaseDraggableDialog::getEffectiveWidth(int content_width, float scale) {
+		return content_width + 4 * scale;
+	}
+
+	int BaseDraggableDialog::getEffectiveHeight(int content_height, float scale) {
+		return content_height + 12 * scale;
+	}
+
 	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, int width, int height):
 		Dialog(ui),
 		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height) {}
@@ -31,12 +39,15 @@ namespace Game3 {
 
 		rectangler.drawOnScreen(BORDER_COLOR, position);
 		rectangler.drawOnScreen(TITLE_BACKGROUND_COLOR, titleRectangle);
-		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, bodyRectangle);
 
-		bodyRectangle.x += scale;
-		bodyRectangle.y += scale;
-		bodyRectangle.width -= 2 * scale;
-		bodyRectangle.height -= 2 * scale;
+		bodyRectangle = getInnerRectangle();
+
+		Rectangle outer_rectangle = bodyRectangle;
+		outer_rectangle.x -= scale;
+		outer_rectangle.y -= scale;
+		outer_rectangle.width += 2 * scale;
+		outer_rectangle.height += 2 * scale;
+		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, outer_rectangle);
 
 		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 
@@ -58,6 +69,10 @@ namespace Game3 {
 
 	Rectangle BaseDraggableDialog::getPosition() const {
 		return position;
+	}
+
+	Rectangle BaseDraggableDialog::getInnerRectangle() const {
+		return getPosition() + Rectangle(2 * scale, 10 * scale, position.width - 4 * scale, position.height - 12 * scale);
 	}
 
 	void BaseDraggableDialog::init() {
