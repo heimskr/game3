@@ -278,13 +278,16 @@ namespace Game3 {
 		INFO("{}", message);
 	}
 
-	void Window::error(const UString &message, bool do_queue, bool use_markup) {
+	void Window::error(const UString &message, bool do_queue, bool use_markup, std::function<void()> on_close) {
 		(void) use_markup;
 
-		auto action = [message](Window &window) mutable {
+		auto action = [message, on_close = std::move(on_close)](Window &window) mutable {
 			window.activateContext();
 			auto dialog = MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None);
 			dialog->setTitle("Error");
+			if (on_close) {
+				dialog->signalClose.connect(std::move(on_close));
+			}
 			window.uiContext.addDialog(std::move(dialog));
 		};
 
@@ -414,7 +417,7 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		if (game != nullptr) {
+		if (game != nullptr && game->getPlayer() != nullptr) {
 			game->iterateRealms([](const RealmPtr &realm) {
 				if (!realm->renderersReady) {
 					return;
@@ -597,17 +600,6 @@ namespace Game3 {
 		}
 
 		uiContext.render(getMouseX(), getMouseY());
-
-		static std::shared_ptr<MinigameDialog<Breakout, 600, 600>> mgdiag;
-
-		if (!mgdiag) {
-			mgdiag = std::make_shared<MinigameDialog<Breakout, 600, 600>>(uiContext);
-			mgdiag->init();
-		}
-
-		if (!uiContext.hasDialog<MinigameDialog<Breakout, 600, 600>>()) {
-			uiContext.addDialog(mgdiag);
-		}
 
 		if (settings.showFPS && runningFPS > 0) {
 			textRenderer.drawOnScreen(std::format("{:.1f} FPS", runningFPS), TextRenderOptions{
@@ -932,6 +924,7 @@ namespace Game3 {
 		removeModule();
 		game->stopThread();
 		game.reset();
+		serverWrapper.stop();
 		goToTitle();
 	}
 
@@ -1060,7 +1053,7 @@ namespace Game3 {
 			client->connect(hostname, port);
 		} catch (const std::exception &err) {
 			closeGame();
-			error(err.what());
+			error(err.what(), true, false, [this] { goToTitle(); });
 			return false;
 		}
 
@@ -1230,7 +1223,7 @@ namespace Game3 {
 			} else if (display_name.empty()) {
 				queue([this, username](Window &) {
 					closeGame();
-					error(std::format("Token not found for user {} and no display name given.", username));
+					error(std::format("Token not found for user {} and no display name given.", username), true, false, [this] { goToTitle(); });
 				});
 			} else {
 				client->send(make<RegisterPlayerPacket>(username.raw(), display_name.raw()));

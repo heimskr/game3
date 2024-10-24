@@ -28,31 +28,66 @@ namespace Game3 {
 	}
 
 	bool Dialog::click(int button, int x, int y) {
-		return contains(x, y) && Widget::click(button, x, y);
+		if (contains(x, y)) {
+			Widget::click(button, x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::mouseDown(int button, int x, int y) {
-		return contains(x, y) && Widget::mouseDown(button, x, y);
+		if (contains(x, y)) {
+			Widget::mouseDown(button, x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::mouseUp(int button, int x, int y) {
-		return contains(x, y) && Widget::mouseUp(button, x, y);
+		if (contains(x, y)) {
+			Widget::mouseUp(button, x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::dragStart(int x, int y) {
-		return contains(x, y) && Widget::dragStart(x, y);
+		if (contains(x, y)) {
+			Widget::dragStart(x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::dragUpdate(int x, int y) {
-		return contains(x, y) && Widget::dragUpdate(x, y);
+		if (contains(x, y)) {
+			Widget::dragUpdate(x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::dragEnd(int x, int y) {
-		return contains(x, y) && Widget::dragEnd(x, y);
+		if (contains(x, y)) {
+			Widget::dragEnd(x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::scroll(float x_delta, float y_delta, int x, int y) {
-		return contains(x, y) && Widget::scroll(x_delta, y_delta, x, y);
+		if (contains(x, y)) {
+			Widget::scroll(x_delta, y_delta, x, y);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool Dialog::contains(int x, int y) const {

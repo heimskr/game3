@@ -7,7 +7,6 @@
 #include "realm/Realm.h"
 #include "tileentity/CraftingStation.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 // #include "ui/tab/GTKCraftingTab.h"
 // #include "ui/tab/GTKInventoryTab.h"
 #include "util/Cast.h"

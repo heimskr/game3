@@ -21,14 +21,14 @@ namespace Game3 {
 			GameDB &database = game->getDatabase();
 
 			if (game->hasPlayer(username)) {
-				client.send(make<LoginStatusPacket>(false));
+				client.send(make<LoginStatusPacket>("User doesn't exist."));
 				return;
 			}
 
 			const bool was_omnitoken = server->game->compareToken(token);
 
 			if (!was_omnitoken && server->generateToken(username) != token) {
-				client.send(make<LoginStatusPacket>(false));
+				client.send(make<LoginStatusPacket>("Invalid token."));
 				return;
 			}
 
@@ -55,7 +55,7 @@ namespace Game3 {
 
 			if (was_omnitoken) {
 				if (!displayName || displayName->empty()) {
-					client.sendError("User doesn't exist and a display name wasn't given.");
+					client.send(make<LoginStatusPacket>("User doesn't exist and a display name wasn't given."));
 					return;
 				}
 
@@ -76,6 +76,6 @@ namespace Game3 {
 			WARN("Client already has player. Display name: {}", player->displayName);
 		}
 
-		client.send(make<LoginStatusPacket>(false));
+		client.send(make<LoginStatusPacket>("Login failed."));
 	}
 }

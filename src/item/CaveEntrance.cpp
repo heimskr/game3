@@ -13,7 +13,6 @@
 #include "tileentity/Building.h"
 #include "types/Position.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 #include "worldgen/CaveGen.h"
 
 namespace {

@@ -9,7 +9,7 @@
 namespace Game3 {
 	class Breakout: public Minigame {
 		public:
-			static std::string_view getName() { return "Breakout"; }
+			std::string getName() const final { return "Breakout"; }
 
 			Breakout();
 

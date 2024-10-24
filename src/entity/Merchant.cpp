@@ -6,7 +6,6 @@
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	Merchant::Merchant(EntityType type_):

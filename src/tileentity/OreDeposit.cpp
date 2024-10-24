@@ -8,7 +8,6 @@
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	Ore::Ore(Identifier identifier_, ItemStackPtr stack_, Identifier tilename_, Identifier regen_tilename, float tooldown_multiplier, uint32_t max_uses, float cooldown_):

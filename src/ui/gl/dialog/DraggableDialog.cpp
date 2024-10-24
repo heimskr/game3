@@ -91,24 +91,20 @@ namespace Game3 {
 	}
 
 	bool BaseDraggableDialog::click(int button, int x, int y) {
-		if (Dialog::click(button, x, y)) {
-			return true;
+		if (closeButton->contains(x, y)) {
+			return closeButton->click(button, x, y);
 		}
 
-		return closeButton->contains(x, y) && closeButton->click(button, x, y);
+		return Dialog::click(button, x, y);
 	}
 
 	bool BaseDraggableDialog::dragStart(int x, int y) {
-		if (Dialog::dragStart(x, y)) {
-			return true;
-		}
-
 		if (titleRectangle.contains(x, y)) {
 			dragOffset.emplace(x - position.x, y - position.y);
 			return true;
 		}
 
-		return false;
+		return Dialog::dragStart(x, y);
 	}
 
 	bool BaseDraggableDialog::dragUpdate(int x, int y) {

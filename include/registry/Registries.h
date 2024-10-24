@@ -11,6 +11,7 @@ namespace Game3 {
 	class ItemStack;
 	class ItemTexture;
 	class LocalCommandFactory;
+	class MinigameFactory;
 	class ModuleFactory;
 	class PacketFactory;
 	class RealmFactory;
@@ -135,5 +136,10 @@ namespace Game3 {
 	struct AttributeExemplarRegistry: NamedRegistry<RegisterableIdentifier> {
 		static Identifier ID() { return {"base", "registry/attribute_exemplar"}; }
 		AttributeExemplarRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct MinigameFactoryRegistry: NamedRegistry<MinigameFactory> {
+		static Identifier ID() { return {"base", "registry/minigame_factory"}; }
+		MinigameFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 }

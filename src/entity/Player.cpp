@@ -18,7 +18,6 @@
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "realm/Realm.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 #include "util/Cast.h"
 
 namespace Game3 {

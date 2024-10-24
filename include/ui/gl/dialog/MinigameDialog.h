@@ -2,6 +2,7 @@
 
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
+#include "minigame/Minigame.h"
 #include "ui/gl/dialog/DraggableDialog.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -9,41 +10,19 @@
 #include <chrono>
 
 namespace Game3 {
-	template <typename MG, int W, int H>
+	class Minigame;
+
 	class MinigameDialog: public DraggableDialog {
 		public:
-			MinigameDialog(UIContext &ui):
-				DraggableDialog(ui, BaseDraggableDialog::getEffectiveWidth(W, UI_SCALE), BaseDraggableDialog::getEffectiveHeight(H, UI_SCALE)) {
-					setTitle(std::string(MG::getName()));
-				}
+			int width{};
+			int height{};
 
-			void init() override {
-				DraggableDialog::init();
-
-				lastTime = std::chrono::system_clock::now();
-				minigame = std::make_shared<MG>();
-				minigame->setSize(W, H);
-				minigame->reset();
-			}
-
-			void render(const RendererContext &renderers) override {
-				DraggableDialog::render(renderers);
-
-				if (!minigame) {
-					return;
-				}
-
-				auto now = std::chrono::system_clock::now();
-				double delta = std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastTime).count() / 1e9;
-				lastTime = now;
-				minigame->tick(ui, delta);
-
-				auto saver = ui.scissorStack.pushAbsolute(getInnerRectangle(), renderers);
-				minigame->render(ui, renderers);
-			}
+			MinigameDialog(UIContext &ui, std::shared_ptr<Minigame> minigame, int width, int height);
+			void init() override;
+			void render(const RendererContext &renderers) override;
 
 		protected:
-			std::shared_ptr<MG> minigame;
+			std::shared_ptr<Minigame> minigame;
 			std::chrono::system_clock::time_point lastTime;
 	};
 }

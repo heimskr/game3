@@ -8,22 +8,26 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	LoginStatusPacket::LoginStatusPacket(bool success_, GlobalID global_id, std::string_view username_, std::string_view display_name, std::shared_ptr<Player> player):
-	success(success_), globalID(global_id), username(username_), displayName(display_name) {
-		assert(!success || (!username.empty() && !display_name.empty()));
+	LoginStatusPacket::LoginStatusPacket(bool success, GlobalID global_id, std::string username, std::string display_name, std::shared_ptr<Player> player):
+	success(success), globalID(global_id), username(std::move(username)), displayName(std::move(display_name)) {
+		assert(!success || (!this->username.empty() && !displayName.empty()));
 		if (player) {
 			player->encode(playerDataBuffer);
 			playerDataBuffer.context = player->getGame();
 		}
 	}
 
+	LoginStatusPacket::LoginStatusPacket(std::string message):
+		success(false),
+		message(std::move(message)) {}
+
 	void LoginStatusPacket::encode(Game &, Buffer &buffer) const {
-		buffer << success << globalID << username << displayName << playerDataBuffer;
+		buffer << success << globalID << username << displayName << playerDataBuffer << message;
 	}
 
 	void LoginStatusPacket::decode(Game &game, Buffer &buffer) {
 		playerDataBuffer.context = game.shared_from_this();
-		buffer >> success >> globalID >> username >> displayName >> playerDataBuffer;
+		buffer >> success >> globalID >> username >> displayName >> playerDataBuffer >> message;
 	}
 
 	void LoginStatusPacket::handle(const ClientGamePtr &game) {
@@ -33,7 +37,7 @@ namespace Game3 {
 			window->queue([](Window &window) {
 				window.closeGame();
 			});
-			throw AuthenticationError("Login failed");
+			throw AuthenticationError(message.empty()? "Login failed" : message);
 		}
 
 		SUCCESS(2, "Login succeeded");

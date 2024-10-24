@@ -107,7 +107,7 @@ namespace Game3 {
 		}
 	}
 
-	void Breakout::render(UIContext &ui, const RendererContext &renderers) {
+	void Breakout::render(UIContext &, const RendererContext &renderers) {
 		TextRenderer &texter = renderers.text;
 		RectangleRenderer &rectangler = renderers.rectangle;
 		rectangler.drawOnScreen(BREAKOUT_BACKGROUND, 0, 0, gameWidth, gameHeight);

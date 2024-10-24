@@ -102,7 +102,7 @@ namespace Game3 {
 			void alert(const UString &message, bool do_queue = true, bool use_markup = false);
 
 			/** Displays an error message. (See alert.) */
-			void error(const UString &message, bool do_queue = true, bool use_markup = false);
+			void error(const UString &message, bool do_queue = true, bool use_markup = false, std::function<void()> on_close = {});
 
 			Modifiers getModifiers() const;
 			Position getHoveredPosition() const;

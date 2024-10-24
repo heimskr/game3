@@ -80,6 +80,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `string` Username
 	- `string` Display name
+	- `string` Message (in case of failure)
 	- `...` Player data
 
 	Player data sent only if successful.
@@ -440,6 +441,14 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 65. **Add Known Item**: tells a client to add an item to its known items set.
 
 	- `string` Item ID
+
+66. **Submit Score**: informs the server of the score the player got while playing a minigame.
+
+	- `string` Game ID
+	- `u64` Score
+
+	There's no anti-cheat of any kind so you could totally just submit a score of 18 quintillion and get away with it.
+	We're trusting you though. DFIU. Sei treu und gedeihe.
 
 # Message Format
 
