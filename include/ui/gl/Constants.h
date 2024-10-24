@@ -10,7 +10,7 @@
 namespace Game3 {
 	constexpr double X_FRACTION = 0.2;
 	constexpr double Y_FRACTION = 0.2;
-	constexpr double UI_SCALE = 4;
+	constexpr double UI_SCALE = 8;
 	constexpr double SLOT_SCALE = UI_SCALE;
 	constexpr double UNSCALE = 1.6;
 	constexpr float TEXT_INPUT_HEIGHT_FACTOR = 11;

@@ -603,8 +603,8 @@ namespace Game3 {
 			static auto last_time = getTime();
 			auto delta = (getTime() - last_time).count() / 1e9;
 
-			breakout.tick(uiContext, delta);
-			breakout.render(uiContext, renderers);
+			// breakout.tick(uiContext, delta);
+			// breakout.render(uiContext, renderers);
 		}
 
 		if (settings.showFPS && runningFPS > 0) {

@@ -49,8 +49,9 @@ namespace Game3 {
 	void ClientGame::click(int button, int, double pos_x, double pos_y, Modifiers modifiers) {
 		RealmPtr realm = activeRealm;
 
-		if (!realm)
+		if (!realm) {
 			return;
+		}
 
 		double fractional_x = 0.;
 		double fractional_y = 0.;
@@ -103,8 +104,9 @@ namespace Game3 {
 	Position ClientGame::translateCanvasCoordinates(double x, double y, double *x_offset_out, double *y_offset_out) const {
 		RealmPtr realm = activeRealm;
 
-		if (!realm)
+		if (!realm) {
 			return {};
+		}
 
 		std::shared_ptr<Window> window = getWindow();
 
@@ -124,11 +126,13 @@ namespace Game3 {
 		double intpart{};
 
 		// The math here is bizarre. Probably tied to the getQuadrant silliness.
-		if (x_offset_out)
+		if (x_offset_out) {
 			*x_offset_out = std::abs(1 - sub_x - std::abs(std::modf(x, &intpart)));
+		}
 
-		if (y_offset_out)
+		if (y_offset_out) {
 			*y_offset_out = std::abs(1 - sub_y - std::abs(std::modf(y, &intpart)));
+		}
 
 		return {static_cast<Index>(y - sub_y), static_cast<Index>(x - sub_x)};
 	}
@@ -146,8 +150,9 @@ namespace Game3 {
 	void ClientGame::runCommand(const std::string &command) {
 		auto pieces = split<std::string>(command, " ", false);
 
-		if (pieces.empty())
+		if (pieces.empty()) {
 			throw CommandError("No command entered");
+		}
 
 		if (auto factory = registry<LocalCommandFactoryRegistry>().maybe(pieces.front())) {
 			auto command = (*factory)();
@@ -159,8 +164,9 @@ namespace Game3 {
 	}
 
 	bool ClientGame::tick() {
-		if (!Game::tick())
+		if (!Game::tick()) {
 			return false;
+		}
 
 		lastGarbageCollection += delta;
 		if (lastGarbageCollection >= GARBAGE_COLLECTION_TIME) {
@@ -178,17 +184,19 @@ namespace Game3 {
 			} catch (const Warning &warning) {
 				getWindow()->error(warning.what());
 			} catch (const std::exception &err) {
-				auto &packet_ref = *packet;
+				Packet &packet_ref = *packet;
 				ERROR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
 				throw;
 			}
 		}
 
-		if (!getPlayer())
+		if (!getPlayer()) {
 			return true;
+		}
 
-		for (const auto &[realm_id, realm]: realms)
+		for (const auto &[realm_id, realm]: realms) {
 			realm->tick(delta);
+		}
 
 		if (auto realm = getPlayer()->getRealm()) {
 			auto missing_chunks_lock = missingChunks.sharedLock();
@@ -245,8 +253,9 @@ namespace Game3 {
 			std::vector<EntityRequest> requests;
 			const std::unordered_map<EntityPtr, Position> &entity_map = iter->second;
 			requests.reserve(entity_map.size());
-			for (const auto &[entity, position]: entity_map)
+			for (const auto &[entity, position]: entity_map) {
 				requests.emplace_back(entity->getGID(), 0);
+			}
 			// TODO: is this safe/reasonable?
 			// Safe in the sense that we aren't erasing something we shouldn't erase.
 			entityLimbo.erase(iter);
@@ -289,8 +298,9 @@ namespace Game3 {
 	}
 
 	bool ClientGame::startThread() {
-		if (active.exchange(true))
+		if (active.exchange(true)) {
 			return false;
+		}
 
 		stoppedByError = false;
 
@@ -312,8 +322,9 @@ namespace Game3 {
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000 / getWindow()->settings.tickFrequency));
 			}
 
-			if (stoppedByError && errorCallback)
+			if (stoppedByError && errorCallback) {
 				errorCallback();
+			}
 		});
 
 		--tickThreadLaunchWaiter;
