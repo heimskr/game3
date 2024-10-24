@@ -47,7 +47,13 @@ namespace Game3 {
 
 			if (ClientGamePtr game = ui.getGame()) {
 				if (text[0] == '/') {
-					game->runCommand(text.raw().substr(1));
+					if (text.size() > 1) {
+						try {
+							game->runCommand(text.raw().substr(1));
+						} catch (const std::exception &error) {
+							game->handleChat(nullptr, std::format("Error: {}", error.what()));
+						}
+					}
 				} else {
 					game->getClient()->send(make<SendChatMessagePacket>(text.raw()));
 				}
