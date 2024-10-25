@@ -10,6 +10,7 @@
 			"base:realm/blacksmith": {"tileset": "base:tileset/monomap"},
 			"base:realm/cave":       {"tileset": "base:tileset/monomap"},
 			"base:realm/tavern":     {"tileset": "base:tileset/monomap"},
+			"base:realm/arcade":     {"tileset": "base:tileset/monomap"},
 			"base:realm/keep":       {"tileset": "base:tileset/monomap"}
 		}]
 	]

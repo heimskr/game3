@@ -444,11 +444,17 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 66. **Submit Score**: informs the server of the score the player got while playing a minigame.
 
-	- `string` Game ID
+	- `string` Minigame ID
 	- `u64` Score
 
 	There's no anti-cheat of any kind so you could totally just submit a score of 18 quintillion and get away with it.
 	We're trusting you though. DFIU. Sei treu und gedeihe.
+
+67. **Open Minigame**: tells a client to open a minigame.
+
+	- `string` Minigame ID
+	- `i32` Viewport width
+	- `i32` Viewport height
 
 # Message Format
 

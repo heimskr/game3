@@ -9,8 +9,9 @@ namespace Game3 {
 	MinigameDialog::MinigameDialog(UIContext &ui, std::shared_ptr<Minigame> minigame, int width, int height):
 		DraggableDialog(ui, BaseDraggableDialog::getEffectiveWidth(width, UI_SCALE), BaseDraggableDialog::getEffectiveHeight(height, UI_SCALE)),
 		width(width),
-		height(height) {
-			setTitle(std::string(minigame->getName()));
+		height(height),
+		minigame(std::move(minigame)) {
+			setTitle(this->minigame->getName());
 		}
 
 	void MinigameDialog::init() {

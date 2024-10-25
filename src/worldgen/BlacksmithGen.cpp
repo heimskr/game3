@@ -18,7 +18,7 @@ namespace Game3::WorldGen {
 
 		realm->markGenerated(0, 0);
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
-		generateIndoors(realm, rng, parent_realm, width, height, entrance);
+		generateIndoors(realm, rng, parent_realm, width, height, entrance, -1);
 
 		realm->setTile(Layer::Objects, {1, 3}, "base:tile/furnace", false);
 		realm->setTile(Layer::Objects, {1, 5}, "base:tile/anvil", false);

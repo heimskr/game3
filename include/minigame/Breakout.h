@@ -9,6 +9,7 @@
 namespace Game3 {
 	class Breakout: public Minigame {
 		public:
+			static Identifier ID() { return {"base", "minigame/breakout"}; }
 			std::string getName() const final { return "Breakout"; }
 
 			Breakout();

@@ -79,6 +79,7 @@ namespace Game3 {
 		addLocalCommandFactories();
 		addTiles();
 		addModuleFactories();
+		addMinigameFactories();
 	}
 
 	void Game::initEntities() {

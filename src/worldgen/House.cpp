@@ -1,6 +1,6 @@
-#include "graphics/Tileset.h"
 #include "entity/Miner.h"
 #include "game/Game.h"
+#include "graphics/Tileset.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -13,13 +13,13 @@
 #include "worldgen/Indoors.h"
 
 namespace Game3::WorldGen {
-	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance) {
+	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, Position entrance) {
 		auto guard = realm->guardGeneration();
 		realm->markGenerated(0, 0);
 		Timer timer("GenerateHouse");
 
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
-		generateIndoors(realm, rng, parent_realm, width, height, entrance);
+		generateIndoors(realm, rng, parent_realm, width, height, entrance, -1);
 
 		const auto &tileset = realm->getTileset();
 		const auto &plants = tileset.getTilesByCategory("base:category/plants"_id);
@@ -61,6 +61,7 @@ namespace Game3::WorldGen {
 					"U18446744073709551615 is totally a valid molecule.",
 					"Gangblanc is 1 cubic meter but a lot of it is hidden inside pocket dimensions so he appears to have a normal human volume.",
 					"I've heard whispers of a vending machine deep beneath the surface that takes quarters... but what kind?",
+					"4200200000001f16000000626173653a6d696e6967616d652f627265616b6f757404ffffffffffffffff",
 				};
 
 				std::ranges::shuffle(texts, rng);
