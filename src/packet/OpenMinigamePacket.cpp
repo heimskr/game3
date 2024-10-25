@@ -9,7 +9,9 @@ namespace Game3 {
 		minigameID(std::move(minigame_id)), gameWidth(game_width), gameHeight(game_height) {}
 
 	void OpenMinigamePacket::handle(const std::shared_ptr<ClientGame> &game) {
-		auto &registry = game->registry<MinigameFactoryRegistry>();
-		game->getWindow()->uiContext.emplaceDialog<MinigameDialog>((*registry.at(minigameID))(game, {}), gameWidth, gameHeight);
+		game->getWindow()->queue([game, id = minigameID, width = gameWidth, height = gameHeight](Window &window) {
+			auto &registry = game->registry<MinigameFactoryRegistry>();
+			window.uiContext.emplaceDialog<MinigameDialog>((*registry.at(id))(game, {}), width, height);
+		});
 	}
 }

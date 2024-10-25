@@ -1,4 +1,3 @@
-#include "graphics/CircleRenderer.h"
 #include "graphics/Color.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
@@ -146,7 +145,7 @@ namespace Game3 {
 		}
 	}
 
-	void Breakout::setSize(float width, float height) {
+	void Breakout::setSize(int width, int height) {
 		gameWidth = width;
 		gameHeight = height;
 	}

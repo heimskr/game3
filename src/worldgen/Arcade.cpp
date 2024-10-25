@@ -4,6 +4,7 @@
 #include "tileentity/ArcadeMachine.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
+#include "ui/gl/Constants.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Arcade.h"
@@ -31,7 +32,7 @@ namespace Game3::WorldGen {
 
 			static const std::array<std::tuple<Identifier, Identifier, int, int>, 2> machines{
 				std::tuple{"base:tile/arcade_machine_green", "base:minigame/breakout", 600, 600},
-				std::tuple{"base:tile/arcade_machine_red",   "base:minigame/breakout", 900, 600},
+				std::tuple{"base:tile/arcade_machine_red",   "base:minigame/flappy_bird", UI_SCALE * 64, UI_SCALE * 32},
 			};
 
 			const auto &[tilename, minigame_name, game_width, game_height] = choose(machines);

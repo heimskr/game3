@@ -16,8 +16,8 @@ namespace Game3 {
 
 			void tick(UIContext &, double delta) final;
 			void render(UIContext &, const RendererContext &) final;
-			void setSize(float width, float height) final;
-			void reset();
+			void setSize(int width, int height) final;
+			void reset() final;
 
 		private:
 			int lives{};

@@ -44,6 +44,25 @@ namespace Game3 {
 		init(std::shared_ptr<uint8_t[]>(raw, stbi_image_free), width, height);
 	}
 
+	void Texture::init(int data_width, int data_height) {
+		if (valid) {
+			return;
+		}
+
+		data.reset();
+		width = data_width;
+		height = data_height;
+		glGenTextures(1, &id); CHECKGL
+		assert(id != 0);
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+		valid = true;
+	}
+
 	void Texture::init(std::shared_ptr<uint8_t[]> new_data, int data_width, int data_height) {
 		if (valid) {
 			return;
@@ -64,6 +83,25 @@ namespace Game3 {
 		valid = true;
 	}
 
+	bool Texture::upload(std::span<const uint8_t> pixels) {
+		if (!valid) {
+			return false;
+		}
+
+		const std::size_t expected_byte_count = width * height * (alpha? 4 : 3);
+
+		if (pixels.size() != expected_byte_count) {
+			ERROR("width = {}, height = {}", width, height);
+			throw std::runtime_error(std::format("Expected {} pixel bytes, got {}", expected_byte_count, pixels.size()));
+		}
+
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, pixels.data()); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+
+		return true;
+	}
+
 	void Texture::bind(int bind_id) {
 		init();
 		if (0 <= bind_id) {
@@ -76,6 +114,16 @@ namespace Game3 {
 		assert(valid);
 		const int channels = alpha? 4 : 3;
 		stbi_write_png(dump_path.c_str(), width, height, channels, data.get(), width * channels);
+	}
+
+	void Texture::destroy() {
+		if (!valid) {
+			return;
+		}
+
+		glDeleteTextures(1, &id); CHECKGL
+		id = 0;
+		valid = false;
 	}
 
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;

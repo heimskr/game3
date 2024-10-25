@@ -1,11 +1,13 @@
 #include "game/Game.h"
 #include "minigame/Breakout.h"
+#include "minigame/FlappyBird.h"
 #include "minigame/Minigame.h"
 #include "minigame/MinigameFactory.h"
 
 namespace Game3 {
 	void Game::addMinigameFactories() {
 		add(MinigameFactory::create<Breakout>());
+		add(MinigameFactory::create<FlappyBird>());
 	}
 
 	void Game::add(MinigameFactory &&factory) {

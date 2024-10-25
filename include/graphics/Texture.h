@@ -1,10 +1,11 @@
 #pragma once
 
-#include <filesystem>
+#include "registry/Registerable.h"
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "registry/Registerable.h"
+#include <filesystem>
+#include <span>
 
 namespace Game3 {
 	class Texture: public NamedRegisterable {
@@ -29,9 +30,12 @@ namespace Game3 {
 
 			void init();
 			void init(std::shared_ptr<uint8_t[]>, int data_width, int data_height);
+			void init(int data_width, int data_height);
+			bool upload(std::span<const uint8_t>);
 			void bind(int bind_id = -1);
 			bool getValid() const { return valid; }
 			void dump(const std::filesystem::path &);
+			void destroy();
 
 			static std::string filterToString(int);
 			static int stringToFilter(const std::string &);
