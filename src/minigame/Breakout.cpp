@@ -1,7 +1,9 @@
+#include "game/ClientGame.h"
 #include "graphics/Color.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "minigame/Breakout.h"
+#include "packet/SubmitScorePacket.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
 #include "util/Math.h"
@@ -26,6 +28,11 @@ namespace Game3 {
 		rowCount(6) {}
 
 	void Breakout::tick(UIContext &ui, double delta) {
+		if (submitQueued) {
+			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+			submitQueued = false;
+		}
+
 		accumulatedTime += delta;
 		if (accumulatedTime < BREAKOUT_CHECK_TIME) {
 			return;
@@ -222,5 +229,6 @@ namespace Game3 {
 
 	void Breakout::gameOver() {
 		isGameOver = true;
+		submitQueued = true;
 	}
 }

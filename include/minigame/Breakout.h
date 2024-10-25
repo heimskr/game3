@@ -37,6 +37,7 @@ namespace Game3 {
 			double accumulatedTime{};
 			std::list<Rectangle> blocks;
 			bool isGameOver = false;
+			bool submitQueued = false;
 
 			std::list<Rectangle>::iterator getBlockIntersection();
 			void normalizeVelocity();

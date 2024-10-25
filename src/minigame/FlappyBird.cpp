@@ -15,7 +15,7 @@ namespace Game3 {
 	namespace {
 		constexpr Color FLAPPYBIRD_FOREGROUND{"#425229"};
 		constexpr Color FLAPPYBIRD_BACKGROUND{"#ffffce"};
-		constexpr std::size_t FLAPPYBIRD_SCORE_MULTIPLIER = 1000;
+		constexpr std::size_t FLAPPYBIRD_SCORE_MULTIPLIER = 500;
 	}
 
 	FlappyBird::FlappyBird() = default;
