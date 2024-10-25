@@ -33,6 +33,22 @@ game3_deps = [
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
+inc_dirs = [
+	include_directories('..' / 'include'),
+	include_directories('..' / 'voronoi' / 'src'),
+]
+
+link_with = [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')]
+
+link_args = []
+
+if get_option('enable_zip8')
+	zip8 = subproject('zip8')
+	game3_deps += zip8.get_variable('zip8')
+	inc_dirs += zip8.get_variable('inc_dir')
+	link_with += zip8.get_variable('zip8_object')
+endif
+
 if get_option('enable_scripting')
 	game3_deps += [
 		dependency('v8'),
@@ -40,17 +56,10 @@ if get_option('enable_scripting')
 	]
 endif
 
-link_args = []
-
 if build_machine.system() == 'linux'
 	game3_deps += dependency('glu')
 	link_args += '-lX11'
 endif
-
-inc_dirs = [
-	include_directories('..' / 'include'),
-	include_directories('..' / 'voronoi' / 'src'),
-]
 
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
@@ -71,7 +80,7 @@ endif
 
 executable('game3', game3_sources,
 	dependencies: game3_deps,
-	link_with: [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')],
+	link_with: link_with,
 	link_args: link_args,
 	install: true,
 	include_directories: [inc_dirs])

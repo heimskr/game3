@@ -18,6 +18,10 @@ test_cpp_args = [
 	'-Wno-volatile'
 ]
 
+if get_option('enable_zip8')
+	config_h.set('ENABLE_ZIP8', '1')
+endif
+
 if get_option('is_flatpak')
 	config_h.set('IS_FLATPAK', '1')
 endif

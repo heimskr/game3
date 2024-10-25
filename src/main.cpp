@@ -42,6 +42,7 @@ namespace Game3 {
 	void damageTest(HitPoints weapon_damage, int defense, int variability, double attacker_luck, double defender_luck);
 	void voronoiTest();
 	void scriptEngineTest();
+	void zip8Test();
 }
 
 int main(int argc, char **argv) {
@@ -213,6 +214,11 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--script-test") {
 			scriptEngineTest();
+			return 0;
+		}
+
+		if (arg1 == "--zip8-test") {
+			zip8Test();
 			return 0;
 		}
 
