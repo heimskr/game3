@@ -26,6 +26,7 @@ namespace Game3 {
 		private:
 			std::unique_ptr<Zip8> cpu;
 			std::shared_ptr<Texture> display;
+			bool dirty = false;
 	};
 }
 

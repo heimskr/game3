@@ -20,6 +20,10 @@ namespace Game3 {
 			void tick(std::size_t cycles = 100'000);
 			void setKey(uint8_t key, bool);
 			void setKeys(uint16_t);
+			void * getCPU() const;
+			uint64_t getFlags() const;
+			bool getFlagsDirty() const;
+			void clearFlagsDirty();
 
 		private:
 			void *cpu = nullptr;

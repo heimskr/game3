@@ -53,6 +53,22 @@ namespace Game3 {
 			zip8CpuSetKeys(cpu, keys);
 		}
 	}
+
+	void * Zip8::getCPU() const {
+		return cpu;
+	}
+
+	uint64_t Zip8::getFlags() const {
+		return zip8CpuGetFlags(cpu);
+	}
+
+	bool Zip8::getFlagsDirty() const {
+		return zip8CpuFlagsAreDirty(cpu);
+	}
+
+	void Zip8::clearFlagsDirty() {
+		return zip8CpuSetFlagsNotDirty(cpu);
+	}
 }
 
 #endif

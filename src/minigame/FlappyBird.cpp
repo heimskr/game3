@@ -1,8 +1,10 @@
+#include "game/ClientGame.h"
 #include "graphics/Color.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
 #include "minigame/FlappyBird.h"
+#include "packet/SubmitScorePacket.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
@@ -18,19 +20,30 @@ namespace Game3 {
 
 	FlappyBird::FlappyBird() = default;
 
-	void FlappyBird::tick(UIContext &ui, double delta) {
+	void FlappyBird::tick(UIContext &ui, double) {
 		if (!cpu) {
 			return;
 		}
 
-		cpu->setKey(0xe, ui.window.isKeyHeld(GLFW_KEY_UP));
+		const bool fire = ui.window.isKeyHeld(GLFW_KEY_UP);
+
+		cpu->setKey(0xe, fire);
 		cpu->tick(400);
+
+		if (cpu->getFlagsDirty()) {
+			dirty = true;
+			score = cpu->getFlags() * FLAPPYBIRD_SCORE_MULTIPLIER;
+			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+			cpu->clearFlagsDirty();
+		}
+
+		if (dirty && fire) {
+			reset();
+			dirty = false;
+		}
 	}
 
 	void FlappyBird::render(UIContext &, const RendererContext &renderers) {
-		RectangleRenderer &rectangler = renderers.rectangle;
-		renderers.rectangle.drawOnScreen(FLAPPYBIRD_BACKGROUND, 0, 0, gameWidth, gameHeight);
-
 		if (!cpu || !display) {
 			return;
 		}

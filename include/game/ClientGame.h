@@ -58,6 +58,7 @@ namespace Game3 {
 			void runCommand(const std::string &);
 			bool tick() final;
 			void queuePacket(std::shared_ptr<Packet>);
+			void send(const std::shared_ptr<Packet> &);
 			void chunkReceived(ChunkPosition);
 			void interactOn(Modifiers, Hand = Hand::None);
 			void interactNextTo(Modifiers, Hand = Hand::None);

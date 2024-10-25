@@ -219,6 +219,11 @@ namespace Game3 {
 		packetQueue.push(std::move(packet));
 	}
 
+	void ClientGame::send(const std::shared_ptr<Packet> &packet) {
+		assert(client != nullptr);
+		client->send(packet);
+	}
+
 	void ClientGame::chunkReceived(ChunkPosition chunk_position) {
 		auto lock = missingChunks.uniqueLock();
 		missingChunks.erase(chunk_position);
