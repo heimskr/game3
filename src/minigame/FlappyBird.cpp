@@ -23,6 +23,7 @@ namespace Game3 {
 			return;
 		}
 
+		cpu->setKey(0xe, ui.window.isKeyHeld(GLFW_KEY_UP));
 		cpu->tick(400);
 	}
 
@@ -51,7 +52,7 @@ namespace Game3 {
 	}
 
 	void FlappyBird::reset() {
-		cpu = std::make_unique<Zip8>(readFile("chip8/flappyai.ch8"));
+		cpu = std::make_unique<Zip8>(readFile("chip8/flappybird.ch8"));
 
 		if (display) {
 			display->destroy();

@@ -38,6 +38,21 @@ namespace Game3 {
 			lastTimerUpdate = now;
 		}
 	}
+
+	void Zip8::setKey(uint8_t key, bool value) {
+		if (value) {
+			setKeys(keys | (1 << key));
+		} else {
+			setKeys(keys & ~(1 << key));
+		}
+	}
+
+	void Zip8::setKeys(uint16_t new_keys) {
+		if (keys != new_keys) {
+			keys = new_keys;
+			zip8CpuSetKeys(cpu, keys);
+		}
+	}
 }
 
 #endif

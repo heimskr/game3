@@ -18,11 +18,14 @@ namespace Game3 {
 			~Zip8();
 
 			void tick(std::size_t cycles = 100'000);
+			void setKey(uint8_t key, bool);
+			void setKeys(uint16_t);
 
 		private:
 			void *cpu = nullptr;
 			uint16_t error{};
 			std::chrono::system_clock::time_point lastTimerUpdate{};
+			uint16_t keys{};
 	};
 }
 
