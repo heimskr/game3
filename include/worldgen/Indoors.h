@@ -11,6 +11,7 @@ namespace Game3 {
 
 	namespace WorldGen {
 		/** Generates floors, walls and a door. Returns the position of the door. */
-		Position generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance, Index door_x = -1);
+		Position generateIndoors(const std::shared_ptr<Realm> &realm, std::default_random_engine &, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, const Position &entrance, Index door_x,
+			const Identifier &wall = "base:tile/wooden_wall", const Identifier &floor = "base:tile/floor");
 	}
 }

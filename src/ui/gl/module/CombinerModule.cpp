@@ -104,6 +104,10 @@ namespace Game3 {
 		multiModule->setInventory(std::move(inventory));
 	}
 
+	std::shared_ptr<InventoryModule> CombinerModule::getPrimaryInventoryModule() {
+		return multiModule->getPrimaryInventoryModule();
+	}
+
 	void CombinerModule::setTarget(const std::string &target) {
 		if (combiner) {
 			getGame()->getPlayer()->sendMessage(combiner, "SetTarget", target);

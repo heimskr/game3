@@ -1,12 +1,23 @@
 #pragma once
 
 #include "ui/gl/tab/Tab.h"
+#include "ui/gl/widget/Box.h"
 
 #include <memory>
 
 namespace Game3 {
-	class Box;
+	class CraftingTab;
 	class InventoryModule;
+
+	class RecipeRow: public Box {
+		public:
+			RecipeRow(UIContext &, float scale, CraftingRecipePtr);
+
+			void init() final;
+
+		private:
+			CraftingRecipePtr recipe;
+	};
 
 	class CraftingTab: public Tab {
 		public:
@@ -24,9 +35,8 @@ namespace Game3 {
 
 		private:
 			bool resetQueued = false;
-			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<Box> hbox;
+			std::shared_ptr<InventoryModule> inventoryModule;
 			std::shared_ptr<Box> recipeList;
-			std::shared_ptr<Box> rightPane;
 	};
 }

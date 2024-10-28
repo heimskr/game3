@@ -16,9 +16,12 @@ namespace Game3 {
 			GlobalID globalID = -1;
 			std::string username;
 			std::string displayName;
+			std::string message;
 
 			LoginStatusPacket() = default;
-			LoginStatusPacket(bool success_, GlobalID = -1, std::string_view username_ = {}, std::string_view display_name = {}, std::shared_ptr<Player> = nullptr);
+			LoginStatusPacket(bool success, GlobalID, std::string username, std::string display_name, std::shared_ptr<Player> = nullptr);
+			/** For login failure */
+			explicit LoginStatusPacket(std::string message);
 
 			PacketID getID() const override { return ID(); }
 

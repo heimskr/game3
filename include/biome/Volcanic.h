@@ -10,7 +10,7 @@ namespace Game3 {
 
 			Volcanic(): Biome(Biome::VOLCANIC) {}
 
-			void init(Realm &, int noise_seed) override;
+			void init(const std::shared_ptr<Realm> &, int noise_seed) override;
 			double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &, double suggested_noise) override;
 			void postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) override;
 

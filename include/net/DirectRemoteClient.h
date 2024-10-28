@@ -14,7 +14,7 @@ namespace Game3 {
 	/** A direct client is one that is connected to the server through local play and exchanges packets directly in memory and not through a socket. */
 	class DirectRemoteClient: public GenericClient {
 		public:
-			DirectRemoteClient(Server &);
+			DirectRemoteClient(const std::shared_ptr<Server> &);
 
 			void start() final;
 			bool send(const PacketPtr &) final;

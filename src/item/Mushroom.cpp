@@ -5,7 +5,6 @@
 #include "item/Mushroom.h"
 #include "realm/Realm.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	Mushroom::Mushroom(ItemID id_, std::string name_, MoneyCount base_price, Mushroom::ID sub_id):

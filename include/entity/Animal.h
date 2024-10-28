@@ -13,6 +13,8 @@ namespace Game3 {
 
 	class Animal: public LivingEntity {
 		public:
+			constexpr static std::size_t PATHFIND_MAX = 256;
+
 			static std::uniform_real_distribution<float> getWanderDistribution();
 
 			Index wanderRadius = 8;
@@ -26,7 +28,7 @@ namespace Game3 {
 			void tick(const TickArgs &) override;
 			float getMovementSpeed() const override { return 5.f; }
 			HitPoints getMaxHealth() const override;
-			bool wander();
+			virtual bool wander();
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

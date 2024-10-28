@@ -9,7 +9,7 @@
 #include "worldgen/WorldGen.h"
 
 namespace Game3 {
-	void Volcanic::init(Realm &realm, int noise_seed) {
+	void Volcanic::init(const std::shared_ptr<Realm> &realm, int noise_seed) {
 		Biome::init(realm, noise_seed);
 	}
 
@@ -38,20 +38,17 @@ namespace Game3 {
 	}
 
 	void Volcanic::postgen(Index row, Index column, std::default_random_engine &rng, const NoiseGenerator &, const WorldGenParams &) {
-		Realm &realm = *getRealm();
+		RealmPtr realm = getRealm();
 		std::uniform_int_distribution distribution{0, 199};
 
-		if (realm.getTile(Layer::Terrain, {row, column}) == realm.getTileset()["base:tile/volcanic_sand"_id]) {
+		if (realm->getTile(Layer::Terrain, {row, column}) == realm->getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
-				std::shared_ptr<Game> game = realm.getGame();
+				std::shared_ptr<Game> game = realm->getGame();
 				static std::vector<Identifier> mushrooms {
 					"base:item/indigo_milkcap",
 					"base:item/black_trumpet",
 					"base:item/grey_knight",
 				};
-
-				// TODO: use random ticks to spawn mushrooms
-				// realm.add(TileEntity::create<ItemSpawner>(game, Position(row, column), 0.0002f, std::move(mushrooms)));
 			}
 		}
 	}

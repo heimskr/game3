@@ -21,7 +21,6 @@
 #include "threading/ThreadContext.h"
 #include "tile/Tile.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 #include "util/Cast.h"
 #include "util/Timer.h"
 #include "util/Util.h"

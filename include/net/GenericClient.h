@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net/SendBuffer.h"
+#include "packet/ErrorPacket.h"
 #include "packet/Packet.h"
 #include "threading/Lockable.h"
 
@@ -25,14 +26,14 @@ namespace Game3 {
 
 	class GenericClient: public std::enable_shared_from_this<GenericClient> {
 		public:
-			Server &server;
+			std::weak_ptr<Server> weakServer;
 			int id = -1;
 			std::string ip;
 			SendBuffer sendBuffer;
 
 			GenericClient(const GenericClient &) = delete;
 			GenericClient(GenericClient &&) = delete;
-			GenericClient(Server &server, std::string_view ip, int id);
+			GenericClient(const std::shared_ptr<Server> &server, std::string_view ip, int id);
 
 			virtual ~GenericClient();
 
@@ -56,11 +57,18 @@ namespace Game3 {
 			inline void setClosed() { closed = true; }
 			inline bool isClosed() const { return closed; }
 
+			inline std::shared_ptr<Server> getServer() { return weakServer.lock(); }
+
+			template <typename... Args>
+			void sendError(const char *format, Args &&...args) {
+				send(make<ErrorPacket>(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
+			}
+
 		protected:
 			std::weak_ptr<ServerPlayer> weakPlayer;
 			bool closed = false;
 
-			GenericClient(Server &);
+			GenericClient(const std::shared_ptr<Server> &);
 	};
 
 	using GenericClientPtr = std::shared_ptr<GenericClient>;

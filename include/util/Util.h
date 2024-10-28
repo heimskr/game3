@@ -209,7 +209,7 @@ namespace Game3 {
 	}
 
 	template <typename T, typename R>
-	typename T::value_type & choose(T &container, R &rng) {
+	typename T::value_type & choose(T &container, R &&rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return container.at(std::uniform_int_distribution<size_t>(0, container.size() - 1)(rng));
@@ -218,49 +218,49 @@ namespace Game3 {
 	// Here be ugly duplication
 
 	template <typename T, typename R>
-	T & choose(std::list<T> &container, R &rng) {
+	T & choose(std::list<T> &container, R &&rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
-	T & choose(std::set<T> &set, R &rng) {
+	T & choose(std::set<T> &set, R &&rng) {
 		if (set.empty())
 			throw std::invalid_argument("Set is empty");
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
-	T & choose(std::unordered_set<T> &set, R &rng) {
+	T & choose(std::unordered_set<T> &set, R &&rng) {
 		if (set.empty())
 			throw std::invalid_argument("Set is empty");
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
-	const typename T::value_type & choose(const T &container, R &rng) {
+	const typename T::value_type & choose(const T &container, R &&rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
-	const T & choose(const std::list<T> &container, R &rng) {
+	const T & choose(const std::list<T> &container, R &&rng) {
 		if (container.empty())
 			throw std::invalid_argument("Container is empty");
 		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
-	const T & choose(const std::unordered_set<T> &set, R &rng) {
+	const T & choose(const std::unordered_set<T> &set, R &&rng) {
 		if (set.empty())
 			throw std::invalid_argument("Set is empty");
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
-	const T & choose(const std::set<T> &set, R &rng) {
+	const T & choose(const std::set<T> &set, R &&rng) {
 		if (set.empty())
 			throw std::invalid_argument("Set is empty");
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
@@ -285,8 +285,8 @@ namespace Game3 {
 		return buffer.data();
 	}
 
-	template <typename T, typename R, template <typename...> typename M = std::map, std::floating_point F = double>
-	const T & weightedChoice(const M<T, F> &map, R &rng) {
+	template <typename T, typename R, template <typename...> typename M = std::map, std::floating_point F = double, typename... E>
+	const T & weightedChoice(const M<T, F, E...> &map, R &rng) {
 		F sum{};
 		for (const auto &[item, weight]: map)
 			sum += weight;

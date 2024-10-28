@@ -21,6 +21,6 @@ namespace Game3 {
 		void encode(Game &, Buffer &buffer) const override { buffer << packetID << recipeIndex << count; }
 		void decode(Game &, Buffer &buffer)       override { buffer >> packetID >> recipeIndex >> count; }
 
-		void handle(const std::shared_ptr<ServerGame> &, RemoteClient &) override;
+		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
 	};
 }

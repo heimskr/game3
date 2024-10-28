@@ -51,7 +51,7 @@ namespace Game3::WorldGen {
 
 		DefaultNoiseGenerator noisegen2(noise_seed * 3 - 1);
 
-		auto biomes = Biome::getMap(*realm, noise_seed);
+		auto biomes = Biome::getMap(realm, noise_seed);
 		auto get_biome = [&](Index row, Index column) -> Biome & {
 			if (auto biome_type = provider.copyBiomeType(Position(row, column)))
 				return *biomes.at(*biome_type);

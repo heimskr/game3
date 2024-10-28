@@ -7,7 +7,6 @@
 #include "realm/Realm.h"
 #include "tileentity/CraftingStation.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 // #include "ui/tab/GTKCraftingTab.h"
 // #include "ui/tab/GTKInventoryTab.h"
 #include "util/Cast.h"
@@ -28,8 +27,9 @@ namespace Game3 {
 
 		if (modifiers.onlyAlt()) {
 			getRealm()->queueDestruction(getSelf());
-			if (itemName)
+			if (itemName) {
 				player->give(ItemStack::create(getGame(), itemName));
+			}
 		} else {
 			player->addStationType(stationType);
 			player->queueForMove([station_type = stationType](const EntityPtr &player, bool) {

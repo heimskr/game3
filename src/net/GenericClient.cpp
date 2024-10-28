@@ -5,11 +5,11 @@
 #include "types/ChunkPosition.h"
 
 namespace Game3 {
-	GenericClient::GenericClient(Server &server):
-		server(server) {}
+	GenericClient::GenericClient(const ServerPtr &server):
+		weakServer(server) {}
 
-	GenericClient::GenericClient(Server &server, std::string_view ip, int id):
-		server(server),
+	GenericClient::GenericClient(const ServerPtr &server, std::string_view ip, int id):
+		weakServer(server),
 		id(id),
 		ip(ip) {}
 
@@ -18,7 +18,9 @@ namespace Game3 {
 	}
 
 	void GenericClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {
-		assert(server.game);
+		auto server = getServer();
+		assert(server != nullptr);
+		assert(server->game != nullptr);
 
 		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold)
 			return;

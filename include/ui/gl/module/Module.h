@@ -11,6 +11,7 @@
 namespace Game3 {
 	class Agent;
 	class ClientInventory;
+	class InventoryModule;
 
 	class Module: public ChildDependentExpandingWidget<Widget> {
 		public:
@@ -26,6 +27,9 @@ namespace Game3 {
 			virtual void update();
 			virtual void setInventory(std::shared_ptr<ClientInventory>);
 			virtual std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &, const std::string &, std::any &);
+			virtual std::shared_ptr<InventoryModule> getPrimaryInventoryModule();
+			/** Returns false if the default shift click behavior should occur, or true otherwise. */
+			virtual bool handleShiftClick(std::shared_ptr<Inventory> /* source_inventory */, Slot);
 
 			ClientGamePtr getGame() const;
 

@@ -21,7 +21,9 @@ namespace Game3 {
 	class Discord {
 		private:
 			std::unique_ptr<discord::Core> core;
+#ifdef DISCORD_RICH_PRESENCE
 			discord::Activity activity{};
+#endif
 			std::string details;
 			std::chrono::system_clock::time_point startingTime;
 

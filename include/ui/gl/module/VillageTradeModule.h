@@ -52,7 +52,7 @@ namespace Game3 {
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
-			// bool handleShiftClick(std::shared_ptr<Inventory>, Slot) final;
+			bool handleShiftClick(std::shared_ptr<Inventory>, Slot) final;
 
 		private:
 			std::map<Identifier, std::shared_ptr<VillageTradeRow>> rows;

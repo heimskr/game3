@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types/Position.h"
+
 #include <format>
 
 namespace Game3 {
@@ -17,6 +19,12 @@ namespace Game3 {
 		Rectangle(int x, int y):
 			Rectangle(x, y, 0, 0) {}
 
+		Rectangle(Vector2d pos, int size):
+			Rectangle(pos.x, pos.y, size, size) {}
+
+		Rectangle(Vector2i pos, int size):
+			Rectangle(pos.x, pos.y, size, size) {}
+
 		int area() const;
 		void scissor(int outer_height) const;
 		void viewport(int outer_height) const;
@@ -32,6 +40,9 @@ namespace Game3 {
 
 		/** Ignores the width/height of the RHS and uses the width/height of the LHS. */
 		Rectangle operator-(const Rectangle &) const;
+
+		/** Returns whether both the height and width of the rectangle are positive. */
+		operator bool() const;
 	};
 }
 

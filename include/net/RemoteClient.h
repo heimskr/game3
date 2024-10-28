@@ -5,7 +5,6 @@
 
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
-#include "packet/ErrorPacket.h"
 #include "packet/Packet.h"
 
 namespace Game3 {
@@ -40,7 +39,7 @@ namespace Game3 {
 			asio::io_context::strand strand;
 			Lockable<std::deque<std::string>, std::shared_mutex> outbox;
 
-			RemoteClient(Server &server_, std::string_view ip_, int id_, asio::ip::tcp::socket &&socket_);
+			RemoteClient(const std::shared_ptr<Server> &, std::string_view ip, int id_, asio::ip::tcp::socket &&socket);
 
 			~RemoteClient() override;
 
@@ -60,11 +59,6 @@ namespace Game3 {
 
 			void close() final;
 			void removeSelf() override;
-
-			template <typename... Args>
-			void sendError(const char *format, Args &&...args) {
-				send(make<ErrorPacket>(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
-			}
 
 		protected:
 			using GenericClient::GenericClient;

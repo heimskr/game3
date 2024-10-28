@@ -9,8 +9,8 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	Tab::Tab(UIContext &ui):
-		Widget(ui, UI_SCALE) {}
+	Tab::Tab(UIContext &ui, float scale):
+		Widget(ui, scale) {}
 
 	void Tab::renderIcon(const RendererContext &) {}
 
@@ -24,12 +24,12 @@ namespace Game3 {
 
 	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
-			.x = 5 * UI_SCALE,
-			.y = 5 * UI_SCALE,
+			.x = 5 * scale,
+			.y = 5 * scale,
 			.sizeX = -1,
 			.sizeY = -1,
-			.scaleX = 5,
-			.scaleY = 5,
+			.scaleX = 5 * scale / 8,
+			.scaleY = 5 * scale / 8,
 			.invertY = false,
 		});
 	}

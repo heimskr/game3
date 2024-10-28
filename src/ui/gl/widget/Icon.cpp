@@ -2,14 +2,17 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
 #include "ui/gl/widget/Icon.h"
+#include "ui/gl/widget/Tooltip.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	Icon::Icon(UIContext &ui, float scale):
 		Widget(ui, scale) {}
 
 	void Icon::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (fixedHeight > 0)
+		if (fixedHeight > 0) {
 			height = fixedHeight;
+		}
 
 		const float original_width = width;
 		const float original_height = height;
@@ -19,8 +22,9 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
-		if (!iconTexture)
+		if (!iconTexture || shouldCull()) {
 			return;
+		}
 
 		renderers.singleSprite.drawOnScreen(iconTexture, RenderOptions{
 			.x = x,
@@ -31,6 +35,19 @@ namespace Game3 {
 			.scaleY = height / iconTexture->height,
 			.invertY = false,
 		});
+
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
+
+		if (tooltipText && !ui.anyDragUpdaters() && ui.checkMouse(lastRectangle)) {
+			if (!tooltip->wasUpdatedBy(*this) || tooltipTextChanged) {
+				tooltipTextChanged = false;
+				tooltip->setText(*tooltipText);
+			}
+			tooltip->setRegion(std::nullopt);
+			tooltip->show(*this);
+		} else {
+			tooltip->hide(*this);
+		}
 	}
 
 	SizeRequestMode Icon::getRequestMode() const {
@@ -41,27 +58,31 @@ namespace Game3 {
 		float size{};
 
 		if (orientation == Orientation::Horizontal) {
-			if (fixedWidth)
+			if (fixedWidth) {
 				size = fixedWidth;
-			else if (iconTexture)
+			} else if (iconTexture) {
 				size = scale * iconTexture->width;
-			else
+			} else {
 				size = scale * 16;
+			}
 		} else {
-			if (fixedHeight)
+			if (fixedHeight) {
 				size = fixedHeight;
-			else if (iconTexture)
+			} else if (iconTexture) {
 				size = scale * iconTexture->height;
-			else
+			} else {
 				size = scale * 16;
+			}
 		}
 
 		minimum = natural = size;
 	}
 
 	void Icon::setIconTexture(TexturePtr new_icon_texture) {
+		assert(new_icon_texture != nullptr);
 		iconTexture = std::move(new_icon_texture);
-		if (iconTexture)
+		if (iconTexture) {
 			iconTexture->init();
+		}
 	}
 }

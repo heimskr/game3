@@ -64,6 +64,8 @@
 #include "packet/PlaySoundPacket.h"
 #include "packet/KnownItemsPacket.h"
 #include "packet/AddKnownItemPacket.h"
+#include "packet/SubmitScorePacket.h"
+#include "packet/OpenMinigamePacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -138,5 +140,7 @@ namespace Game3 {
 		add(PacketFactory::create<PlaySoundPacket>());
 		add(PacketFactory::create<KnownItemsPacket>());
 		add(PacketFactory::create<AddKnownItemPacket>());
+		add(PacketFactory::create<SubmitScorePacket>());
+		add(PacketFactory::create<OpenMinigamePacket>());
 	}
 }

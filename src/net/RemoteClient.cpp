@@ -15,11 +15,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	RemoteClient::RemoteClient(Server &server, std::string_view ip, int id, asio::ip::tcp::socket &&socket):
+	RemoteClient::RemoteClient(const ServerPtr &server, std::string_view ip, int id, asio::ip::tcp::socket &&socket):
 		GenericClient(server, ip, id),
-		socket(std::move(socket), server.sslContext),
-		strand(server.context),
-		bufferSize(server.getChunkSize()),
+		socket(std::move(socket), server->sslContext),
+		strand(server->context),
+		bufferSize(server->getChunkSize()),
 		buffer(std::make_unique<char[]>(bufferSize)) {}
 
 	RemoteClient::~RemoteClient() {
@@ -92,14 +92,17 @@ namespace Game3 {
 				throw std::logic_error("Buffer grew too large");
 			}
 
+			auto server = getServer();
+			assert(server != nullptr);
+
 			if (payloadSize == receiveBuffer.size()) {
 				if (receiveBuffer.context.expired())
-					receiveBuffer.context = server.game;
+					receiveBuffer.context = server->game;
 
-				auto packet = (*server.game->registry<PacketFactoryRegistry>()[packetType])();
+				auto packet = (*server->game->registry<PacketFactoryRegistry>()[packetType])();
 
 				try {
-					packet->decode(*server.game, receiveBuffer);
+					packet->decode(*server->game, receiveBuffer);
 				} catch (const std::exception &err) {
 					ERROR("Couldn't decode packet of type {}, size {}: {}", packetType, payloadSize, err.what());
 					mock();
@@ -112,7 +115,7 @@ namespace Game3 {
 
 				assert(receiveBuffer.empty());
 				receiveBuffer.clear();
-				server.game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
+				server->game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
 				state = State::Begin;
 			}
 		}
@@ -129,13 +132,20 @@ namespace Game3 {
 			return false;
 		}
 
-		if (!server.game) {
+		ServerPtr server = getServer();
+
+		if (server == nullptr) {
+			WARN("Dropping packet: no server present");
+			return false;
+		}
+
+		if (server->game == nullptr) {
 			WARN("Dropping packet of type {}: game unavailable", DEMANGLE(packet));
 			return false;
 		}
 
 		Buffer send_buffer{Side::Client};
-		packet->encode(*server.game, send_buffer);
+		packet->encode(*server->game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
 		const auto packet_id = toLittle(packet->getID());
@@ -219,26 +229,38 @@ namespace Game3 {
 	void RemoteClient::removeSelf() {
 		INFO("Removing client from IP {}", ip);
 
-		if (server.game)
-			if (ServerPlayerPtr player = getPlayer())
-				server.game->queueRemoval(player);
+		ServerPtr server = getServer();
+		if (server == nullptr) {
+			return;
+		}
+
+		if (server->game != nullptr) {
+			if (ServerPlayerPtr player = getPlayer()) {
+				server->game->queueRemoval(player);
+			}
+		}
 
 		auto self = std::static_pointer_cast<RemoteClient>(shared_from_this());
 
-		server.close(self);
+		server->close(self);
 
-		auto &clients = server.getClients();
+		auto &clients = server->getClients();
 		auto lock = clients.uniqueLock();
 		clients.erase(self);
 	}
 
 	void RemoteClient::mock() {
+		ServerPtr server = getServer();
+		if (server == nullptr) {
+			return;
+		}
+
 		const static std::string message =
 			"Look at you, hacker: a pathetic creature of meat and bone, panting and sweating as "
 			"you run through my corridors.\nHow can you challenge a perfect, immortal machine?\n";
 		WARN("Telling {} to go perish.", ip);
 		asio::write(socket, asio::buffer(message));
-		server.close(std::static_pointer_cast<RemoteClient>(shared_from_this()));
+		server->close(std::static_pointer_cast<RemoteClient>(shared_from_this()));
 	}
 
 	void RemoteClient::write() {

@@ -6,7 +6,7 @@
 #include "packet/SetHeldItemPacket.h"
 
 namespace Game3 {
-	void SetHeldItemPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void SetHeldItemPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		const ServerPlayerPtr player = client.getPlayer();
 		if (!player) {
 			client.send(make<ErrorPacket>("Can't set held item: no player"));
@@ -19,14 +19,15 @@ namespace Game3 {
 			return;
 		}
 
-		if (!inventory->hasSlot(slot)) {
+		if (!inventory->hasSlot(slot) && slot != -1) {
 			client.send(make<ErrorPacket>("Can't set held item: invalid slot"));
 			return;
 		}
 
-		if (leftHand)
+		if (leftHand) {
 			player->setHeldLeft(player->getHeldLeft() == slot? -1 : slot);
-		else
+		} else {
 			player->setHeldRight(player->getHeldRight() == slot? -1 : slot);
+		}
 	}
 }

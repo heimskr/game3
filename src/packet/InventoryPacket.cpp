@@ -16,8 +16,15 @@ namespace Game3 {
 	}
 
 	void InventoryPacket::handle(const ClientGamePtr &game) {
+		if (game->isConnectedLocally()) {
+			// TODO: transmogrify ServerInventory into ClientInventory without going through a Buffer.
+			Buffer buffer{game, Side::Client};
+			encode(*game, buffer);
+			decode(*game, buffer);
+		}
+
 		if (PlayerPtr player = game->getPlayer()) {
-			inventory->weakOwner = player;
+			inventory->setOwner(player);
 			player->setInventory(inventory, 0);
 			player->getInventory(0)->notifyOwner({});
 		} else {

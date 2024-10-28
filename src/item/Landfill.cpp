@@ -5,7 +5,6 @@
 #include "item/Landfill.h"
 #include "realm/Realm.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	Landfill::Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier terrain_name, Identifier objects_name, ItemCount required_count):

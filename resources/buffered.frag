@@ -21,11 +21,11 @@ vec4 alphaComposite(vec4 bottom, vec4 top) {
 }
 
 void main() {
-	vec4 base0  = texture(texture0, texCoordBase0);
-	vec4 base1  = texture(texture0, texCoordBase1);
-	vec4 fluid  = texture(texture0, fluidTexCoord);
-	vec4 base2  = texture(texture0, texCoordBase2);
-	vec4 base3  = texture(texture0, texCoordBase3);
+	vec4 base0 = texture(texture0, texCoordBase0);
+	vec4 base1 = texture(texture0, texCoordBase1);
+	vec4 fluid = texture(texture0, fluidTexCoord);
+	vec4 base2 = texture(texture0, texCoordBase2);
+	vec4 base3 = texture(texture0, texCoordBase3);
 
 	if (base0.a == 0.0) {
 		base0 = vec4(0.2, 0.2, 0.2, 1.0);

@@ -1,10 +1,12 @@
 #include "entity/ClientPlayer.h"
+#include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "packet/MoveSlotsPacket.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Window.h"
 #include "util/Defer.h"
 #include "util/Math.h"
 
@@ -16,7 +18,7 @@ namespace {
 
 namespace Game3 {
 	namespace {
-		ClientInventoryPtr getInventory(const std::any &any) {
+		ClientInventoryPtr getInventoryArgument(const std::any &any) {
 			const InventoryModule::Argument *argument = std::any_cast<InventoryModule::Argument>(&any);
 			if (!argument) {
 				const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
@@ -33,7 +35,7 @@ namespace Game3 {
 	}
 
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument):
-		InventoryModule(ui, getInventory(argument)) {}
+		InventoryModule(ui, getInventoryArgument(argument)) {}
 
 	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):
 		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
@@ -46,8 +48,11 @@ namespace Game3 {
 		assert(0 <= slot_count);
 		const bool is_player = inventory->getOwner() == ui.getPlayer();
 		const Slot active_slot = inventory->activeSlot;
-		for (Slot slot = 0; slot < slot_count; ++slot)
-			slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
+		WidgetPtr self = shared_from_this();
+		for (Slot slot = 0; slot < slot_count; ++slot) {
+			auto &slot_widget = slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
+			slot_widget->insertAtEnd(self);
+		}
 	}
 
 	void InventoryModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -63,12 +68,15 @@ namespace Game3 {
 		const Slot active_slot = inventory->activeSlot;
 
 		if (slotWidgets.size() != static_cast<size_t>(slot_count)) {
+			for (const auto &slot_widget: slotWidgets) {
+				remove(slot_widget);
+			}
 			slotWidgets.clear();
-			for (Slot slot = 0; slot < slot_count; ++slot)
-				slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
+			init();
 		} else {
-			for (Slot slot = 0; slot < slot_count; ++slot)
+			for (Slot slot = 0; slot < slot_count; ++slot) {
 				slotWidgets[slot]->setStack((*inventory)[slot]);
+			}
 
 			if (is_player) {
 				if (0 <= previousActive) {
@@ -105,20 +113,19 @@ namespace Game3 {
 	}
 
 	bool InventoryModule::click(int button, int x, int y) {
-		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets)
-			if (widget->contains(x, y) && widget->click(button, x, y))
-				return true;
+		const Modifiers modifiers = ui.window.getModifiers();
 
-		return false;
-	}
-
-	bool InventoryModule::dragStart(int x, int y) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
-			if (widget->contains(x, y)) {
-				WidgetPtr dragged_widget = widget->getDragStartWidget();
-				const bool out = dragged_widget != nullptr;
-				ui.setDraggedWidget(std::move(dragged_widget));
-				return out;
+			if (!widget->contains(x, y)) {
+				continue;
+			}
+
+			if (clickSlot(widget->getSlot(), modifiers)) {
+				return true;
+			}
+
+			if (widget->click(button, x, y)) {
+				return true;
 			}
 		}
 
@@ -128,8 +135,9 @@ namespace Game3 {
 	bool InventoryModule::dragEnd(int x, int y) {
 		auto dragged = std::dynamic_pointer_cast<ItemSlot>(ui.getDraggedWidget());
 
-		if (!dragged)
+		if (!dragged) {
 			return false;
+		}
 
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (widget != dragged && widget->contains(x, y)) {
@@ -160,11 +168,41 @@ namespace Game3 {
 		}
 	}
 
+	std::shared_ptr<InventoryModule> InventoryModule::getPrimaryInventoryModule() {
+		return std::static_pointer_cast<InventoryModule>(shared_from_this());
+	}
+
 	void InventoryModule::setTopPadding(float new_top_padding) {
 		topPadding = new_top_padding;
 	}
 
 	float InventoryModule::getTopPadding() const {
 		return topPadding;
+	}
+
+	InventoryPtr InventoryModule::getInventory() const {
+		assert(inventoryGetter != nullptr);
+		return inventoryGetter->get();
+	}
+
+	void InventoryModule::setOnSlotClick(std::function<bool(Slot, Modifiers)> function) {
+		onSlotClick = std::move(function);
+	}
+
+	bool InventoryModule::clickSlot(Slot slot, Modifiers modifiers) {
+		if (onSlotClick && onSlotClick(slot, modifiers)) {
+			return true;
+		}
+
+		if (modifiers.onlyShift()) {
+			ClientPlayerPtr player = ui.getPlayer();
+			assert(player != nullptr);
+			InventoryPtr inventory = *inventoryGetter;
+			assert(inventory != nullptr);
+			player->send(make<MoveSlotsPacket>(inventory->getOwner()->getGID(), player->getGID(), slot, -1, inventory->index, 0));
+			return true;
+		}
+
+		return false;
 	}
 }

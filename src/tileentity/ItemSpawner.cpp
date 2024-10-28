@@ -9,7 +9,6 @@
 #include "threading/ThreadContext.h"
 #include "tileentity/ItemSpawner.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {

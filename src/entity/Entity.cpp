@@ -331,8 +331,9 @@ namespace Game3 {
 		if (!inventory) {
 			setInventory(Inventory::create(getSide(), shared, DEFAULT_INVENTORY_SIZE), 0);
 			inventory = getInventory(0);
-		} else
-			inventory->weakOwner = shared;
+		} else {
+			inventory->setOwner(shared);
+		}
 
 		if (game->getSide() == Side::Server) {
 			inventory->onSwap = [this](Inventory &here, Slot here_slot, Inventory &there, Slot there_slot) {

@@ -6,6 +6,7 @@
 #include "ui/gl/widget/ItemSlot.h"
 
 #include <any>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -32,19 +33,27 @@ namespace Game3 {
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			bool click(int button, int x, int y) final;
-			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final;
+
 			void setTopPadding(float);
 			float getTopPadding() const;
+
+			InventoryPtr getInventory() const;
+			void setOnSlotClick(std::function<bool(Slot, Modifiers)>);
 
 		private:
 			std::vector<std::shared_ptr<ItemSlot>> slotWidgets;
 			std::unique_ptr<InventoryGetter> inventoryGetter;
+			/** Returns true to override the default click behavior. */
+			std::function<bool(Slot, Modifiers)> onSlotClick;
 			Slot previousActive = -1;
 			float topPadding = 0;
+
+			bool clickSlot(Slot, Modifiers);
 	};
 }

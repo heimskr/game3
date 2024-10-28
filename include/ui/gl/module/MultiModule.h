@@ -33,8 +33,10 @@ namespace Game3 {
 				};
 
 				std::string suffix;
-				for (Substance substance: {S...})
+				for (Substance substance: {S...}) {
 					suffix += substances.at(substance);
+				}
+
 				return suffix;
 			}
 
@@ -58,7 +60,11 @@ namespace Game3 {
 							assert(inventoried);
 							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
 								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
-								submodules.emplace_back(std::make_shared<InventoryModule>(ui, std::move(inventory)));
+								auto inventory_module = std::make_shared<InventoryModule>(ui, std::move(inventory));
+								submodules.emplace_back(inventory_module);
+								if (firstInventoryModule == nullptr) {
+									firstInventoryModule = inventory_module;
+								}
 							}
 							break;
 						}
@@ -90,20 +96,29 @@ namespace Game3 {
 			}
 
 			void reset() final {
-				for (const ModulePtr &submodule: submodules)
+				for (const ModulePtr &submodule: submodules) {
 					submodule->reset();
+				}
 			}
 
 			void update() final {
-				for (const ModulePtr &submodule: submodules)
+				for (const ModulePtr &submodule: submodules) {
 					submodule->update();
+				}
 			}
 
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final {
-				for (const ModulePtr &submodule: submodules)
-					if (std::optional<Buffer> buffer = submodule->handleMessage(source, name, data))
+				for (const ModulePtr &submodule: submodules) {
+					if (std::optional<Buffer> buffer = submodule->handleMessage(source, name, data)) {
 						return buffer;
+					}
+				}
+
 				return std::nullopt;
+			}
+
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final {
+				return firstInventoryModule;
 			}
 
 			void render(const RendererContext &renderers, float x, float y, float width, float height) final {
@@ -123,5 +138,6 @@ namespace Game3 {
 			AgentPtr agent;
 			std::shared_ptr<Box> box;
 			std::vector<ModulePtr> submodules;
+			std::shared_ptr<InventoryModule> firstInventoryModule;
 	};
 }

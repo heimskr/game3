@@ -29,6 +29,8 @@ namespace Game3 {
 		static CraftingRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 	};
 
+	using CraftingRecipePtr = std::shared_ptr<CraftingRecipe>;
+
 	void to_json(nlohmann::json &, const CraftingRecipe &);
 
 	struct CraftingRecipeRegistry: UnnamedJSONRegistry<CraftingRecipe> {

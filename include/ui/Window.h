@@ -22,6 +22,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <set>
 #include <string>
 
 struct GLFWwindow;
@@ -33,6 +34,7 @@ namespace Game3 {
 	class HasFluids;
 	class LocalClient;
 	class OmniDialog;
+	class TopDialog;
 	class Window;
 	struct Modifiers;
 	struct Position;
@@ -50,6 +52,7 @@ namespace Game3 {
 			float yScale = 1.0;
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
+			std::shared_ptr<TopDialog> topDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
 			SingleSpriteRenderer singleSpriteRenderer{*this};
@@ -65,6 +68,7 @@ namespace Game3 {
 			GL::FBO fbo;
 			Rectangle realmBounds;
 			bool autofocus = true;
+			std::set<int> heldKeys;
 
 			Window(GLFWwindow &);
 
@@ -86,8 +90,10 @@ namespace Game3 {
 
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();
+			const std::shared_ptr<TopDialog> & getTopDialog();
 			void showOmniDialog();
-			void closeOmniDialog();
+			void hideOmniDialog();
+			void toggleOmniDialog();
 
 			void openModule(const Identifier &, const std::any &);
 			void removeModule();
@@ -96,7 +102,7 @@ namespace Game3 {
 			void alert(const UString &message, bool do_queue = true, bool use_markup = false);
 
 			/** Displays an error message. (See alert.) */
-			void error(const UString &message, bool do_queue = true, bool use_markup = false);
+			void error(const UString &message, bool do_queue = true, bool use_markup = false, std::function<void()> on_close = {});
 
 			Modifiers getModifiers() const;
 			Position getHoveredPosition() const;
@@ -122,6 +128,10 @@ namespace Game3 {
 			void playLocally();
 			void feedFPS(double);
 			void showLoginAndRegisterDialogs(const std::string &hostname);
+			bool isConnectedLocally() const;
+			bool isConnected() const;
+			void disconnect();
+			bool isKeyHeld(int key) const;
 
 		private:
 			struct KeyInfo {
@@ -144,6 +154,8 @@ namespace Game3 {
 			std::deque<double> fpses;
 			double runningSum = 0;
 			double runningFPS = 0;
+			bool connectedLocally = false;
+			bool connected = false;
 
 			void keyCallback(int key, int scancode, int action, int mods);
 			void charCallback(uint32_t codepoint, int mods);
@@ -156,4 +168,6 @@ namespace Game3 {
 			void continueLocalConnection();
 			void handleKeys();
 	};
+
+	using WindowPtr = std::shared_ptr<Window>;
 }

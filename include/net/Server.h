@@ -30,7 +30,7 @@ namespace Game3 {
 	class ServerGame;
 	class ServerPlayer;
 
-	class Server {
+	class Server: public std::enable_shared_from_this<Server> {
 		private:
 			std::string ip;
 			int port;
@@ -46,6 +46,8 @@ namespace Game3 {
 
 			void accept();
 
+			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size = 8192);
+
 		public:
 			asio::ssl::context sslContext;
 			asio::io_context context;
@@ -59,7 +61,6 @@ namespace Game3 {
 			std::function<void(GenericClient &)> onClose;
 			std::function<void(GenericClient &)> onAdd;
 
-			Server(const std::string &ip_, uint16_t port_, const std::filesystem::path &certificate_path, const std::filesystem::path &key_path, std::string_view secret_, size_t thread_count, size_t chunk_size = 8192);
 			Server(const Server &) = delete;
 			Server(Server &&) = delete;
 			Server & operator=(const Server &) = delete;
@@ -88,6 +89,17 @@ namespace Game3 {
 				send(client, std::string(reinterpret_cast<const char *>(&little), sizeof(T)), true);
 			}
 
+			template <typename... Args>
+			static std::shared_ptr<Server> create(Args &&...args) {
+				Server *server = new Server(std::forward<Args>(args)...);
+				try {
+					return std::shared_ptr<Server>(server);
+				} catch (...) {
+					delete server;
+					throw;
+				}
+			}
+
 			[[nodiscard]]
 			inline auto getChunkSize() const { return chunkSize; }
 
@@ -102,4 +114,6 @@ namespace Game3 {
 
 		friend class ServerWrapper;
 	};
+
+	using ServerPtr = std::shared_ptr<Server>;
 }

@@ -37,6 +37,7 @@ namespace Game3 {
 			void iterateGenes(const std::function<void(const Gene &)> &) const override;
 
 			void render(const RendererContext &) override;
+			bool wander() override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

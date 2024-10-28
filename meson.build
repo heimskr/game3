@@ -2,8 +2,6 @@ project('game3', 'cpp', version: '0.41.0',
 	meson_version: '>= 0.62.0',
 	default_options: ['warning_level=2', 'werror=false', 'cpp_std=c++23'])
 
-i18n = import('i18n')
-gnome = import('gnome')
 cxx = meson.get_compiler('cpp')
 
 config_h = configuration_data()
@@ -18,6 +16,10 @@ test_cpp_args = [
 	'-Wextra',
 	'-Wno-volatile'
 ]
+
+if get_option('enable_zip8')
+	config_h.set('ENABLE_ZIP8', '1')
+endif
 
 if get_option('is_flatpak')
 	config_h.set('IS_FLATPAK', '1')
@@ -50,13 +52,3 @@ endforeach
 add_project_arguments(project_cpp_args, language: 'cpp')
 
 subdir('src')
-
-if build_machine.system() == 'linux'
-	subdir('data')
-	subdir('po')
-	gnome.post_install(
-		glib_compile_schemas: true,
-		gtk_update_icon_cache: true,
-		update_desktop_database: true,
-	)
-endif

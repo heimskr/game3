@@ -6,6 +6,7 @@
 #include "tile/DirtTile.h"
 #include "tile/FarmlandTile.h"
 #include "tile/FenceGateTile.h"
+#include "tile/FoodTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
 #include "tile/Tile.h"
@@ -36,7 +37,7 @@ namespace Game3 {
 		for (Identifier id: {"base:tile/gate_horizontal", "base:tile/gate_horizontal_n", "base:tile/gate_horizontal_s", "base:tile/gate_vertical", "base:tile/gate_vertical_e", "base:tile/gate_vertical_w"})
 			reg.add<FenceGateTile>(std::move(id));
 
-		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal", 8),     "base:tile/cave_dirt"));
+		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal", 4),     "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack::create(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_diamond",  std::make_shared<CaveTile>("base:tile/cave_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_gold",     std::make_shared<CaveTile>("base:tile/cave_gold",     ItemStack::create(self, "base:item/gold_ore"),    "base:tile/cave_dirt"));
@@ -47,6 +48,8 @@ namespace Game3 {
 		reg.add("base:tile/grim_diamond",  std::make_shared<CaveTile>("base:tile/grim_diamond",  ItemStack::create(self, "base:item/diamond_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
+
+		reg.add("base:tile/cake", std::make_shared<FoodTile>("base:tile/cake", "base:item/cake"));
 
 		static const std::array rares {
 			"apatite",

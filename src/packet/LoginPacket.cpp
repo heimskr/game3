@@ -11,7 +11,7 @@
 #include "packet/PacketError.h"
 
 namespace Game3 {
-	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (ServerPlayerPtr player = client.getPlayer(); !player) {
 			auto server = game->getServer();
 			std::string display_name;
@@ -21,14 +21,14 @@ namespace Game3 {
 			GameDB &database = game->getDatabase();
 
 			if (game->hasPlayer(username)) {
-				client.send(make<LoginStatusPacket>(false));
+				client.send(make<LoginStatusPacket>("User doesn't exist."));
 				return;
 			}
 
 			const bool was_omnitoken = server->game->compareToken(token);
 
 			if (!was_omnitoken && server->generateToken(username) != token) {
-				client.send(make<LoginStatusPacket>(false));
+				client.send(make<LoginStatusPacket>("Invalid token."));
 				return;
 			}
 
@@ -39,7 +39,7 @@ namespace Game3 {
 				game->addPlayer(player);
 				RealmPtr realm = game->getRealm(player->realmID);
 				player->setRealm(realm);
-				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+				player->weakClient = client.weak_from_this();
 				player->notifyOfRealm(*realm);
 				SUCCESS("Player {} logged in \e[2m(GID {})\e[22m", username, player->globalID);
 				player->init(game);
@@ -55,7 +55,7 @@ namespace Game3 {
 
 			if (was_omnitoken) {
 				if (!displayName || displayName->empty()) {
-					client.sendError("User doesn't exist and a display name wasn't given.");
+					client.send(make<LoginStatusPacket>("User doesn't exist and a display name wasn't given."));
 					return;
 				}
 
@@ -64,7 +64,7 @@ namespace Game3 {
 				client.send(make<RegistrationStatusPacket>(username, *displayName, player->token));
 				client.setPlayer(player);
 				auto realm = player->getRealm();
-				player->weakClient = std::static_pointer_cast<RemoteClient>(client.shared_from_this());
+				player->weakClient = client.weak_from_this();
 				player->notifyOfRealm(*realm);
 				INFO("Player {}'s GID is {}", username, player->globalID);
 				client.send(make<LoginStatusPacket>(true, player->globalID, username, *displayName, player));
@@ -76,6 +76,6 @@ namespace Game3 {
 			WARN("Client already has player. Display name: {}", player->displayName);
 		}
 
-		client.send(make<LoginStatusPacket>(false));
+		client.send(make<LoginStatusPacket>("Login failed."));
 	}
 }

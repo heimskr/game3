@@ -30,11 +30,13 @@ namespace Game3 {
 		ItemSlot(ui, slot, INNER_SLOT_SIZE, SLOT_SCALE, active) {}
 
 	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (width < 0)
+		if (width < 0) {
 			width = size * scale;
+		}
 
-		if (height < 0)
+		if (height < 0) {
 			height = size * scale;
+		}
 
 		adjustCoordinate(Orientation::Horizontal, x, width, size * scale);
 		adjustCoordinate(Orientation::Vertical, y, height, size * scale);
@@ -49,23 +51,29 @@ namespace Game3 {
 			renderers.rectangle.drawOnScreen(Color{0.6, 0.3, 0, alpha}, x, y, size * scale, size * scale);
 		}
 
-		if (!stack)
+		if (!stack) {
 			return;
+		}
 
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
 
 		if (ui.checkMouse(lastRectangle)) {
 			if (!tooltip->wasUpdatedBy(*this)) {
-				tooltip->setText(stack->getTooltip());
-				tooltip->setRegion(lastRectangle);
-				tooltip->show(*this);
+				if (tooltipText) {
+					tooltip->setText(*tooltipText);
+				} else {
+					tooltip->setText(stack->getTooltip());
+				}
 			}
+			tooltip->setRegion(lastRectangle);
+			tooltip->show(*this);
 		} else {
 			tooltip->hide(*this);
 		}
 
-		if (!texture)
+		if (!texture) {
 			texture = stack->getTexture(*ui.getGame());
+		}
 
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
 			.x = x,
@@ -92,21 +100,35 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlot::click(int, int, int) {
-		if (inventory && inventory->getOwner() == ui.getPlayer())
+	bool ItemSlot::click(int button, int x, int y) {
+		if (button == LEFT_BUTTON && slot >= 0 && inventory && inventory->getOwner() == ui.getPlayer()) {
 			ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
-		return true;
+			return true;
+		}
+
+		return Widget::click(button, x, y);
 	}
 
-	bool ItemSlot::dragEnd(int, int) {
+	bool ItemSlot::dragStart(int x, int y) {
+		WidgetPtr dragged_widget = getDragStartWidget();
+		const bool out = dragged_widget != nullptr;
+		ui.setDraggedWidget(std::move(dragged_widget));
+		return Widget::dragStart(x, y) || out;
+	}
+
+	bool ItemSlot::dragEnd(int x, int y) {
 		if (!onDrop.empty()) {
 			if (WidgetPtr dragged = ui.getDraggedWidget()) {
+				if (dragged.get() == this) {
+					return false;
+				}
+
 				onDrop(*this, dragged);
 				return true;
 			}
 		}
 
-		return false;
+		return Widget::dragEnd(x, y);
 	}
 
 	SizeRequestMode ItemSlot::getRequestMode() const {

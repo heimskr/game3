@@ -14,7 +14,6 @@
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {

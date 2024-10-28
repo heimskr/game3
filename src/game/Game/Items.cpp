@@ -8,6 +8,7 @@
 #include "item/AutofarmerItem.h"
 #include "item/BasicFood.h"
 #include "item/BiomassLiquefierItem.h"
+#include "item/Cake.h"
 #include "item/CaveEntrance.h"
 #include "item/CentrifugeItem.h"
 #include "item/ChemicalItem.h"
@@ -88,6 +89,8 @@ namespace Game3 {
 		add(std::make_shared<BasicFood>("base:item/bleach",      "Bleach",         16, -8));
 
 		add(std::make_shared<BiomassLiquefierItem>("base:item/biomass_liquefier", "Biomass Liquefier", 999, 64)); // TODO: cost
+
+		add(std::make_shared<Cake>("base:item/cake", "Cake", 999, 16)); // TODO: cost
 
 		add(std::make_shared<CaveEntrance>("base:item/cave_entrance", "Cave Entrance", 50, 1));
 
@@ -236,6 +239,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/vanadium_magnetite_ore", "Vanadium Magnetite Ore", 32, 64));
 		add(std::make_shared<Item>("base:item/niobium_bar",      "Niobium Bar",       128, 64));
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
+		add(std::make_shared<Item>("base:item/ticket",           "Ticket",              0, -1));
 
 		add(std::make_shared<ItemPipeItem>(4));
 
@@ -252,7 +256,7 @@ namespace Game3 {
 		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
 
 		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",    "Iron Sword",    150, 3, 1, 128));
-		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Iron Sword",    400, 8, 3,  64));
+		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Gold Sword",    400, 8, 3,  64));
 		add(std::make_shared<MeleeWeapon>("base:item/diamond_sword", "Diamond Sword", 900, 6, 2, 256));
 		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
 
@@ -334,6 +338,7 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/fence_gate",       "Fence Gate ",       10, Layer::Submerged, "base:tile/gate_horizontal"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",      "Wooden Wall",       9, Layer::Objects,   "base:tile/wooden_wall",      "base:autotile/wooden_walls"));
+		add(Furniture::createMarchable("base:item/concrete_wall",    "Concrete Wall",     9, Layer::Objects,   "base:tile/concrete_wall",    "base:autotile/concrete_walls"));
 		add(Furniture::createMarchable("base:item/tall_wooden_wall", "Tall Wooden Wall",  9, Layer::Objects,   "base:tile/tall_wooden_wall", "base:autotile/tall_wooden_walls"));
 		add(Furniture::createMarchable("base:item/tower",            "Tower",            10, Layer::Objects,   "base:tile/tower",            "base:autotile/towers"));
 		add(Furniture::createMarchable("base:item/kitchen_counter",  "Kitchen Counter",  10, Layer::Objects,   "base:tile/kitchen_counter",  "base:autotile/kitchen_counters"));
@@ -393,7 +398,7 @@ namespace Game3 {
 			for (const char *color: {"red", "orange", "yellow", "green", "blue", "purple", "white", "black"}) {
 				std::string name = std::string(color) + " Flower";
 				name[0] = std::toupper(name[0]);
-				std::string post = "flower" + std::to_string(i) + "_" + color;
+				std::string post = std::format("flower{}_{}", i, color);
 				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10);
 				flower->addAttribute(Identifier("base:attribute/flower_" + std::string(color)));
 				add(flower);

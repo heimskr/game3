@@ -12,5 +12,6 @@ namespace Game3 {
 
 		protected:
 			mutable std::optional<UString> tooltipText;
+			bool tooltipTextChanged;
 	};
 }

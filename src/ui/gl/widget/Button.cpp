@@ -46,6 +46,10 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		RectangleRenderer &rectangler = renderers.rectangle;
 		const Color &top_color = pressed? topBorderColorPressed : topBorderColor;
 		const Color &bottom_color = pressed? bottomBorderColorPressed : bottomBorderColor;
@@ -191,7 +195,7 @@ namespace Game3 {
 	}
 
 	float Button::getTextScale(const RendererContext &renderers, float height) const {
-		return height / (renderers.text.getIHeight() * scale / 8);
+		return height / (renderers.text.getIHeight());
 	}
 
 	void Button::setColors(Color top, Color bottom, Color text_color) {

@@ -14,7 +14,6 @@
 #include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	namespace {

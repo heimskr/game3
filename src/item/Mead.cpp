@@ -14,13 +14,15 @@ namespace Game3 {
 		GamePtr game = realm->getGame();
 		assert(game->getSide() == Side::Server);
 
-		if (place.position == player->getPosition())
+		if (place.position == player->getPosition()) {
 			return use(slot, stack, player, modifiers);
+		}
 
 		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); !tile || tile->level == 0) {
 			std::shared_ptr<Fluid> fluid = game->registry<FluidRegistry>().at(getFluidType());
-			if (!fluid)
+			if (!fluid) {
 				return false;
+			}
 
 			realm->setFluid(place.position, FluidTile(fluid->registryID, FluidTile::FULL));
 			player->getInventory(0)->decrease(stack, slot, 1, true);

@@ -75,6 +75,10 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		if (cursorFixQueued) {
 			fixCursorOffset();
 		}

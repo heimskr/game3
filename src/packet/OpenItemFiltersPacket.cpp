@@ -18,10 +18,10 @@ namespace Game3 {
 		auto window = game->getWindow();
 
 		if (removeOnMove) {
-			game->getPlayer()->queueForMove([&window](const auto &, bool) {
+			game->getPlayer()->queueForMove([window](const auto &, bool) {
 				window->queue([](Window &window) {
 					window.removeModule();
-					window.closeOmniDialog();
+					window.hideOmniDialog();
 				});
 				return true;
 			});

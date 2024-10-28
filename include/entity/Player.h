@@ -3,6 +3,7 @@
 #include "data/Identifier.h"
 #include "entity/Entity.h"
 #include "entity/LivingEntity.h"
+#include "game/CraftingManager.h"
 #include "types/UString.h"
 #include "ui/Modifiers.h"
 
@@ -37,9 +38,9 @@ namespace Game3 {
 			bool ticked = false;
 			Atomic<RealmID> spawnRealmID;
 			Lockable<Position> spawnPosition;
-
 			std::optional<Place> lastContinuousInteraction;
 			Modifiers continuousInteractionModifiers;
+			CraftingManager craftingManager{*this};
 
 			~Player() override = 0;
 			void destroy() override;
@@ -75,6 +76,7 @@ namespace Game3 {
 			bool send(const PacketPtr &);
 			void addStationType(Identifier);
 			void removeStationType(const Identifier &);
+			bool hasStationType(const Identifier &) const;
 			std::shared_ptr<Player> getShared();
 			std::shared_ptr<ClientPlayer> toClient();
 			std::shared_ptr<ServerPlayer> toServer();
@@ -89,6 +91,7 @@ namespace Game3 {
 			/** Returns whether the item was added (i.e., not already in the set). */
 			bool addKnownItem(const Identifier &);
 			void setKnownItems(std::set<Identifier>);
+			bool hasKnownItem(const Identifier &) const;
 
 			inline std::string getUsername() const { return username.copyBase(); }
 			inline const auto & getKnownItems() const { return knownItems; }

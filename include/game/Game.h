@@ -83,6 +83,7 @@ namespace Game3 {
 			void addTiles();
 			size_t addSounds(const std::filesystem::path &);
 			void addModuleFactories();
+			void addMinigameFactories();
 			void initialSetup(const std::filesystem::path &dir = "gamedata");
 			void initEntities();
 			void initInteractionSets();
@@ -92,6 +93,7 @@ namespace Game3 {
 			void add(RealmFactory &&);
 			void add(LocalCommandFactory &&);
 			void add(ModuleFactory &&);
+			void add(MinigameFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadData(const nlohmann::json &);
 			void addRecipe(const nlohmann::json &);

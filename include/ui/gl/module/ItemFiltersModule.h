@@ -64,7 +64,7 @@ namespace Game3 {
 			void onDrop(const WidgetPtr &source);
 			void populate(ItemFilterPtr filter_to_use = {});
 
-			void addHBox(const Identifier &, const ItemFilter::Config &);
+			std::shared_ptr<Box> addHBox(const Identifier &, const ItemFilter::Config &);
 			std::shared_ptr<Icon> makeImage(ItemStack &);
 			std::shared_ptr<Label> makeLabel(const ItemStack &);
 			std::shared_ptr<Button> makeComparator(const Identifier &, const ItemFilter::Config &);

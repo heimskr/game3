@@ -6,8 +6,6 @@
 #include "packet/Packet.h"
 
 namespace Game3 {
-	class Player;
-
 	class TimePacket: public Packet {
 		public:
 			static PacketID ID() { return 30; }

@@ -25,6 +25,7 @@ namespace Game3 {
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;
 			virtual double getLuck() const;
+			virtual bool atFullHealth() const;
 			virtual HitPoints getHealth() const { return health; }
 			/** Returns whether the health actually changed. */
 			virtual bool setHealth(HitPoints);

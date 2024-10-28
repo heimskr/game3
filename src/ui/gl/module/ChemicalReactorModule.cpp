@@ -111,6 +111,10 @@ namespace Game3 {
 		}
 	}
 
+	std::shared_ptr<InventoryModule> ChemicalReactorModule::getPrimaryInventoryModule() {
+		return inventoryModule;
+	}
+
 	void ChemicalReactorModule::setEquation(const std::string &equation) {
 		if (reactor) {
 			getGame()->getPlayer()->sendMessage(reactor, "SetEquation", equation);

@@ -11,7 +11,7 @@
 
 namespace Game3 {
 	// Magnificent code duplication.
-	void MoveSlotsPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void MoveSlotsPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		if (firstGID == secondGID && firstInventory == secondInventory && firstSlot == secondSlot) {
 			return;
 		}

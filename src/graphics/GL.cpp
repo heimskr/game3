@@ -4,7 +4,7 @@
 namespace GL {
 	void checkGL(GLenum err, const char *file, int line) {
 		if (err) {
-			std::cerr << "\e[31mError at " << file << ':' << line << ": " << gluErrorString(err) << "\e[39m\n";
+			Game3::ERROR("\x1b[31mError at {}:{}: {}\x1b[39m", file, line, reinterpret_cast<const char *>(gluErrorString(err)));
 			raise(SIGTRAP);
 		}
 	}

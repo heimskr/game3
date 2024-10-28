@@ -86,7 +86,7 @@ namespace Game3 {
 
 		port = 12255;
 		running = true;
-		server = std::make_shared<Server>("::0", port, CERT_PATH, KEY_PATH, secret, 2);
+		server = Server::create("::0", port, CERT_PATH, KEY_PATH, secret, 2);
 
 		logThread = std::thread([this, fd = logDataPipe->readEnd(), control = logControlPipe.readEnd()] {
 			fd_set fds{};
@@ -222,6 +222,8 @@ namespace Game3 {
 	}
 
 	void ServerWrapper::stop() {
+		directRemoteClient.reset();
+
 		if (!game || !running)
 			return;
 
@@ -274,7 +276,7 @@ namespace Game3 {
 		if (directRemoteClient == nullptr) {
 			assert(local != nullptr);
 			assert(server != nullptr);
-			directRemoteClient = std::make_shared<DirectRemoteClient>(*server);
+			directRemoteClient = std::make_shared<DirectRemoteClient>(server);
 			directRemoteClient->setLocal(local);
 			server->allClients.withUnique([this](std::unordered_set<GenericClientPtr> &all_clients) {
 				all_clients.insert(directRemoteClient);

@@ -15,12 +15,15 @@
 
 #define HIDE_CHECKGL
 
+#define FORCE_CHECKGL do { GL::checkGL(glGetError(), __FILE__, __LINE__); } while(0);
+#define FORCE_CHECKGL_SET GLenum gl_err = glGetError(); GL::checkGL(gl_err, __FILE__, __LINE__);
+
 #ifdef HIDE_CHECKGL
 #define CHECKGL
 #define CHECKGL_SET GLenum gl_err = 0;
 #else
-#define CHECKGL do { GL::checkGL(glGetError(), __FILE__, __LINE__); } while(0);
-#define CHECKGL_SET GLenum gl_err = glGetError(); GL::checkGL(gl_err, __FILE__, __LINE__);
+#define CHECKGL FORCE_CHECKGL
+#define CHECKGL_SET FORCE_CHECKGL_SET
 #endif
 
 namespace GL {

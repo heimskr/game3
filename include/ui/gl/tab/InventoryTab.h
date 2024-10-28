@@ -11,7 +11,7 @@ namespace Game3 {
 
 	class InventoryTab: public Tab {
 		public:
-			InventoryTab(UIContext &);
+			InventoryTab(UIContext &, float scale);
 
 			void init() final;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
@@ -34,5 +34,7 @@ namespace Game3 {
 
 			std::shared_ptr<Scroller> makePlayerScroller();
 			std::shared_ptr<Scroller> makeModuleScroller();
+
+			bool onSlotClick(Slot, Modifiers);
 	};
 }

@@ -11,6 +11,10 @@ namespace Game3 {
 
 		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
 
+		if (shouldCull()) {
+			return;
+		}
+
 		const float original_x = x;
 
 		for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {
@@ -18,24 +22,26 @@ namespace Game3 {
 			float max_height = 0;
 
 			for (std::size_t column = 0; column < widgetContainer.columns(); ++column) {
+				const auto [child_width, child_height] = sizeContainer.at(row, column);
+				max_height = std::max(max_height, child_height);
 				if (Widget *widget = widgetContainer[row, column]) {
-					const auto [child_width, child_height] = sizeContainer.at(row, column);
-					max_height = std::max(max_height, child_height);
 					widget->render(renderers, x, y, child_width, child_height);
-					x += child_width + columnSpacing;
 				}
+				x += child_width + columnSpacing;
 			}
 
-			if (max_height > 0)
+			if (max_height > 0) {
 				y += max_height + rowSpacing;
+			}
 		}
 	}
 
 	SizeRequestMode Grid::getRequestMode() const {
 		// Basically stolen from Gtk4.
 
-		if (lastMode)
+		if (lastMode) {
 			return *lastMode;
+		}
 
 		using enum SizeRequestMode;
 

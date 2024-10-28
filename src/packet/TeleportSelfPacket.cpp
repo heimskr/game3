@@ -5,7 +5,7 @@
 #include "packet/TeleportSelfPacket.h"
 
 namespace Game3 {
-	void TeleportSelfPacket::handle(const std::shared_ptr<ServerGame> &game, RemoteClient &client) {
+	void TeleportSelfPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
 		auto player = client.getPlayer();
 		if (!player)
 			return;

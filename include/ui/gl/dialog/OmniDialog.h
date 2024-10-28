@@ -10,17 +10,18 @@
 #include <vector>
 
 namespace Game3 {
+	class CraftingTab;
 	class InventoryTab;
 	class Tab;
 
 	class OmniDialog: public Dialog {
 		public:
 			std::shared_ptr<InventoryTab> inventoryTab;
-			std::shared_ptr<Tab> craftingTab;
+			std::shared_ptr<CraftingTab> craftingTab;
 			std::shared_ptr<Tab> settingsTab;
 			std::shared_ptr<Tab> activeTab;
 
-			OmniDialog(UIContext &);
+			OmniDialog(UIContext &, float scale);
 
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;

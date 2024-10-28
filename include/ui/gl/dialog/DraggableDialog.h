@@ -13,12 +13,16 @@ namespace Game3 {
 
 	class BaseDraggableDialog: public Dialog {
 		public:
+			static int getEffectiveWidth(int content_width, float scale);
+			static int getEffectiveHeight(int content_height, float scale);
+
 			sigc::signal<void()> signalDismiss;
 
 			BaseDraggableDialog(UIContext &, int width, int height);
 
 			void render(const RendererContext &) override;
 			Rectangle getPosition() const override;
+			Rectangle getInnerRectangle() const;
 			void init() override;
 			bool click(int button, int x, int y) override;
 			bool dragStart(int x, int y) override;

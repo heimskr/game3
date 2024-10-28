@@ -137,6 +137,17 @@ namespace Game3 {
 		return {};
 	}
 
+	bool VillageTradeModule::handleShiftClick(std::shared_ptr<Inventory> source_inventory, Slot slot) {
+		if (ItemStackPtr stack = (*source_inventory)[slot]) {
+			if (setSellStack(stack)) {
+				showSell();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	bool VillageTradeModule::setSellStack(ItemStackPtr stack) {
 		if (!isSellable(stack))
 			return false;

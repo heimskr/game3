@@ -16,6 +16,14 @@ namespace Game3 {
 		constexpr Color INTERIOR_BACKGROUND_COLOR{"#ffc07e"};
 	}
 
+	int BaseDraggableDialog::getEffectiveWidth(int content_width, float scale) {
+		return content_width + 4 * scale;
+	}
+
+	int BaseDraggableDialog::getEffectiveHeight(int content_height, float scale) {
+		return content_height + 12 * scale;
+	}
+
 	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, int width, int height):
 		Dialog(ui),
 		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height) {}
@@ -31,12 +39,15 @@ namespace Game3 {
 
 		rectangler.drawOnScreen(BORDER_COLOR, position);
 		rectangler.drawOnScreen(TITLE_BACKGROUND_COLOR, titleRectangle);
-		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, bodyRectangle);
 
-		bodyRectangle.x += scale;
-		bodyRectangle.y += scale;
-		bodyRectangle.width -= 2 * scale;
-		bodyRectangle.height -= 2 * scale;
+		bodyRectangle = getInnerRectangle();
+
+		Rectangle outer_rectangle = bodyRectangle;
+		outer_rectangle.x -= scale;
+		outer_rectangle.y -= scale;
+		outer_rectangle.width += 2 * scale;
+		outer_rectangle.height += 2 * scale;
+		rectangler.drawOnScreen(INTERIOR_BACKGROUND_COLOR, outer_rectangle);
 
 		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 
@@ -60,6 +71,10 @@ namespace Game3 {
 		return position;
 	}
 
+	Rectangle BaseDraggableDialog::getInnerRectangle() const {
+		return getPosition() + Rectangle(2 * scale, 10 * scale, position.width - 4 * scale, position.height - 12 * scale);
+	}
+
 	void BaseDraggableDialog::init() {
 		closeButton = std::make_shared<Icon>(ui, UI_SCALE);
 		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
@@ -76,24 +91,20 @@ namespace Game3 {
 	}
 
 	bool BaseDraggableDialog::click(int button, int x, int y) {
-		if (Dialog::click(button, x, y)) {
-			return true;
+		if (closeButton->contains(x, y)) {
+			return closeButton->click(button, x, y);
 		}
 
-		return closeButton->contains(x, y) && closeButton->click(button, x, y);
+		return Dialog::click(button, x, y);
 	}
 
 	bool BaseDraggableDialog::dragStart(int x, int y) {
-		if (Dialog::dragStart(x, y)) {
-			return true;
-		}
-
 		if (titleRectangle.contains(x, y)) {
 			dragOffset.emplace(x - position.x, y - position.y);
 			return true;
 		}
 
-		return false;
+		return Dialog::dragStart(x, y);
 	}
 
 	bool BaseDraggableDialog::dragUpdate(int x, int y) {

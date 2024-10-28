@@ -106,9 +106,9 @@ namespace Game3 {
 				updateResults();
 			}
 
-			// std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final {
-			// 	return multiModule->getPrimaryInventoryModule();
-			// }
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final {
+				return multiModule->getPrimaryInventoryModule();
+			}
 
 			void render(const RendererContext &renderers, float x, float y, float width, float height) final {
 				Widget::render(renderers, x, y, width, height);

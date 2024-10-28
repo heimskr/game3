@@ -36,27 +36,24 @@ namespace Game3 {
 			Biome & operator=(const Biome &) = default;
 			Biome & operator=(Biome &&) noexcept = default;
 
-			virtual void init(Realm &realm_, int noise_seed);
+			virtual void init(const std::shared_ptr<Realm> &, int noise_seed);
 
 			/** Returns the noise value generated for the position. */
-			virtual double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &, double suggested_noise) {
-				(void) row; (void) column; (void) suggested_noise;
-				return 0.;
-			}
+			virtual double generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &, double suggested_noise);
 
 			virtual void postgen(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &) {
 				(void) row; (void) column;
 			}
 
-			static std::map<BiomeType, std::shared_ptr<Biome>> getMap(Realm &, int noise_seed);
+			static std::map<BiomeType, std::shared_ptr<Biome>> getMap(const std::shared_ptr<Realm> &, int noise_seed);
 
 		protected:
-			inline Realm * getRealm() { return realm; }
-			inline void setRealm(Realm &realm_) { realm = &realm_; }
+			std::shared_ptr<Realm> getRealm() const;
+			void setRealm(const std::shared_ptr<Realm> &);
 			virtual std::shared_ptr<Biome> clone() const { return std::make_shared<Biome>(*this); }
 
 		private:
-			Realm *realm = nullptr;
+			std::weak_ptr<Realm> weakRealm;
 			static const std::map<BiomeType, std::shared_ptr<const Biome>> & getMap();
 	};
 

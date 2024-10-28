@@ -103,10 +103,9 @@ namespace Game3 {
 	}
 
 	void CircleRenderer::drawOnScreen(const Color &color, float x, float y, float width, float height, float cutoff, float angle) {
-		if (!isInitialized())
+		if (!isInitialized()) {
 			return;
-
-		y = backbufferHeight - y;
+		}
 
 		shader.bind(); CHECKGL
 
@@ -124,9 +123,8 @@ namespace Game3 {
 		shader.set("circleColor", color); CHECKGL
 		shader.set("cutoff", cutoff);
 
-
-		glEnable(GL_BLEND); CHECKGL
-		glBlendFunc(GL_SRC_ALPHA, BLEND_MODE); CHECKGL
+		// glEnable(GL_BLEND); CHECKGL
+		// glBlendFunc(GL_SRC_ALPHA, BLEND_MODE); CHECKGL
 		glBindVertexArray(quadVAO); CHECKGL
 		glDrawArrays(GL_TRIANGLES, 0, initializedTo * 3); CHECKGL
 		glBindVertexArray(0); CHECKGL
@@ -172,16 +170,16 @@ namespace Game3 {
 		for (int i = 0; i < sides; ++i) {
 			const float rad1 = 2. * M_PI * i / sides;
 			const float rad2 = 2. * M_PI * (i + 1) / sides;
-			const float x1 = cos(rad1);
-			const float y1 = sin(rad1);
-			const float x2 = cos(rad2);
-			const float y2 = sin(rad2);
-			vertices.push_back(0.f);
-			vertices.push_back(0.f);
-			vertices.push_back(x1);
-			vertices.push_back(y1);
-			vertices.push_back(x2);
-			vertices.push_back(y2);
+			const float x1 = std::cos(rad1);
+			const float y1 = std::sin(rad1);
+			const float x2 = std::cos(rad2);
+			const float y2 = std::sin(rad2);
+			vertices.emplace_back(0.f);
+			vertices.emplace_back(0.f);
+			vertices.emplace_back(x1);
+			vertices.emplace_back(y1);
+			vertices.emplace_back(x2);
+			vertices.emplace_back(y2);
 		}
 
 		unique_lock = {};

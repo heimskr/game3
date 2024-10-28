@@ -7,5 +7,6 @@ namespace Game3 {
 
 	void HasTooltipText::setTooltipText(UString new_tooltip_text) {
 		tooltipText = std::move(new_tooltip_text);
+		tooltipTextChanged = true;
 	}
 }

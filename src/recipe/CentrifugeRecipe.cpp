@@ -18,9 +18,11 @@ namespace Game3 {
 	}
 
 	bool CentrifugeRecipe::canCraft(const std::shared_ptr<Container> &container) {
-		if (auto fluids = std::dynamic_pointer_cast<FluidContainer>(container))
-			if (auto iter = fluids->levels.find(input.id); iter != fluids->levels.end())
+		if (auto fluids = std::dynamic_pointer_cast<FluidContainer>(container)) {
+			if (auto iter = fluids->levels.find(input.id); iter != fluids->levels.end()) {
 				return input.amount <= iter->second;
+			}
+		}
 
 		return false;
 	}
@@ -29,13 +31,15 @@ namespace Game3 {
 		auto fluids = std::dynamic_pointer_cast<FluidContainer>(input_container);
 		auto inventory = std::dynamic_pointer_cast<Inventory>(output_container);
 
-		if (!fluids || !inventory || !canCraft(fluids))
+		if (!fluids || !inventory || !canCraft(fluids)) {
 			return false;
+		}
 
 		ItemStackPtr output = getOutput(input, game);
 
-		if (!inventory->canInsert(output))
+		if (!inventory->canInsert(output)) {
 			return false;
+		}
 
 		auto remaining = fluids->levels.at(input.id) -= input.amount;
 
@@ -57,8 +61,9 @@ namespace Game3 {
 		json["type"] = CentrifugeRecipeRegistry::ID();
 		json["input"] = input;
 		nlohmann::json &output = json["output"];
-		for (const auto &[item, weight]: weightMap)
+		for (const auto &[item, weight]: weightMap) {
 			output.push_back(nlohmann::json{weight, item});
+		}
 	}
 
 	CentrifugeRecipe CentrifugeRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
@@ -66,8 +71,9 @@ namespace Game3 {
 
 		recipe.input = FluidStack::fromJSON(*game, json.at("input"));
 
-		for (const auto &item: json.at("output"))
+		for (const auto &item: json.at("output")) {
 			recipe.weightMap[item.at(1)] = item.at(0);
+		}
 
 		return recipe;
 	}

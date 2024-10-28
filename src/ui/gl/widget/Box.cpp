@@ -16,6 +16,9 @@ namespace Game3 {
 		separatorThickness(separator_thickness),
 		separatorColor(separator_color) {}
 
+	Box::Box(UIContext &ui, float scale, Orientation orientation, float padding):
+		Box(ui, scale, orientation, padding, padding == 0? 0 : DEFAULT_SEPARATOR_THICKNESS, padding == 0? Color{} : DEFAULT_SEPARATOR_COLOR) {}
+
 	Box::Box(UIContext &ui, float scale, Orientation orientation):
 		Box(ui, scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
 
@@ -27,6 +30,10 @@ namespace Game3 {
 
 		maybeRemeasure(renderers, width, height);
 		ChildDependentExpandingWidget<Widget>::render(renderers, x, y, width, height);
+
+		if (shouldCull()) {
+			return;
+		}
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
@@ -69,7 +76,7 @@ namespace Game3 {
 					child_height = pair.second;
 					to_add = vertical? child_height : child_width;
 					if (to_add < 0) {
-						ERROR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
+						// ERROR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
 						// assert(0 <= to_add);
 					}
 				}
@@ -211,8 +218,9 @@ namespace Game3 {
 	}
 
 	bool Box::onChildrenUpdated() {
-		if (!ChildDependentExpandingWidget<Widget>::onChildrenUpdated())
+		if (!ChildDependentExpandingWidget<Widget>::onChildrenUpdated()) {
 			return false;
+		}
 
 		childMeasurements.clear();
 		return true;

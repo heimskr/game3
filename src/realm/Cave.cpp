@@ -15,9 +15,7 @@ namespace Game3 {
 		Realm(game_, id_, ID(), "base:tileset/monomap", seed_), parentRealm(parent_realm) {}
 
 	void Cave::clearLighting(float) {
-		glClearColor(0.117, 0.117, 0.235, 1); CHECKGL
-		// glClearColor(1, 1, 1, 1); CHECKGL
-		glClear(GL_COLOR_BUFFER_BIT); CHECKGL
+		GL::clear(0.117, 0.117, 0.235, 1, GL_COLOR_BUFFER_BIT);
 	}
 
 	void Cave::onRemove() {
@@ -29,14 +27,16 @@ namespace Game3 {
 		GamePtr game = getGame();
 		auto lock = tileEntities.sharedLock();
 		for (const auto &[index, tile_entity]: tileEntities) {
-			if (tile_entity->tileID != "base:tile/cave")
+			if (tile_entity->tileID != "base:tile/cave") {
 				continue;
+			}
 
 			if (auto building = std::dynamic_pointer_cast<Building>(tile_entity)) {
-				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(building->innerRealmID)))
+				if (auto cave_realm = std::dynamic_pointer_cast<Cave>(game->getRealm(building->innerRealmID))) {
 					game->removeRealm(cave_realm);
-				else
+				} else {
 					WARN("Cave entrance leads to realm {}, which isn't a cave. Not erasing.", building->innerRealmID);
+				}
 				break;
 			}
 		}
@@ -47,11 +47,15 @@ namespace Game3 {
 		const TileID empty_id = tileset.getEmptyID();
 		if (force || getTile(Layer::Objects, position) != empty_id) {
 			const TileID void_id = tileset["base:tile/void"];
-			for (Index row_offset = -1; row_offset <= 1; ++row_offset)
-				for (Index column_offset = -1; column_offset <= 1; ++column_offset)
-					if (row_offset != 0 || column_offset != 0)
-						if (const Position offset_position = position + Position(row_offset, column_offset); getTile(Layer::Highest, offset_position) == void_id)
+			for (Index row_offset = -1; row_offset <= 1; ++row_offset) {
+				for (Index column_offset = -1; column_offset <= 1; ++column_offset) {
+					if (row_offset != 0 || column_offset != 0) {
+						if (Position offset_position = position + Position(row_offset, column_offset); getTile(Layer::Highest, offset_position) == void_id) {
 							setTile(Layer::Highest, offset_position, empty_id);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -81,8 +85,9 @@ namespace Game3 {
 		std::vector<TileID> rares;
 		rares.reserve(rare_category.size());
 
-		for (const Identifier &rare_ore: rare_category)
+		for (const Identifier &rare_ore: rare_category) {
 			rares.push_back(tileset[rare_ore]);
+		}
 
 		voronoize<uint16_t>(vector, safeCast<int>(rares.size()), rng, [&] {
 			return safeCast<uint16_t>(choose(rares, rng));
@@ -95,16 +100,18 @@ namespace Game3 {
 	void Cave::absorbJSON(const nlohmann::json &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
 		parentRealm = json.at("parentRealm");
-		if (auto iter = json.find("entranceCount"); iter != json.end())
+		if (auto iter = json.find("entranceCount"); iter != json.end()) {
 			entranceCount = iter->get<size_t>();
-		else
+		} else {
 			entranceCount = 1;
+		}
 	}
 
 	void Cave::toJSON(nlohmann::json &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
 		json["parentRealm"] = parentRealm;
-		if (entranceCount != 1)
+		if (entranceCount != 1) {
 			json["entranceCount"] = entranceCount.load();
+		}
 	}
 }

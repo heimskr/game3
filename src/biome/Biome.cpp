@@ -18,11 +18,25 @@ namespace Game3 {
 		return map;
 	};
 
-	void Biome::init(Realm &realm_, int) {
-		setRealm(realm_);
+	void Biome::init(const std::shared_ptr<Realm> &realm, int) {
+		setRealm(realm);
 	}
 
-	std::map<BiomeType, BiomePtr> Biome::getMap(Realm &realm, int noise_seed) {
+	double Biome::generate(Index, Index, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &, double) {
+		return 0.0;
+	}
+
+	std::shared_ptr<Realm> Biome::getRealm() const {
+		std::shared_ptr<Realm> locked = weakRealm.lock();
+		assert(locked != nullptr);
+		return locked;
+	}
+
+	void Biome::setRealm(const std::shared_ptr<Realm> &realm) {
+		weakRealm = realm;
+	}
+
+	std::map<BiomeType, BiomePtr> Biome::getMap(const std::shared_ptr<Realm> &realm, int noise_seed) {
 		std::map<BiomeType, BiomePtr> out;
 
 		for (const auto &[type, ptr]: getMap()) {

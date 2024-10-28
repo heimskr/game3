@@ -26,6 +26,8 @@ namespace Game3 {
 			void toggle(bool affect_focus);
 			void setHidden(bool);
 			void focusInput();
+			/** Sets the input text to "/". */
+			void setSlash();
 
 		private:
 			std::shared_ptr<Scroller> scroller;

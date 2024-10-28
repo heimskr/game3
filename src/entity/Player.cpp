@@ -18,7 +18,6 @@
 #include "packet/SetPlayerStationTypesPacket.h"
 #include "realm/Realm.h"
 #include "ui/Window.h"
-#include "ui/Window.h"
 #include "util/Cast.h"
 
 namespace Game3 {
@@ -336,6 +335,11 @@ namespace Game3 {
 		send(make<SetPlayerStationTypesPacket>(stationTypes, false));
 	}
 
+	bool Player::hasStationType(const Identifier &station_type) const {
+		auto lock = stationTypes.sharedLock();
+		return stationTypes.contains(station_type);
+	}
+
 	PlayerPtr Player::getShared() {
 		return safeDynamicCast<Player>(shared_from_this());
 	}
@@ -395,6 +399,11 @@ namespace Game3 {
 
 	void Player::setKnownItems(std::set<Identifier> item_ids) {
 		knownItems = item_ids;
+	}
+
+	bool Player::hasKnownItem(const Identifier &item_id) const {
+		auto lock = knownItems.sharedLock();
+		return knownItems.contains(item_id);
 	}
 
 	void Player::resetEphemeral() {

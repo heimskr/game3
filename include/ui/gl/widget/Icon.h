@@ -2,9 +2,10 @@
 
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasFixedSize.h"
+#include "ui/gl/HasTooltipText.h"
 
 namespace Game3 {
-	class Icon: public Widget, public HasFixedSize {
+	class Icon: public Widget, public HasFixedSize, public HasTooltipText {
 		public:
 			Icon(UIContext &, float scale);
 

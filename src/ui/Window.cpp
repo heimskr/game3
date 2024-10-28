@@ -16,16 +16,21 @@
 #include "ui/gl/dialog/DraggableDialog.h"
 #include "ui/gl/dialog/LoginDialog.h"
 #include "ui/gl/dialog/MessageDialog.h"
+#include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
+#include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
 #include "ui/gl/tab/InventoryTab.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "ui/Modifiers.h"
 #include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
+
+#include "minigame/Breakout.h"
 
 #include <fstream>
 
@@ -106,8 +111,9 @@ namespace Game3 {
 
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
 
-			if (std::filesystem::exists("settings.json"))
+			try {
 				settings = nlohmann::json::parse(readFile("settings.json"));
+			} catch (const std::ios_base::failure &) {}
 
 			settings.apply();
 
@@ -195,27 +201,42 @@ namespace Game3 {
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
 		if (!omniDialog) {
-			omniDialog = std::make_shared<OmniDialog>(uiContext);
-			omniDialog->init();
+			omniDialog = make<OmniDialog>(uiContext, UI_SCALE);
 		}
 		return omniDialog;
 	}
 
 	const std::shared_ptr<ChatDialog> & Window::getChatDialog() {
 		if (!chatDialog) {
-			chatDialog = std::make_shared<ChatDialog>(uiContext);
-			chatDialog->init();
+			chatDialog = make<ChatDialog>(uiContext);
 		}
 		return chatDialog;
 	}
 
-	void Window::showOmniDialog() {
-		if (!uiContext.hasDialog<OmniDialog>())
-			uiContext.addDialog(getOmniDialog());
+	const std::shared_ptr<TopDialog> & Window::getTopDialog() {
+		if (!topDialog) {
+			topDialog = make<TopDialog>(uiContext);
+		}
+		return topDialog;
 	}
 
-	void Window::closeOmniDialog() {
-		uiContext.removeDialogs<OmniDialog>();
+	void Window::showOmniDialog() {
+		if (!uiContext.hasDialog<OmniDialog>()) {
+			uiContext.addDialog(getOmniDialog());
+			uiContext.addDialog(getTopDialog());
+		}
+	}
+
+	void Window::hideOmniDialog() {
+		uiContext.removeDialogs<OmniDialog, TopDialog>();
+	}
+
+	void Window::toggleOmniDialog() {
+		if (uiContext.hasDialog<OmniDialog>()) {
+			hideOmniDialog();
+		} else {
+			showOmniDialog();
+		}
 	}
 
 	void Window::openModule(const Identifier &module_id, const std::any &argument) {
@@ -227,8 +248,7 @@ namespace Game3 {
 			getOmniDialog();
 			omniDialog->inventoryTab->setModule((*factory)(game, argument));
 			omniDialog->activeTab = omniDialog->inventoryTab;
-			if (!uiContext.hasDialog<OmniDialog>())
-				uiContext.addDialog(omniDialog);
+			showOmniDialog();
 			return;
 		}
 
@@ -258,13 +278,16 @@ namespace Game3 {
 		INFO("{}", message);
 	}
 
-	void Window::error(const UString &message, bool do_queue, bool use_markup) {
+	void Window::error(const UString &message, bool do_queue, bool use_markup, std::function<void()> on_close) {
 		(void) use_markup;
 
-		auto action = [message](Window &window) mutable {
+		auto action = [message, on_close = std::move(on_close)](Window &window) mutable {
 			window.activateContext();
 			auto dialog = MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None);
 			dialog->setTitle("Error");
+			if (on_close) {
+				dialog->signalClose.connect(std::move(on_close));
+			}
 			window.uiContext.addDialog(std::move(dialog));
 		};
 
@@ -323,8 +346,9 @@ namespace Game3 {
 			std::unique_lock<DefaultMutex> lock;
 			if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
 				std::any empty;
-				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty))
+				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty)) {
 					return response->take<GlobalID>();
+				}
 			}
 		}
 
@@ -361,15 +385,21 @@ namespace Game3 {
 			}
 		}
 
-		{
-			auto lock = boolFunctions.uniqueLock();
-			std::erase_if(boolFunctions, [this](const auto &function) {
+		boolFunctions.withUnique([this](std::list<std::function<bool (Game3::Window &)>> &bool_functions) {
+			std::erase_if(bool_functions, [this](const auto &function) {
 				return function(*this);
 			});
-		}
+		});
 
 		drawGL();
 	}
+
+	Breakout breakout = [] {
+		Breakout out;
+		out.setSize(600, 600);
+		out.reset();
+		return out;
+	}();
 
 	void Window::drawGL() {
 		const float x_factor = getXFactor();
@@ -387,37 +417,47 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		if (game != nullptr) {
+		if (game != nullptr && game->getPlayer() != nullptr) {
 			game->iterateRealms([](const RealmPtr &realm) {
-				if (!realm->renderersReady)
+				if (!realm->renderersReady) {
 					return;
+				}
 
 				if (realm->wakeupPending.exchange(false)) {
-					for (auto &row: *realm->baseRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->baseRenderers) {
+						for (auto &renderer: row) {
 							renderer.wakeUp();
+						}
+					}
 
-					for (auto &row: *realm->upperRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->upperRenderers) {
+						for (auto &renderer: row) {
 							renderer.wakeUp();
+						}
+					}
 
 					realm->reupload();
 				} else if (realm->snoozePending.exchange(false)) {
-					for (auto &row: *realm->baseRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->baseRenderers) {
+						for (auto &renderer: row) {
 							renderer.snooze();
+						}
+					}
 
-					for (auto &row: *realm->upperRenderers)
-						for (auto &renderer: row)
+					for (auto &row: *realm->upperRenderers) {
+						for (auto &renderer: row) {
 							renderer.snooze();
+						}
+					}
 				}
 			});
 
 			GLsizei tile_size = 16;
 			RealmPtr realm = game->getActiveRealm();
 
-			if (realm)
+			if (realm) {
 				tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
+			}
 
 			const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
 			const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
@@ -437,11 +477,9 @@ namespace Game3 {
 				}
 			}
 
-			bool do_lighting{};
-			{
-				auto lock = settings.sharedLock();
-				do_lighting = settings.renderLighting;
-			}
+			bool do_lighting = settings.withShared([&](auto &settings) {
+				return settings.renderLighting;
+			});
 
 			if (realm) {
 				if (do_lighting) {
@@ -540,16 +578,25 @@ namespace Game3 {
 				has_been_nonzero = true;
 			}
 
-			textRenderer.drawOnScreen("game3", TextRenderOptions{
-				.x = getWidth() / 2.0,
-				.y = 64.0,
-				.scaleX = 2.5,
-				.scaleY = 2.5,
-				.color = OKHsv{hue += 0.001, 1, 1, 1}.convert<Color>(),
-				.align = TextAlign::Center,
-				.alignTop = true,
-				.shadow{1, 1, 1, 1},
-			});
+			OKHsv hsv{hue += 0.001, 1, 1, 1};
+			constexpr int i_max = 32;
+			constexpr double offset_factor = 2;
+			constexpr double x_offset = offset_factor * i_max;
+
+			for (int i = 0; i < i_max; ++i) {
+				const double offset = offset_factor * (i_max - i);
+				textRenderer.drawOnScreen("game3", TextRenderOptions{
+					.x = getWidth() / 2.0 + (offset - x_offset) / 2,
+					.y = 64.0 + offset / 2,
+					.scaleX = 2.5,
+					.scaleY = 2.5,
+					.color = hsv.convert<Color>(),
+					.align = TextAlign::Center,
+					.alignTop = true,
+				});
+
+				hsv.hue += 0.5 / i_max;
+			}
 		}
 
 		uiContext.render(getMouseX(), getMouseY());
@@ -572,6 +619,12 @@ namespace Game3 {
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
 		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
 		lastModifiers = modifiers;
+
+		if (action == GLFW_PRESS) {
+			heldKeys.insert(key);
+		} else if (action == GLFW_RELEASE) {
+			heldKeys.erase(key);
+		}
 
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 			if (auto iter = keyTimes.find(key); iter != keyTimes.end()) {
@@ -610,14 +663,17 @@ namespace Game3 {
 			if (action == GLFW_PRESS || action == CUSTOM_REPEAT) {
 				if (modifiers.empty() || modifiers.onlyShift()) {
 					auto handle = [&](int movement_key, Direction direction) {
-						if (key != movement_key)
+						if (key != movement_key) {
 							return false;
+						}
 
-						if (!player->isMoving())
+						if (!player->isMoving()) {
 							player->setContinuousInteraction(modifiers.shift, Modifiers(modifiers));
+						}
 
-						if (!player->isMoving(direction))
+						if (!player->isMoving(direction)) {
 							player->startMoving(direction);
+						}
 
 						return true;
 					};
@@ -628,14 +684,15 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_SPACE) {
-					if (player != nullptr)
+					if (player != nullptr) {
 						player->jump();
+					}
 					return;
 				}
 
 				if (key == GLFW_KEY_E) {
 					if (uiContext.hasDialog<OmniDialog>()) {
-						uiContext.removeDialogs<OmniDialog>();
+						hideOmniDialog();
 					} else {
 						game->interactNextTo(modifiers, Hand::Right);
 					}
@@ -686,9 +743,7 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_ESCAPE) {
-					if (uiContext.removeDialogs<OmniDialog>() == 0) {
-						uiContext.addDialog(getOmniDialog());
-					}
+					toggleOmniDialog();
 					return;
 				}
 
@@ -725,8 +780,12 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_BACKSLASH) {
-					queue([](Window &window) {
-						window.getChatDialog()->focusInput();
+					queue([slash = modifiers.onlyShift()](Window &window) {
+						std::shared_ptr<ChatDialog> chat = window.getChatDialog();
+						chat->focusInput();
+						if (slash) {
+							chat->setSlash();
+						}
 					});
 					return;
 				}
@@ -739,8 +798,9 @@ namespace Game3 {
 				}
 
 				auto handle = [&](int released_key, Direction direction) {
-					if (key != released_key)
+					if (key != released_key) {
 						return false;
+					}
 
 					player->stopMoving(direction);
 					return true;
@@ -830,10 +890,11 @@ namespace Game3 {
 		const auto y_factor = getYFactor();
 		const auto old_scale = scale;
 
-		if (y_delta < 0)
+		if (y_delta < 0) {
 			scale /= 1.08 * -y_delta;
-		else if (y_delta > 0)
+		} else if (y_delta > 0) {
 			scale *= 1.08 * y_delta;
+		}
 
 		const float width = lastWindowSize.first;
 		const float height = lastWindowSize.second;
@@ -853,14 +914,17 @@ namespace Game3 {
 	}
 
 	void Window::closeGame() {
-		if (game == nullptr)
+		if (game == nullptr) {
 			return;
+		}
 
 		// richPresence.setActivityDetails("Idling");
 
+		connected = false;
 		removeModule();
 		game->stopThread();
 		game.reset();
+		serverWrapper.stop();
 		goToTitle();
 	}
 
@@ -874,6 +938,7 @@ namespace Game3 {
 		// richPresence.setActivityStartTime(false);
 		// richPresence.setActivityDetails("Playing", true);
 
+		connected = true;
 		uiContext.reset();
 		uiContext.addDialog(getChatDialog());
 
@@ -900,8 +965,9 @@ namespace Game3 {
 
 		game->signalFluidUpdate.connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([has_fluids](Window &window) mutable {
-				if (!window.omniDialog)
+				if (!window.omniDialog) {
 					return;
+				}
 
 				std::unique_lock<DefaultMutex> lock;
 
@@ -914,8 +980,9 @@ namespace Game3 {
 
 		game->signalEnergyUpdate.connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([has_energy](Window &window) mutable {
-				if (!window.omniDialog)
+				if (!window.omniDialog) {
 					return;
+				}
 
 				std::unique_lock<DefaultMutex> lock;
 
@@ -928,8 +995,9 @@ namespace Game3 {
 
 		game->signalVillageUpdate.connect([this](const VillagePtr &village) {
 			queue([village](Window &window) mutable {
-				if (!window.omniDialog)
+				if (!window.omniDialog) {
 					return;
+				}
 
 				std::unique_lock<DefaultMutex> lock;
 
@@ -941,12 +1009,18 @@ namespace Game3 {
 		});
 
 		game->signalChatReceived.connect([this](const PlayerPtr &player, const UString &message) {
-			getChatDialog()->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
+			auto dialog = getChatDialog();
+			if (player == nullptr) {
+				dialog->addMessage(message);
+			} else {
+				dialog->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
+			}
 		});
 
 		game->errorCallback = [this] {
-			if (game->suppressDisconnectionMessage)
+			if (game->suppressDisconnectionMessage) {
 				return;
+			}
 
 			queue([](Window &window) {
 				window.closeGame();
@@ -967,8 +1041,10 @@ namespace Game3 {
 		}
 
 		client->onError = [this](const asio::error_code &errc) {
-			closeGame();
-			error(std::format("{} ({})", errc.message(), errc.value()));
+			queue([errc](Window &window) {
+				window.closeGame();
+				window.error(std::format("{} ({})", errc.message(), errc.value()));
+			});
 		};
 
 		game->setClient(client);
@@ -977,7 +1053,7 @@ namespace Game3 {
 			client->connect(hostname, port);
 		} catch (const std::exception &err) {
 			closeGame();
-			error(err.what());
+			error(err.what(), true, false, [this] { goToTitle(); });
 			return false;
 		}
 
@@ -1014,8 +1090,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (!connect(settings.hostname, settings.port))
+		if (!connect(settings.hostname, settings.port)) {
 			return;
+		}
 
 		LocalClientPtr client = game->getClient();
 		const std::string &hostname = client->getHostname();
@@ -1034,11 +1111,11 @@ namespace Game3 {
 	}
 
 	void Window::playLocally() {
-		const bool was_running = serverWrapper.isRunning();
-
 		if (game) {
 			game->suppressDisconnectionMessage = true;
 		}
+
+		closeGame();
 
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {
@@ -1050,7 +1127,6 @@ namespace Game3 {
 			}
 		}
 
-
 		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
@@ -1059,15 +1135,7 @@ namespace Game3 {
 		}
 
 		serverWrapper.save();
-
-		if (was_running) {
-			// Ugly hack!
-			delay([](Window &window) {
-				window.continueLocalConnection();
-			}, DEFAULT_CLIENT_TICK_FREQUENCY * 2);
-		} else {
-			continueLocalConnection();
-		}
+		continueLocalConnection();
 	}
 
 	void Window::continueLocalConnection() {
@@ -1075,10 +1143,12 @@ namespace Game3 {
 
 		if (!connect("::1", serverWrapper.getPort(), client)) {
 			error("Failed to connect to local server.");
+			closeGame();
 			return;
 		}
 
 		assert(game != nullptr);
+		connectedLocally = true;
 
 		// Tie the loop. Or whatever the expression is.
 		// What I'm trying to say is that we're doing a funny thing where we make both Direct*Clients point at each other.
@@ -1107,8 +1177,9 @@ namespace Game3 {
 	}
 
 	void Window::feedFPS(double fps) {
-		if (!settings.showFPS)
+		if (!settings.showFPS) {
 			return;
+		}
 
 		fpses.push_back(fps);
 		runningSum += fps;
@@ -1152,8 +1223,7 @@ namespace Game3 {
 			} else if (display_name.empty()) {
 				queue([this, username](Window &) {
 					closeGame();
-					goToTitle();
-					error(std::format("Token not found for user {} and no display name given.", username));
+					error(std::format("Token not found for user {} and no display name given.", username), true, false, [this] { goToTitle(); });
 				});
 			} else {
 				client->send(make<RegisterPlayerPacket>(username.raw(), display_name.raw()));
@@ -1167,6 +1237,26 @@ namespace Game3 {
 		});
 
 		uiContext.addDialog(std::move(dialog));
+	}
+
+	bool Window::isConnectedLocally() const {
+		return connectedLocally;
+	}
+
+	bool Window::isConnected() const {
+		return connected;
+	}
+
+	void Window::disconnect() {
+		if (isConnectedLocally()) {
+			serverWrapper.stop();
+		}
+
+		closeGame();
+	}
+
+	bool Window::isKeyHeld(int key) const {
+		return heldKeys.contains(key);
 	}
 
 	void Window::handleKeys() {

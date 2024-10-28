@@ -7,6 +7,11 @@
 #include <type_traits>
 
 namespace Game3 {
+	template <std::floating_point F, typename R>
+	inline F replaceNaN(F number, R replacement) {
+		return std::isnan(number)? static_cast<F>(replacement) : number;
+	}
+
 	inline auto updiv(auto n, auto d) {
 		return n / d + (n % d? 1 : 0);
 	}
@@ -70,5 +75,10 @@ namespace Game3 {
 		} while (shift != 0);
 
 		return result;
+	}
+
+	template <typename I>
+	I sqr(I n) {
+		return n * n;
 	}
 }

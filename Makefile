@@ -46,9 +46,8 @@ INCLUDES     := $(shell pkg-config --cflags $(DEPS))
 LIBS         := $(shell pkg-config --libs   $(DEPS))
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
-SOURCES      := $(shell find -L src -name \*.cpp) src/gtk_resources.cpp
+SOURCES      := $(shell find -L src -name \*.cpp)
 OBJECTS      := $(SOURCES:.cpp=.o)
-RESXML       := src/$(OUTPUT).gresource.xml
 CLOC_OPTIONS := . --exclude-dir=voronoi,pvs-report,discord,subprojects,*build*,.codechecker,_build,po,vscode,stb,eigen,json,data,.github,.idea,vcpkg_installed,build,builddir,.flatpak-builder,libnoise --fullpath --not-match-f='^\.\/((src\/(gtk_)?resources\.cpp|include\/resources\.h|analysis\.txt|include\/lib\/.*|.*\.(json|txt|md|xml))|(chemskr\/src\/chemskr/(NuclideMasses|yylex|yyparse)\.cpp|chemskr\/(include|src)\/chemskr\/yyparse\.h))$$'
 
 .PHONY: all clean flags test
@@ -93,9 +92,6 @@ flags:
 	@ echo "CPPFLAGS: $(CPPFLAGS)"
 	@ echo
 	@ echo "LDFLAGS:  $(LDFLAGS)"
-
-src/gtk_resources.cpp: $(RESXML) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=resources --generate-dependencies $(RESXML))
-	$(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=resources --generate-source $<
 
 %.o: %.cpp
 	@ printf "\e[2m[\e[22;32mc++\e[39;2m]\e[22m $< \e[2m$(strip $(BUILDFLAGS) $(LTO))\e[22m\n"

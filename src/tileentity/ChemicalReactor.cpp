@@ -76,8 +76,9 @@ namespace Game3 {
 		enqueueTick(PERIOD);
 
 		InventoryPtr inventory = getInventory(0);
-		if (inventory->weakOwner.expired())
-			inventory->weakOwner = shared_from_this();
+		if (!inventory->hasOwner()) {
+			inventory->setOwner(weak_from_this());
+		}
 
 		react();
 	}
@@ -252,7 +253,7 @@ namespace Game3 {
 		auto &item_registry = game->registry<ItemRegistry>();
 		std::shared_ptr<Item> chemical_item = item_registry["base:item/chemical"_id];
 		std::unique_ptr<Inventory> inventory_copy = inventory->copy();
-		inventory_copy->weakOwner = {};
+		inventory_copy->setOwner({});
 
 		{
 			auto reactant_lock = reactants.sharedLock();
@@ -304,7 +305,7 @@ namespace Game3 {
 		// Silly.
 		auto storage_inventory = std::dynamic_pointer_cast<StorageInventory>(inventory);
 		assert(storage_inventory);
-		inventory_copy->weakOwner = shared_from_this();
+		inventory_copy->setOwner(weak_from_this());
 		*storage_inventory = std::move(dynamic_cast<StorageInventory &>(*inventory_copy));
 		inventory->notifyOwner({});
 

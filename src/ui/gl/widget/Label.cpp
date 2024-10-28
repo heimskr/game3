@@ -5,7 +5,6 @@
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Types.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Window.h"
 
 namespace Game3 {
 	Label::Label(UIContext &ui, float scale, UString text, Color text_color):
@@ -24,10 +23,15 @@ namespace Game3 {
 		tryWrap(renderers.text, width);
 		const UString &string = wrapped? wrapped.value() : text;
 
-		if (0 <= lastUnwrappedTextWidth)
+		if (0 <= lastUnwrappedTextWidth) {
 			adjustCoordinate(Orientation::Horizontal, x, width, std::min(width, lastUnwrappedTextWidth));
+		}
 
 		Widget::render(renderers, x, y, width, height);
+
+		if (shouldCull()) {
+			return;
+		}
 
 		float y_pos = y + padding;
 		bool align_top = true;
@@ -35,8 +39,9 @@ namespace Game3 {
 		if (verticalAlignment == Alignment::End) {
 			align_top = false;
 			y_pos -= padding;
-			if (0 <= height)
+			if (0 <= height) {
 				y_pos += height;
+			}
 		} else if (verticalAlignment == Alignment::Center) {
 			y_pos -= padding;
 			if (0 < lastTextHeight) {

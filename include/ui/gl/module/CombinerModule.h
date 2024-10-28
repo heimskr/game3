@@ -26,7 +26,7 @@ namespace Game3 {
 
 			std::optional<Buffer> handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) final;
 			void setInventory(std::shared_ptr<ClientInventory>) final;
-			// std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final;
+			std::shared_ptr<InventoryModule> getPrimaryInventoryModule() final;
 
 		private:
 			std::shared_ptr<Combiner> combiner;

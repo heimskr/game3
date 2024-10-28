@@ -1,4 +1,5 @@
 #include "game/Game.h"
+#include "tileentity/ArcadeMachine.h"
 #include "tileentity/Autocrafter.h"
 #include "tileentity/Autofarmer.h"
 #include "tileentity/BiomassLiquefier.h"
@@ -43,6 +44,7 @@ namespace Game3 {
 	}
 
 	void Game::addTileEntityFactories() {
+		add(TileEntityFactory::create<ArcadeMachine>());
 		add(TileEntityFactory::create<Autocrafter>());
 		add(TileEntityFactory::create<Autofarmer>());
 		add(TileEntityFactory::create<BiomassLiquefier>());

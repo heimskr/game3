@@ -6,6 +6,7 @@
 #include "graphics/Texture.h"
 #include "types/Types.h"
 #include "ui/gl/dialog/Dialog.h"
+#include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/ContextMenu.h"
@@ -13,15 +14,17 @@
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
-#include "ui/Window.h"
 #include "ui/Modifiers.h"
+#include "ui/Window.h"
+#include "util/Defer.h"
 #include "util/Util.h"
 
 namespace Game3 {
 	UIContext::UIContext(Window &window):
 		window(window),
-		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE)),
+		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE / window.xScale)),
 		tooltip(std::make_shared<Tooltip>(*this, UI_SCALE)) {
+			hotbar->setName("Hotbar");
 			hotbar->init();
 			tooltip->init();
 		}
@@ -83,55 +86,73 @@ namespace Game3 {
 	void UIContext::reset() {
 		draggedWidget = nullptr;
 		draggedWidgetActive = false;
-		for (const DialogPtr &dialog: reverse(dialogs))
+		for (const DialogPtr &dialog: reverse(dialogs)) {
 			dialog->onClose();
+		}
 		dialogs.clear();
 		hotbar->reset();
+		tooltip->hide();
 	}
 
 	bool UIContext::click(int button, int x, int y) {
 		refocusDialogs(x, y);
 
-		if (contextMenu && contextMenu->click(button, x, y))
+		if (contextMenu && contextMenu->click(button, x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y)) {
 			return true;
+		}
 
-		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->click(button, x, y))
+		bool contained = false;
+
+		for (const DialogPtr &dialog: reverse(dialogs)) {
+			contained = contained || dialog->contains(x, y);
+			if (dialog->click(button, x, y)) {
 				return true;
+			}
+		}
 
-		return hotbar->contains(x, y) && hotbar->click(button, x, y);
+		return (hotbar->contains(x, y) && hotbar->click(button, x, y)) || contained;
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y) {
-		if (contextMenu && contextMenu->mouseDown(button, x, y))
+		if (contextMenu && contextMenu->mouseDown(button, x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y)) {
 			return true;
+		}
 
-		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->mouseDown(button, x, y))
+		for (const DialogPtr &dialog: reverse(dialogs)) {
+			if (dialog->mouseDown(button, x, y)) {
 				return true;
+			}
+		}
 
 		return hotbar->contains(x, y) && hotbar->mouseDown(button, x, y);
 	}
 
 	bool UIContext::mouseUp(int button, int x, int y) {
-		if (contextMenu && contextMenu->mouseUp(button, x, y))
+		if (contextMenu && contextMenu->mouseUp(button, x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y))
+		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y)) {
 			return true;
+		}
 
-		if (auto pressed = getPressedWidget())
+		if (auto pressed = getPressedWidget()) {
 			return pressed->mouseUp(button, x, y);
+		}
 
-		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->mouseUp(button, x, y))
+		for (const DialogPtr &dialog: reverse(dialogs)) {
+			if (dialog->mouseUp(button, x, y)) {
 				return true;
+			}
+		}
 
 		return hotbar->contains(x, y) && hotbar->mouseUp(button, x, y);
 	}
@@ -139,52 +160,98 @@ namespace Game3 {
 	bool UIContext::dragStart(int x, int y) {
 		refocusDialogs(x, y);
 
-		if (contextMenu && contextMenu->dragStart(x, y))
+		if (contextMenu && contextMenu->dragStart(x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->dragStart(x, y))
+		if (autocompleteDropdown && autocompleteDropdown->dragStart(x, y)) {
 			return true;
+		}
 
 		unfocusWidget();
 		dragOrigin.emplace(x, y);
 
-		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->dragStart(x, y))
-				return true;
+		bool contained = false;
 
-		return hotbar->contains(x, y) && hotbar->dragStart(x, y);
+		for (const DialogPtr &dialog: reverse(dialogs)) {
+			contained = contained || dialog->contains(x, y);
+			if (dialog->dragStart(x, y)) {
+				return true;
+			}
+		}
+
+		if (contained) {
+			return true;
+		}
+
+		if (hotbar->contains(x, y)) {
+			return hotbar->dragStart(x, y);
+		}
+
+		if (ClientGamePtr game = getGame()) {
+			game->dragStart(x, y, window.getModifiers());
+			return true;
+		}
+
+		return false;
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
-		if (contextMenu && contextMenu->dragUpdate(x, y))
+		if (contextMenu && contextMenu->dragUpdate(x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->dragUpdate(x, y))
+		if (autocompleteDropdown && autocompleteDropdown->dragUpdate(x, y)) {
 			return true;
+		}
 
-		if (draggedWidget && dragOrigin != std::pair{x, y})
+		if (draggedWidget && dragOrigin != std::pair{x, y}) {
 			draggedWidgetActive = true;
+		}
 
-		for (const WidgetPtr &widget: extraDragUpdaters)
-			if (widget->dragUpdate(x, y))
+		for (const WidgetPtr &widget: extraDragUpdaters) {
+			if (widget->dragUpdate(x, y)) {
 				return true;
+			}
+		}
 
-		for (const DialogPtr &dialog: reverse(dialogs))
-			if (dialog->dragUpdate(x, y))
+		bool contained = false;
+
+		for (const DialogPtr &dialog: reverse(dialogs)) {
+			contained = contained || dialog->contains(x, y);
+			if (dialog->dragUpdate(x, y)) {
 				return true;
+			}
+		}
 
-		return hotbar->contains(x, y) && hotbar->dragUpdate(x, y);
+		if (contained) {
+			return true;
+		}
+
+		if (hotbar->contains(x, y)) {
+			return hotbar->dragUpdate(x, y);
+		}
+
+		if (ClientGamePtr game = getGame()) {
+			game->dragUpdate(x, y, window.getModifiers());
+			return true;
+		}
+
+		return false;
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
-		if (contextMenu && contextMenu->dragEnd(x, y))
+		if (contextMenu && contextMenu->dragEnd(x, y)) {
 			return true;
+		}
 
-		if (autocompleteDropdown && autocompleteDropdown->dragEnd(x, y))
+		if (autocompleteDropdown && autocompleteDropdown->dragEnd(x, y)) {
 			return true;
+		}
 
-		if (auto pressed = getPressedWidget())
+		if (auto pressed = getPressedWidget()) {
 			return pressed->dragEnd(x, y);
+		}
 
 		for (const WidgetPtr &widget: extraDragUpdaters) {
 			widget->dragOrigin.reset();
@@ -196,20 +263,27 @@ namespace Game3 {
 		bool out = false;
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
+			if (dialog->contains(x, y)) {
+				out = true;
+			}
+
 			if (dialog->dragEnd(x, y)) {
 				out = true;
 				break;
 			}
 		}
 
+		Defer defer;
+
 		if (draggedWidget != nullptr && draggedWidgetActive) {
 			draggedWidget->dragEnd(x, y);
 			draggedWidgetActive = false;
-			setDraggedWidget(nullptr);
+			defer = [this] { setDraggedWidget(nullptr); };
 		}
 
-		if (!out)
+		if (!out) {
 			return hotbar->contains(x, y) && hotbar->dragEnd(x, y);
+		}
 
 		return true;
 	}
@@ -233,42 +307,48 @@ namespace Game3 {
 	}
 
 	bool UIContext::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
-		if (auto focused = getFocusedWidget())
-			if (focused->keyPressed(key, modifiers, is_repeat))
-				return true;
+		if (auto focused = getFocusedWidget(); focused && focused->keyPressed(key, modifiers, is_repeat)) {
+			return true;
+		}
 
-		if (auto context_menu = getContextMenu())
-			if (context_menu->keyPressed(key, modifiers, is_repeat))
-				return true;
+		if (auto context_menu = getContextMenu(); context_menu && context_menu->keyPressed(key, modifiers, is_repeat)) {
+			return true;
+		}
 
 		if (auto dialog = focusedDialog.lock()) {
-			if (dialog->keyPressed(key, modifiers, is_repeat))
+			if (dialog->keyPressed(key, modifiers, is_repeat)) {
 				return true;
+			}
 		} else {
-			for (const DialogPtr &dialog: reverse(dialogs))
-				if (dialog->keyPressed(key, modifiers, is_repeat))
+			for (const DialogPtr &dialog: reverse(dialogs)) {
+				if (dialog->keyPressed(key, modifiers, is_repeat)) {
 					return true;
+				}
+			}
 		}
 
 		return hotbar->keyPressed(key, modifiers, is_repeat);
 	}
 
 	bool UIContext::charPressed(uint32_t codepoint, Modifiers modifiers) {
-		if (auto focused = getFocusedWidget())
-			if (focused->charPressed(codepoint, modifiers))
-				return true;
+		if (auto focused = getFocusedWidget(); focused && focused->charPressed(codepoint, modifiers)) {
+			return true;
+		}
 
-		if (auto context_menu = getContextMenu())
-			if (context_menu->charPressed(codepoint, modifiers))
-				return true;
+		if (auto context_menu = getContextMenu(); context_menu && context_menu->charPressed(codepoint, modifiers)) {
+			return true;
+		}
 
 		if (auto dialog = focusedDialog.lock()) {
-			if (dialog->charPressed(codepoint, modifiers))
+			if (dialog->charPressed(codepoint, modifiers)) {
 				return true;
+			}
 		} else {
-			for (const DialogPtr &dialog: reverse(dialogs))
-				if (dialog->charPressed(codepoint, modifiers))
+			for (const DialogPtr &dialog: reverse(dialogs)) {
+				if (dialog->charPressed(codepoint, modifiers)) {
 					return true;
+				}
+			}
 		}
 
 		return hotbar->charPressed(codepoint, modifiers);
@@ -293,16 +373,18 @@ namespace Game3 {
 	void UIContext::focusWidget(const WidgetPtr &to_focus) {
 		auto locked = focusedWidget.lock();
 
-		if (to_focus == locked)
+		if (to_focus == locked) {
 			return;
+		}
 
 		if (locked)
 			locked->onBlur();
 
 		focusedWidget = to_focus;
 
-		if (to_focus)
+		if (to_focus) {
 			to_focus->onFocus();
+		}
 	}
 
 	WidgetPtr UIContext::getFocusedWidget() const {
@@ -326,16 +408,19 @@ namespace Game3 {
 	void UIContext::focusDialog(const DialogPtr &to_focus) {
 		auto locked = focusedDialog.lock();
 
-		if (to_focus == locked)
+		if (to_focus == locked) {
 			return;
+		}
 
-		if (locked)
+		if (locked) {
 			locked->onBlur();
+		}
 
 		focusedDialog = to_focus;
 
-		if (to_focus)
+		if (to_focus) {
 			to_focus->onFocus();
+		}
 	}
 
 	DialogPtr UIContext::getFocusedDialog() const {
@@ -436,10 +521,11 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<InventoryModule> UIContext::makePlayerInventoryModule() {
-		if (ClientPlayerPtr player = getPlayer())
-			return std::make_shared<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+		if (ClientPlayerPtr player = getPlayer()) {
+			return make<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+		}
 
-		return std::make_shared<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
+		return make<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {

@@ -6,12 +6,19 @@
 namespace Game3 {
 	class Defer {
 		public:
-			Defer(std::function<void()> function_): function(std::move(function_)) {
-				assert(function);
-			}
+			Defer(std::function<void()> function = {}):
+				function(std::move(function)) {}
 
 			~Defer() {
-				function();
+				if (function) {
+					function();
+				}
+			}
+
+			template <std::invocable T>
+			Defer & operator=(T new_function) {
+				function = std::move(new_function);
+				return *this;
 			}
 
 		private:

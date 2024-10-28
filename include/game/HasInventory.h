@@ -41,7 +41,7 @@ namespace Game3 {
 					buffer >> inventory;
 					assert(inventory);
 					if (inventory) {
-						inventory->weakOwner = getSharedAgent();
+						inventory->setOwner(getSharedAgent());
 						inventory->setSlotCount(slot_count); // Maybe not necessary? Try an assert before.
 						inventory->index = index;
 						setInventory(inventory, index);

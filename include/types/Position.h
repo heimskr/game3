@@ -26,7 +26,8 @@ namespace Game3 {
 		IntType column = 0;
 
 		Position() = default;
-		Position(IntType row_, IntType column_): row(row_), column(column_) {}
+		Position(IntType row, IntType column):
+			row(row), column(column) {}
 		Position(std::string_view);
 
 		inline bool operator==(const Position &other) const { return this == &other || (row == other.row && column == other.column); }
@@ -74,8 +75,8 @@ namespace Game3 {
 		std::shared_ptr<Realm> realm;
 		std::shared_ptr<Player> player;
 
-		Place(Position position_, std::shared_ptr<Realm> realm_, std::shared_ptr<Player> player_ = {}):
-			position(std::move(position_)), realm(std::move(realm_)), player(std::move(player_)) {}
+		Place(Position position, std::shared_ptr<Realm> realm, std::shared_ptr<Player> player = {}):
+			position(std::move(position)), realm(std::move(realm)), player(std::move(player)) {}
 
 		std::optional<TileID> get(Layer) const;
 		std::optional<std::reference_wrapper<const Identifier>> getName(Layer) const;
@@ -83,6 +84,7 @@ namespace Game3 {
 		void set(Layer, const Identifier &) const;
 		bool isPathable() const;
 		std::shared_ptr<TileEntity> getTileEntity() const;
+		Place withPosition(Position) const;
 
 		std::shared_ptr<Game> getGame() const;
 
@@ -112,18 +114,22 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const Vector3 &);
 	Buffer & operator>>(Buffer &, Vector3 &);
 
-	struct Vector2f {
+	struct Vector2d {
 		double x = 0;
 		double y = 0;
+
+		double magnitude() const;
 	};
 
-	Buffer & operator+=(Buffer &, const Vector2f &);
-	Buffer & operator<<(Buffer &, const Vector2f &);
-	Buffer & operator>>(Buffer &, Vector2f &);
+	Buffer & operator+=(Buffer &, const Vector2d &);
+	Buffer & operator<<(Buffer &, const Vector2d &);
+	Buffer & operator>>(Buffer &, Vector2d &);
 
 	struct Vector2i {
 		int x = 0;
 		int y = 0;
+
+		double magnitude() const;
 	};
 
 	Buffer & operator+=(Buffer &, const Vector2i &);
@@ -134,7 +140,7 @@ namespace Game3 {
 template <>
 struct std::hash<Game3::Position> {
 	size_t operator()(const Game3::Position &position) const noexcept {
-		return (static_cast<size_t>(position.row) * 1298758219ul) ^ static_cast<size_t>(position.column);
+		return (static_cast<size_t>(position.row) * 0x1f1f1f1f1f1f1f1fuz) ^ static_cast<size_t>(position.column);
 	}
 };
 
@@ -180,7 +186,7 @@ struct std::formatter<Game3::Vector3> {
 };
 
 template <>
-struct std::formatter<Game3::Vector2f> {
+struct std::formatter<Game3::Vector2d> {
 	constexpr auto parse(auto &ctx) {
 		return ctx.begin();
 	}

@@ -7,7 +7,7 @@
 #include "packet/ClickPacket.h"
 
 namespace Game3 {
-	void ClickPacket::handle(const std::shared_ptr<ServerGame> &, RemoteClient &client) {
+	void ClickPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
 		auto player = client.getPlayer();
 		if (!player)
 			return;

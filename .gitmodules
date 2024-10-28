@@ -16,3 +16,6 @@
 [submodule "voronoi"]
 	path = voronoi
 	url = https://github.com/JCash/voronoi.git
+[submodule "subprojects/zip8"]
+	path = subprojects/zip8
+	url = https://github.com/heimskr/zip8.git

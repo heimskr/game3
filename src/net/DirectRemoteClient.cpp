@@ -4,7 +4,7 @@
 #include "net/Server.h"
 
 namespace Game3 {
-	DirectRemoteClient::DirectRemoteClient(Server &server):
+	DirectRemoteClient::DirectRemoteClient(const ServerPtr &server):
 		GenericClient(server) {}
 
 	void DirectRemoteClient::start() {}
@@ -44,6 +44,13 @@ namespace Game3 {
 	}
 
 	void DirectRemoteClient::receive(const PacketPtr &packet) {
-		server.game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
+		ServerPtr server = getServer();
+
+		if (server == nullptr) {
+			WARN("DirectRemoteClient can't receive packet: server has expired");
+			return;
+		}
+
+		server->game->queuePacket(shared_from_this(), packet);
 	}
 }

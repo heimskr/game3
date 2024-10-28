@@ -40,9 +40,9 @@ namespace Game3 {
 			if (progress != lastReportedProgress || !tooltip->wasUpdatedBy(*this)) {
 				lastReportedProgress = progress;
 				tooltip->setText(std::format("{:.1f}%", progress * 100));
-				tooltip->setRegion(lastRectangle);
-				tooltip->show(*this);
 			}
+			tooltip->setRegion(lastRectangle);
+			tooltip->show(*this);
 		} else {
 			tooltip->hide(*this);
 			lastReportedProgress = -1;

@@ -13,6 +13,10 @@ namespace Game3 {
 			return;
 		}
 
+		sentPacketCounts.withUnique([&](std::map<PacketID, std::size_t> &counts) {
+			++counts[packet->getID()];
+		});
+
 		remote->receive(packet);
 	}
 
@@ -25,6 +29,10 @@ namespace Game3 {
 	}
 
 	void DirectLocalClient::receive(const PacketPtr &packet) {
+		receivedPacketCounts.withUnique([&](std::map<PacketID, std::size_t> &counts) {
+			++counts[packet->getID()];
+		});
+
 		getGame()->queuePacket(packet);
 	}
 }

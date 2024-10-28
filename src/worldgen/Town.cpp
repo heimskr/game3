@@ -5,6 +5,7 @@
 #include "tileentity/Building.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+#include "worldgen/Arcade.h"
 #include "worldgen/BlacksmithGen.h"
 #include "worldgen/Keep.h"
 #include "worldgen/House.h"
@@ -211,21 +212,29 @@ namespace Game3::WorldGen {
 				building_position = *buildable_set.begin();
 				switch (rng() % 8) {
 					case 0: {
-						static std::array<Identifier, 3> blacksmiths {"base:tile/blacksmith1", "base:tile/blacksmith2", "base:tile/blacksmith3"};
+						static const std::array blacksmiths {"base:tile/blacksmith1"_id, "base:tile/blacksmith2"_id, "base:tile/blacksmith3"_id};
 						gen_building(choose(blacksmiths), 9, 9, "base:realm/blacksmith", WorldGen::generateBlacksmith);
 						break;
 					}
 
 					case 1: {
-						static std::array<Identifier, 1> taverns {"base:tile/tavern1"};
+						static const std::array taverns {"base:tile/tavern1"_id};
 						constexpr size_t tavern_width  = 25;
 						constexpr size_t tavern_height = 15;
 						gen_building(choose(taverns), tavern_width, tavern_height, "base:realm/tavern", WorldGen::generateTavern, Position(tavern_height - 2, tavern_width / 2));
 						break;
 					}
 
+					case 2: {
+						static const std::array arcades{"base:tile/arcade1"_id};
+						constexpr size_t arcade_width  = 8;
+						constexpr size_t arcade_height = 8;
+						gen_building(choose(arcades), arcade_width, arcade_height, "base:realm/arcade", WorldGen::generateArcade, Position(arcade_height - 2, arcade_width / 2));
+						break;
+					}
+
 					default: {
-						static std::array<Identifier, 3> houses {"base:tile/house1", "base:tile/house2", "base:tile/house3"};
+						static const std::array houses{"base:tile/house1"_id, "base:tile/house2"_id, "base:tile/house3"_id};
 						gen_building(choose(houses), 9, 9, "base:realm/house", WorldGen::generateHouse);
 						break;
 					}

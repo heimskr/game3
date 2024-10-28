@@ -29,6 +29,7 @@ namespace Game3 {
 		addRealm.operator()<Cave>(Cave::ID());
 		addRealm.operator()<Realm>("base:realm/tavern");
 		addRealm.operator()<Realm>("base:realm/keep");
+		addRealm.operator()<Realm>("base:realm/arcade");
 		addRealm.operator()<ShipRealm>(ShipRealm::ID());
 	}
 
