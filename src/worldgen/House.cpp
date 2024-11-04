@@ -66,7 +66,7 @@ namespace Game3::WorldGen {
 					"cycles turn while the far stars burn\nand people and planets age\nlife's crown passes to younger lands\ntime sweeps dust of hope from her hands\nand turns another page",
 					"but we who feel the weight of the wheel, when winter falls over our world\ncan hope for tomorrow and raise our eyes\nto a silver moon in the open skies and a single flag unfurled",
 					"we know well what life can tell: if you will not perish, then grow\nand today our fragile flesh and steel have laid our hands on a vaster wheel\nwith all of the stars to know",
-					"for all who tried out of history's tide, a salute for the team that won\nand the old earth smiles at her children's reach\nthe wave that carried us up the beach\nto reach for the shining sun",
+					"from all who tried out of history's tide, a salute for the team that won\nand the old earth smiles at her children's reach\nthe wave that carried us up the beach\nto reach for the shining sun",
 				};
 
 				std::ranges::shuffle(texts, rng);
