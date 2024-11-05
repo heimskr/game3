@@ -4,7 +4,10 @@
 #include "minigame/Minigame.h"
 #include "types/UString.h"
 
+#include <chrono>
+
 namespace Game3 {
+	class ProgressBar;
 	class Texture;
 	class TextInput;
 
@@ -25,12 +28,24 @@ namespace Game3 {
 			struct Equation {
 				UString text;
 				int64_t answer;
-				std::size_t score;
+				std::size_t points;
+				double duration;
+				double secondsLeft;
+				std::chrono::system_clock::time_point generationTime;
+
+				Equation(UString text, int64_t answer, std::size_t points, double duration);
+
+				std::size_t getRemainingPoints() const;
 
 				static Equation generate();
 			};
 
+			Color equationColor;
 			std::optional<Equation> equation;
 			std::shared_ptr<TextInput> input;
+			std::shared_ptr<ProgressBar> bar;
+
+			void invalidInput();
+			void validInput();
 	};
 }
