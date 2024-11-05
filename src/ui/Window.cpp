@@ -30,8 +30,6 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
-#include "minigame/Breakout.h"
-
 #include <fstream>
 
 namespace Game3 {
@@ -393,13 +391,6 @@ namespace Game3 {
 
 		drawGL();
 	}
-
-	Breakout breakout = [] {
-		Breakout out;
-		out.setSize(600, 600);
-		out.reset();
-		return out;
-	}();
 
 	void Window::drawGL() {
 		const float x_factor = getXFactor();

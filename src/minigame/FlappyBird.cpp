@@ -18,9 +18,7 @@ namespace Game3 {
 		constexpr std::size_t FLAPPYBIRD_SCORE_MULTIPLIER = 500;
 	}
 
-	FlappyBird::FlappyBird() = default;
-
-	void FlappyBird::tick(UIContext &ui, double) {
+	void FlappyBird::tick(double) {
 		if (!cpu) {
 			return;
 		}
@@ -43,25 +41,25 @@ namespace Game3 {
 		}
 	}
 
-	void FlappyBird::render(UIContext &, const RendererContext &renderers) {
+	void FlappyBird::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		width = gameWidth;
+		height = gameHeight;
+
+		Minigame::render(renderers, x, y, width, height);
+
 		if (!cpu || !display) {
 			return;
 		}
 
 		renderers.singleSprite.drawOnScreen(display, RenderOptions{
-			.x = 0,
-			.y = 0,
+			.x = x,
+			.y = y,
 			.sizeX = -1,
 			.sizeY = -1,
 			.scaleX = static_cast<double>(UI_SCALE),
 			.scaleY = static_cast<double>(UI_SCALE),
 			.invertY = false,
 		});
-	}
-
-	void FlappyBird::setSize(int width, int height) {
-		gameWidth = width;
-		gameHeight = height;
 	}
 
 	void FlappyBird::reset() {

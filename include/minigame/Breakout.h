@@ -10,13 +10,13 @@ namespace Game3 {
 	class Breakout: public Minigame {
 		public:
 			static Identifier ID() { return {"base", "minigame/breakout"}; }
-			std::string getName() const final { return "Breakout"; }
+			std::string getGameName() const final { return "Breakout"; }
 
-			Breakout();
+			Breakout(UIContext &, float scale);
+			Breakout(UIContext &);
 
-			void tick(UIContext &, double delta) final;
-			void render(UIContext &, const RendererContext &) final;
-			void setSize(int width, int height) final;
+			void tick(double delta) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void reset() final;
 
 		private:

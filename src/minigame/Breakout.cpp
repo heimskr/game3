@@ -4,6 +4,7 @@
 #include "graphics/RendererContext.h"
 #include "minigame/Breakout.h"
 #include "packet/SubmitScorePacket.h"
+#include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
 #include "util/Math.h"
@@ -17,7 +18,8 @@ namespace Game3 {
 		constexpr int BREAKOUT_INITIAL_LIVES = 3;
 	}
 
-	Breakout::Breakout():
+	Breakout::Breakout(UIContext &ui, float scale):
+		Minigame(ui, scale),
 		ballSize(30),
 		blockWidth(50),
 		blockHeight(30),
@@ -27,7 +29,10 @@ namespace Game3 {
 		paddleSpeed(8),
 		rowCount(6) {}
 
-	void Breakout::tick(UIContext &ui, double delta) {
+	Breakout::Breakout(UIContext &ui):
+		Breakout(ui, UI_SCALE) {}
+
+	void Breakout::tick(double delta) {
 		if (submitQueued) {
 			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
 			submitQueued = false;
@@ -113,15 +118,20 @@ namespace Game3 {
 		}
 	}
 
-	void Breakout::render(UIContext &, const RendererContext &renderers) {
+	void Breakout::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		width = gameWidth;
+		height = gameHeight;
+
+		Widget::render(renderers, x, y, width, height);
+
 		TextRenderer &texter = renderers.text;
 		RectangleRenderer &rectangler = renderers.rectangle;
-		rectangler.drawOnScreen(BREAKOUT_BACKGROUND, 0, 0, gameWidth, gameHeight);
+		rectangler.drawOnScreen(BREAKOUT_BACKGROUND, x, y, gameWidth, gameHeight);
 
 		if (isGameOver) {
 			texter("GAME OVER", TextRenderOptions{
-				.x = static_cast<double>(gameWidth / 2),
-				.y = static_cast<double>(gameHeight / 2),
+				.x = x + static_cast<double>(gameWidth / 2),
+				.y = y + static_cast<double>(gameHeight / 2),
 				.color = BREAKOUT_FOREGROUND,
 				.align = TextAlign::Center,
 			});
@@ -129,32 +139,27 @@ namespace Game3 {
 		}
 
 		for (const Rectangle &block: blocks) {
-			rectangler.drawOnScreen(BREAKOUT_FOREGROUND, block);
+			rectangler.drawOnScreen(BREAKOUT_FOREGROUND, Rectangle(x, y) + block);
 		}
 
-		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, paddle);
-		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, Rectangle(ballPosition, ballSize));
+		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, Rectangle(x, y) + paddle);
+		rectangler.drawOnScreen(BREAKOUT_FOREGROUND, Rectangle(x, y) + Rectangle(ballPosition, ballSize));
 
 		texter(std::format("{}", score), TextRenderOptions{
-			.x = static_cast<double>(blockPadding),
-			.y = static_cast<double>(gameHeight - blockPadding),
+			.x = x + static_cast<double>(blockPadding),
+			.y = y + static_cast<double>(gameHeight - blockPadding),
 			.scaleX = 0.5,
 			.scaleY = 0.5,
 			.color = BREAKOUT_FOREGROUND,
 		});
 
-		int shrunk = ballSize * 0.5;
-		int x = gameWidth - shrunk - blockPadding;
+		const int shrunk = ballSize * 0.5;
+		x += gameWidth - shrunk - blockPadding;
 
 		for (int i = 0; i < lives; ++i) {
-			rectangler.drawOnScreen(BREAKOUT_FOREGROUND, x, gameHeight - blockPadding - shrunk, shrunk, shrunk);
+			rectangler.drawOnScreen(BREAKOUT_FOREGROUND, x, y + gameHeight - blockPadding - shrunk, shrunk, shrunk);
 			x -= shrunk + blockPadding;
 		}
-	}
-
-	void Breakout::setSize(int width, int height) {
-		gameWidth = width;
-		gameHeight = height;
 	}
 
 	void Breakout::reset() {

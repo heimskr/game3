@@ -20,6 +20,7 @@ namespace Game3 {
 		lastTime = std::chrono::system_clock::now();
 		minigame->setSize(width, height);
 		minigame->reset();
+		minigame->insertAtEnd(shared_from_this());
 	}
 
 	void MinigameDialog::render(const RendererContext &renderers) {
@@ -32,9 +33,7 @@ namespace Game3 {
 		auto now = std::chrono::system_clock::now();
 		double delta = std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastTime).count() / 1e9;
 		lastTime = now;
-		minigame->tick(ui, delta);
-
-		auto saver = ui.scissorStack.pushAbsolute(getInnerRectangle(), renderers);
-		minigame->render(ui, renderers);
+		minigame->tick(delta);
+		minigame->render(renderers, getInnerRectangle());
 	}
 }

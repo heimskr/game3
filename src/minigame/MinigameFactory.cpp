@@ -13,4 +13,8 @@ namespace Game3 {
 
 		return function(game, argument);
 	}
+
+	UIContext & MinigameFactory::getUIContext(ClientGame &game) {
+		return game.getUIContext();
+	}
 }

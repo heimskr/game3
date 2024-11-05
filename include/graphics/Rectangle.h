@@ -13,10 +13,10 @@ namespace Game3 {
 
 		Rectangle() = default;
 
-		Rectangle(int x, int y, int width, int height):
+		constexpr Rectangle(int x, int y, int width, int height):
 			x(x), y(y), width(width), height(height) {}
 
-		Rectangle(int x, int y):
+		constexpr Rectangle(int x, int y):
 			Rectangle(x, y, 0, 0) {}
 
 		Rectangle(Vector2d pos, int size):

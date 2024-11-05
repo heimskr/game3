@@ -10,10 +10,12 @@
 
 namespace Game3 {
 	class Game;
+	class UIContext;
 
 	class MinigameFactory: public NamedRegisterable {
 		private:
 			std::function<std::shared_ptr<Minigame>(const std::shared_ptr<ClientGame> &, const std::any &)> function;
+			static UIContext & getUIContext(ClientGame &);
 
 		public:
 			MinigameFactory(Identifier, decltype(function));
@@ -22,8 +24,10 @@ namespace Game3 {
 
 			template <typename T>
 			static MinigameFactory create(const Identifier &id = T::ID()) {
-				return {id, [](const std::shared_ptr<ClientGame> &, const std::any &) {
-					return std::make_shared<T>();
+				return {id, [](const std::shared_ptr<ClientGame> &game, const std::any &) {
+					auto out = std::make_shared<T>(getUIContext(*game));
+					out->init();
+					return out;
 				}};
 			}
 	};

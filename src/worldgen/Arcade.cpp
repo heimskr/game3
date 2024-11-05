@@ -27,17 +27,20 @@ namespace Game3::WorldGen {
 		realm->setTile(Layer::Submerged, {height - 2, 1}, choose(plants, rng), false);
 		realm->setTile(Layer::Submerged, {height - 2, width - 2}, choose(plants, rng), false);
 
-		for (Index column = 2; column < width - 2; ++column) {
-			Place place{Position{1, column}, realm};
+		for (Index row = 1; row <= 3; row += 2) {
+			for (Index column = 2; column < width - 2; ++column) {
+				Place place{Position{row, column}, realm};
 
-			static const std::array<std::tuple<Identifier, Identifier, int, int>, 2> machines{
-				std::tuple{"base:tile/arcade_machine_green", "base:minigame/breakout", 600, 600},
-				std::tuple{"base:tile/arcade_machine_red",   "base:minigame/flappy_bird", UI_SCALE * 64, UI_SCALE * 32},
-			};
+				static const std::array<std::tuple<Identifier, Identifier, int, int>, 3> machines{
+					std::tuple{"base:tile/arcade_machine_green", "base:minigame/breakout",    600, 600},
+					std::tuple{"base:tile/arcade_machine_red",   "base:minigame/flappy_bird", UI_SCALE * 64, UI_SCALE * 32},
+					std::tuple{"base:tile/arcade_machine_blue",  "base:minigame/math",        600, 600},
+				};
 
-			const auto &[tilename, minigame_name, game_width, game_height] = choose(machines);
+				const auto &[tilename, minigame_name, game_width, game_height] = choose(machines);
 
-			TileEntity::spawn<ArcadeMachine>(place, tilename, place.position, minigame_name, game_width, game_height);
+				TileEntity::spawn<ArcadeMachine>(place, tilename, place.position, minigame_name, game_width, game_height);
+			}
 		}
 	}
 }
