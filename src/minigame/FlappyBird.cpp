@@ -15,7 +15,12 @@ namespace Game3 {
 	namespace {
 		constexpr Color FLAPPYBIRD_FOREGROUND{"#425229"};
 		constexpr Color FLAPPYBIRD_BACKGROUND{"#ffffce"};
-		constexpr std::size_t FLAPPYBIRD_SCORE_MULTIPLIER = 500;
+		constexpr double FLAPPYBIRD_SCORE_MULTIPLIER = 100;
+		constexpr double FLAPPYBIRD_SCORE_POWER = 1.1;
+
+		constexpr std::size_t getScore(uint64_t flags) {
+			return static_cast<std::size_t>(std::pow(flags, FLAPPYBIRD_SCORE_POWER) * FLAPPYBIRD_SCORE_MULTIPLIER);
+		}
 	}
 
 	void FlappyBird::tick(double) {
@@ -30,8 +35,8 @@ namespace Game3 {
 
 		if (cpu->getFlagsDirty()) {
 			dirty = true;
-			score = cpu->getFlags() * FLAPPYBIRD_SCORE_MULTIPLIER;
-			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+			const uint64_t flags = cpu->getFlags();
+			ui.getGame()->send(make<SubmitScorePacket>(ID(), getScore(flags)));
 			cpu->clearFlagsDirty();
 		}
 
