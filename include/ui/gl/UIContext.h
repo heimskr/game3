@@ -74,7 +74,7 @@ namespace Game3 {
 			int getWidth() const;
 			int getHeight() const;
 			void removeDialog(const DialogPtr &);
-			void addDialog(DialogPtr);
+			void addDialog(const DialogPtr &);
 			const std::optional<std::pair<int, int>> & getDragOrigin() const;
 			std::shared_ptr<ContextMenu> getContextMenu() const;
 			std::shared_ptr<Hotbar> getHotbar() const;
@@ -98,6 +98,7 @@ namespace Game3 {
 				auto dialog = std::make_shared<T>(*this, std::forward<Args>(args)...);
 				dialog->init();
 				dialogs.emplace_back(dialog);
+				focusDialog(dialog);
 			}
 
 		private:

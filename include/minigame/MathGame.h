@@ -23,6 +23,7 @@ namespace Game3 {
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void setSize(int width, int height) final;
 			void reset() final;
+			void onFocus() final;
 
 		private:
 			struct Equation {

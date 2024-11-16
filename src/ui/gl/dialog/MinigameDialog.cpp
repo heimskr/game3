@@ -11,6 +11,7 @@ namespace Game3 {
 		width(width),
 		height(height),
 		minigame(std::move(minigame)) {
+			assert(this->minigame != nullptr);
 			setTitle(this->minigame->getName());
 		}
 
@@ -35,5 +36,13 @@ namespace Game3 {
 		lastTime = now;
 		minigame->tick(delta);
 		minigame->render(renderers, getInnerRectangle());
+	}
+
+	void MinigameDialog::onFocus() {
+		minigame->onFocus();
+	}
+
+	void MinigameDialog::onBlur() {
+		minigame->onBlur();
 	}
 }

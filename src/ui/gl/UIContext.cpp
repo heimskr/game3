@@ -504,8 +504,9 @@ namespace Game3 {
 		}
 	}
 
-	void UIContext::addDialog(DialogPtr dialog) {
-		dialogs.emplace_back(std::move(dialog));
+	void UIContext::addDialog(const DialogPtr &dialog) {
+		dialogs.emplace_back(dialog);
+		focusDialog(dialog);
 	}
 
 	const std::optional<std::pair<int, int>> & UIContext::getDragOrigin() const {

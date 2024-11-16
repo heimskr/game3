@@ -130,6 +130,10 @@ namespace Game3 {
 		validInput();
 	}
 
+	void MathGame::onFocus() {
+		ui.focusWidget(input);
+	}
+
 	MathGame::Equation::Equation(UString text, int64_t answer, std::size_t points, double duration):
 		text(std::move(text)),
 		answer(answer),
