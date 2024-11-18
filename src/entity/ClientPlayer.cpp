@@ -15,6 +15,8 @@
 #include "threading/ThreadContext.h"
 #include "ui/Window.h"
 
+#include <cmath>
+
 namespace Game3 {
 	namespace {
 		inline Tick getMaxMessageAge(ClientGame &game) {
@@ -94,6 +96,30 @@ namespace Game3 {
 				.align = TextAlign::Center,
 			});
 		}
+
+		constexpr double thickness = 5 / 16.;
+		constexpr double shrink = 16 / 16.;
+		Vector2d target(4.5, 1.5);
+		Vector2d diff = Vector2d(getPosition()) + Vector2d(offset.x + 0.5, offset.y - offset.z + 0.5) - target;
+		Vector2d midpoint = target + diff / 2.0;
+		double degrees = diff.atan2() * 180 / M_PI;
+		double distance = diff.magnitude();
+		renderers.rectangle.drawOnMap(RenderOptions{
+			.x = midpoint.x - distance / 2 + shrink / 2,
+			.y = midpoint.y - thickness / 2,
+			.sizeX = distance - shrink,
+			.sizeY = thickness,
+			.angle = degrees,
+			.color = Color{"#fa4d10bd"},
+		});
+
+		renderers.singleSprite.drawOnMap(cacheTexture("resources/sticky_hand.png"), RenderOptions {
+			.x = target.x - 0.5,
+			.y = target.y - 0.5,
+			.sizeX = -1,
+			.sizeY = -1,
+			.angle = degrees,
+		});
 
 		text.drawOnMap(displayName, {
 			.x = float(column) + x + .5,

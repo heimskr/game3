@@ -79,7 +79,7 @@ namespace Game3 {
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color{1.f, 1.f, 1.f, float(alpha)},
+			.color{1.f, 1.f, 1.f, static_cast<float>(alpha)},
 		});
 	}
 
@@ -121,9 +121,11 @@ namespace Game3 {
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * options.scaleX, y - options.offsetY * window->scale * options.scaleY, 0.));
 		if (options.angle != 0) {
-			model = glm::translate(model, glm::vec3(.5 * texture->width, .5 * texture->height, 0.)); // move origin of rotation to center of quad
-			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-			model = glm::translate(model, glm::vec3(-.5 * texture->width, -.5 * texture->height, 0.)); // move origin back
+			const float xs = texture->width * options.scaleX * window->scale / 4.;
+			const float ys = texture->height * options.scaleY * window->scale / 4.;
+			model = glm::translate(model, glm::vec3(xs, ys, 0.)); // move origin of rotation to center of quad
+			model = glm::rotate(model, static_cast<float>(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
+			model = glm::translate(model, glm::vec3(-xs, -ys, 0.)); // move origin back
 		}
 		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * window->scale / 2., texture->height * options.scaleY * window->scale / 2., 2.)); // last scale
 
@@ -195,9 +197,11 @@ namespace Game3 {
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * x_scale, y - options.offsetY * window->scale * y_scale, 0.));
 		if (options.angle != 0) {
-			model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.)); // move origin of rotation to center of quad
-			model = glm::rotate(model, float(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-			model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.)); // move origin back
+			const float xs = texture_width * x_scale * window->scale / 4.;
+			const float ys = texture_height * y_scale * window->scale / 4.;
+			model = glm::translate(model, glm::vec3(xs, ys, 0.)); // move origin of rotation to center of quad
+			model = glm::rotate(model, static_cast<float>(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
+			model = glm::translate(model, glm::vec3(-xs, -ys, 0.)); // move origin back
 		}
 		model = glm::scale(model, glm::vec3(texture_width * x_scale * window->scale / 2., texture_height * y_scale * window->scale / 2., 2.)); // last scale
 
@@ -332,7 +336,7 @@ namespace Game3 {
 			model = glm::scale(model, glm::vec3(1., -1., 1.));
 		if (options.angle != 0)  {
 			model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.f));
-			model = glm::rotate   (model, float(glm::radians(options.angle)), glm::vec3(0.f, 0.f, 1.f));
+			model = glm::rotate   (model, static_cast<float>(glm::radians(options.angle)), glm::vec3(0.f, 0.f, 1.f));
 			model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.f));
 		}
 		model = glm::scale(model, glm::vec3(texture_width * options.scaleX, texture_height * options.scaleY, 1.f));

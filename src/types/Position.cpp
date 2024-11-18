@@ -307,8 +307,40 @@ namespace Game3 {
 		return buffer;
 	}
 
+	Vector2d::Vector2d() = default;
+
+	Vector2d::Vector2d(double x, double y):
+		x(x), y(y) {}
+
+	Vector2d::Vector2d(Position position):
+		x(position.column), y(position.row) {}
+
 	double Vector2d::magnitude() const {
 		return std::sqrt(x * x + y * y);
+	}
+
+	bool Vector2d::operator==(const Vector2d &other) const {
+		return this == &other || (x == other.x && y == other.y);
+	}
+
+	Vector2d & Vector2d::operator+=(const Vector2d &other) {
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	Vector2d & Vector2d::operator-=(const Vector2d &other) {
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
+	Vector2d Vector2d::operator+(const Vector2d &other) const {
+		return {x + other.x, y + other.y};
+	}
+
+	Vector2d Vector2d::operator-(const Vector2d &other) const {
+		return {x - other.x, y - other.y};
 	}
 
 	template <>

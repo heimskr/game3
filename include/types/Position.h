@@ -3,6 +3,7 @@
 #include "types/Direction.h"
 #include "types/Layer.h"
 #include "types/Types.h"
+#include "util/Concepts.h"
 
 #include <cmath>
 #include <functional>
@@ -118,7 +119,33 @@ namespace Game3 {
 		double x = 0;
 		double y = 0;
 
+		Vector2d();
+		Vector2d(double x, double y);
+		Vector2d(Position);
+
 		double magnitude() const;
+
+		bool operator==(const Vector2d &) const;
+
+		Vector2d & operator+=(const Vector2d &);
+		Vector2d & operator-=(const Vector2d &);
+		Vector2d operator+(const Vector2d &) const;
+		Vector2d operator-(const Vector2d &) const;
+
+		template <Numeric N>
+		Vector2d operator/(N divisor) const {
+			return {x / divisor, y / divisor};
+		}
+
+		template <Numeric N>
+		Vector2d operator*(N divisor) const {
+			return {x * divisor, y * divisor};
+		}
+
+		/** Returns an angle in radians. */
+		double atan2() const {
+			return std::atan2(y, x);
+		}
 	};
 
 	Buffer & operator+=(Buffer &, const Vector2d &);
