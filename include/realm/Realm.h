@@ -172,6 +172,7 @@ namespace Game3 {
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			bool isPathable(const Position &) const;
 			void setPathable(const Position &, bool);
+			uint64_t getPathmapUpdateCounter(ChunkPosition);
 			bool hasTileEntityAt(const Position &) const;
 			void damageGround(const Position &);
 			Tileset & getTileset() const;

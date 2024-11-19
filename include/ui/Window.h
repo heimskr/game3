@@ -62,9 +62,10 @@ namespace Game3 {
 			Recolor recolor{*this};
 			Multiplier multiplier;
 			Overlayer overlayer;
-			GL::Texture mainTexture;
+			GL::Texture mainGLTexture;
 			GL::Texture staticLightingTexture;
 			GL::Texture dynamicLightingTexture;
+			TexturePtr mainTexture;
 			GL::FBO fbo;
 			Rectangle realmBounds;
 			bool autofocus = true;

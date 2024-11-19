@@ -39,6 +39,7 @@ namespace Game3 {
 			bool onBackbufferResized(int width, int height);
 			void setChunk(TileChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);
+			ChunkPosition getChunkPosition() const;
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
 
 			void snooze();

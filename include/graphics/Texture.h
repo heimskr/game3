@@ -7,6 +7,10 @@
 #include <filesystem>
 #include <span>
 
+namespace GL {
+	class Texture;
+}
+
 namespace Game3 {
 	class Texture: public NamedRegisterable {
 		public:
@@ -30,7 +34,9 @@ namespace Game3 {
 
 			void init();
 			void init(std::shared_ptr<uint8_t[]>, int data_width, int data_height);
+			void init(std::span<const uint8_t>, int data_width, int data_height);
 			void init(int data_width, int data_height);
+			void init(const GL::Texture &);
 			bool upload(std::span<const uint8_t>);
 			void bind(int bind_id = -1);
 			bool getValid() const { return valid; }

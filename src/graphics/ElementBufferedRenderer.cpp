@@ -188,6 +188,10 @@ namespace Game3 {
 		}
 	}
 
+	ChunkPosition ElementBufferedRenderer::getChunkPosition() const {
+		return chunkPosition.copyBase();
+	}
+
 	void ElementBufferedRenderer::snooze() {
 		reset();
 	}

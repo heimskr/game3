@@ -1186,8 +1186,19 @@ namespace Game3 {
 	}
 
 	void Realm::setPathable(const Position &position, bool pathable) {
-		std::unique_lock<std::shared_mutex> lock;
-		tileProvider.findPathState(position, &lock) = pathable;
+		Chunk<uint8_t> &chunk = tileProvider.getPathChunk(position.getChunk());
+		auto lock = chunk.uniqueLock();
+		uint8_t &stored = TileProvider::access(chunk, TileProvider::remainder(position.row), TileProvider::remainder(position.column));
+		if (stored != pathable) {
+			stored = pathable;
+			++chunk.updateCounter;
+		}
+	}
+
+	uint64_t Realm::getPathmapUpdateCounter(ChunkPosition chunk_position) {
+		Chunk<uint8_t> &chunk = tileProvider.getPathChunk(chunk_position);
+		auto lock = chunk.sharedLock();
+		return chunk.updateCounter;
 	}
 
 	void Realm::updateNeighbors(const Position &position, Layer layer, TileUpdateContext context) {

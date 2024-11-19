@@ -453,8 +453,8 @@ namespace Game3 {
 			const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
 			const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
 
-			if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
-				mainTexture.initRGBA(width, height, GL_NEAREST);
+			if (mainGLTexture.getWidth() != width || mainGLTexture.getHeight() != height) {
+				mainGLTexture.initRGBA(width, height, GL_NEAREST);
 				staticLightingTexture.initRGBA(x_static_size, y_static_size, GL_NEAREST);
 				dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
 				scratchTexture.initRGBA(width, height, GL_NEAREST);
@@ -466,6 +466,9 @@ namespace Game3 {
 				if (realm) {
 					realm->queueStaticLightingTexture();
 				}
+
+				mainTexture = std::make_shared<Texture>();
+				mainTexture->init(mainGLTexture);
 			}
 
 			bool do_lighting = settings.withShared([&](auto &settings) {
@@ -473,16 +476,49 @@ namespace Game3 {
 			});
 
 			if (realm) {
-				if (do_lighting) {
+				if (true) {
+					RendererContext context = getRendererContext();
 					GL::FBOBinder binder = fbo.getBinder();
-					mainTexture.useInFB();
+					mainGLTexture.useInFB();
+					glViewport(0, 0, width, height); CHECKGL
+					GL::clear(.2, .2, .2);
+					context.updateSize(width, height);
+
+					if (realm->prerender()) {
+						mainGLTexture.useInFB();
+						batchSpriteRenderer.update(*this);
+						singleSpriteRenderer.update(*this);
+						recolor.update(*this);
+						textRenderer.update(*this);
+						context.updateSize(getWidth(), getHeight());
+						glViewport(0, 0, width, height); CHECKGL
+					}
+
+					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
+
+					binder.undo();
+
+					context.updateSize(width, height);
+					glViewport(0, 0, width, height); CHECKGL
+
+					singleSpriteRenderer.drawOnScreen(mainTexture, RenderOptions{
+						.x = 0,
+						.y = double(height),
+						.sizeX = -1,
+						.sizeY = -1,
+						.color{0.25, 0.25, 1.5},
+						.invertY = true,
+					});
+				} else if (do_lighting) {
+					GL::FBOBinder binder = fbo.getBinder();
+					mainGLTexture.useInFB();
 					glViewport(0, 0, width, height); CHECKGL
 					GL::clear(.2, .2, .2);
 					RendererContext context = getRendererContext();
 					context.updateSize(width, height);
 
 					if (realm->prerender()) {
-						mainTexture.useInFB();
+						mainGLTexture.useInFB();
 						batchSpriteRenderer.update(*this);
 						singleSpriteRenderer.update(*this);
 						recolor.update(*this);
@@ -528,7 +564,7 @@ namespace Game3 {
 
 					context.updateSize(width, height);
 					glViewport(0, 0, width, height); CHECKGL
-					multiplier(mainTexture, scratchTexture);
+					multiplier(mainGLTexture, scratchTexture);
 				} else {
 					RendererContext context = getRendererContext();
 					glViewport(0, 0, width, height); CHECKGL

@@ -110,7 +110,7 @@ namespace Game3 {
 			/** Stops iterating if the function returns true. */
 			template <typename Fn>
 			requires(Returns<Fn, bool, ChunkPosition>)
-			void iterate(const Fn &fn) const {
+			void iterate(Fn &&fn) const {
 				for (auto y = topLeft.y; y <= bottomRight.y; ++y)
 					for (auto x = topLeft.x; x <= bottomRight.x; ++x)
 						if (fn(ChunkPosition{x, y}))

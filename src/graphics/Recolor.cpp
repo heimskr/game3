@@ -131,7 +131,10 @@ namespace Game3 {
 		shader.set("mask", 1);
 
 		texture->bind(0);
-		mask->bind(1);
+
+		if (mask) {
+			mask->bind(1);
+		}
 
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL

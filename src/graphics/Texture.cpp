@@ -19,6 +19,13 @@
 namespace Game3 {
 	static constexpr GLint DEFAULT_FILTER = GL_NEAREST;
 
+	static void setParameters(GLint filter) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+	}
+
 	Texture::Texture(Identifier identifier, bool alpha, int filter):
 		Texture(std::move(identifier), std::filesystem::path{}, alpha, filter) {}
 
@@ -55,10 +62,7 @@ namespace Game3 {
 		glGenTextures(1, &id); CHECKGL
 		assert(id != 0);
 		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+		setParameters(filter);
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
 		valid = true;
 	}
@@ -75,11 +79,32 @@ namespace Game3 {
 		assert(id != 0);
 		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.get()); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter); CHECKGL
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter); CHECKGL
+		setParameters(filter);
 		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+		valid = true;
+	}
+
+	void Texture::init(std::span<const uint8_t> span, int data_width, int data_height) {
+		width = data_width;
+		height = data_height;
+		glGenTextures(1, &id); CHECKGL
+		assert(id != 0);
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, span.data()); CHECKGL
+		setParameters(filter);
+		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+		valid = true;
+	}
+
+	void Texture::init(const GL::Texture &from) {
+		if (valid) {
+			return;
+		}
+
+		width = from.getWidth();
+		height = from.getHeight();
+		id = from.getHandle();
+
 		valid = true;
 	}
 
