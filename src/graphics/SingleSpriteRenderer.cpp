@@ -6,6 +6,7 @@
 #include "game/ClientGame.h"
 #include "graphics/GL.h"
 #include "graphics/SingleSpriteRenderer.h"
+#include "graphics/Util.h"
 #include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
@@ -84,13 +85,12 @@ namespace Game3 {
 	}
 
 	void SingleSpriteRenderer::drawOnMap(const TexturePtr &texture, const RenderOptions &options) {
-		if (!initialized)
+		if (!initialized) {
 			return;
+		}
 
 		auto size_x = options.sizeX;
 		auto size_y = options.sizeY;
-		auto x = options.x;
-		auto y = options.y;
 
 		if (size_x < 0)
 			size_x = texture->width;
@@ -99,40 +99,13 @@ namespace Game3 {
 
 		assert(window != nullptr);
 		RealmPtr realm = window->game->getActiveRealm();
-		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*window->game);
-		const auto tile_size   = tileset->getTileSize();
-		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * window->scale / 2.;
-		y *= tile_size * window->scale / 2.;
-
-		x += window->getWidth() / 2.;
-		x -= map_length * tile_size * window->scale / window->magic * 2.; // TODO: the math here is a little sus... things might cancel out
-		x += window->center.first * window->scale * tile_size / 2.;
-
-		y += window->getHeight() / 2.;
-		y -= map_length * tile_size * window->scale / window->magic * 2.;
-		y += window->center.second * window->scale * tile_size / 2.;
-
-		shader.bind();
-
-		glm::mat4 model = glm::mat4(1.);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * options.scaleX, y - options.offsetY * window->scale * options.scaleY, 0.));
-		if (options.angle != 0) {
-			const float xs = texture->width * options.scaleX * window->scale / 4.;
-			const float ys = texture->height * options.scaleY * window->scale / 4.;
-			model = glm::translate(model, glm::vec3(xs, ys, 0.)); // move origin of rotation to center of quad
-			model = glm::rotate(model, static_cast<float>(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-			model = glm::translate(model, glm::vec3(-xs, -ys, 0.)); // move origin back
-		}
-		model = glm::scale(model, glm::vec3(texture->width * options.scaleX * window->scale / 2., texture->height * options.scaleY * window->scale / 2., 2.)); // last scale
-
-		shader.set("model", model);
-		shader.set("spriteColor", options.color);
 		const double multiplier_x = 2. / texture->width;
 		const double multiplier_y = 2. / texture->height;
+
+		shader.bind();
+		shader.set("model", makeMapModel(options, texture->width, texture->height, realm->getTileset(), *window));
+		shader.set("spriteColor", options.color);
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);
 
 		texture->bind(0);
@@ -146,14 +119,12 @@ namespace Game3 {
 
 	// TODO: share the bulk of the code with the `const TexturePtr &` override.
 	void SingleSpriteRenderer::drawOnMap(GL::Texture &texture, const RenderOptions &options) {
-		if (!initialized)
+		if (!initialized) {
 			return;
+		}
 
 		auto size_x = options.sizeX;
 		auto size_y = options.sizeY;
-		auto x = options.x;
-		auto y = options.y;
-
 		const GLsizei texture_width = texture.getWidth();
 		const GLsizei texture_height = texture.getHeight();
 
@@ -164,51 +135,13 @@ namespace Game3 {
 
 		assert(window != nullptr);
 		RealmPtr realm = window->game->getActiveRealm();
-		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*window->game);
-		const auto tile_size   = tileset->getTileSize();
-		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 
-		x *= tile_size * window->scale / 2.;
-		y *= tile_size * window->scale / 2.;
-
-		const double x_scale = options.scaleX;
-		const double y_scale = options.scaleY;
-		auto viewport_x = options.viewportX;
-		auto viewport_y = options.viewportY;
-
-		if (viewport_x < 0)
-			viewport_x *= -window->getWidth();
-
-		if (viewport_y < 0)
-			viewport_y *= -window->getHeight();
-
-		x += viewport_x / 2.;
-		x -= map_length * tile_size * window->scale / 4.; // TODO: the math here is a little sus... things might cancel out
-		x += window->center.first * window->scale * tile_size / 2.;
-
-		y += viewport_y / 2.;
-		y -= map_length * tile_size * window->scale / 4.;
-		y += window->center.second * window->scale * tile_size / 2.;
-
-		shader.bind();
-
-		glm::mat4 model = glm::mat4(1.);
-		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - options.offsetX * window->scale * x_scale, y - options.offsetY * window->scale * y_scale, 0.));
-		if (options.angle != 0) {
-			const float xs = texture_width * x_scale * window->scale / 4.;
-			const float ys = texture_height * y_scale * window->scale / 4.;
-			model = glm::translate(model, glm::vec3(xs, ys, 0.)); // move origin of rotation to center of quad
-			model = glm::rotate(model, static_cast<float>(glm::radians(options.angle)), glm::vec3(0., 0., 1.)); // then rotate
-			model = glm::translate(model, glm::vec3(-xs, -ys, 0.)); // move origin back
-		}
-		model = glm::scale(model, glm::vec3(texture_width * x_scale * window->scale / 2., texture_height * y_scale * window->scale / 2., 2.)); // last scale
-
-		shader.set("model", model);
-		shader.set("spriteColor", options.color);
 		const double multiplier_x = 2. / texture_width;
 		const double multiplier_y = 2. / texture_height;
+
+		shader.bind();
+		shader.set("model", makeMapModel(options, texture_width, texture_height, realm->getTileset(), *window));
+		shader.set("spriteColor", options.color);
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture_width, size_y / texture_width);
 
 		texture.bind(0);
@@ -234,6 +167,7 @@ namespace Game3 {
 			0, 1, 0, 1,
 			1, 0, 1, 0,
 			0, 0, 0, 0,
+
 			0, 1, 0, 1,
 			1, 1, 1, 1,
 			1, 0, 1, 0

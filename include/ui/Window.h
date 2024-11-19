@@ -8,9 +8,11 @@
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"
 #include "graphics/Overlayer.h"
+#include "graphics/PathmapTextureCache.h"
 #include "graphics/Recolor.h"
 #include "graphics/Rectangle.h"
 #include "graphics/RectangleRenderer.h"
+#include "graphics/Reshader.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "threading/Lockable.h"
@@ -60,6 +62,7 @@ namespace Game3 {
 			RectangleRenderer rectangleRenderer{*this};
 			CircleRenderer circleRenderer{*this};
 			Recolor recolor{*this};
+			Reshader causticsShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
 			GL::Texture mainGLTexture;
@@ -144,8 +147,10 @@ namespace Game3 {
 			MTQueue<std::function<void(Window &)>> functionQueue;
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
 			GL::Texture scratchTexture;
+			TexturePtr causticsTexture;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
+			PathmapTextureCache pathmapTextureCache;
 			std::pair<int, int> lastWindowSize{-1, -1};
 			Modifiers lastModifiers;
 			std::optional<std::pair<int, int>> clickPosition;

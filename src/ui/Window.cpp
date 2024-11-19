@@ -77,7 +77,8 @@ namespace Game3 {
 
 	Window::Window(GLFWwindow &glfw_window):
 		glfwWindow(&glfw_window),
-		scale(8) {
+		scale(8),
+		causticsShader(readFile("resources/caustics.frag")) {
 			glfwSetWindowUserPointer(glfwWindow, this);
 
 			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
@@ -408,6 +409,12 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
+		if (!causticsTexture) {
+			causticsTexture = cacheTexture("resources/caustic.png", false);
+			causticsTexture->init();
+			causticsTexture->repeat();
+		}
+
 		if (game != nullptr && game->getPlayer() != nullptr) {
 			game->iterateRealms([](const RealmPtr &realm) {
 				if (!realm->renderersReady) {
@@ -500,6 +507,7 @@ namespace Game3 {
 
 					context.updateSize(width, height);
 					glViewport(0, 0, width, height); CHECKGL
+					causticsShader.update(width, height);
 
 					singleSpriteRenderer.drawOnScreen(mainTexture, RenderOptions{
 						.x = 0,
@@ -509,6 +517,30 @@ namespace Game3 {
 						.color{0.25, 0.25, 1.5},
 						.invertY = true,
 					});
+
+					if (ClientPlayerPtr player = game->getPlayer()) {
+						pathmapTextureCache.updateRealm(realm);
+						pathmapTextureCache.visitChunk(player->getChunk());
+						ChunkRange(player->getChunk()).iterate([&](ChunkPosition visible_chunk) {
+							if (TexturePtr pathmap = pathmapTextureCache.getTexture(visible_chunk)) {
+								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
+									// pathmap->bind(2);
+									// shader.set("pathmap", 2);
+
+									shader.set("time", static_cast<GLfloat>(std::remainder(game->time.load(), 1e6)));
+								};
+
+								const auto [row, column] = visible_chunk.topLeft();
+
+								causticsShader.drawOnMap(causticsTexture, RenderOptions{
+									.x = static_cast<double>(column),
+									.y = static_cast<double>(row),
+									.sizeX = static_cast<double>(CHUNK_SIZE * 16),
+									.sizeY = static_cast<double>(CHUNK_SIZE * 16),
+								}, realm->getTileset(), *this);
+							};
+						});
+					}
 				} else if (do_lighting) {
 					GL::FBOBinder binder = fbo.getBinder();
 					mainGLTexture.useInFB();
@@ -854,8 +886,8 @@ namespace Game3 {
 		lastModifiers = Modifiers(mods);
 
 		const auto [x_pos, y_pos] = getMouseCoordinates<double>();
-		const auto x = static_cast<int>(std::floor(x_pos));
-		const auto y = static_cast<int>(std::floor(y_pos));
+		const int x = static_cast<int>(std::floor(x_pos));
+		const int y = static_cast<int>(std::floor(y_pos));
 
 		if (action == GLFW_PRESS) {
 			heldMouseButton = button;

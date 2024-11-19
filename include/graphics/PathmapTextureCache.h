@@ -23,7 +23,10 @@ namespace Game3 {
 
 			void visitChunk(ChunkPosition);
 
-			void addChunk(ChunkPosition);
+			void addChunk(ChunkPosition, bool force);
+
+			/** Will return nullptr if the chunk position isn't in the cache. */
+			std::shared_ptr<Texture> getTexture(ChunkPosition) const;
 
 			std::shared_ptr<Texture> generateTexture(ChunkPosition);
 

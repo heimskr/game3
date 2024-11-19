@@ -96,6 +96,17 @@ namespace Game3 {
 		valid = true;
 	}
 
+	void Texture::repeat() {
+		if (id == 0) {
+			return;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, id); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); CHECKGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); CHECKGL
+		glBindTexture(GL_TEXTURE_2D, 0); CHECKGL
+	}
+
 	void Texture::init(const GL::Texture &from) {
 		if (valid) {
 			return;

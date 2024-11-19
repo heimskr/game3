@@ -37,6 +37,7 @@ namespace Game3 {
 			void init(std::span<const uint8_t>, int data_width, int data_height);
 			void init(int data_width, int data_height);
 			void init(const GL::Texture &);
+			void repeat();
 			bool upload(std::span<const uint8_t>);
 			void bind(int bind_id = -1);
 			bool getValid() const { return valid; }

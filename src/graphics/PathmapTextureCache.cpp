@@ -2,6 +2,7 @@
 #include "graphics/PathmapTextureCache.h"
 #include "graphics/Texture.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 
 #include <cassert>
 
@@ -22,6 +23,14 @@ namespace Game3 {
 
 	void PathmapTextureCache::visitChunk(ChunkPosition chunk_position) {
 		if (lastChunk == chunk_position) {
+			assert(realm != nullptr);
+			ChunkRange(chunk_position).iterate([this](ChunkPosition neighbor) {
+				if (auto iter = dataMap.find(neighbor); iter != dataMap.end()) {
+					if (realm->getPathmapUpdateCounter(neighbor) > iter->second.pathUpdateCounter) {
+						addChunk(neighbor, true);
+					}
+				}
+			});
 			return;
 		}
 
@@ -32,13 +41,26 @@ namespace Game3 {
 		});
 
 		ChunkRange(chunk_position).iterate([this](ChunkPosition neighbor) {
-			addChunk(neighbor);
+			addChunk(neighbor, false);
 		});
 	}
 
-	void PathmapTextureCache::addChunk(ChunkPosition chunk_position) {
+	void PathmapTextureCache::addChunk(ChunkPosition chunk_position, bool force) {
 		assert(realm != nullptr);
-		dataMap[chunk_position] = {generateTexture(chunk_position), realm->getPathmapUpdateCounter(chunk_position)};
+		auto iter = dataMap.find(chunk_position);
+		if (iter == dataMap.end()) {
+			dataMap.try_emplace(chunk_position, generateTexture(chunk_position), realm->getPathmapUpdateCounter(chunk_position));
+		} else if (force) {
+			iter->second = {generateTexture(chunk_position), realm->getPathmapUpdateCounter(chunk_position)};
+		}
+	}
+
+	TexturePtr PathmapTextureCache::getTexture(ChunkPosition chunk_position) const {
+		if (auto iter = dataMap.find(chunk_position); iter != dataMap.end()) {
+			return iter->second.texture;
+		}
+
+		return nullptr;
 	}
 
 	TexturePtr PathmapTextureCache::generateTexture(ChunkPosition chunk_position) {
@@ -46,7 +68,7 @@ namespace Game3 {
 		TexturePtr texture = std::make_shared<Texture>(Identifier{}, false, -1);
 		texture->format = GL_RED;
 
-		const Chunk<uint8_t> &chunk = realm->tileProvider.getPathChunk(chunk_position);
+		Chunk<uint8_t> &chunk = realm->tileProvider.getPathChunk(chunk_position);
 		auto lock = chunk.sharedLock();
 		texture->init(chunk, CHUNK_SIZE, CHUNK_SIZE);
 		return texture;
