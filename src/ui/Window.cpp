@@ -524,9 +524,8 @@ namespace Game3 {
 						ChunkRange(player->getChunk()).iterate([&](ChunkPosition visible_chunk) {
 							if (TexturePtr pathmap = pathmapTextureCache.getTexture(visible_chunk)) {
 								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
-									// pathmap->bind(2);
-									// shader.set("pathmap", 2);
-
+									pathmap->bind(2);
+									shader.set("pathmap", 2);
 									shader.set("time", static_cast<GLfloat>(std::remainder(game->time.load(), 1e6)));
 								};
 

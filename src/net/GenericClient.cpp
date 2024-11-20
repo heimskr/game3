@@ -22,8 +22,9 @@ namespace Game3 {
 		assert(server != nullptr);
 		assert(server->game != nullptr);
 
-		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold)
+		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold) {
 			return;
+		}
 
 		try {
 			realm.sendToOne(*this, chunk_position);

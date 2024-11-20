@@ -29,6 +29,8 @@ namespace Game3 {
 					if (realm->getPathmapUpdateCounter(neighbor) > iter->second.pathUpdateCounter) {
 						addChunk(neighbor, true);
 					}
+				} else {
+					addChunk(neighbor, false);
 				}
 			});
 			return;
@@ -49,9 +51,15 @@ namespace Game3 {
 		assert(realm != nullptr);
 		auto iter = dataMap.find(chunk_position);
 		if (iter == dataMap.end()) {
-			dataMap.try_emplace(chunk_position, generateTexture(chunk_position), realm->getPathmapUpdateCounter(chunk_position));
+			TexturePtr texture = generateTexture(chunk_position);
+			if (texture != nullptr) {
+				dataMap.try_emplace(chunk_position, std::move(texture), realm->getPathmapUpdateCounter(chunk_position));
+			}
 		} else if (force) {
-			iter->second = {generateTexture(chunk_position), realm->getPathmapUpdateCounter(chunk_position)};
+			TexturePtr texture = generateTexture(chunk_position);
+			if (texture != nullptr) {
+				iter->second = {std::move(texture), realm->getPathmapUpdateCounter(chunk_position)};
+			}
 		}
 	}
 
@@ -65,12 +73,17 @@ namespace Game3 {
 
 	TexturePtr PathmapTextureCache::generateTexture(ChunkPosition chunk_position) {
 		assert(realm != nullptr);
+
+		Chunk<uint8_t> *chunk = realm->tileProvider.tryPathChunk(chunk_position);
+		if (chunk == nullptr) {
+			return nullptr;
+		}
+
 		TexturePtr texture = std::make_shared<Texture>(Identifier{}, false, -1);
 		texture->format = GL_RED;
 
-		Chunk<uint8_t> &chunk = realm->tileProvider.getPathChunk(chunk_position);
-		auto lock = chunk.sharedLock();
-		texture->init(chunk, CHUNK_SIZE, CHUNK_SIZE);
+		auto lock = chunk->sharedLock();
+		texture->init(*chunk, CHUNK_SIZE, CHUNK_SIZE);
 		return texture;
 	}
 }

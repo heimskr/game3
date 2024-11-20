@@ -20,18 +20,24 @@ namespace Game3 {
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
 
-		const FluidChunk &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
-		auto lock = fluid_chunk.sharedLock();
-		fluids = fluid_chunk;
+		{
+			const FluidChunk &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
+			auto lock = fluid_chunk.sharedLock();
+			fluids = fluid_chunk;
+		}
+
+		const PathChunk &path_chunk = realm.tileProvider.getPathChunk(chunk_position);
+		auto lock = path_chunk.sharedLock();
+		pathmap = path_chunk;
 	}
 
-	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
+	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
 		updateCounter = realm.tileProvider.getUpdateCounter(chunk_position);
 	}
 
 	void ChunkTilesPacket::encode(Game &, Buffer &buffer) const {
 		Buffer secondary{buffer.target};
-		secondary << realmID << chunkPosition << updateCounter << tiles << fluids;
+		secondary << realmID << chunkPosition << updateCounter << tiles << fluids << pathmap;
 		auto compressed = LZ4::compress(secondary.getSpan());
 #ifdef DEBUG_COMPRESSION
 		INFO("Compression: {} → {} ({})", secondary.getSpan().size_bytes(), compressed.size(), double(secondary.getSpan().size_bytes()) / compressed.size());
@@ -43,7 +49,7 @@ namespace Game3 {
 		Buffer secondary{buffer.target};
 		buffer >> secondary.bytes;
 		secondary.bytes = LZ4::decompress(secondary.getSpan());
-		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;
+		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids >> pathmap;
 	}
 
 	void ChunkTilesPacket::handle(const ClientGamePtr &game) {
@@ -63,6 +69,8 @@ namespace Game3 {
 		}
 
 		provider.getFluidChunk(chunkPosition) = std::move(fluids);
+
+		provider.setPathChunk(chunkPosition, std::move(pathmap));
 
 		provider.setUpdateCounter(chunkPosition, updateCounter);
 

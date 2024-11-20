@@ -61,7 +61,7 @@ namespace Game3 {
 
 			uint64_t updateChunk(ChunkPosition);
 			/** If the chunk position isn't present in the meta map, this returns 0 without adding the chunk position to the meta map. */
-			uint64_t getUpdateCounter(ChunkPosition);
+			uint64_t getUpdateCounter(ChunkPosition) const;
 			void setUpdateCounter(ChunkPosition, uint64_t);
 
 			/** Copies the data from a ChunkSet object into this TileProvider object's terrain, biome and fluid data, then remakes the path map.
@@ -153,14 +153,19 @@ namespace Game3 {
 			const TileChunk & getTileChunk(Layer, ChunkPosition) const;
 			TileChunk & getTileChunk(Layer, ChunkPosition);
 
-			std::optional<std::reference_wrapper<const TileChunk>> tryTileChunk(Layer, ChunkPosition) const;
-			std::optional<std::reference_wrapper<TileChunk>> tryTileChunk(Layer, ChunkPosition);
+			const TileChunk * tryTileChunk(Layer, ChunkPosition) const;
+			TileChunk * tryTileChunk(Layer, ChunkPosition);
 
 			const Chunk<BiomeType> & getBiomeChunk(ChunkPosition) const;
 			Chunk<BiomeType> & getBiomeChunk(ChunkPosition);
 
 			const Chunk<uint8_t> & getPathChunk(ChunkPosition) const;
 			Chunk<uint8_t> & getPathChunk(ChunkPosition);
+
+			void setPathChunk(ChunkPosition, PathChunk);
+
+			const Chunk<uint8_t> * tryPathChunk(ChunkPosition) const;
+			Chunk<uint8_t> * tryPathChunk(ChunkPosition);
 
 			const Chunk<FluidTile> & getFluidChunk(ChunkPosition) const;
 			Chunk<FluidTile> & getFluidChunk(ChunkPosition);

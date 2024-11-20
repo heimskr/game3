@@ -1,3 +1,5 @@
+// There's an obscene amount of code duplication here. I'm sorry.
+
 #include "graphics/Tileset.h"
 #include "game/Game.h"
 #include "game/TileProvider.h"
@@ -9,17 +11,24 @@ namespace Game3 {
 		tilesetID(std::move(tileset_id)) {}
 
 	void TileProvider::clear() {
-		for (auto &map: chunkMaps)
+		for (auto &map: chunkMaps) {
 			map.clear();
+		}
+
 		biomeMap.clear();
 	}
 
 	bool TileProvider::contains(ChunkPosition chunk_position) const {
-		if (!pathMap.contains(chunk_position) || !biomeMap.contains(chunk_position))
+		if (!pathMap.contains(chunk_position) || !biomeMap.contains(chunk_position)) {
 			return false;
-		for (const auto &map: chunkMaps)
-			if (!map.contains(chunk_position))
+		}
+
+		for (const auto &map: chunkMaps) {
+			if (!map.contains(chunk_position)) {
 				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -28,10 +37,13 @@ namespace Game3 {
 		return ++metaMap[chunk_position].updateCount;
 	}
 
-	uint64_t TileProvider::getUpdateCounter(ChunkPosition chunk_position) {
+	uint64_t TileProvider::getUpdateCounter(ChunkPosition chunk_position) const {
 		std::shared_lock shared_lock(metaMutex);
-		if (auto iter = metaMap.find(chunk_position); iter != metaMap.end())
+
+		if (auto iter = metaMap.find(chunk_position); iter != metaMap.end()) {
 			return iter->second.updateCount;
+		}
+
 		return 0;
 	}
 
@@ -41,14 +53,17 @@ namespace Game3 {
 	}
 
 	void TileProvider::absorb(ChunkPosition chunk_position, ChunkSet chunk_set) {
-		if (chunk_set.terrain.size() != LAYER_COUNT)
+		if (chunk_set.terrain.size() != LAYER_COUNT) {
 			throw std::invalid_argument("ChunkSet has invalid number of terrain layers in TileProvider::absorb: " + std::to_string(chunk_set.terrain.size()));
+		}
 
-		if (chunk_set.biomes.size() != CHUNK_SIZE * CHUNK_SIZE)
+		if (chunk_set.biomes.size() != CHUNK_SIZE * CHUNK_SIZE) {
 			throw std::invalid_argument("Invalid number of biome tiles in TileProvider::absorb: " + std::to_string(chunk_set.biomes.size()));
+		}
 
-		if (chunk_set.fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
+		if (chunk_set.fluids.size() != CHUNK_SIZE * CHUNK_SIZE) {
 			throw std::invalid_argument("Invalid number of fluid tiles in TileProvider::absorb: " + std::to_string(chunk_set.fluids.size()));
+		}
 
 		for (size_t i = 0; i < LAYER_COUNT; ++i) {
 			std::unique_lock lock(chunkMutexes[i]);
@@ -74,11 +89,13 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Tileset> TileProvider::getTileset(const Game &game) const {
-		if (cachedTileset)
+		if (cachedTileset) {
 			return cachedTileset;
+		}
 
-		if (!tilesetID)
+		if (!tilesetID) {
 			throw std::runtime_error("Can't get empty tileset from TileProvider");
+		}
 
 		return cachedTileset = game.registry<TilesetRegistry>().at(tilesetID);
 	}
@@ -93,11 +110,16 @@ namespace Game3 {
 		size_t i = 0;
 		bool was_empty = false;
 
-		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row)
-			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column)
-				if (tileset->isLand(copyTileUnsafe(Layer::Terrain, Position(row, column), was_empty, TileMode::Throw)))
-					if (auto fluid_tile = copyFluidTile(Position(row, column)); !fluid_tile || fluid_tile->level == 0)
+		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row) {
+			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column) {
+				if (tileset->isLand(copyTileUnsafe(Layer::Terrain, Position(row, column), was_empty, TileMode::Throw))) {
+					if (auto fluid_tile = copyFluidTile(Position(row, column)); !fluid_tile || fluid_tile->level == 0) {
 						land_tiles[i++] = {row, column};
+					}
+				}
+			}
+		}
+
 		return land_tiles;
 	}
 
@@ -114,8 +136,9 @@ namespace Game3 {
 
 		const ChunkMap &map = chunkMaps[getIndex(layer)];
 
-		if (auto iter = map.find(chunk_position); iter != map.end())
+		if (auto iter = map.find(chunk_position); iter != map.end()) {
 			return access(iter->second, remainder(position.row), remainder(position.column));
+		}
 
 		if (mode == TileMode::ReturnEmpty) {
 			was_empty = true;
@@ -138,8 +161,9 @@ namespace Game3 {
 		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
 		const auto &map = chunkMaps[getIndex(layer)];
 
-		if (auto iter = map.find(chunk_position); iter != map.end())
+		if (auto iter = map.find(chunk_position); iter != map.end()) {
 			return access(iter->second, remainder(position.row), remainder(position.column));
+		}
 
 		return std::nullopt;
 	}
@@ -149,8 +173,9 @@ namespace Game3 {
 
 		std::shared_lock lock(biomeMutex);
 
-		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
+		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end()) {
 			return access(iter->second, remainder(position.row), remainder(position.column));
+		}
 
 		return std::nullopt;
 	}
@@ -160,8 +185,9 @@ namespace Game3 {
 
 		std::shared_lock lock(pathMutex);
 
-		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
+		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
 			return access(iter->second, remainder(position.row), remainder(position.column));
+		}
 
 		return std::nullopt;
 	}
@@ -171,8 +197,9 @@ namespace Game3 {
 
 		std::shared_lock lock(fluidMutex);
 
-		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end())
+		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
 			return access(iter->second, remainder(position.row), remainder(position.column));
+		}
 
 		return std::nullopt;
 	}
@@ -229,8 +256,9 @@ namespace Game3 {
 			std::vector<FluidInt> raw_fluids;
 			raw_fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 
-			for (const FluidTile &tile: fluidMap.at(chunk_position))
+			for (const FluidTile &tile: fluidMap.at(chunk_position)) {
 				raw_fluids.emplace_back(tile);
+			}
 
 			appendSpan(raw, std::span(raw_fluids));
 		}
@@ -284,8 +312,9 @@ namespace Game3 {
 			std::shared_lock lock(fluidMutex);
 			const FluidChunk &fluid_data = fluidMap.at(chunk_position);
 			auto fluid_lock = fluid_data.sharedLock();
-			for (const FluidTile &tile: fluidMap.at(chunk_position))
+			for (const FluidTile &tile: fluidMap.at(chunk_position)) {
 				raw_fluids.emplace_back(tile);
+			}
 		}
 		assert(raw_fluids.size() == CHUNK_SIZE * CHUNK_SIZE);
 		appendSpan(raw, std::span(raw_fluids));
@@ -304,8 +333,9 @@ namespace Game3 {
 		ChunkMap &map = chunkMaps[getIndex(layer)];
 
 		if (auto iter = map.find(chunk_position); iter != map.end()) {
-			if (lock_out != nullptr)
+			if (lock_out != nullptr) {
 				*lock_out = std::move(shared_lock);
+			}
 			return access(iter->second, remainder(position.row), remainder(position.column));
 		}
 
@@ -354,8 +384,9 @@ namespace Game3 {
 			TileChunk &chunk = map[chunk_position];
 			initTileChunk(layer, chunk, chunk_position);
 			TileID &accessed = access(chunk, remainder(position.row), remainder(position.column)) = 0;
-			if (lock_out != nullptr)
+			if (lock_out != nullptr) {
 				*lock_out = std::move(unique_lock);
+			}
 			return accessed;
 		}
 
@@ -404,8 +435,9 @@ namespace Game3 {
 		validateLayer(layer);
 
 		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
-		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
+		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end()) {
 			return iter->second;
+		}
 
 		throw std::out_of_range("Couldn't find tile chunk at position " + static_cast<std::string>(chunk_position));
 	}
@@ -417,24 +449,32 @@ namespace Game3 {
 		return chunkMaps[getIndex(layer)][chunk_position];
 	}
 
-	std::optional<std::reference_wrapper<const TileChunk>> TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) const {
+	const TileChunk * TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) const {
 		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
-		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
-			return std::ref(iter->second);
-		return std::nullopt;
+
+		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end()) {
+			return &iter->second;
+		}
+
+		return nullptr;
 	}
 
-	std::optional<std::reference_wrapper<TileChunk>> TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) {
+	TileChunk * TileProvider::tryTileChunk(Layer layer, ChunkPosition chunk_position) {
 		std::shared_lock lock(chunkMutexes[getIndex(layer)]);
-		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end())
-			return std::ref(iter->second);
-		return std::nullopt;
+
+		if (auto iter = chunkMaps[getIndex(layer)].find(chunk_position); iter != chunkMaps[getIndex(layer)].end()) {
+			return &iter->second;
+		}
+
+		return nullptr;
 	}
 
 	const Chunk<BiomeType> & TileProvider::getBiomeChunk(ChunkPosition chunk_position) const {
 		std::shared_lock lock(biomeMutex);
-		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end())
+
+		if (auto iter = biomeMap.find(chunk_position); iter != biomeMap.end()) {
 			return iter->second;
+		}
 
 		throw std::out_of_range("Couldn't find biome chunk at position " + static_cast<std::string>(chunk_position));
 	}
@@ -447,8 +487,10 @@ namespace Game3 {
 
 	const Chunk<uint8_t> & TileProvider::getPathChunk(ChunkPosition chunk_position) const {
 		std::shared_lock lock(pathMutex);
-		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end())
+
+		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
 			return iter->second;
+		}
 
 		throw std::out_of_range("Couldn't find path chunk at position " + static_cast<std::string>(chunk_position));
 	}
@@ -459,10 +501,45 @@ namespace Game3 {
 		return pathMap[chunk_position];
 	}
 
+	void TileProvider::setPathChunk(ChunkPosition chunk_position, PathChunk chunk) {
+		std::shared_lock lock(pathMutex);
+
+		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
+			const auto new_update_counter = std::max(iter->second.updateCounter + 1, chunk.updateCounter);
+			iter->second = std::move(chunk);
+			iter->second.updateCounter = new_update_counter;
+			return;
+		}
+
+		pathMap.emplace(chunk_position, std::move(chunk));
+	}
+
+	const Chunk<uint8_t> * TileProvider::tryPathChunk(ChunkPosition chunk_position) const {
+		std::shared_lock lock(pathMutex);
+
+		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
+			return &iter->second;
+		}
+
+		return nullptr;
+	}
+
+	Chunk<uint8_t> * TileProvider::tryPathChunk(ChunkPosition chunk_position) {
+		std::shared_lock lock(pathMutex);
+
+		if (auto iter = pathMap.find(chunk_position); iter != pathMap.end()) {
+			return &iter->second;
+		}
+
+		return nullptr;
+	}
+
 	const Chunk<FluidTile> & TileProvider::getFluidChunk(ChunkPosition chunk_position) const {
 		std::shared_lock lock(fluidMutex);
-		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end())
+
+		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
 			return iter->second;
+		}
 
 		throw std::out_of_range("Couldn't find fluid chunk at position " + static_cast<std::string>(chunk_position));
 	}
@@ -476,34 +553,39 @@ namespace Game3 {
 	void TileProvider::ensureTileChunk(ChunkPosition chunk_position) {
 		for (const auto layer: allLayers) {
 			std::unique_lock lock(chunkMutexes[getIndex(layer)]);
-			if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted)
+			if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted) {
 				initTileChunk(layer, iter->second, chunk_position);
+			}
 		}
 	}
 
 	void TileProvider::ensureTileChunk(ChunkPosition chunk_position, Layer layer) {
 		validateLayer(layer);
 		std::unique_lock lock(chunkMutexes[getIndex(layer)]);
-		if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted)
+		if (auto [iter, inserted] = chunkMaps[getIndex(layer)].try_emplace(chunk_position); inserted) {
 			initTileChunk(layer, iter->second, chunk_position);
+		}
 	}
 
 	void TileProvider::ensureBiomeChunk(ChunkPosition chunk_position) {
 		std::unique_lock lock(biomeMutex);
-		if (auto [iter, inserted] = biomeMap.try_emplace(chunk_position); inserted)
+		if (auto [iter, inserted] = biomeMap.try_emplace(chunk_position); inserted) {
 			initBiomeChunk(iter->second, chunk_position);
+		}
 	}
 
 	void TileProvider::ensurePathChunk(ChunkPosition chunk_position) {
 		std::unique_lock lock(pathMutex);
-		if (auto [iter, inserted] = pathMap.try_emplace(chunk_position); inserted)
+		if (auto [iter, inserted] = pathMap.try_emplace(chunk_position); inserted) {
 			initPathChunk(iter->second, chunk_position);
+		}
 	}
 
 	void TileProvider::ensureFluidChunk(ChunkPosition chunk_position) {
 		std::unique_lock lock(fluidMutex);
-		if (auto [iter, inserted] = fluidMap.try_emplace(chunk_position); inserted)
+		if (auto [iter, inserted] = fluidMap.try_emplace(chunk_position); inserted) {
 			initFluidChunk(iter->second, chunk_position);
+		}
 	}
 
 	void TileProvider::ensureAllChunks(ChunkPosition chunk_position) {
@@ -518,8 +600,9 @@ namespace Game3 {
 	}
 
 	void TileProvider::validateLayer(Layer layer) const {
-		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Terrain) || LAYER_COUNT < static_cast<uint8_t>(layer))
+		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Terrain) || LAYER_COUNT < static_cast<uint8_t>(layer)) {
 			throw std::out_of_range("Invalid layer: " + std::to_string(static_cast<uint8_t>(layer)));
+		}
 	}
 
 	void TileProvider::initTileChunk(Layer, Chunk<TileID> &chunk, ChunkPosition chunk_position) {
@@ -584,8 +667,9 @@ namespace Game3 {
 					{
 						auto chunk_lock = chunk.sharedLock();
 						packed.reserve(chunk.size());
-						for (const FluidTile &fluid_tile: chunk)
+						for (const FluidTile &fluid_tile: chunk) {
 							packed.emplace_back(fluid_tile);
+						}
 					}
 					fluid_array.push_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(packed.data(), packed.size()))));
 				}
