@@ -10,6 +10,7 @@
 #include "packet/LoginPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/SetHeldItemPacket.h"
+#include "threading/ThreadContext.h"
 #include "types/Position.h"
 #include "ui/gl/dialog/ChatDialog.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
@@ -78,7 +79,8 @@ namespace Game3 {
 	Window::Window(GLFWwindow &glfw_window):
 		glfwWindow(&glfw_window),
 		scale(8),
-		causticsShader(readFile("resources/caustics.frag")) {
+		causticsShader(readFile("resources/caustics.frag")),
+		waveShader(readFile("resources/wave.frag")) {
 			glfwSetWindowUserPointer(glfwWindow, this);
 
 			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
@@ -490,6 +492,7 @@ namespace Game3 {
 					glViewport(0, 0, width, height); CHECKGL
 					GL::clear(.2, .2, .2);
 					context.updateSize(width, height);
+					causticsShader.update(width, height);
 
 					if (realm->prerender()) {
 						mainGLTexture.useInFB();
@@ -503,21 +506,6 @@ namespace Game3 {
 
 					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
-					binder.undo();
-
-					context.updateSize(width, height);
-					glViewport(0, 0, width, height); CHECKGL
-					causticsShader.update(width, height);
-
-					singleSpriteRenderer.drawOnScreen(mainTexture, RenderOptions{
-						.x = 0,
-						.y = double(height),
-						.sizeX = -1,
-						.sizeY = -1,
-						.color{0.25, 0.25, 1.5},
-						.invertY = true,
-					});
-
 					if (ClientPlayerPtr player = game->getPlayer()) {
 						pathmapTextureCache.updateRealm(realm);
 						pathmapTextureCache.visitChunk(player->getChunk());
@@ -526,7 +514,6 @@ namespace Game3 {
 								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
 									pathmap->bind(2);
 									shader.set("pathmap", 2);
-									shader.set("time", static_cast<GLfloat>(std::remainder(game->time.load(), 1e6)));
 								};
 
 								const auto [row, column] = visible_chunk.topLeft();
@@ -538,6 +525,32 @@ namespace Game3 {
 									.sizeY = static_cast<double>(CHUNK_SIZE * 16),
 								}, realm->getTileset(), *this);
 							};
+						});
+					}
+
+					binder.undo();
+
+					context.updateSize(width, height);
+					glViewport(0, 0, width, height); CHECKGL
+
+					constexpr Color SEA_COLOR{0.25, 0.25, 1.5};
+
+					if (settings.withShared([](const ClientSettings &settings) { return settings.specialEffects; })) {
+						waveShader.shaderSetup = [&](Shader &shader, GLint) {
+							shader.set("resolution", GLfloat(width), GLfloat(height));
+							shader.set("time", static_cast<GLfloat>(game->time.load()));
+							shader.set("colorMultiplier", SEA_COLOR);
+						};
+						waveShader.update(width, height);
+						waveShader.drawOnScreen(mainTexture);
+					} else {
+						singleSpriteRenderer.drawOnScreen(mainTexture, RenderOptions{
+							.x = 0,
+							.y = double(height),
+							.sizeX = -1,
+							.sizeY = -1,
+							.color = SEA_COLOR,
+							.invertY = true,
 						});
 					}
 				} else if (do_lighting) {

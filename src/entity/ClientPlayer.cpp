@@ -99,13 +99,11 @@ namespace Game3 {
 
 		constexpr double thickness = 5 / 16.;
 		constexpr double shrink = 16 / 16.;
-
 		ClientGamePtr client_game = game->toClientPointer();
 		const auto [mouse_x, mouse_y] = client_game->getWindow()->getMouseCoordinates<double>();
 		double x_offset{}, y_offset{};
 		Position mouse_position = client_game->translateCanvasCoordinates(mouse_x, mouse_y, &x_offset, &y_offset);
 		Vector2d target(mouse_position.column - x_offset + 1, mouse_position.row - y_offset + 1);
-
 		Vector2d diff = Vector2d(getPosition()) + Vector2d(offset.x + 0.5, offset.y - offset.z + 0.5) - target;
 		Vector2d midpoint = target + diff / 2.0;
 		double degrees = diff.atan2() * 180 / M_PI;

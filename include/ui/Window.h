@@ -63,6 +63,7 @@ namespace Game3 {
 			CircleRenderer circleRenderer{*this};
 			Recolor recolor{*this};
 			Reshader causticsShader;
+			Reshader waveShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
 			GL::Texture mainGLTexture;

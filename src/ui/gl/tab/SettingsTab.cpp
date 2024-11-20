@@ -176,6 +176,7 @@ namespace Game3 {
 		add_checkbox("Enable Timers", &ClientSettings::hideTimers, true);
 		add_checkbox("Display FPS", &ClientSettings::showFPS);
 		add_checkbox("Cap FPS", &ClientSettings::capFPS);
+		add_checkbox("Special Effects", &ClientSettings::specialEffects);
 
 		auto level_slider = add_slider("Log Level");
 		level_slider->setRange(0, 3);

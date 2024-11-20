@@ -27,6 +27,7 @@ namespace Game3 {
 		std::size_t fpsSmoothing = 200;
 		bool showFPS = true;
 		bool capFPS = true;
+		bool specialEffects = true;
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;

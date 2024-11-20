@@ -35,6 +35,7 @@ namespace Game3 {
 		get("fpsSmoothing", &ClientSettings::fpsSmoothing);
 		get("showFPS", &ClientSettings::showFPS);
 		get("capFPS", &ClientSettings::capFPS);
+		get("specialEffects", &ClientSettings::specialEffects);
 	}
 
 	void to_json(nlohmann::json &json, const ClientSettings &settings) {
@@ -50,5 +51,6 @@ namespace Game3 {
 		json["fpsSmoothing"] = settings.fpsSmoothing;
 		json["showFPS"] = settings.showFPS;
 		json["capFPS"] = settings.capFPS;
+		json["specialEffects"] = settings.specialEffects;
 	}
 }
