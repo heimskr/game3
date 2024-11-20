@@ -41,13 +41,14 @@ namespace Game3 {
 			}
 
 		private:
-			void initRenderData();
 			GLuint vbo = 0;
 			GLuint quadVAO = 0;
 			bool initialized = false;
 			int backbufferWidth = -1;
 			int backbufferHeight = -1;
 
+			void initRenderData();
+			/** Be sure to bind the shader first! */
 			bool draw(GLuint texture, const glm::mat4 &model);
 			bool drawOnMap(GLuint texture, int texture_width, int texture_height, const RenderOptions &, const Tileset &, const Window &);
 	};

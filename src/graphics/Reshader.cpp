@@ -48,10 +48,11 @@ namespace Game3 {
 	}
 
 	void Reshader::bind() {
-		shader.bind(); CHECKGL
+		shader.bind();
 	}
 
 	bool Reshader::drawOnScreen(GLuint texture) {
+		shader.bind();
 		return draw(texture, glm::scale(glm::mat4(1.f), glm::vec3(backbufferWidth, backbufferHeight, 1.f)));
 	}
 
@@ -114,8 +115,6 @@ namespace Game3 {
 			return false;
 		}
 
-		shader.bind(); CHECKGL
-
 		shader.set("model", model);
 
 		glActiveTexture(GL_TEXTURE1); CHECKGL
@@ -135,6 +134,8 @@ namespace Game3 {
 
 	bool Reshader::drawOnMap(GLuint texture, int texture_width, int texture_height, const RenderOptions &options, const Tileset &tileset, const Window &window) {
 		assert(texture != 0);
+		shader.bind();
+		shader.set("texturePosition", options.offsetX / texture_width, options.offsetY / texture_height, options.sizeX / texture_width, options.sizeY / texture_height);
 		return draw(texture, makeMapModel(options, texture_width, texture_height, tileset, window));
 	}
 }

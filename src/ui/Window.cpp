@@ -504,11 +504,19 @@ namespace Game3 {
 						glViewport(0, 0, width, height); CHECKGL
 					}
 
+					causticsShader.update(width, height);
 					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
 					if (ClientPlayerPtr player = game->getPlayer()) {
 						pathmapTextureCache.updateRealm(realm);
 						pathmapTextureCache.visitChunk(player->getChunk());
+						const int frame = int(game->time.load() * 4) % 64;
+						const int frame_x = frame % 8;
+						const int frame_y = frame / 8;
+						constexpr double size = CHUNK_SIZE * 16;
+						const double offset_x = frame_x * size;
+						const double offset_y = frame_y * size;
+
 						ChunkRange(player->getChunk()).iterate([&](ChunkPosition visible_chunk) {
 							if (TexturePtr pathmap = pathmapTextureCache.getTexture(visible_chunk)) {
 								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
@@ -521,8 +529,11 @@ namespace Game3 {
 								causticsShader.drawOnMap(causticsTexture, RenderOptions{
 									.x = static_cast<double>(column),
 									.y = static_cast<double>(row),
-									.sizeX = static_cast<double>(CHUNK_SIZE * 16),
-									.sizeY = static_cast<double>(CHUNK_SIZE * 16),
+									.offsetX = offset_x,
+									.offsetY = offset_y,
+									.sizeX = size,
+									.sizeY = size,
+									.wrapMode = GL_REPEAT,
 								}, realm->getTileset(), *this);
 							};
 						});

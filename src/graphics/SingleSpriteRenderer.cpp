@@ -136,13 +136,13 @@ namespace Game3 {
 		assert(window != nullptr);
 		RealmPtr realm = window->game->getActiveRealm();
 
-		const double multiplier_x = 2. / texture_width;
-		const double multiplier_y = 2. / texture_height;
+		const double multiplier_x = 1. / texture_width;
+		const double multiplier_y = 1. / texture_height;
 
 		shader.bind();
 		shader.set("model", makeMapModel(options, texture_width, texture_height, realm->getTileset(), *window));
 		shader.set("spriteColor", options.color);
-		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture_width, size_y / texture_width);
+		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture_width, size_y / texture_height);
 
 		texture.bind(0);
 

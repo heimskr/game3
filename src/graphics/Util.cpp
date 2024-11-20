@@ -36,7 +36,7 @@ namespace Game3 {
 		glm::mat4 model = glm::mat4(1.);
 
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
-		model = glm::translate(model, glm::vec3(x - options.offsetX * window.scale * x_scale, y - options.offsetY * window.scale * y_scale, 0.));
+		model = glm::translate(model, glm::vec3(x - options.offsetX * window.scale * x_scale / 2.0, y - options.offsetY * window.scale * y_scale / 2.0, 0.));
 
 		if (options.angle != 0) {
 			const float xs = texture_width * x_scale * window.scale / 4.;
