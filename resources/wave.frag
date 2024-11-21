@@ -31,6 +31,5 @@ void main() {
 	float amplitude = 1 / 1024.0;
     vec2 s = r + amplitude * (p - q);
 	s /= m;
-    s.y = 1.0 - s.y;
     color = texture(txr, s) * colorMultiplier;
 }

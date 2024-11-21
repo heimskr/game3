@@ -137,6 +137,31 @@ namespace Game3 {
 		return {static_cast<Index>(y - sub_y), static_cast<Index>(x - sub_x)};
 	}
 
+	std::pair<double, double> ClientGame::untranslateCanvasCoordinates(Position position) const {
+		RealmPtr realm = activeRealm;
+
+		if (!realm) {
+			return {};
+		}
+
+		std::shared_ptr<Window> window = getWindow();
+		const int width = window->getWidth();
+		const int height = window->getHeight();
+		const auto scale = window->scale;
+		const auto tile_size = realm->getTileset().getTileSize();
+		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+
+		double x = position.column;
+		double y = position.row;
+
+		y *= tile_size * scale / 2.;
+		x *= tile_size * scale / 2.;
+		y += height / 2. - (map_length * tile_size / 4.) * scale + window->center.second * window->magic * scale;
+		x += width  / 2. - (map_length * tile_size / 4.) * scale + window->center.first  * window->magic * scale;
+
+		return {x, y};
+	}
+
 	void ClientGame::activateContext() {
 		getWindow()->activateContext();
 	}

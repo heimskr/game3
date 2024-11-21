@@ -34,6 +34,7 @@ namespace Game3 {
 
 			bool drawOnMap(const std::shared_ptr<Texture> &, const RenderOptions &, const Tileset &, const Window &);
 			bool drawOnMap(const GL::Texture &, const RenderOptions &, const Tileset &, const Window &);
+			bool drawOnMap(int width, int height, const RenderOptions &, const Tileset &, const Window &);
 
 			template <typename... Args>
 			void set(const char *uniform, Args &&...args) {

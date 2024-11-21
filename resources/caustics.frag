@@ -1,18 +1,13 @@
 #version 330 core
 
 in vec2 TexCoords;
-in vec4 position;
-in vec4 originalVertex;
 out vec4 color;
 
 uniform sampler2D txr;
 uniform sampler2D pathmap;
-uniform vec4 texturePosition;
-uniform vec2 resolution;
 uniform float time;
-uniform mat4 model;
-uniform mat4 submodel;
-uniform mat4 projection;
+uniform vec2 mapCoord;
+uniform float chunkSize;
 
 // CC0 license https://creativecommons.org/share-your-work/public-domain/cc0/
 
@@ -112,19 +107,17 @@ vec4 os2NoiseWithDerivatives_ImproveXY(vec3 X) {
 
 //////////////////////////////// End noise code ////////////////////////////////
 
-vec4 invert(vec4 color) {
-	return vec4(1 - color.rgb, color.a);
-}
-
 // Credit: https://www.shadertoy.com/view/wlc3zr
 
 void main() {
-	vec2 fragCoord = (inverse(submodel) * inverse(projection) * position).xy;
-	vec2 uv = fragCoord * 128.0;
+	vec2 fragCoord = mapCoord + TexCoords * chunkSize;
+	vec2 uv = fragCoord;
 	vec3 X = vec3(uv, mod(time, 578.0) * 0.8660254037844386);
 	vec4 noiseResult = os2NoiseWithDerivatives_ImproveXY(X);
 	noiseResult = os2NoiseWithDerivatives_ImproveXY(X - noiseResult.xyz / 16.0);
-	vec4 caustic = vec4(vec3(.431, .8, 1.0) * (1 + noiseResult.w) / 2, 1.0);
-	vec4 mainColor = texture(txr, vec2(TexCoords.x, 1.0 - TexCoords.y));
-	color = mainColor / invert(caustic);
+	vec3 base = vec3(.431, .8, 0.9);
+	base = vec3(1.0, 1.0, 1.0);
+	base *= 0.8;
+	color = vec4(base * (1 + noiseResult.w) / 2, 1.0);
+	color.rgb *= texture(pathmap, TexCoords).r * 255.0;
 }

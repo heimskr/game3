@@ -72,6 +72,10 @@ namespace Game3 {
 		return drawOnMap(texture->id, texture->width, texture->height, options, tileset, window);
 	}
 
+	bool Reshader::drawOnMap(int width, int height, const RenderOptions &options, const Tileset &tileset, const Window &window) {\
+		return drawOnMap(0, width, height, options, tileset, window);
+	}
+
 	bool Reshader::drawOnMap(const GL::Texture &texture, const RenderOptions &options, const Tileset &tileset, const Window &window) {
 		return drawOnMap(texture.getHandle(), texture.getWidth(), texture.getHeight(), options, tileset, window);
 	}
@@ -117,9 +121,11 @@ namespace Game3 {
 
 		shader.set("model", model);
 
-		glActiveTexture(GL_TEXTURE1); CHECKGL
-		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
-		shader.set("txr", 1); CHECKGL
+		if (texture > 0) {
+			glActiveTexture(GL_TEXTURE1); CHECKGL
+			glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
+			shader.set("txr", 1); CHECKGL
+		}
 
 		if (shaderSetup) {
 			shaderSetup(shader, texture);
@@ -133,9 +139,7 @@ namespace Game3 {
 	}
 
 	bool Reshader::drawOnMap(GLuint texture, int texture_width, int texture_height, const RenderOptions &options, const Tileset &tileset, const Window &window) {
-		assert(texture != 0);
 		shader.bind();
-		shader.set("texturePosition", options.offsetX / texture_width, options.offsetY / texture_height, options.sizeX / texture_width, options.sizeY / texture_height);
 		return draw(texture, makeMapModel(options, texture_width, texture_height, tileset, window));
 	}
 }

@@ -53,6 +53,7 @@ namespace Game3 {
 			Rectangle getVisibleRealmBounds() const;
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
 			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
+			std::pair<double, double> untranslateCanvasCoordinates(Position) const;
 			void activateContext();
 			void setText(const UString &text);
 			void runCommand(const std::string &);

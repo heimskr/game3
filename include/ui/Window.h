@@ -64,6 +64,7 @@ namespace Game3 {
 			Recolor recolor{*this};
 			Reshader causticsShader;
 			Reshader waveShader;
+			Reshader colorDodgeShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
 			GL::Texture mainGLTexture;
@@ -149,8 +150,10 @@ namespace Game3 {
 
 			MTQueue<std::function<void(Window &)>> functionQueue;
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
-			GL::Texture scratchTexture;
+			GL::Texture scratchGLTexture;
+			GL::Texture causticsGLTexture;
 			TexturePtr causticsTexture;
+			TexturePtr scratchTexture;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
 			PathmapTextureCache pathmapTextureCache;

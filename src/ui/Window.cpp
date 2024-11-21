@@ -81,7 +81,8 @@ namespace Game3 {
 		glfwWindow(&glfw_window),
 		scale(8),
 		causticsShader(readFile("resources/caustics.frag")),
-		waveShader(readFile("resources/wave.frag")) {
+		waveShader(readFile("resources/wave.frag")),
+		colorDodgeShader(readFile("resources/color_dodge.frag")) {
 			glfwSetWindowUserPointer(glfwWindow, this);
 
 			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
@@ -467,7 +468,8 @@ namespace Game3 {
 				mainGLTexture.initRGBA(width, height, GL_NEAREST);
 				staticLightingTexture.initRGBA(x_static_size, y_static_size, GL_NEAREST);
 				dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
-				scratchTexture.initRGBA(width, height, GL_NEAREST);
+				scratchGLTexture.initRGBA(width, height, GL_NEAREST);
+				causticsGLTexture.initRGBA(width, height, GL_NEAREST);
 
 				GL::FBOBinder binder = fbo.getBinder();
 				dynamicLightingTexture.useInFB();
@@ -479,6 +481,12 @@ namespace Game3 {
 
 				mainTexture = std::make_shared<Texture>();
 				mainTexture->init(mainGLTexture);
+
+				scratchTexture = std::make_shared<Texture>();
+				scratchTexture->init(scratchGLTexture);
+
+				causticsTexture = std::make_shared<Texture>();
+				causticsTexture->init(causticsGLTexture);
 			}
 
 			bool do_lighting = settings.withShared([&](auto &settings) {
@@ -489,14 +497,13 @@ namespace Game3 {
 				if (true) {
 					RendererContext context = getRendererContext();
 					GL::FBOBinder binder = fbo.getBinder();
-					scratchTexture.useInFB();
+					mainGLTexture.useInFB();
 					glViewport(0, 0, width, height); CHECKGL
 					GL::clear(.2, .2, .2);
 					context.updateSize(width, height);
-					causticsShader.update(width, height);
 
 					if (realm->prerender()) {
-						scratchTexture.useInFB();
+						mainGLTexture.useInFB();
 						batchSpriteRenderer.update(*this);
 						singleSpriteRenderer.update(*this);
 						recolor.update(*this);
@@ -506,68 +513,49 @@ namespace Game3 {
 					}
 
 					causticsShader.update(width, height);
+					colorDodgeShader.update(width, height);
+
 					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
 					if (ClientPlayerPtr player = game->getPlayer()) {
 						pathmapTextureCache.updateRealm(realm);
 						pathmapTextureCache.visitChunk(player->getChunk());
-						const int frame = int(game->time.load() * 4) % 64;
-						const int frame_x = frame % 8;
-						const int frame_y = frame / 8;
-						constexpr double size = CHUNK_SIZE * 16;
-						const double offset_x = frame_x * size;
-						const double offset_y = frame_y * size;
 
-						mainGLTexture.useInFB();
+						causticsGLTexture.useInFB();
 						GL::clear(1, 1, 1);
 
-#if 1
-						causticsShader.shaderSetup = [&](Shader &shader, GLint) {
-							// pathmap->bind(2);
-							// shader.set("pathmap", 2);
-							// shader.set("resolution", static_cast<GLfloat>(width), static_cast<GLfloat>(height));
-							shader.set("time", static_cast<GLfloat>(game->time.load()));
-
-							const auto [row, column] = (player->getChunk() - ChunkPosition{1, 1}).topLeft();
-
-							constexpr int edge = CHUNK_SIZE * 16 * REALM_DIAMETER;
-
-							shader.set("submodel", makeMapModel(RenderOptions {
-								.x = static_cast<double>(0),
-								.y = static_cast<double>(0),
-								.sizeX = static_cast<double>(edge),
-								.sizeY = static_cast<double>(edge),
-							}, edge, edge, player->getRealm()->getTileset(), *this));
-						};
-
-						causticsShader.drawOnScreen(scratchTexture);
-#else
 						ChunkRange(player->getChunk()).iterate([&](ChunkPosition visible_chunk) {
 							if (TexturePtr pathmap = pathmapTextureCache.getTexture(visible_chunk)) {
+								constexpr double size = CHUNK_SIZE * 16;
+								const auto [row, column] = visible_chunk.topLeft();
+
+								RenderOptions options{
+									.x = static_cast<double>(column),
+									.y = static_cast<double>(row),
+									.sizeX = size,
+									.sizeY = size,
+								};
+
 								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
 									pathmap->bind(2);
 									shader.set("pathmap", 2);
-									shader.set("resolution", static_cast<GLfloat>(width), static_cast<GLfloat>(height));
 									shader.set("time", static_cast<GLfloat>(game->time.load()));
+									shader.set("mapCoord", static_cast<GLfloat>(column), static_cast<GLfloat>(row));
+									shader.set("chunkSize", static_cast<GLfloat>(CHUNK_SIZE));
 								};
 
-								causticsShader.drawOnScreen(scratchTexture);
-
-								const auto [row, column] = visible_chunk.topLeft();
-
-
-								causticsShader.drawOnMap(scratchTexture, RenderOptions{
-									.x = static_cast<double>(column),
-									.y = static_cast<double>(row),
-									// .offsetX = offset_x,
-									// .offsetY = offset_y,
-									.sizeX = size,
-									.sizeY = size,
-									.wrapMode = GL_REPEAT,
-								}, realm->getTileset(), *this);
+								causticsShader.drawOnMap(size, size, options, realm->getTileset(), *this);
 							};
 						});
-#endif
+
+						scratchGLTexture.useInFB();
+
+						colorDodgeShader.shaderSetup = [&](Shader &shader, GLint) {
+							causticsGLTexture.bind(2);
+							shader.set("top", 2);
+						};
+
+						colorDodgeShader.drawOnScreen(mainGLTexture);
 					}
 
 					binder.undo();
@@ -575,7 +563,8 @@ namespace Game3 {
 					context.updateSize(width, height);
 					glViewport(0, 0, width, height); CHECKGL
 
-					constexpr Color SEA_COLOR{0.25, 0.25, 1.5};
+					// constexpr Color SEA_COLOR{0.25, 0.25, 1.5};
+					constexpr Color SEA_COLOR{"#0075a1"};
 
 					if (settings.withShared([](const ClientSettings &settings) { return settings.specialEffects; })) {
 						waveShader.shaderSetup = [&](Shader &shader, GLint) {
@@ -584,15 +573,13 @@ namespace Game3 {
 							shader.set("colorMultiplier", SEA_COLOR);
 						};
 						waveShader.update(width, height);
-						waveShader.drawOnScreen(mainTexture);
+						waveShader.drawOnScreen(scratchTexture);
 					} else {
-						singleSpriteRenderer.drawOnScreen(mainTexture, RenderOptions{
-							.x = 0,
-							.y = double(height),
+						singleSpriteRenderer.drawOnScreen(scratchTexture, RenderOptions{
 							.sizeX = -1,
 							.sizeY = -1,
 							.color = SEA_COLOR,
-							.invertY = true,
+							.invertY = false,
 						});
 					}
 				} else if (do_lighting) {
@@ -621,7 +608,7 @@ namespace Game3 {
 
 					realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
 
-					scratchTexture.useInFB();
+					scratchGLTexture.useInFB();
 					GL::clear(1, 1, 1);
 
 					singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
@@ -650,7 +637,7 @@ namespace Game3 {
 
 					context.updateSize(width, height);
 					glViewport(0, 0, width, height); CHECKGL
-					multiplier(mainGLTexture, scratchTexture);
+					multiplier(mainGLTexture, scratchGLTexture);
 				} else {
 					RendererContext context = getRendererContext();
 					glViewport(0, 0, width, height); CHECKGL
