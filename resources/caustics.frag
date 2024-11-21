@@ -129,5 +129,4 @@ void main() {
 	color.rgb *= texture(pathmap, TexCoords).r * 255.0;
     const float e = 2.71828;
     color.rgb *= adjust(color.r, e);
-    // color.rgb *= adjust(color.r, pow(sin(time * 2), 2) * 100 + 0.1);
 }

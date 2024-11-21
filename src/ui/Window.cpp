@@ -493,9 +493,7 @@ namespace Game3 {
 				return settings.renderLighting;
 			});
 
-			// constexpr Color SEA_COLOR{0.25, 0.25, 1.5};
-			constexpr Color SEA_COLOR{"#0075a1"};
-			// constexpr Color SEA_COLOR{0, 1, 0.9};
+			constexpr Color SEA_COLOR{"#00a0d0"};
 
 			if (realm) {
 				if (true) {
