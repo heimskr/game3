@@ -69,7 +69,9 @@ namespace Game3 {
 			GL::Texture mainGLTexture;
 			GL::Texture staticLightingTexture;
 			GL::Texture dynamicLightingTexture;
+			GL::Texture secondaryGLTexture;
 			TexturePtr mainTexture;
+			TexturePtr secondaryTexture;
 			GL::FBO fbo;
 			Rectangle realmBounds;
 			bool autofocus = true;

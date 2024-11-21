@@ -4,6 +4,7 @@
 #include "game/ClientInventory.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Tileset.h"
+#include "graphics/Util.h"
 #include "net/DirectLocalClient.h"
 #include "net/LocalClient.h"
 #include "packet/ContinuousInteractionPacket.h"
@@ -488,14 +489,14 @@ namespace Game3 {
 				if (true) {
 					RendererContext context = getRendererContext();
 					GL::FBOBinder binder = fbo.getBinder();
-					mainGLTexture.useInFB();
+					scratchTexture.useInFB();
 					glViewport(0, 0, width, height); CHECKGL
 					GL::clear(.2, .2, .2);
 					context.updateSize(width, height);
 					causticsShader.update(width, height);
 
 					if (realm->prerender()) {
-						mainGLTexture.useInFB();
+						scratchTexture.useInFB();
 						batchSpriteRenderer.update(*this);
 						singleSpriteRenderer.update(*this);
 						recolor.update(*this);
@@ -517,26 +518,56 @@ namespace Game3 {
 						const double offset_x = frame_x * size;
 						const double offset_y = frame_y * size;
 
+						mainGLTexture.useInFB();
+						GL::clear(1, 1, 1);
+
+#if 1
+						causticsShader.shaderSetup = [&](Shader &shader, GLint) {
+							// pathmap->bind(2);
+							// shader.set("pathmap", 2);
+							// shader.set("resolution", static_cast<GLfloat>(width), static_cast<GLfloat>(height));
+							shader.set("time", static_cast<GLfloat>(game->time.load()));
+
+							const auto [row, column] = (player->getChunk() - ChunkPosition{1, 1}).topLeft();
+
+							constexpr int edge = CHUNK_SIZE * 16 * REALM_DIAMETER;
+
+							shader.set("submodel", makeMapModel(RenderOptions {
+								.x = static_cast<double>(0),
+								.y = static_cast<double>(0),
+								.sizeX = static_cast<double>(edge),
+								.sizeY = static_cast<double>(edge),
+							}, edge, edge, player->getRealm()->getTileset(), *this));
+						};
+
+						causticsShader.drawOnScreen(scratchTexture);
+#else
 						ChunkRange(player->getChunk()).iterate([&](ChunkPosition visible_chunk) {
 							if (TexturePtr pathmap = pathmapTextureCache.getTexture(visible_chunk)) {
 								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
 									pathmap->bind(2);
 									shader.set("pathmap", 2);
+									shader.set("resolution", static_cast<GLfloat>(width), static_cast<GLfloat>(height));
+									shader.set("time", static_cast<GLfloat>(game->time.load()));
 								};
+
+								causticsShader.drawOnScreen(scratchTexture);
 
 								const auto [row, column] = visible_chunk.topLeft();
 
-								causticsShader.drawOnMap(causticsTexture, RenderOptions{
+
+								causticsShader.drawOnMap(scratchTexture, RenderOptions{
 									.x = static_cast<double>(column),
 									.y = static_cast<double>(row),
-									.offsetX = offset_x,
-									.offsetY = offset_y,
+									// .offsetX = offset_x,
+									// .offsetY = offset_y,
 									.sizeX = size,
 									.sizeY = size,
 									.wrapMode = GL_REPEAT,
 								}, realm->getTileset(), *this);
 							};
 						});
+#endif
 					}
 
 					binder.undo();

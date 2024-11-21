@@ -97,6 +97,7 @@ namespace Game3 {
 			});
 		}
 
+#if 0
 		constexpr double thickness = 5 / 16.;
 		constexpr double shrink = 16 / 16.;
 		ClientGamePtr client_game = game->toClientPointer();
@@ -125,6 +126,7 @@ namespace Game3 {
 			.sizeY = -1,
 			.angle = degrees,
 		});
+#endif
 
 		text.drawOnMap(displayName, {
 			.x = float(column) + x + .5,
