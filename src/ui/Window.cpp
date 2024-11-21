@@ -493,6 +493,10 @@ namespace Game3 {
 				return settings.renderLighting;
 			});
 
+			// constexpr Color SEA_COLOR{0.25, 0.25, 1.5};
+			constexpr Color SEA_COLOR{"#0075a1"};
+			// constexpr Color SEA_COLOR{0, 1, 0.9};
+
 			if (realm) {
 				if (true) {
 					RendererContext context = getRendererContext();
@@ -562,9 +566,6 @@ namespace Game3 {
 
 					context.updateSize(width, height);
 					glViewport(0, 0, width, height); CHECKGL
-
-					// constexpr Color SEA_COLOR{0.25, 0.25, 1.5};
-					constexpr Color SEA_COLOR{"#0075a1"};
 
 					if (settings.withShared([](const ClientSettings &settings) { return settings.specialEffects; })) {
 						waveShader.shaderSetup = [&](Shader &shader, GLint) {

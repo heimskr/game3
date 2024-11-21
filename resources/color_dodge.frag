@@ -10,6 +10,10 @@ vec4 invert(vec4 color) {
 	return vec4(1 - color.rgb, color.a);
 }
 
+vec4 dodge(vec4 bottom, vec4 top) {
+	return bottom / invert(top);
+}
+
 void main() {
-	color = texture(txr, TexCoords) / invert(texture(top, TexCoords));
+	color = dodge(texture(txr, TexCoords), texture(top, TexCoords));
 }

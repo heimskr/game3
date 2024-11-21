@@ -109,6 +109,14 @@ vec4 os2NoiseWithDerivatives_ImproveXY(vec3 X) {
 
 // Credit: https://www.shadertoy.com/view/wlc3zr
 
+float magic(float x, float b) {
+    return (log(x + pow(b, -2)) / log(b)) / 2.0 + 1.0;
+}
+
+float adjust(float x, float b) {
+    return magic(x, b) / magic(1, b);
+}
+
 void main() {
 	vec2 fragCoord = mapCoord + TexCoords * chunkSize;
 	vec2 uv = fragCoord;
@@ -117,7 +125,9 @@ void main() {
 	noiseResult = os2NoiseWithDerivatives_ImproveXY(X - noiseResult.xyz / 16.0);
 	vec3 base = vec3(.431, .8, 0.9);
 	base = vec3(1.0, 1.0, 1.0);
-	base *= 0.8;
 	color = vec4(base * (1 + noiseResult.w) / 2, 1.0);
 	color.rgb *= texture(pathmap, TexCoords).r * 255.0;
+    const float e = 2.71828;
+    color.rgb *= adjust(color.r, e);
+    // color.rgb *= adjust(color.r, pow(sin(time * 2), 2) * 100 + 0.1);
 }
