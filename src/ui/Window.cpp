@@ -413,12 +413,6 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		if (!causticsTexture) {
-			causticsTexture = cacheTexture("resources/caustic.png", false);
-			causticsTexture->init();
-			causticsTexture->repeat();
-		}
-
 		if (game != nullptr && game->getPlayer() != nullptr) {
 			game->iterateRealms([](const RealmPtr &realm) {
 				if (!realm->renderersReady) {
@@ -484,9 +478,6 @@ namespace Game3 {
 
 				scratchTexture = std::make_shared<Texture>();
 				scratchTexture->init(scratchGLTexture);
-
-				causticsTexture = std::make_shared<Texture>();
-				causticsTexture->init(causticsGLTexture);
 			}
 
 			bool do_lighting = settings.withShared([&](auto &settings) {

@@ -152,7 +152,6 @@ namespace Game3 {
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
 			GL::Texture scratchGLTexture;
 			GL::Texture causticsGLTexture;
-			TexturePtr causticsTexture;
 			TexturePtr scratchTexture;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
