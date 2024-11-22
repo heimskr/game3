@@ -1,9 +1,11 @@
+#include "minigame/FlappyBird.h"
+
+#ifdef ENABLE_ZIP8
 #include "game/ClientGame.h"
 #include "graphics/Color.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
-#include "minigame/FlappyBird.h"
 #include "packet/SubmitScorePacket.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -105,3 +107,4 @@ namespace Game3 {
 		});
 	}
 }
+#endif

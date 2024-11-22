@@ -8,8 +8,10 @@
 namespace Game3 {
 	void Game::addMinigameFactories() {
 		add(MinigameFactory::create<Breakout>());
-		add(MinigameFactory::create<FlappyBird>());
 		add(MinigameFactory::create<MathGame>());
+#ifdef ENABLE_ZIP8
+		add(MinigameFactory::create<FlappyBird>());
+#endif
 	}
 
 	void Game::add(MinigameFactory &&factory) {
