@@ -11,7 +11,7 @@
 // #define DEBUG_COMPRESSION
 
 namespace Game3 {
-	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
+	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
 	realmID(realm.id), chunkPosition(chunk_position), updateCounter(update_counter) {
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
 		for (const Layer layer: allLayers) {
@@ -31,7 +31,7 @@ namespace Game3 {
 		pathmap = path_chunk;
 	}
 
-	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
+	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
 		updateCounter = realm.tileProvider.getUpdateCounter(chunk_position);
 	}
 

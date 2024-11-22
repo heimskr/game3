@@ -17,8 +17,8 @@ namespace Game3 {
 		std::vector<uint8_t> pathmap;
 
 		ChunkTilesPacket() = default;
-		ChunkTilesPacket(const Realm &, ChunkPosition, uint64_t update_counter);
-		ChunkTilesPacket(const Realm &, ChunkPosition);
+		ChunkTilesPacket(Realm &, ChunkPosition, uint64_t update_counter);
+		ChunkTilesPacket(Realm &, ChunkPosition);
 		ChunkTilesPacket(RealmID realm_id, ChunkPosition chunk_position, uint64_t update_counter, std::vector<TileID> tiles, std::vector<FluidTile> fluids, std::vector<uint8_t> pathmap):
 			realmID(realm_id), chunkPosition(chunk_position), updateCounter(update_counter), tiles(std::move(tiles)), fluids(std::move(fluids)), pathmap(std::move(pathmap)) {}
 
