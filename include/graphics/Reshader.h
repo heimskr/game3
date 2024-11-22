@@ -3,8 +3,6 @@
 #include "graphics/Shader.h"
 #include "graphics/GL.h"
 
-#include "lib/Eigen.h"
-
 #include <functional>
 #include <string_view>
 

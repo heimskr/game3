@@ -1,7 +1,5 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.ull_source/sprite_renderer.cpp
 
-#include <iostream>
-
 #include "graphics/Shader.h"
 
 #include "graphics/Texture.h"
@@ -13,6 +11,8 @@
 #include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
+
+#include "lib/Eigen.h"
 
 namespace Game3 {
 	namespace {

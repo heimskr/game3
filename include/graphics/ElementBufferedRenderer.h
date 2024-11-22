@@ -8,6 +8,8 @@
 #include "graphics/Reshader.h"
 #include "threading/Lockable.h"
 
+#include "lib/Eigen.h"
+
 #include <atomic>
 #include <future>
 #include <unordered_set>

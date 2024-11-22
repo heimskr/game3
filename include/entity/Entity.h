@@ -22,7 +22,6 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
-#include "lib/Eigen.h"
 #include <nlohmann/json_fwd.hpp>
 
 #include <atomic>

@@ -13,6 +13,7 @@
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
+#include <vector>
 
 namespace Game3 {
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args) {

@@ -7,6 +7,8 @@
 #include "graphics/RectangleRenderer.h"
 #include "threading/Lockable.h"
 
+#include "lib/Eigen.h"
+
 #include <atomic>
 #include <unordered_set>
 #include <vector>
