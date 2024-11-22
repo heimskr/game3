@@ -514,6 +514,15 @@ namespace Game3 {
 						pathmapTextureCache.updateRealm(realm);
 						pathmapTextureCache.visitChunk(player->getChunk());
 
+						{
+							auto lock = realm->pathmapUpdateSet.uniqueLock();
+							auto set = std::move(realm->pathmapUpdateSet.getBase());
+							lock.unlock();
+							for (ChunkPosition chunk_position: set) {
+								pathmapTextureCache.addChunk(chunk_position, true);
+							}
+						}
+
 						causticsGLTexture.useInFB();
 						GL::clear(1, 1, 1);
 

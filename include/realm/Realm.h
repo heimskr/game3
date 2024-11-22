@@ -89,12 +89,12 @@ namespace Game3 {
 			int64_t seed = 0;
 			std::unordered_set<ChunkPosition> generatedChunks;
 			Lockable<std::unordered_set<ChunkPosition>> visibleChunks;
+			Lockable<std::unordered_set<ChunkPosition>> pathmapUpdateSet;
+
 			std::atomic_bool wakeupPending = false;
 			std::atomic_bool snoozePending = false;
-
 			std::atomic_bool reuploadPending = false;
 			std::atomic_bool renderersReady = false;
-
 			std::atomic_bool staticLightingQueued = false;
 
 			Realm(const Realm &) = delete;

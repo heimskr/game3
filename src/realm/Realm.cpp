@@ -1079,13 +1079,25 @@ namespace Game3 {
 				tileProvider.updateChunk(position.getChunk());
 				game->toServer().broadcastTileUpdate(id, layer, position, tile_id);
 			}
-			if (run_helper)
+			if (run_helper) {
 				setLayerHelper(position.row, position.column, layer, context);
+			}
 		} else if (run_helper) {
-			if (affected_lighting)
+			if (affected_lighting) {
 				queueStaticLightingTexture();
-			else if (auto tile = game->getTile(getTileset()[tile_id]); tile && tile->hasStaticLighting())
+			} else if (auto tile = game->getTile(getTileset()[tile_id]); tile && tile->hasStaticLighting()) {
 				queueStaticLightingTexture();
+			}
+
+			{
+				const bool walkable = isWalkable(position.row, position.column, getTileset());
+				std::unique_lock<std::shared_mutex> path_lock;
+				tileProvider.findPathState(position, &path_lock) = walkable;
+			}
+			{
+				auto lock = pathmapUpdateSet.uniqueLock();
+				pathmapUpdateSet.insert(position.getChunk());
+			}
 		}
 	}
 
