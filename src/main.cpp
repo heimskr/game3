@@ -217,10 +217,12 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
+#ifdef ENABLE_ZIP8
 		if (arg1 == "--zip8-test") {
 			zip8Test();
 			return 0;
 		}
+#endif
 
 		if (arg1 == "--buffer-test-2") {
 			testBuffer2();
@@ -256,10 +258,14 @@ int main(int argc, char **argv) {
 	richPresence.init();
 	richPresence.initActivity();
 
+	const std::filesystem::path old_path = std::filesystem::current_path();
+
 	if (!glfwInit()) {
 		ERROR("Can't initialize GLFW");
 		return 1;
 	}
+
+	std::filesystem::current_path(old_path);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
