@@ -20,14 +20,19 @@ namespace Game3 {
 		// immediately after the check. It's marked as spawning before the check to indicate that it's in a
 		// weird state. Therefore, we check here whether it's spawning to decide whether we should skip the
 		// regular ServerPlayer destruction process.
-		if (spawning)
+		if (spawning) {
 			return;
+		}
 
-		GamePtr game;
+		GamePtr game = weakGame.lock();
 
-		try {
-			game = getGame();
-		} catch (const std::runtime_error &) {
+		if (!game) {	
+			if (auto realm = weakRealm.lock()) {
+				game = realm->getGame();
+			}
+		}
+
+		if (!game) {
 			// We probably persisted past the death of the server.
 			// This probably happens when a player uses the `stop` command.
 			return;
@@ -36,8 +41,9 @@ namespace Game3 {
 		// If the game is being destroyed right now, we can't cast it.
 		// The game is responsible for persisting all players before
 		// the compiler-generated part of its destructor begins.
-		if (game->dying)
+		if (game->dying) {
 			return;
+		}
 
 		GameDB &database = game->toServer().getDatabase();
 		if (database.isOpen()) {
