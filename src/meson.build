@@ -10,7 +10,6 @@ sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
 
 game3_deps = [
-	cxx.find_library('m'),
 	dependency('glibmm-2.68'),
 	dependency('threads'),
 	dependency('openssl'),
@@ -69,6 +68,8 @@ endif
 
 if build_machine.system() == 'darwin'
 	link_args += ['-L/usr/local/opt/llvm/lib/c++']
+else
+	game3_deps += cxx.find_library('m')
 endif
 
 if get_option('discord_rich_presence') == true
