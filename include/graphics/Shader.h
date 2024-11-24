@@ -1,7 +1,6 @@
 #pragma once
 
 #include "graphics/GL.h"
-#include "lib/Eigen.h"
 
 #include <string>
 
@@ -9,6 +8,7 @@
 
 namespace Game3 {
 	struct Color;
+	struct Vector2d;
 
 	class Shader {
 		public:
@@ -31,8 +31,7 @@ namespace Game3 {
 			Shader & set(const char *, GLfloat, GLfloat, GLfloat, GLfloat);
 			Shader & set(const char *, const GLint *, GLsizei);
 			Shader & set(const char *, const glm::mat4 &);
-			Shader & set(const char *, const Eigen::Vector2f &);
-			Shader & set(const char *, const Eigen::Vector4f &);
+			Shader & set(const char *, const Vector2d &);
 			Shader & set(const char *, const Color &);
 
 			template <template <typename...> typename C>

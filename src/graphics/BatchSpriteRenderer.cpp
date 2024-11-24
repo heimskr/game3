@@ -12,8 +12,6 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
-#include "lib/Eigen.h"
-
 namespace Game3 {
 	namespace {
 		const std::string & spriteFrag() { static auto out = readFile("resources/sprite_batch.frag"); return out; }
@@ -43,7 +41,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			HasBackbuffer::update(backbuffer_width, backbuffer_height);
 			shader.bind();
-			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
+			shader.set("screenSize", Vector2d(backbuffer_width, backbuffer_height));
 		}
 
 		if (scale != canvasScale) {
@@ -56,7 +54,7 @@ namespace Game3 {
 			centerX = window.center.first;
 			centerY = window.center.second;
 			shader.bind();
-			shader.set("center", Eigen::Vector2f(float(centerX), float(centerY)));
+			shader.set("center", Vector2d(float(centerX), float(centerY)));
 		}
 	}
 
@@ -65,7 +63,7 @@ namespace Game3 {
 			backbufferWidth = width;
 			backbufferHeight = height;
 			shader.bind();
-			shader.set("screenSize", Eigen::Vector2f(width, height));
+			shader.set("screenSize", Vector2d(width, height));
 		}
 	}
 
@@ -156,7 +154,7 @@ namespace Game3 {
 
 		Atlas &atlas = *atlas_ptr;
 		shader.bind();
-		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
+		shader.set("atlasSize", Vector2d(atlas.texture->width, atlas.texture->height));
 		shader.set("tileSize", float(tile_size));
 		shader.set("sprite", 0);
 		atlas.vao.bind();

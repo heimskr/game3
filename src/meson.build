@@ -13,7 +13,6 @@ game3_deps = [
 	cxx.find_library('m'),
 	dependency('glibmm-2.68'),
 	dependency('threads'),
-	dependency('eigen3'),
 	dependency('openssl'),
 	dependency('freetype2'),
 	dependency('libzstd'),

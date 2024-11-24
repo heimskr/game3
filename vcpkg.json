@@ -9,7 +9,6 @@
 		"stb",
 		"nlohmann-json",
 		"libnoise",
-		"eigen3",
 		"cxxopts",
 		{
 			"name": "asio",

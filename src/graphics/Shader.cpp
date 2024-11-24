@@ -1,13 +1,14 @@
-#include <iostream>
-
-#include <glm/gtc/type_ptr.hpp>
-
 #include "Log.h"
 #include "graphics/Color.h"
 #include "graphics/GL.h"
 #include "graphics/Shader.h"
+#include "types/Position.h"
 #include "types/Types.h"
 #include "util/Util.h"
+
+#include <glm/gtc/type_ptr.hpp>
+
+#include <iostream>
 
 namespace Game3 {
 	namespace {
@@ -170,13 +171,8 @@ namespace Game3 {
 		return *this;
 	}
 
-	Shader & Shader::set(const char *uniform_name, const Eigen::Vector2f &vector) {
-		glUniform2f(uniform(uniform_name), vector.x(), vector.y()); CHECKGL
-		return *this;
-	}
-
-	Shader & Shader::set(const char *uniform_name, const Eigen::Vector4f &vector) {
-		glUniform4f(uniform(uniform_name), vector.x(), vector.y(), vector.z(), vector.w()); CHECKGL
+	Shader & Shader::set(const char *uniform_name, const Vector2d &vector) {
+		glUniform2f(uniform(uniform_name), static_cast<GLfloat>(vector.x), static_cast<GLfloat>(vector.y)); CHECKGL
 		return *this;
 	}
 

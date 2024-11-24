@@ -8,8 +8,6 @@
 #include "graphics/Reshader.h"
 #include "threading/Lockable.h"
 
-#include "lib/Eigen.h"
-
 #include <atomic>
 #include <future>
 #include <unordered_set>
@@ -24,7 +22,7 @@ namespace Game3 {
 			int backbufferHeight = -1;
 			std::atomic_bool isMissing = false;
 
-			Eigen::Vector2f center{0.f, 0.f};
+			Vector2d center{0, 0};
 			std::shared_ptr<Tileset> tileset;
 
 			ElementBufferedRenderer();

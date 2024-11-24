@@ -49,3 +49,4 @@ vgcore.*
 /game3.log
 /old
 /.codechecker
+/go.sh
