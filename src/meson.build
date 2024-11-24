@@ -16,7 +16,6 @@ game3_deps = [
 	dependency('openssl'),
 	dependency('freetype2'),
 	dependency('libzstd'),
-	dependency('sqlite3'),
 	dependency('gl'),
 	dependency('asio'),
 	dependency('liblz4'),
@@ -64,8 +63,12 @@ if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
-else
+elif build_machine.system() == 'linux'
 	link_args += '-lnoise'
+endif
+
+if build_machine.system() == 'darwin'
+	link_args += ['-L/usr/local/opt/llvm/lib/c++']
 endif
 
 if get_option('discord_rich_presence') == true
