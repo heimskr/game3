@@ -28,6 +28,7 @@ namespace Game3 {
 		bool showFPS = true;
 		bool capFPS = true;
 		bool specialEffects = true;
+		double mystery = 1;
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;

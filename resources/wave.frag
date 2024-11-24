@@ -18,14 +18,15 @@ vec2 shift(vec2 p) {
 	float d = time * speed;
     vec2 f = frequency * (p + d);
     return cos(vec2(
-       cos(f.x - f.y) * cos(f.y),
+       cos(f.x - f.y) * cos(f.x),
        sin(f.x + f.y) * sin(f.y)
 	));
 }
 
 void main() {
-	vec2 m = 128 / resolution.xy;
-	vec2 r = TexCoords * m;
+    vec2 t = TexCoords;
+	vec2 m = frequency / resolution.xy;
+	vec2 r = t * m;
     vec2 p = shift(r);
     vec2 q = shift(r + 1.0);
 	float amplitude = 1 / 1024.0;

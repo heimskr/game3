@@ -21,6 +21,9 @@ namespace {
 		"resources/gui/gui_topleft.png", "resources/gui/gui_top.png", "resources/gui/gui_topright.png", "resources/gui/gui_right.png",
 		"resources/gui/gui_bottomright_empty.png", "resources/gui/gui_bottom_empty.png", "resources/gui/gui_bottomleft_empty.png", "resources/gui/gui_left.png",
 	};
+
+	constexpr double X_FRACTION = 0.5;
+	constexpr double Y_FRACTION = 0.2;
 }
 
 namespace Game3 {

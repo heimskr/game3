@@ -82,7 +82,7 @@ namespace Game3 {
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {float(tilesize), -float(tilesize), 1.f}) *
-		             glm::scale(projection, {scale / float(backbufferWidth), scale / float(backbufferHeight), 1.f}) *
+		             glm::scale(projection, {scale / static_cast<float>(backbufferWidth), scale / static_cast<float>(backbufferHeight), 1.f}) *
 		             glm::translate(projection, {
 		                 center_x - CHUNK_SIZE / 2.f + float(chunk_x) * CHUNK_SIZE,
 		                 center_y - CHUNK_SIZE / 2.f + float(chunk_y) * CHUNK_SIZE,
@@ -121,7 +121,7 @@ namespace Game3 {
 
 		glm::mat4 projection(1.f);
 		projection = glm::scale(projection, {tilesize, tilesize, 1.f}) *
-		             glm::scale(projection, {2.f / float(backbufferWidth), 2.f / float(backbufferHeight), 1.f}) *
+		             glm::scale(projection, {2.f / static_cast<float>(backbufferWidth), 2.f / static_cast<float>(backbufferHeight), 1.f}) *
 		             glm::translate(projection, {-CHUNK_SIZE, -CHUNK_SIZE, 0.f});
 
 		shader.bind();

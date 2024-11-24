@@ -8,6 +8,7 @@
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/ServerGame.h"
+#include "graphics/RealmRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
 #include "graphics/TextRenderer.h"
@@ -210,7 +211,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, RendererContext &renderers, float game_time) {
+	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, const RendererContext &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -298,7 +299,7 @@ namespace Game3 {
 		batch_sprite.renderNow();
 	}
 
-	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, RendererContext &renderers, float game_time) {
+	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, const RendererContext &renderers, float game_time) {
 		if (getSide() != Side::Client)
 			return;
 
@@ -1818,6 +1819,10 @@ namespace Game3 {
 
 		const double hour = getGame()->getHour();
 		return !(5. <= hour && hour < 21.);
+	}
+
+	std::unique_ptr<RealmRenderer> Realm::getRenderer() {
+		return std::make_unique<RealmRenderer>();
 	}
 
 	void Realm::initEntity(const EntityPtr &entity, const Position &position) {

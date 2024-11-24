@@ -2,6 +2,7 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
+#include "graphics/RealmRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Tileset.h"
 #include "graphics/Util.h"
@@ -480,180 +481,8 @@ namespace Game3 {
 				scratchTexture->init(scratchGLTexture);
 			}
 
-			bool do_lighting = settings.withShared([&](auto &settings) {
-				return settings.renderLighting;
-			});
-
-			constexpr Color SEA_COLOR{"#00a0d0"};
-
 			if (realm) {
-				if (true) {
-					RendererContext context = getRendererContext();
-					GL::FBOBinder binder = fbo.getBinder();
-					mainGLTexture.useInFB();
-					glViewport(0, 0, width, height); CHECKGL
-					GL::clear(.2, .2, .2);
-					context.updateSize(width, height);
-
-					if (realm->prerender()) {
-						mainGLTexture.useInFB();
-						batchSpriteRenderer.update(*this);
-						singleSpriteRenderer.update(*this);
-						recolor.update(*this);
-						textRenderer.update(*this);
-						context.updateSize(getWidth(), getHeight());
-						glViewport(0, 0, width, height); CHECKGL
-					}
-
-					causticsShader.update(width, height);
-					colorDodgeShader.update(width, height);
-
-					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-					if (ClientPlayerPtr player = game->getPlayer()) {
-						pathmapTextureCache.updateRealm(realm);
-						pathmapTextureCache.visitChunk(player->getChunk());
-
-						{
-							auto lock = realm->pathmapUpdateSet.uniqueLock();
-							auto set = std::move(realm->pathmapUpdateSet.getBase());
-							lock.unlock();
-							for (ChunkPosition chunk_position: set) {
-								pathmapTextureCache.addChunk(chunk_position, true);
-							}
-						}
-
-						causticsGLTexture.useInFB();
-						GL::clear(1, 1, 1);
-
-						ChunkRange(player->getChunk()).iterate([&](ChunkPosition visible_chunk) {
-							if (TexturePtr pathmap = pathmapTextureCache.getTexture(visible_chunk)) {
-								constexpr double size = CHUNK_SIZE * 16;
-								const auto [row, column] = visible_chunk.topLeft();
-
-								RenderOptions options{
-									.x = static_cast<double>(column),
-									.y = static_cast<double>(row),
-									.sizeX = size,
-									.sizeY = size,
-								};
-
-								causticsShader.shaderSetup = [&](Shader &shader, GLint) {
-									pathmap->bind(2);
-									shader.set("pathmap", 2);
-									shader.set("time", static_cast<GLfloat>(game->time.load()));
-									shader.set("mapCoord", static_cast<GLfloat>(column), static_cast<GLfloat>(row));
-									shader.set("chunkSize", static_cast<GLfloat>(CHUNK_SIZE));
-								};
-
-								causticsShader.drawOnMap(size, size, options, realm->getTileset(), *this);
-							};
-						});
-
-						scratchGLTexture.useInFB();
-
-						colorDodgeShader.shaderSetup = [&](Shader &shader, GLint) {
-							causticsGLTexture.bind(2);
-							shader.set("top", 2);
-						};
-
-						colorDodgeShader.drawOnScreen(mainGLTexture);
-					}
-
-					binder.undo();
-
-					context.updateSize(width, height);
-					glViewport(0, 0, width, height); CHECKGL
-
-					if (settings.withShared([](const ClientSettings &settings) { return settings.specialEffects; })) {
-						waveShader.shaderSetup = [&](Shader &shader, GLint) {
-							shader.set("resolution", GLfloat(width), GLfloat(height));
-							shader.set("time", static_cast<GLfloat>(game->time.load()));
-							shader.set("colorMultiplier", SEA_COLOR);
-						};
-						waveShader.update(width, height);
-						waveShader.drawOnScreen(scratchTexture);
-					} else {
-						singleSpriteRenderer.drawOnScreen(scratchTexture, RenderOptions{
-							.sizeX = -1,
-							.sizeY = -1,
-							.color = SEA_COLOR,
-							.invertY = false,
-						});
-					}
-				} else if (do_lighting) {
-					GL::FBOBinder binder = fbo.getBinder();
-					mainGLTexture.useInFB();
-					glViewport(0, 0, width, height); CHECKGL
-					GL::clear(.2, .2, .2);
-					RendererContext context = getRendererContext();
-					context.updateSize(width, height);
-
-					if (realm->prerender()) {
-						mainGLTexture.useInFB();
-						batchSpriteRenderer.update(*this);
-						singleSpriteRenderer.update(*this);
-						recolor.update(*this);
-						textRenderer.update(*this);
-						context.updateSize(getWidth(), getHeight());
-						glViewport(0, 0, width, height); CHECKGL
-						// Skip a frame to avoid glitchiness
-						return;
-					}
-
-					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-					dynamicLightingTexture.useInFB();
-
-					realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-					scratchGLTexture.useInFB();
-					GL::clear(1, 1, 1);
-
-					singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
-						.x = 0,
-						.y = 0,
-						.sizeX = -1,
-						.sizeY = -1,
-						.scaleX = 1,
-						.scaleY = 1,
-					});
-
-					ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
-					const auto [static_y, static_x] = chunk.topLeft();
-					singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
-						.x = static_cast<double>(static_x),
-						.y = static_cast<double>(static_y),
-						.sizeX = -1,
-						.sizeY = -1,
-						.scaleX = 1. / x_factor,
-						.scaleY = 1. / y_factor,
-						.viewportX = -static_cast<double>(x_factor),
-						.viewportY = -static_cast<double>(y_factor),
-					});
-
-					binder.undo();
-
-					context.updateSize(width, height);
-					glViewport(0, 0, width, height); CHECKGL
-					multiplier(mainGLTexture, scratchGLTexture);
-				} else {
-					RendererContext context = getRendererContext();
-					glViewport(0, 0, width, height); CHECKGL
-					GL::clear(.2, .2, .2);
-					context.updateSize(width, height);
-
-					if (realm->prerender()) {
-						batchSpriteRenderer.update(*this);
-						singleSpriteRenderer.update(*this);
-						recolor.update(*this);
-						textRenderer.update(*this);
-						context.updateSize(width, height);
-					}
-
-					realm->render(width, height, center, scale, context, 1.f); CHECKGL
-				}
-
+				realm->getRenderer()->render(getRendererContext(), realm, *this);
 				realmBounds = game->getVisibleRealmBounds();
 			}
 		} else {
@@ -677,7 +506,15 @@ namespace Game3 {
 				has_been_nonzero = true;
 			}
 
-			OKHsv hsv{hue += 0.001, 1, 1, 1};
+			auto now = getTime();
+
+			if (lastRenderTime) {
+				hue += std::chrono::duration_cast<std::chrono::nanoseconds>(now - *lastRenderTime).count() / 1e9 * 144 * 0.001;
+			}
+
+			lastRenderTime = now;
+
+			OKHsv hsv{hue, 1, 1, 1};
 			constexpr int i_max = 32;
 			constexpr double offset_factor = 2;
 			constexpr double x_offset = offset_factor * i_max;

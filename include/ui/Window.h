@@ -67,12 +67,14 @@ namespace Game3 {
 			Reshader colorDodgeShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
+			PathmapTextureCache pathmapTextureCache;
 			GL::Texture mainGLTexture;
 			GL::Texture staticLightingTexture;
 			GL::Texture dynamicLightingTexture;
-			GL::Texture secondaryGLTexture;
+			GL::Texture scratchGLTexture;
+			GL::Texture causticsGLTexture;
 			TexturePtr mainTexture;
-			TexturePtr secondaryTexture;
+			TexturePtr scratchTexture;
 			GL::FBO fbo;
 			Rectangle realmBounds;
 			bool autofocus = true;
@@ -150,21 +152,18 @@ namespace Game3 {
 
 			MTQueue<std::function<void(Window &)>> functionQueue;
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
-			GL::Texture scratchGLTexture;
-			GL::Texture causticsGLTexture;
-			TexturePtr scratchTexture;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
-			PathmapTextureCache pathmapTextureCache;
 			std::pair<int, int> lastWindowSize{-1, -1};
 			Modifiers lastModifiers;
 			std::optional<std::pair<int, int>> clickPosition;
 			std::optional<int> heldMouseButton;
-			bool dragStarted = false;
-			int fpsCountup = 0;
+			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
 			std::deque<double> fpses;
 			double runningSum = 0;
 			double runningFPS = 0;
+			int fpsCountup = 0;
+			bool dragStarted = false;
 			bool connectedLocally = false;
 			bool connected = false;
 

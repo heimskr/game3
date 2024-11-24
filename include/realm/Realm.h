@@ -41,6 +41,7 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class GenericClient;
+	struct RealmRenderer;
 	struct RendererContext;
 
 	using EntityPtr = std::shared_ptr<Entity>;
@@ -121,8 +122,8 @@ namespace Game3 {
 			virtual void onRemove();
 			void createRenderers();
 			bool prerender();
-			void render(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
-			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
+			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
 			virtual void clearLighting(float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
@@ -233,6 +234,7 @@ namespace Game3 {
 			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
 			virtual void generateChunk(const ChunkPosition &) {}
 			virtual bool canSpawnMonsters() const;
+			virtual std::unique_ptr<RealmRenderer> getRenderer();
 
 			/** Full data doesn't include terrain, entities or tile entities. */
 			virtual void toJSON(nlohmann::json &, bool full_data) const;

@@ -178,6 +178,15 @@ namespace Game3 {
 		add_checkbox("Cap FPS", &ClientSettings::capFPS);
 		add_checkbox("Special Effects", &ClientSettings::specialEffects);
 
+		auto mystery_slider = add_slider("Mystery");
+		mystery_slider->setRange(0, 40);
+		mystery_slider->setStep(0.00000000001);
+		mystery_slider->setValue(settings.mystery);
+		mystery_slider->setDisplayDigits(5);
+		mystery_slider->onValueUpdate.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::mystery, value);
+		});
+
 		auto level_slider = add_slider("Log Level");
 		level_slider->setRange(0, 3);
 		level_slider->setStep(1);
