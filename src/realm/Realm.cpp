@@ -212,11 +212,11 @@ namespace Game3 {
 	}
 
 	void Realm::render(const int width, const int height, const std::pair<double, double> &center, float scale, const RendererContext &renderers, float game_time) {
-		if (getSide() != Side::Client)
-			return;
+		assert(getSide() == Side::Client);
 
-		if (!focused)
+		if (!focused) {
 			onFocus();
+		}
 
 		ClientGame &game = getGame()->toClient();
 		PlayerPtr player = game.getPlayer();
@@ -229,8 +229,9 @@ namespace Game3 {
 		if (baseRenderers) {
 			{
 				auto lock = settings.sharedLock();
-				if (!settings.renderLighting)
+				if (!settings.renderLighting) {
 					effective_time = 1;
+				}
 			}
 
 			for (auto &row: *baseRenderers) {
@@ -300,8 +301,7 @@ namespace Game3 {
 	}
 
 	void Realm::renderLighting(const int, const int, const std::pair<double, double> &, float, const RendererContext &renderers, float game_time) {
-		if (getSide() != Side::Client)
-			return;
+		assert(getSide() == Side::Client);
 
 		clearLighting(game_time);
 
