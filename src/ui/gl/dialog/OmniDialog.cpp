@@ -22,7 +22,7 @@ namespace {
 		"resources/gui/gui_bottomright_empty.png", "resources/gui/gui_bottom_empty.png", "resources/gui/gui_bottomleft_empty.png", "resources/gui/gui_left.png",
 	};
 
-	constexpr double X_FRACTION = 0.5;
+	constexpr double X_FRACTION = 0.2;
 	constexpr double Y_FRACTION = 0.2;
 }
 

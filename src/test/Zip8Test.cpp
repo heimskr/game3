@@ -10,7 +10,7 @@
 #include <chrono>
 #include <cstdlib>
 
-extern "C" void zip8Log(const char *buf, size_t len) {
+extern "C" void zip8Log(const char *, size_t) {
 	// Game3::INFO("Zip8: {}", std::string_view(buf, len));
 }
 

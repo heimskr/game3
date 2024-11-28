@@ -827,9 +827,9 @@ namespace Game3 {
 		const auto old_scale = scale;
 
 		if (y_delta < 0) {
-			scale /= 1.08 * -y_delta;
+			scale /= 1 + .08 * -y_delta;
 		} else if (y_delta > 0) {
-			scale *= 1.08 * y_delta;
+			scale *= 1 + .08 * y_delta;
 		}
 
 		const float width = lastWindowSize.first;
