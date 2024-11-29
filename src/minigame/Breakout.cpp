@@ -14,7 +14,7 @@ namespace Game3 {
 		constexpr Color BREAKOUT_FOREGROUND{"#425229"};
 		constexpr Color BREAKOUT_BACKGROUND{"#ffffce"};
 		constexpr double BREAKOUT_CHECK_TIME = 0.005;
-		constexpr std::size_t BREAKOUT_BLOCK_SCORE = 100;
+		constexpr std::size_t BREAKOUT_BLOCK_SCORE = 25;
 		constexpr int BREAKOUT_INITIAL_LIVES = 3;
 	}
 
@@ -34,7 +34,7 @@ namespace Game3 {
 
 	void Breakout::tick(double delta) {
 		if (submitQueued) {
-			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+			submitScore();
 			submitQueued = false;
 		}
 
@@ -182,6 +182,15 @@ namespace Game3 {
 		ballSpeed = 3;
 		paddle = {(gameWidth - paddleWidth) / 2, gameHeight - blockPadding - paddleHeight - 40, paddleWidth, paddleHeight};
 		normalizeVelocity();
+	}
+
+	void Breakout::onClose() {
+		submitScore();
+	}
+
+	void Breakout::submitScore() {
+		ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+		score = 0;
 	}
 
 	std::list<Rectangle>::iterator Breakout::getBlockIntersection() {

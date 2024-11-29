@@ -21,6 +21,8 @@ namespace Game3 {
 		gameHeight = height;
 	}
 
+	void Minigame::onClose() {}
+
 	SizeRequestMode Minigame::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}

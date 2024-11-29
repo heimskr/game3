@@ -18,6 +18,8 @@ namespace Game3 {
 			void tick(double delta) final;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void reset() final;
+			void onClose() final;
+			void submitScore();
 
 		private:
 			int lives{};

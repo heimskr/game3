@@ -38,6 +38,11 @@ namespace Game3 {
 		minigame->render(renderers, getInnerRectangle());
 	}
 
+	void MinigameDialog::onClose() {
+		Dialog::onClose();
+		minigame->onClose();
+	}
+
 	void MinigameDialog::onFocus() {
 		minigame->onFocus();
 	}

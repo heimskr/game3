@@ -23,6 +23,7 @@ namespace Game3 {
 			virtual void tick(double delta) = 0;
 			virtual void reset() = 0;
 			virtual void setSize(int width, int height);
+			virtual void onClose();
 			SizeRequestMode getRequestMode() const override;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) override;
 

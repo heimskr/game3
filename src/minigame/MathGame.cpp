@@ -61,7 +61,7 @@ namespace Game3 {
 
 		equation->secondsLeft -= delta;
 		if (equation->secondsLeft <= 0) {
-			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+			submitScore();
 			reset();
 			return;
 		}
@@ -132,6 +132,15 @@ namespace Game3 {
 
 	void MathGame::onFocus() {
 		ui.focusWidget(input);
+	}
+
+	void MathGame::onClose() {
+		submitScore();
+	}
+
+	void MathGame::submitScore() {
+		ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+		score = 0;
 	}
 
 	MathGame::Equation::Equation(UString text, int64_t answer, std::size_t points, double duration):

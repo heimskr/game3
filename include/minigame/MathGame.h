@@ -24,6 +24,8 @@ namespace Game3 {
 			void setSize(int width, int height) final;
 			void reset() final;
 			void onFocus() final;
+			void onClose() final;
+			void submitScore();
 
 		private:
 			struct Equation {
