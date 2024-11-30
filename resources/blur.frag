@@ -1,29 +1,38 @@
-// Credit: https://github.com/Jam3/glsl-fast-gaussian-blur
+// Credit: https://www.shadertoy.com/view/ltScRG
+// 16x acceleration of https://www.shadertoy.com/view/4tSyzy by applying gaussian at intermediate MIPmap level.
 
 #version 330 core
 
-precision mediump float;
-
-out vec4 FragColor;    // fragment output color
+in vec2 TexCoords;
+out vec4 color;    // fragment output color
 uniform sampler2D txr; // texture to blur
-uniform float xs, ys;  // texture resolution
-uniform float r;       // blur radius
-uniform int axis;
+uniform vec2 resolution;  // texture resolution
+uniform vec2 radius;      // blur radius
 
-vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
-	vec4 color = vec4(0.0);
-	vec2 off1 = vec2(1.3846153846) * direction;
-	vec2 off2 = vec2(3.2307692308) * direction;
-	color += texture(image, uv) * 0.2270270270;
-	color += texture(image, uv + (off1 / resolution)) * 0.3162162162;
-	color += texture(image, uv - (off1 / resolution)) * 0.3162162162;
-	color += texture(image, uv + (off2 / resolution)) * 0.0702702703;
-	color += texture(image, uv - (off2 / resolution)) * 0.0702702703;
-	return color;
+const int samples = 20,
+          LOD = 2,         // gaussian done on MIPmap at scale LOD
+          sLOD = 1 << LOD; // tile size = 2^LOD
+
+const float sigma = float(samples) * 0.25;
+
+float gaussian(vec2 i) {
+    return exp(-0.5 * dot(i /= sigma, i)) / (6.28 * sigma * sigma);
+}
+
+vec4 blur(sampler2D sp, vec2 U, vec2 scale) {
+    vec4 blurred = vec4(0);
+    int s = samples / sLOD;
+
+    for (int i = 0; i < s * s; i++) {
+        vec2 d = vec2(i % s, i / s) * float(sLOD) - float(samples) / 2.0;
+        blurred += gaussian(d) * textureLod( sp, U + scale * d , float(LOD) );
+    }
+
+    return blurred / blurred.a;
 }
 
 void main() {
-	vec2 resolution = vec2(xs, ys);
-	vec2 uv = vec2(gl_FragCoord.xy / resolution);
-	FragColor = blur9(txr, uv, resolution, axis == 0? vec2(r, 0.0) : vec2(0.0, r));
+	vec2 uv = TexCoords;
+	uv.y = 1.0 - uv.y;
+    color = blur(txr, uv, 1.0 / resolution);
 }

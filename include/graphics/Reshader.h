@@ -20,6 +20,7 @@ namespace Game3 {
 
 			Reshader() = delete;
 			Reshader(std::string_view fragment_shader);
+			Reshader(std::string_view vertex_shader, std::string_view fragment_shader);
 			~Reshader();
 
 			void reset();
@@ -34,8 +35,11 @@ namespace Game3 {
 			bool drawOnMap(const GL::Texture &, const RenderOptions &, const Tileset &, const Window &);
 			bool drawOnMap(int width, int height, const RenderOptions &, const Tileset &, const Window &);
 
-			template <typename... Args>
+			template <bool Bind = false, typename... Args>
 			void set(const char *uniform, Args &&...args) {
+				if constexpr (Bind) {
+					shader.bind();
+				}
 				shader.set(uniform, std::forward<Args>(args)...);
 			}
 

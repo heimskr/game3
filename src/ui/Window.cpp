@@ -83,7 +83,8 @@ namespace Game3 {
 		scale(8),
 		causticsShader(readFile("resources/caustics.frag")),
 		waveShader(readFile("resources/wave.frag")),
-		colorDodgeShader(readFile("resources/color_dodge.frag")) {
+		colorDodgeShader(readFile("resources/color_dodge.frag")),
+		blurShader(readFile("resources/blur.frag")) {
 			glfwSetWindowUserPointer(glfwWindow, this);
 
 			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {

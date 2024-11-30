@@ -17,8 +17,13 @@ namespace Game3 {
 		const std::string & reshaderVert() { static auto out = readFile("resources/sprite.vert"); return out; }
 	}
 
-	Reshader::Reshader(std::string_view fragment): shader("reshader") {
-		shader.init(reshaderVert(), fragment); CHECKGL
+	Reshader::Reshader(std::string_view fragment_shader): shader("reshader") {
+		shader.init(reshaderVert(), fragment_shader); CHECKGL
+		initRenderData(); CHECKGL
+	}
+
+	Reshader::Reshader(std::string_view vertex_shader, std::string_view fragment_shader): shader("reshader") {
+		shader.init(vertex_shader, fragment_shader); CHECKGL
 		initRenderData(); CHECKGL
 	}
 

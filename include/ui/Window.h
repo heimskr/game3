@@ -65,6 +65,7 @@ namespace Game3 {
 			Reshader causticsShader;
 			Reshader waveShader;
 			Reshader colorDodgeShader;
+			Reshader blurShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
 			PathmapTextureCache pathmapTextureCache;
