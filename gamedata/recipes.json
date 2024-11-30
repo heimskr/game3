@@ -239,6 +239,10 @@
 				"output": [["base:item/fence", 1]]
 			}],
 			["base:registry/crafting_recipe", {
+				"input": [["base:item/fence", 1]],
+				"output": [["base:item/fence_gate", 1]]
+			}],
+			["base:registry/crafting_recipe", {
 				"input": [["base:item/plank", 1], ["base:item/knife", 1]],
 				"output": [["base:item/cutting_board", 1]]
 			}],
