@@ -84,7 +84,7 @@ namespace Game3 {
 			size_t addSounds(const std::filesystem::path &);
 			void addModuleFactories();
 			void addMinigameFactories();
-			void initialSetup(const std::filesystem::path &dir = "gamedata");
+			virtual void initialSetup(const std::filesystem::path &dir = "gamedata");
 			void initEntities();
 			void initInteractionSets();
 			void add(std::shared_ptr<Item>);

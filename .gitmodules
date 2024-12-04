@@ -19,3 +19,6 @@
 [submodule "subprojects/zip8"]
 	path = subprojects/zip8
 	url = https://github.com/heimskr/zip8.git
+[submodule "subprojects/pngpp"]
+	path = subprojects/pngpp
+	url = https://github.com/heimskr/pngpp.git

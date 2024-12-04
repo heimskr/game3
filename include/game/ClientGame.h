@@ -23,14 +23,16 @@ namespace Game3 {
 	class HasInventory;
 	class LocalClient;
 	class Packet;
+	class Texture;
 	class UIContext;
 
 	class ClientGame: public Game {
 		public:
 			bool stoppedByError = false;
+			bool suppressDisconnectionMessage = false;
 			std::function<void()> errorCallback;
 			SoundEngine sounds;
-			bool suppressDisconnectionMessage = false;
+			std::shared_ptr<Texture> omniatlas;
 
 			sigc::signal<void(const PlayerPtr &)> signalPlayerInventoryUpdate;
 			sigc::signal<void(const PlayerPtr &)> signalPlayerMoneyUpdate;
@@ -97,6 +99,9 @@ namespace Game3 {
 			std::shared_ptr<Window> getWindow() const;
 
 			bool isConnectedLocally() const;
+
+			void initialSetup(const std::filesystem::path &dir) final;
+			std::shared_ptr<Texture> makeOmniatlas();
 
 		private:
 			std::weak_ptr<Window> weakWindow;

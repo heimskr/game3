@@ -8,7 +8,8 @@ config_h = configuration_data()
 config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
 config_h.set_quoted('GETTEXT_PACKAGE', 'game3')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
-add_project_arguments(['-I' + meson.project_build_root()], language: 'cpp')
+source_root = meson.project_source_root()
+add_project_arguments(['-I' + meson.project_build_root(), '-I' + source_root + '/subprojects'], language: 'cpp')
 
 project_cpp_args = ['-DV8_COMPRESS_POINTERS', '-DV8_ENABLE_SANDBOX']
 test_cpp_args = [

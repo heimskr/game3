@@ -7,6 +7,7 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/SimulationOptions.h"
+#include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "net/DisconnectedError.h"
 #include "net/LocalClient.h"
@@ -22,6 +23,8 @@
 #include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "util/Util.h"
+
+#include "pngpp/png.hpp"
 
 namespace Game3 {
 	namespace {
@@ -387,6 +390,48 @@ namespace Game3 {
 		}
 
 		return *cachedIsConnectedLocally;
+	}
+
+	void ClientGame::initialSetup(const std::filesystem::path &dir) {
+		Game::initialSetup(dir);
+		omniatlas = makeOmniatlas();
+	}
+
+	TexturePtr ClientGame::makeOmniatlas() {
+		std::vector<png::image<png::rgba_pixel>> images;
+		std::size_t tile_count = 0;
+
+		for (const auto &entry: std::filesystem::recursive_directory_iterator("resources")) {
+			const auto &path = entry.path();
+			if (path.extension() == ".png") {
+				auto &image = images.emplace_back(path.string());
+				bool can_add = true;
+				const auto &text_map = image.get_text_map();
+
+				for (const auto &[key, value]: text_map) {
+					if (key == "NoAtlas" || (key == "Comment" && value.find("[noatlas]") != std::string::npos)) {
+						can_add = false;
+						break;
+					}
+				}
+
+				if (can_add) {
+					auto width = image.get_width();
+					auto height = image.get_height();
+
+					if (width % 16 != 0 || height % 16 != 0) {
+						throw std::runtime_error(std::format("Invalid dimensions encountered in {}: {} x {}", path.string(), width, height));
+					}
+
+					tile_count += (width / 16) * (height / 16);
+				} else {
+					images.pop_back();
+				}
+			}
+		}
+
+		INFO("Omniatlas image count: {}, tile count: {}", images.size(), tile_count);
+		return nullptr;
 	}
 
 	void ClientGame::garbageCollect() {
