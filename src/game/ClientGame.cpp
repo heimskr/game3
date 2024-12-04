@@ -430,7 +430,7 @@ namespace Game3 {
 			}
 		}
 
-		INFO("Omniatlas image count: {}, tile count: {}", images.size(), tile_count);
+		INFO("Omniatlas image count: {}, tile count: {}, side length: {}", images.size(), tile_count, std::ceil(std::sqrt(static_cast<double>(tile_count))) * 16);
 		return nullptr;
 	}
 
