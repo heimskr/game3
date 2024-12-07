@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
@@ -20,13 +18,15 @@ namespace Game3 {
 		return name;
 	}
 
-	void Chest::toJSON(nlohmann::json &json) const {
+	void Chest::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
+		auto &object = json.as_object();
 		const InventoryPtr inventory = getInventory(0);
-		if (inventory)
-			json["inventory"] = dynamic_cast<ServerInventory &>(*inventory);
-		json["name"] = name;
-		json["itemName"] = itemName;
+		if (inventory) {
+			object["inventory"] = boost::json::value_from(dynamic_cast<ServerInventory &>(*inventory));
+		}
+		object["name"] = name;
+		object["itemName"] = boost::json::value_from(itemName);
 	}
 
 	bool Chest::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
@@ -46,12 +46,14 @@ namespace Game3 {
 		return true;
 	}
 
-	void Chest::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Chest::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		if (auto iter = json.find("inventory"); iter != json.end())
-			HasInventory::setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
-		name = json.at("name");
-		itemName = json.at("itemName");
+		const auto &object = json.as_object();
+		if (auto iter = object.find("inventory"); iter != object.end()) {
+			HasInventory::setInventory(std::make_shared<ServerInventory>(boost::json::value_to<ServerInventory>(iter->value(), std::pair{game, shared_from_this()})), 0);
+		}
+		name = object.at("name").get_string();
+		itemName = boost::json::value_to<Identifier>(object.at("itemName"));
 	}
 
 	void Chest::encode(Game &game, Buffer &buffer) {

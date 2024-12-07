@@ -1,7 +1,7 @@
 #include "entity/ClientPlayer.h"
-#include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
+#include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/TileEntityPacket.h"
@@ -10,6 +10,8 @@
 #include "tileentity/TileEntityFactory.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
+
+#include <boost/json.hpp>
 
 namespace Game3 {
 	void TileEntity::destroy() {
@@ -25,8 +27,8 @@ namespace Game3 {
 		}
 	}
 
-	std::shared_ptr<TileEntity> TileEntity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		auto factory = game->registry<TileEntityFactoryRegistry>().at(json.at("id").get<Identifier>());
+	std::shared_ptr<TileEntity> TileEntity::fromJSON(const GamePtr &game, const boost::json::value &json) {
+		auto factory = game->registry<TileEntityFactoryRegistry>().at(boost::json::value_to<Identifier>(json.at("id")));
 		assert(factory);
 		auto out = (*factory)();
 		out->absorbJSON(game, json);
@@ -231,7 +233,7 @@ namespace Game3 {
 		buffer << position;
 		buffer << solid;
 		buffer << getUpdateCounter();
-		buffer << extraData.dump();
+		buffer << extraData;
 	}
 
 	void TileEntity::decode(Game &, Buffer &buffer) {
@@ -240,7 +242,7 @@ namespace Game3 {
 		buffer >> position;
 		buffer >> solid;
 		setUpdateCounter(buffer.take<UpdateCounter>());
-		extraData = nlohmann::json::parse(buffer.take<std::string>());
+		buffer >> extraData;
 		cachedTile = -1;
 	}
 
@@ -299,35 +301,39 @@ namespace Game3 {
 		return getGame()->enqueue(getTickFunction());
 	}
 
-	void TileEntity::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void TileEntity::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		assert(game->getSide() == Side::Server);
-		tileEntityID = json.at("id");
-		tileID       = json.at("tileID");
-		solid        = json.at("solid");
-		if (auto iter = json.find("extra"); iter != json.end())
-			extraData = *iter;
-		if (auto iter = json.find("position"); iter != json.end())
-			position = *iter;
-		if (auto iter = json.find("gid"); iter != json.end())
-			globalID = *iter;
+		tileEntityID = boost::json::value_to<Identifier>(json.at("id"));
+		tileID       = boost::json::value_to<Identifier>(json.at("tileID"));
+		solid        = boost::json::value_to<bool>(json.at("solid"));
+		const auto &object = json.as_object();
+		if (auto iter = object.find("extra"); iter != object.end()) {
+			extraData = iter->value();
+		}
+		if (auto iter = object.find("position"); iter != object.end()) {
+			position = boost::json::value_to<Position>(iter->value());
+		}
+		if (auto iter = object.find("gid"); iter != object.end()) {
+			globalID = boost::json::value_to<GlobalID>(iter->value());
+		}
 		increaseUpdateCounter();
 	}
 
-	void TileEntity::toJSON(nlohmann::json &json) const {
-		json["id"]       = getID();
-		json["gid"]      = globalID;
-		json["tileID"]   = tileID;
-		json["position"] = position;
-		json["solid"]    = solid;
-		if (!extraData.empty())
-			json["extra"] = extraData;
+	void TileEntity::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["id"]       = boost::json::value_from(getID());
+		object["gid"]      = globalID;
+		object["tileID"]   = boost::json::value_from(tileID);
+		object["position"] = boost::json::value_from(position);
+		object["solid"]    = solid;
+		object["extra"]    = extraData;
 	}
 
 	bool TileEntity::spawnIn(const Place &place) {
 		return place.realm->add(getSelf()) != nullptr;
 	}
 
-	void to_json(nlohmann::json &json, const TileEntity &tile_entity) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const TileEntity &tile_entity) {
 		tile_entity.toJSON(json);
 	}
 }

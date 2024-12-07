@@ -5,6 +5,8 @@
 #include "util/Concepts.h"
 #include "util/Demangle.h"
 
+#include <boost/json/fwd.hpp>
+
 #include <bit>
 #include <cassert>
 #include <concepts>
@@ -21,9 +23,6 @@
 #include <ranges>
 #include <span>
 #include <vector>
-
-#include <nlohmann/json_fwd.hpp>
-
 
 namespace Game3 {
 	class Buffer;
@@ -111,7 +110,7 @@ namespace Game3 {
 			Buffer & operator+=(std::same_as<double> auto);
 			Buffer & operator+=(std::same_as<std::string_view> auto);
 			Buffer & operator+=(std::same_as<std::string> auto const &);
-			Buffer & operator+=(std::same_as<nlohmann::json> auto const &);
+			Buffer & operator+=(std::same_as<boost::json::value> auto const &);
 
 			template <std::signed_integral T>
 			Buffer & operator+=(T item) {
@@ -236,8 +235,8 @@ namespace Game3 {
 			size_t getSkip() const;
 			void setSkip(size_t);
 
-			nlohmann::json popJSON();
-			nlohmann::json popAllJSON();
+			boost::json::value popJSON();
+			boost::json::value popAllJSON();
 
 			Buffer & operator<<(bool);
 			Buffer & operator<<(uint8_t);
@@ -436,10 +435,10 @@ namespace Game3 {
 		return static_cast<T>(popBuffer<std::underlying_type_t<T>>(buffer));
 	}
 
-	Buffer & operator<<(Buffer &, std::same_as<nlohmann::json> auto const &);
+	Buffer & operator<<(Buffer &, std::same_as<boost::json::value> auto const &);
 
 	template <>
-	Buffer & operator>>(Buffer &, nlohmann::json &);
+	Buffer & operator>>(Buffer &, boost::json::value &);
 }
 
 template <>

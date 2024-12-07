@@ -1,11 +1,11 @@
 #pragma once
 
-#include <format>
-#include <memory>
-
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
 #include "packet/Packet.h"
+
+#include <format>
+#include <memory>
 
 namespace Game3 {
 	class RemoteClient: public GenericClient {

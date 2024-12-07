@@ -1,6 +1,3 @@
-#include <cassert>
-#include <csignal>
-
 #include "Log.h"
 #include "game/ServerGame.h"
 #include "net/Buffer.h"
@@ -13,6 +10,9 @@
 #include "util/Demangle.h"
 #include "util/Math.h"
 #include "util/Util.h"
+
+#include <cassert>
+#include <csignal>
 
 namespace Game3 {
 	RemoteClient::RemoteClient(const ServerPtr &server, std::string_view ip, int id, asio::ip::tcp::socket &&socket):

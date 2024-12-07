@@ -8,11 +8,11 @@
 #include "types/Position.h"
 #include "util/Util.h"
 
+#include <boost/json.hpp>
+
 #include <cassert>
 #include <cstring>
 #include <iomanip>
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	Buffer::Buffer(Side target):
@@ -92,7 +92,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType<nlohmann::json>(const nlohmann::json &, bool in_container) {
+	std::string Buffer::getType<boost::json::value>(const boost::json::value &, bool in_container) {
 		return getType(std::string{}, in_container);
 	}
 
@@ -190,8 +190,8 @@ namespace Game3 {
 	}
 
 	template<>
-	Buffer & Buffer::operator+=(const nlohmann::json &json) {
-		return *this += json.dump();
+	Buffer & Buffer::operator+=(const boost::json::value &json) {
+		return *this += boost::json::serialize(json);
 	}
 
 	template <>
@@ -239,8 +239,8 @@ namespace Game3 {
 	}
 
 	template <>
-	nlohmann::json popBuffer<nlohmann::json>(Buffer &buffer) {
-		return buffer.take<nlohmann::json>();
+	boost::json::value popBuffer<boost::json::value>(Buffer &buffer) {
+		return buffer.take<boost::json::value>();
 	}
 
 	std::string Buffer::popType() {
@@ -315,26 +315,32 @@ namespace Game3 {
 	}
 
 	namespace {
-		std::string stringifyKey(const nlohmann::json &json) {
-			if (json.is_string())
-				return json;
+		std::string stringifyKey(const boost::json::value &json) {
+			if (const auto *value = json.if_string()) {
+				return std::string(*value);
+			}
 
-			if (json.is_number_float())
-				return std::to_string(json.get<double>());
+			if (const double *value = json.if_double()) {
+				return std::to_string(*value);
+			}
 
-			if (json.is_number_integer())
-				return std::to_string(json.get<int64_t>());
+			if (const int64_t *value = json.if_int64()) {
+				return std::to_string(*value);
+			}
 
-			if (json.is_number_unsigned())
-				return std::to_string(json.get<uint64_t>());
+			if (const uint64_t *value = json.if_uint64()) {
+				return std::to_string(*value);
+			}
 
-			if (json.is_null())
+			if (json.is_null()) {
 				return "null";
+			}
 
-			if (json.is_boolean())
-				return json.get<bool>()? "true" : "false";
+			if (const bool *value = json.if_bool()) {
+				return *value? "true" : "false";
+			}
 
-			return json.dump();
+			return boost::json::serialize(json);
 		}
 
 		std::string_view extractType(std::string_view type);
@@ -373,7 +379,7 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid type byte: " + hexString(type.substr(0, 1), true));
 		}
 
-		nlohmann::json popJSON(Buffer &buffer, std::string_view type, bool in_container) {
+		boost::json::value popJSON(Buffer &buffer, std::string_view type, bool in_container) {
 			assert(!type.empty());
 
 			if (!in_container) {
@@ -388,21 +394,25 @@ namespace Game3 {
 					case '\x08': return buffer.take<int64_t>();
 					case '\x09': return buffer.take<float>();
 					case '\x0a': return buffer.take<double>();
+
 					case '\x0b': ++buffer.skip; return buffer.popJSON();
+
 					case '\x0c': return nullptr;
 
 					case '\x10': case '\x11': case '\x12': case '\x13': case '\x14': case '\x15': case '\x16': case '\x17':
 					case '\x18': case '\x19': case '\x1a': case '\x1b': case '\x1c': case '\x1d': case '\x1e': case '\x1f':
-						return buffer.take<std::string>();
+						return boost::json::value_from(buffer.take<std::string>());
 
 					case '\x20': {
 						++buffer.skip;
 						std::string type = buffer.peekType(0);
 						buffer.skip += type.size();
 						const uint32_t length = popBuffer<uint32_t>(buffer);
-						nlohmann::json out;
-						for (uint32_t i = 0; i < length; ++i)
-							out.push_back(popJSON(buffer, type, true));
+						boost::json::value out;
+						auto &array = out.emplace_array();
+						for (uint32_t i = 0; i < length; ++i) {
+							array.push_back(popJSON(buffer, type, true));
+						}
 						return out;
 					}
 
@@ -413,14 +423,16 @@ namespace Game3 {
 						std::string value_type = buffer.peekType(0);
 						buffer.skip += value_type.size();
 						const uint32_t length = popBuffer<uint32_t>(buffer);
-						nlohmann::json out;
+						boost::json::value out;
+						auto &object = out.emplace_object();
 						for (uint32_t i = 0; i < length; ++i) {
-							nlohmann::json key = popJSON(buffer, key_type, true);
-							nlohmann::json value = popJSON(buffer, value_type, true);
-							if (key.is_string())
-								out[std::move(key)] = std::move(value);
-							else
-								out[stringifyKey(key)] = std::move(value);
+							boost::json::value key = popJSON(buffer, key_type, true);
+							boost::json::value value = popJSON(buffer, value_type, true);
+							if (const auto *string = key.if_string()) {
+								object[*string] = std::move(value);
+							} else {
+								object[stringifyKey(key)] = std::move(value);
+							}
 						}
 						return out;
 					}
@@ -431,9 +443,11 @@ namespace Game3 {
 						++buffer.skip;
 						std::string type = buffer.peekType(0);
 						buffer.skip += type.size();
-						nlohmann::json out;
-						for (uint32_t i = 0; i < length; ++i)
-							out.push_back(popJSON(buffer, type, true));
+						boost::json::value out;
+						auto &array = out.emplace_array();
+						for (uint32_t i = 0; i < length; ++i) {
+							array.push_back(popJSON(buffer, type, true));
+						}
 						return out;
 					}
 				}
@@ -450,7 +464,9 @@ namespace Game3 {
 				case '\x08': return popBuffer<int64_t>(buffer);
 				case '\x09': return popBuffer<float>(buffer);
 				case '\x0a': return popBuffer<double>(buffer);
+
 				case '\x0b': return popJSON(buffer, type.substr(1), true);
+
 				case '\x0c': assert(!"Empty optional in container subtype"); return {};
 
 				case '\x10': case '\x11': case '\x12': case '\x13': case '\x14': case '\x15': case '\x16': case '\x17':
@@ -459,16 +475,18 @@ namespace Game3 {
 					return {};
 
 				case '\x1f':
-					return popBuffer<std::string>(buffer);
+					return boost::json::value_from(popBuffer<std::string>(buffer));
 
 				case '\x20':
 				case '\x30': case '\x31': case '\x32': case '\x33': case '\x34': case '\x35': case '\x36': case '\x37':
 				case '\x38': case '\x39': case '\x3a': case '\x3b': case '\x3c': case '\x3d': case '\x3e': case '\x3f': {
 					const uint32_t length = type[0] == '\x20'? popBuffer<uint32_t>(buffer) : type[0] - '\x30';
-					nlohmann::json out;
+					boost::json::value out;
+					auto &array = out.emplace_array();
 					std::string_view subtype = type.substr(1);
-					for (uint32_t i = 0; i < length; ++i)
-						out.push_back(popJSON(buffer, subtype, true));
+					for (uint32_t i = 0; i < length; ++i) {
+						array.push_back(popJSON(buffer, subtype, true));
+					}
 					return out;
 				}
 
@@ -476,26 +494,28 @@ namespace Game3 {
 					auto [key_type, value_type] = extractMapTypes(type);
 					buffer.skip += type.size();
 					const uint32_t length = popBuffer<uint32_t>(buffer);
-					nlohmann::json out;
+					boost::json::value out;
+					auto &object = out.emplace_object();
 					for (uint32_t i = 0; i < length; ++i) {
-						nlohmann::json key = popJSON(buffer, key_type, true);
-						nlohmann::json value = popJSON(buffer, value_type, true);
-						if (key.is_string())
-							out[std::move(key)] = std::move(value);
-						else
-							out[stringifyKey(key)] = std::move(value);
+						boost::json::value key = popJSON(buffer, key_type, true);
+						boost::json::value value = popJSON(buffer, value_type, true);
+						if (const auto *string = key.if_string()) {
+							object[*string] = std::move(value);
+						} else {
+							object[stringifyKey(key)] = std::move(value);
+						}
 					}
 					return out;
 				}
 
 				case '\xe0':
-					return *buffer.take<ItemStackPtr>();
+					return boost::json::value_from(*buffer.take<ItemStackPtr>());
 
 				case '\xe1':
-					return buffer.take<ServerInventory>();
+					return boost::json::value_from(buffer.take<ServerInventory>());
 
 				case '\xe2':
-					return std::format("FluidStack<{}>", std::string(buffer.take<FluidStack>()));
+					return boost::json::value_from(std::format("FluidStack<{}>", std::string(buffer.take<FluidStack>())));
 
 				case '\xe3': {
 					buffer.take<ItemFilter>();
@@ -508,33 +528,35 @@ namespace Game3 {
 				}
 
 				case '\xe5':
-					return buffer.take<FloatGene>();
+					return boost::json::value_from(buffer.take<FloatGene>());
 
 				case '\xe6':
-					return buffer.take<LongGene>();
+					return boost::json::value_from(buffer.take<LongGene>());
 
 				case '\xe7':
-					return buffer.take<CircularGene>();
+					return boost::json::value_from(buffer.take<CircularGene>());
 
 				case '\xe8':
-					return buffer.take<StringGene>();
+					return boost::json::value_from(buffer.take<StringGene>());
 
 				case '\xe9':
-					return buffer.take<Position>();
+					return boost::json::value_from(buffer.take<Position>());
 			}
 
 			return {};
 		}
 	}
 
-	nlohmann::json Buffer::popJSON() {
+	boost::json::value Buffer::popJSON() {
 		return Game3::popJSON(*this, peekType(0), false);
 	}
 
-	nlohmann::json Buffer::popAllJSON() {
-		nlohmann::json out;
-		while (!empty())
-			out.push_back(popJSON());
+	boost::json::value Buffer::popAllJSON() {
+		boost::json::value out;
+		auto &array = out.emplace_array();
+		while (!empty()) {
+			array.push_back(popJSON());
+		}
 		return out;
 	}
 
@@ -652,13 +674,13 @@ namespace Game3 {
 	}
 
 	template<>
-	Buffer & operator<<(Buffer &buffer, const nlohmann::json &json) {
-		return buffer << json.dump();
+	Buffer & operator<<(Buffer &buffer, const boost::json::value &json) {
+		return buffer << boost::json::serialize(json);
 	}
 
 	template<>
-	Buffer & operator>>(Buffer &buffer, nlohmann::json &json) {
-		json = nlohmann::json::parse(buffer.take<std::string>());
+	Buffer & operator>>(Buffer &buffer, boost::json::value &json) {
+		json = boost::json::parse(buffer.take<std::string>());
 		return buffer;
 	}
 }

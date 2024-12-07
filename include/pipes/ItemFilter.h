@@ -4,7 +4,7 @@
 #include "threading/Lockable.h"
 #include "types/Types.h"
 
-#include <boost/json/fwd.hpp>
+#include <boost/json.hpp>
 
 #include <map>
 #include <memory>
@@ -25,7 +25,7 @@ namespace Game3 {
 				Comparator comparator{};
 				ItemCount count{};
 
-				Config(boost::json::value data = {}, Comparator comparator = {}, ItemCount count = {}):
+				explicit Config(boost::json::value data = {}, Comparator comparator = {}, ItemCount count = {}):
 					data(std::move(data)), comparator(comparator), count(count) {}
 
 				bool operator()(const ItemStackPtr &, const Inventory &, bool strict) const;

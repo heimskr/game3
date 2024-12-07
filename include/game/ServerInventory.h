@@ -36,10 +36,11 @@ namespace Game3 {
 
 			void notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) override;
 
-			static ServerInventory fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, const std::shared_ptr<Agent> &);
-
-			friend void to_json(nlohmann::json &, const ServerInventory &);
+			friend ServerInventory tag_invoke(boost::json::value_to_tag<ServerInventory>, const boost::json::value &, const std::pair<GamePtr, AgentPtr> &);
+			friend void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ServerInventory &);
 	};
+
+	ServerInventory tag_invoke(boost::json::value_to_tag<ServerInventory>, const boost::json::value &, const std::pair<GamePtr, AgentPtr> &);
 
 	template <typename T>
 	T popBuffer(Buffer &);
@@ -49,5 +50,6 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const ServerInventory &);
 	Buffer & operator>>(Buffer &, ServerInventory &);
 
-	void to_json(nlohmann::json &, const ServerInventory &);
+	ServerInventory tag_invoke(boost::json::value_to_tag<ServerInventory>, const boost::json::value &, const std::pair<GamePtr, AgentPtr> &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ServerInventory &);
 }
