@@ -11,6 +11,8 @@
 #include "util/Cast.h"
 #include "util/Util.h"
 
+#include <boost/json.hpp>
+
 namespace Game3 {
 
 // ItemTexture
@@ -147,7 +149,7 @@ namespace Game3 {
 		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_):
+	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, boost::json::object data_):
 	item(std::move(item_)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
 		item->initStack(*game, *this);
@@ -159,7 +161,7 @@ namespace Game3 {
 		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count, nlohmann::json data):
+	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count, boost::json::object data):
 		item(game->registry<ItemRegistry>().at(id)), count(count), data(std::move(data)), weakGame(game) {
 			assert(item != nullptr);
 			item->initStack(*game, *this);
@@ -196,7 +198,9 @@ namespace Game3 {
 
 	ItemStackPtr ItemStack::withDurability(const GamePtr &game, const ItemID &id, Durability durability) {
 		ItemStackPtr out = ItemStack::create(game, id, 1);
-		out->data["durability"] = std::make_pair(durability, durability);
+		auto &array = out->data["durability"].emplace_array();
+		array.emplace_back(durability);
+		array.emplace_back(durability);
 		return out;
 	}
 
@@ -209,7 +213,10 @@ namespace Game3 {
 			return false;
 		}
 
-		return (data["durability"].at(0) = std::max(0, data["durability"].at(0).get<Durability>() - amount)) == 0;
+		auto &durability = data["durability"].at(0);
+		auto new_durability = std::max(0, boost::json::value_to<Durability>(durability) - amount);
+		durability = new_durability;
+		return new_durability == 0;
 	}
 
 	bool ItemStack::hasAttribute(const Identifier &attribute) const {
@@ -218,7 +225,7 @@ namespace Game3 {
 
 	bool ItemStack::hasDurability() const {
 		if (auto iter = data.find("durability"); iter != data.end()) {
-			return 0 <= iter->get<std::pair<double, double>>().second;
+			return 0 <= iter->value().as_array().at(1).as_double();
 		}
 
 		return false;
@@ -229,8 +236,8 @@ namespace Game3 {
 			return 1.;
 		}
 
-		const std::pair<double, double> &pair = data.at("durability");
-		return pair.first / pair.second;
+		const auto &array = data.at("durability").as_array();
+		return array[0].as_double() / array.at(1).as_double();
 	}
 
 	std::string ItemStack::getTooltip() const {
@@ -247,32 +254,31 @@ namespace Game3 {
 		return item->getItemTexture(shared_from_this());
 	}
 
-	void ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json, ItemStack &stack) {
-		const Identifier id = json.at(0);
-		stack.item = game->registry<ItemRegistry>()[id];
-		stack.count = 1 < json.size()? json.at(1).get<ItemCount>() : 1;
-		if (2 < json.size()) {
-			const auto &extra = json.at(2);
+	ItemStackPtr tag_invoke(boost::json::value_to_tag<ItemStackPtr>, const boost::json::value &json, const GamePtr &game) {
+		auto stack = ItemStack::create(game);
+		auto &array = json.as_array();
+		const Identifier id = boost::json::value_to<Identifier>(json.at(0), game);
+		stack->item = game->registry<ItemRegistry>()[id];
+		stack->count = 1 < array.size()? array[1].as_uint64() : 1;
+		if (2 < array.size()) {
+			const auto &extra = array[2];
 			if (extra.is_string() && extra == "with_durability") {
-				const Durability durability = dynamic_cast<HasMaxDurability &>(*stack.item).maxDurability;
-				stack.data["durability"] = std::make_pair(durability, durability);
+				const Durability durability = dynamic_cast<HasMaxDurability &>(*stack->item).maxDurability;
+				auto &durability_array = stack->data["durability"].emplace_array();
+				durability_array.emplace_back(durability);
+				durability_array.emplace_back(durability);
 			} else {
-				stack.data = extra;
+				stack->data = extra;
 			}
 		}
-		stack.item->initStack(*game, stack);
+		stack->item->initStack(*game, *stack);
+		return stack;
 	}
 
-	ItemStackPtr ItemStack::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		auto out = ItemStack::create(game);
-		fromJSON(game, json, *out);
-		return out;
-	}
-
-	std::vector<ItemStackPtr> ItemStack::manyFromJSON(const GamePtr &game, const nlohmann::json &json) {
+	std::vector<ItemStackPtr> ItemStack::manyFromJSON(const GamePtr &game, const boost::json::value &json) {
 		std::vector<ItemStackPtr> out;
-		for (const auto &item: json) {
-			out.push_back(fromJSON(game, item));
+		for (const auto &item: json.as_array()) {
+			out.emplace_back(boost::json::value_to<ItemStackPtr>(item, game));
 		}
 		return out;
 	}
@@ -294,14 +300,14 @@ namespace Game3 {
 		absorbGame(game);
 		buffer << item->identifier;
 		buffer << count;
-		buffer << data.dump();
+		buffer << boost::json::serialize(data);
 	}
 
 	void ItemStack::decode(Game &game, Buffer &buffer) {
 		absorbGame(game);
 		item = game.registry<ItemRegistry>()[buffer.take<Identifier>()];
 		buffer >> count;
-		data = nlohmann::json::parse(buffer.take<std::string>());
+		data = boost::json::parse(buffer.take<std::string>());
 	}
 
 	ItemStackPtr ItemStack::copy() const {
@@ -362,16 +368,17 @@ namespace Game3 {
 		}
 		const Identifier item_id = buffer.take<Identifier>();
 		stack->count = buffer.take<ItemCount>();
-		stack->data = buffer.take<nlohmann::json>();
+		stack->data = buffer.take<boost::json::value>();
 		stack->item = stack->getGame()->registry<ItemRegistry>().at(item_id);
 		return buffer;
 	}
 
-	void to_json(nlohmann::json &json, const ItemStack &stack) {
-		json[0] = stack.item->identifier;
-		json[1] = stack.count;
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ItemStack &stack) {
+		auto &array = json.as_array();
+		array[0] = boost::json::value_from(stack.item->identifier);
+		array[1] = stack.count;
 		if (!stack.data.empty()) {
-			json[2] = stack.data;
+			array[2] = stack.data;
 		}
 	}
 

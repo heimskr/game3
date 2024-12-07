@@ -110,29 +110,35 @@ namespace Game3 {
 		return true;
 	}
 
-	void CraftingRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = CraftingRecipeRegistry::ID();
-		json["input"] = input;
-		json["output"] = output;
-		if (stationType)
-			json["station"] = stationType;
+	void CraftingRecipe::toJSON(boost::json::value &json) const {
+		boost::json::value_from(*this, json);
 	}
 
-	CraftingRecipe CraftingRecipe::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const CraftingRecipe &recipe) {
+		auto &object = json.emplace_object();
+		object["type"] = boost::json::value_from(CraftingRecipeRegistry::ID());
+		object["input"] = boost::json::value_from(recipe.input);
+		object["output"] = boost::json::value_from(recipe.output);
+		if (recipe.stationType) {
+			object["station"] = boost::json::value_from(recipe.stationType);
+		}
+	}
+
+	CraftingRecipe tag_invoke(boost::json::value_to_tag<CraftingRecipe>, const boost::json::value &json, const GamePtr &game) {
 		CraftingRecipe recipe;
 
-		for (const auto &item: json.at("input"))
-			recipe.input.emplace_back(CraftingRequirement::fromJSON(game, item));
+		const auto &object = json.as_object();
 
-		recipe.output = ItemStack::manyFromJSON(game, json.at("output"));
+		for (const auto &item: object.at("input").as_array()) {
+			recipe.input.emplace_back(boost::json::value_to<CraftingRequirement>(item, game));
+		}
 
-		if (auto iter = json.find("station"); iter != json.end())
-			recipe.stationType = *iter;
+		recipe.output = ItemStack::manyFromJSON(game, object.at("output"));
+
+		if (auto iter = object.find("station"); iter != object.end()) {
+			recipe.stationType = boost::json::value_to<Identifier>(iter->value());
+		}
 
 		return recipe;
-	}
-
-	void to_json(nlohmann::json &json, const CraftingRecipe &recipe) {
-		recipe.toJSON(json);
 	}
 }

@@ -2,7 +2,7 @@
 
 #include <variant>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "item/Item.h"
 
@@ -14,8 +14,6 @@ namespace Game3 {
 
 	struct CraftingRequirement: std::variant<ItemStackPtr, AttributeRequirement> {
 		using std::variant<ItemStackPtr, AttributeRequirement>::variant;
-
-		static CraftingRequirement fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		template <typename T>
 		constexpr inline bool is() const {
@@ -47,5 +45,6 @@ namespace Game3 {
 		}
 	};
 
-	void to_json(nlohmann::json &, const CraftingRequirement &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const CraftingRequirement &);
+	CraftingRequirement tag_invoke(boost::json::value_to_tag<CraftingRequirement>, const boost::json::value &, const GamePtr &game);
 }

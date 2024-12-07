@@ -3,8 +3,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <format>
+#include <memory>
 #include <ostream>
 #include <shared_mutex>
+#include <unordered_map>
 #include <utility>
 
 #include "data/Identifier.h"
@@ -83,7 +85,7 @@ namespace Game3 {
 	using ItemStackPtr = std::shared_ptr<ItemStack>;
 	using ConstItemStackPtr = std::shared_ptr<const ItemStack>;
 
-	using Resources = std::map<Identifier, double>;
+	using Resources = std::unordered_map<Identifier, double>;
 
 	struct Place;
 

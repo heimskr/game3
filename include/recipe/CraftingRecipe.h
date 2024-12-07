@@ -1,12 +1,12 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
-
 #include "data/Identifier.h"
 #include "item/Item.h"
 #include "recipe/CraftingRequirement.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
+
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	struct CraftingRecipe: Recipe<std::vector<CraftingRequirement>, std::vector<ItemStackPtr>> {
@@ -24,14 +24,13 @@ namespace Game3 {
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Crafting will fail if there's not enough space in the output inventory. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(nlohmann::json &) const override;
-
-		static CraftingRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+		void toJSON(boost::json::value &) const override;
 	};
 
 	using CraftingRecipePtr = std::shared_ptr<CraftingRecipe>;
 
-	void to_json(nlohmann::json &, const CraftingRecipe &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const CraftingRecipe &);
+	CraftingRecipe tag_invoke(boost::json::value_to_tag<CraftingRecipe>, const boost::json::value &, const GamePtr &);
 
 	struct CraftingRecipeRegistry: UnnamedJSONRegistry<CraftingRecipe> {
 		static Identifier ID() { return {"base", "registry/crafting_recipe"}; }

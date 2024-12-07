@@ -2,7 +2,7 @@
 
 #include "registry/Registerable.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <memory>
 #include <optional>
@@ -40,7 +40,7 @@ namespace Game3 {
 		/** Attempts to produce the result of the recipe, removing any ingredients from the given container as necessary. Fails without making any changes if there would be any leftover output. */
 		virtual bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) = 0;
 
-		virtual void toJSON(nlohmann::json &) const = 0;
+		virtual void toJSON(boost::json::value &) const = 0;
 
 		virtual bool operator==(const Recipe &other) {
 			return this == &other;

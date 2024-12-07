@@ -1,7 +1,7 @@
 #include "data/Identifier.h"
 #include "net/Buffer.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	std::string Identifier::getPath() const {
@@ -57,11 +57,11 @@ namespace Game3 {
 		return os << identifier.space << ':' << identifier.name;
 	}
 
-	void from_json(const nlohmann::json &json, Identifier &identifier) {
-		identifier = std::string_view(json.get<std::string>());
+	Identifier tag_invoke(boost::json::value_to_tag<Identifier>, const boost::json::value &json) {
+		return {static_cast<std::string_view>(json.get_string())};
 	}
 
-	void to_json(nlohmann::json &json, const Identifier &identifier) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Identifier &identifier) {
 		json = identifier.str();
 	}
 

@@ -6,7 +6,7 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include <format>
 #include <map>
@@ -90,7 +90,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Item> item;
 			ItemCount count = 1;
-			Lockable<nlohmann::json> data;
+			Lockable<boost::json::object> data;
 
 			template <typename... Args>
 			static std::shared_ptr<ItemStack> create(Args &&...args) {
@@ -144,9 +144,7 @@ namespace Game3 {
 
 			std::shared_ptr<ItemTexture> getItemTexture(Game &) const;
 
-			static void fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, ItemStack &);
-			static ItemStackPtr fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
-			static std::vector<ItemStackPtr> manyFromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::vector<ItemStackPtr> manyFromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			void onDestroy();
 			void onDestroy(Game &);
@@ -168,9 +166,9 @@ namespace Game3 {
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Game> &);
 			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
-			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, boost::json::object data_);
 			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount = 1);
-			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, boost::json::object data_);
 
 			void absorbGame(Game &);
 
@@ -192,7 +190,8 @@ namespace Game3 {
 	template <>
 	ItemStackPtr makeForBuffer<ItemStackPtr>(Buffer &);
 
-	void to_json(nlohmann::json &, const ItemStack &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ItemStack &);
+	ItemStackPtr tag_invoke(boost::json::value_to_tag<ItemStackPtr>, const boost::json::value &, const GamePtr &);
 }
 
 template <>

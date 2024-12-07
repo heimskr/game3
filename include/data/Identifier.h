@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Buffer;
@@ -68,8 +68,8 @@ namespace Game3 {
 
 	std::ostream & operator<<(std::ostream &, const Identifier &);
 
-	void from_json(const nlohmann::json &, Identifier &);
-	void to_json(nlohmann::json &, const Identifier &);
+	Identifier tag_invoke(boost::json::value_to_tag<Identifier>, const boost::json::value &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Identifier &);
 
 	Identifier operator""_id(const char *string, size_t);
 	template <typename T>
