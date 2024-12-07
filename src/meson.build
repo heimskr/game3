@@ -18,7 +18,6 @@ game3_deps = [
 	dependency('gl'),
 	dependency('asio'),
 	dependency('liblz4'),
-	dependency('nlohmann_json'),
 	dependency('glm'),
 	dependency('glfw3'),
 	dependency('boost'),

@@ -60,16 +60,19 @@ namespace Game3 {
 
 	std::string ChemicalItem::getTooltip(const ConstItemStackPtr &stack) {
 		std::string formula = getFormula(*stack);
-		if (formula.empty())
+		if (formula.empty()) {
 			return "Unknown Chemical";
-		if (auto iter = moleculeNames.find(formula); iter != moleculeNames.end())
-			return iter->second + " (" + formula + ')';
+		}
+		if (auto iter = moleculeNames.find(formula); iter != moleculeNames.end()) {
+			return std::format("{} ({})", iter->second, formula);
+		}
 		return formula;
 	}
 
 	std::string ChemicalItem::getFormula(const ItemStack &stack) {
-		if (auto iter = stack.data.find("formula"); iter != stack.data.end() && !iter->is_null())
-			return *iter;
+		if (auto iter = stack.data.find("formula"); iter != stack.data.end() && !iter->value().is_null()) {
+			return std::string(iter->value().as_string());
+		}
 		return {};
 	}
 }

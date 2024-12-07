@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class CombinerInput {
@@ -15,7 +15,7 @@ namespace Game3 {
 			CombinerInput() = default;
 
 			std::vector<ItemStackPtr> getStacks(const GamePtr &);
-
-			static CombinerInput fromJSON(const nlohmann::json &, ItemCount *output_count_out = nullptr);
 	};
+
+	CombinerInput tag_invoke(boost::json::value_to_tag<CombinerInput>, const boost::json::value &, ItemCount *output_count_out = nullptr);
 }

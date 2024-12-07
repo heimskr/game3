@@ -113,7 +113,8 @@ namespace Game3 {
 		return true;
 	}
 
-	void BiomassLiquefierRecipe::toJSON(nlohmann::json &json) const {
-		json = output;
+	void BiomassLiquefierRecipe::toJSON(boost::json::value &json) const {
+		// TODO: is this correct?
+		json = boost::json::value_from(output);
 	}
 }

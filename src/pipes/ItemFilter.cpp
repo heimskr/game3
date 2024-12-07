@@ -21,9 +21,11 @@ namespace Game3 {
 	bool ItemFilter::isAllowed(const ItemStackPtr &stack, const Inventory &inventory) const {
 		auto lock = configsByItem.sharedLock();
 
-		if (auto iter = configsByItem.find(stack->item->identifier); iter != configsByItem.end())
-			if (std::ranges::any_of(iter->second, std::bind(&isMatch, std::cref(stack), std::cref(inventory), strict, std::placeholders::_1)))
+		if (auto iter = configsByItem.find(stack->item->identifier); iter != configsByItem.end()) {
+			if (std::ranges::any_of(iter->second, std::bind(&isMatch, std::cref(stack), std::cref(inventory), strict, std::placeholders::_1))) {
 				return allowMode;
+			}
+		}
 
 		return !allowMode;
 	}
@@ -63,36 +65,19 @@ namespace Game3 {
 	}
 
 	bool ItemFilter::Config::operator()(const ItemStackPtr &stack, const Inventory &inventory, bool strict) const {
-		if (strict && stack->data != data)
+		if (strict && stack->data != data) {
 			return false;
+		}
 
 		if (comparator != Comparator::None) {
 			const ItemCount inventory_count = strict? inventory.count(stack) : inventory.count(*stack->item);
-			if (comparator == Comparator::Less)
+			if (comparator == Comparator::Less) {
 				return inventory_count < count;
+			}
 			return inventory_count > count;
 		}
 
 		return true;
-	}
-
-	bool ItemFilter::Config::operator<(const Config &other) const {
-		if (this == &other)
-			return false;
-
-		if (data < other.data)
-			return true;
-
-		if (data > other.data)
-			return false;
-
-		if (comparator < other.comparator)
-			return true;
-
-		if (comparator > other.comparator)
-			return false;
-
-		return count < other.count;
 	}
 
 	template <>

@@ -24,10 +24,10 @@ namespace Game3 {
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(nlohmann::json &) const override;
-
-		static LiquefierRecipe fromJSON(const GamePtr &, const nlohmann::json &);
+		void toJSON(boost::json::value &) const override;
 	};
+
+	LiquefierRecipe tag_invoke(boost::json::value_to_tag<LiquefierRecipe>, const boost::json::value &, const GamePtr &);
 
 	struct LiquefierRecipeRegistry: UnnamedJSONRegistry<LiquefierRecipe> {
 		static Identifier ID() { return {"base", "registry/liquefier_recipe"}; }

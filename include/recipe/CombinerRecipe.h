@@ -6,8 +6,6 @@
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
-#include <nlohmann/json_fwd.hpp>
-
 namespace Game3 {
 	class CombinerResult;
 	class Game;
@@ -18,7 +16,7 @@ namespace Game3 {
 		Identifier outputID;
 
 		CombinerRecipe(Identifier);
-		CombinerRecipe(Identifier, const std::shared_ptr<Game> &, const nlohmann::json &);
+		CombinerRecipe(Identifier, const std::shared_ptr<Game> &, const boost::json::value &);
 
 		Input getInput(const std::shared_ptr<Game> &) override;
 		Output getOutput(const Input &, const std::shared_ptr<Game> &) override;
@@ -28,10 +26,8 @@ namespace Game3 {
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftover) override;
 		/** Doesn't lock either container. Computationally expensive. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(nlohmann::json &) const override;
+		void toJSON(boost::json::value &) const override;
 	};
-
-	void to_json(nlohmann::json &, const CombinerRecipe &);
 
 	struct CombinerRecipeRegistry: NamedRegistry<CombinerRecipe> {
 		static Identifier ID() { return {"base", "registry/combiner"}; }

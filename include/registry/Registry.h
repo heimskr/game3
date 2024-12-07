@@ -5,7 +5,7 @@
 #include "registry/Registerable.h"
 #include "threading/HasMutex.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json.hpp>
 
 #include <map>
 #include <memory>
@@ -40,8 +40,6 @@ namespace Game3 {
 		protected:
 			size_t nextCounter = 0;
 	};
-
-	void from_json(const nlohmann::json &, Registry &);
 
 	class IdentifierRegistry: public Registry {
 		public:
@@ -230,7 +228,7 @@ namespace Game3 {
 	struct UnnamedRegistryBase: Registry {
 		using Registry::Registry;
 
-		virtual void add(const std::shared_ptr<Game> &, const nlohmann::json &) = 0;
+		virtual void add(const std::shared_ptr<Game> &, const boost::json::value &) = 0;
 	};
 
 	template <typename T, template <typename...> typename Set = std::unordered_set>
@@ -278,7 +276,7 @@ namespace Game3 {
 				return false;
 			}
 
-			void add(const std::shared_ptr<Game> &, const nlohmann::json &) override {
+			void add(const std::shared_ptr<Game> &, const boost::json::value &) override {
 				throw std::runtime_error("Adding from JSON unimplemented");
 			}
 
@@ -332,8 +330,8 @@ namespace Game3 {
 		public:
 			using UnnamedRegistry<T, Set>::UnnamedRegistry;
 
-			void add(const std::shared_ptr<Game> &game, const nlohmann::json &json) override {
-				UnnamedRegistry<T, Set>::add(T::fromJSON(game, json));
+			void add(const std::shared_ptr<Game> &game, const boost::json::value &json) override {
+				UnnamedRegistry<T, Set>::add(boost::json::value_to<T>(json, game));
 			}
 	};
 
@@ -483,8 +481,8 @@ namespace Game3 {
 		public:
 			using StringRegistry<T>::StringRegistry;
 
-			void add(const std::shared_ptr<Game> &game, const std::string &name, const nlohmann::json &json) {
-				StringRegistry<T>::add(name, T::fromJSON(game, json));
+			void add(const std::shared_ptr<Game> &game, const std::string &name, const boost::json::value &json) {
+				StringRegistry<T>::add(name, boost::json::value_to<T>(json, game));
 			}
 	};
 }

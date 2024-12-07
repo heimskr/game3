@@ -6,8 +6,6 @@
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
-#include <nlohmann/json_fwd.hpp>
-
 namespace Game3 {
 	class DissolverResult;
 
@@ -16,7 +14,7 @@ namespace Game3 {
 		std::unique_ptr<DissolverResult> dissolverResult;
 
 		DissolverRecipe(Identifier);
-		DissolverRecipe(Identifier, Input, const nlohmann::json &);
+		DissolverRecipe(Identifier, Input, const boost::json::value &);
 
 		Input getInput(const std::shared_ptr<Game> &) override;
 		Output getOutput(const Input &, const std::shared_ptr<Game> &) override;
@@ -29,12 +27,12 @@ namespace Game3 {
 		/** Doesn't lock either container. Computationally expensive (makes a copy of the output inventory). */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
 
-		void toJSON(nlohmann::json &) const override;
+		void toJSON(boost::json::value &) const override;
 
-		static DissolverRecipe fromJSON(const std::shared_ptr<Game> &, const Identifier &, const nlohmann::json &);
+		static DissolverRecipe fromJSON(const std::shared_ptr<Game> &, const Identifier &, const boost::json::value &);
 	};
 
-	void to_json(nlohmann::json &, const DissolverRecipe &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const DissolverRecipe &);
 
 	struct DissolverRecipeRegistry: NamedRegistry<DissolverRecipe> {
 		static Identifier ID() { return {"base", "registry/dissolver"}; }

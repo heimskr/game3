@@ -84,7 +84,11 @@ namespace Game3 {
 template <>
 struct std::hash<Game3::Identifier> {
 	size_t operator()(const Game3::Identifier &identifier) const {
-		return std::hash<std::string>()(static_cast<std::string>(identifier));
+		std::hash<std::string> hasher;
+		uintmax_t hash = hasher(identifier.space);
+		hash <<= sizeof(uintmax_t) * 4;
+		hash ^= hasher(identifier.name);
+		return std::hash<uintmax_t>{}(hash);
 	}
 };
 

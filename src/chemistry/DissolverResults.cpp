@@ -4,9 +4,7 @@
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
 
-#include <random>
-
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	std::vector<ItemStackPtr> DissolverResult::getResult(const std::shared_ptr<Game> &game) {
@@ -15,7 +13,7 @@ namespace Game3 {
 		return out;
 	}
 
-	std::vector<ItemStackPtr> DissolverResult::getResult(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	std::vector<ItemStackPtr> DissolverResult::getResult(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 		auto result = fromJSON(json);
 		assert(result);
 		std::vector<ItemStackPtr> out;
@@ -23,37 +21,52 @@ namespace Game3 {
 		return out;
 	}
 
-	std::unique_ptr<DissolverResult> DissolverResult::fromJSON(const nlohmann::json &json) {
-		if (json.is_string())
+	std::unique_ptr<DissolverResult> DissolverResult::fromJSON(const boost::json::value &json) {
+		if (json.is_string()) {
 			return std::make_unique<ChemicalResult>(json);
+		}
 
-		if (json.is_null())
+		if (json.is_null()) {
 			throw std::runtime_error("Null JSON object encountered in DissolverResult::getResult");
+		}
 
-		if (json.at(0).is_number())
+		if (!json.is_array()) {
+			throw std::runtime_error("Expected an array in DissolverResult::getResult");
+		}
+
+		const auto &array = json.as_array();
+
+		if (array.at(0).is_number()) {
 			return std::make_unique<MultiChemicalResult>(json);
+		}
 
-		const std::string type = json.at(0);
+		std::string type(array.at(0).as_string());
 
-		if (type == "union" || type == "+")
+		if (type == "union" || type == "+") {
 			return std::make_unique<UnionDissolverResult>(json);
+		}
 
-		if (type == "weighted" || type == "*")
+		if (type == "weighted" || type == "*") {
 			return std::make_unique<WeightedDissolverResult>(json);
+		}
 
-		if (type == "random" || type == "?")
+		if (type == "random" || type == "?") {
 			return std::make_unique<RandomDissolverResult>(json);
+		}
 
 		throw std::invalid_argument("Invalid DissolverResult JSON");
 	}
 
-	void to_json(nlohmann::json &json, const DissolverResult &result) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const DissolverResult &result) {
 		result.toJSON(json);
 	}
 
-	UnionDissolverResult::UnionDissolverResult(const nlohmann::json &json) {
-		for (size_t i = 1; i < json.size(); ++i)
-			members.push_back(DissolverResult::fromJSON(json.at(i)));
+	UnionDissolverResult::UnionDissolverResult(const boost::json::value &json) {
+		const auto &array = json.as_array();
+
+		for (size_t i = 1; i < array.size(); ++i) {
+			members.push_back(DissolverResult::fromJSON(array.at(i)));
+		}
 	}
 
 	void UnionDissolverResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStackPtr> &stacks) {
@@ -61,19 +74,21 @@ namespace Game3 {
 			member->add(game, stacks);
 	}
 
-	void UnionDissolverResult::toJSON(nlohmann::json &json) const {
-		json.push_back("+");
+	void UnionDissolverResult::toJSON(boost::json::value &json) const {
+		auto &array = json.emplace_array();
+		array.emplace_back("+");
 		for (const auto &member: members) {
-			nlohmann::json subjson;
+			boost::json::value subjson;
 			member->toJSON(subjson);
-			json.push_back(std::move(subjson));
+			array.push_back(std::move(subjson));
 		}
 	}
 
-	WeightedDissolverResult::WeightedDissolverResult(const nlohmann::json &json) {
-		for (size_t i = 1; i < json.size(); ++i) {
-			const nlohmann::json &item = json.at(i);
-			members.push_back(Member(item.at(0).get<double>(), DissolverResult::fromJSON(item.at(1)))); // clang moment
+	WeightedDissolverResult::WeightedDissolverResult(const boost::json::value &json) {
+		const auto &array = json.as_array();
+		for (size_t i = 1; i < array.size(); ++i) {
+			const auto &item = array.at(i).as_array();
+			members.emplace_back(item.at(0).as_double(), DissolverResult::fromJSON(item.at(1)));
 		}
 	}
 
@@ -101,63 +116,72 @@ namespace Game3 {
 		throw std::logic_error("Impossible condition reached");
 	}
 
-	void WeightedDissolverResult::toJSON(nlohmann::json &json) const {
-		json.push_back("*");
+	void WeightedDissolverResult::toJSON(boost::json::value &json) const {
+		auto &array = json.emplace_array();
+		array.push_back("*");
 		for (const auto &[weight, result]: members) {
-			nlohmann::json subjson{weight, nlohmann::json{}};
-			result->toJSON(subjson.at(1));
-			json.push_back(std::move(subjson));
+			boost::json::array subjson{weight, nullptr};
+			result->toJSON(subjson[1]);
+			array.push_back(std::move(subjson));
 		}
 	}
 
-	RandomDissolverResult::RandomDissolverResult(const nlohmann::json &json) {
-		for (size_t i = 1; i < json.size(); ++i)
-			members.push_back(DissolverResult::fromJSON(json.at(i)));
+	RandomDissolverResult::RandomDissolverResult(const boost::json::value &json) {
+		const auto &array = json.as_array();
+		for (size_t i = 1; i < array.size(); ++i) {
+			members.push_back(DissolverResult::fromJSON(array.at(i)));
+		}
 	}
 
 	void RandomDissolverResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStackPtr> &stacks) {
-		if (!members.empty())
+		if (!members.empty()) {
 			choose(members)->add(game, stacks);
-	}
-
-	void RandomDissolverResult::toJSON(nlohmann::json &json) const {
-		json.push_back("?");
-		for (const auto &member: members) {
-			nlohmann::json subjson;
-			member->toJSON(subjson);
-			json.push_back(std::move(subjson));
 		}
 	}
 
-	ChemicalResult::ChemicalResult(const nlohmann::json &json):
-		formula(json.is_null()? "" : json) {}
-
-	void ChemicalResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStackPtr> &stacks) {
-		if (formula.empty())
-			return;
-
-		if (formula.find(':') == std::string::npos)
-			stacks.push_back(ItemStack::create(game, "base:item/chemical", 1, nlohmann::json{{"formula", formula}}));
-		else
-			stacks.push_back(ItemStack::create(game, Identifier(formula), 1));
+	void RandomDissolverResult::toJSON(boost::json::value &json) const {
+		auto &array = json.emplace_array();
+		array.emplace_back("?");
+		for (const auto &member: members) {
+			boost::json::value subjson;
+			member->toJSON(subjson);
+			array.push_back(std::move(subjson));
+		}
 	}
 
-	void ChemicalResult::toJSON(nlohmann::json &json) const {
+	ChemicalResult::ChemicalResult(const boost::json::value &json):
+		formula(json.is_null()? "" : json.get_string()) {}
+
+	void ChemicalResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStackPtr> &stacks) {
+		if (formula.empty()) {
+			return;
+		}
+
+		if (formula.find(':') == std::string::npos) {
+			stacks.push_back(ItemStack::create(game, "base:item/chemical", 1, boost::json::value{{"formula", formula}}));
+		} else {
+			stacks.push_back(ItemStack::create(game, Identifier(formula), 1));
+		}
+	}
+
+	void ChemicalResult::toJSON(boost::json::value &json) const {
 		json = formula;
 	}
 
-	MultiChemicalResult::MultiChemicalResult(const nlohmann::json &json):
-		result(DissolverResult::fromJSON(json.at(1))), count(json.at(0)) {}
+	MultiChemicalResult::MultiChemicalResult(const boost::json::value &json):
+		result(DissolverResult::fromJSON(json.at(1))), count(boost::json::value_to<decltype(count)>(json.at(0))) {}
 
 	void MultiChemicalResult::add(const std::shared_ptr<Game> &game, std::vector<ItemStackPtr> &stacks) {
-		for (size_t i = 0; i < count; ++i)
+		for (size_t i = 0; i < count; ++i) {
 			result->add(game, stacks);
+		}
 	}
 
-	void MultiChemicalResult::toJSON(nlohmann::json &json) const {
-		json.push_back(count);
-		nlohmann::json subjson;
+	void MultiChemicalResult::toJSON(boost::json::value &json) const {
+		auto &array = json.emplace_array();
+		array.emplace_back(count);
+		boost::json::value subjson;
 		result->toJSON(subjson);
-		json.push_back(std::move(subjson));
+		array.push_back(std::move(subjson));
 	}
 }

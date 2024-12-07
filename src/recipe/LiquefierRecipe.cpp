@@ -95,16 +95,17 @@ namespace Game3 {
 		return true;
 	}
 
-	void LiquefierRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = LiquefierRecipeRegistry::ID();
-		json["input"] = input;
-		json["output"] = output;
+	void LiquefierRecipe::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["type"] = boost::json::value_from(LiquefierRecipeRegistry::ID());
+		object["input"] = boost::json::value_from(input);
+		object["output"] = boost::json::value_from(output);
 	}
 
-	LiquefierRecipe LiquefierRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	LiquefierRecipe tag_invoke(boost::json::value_to_tag<LiquefierRecipe>, const boost::json::value &json, const GamePtr &game) {
 		LiquefierRecipe recipe;
-		recipe.input = ItemStack::fromJSON(game, json.at("input"));
-		recipe.output = FluidStack::fromJSON(*game, json.at("output"));
+		recipe.input = boost::json::value_to<LiquefierRecipe::Input>(json.at("input"), game);
+		recipe.output = boost::json::value_to<LiquefierRecipe::Output>(json.at("output"), game);
 		return recipe;
 	}
 }
