@@ -1,3 +1,4 @@
+#include "entity/Player.h"
 #include "game/Game.h"
 #include "item/Food.h"
 #include "tile/FoodTile.h"

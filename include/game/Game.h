@@ -1,6 +1,5 @@
 #pragma once
 
-#include "entity/Player.h"
 #include "game/HasTickQueue.h"
 #include "game/OwnsVillages.h"
 #include "net/Buffer.h"

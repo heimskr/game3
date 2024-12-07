@@ -1,4 +1,5 @@
 #include "biology/Gene.h"
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "item/ContainmentOrb.h"

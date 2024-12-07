@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity/LivingEntity.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"

@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "entity/Entity.h"
 #include "error/PlayerMissingError.h"
 #include "game/ClientGame.h"
 #include "packet/HeldItemSetPacket.h"

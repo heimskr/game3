@@ -1,6 +1,7 @@
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
 #include "data/RegisterableIdentifier.h"
+#include "entity/Entity.h"
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graph/Graph.h"

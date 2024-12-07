@@ -1,5 +1,4 @@
-#include <iostream>
-
+#include "entity/Player.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/SpriteRenderer.h"

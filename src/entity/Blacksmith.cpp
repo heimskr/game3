@@ -3,6 +3,7 @@
 #include "algorithm/Stonks.h"
 #include "entity/Blacksmith.h"
 #include "entity/Merchant.h"
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/Game.h"

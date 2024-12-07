@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/Game.h"
+#include "graphics/Omniatlas.h"
 #include "graphics/Rectangle.h"
 #include "threading/Atomic.h"
 #include "threading/Waiter.h"
@@ -23,7 +24,6 @@ namespace Game3 {
 	class HasInventory;
 	class LocalClient;
 	class Packet;
-	class Texture;
 	class UIContext;
 
 	class ClientGame: public Game {
@@ -32,7 +32,7 @@ namespace Game3 {
 			bool suppressDisconnectionMessage = false;
 			std::function<void()> errorCallback;
 			SoundEngine sounds;
-			std::shared_ptr<Texture> omniatlas;
+			std::optional<Omniatlas> omniatlas;
 
 			sigc::signal<void(const PlayerPtr &)> signalPlayerInventoryUpdate;
 			sigc::signal<void(const PlayerPtr &)> signalPlayerMoneyUpdate;
@@ -101,7 +101,6 @@ namespace Game3 {
 			bool isConnectedLocally() const;
 
 			void initialSetup(const std::filesystem::path &dir) final;
-			std::shared_ptr<Texture> makeOmniatlas();
 
 		private:
 			std::weak_ptr<Window> weakWindow;

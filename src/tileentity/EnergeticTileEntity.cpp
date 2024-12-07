@@ -1,3 +1,4 @@
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "packet/OpenModuleForAgentPacket.h"

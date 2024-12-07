@@ -1,5 +1,6 @@
 #include "biology/Gene.h"
 #include "entity/Animal.h"
+#include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/TextRenderer.h"
 #include "net/Buffer.h"

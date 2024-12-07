@@ -1,3 +1,4 @@
+#include "entity/Player.h"
 #include "game/EnergyContainer.h"
 #include "game/Game.h"
 #include "game/InventorySpan.h"

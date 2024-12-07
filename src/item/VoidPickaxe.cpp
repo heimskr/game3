@@ -1,8 +1,9 @@
-#include "types/Position.h"
+#include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
 #include "item/VoidPickaxe.h"
 #include "realm/Realm.h"
+#include "types/Position.h"
 #include "util/Util.h"
 
 namespace Game3 {

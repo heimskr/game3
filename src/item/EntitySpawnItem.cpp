@@ -1,4 +1,5 @@
 #include "entity/EntityFactory.h"
+#include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "item/EntitySpawnItem.h"

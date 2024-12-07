@@ -1,6 +1,7 @@
 #include "biome/Biome.h"
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
+#include "entity/Player.h"
 #include "game/Resource.h"
 #include "game/Game.h"
 #include "game/Village.h"

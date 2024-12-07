@@ -1,4 +1,5 @@
 #include "Log.h"
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
