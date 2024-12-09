@@ -1,16 +1,17 @@
 #pragma once
 
+#include <boost/json/fwd.hpp>
+
 #include <memory>
 #include <string>
-
-#include <nlohmann/json_fwd.hpp>
+#include <vector>
 
 namespace Game3 {
 	class Buffer;
 
 	class Gene {
 		public:
-			static std::unique_ptr<Gene> fromJSON(const nlohmann::json &);
+			static std::unique_ptr<Gene> fromJSON(const boost::json::value &);
 
 			Gene(std::string name_);
 
@@ -22,7 +23,7 @@ namespace Game3 {
 			Gene & operator=(const Gene &) = default;
 			Gene & operator=(Gene &&) noexcept = default;
 
-			virtual void toJSON(nlohmann::json &) const = 0;
+			virtual void toJSON(boost::json::value &) const = 0;
 			/** strength ∈ [0.0, 1.0] */
 			virtual void mutate(float strength) = 0;
 			virtual std::string describeShort() const = 0;
@@ -45,12 +46,12 @@ namespace Game3 {
 
 	class FloatGene: public Gene {
 		public:
-			static FloatGene fromJSON(const nlohmann::json &);
+			static FloatGene fromJSON(const boost::json::value &);
 
 			using Gene::Gene;
 			FloatGene(std::string name_, float minimum_, float maximum_, float value_);
 
-			void toJSON(nlohmann::json &) const final;
+			void toJSON(boost::json::value &) const final;
 			void mutate(float strength) final;
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
@@ -73,12 +74,12 @@ namespace Game3 {
 		public:
 			using ValueType = int64_t;
 
-			static LongGene fromJSON(const nlohmann::json &);
+			static LongGene fromJSON(const boost::json::value &);
 
 			using Gene::Gene;
 			LongGene(std::string name_, ValueType minimum_, ValueType maximum_, ValueType value_);
 
-			void toJSON(nlohmann::json &) const final;
+			void toJSON(boost::json::value &) const final;
 			void mutate(float strength) final;
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
@@ -99,12 +100,12 @@ namespace Game3 {
 
 	class CircularGene: public Gene {
 		public:
-			static CircularGene fromJSON(const nlohmann::json &);
+			static CircularGene fromJSON(const boost::json::value &);
 
 			using Gene::Gene;
 			CircularGene(std::string name_, float value_);
 
-			void toJSON(nlohmann::json &) const final;
+			void toJSON(boost::json::value &) const final;
 			void mutate(float strength) final;
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
@@ -123,12 +124,12 @@ namespace Game3 {
 
 	class StringGene: public Gene {
 		public:
-			static StringGene fromJSON(const nlohmann::json &);
+			static StringGene fromJSON(const boost::json::value &);
 
 			using Gene::Gene;
 			StringGene(std::string name_, std::string value_);
 
-			void toJSON(nlohmann::json &) const final;
+			void toJSON(boost::json::value &) const final;
 			void mutate(float strength) final;
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
@@ -159,5 +160,5 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const StringGene &);
 	Buffer & operator>>(Buffer &, StringGene &);
 
-	void to_json(nlohmann::json &, const Gene &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Gene &);
 }

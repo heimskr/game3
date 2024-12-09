@@ -9,12 +9,12 @@ namespace Game3 {
 		tileProvider.updateChunk(chunk_position);
 	}
 
-	void Overworld::absorbJSON(const nlohmann::json &json, bool full_data) {
+	void Overworld::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
 		worldgenParams = json.at("worldgenParams");
 	}
 
-	void Overworld::toJSON(nlohmann::json &json, bool full_data) const {
+	void Overworld::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
 		json["worldgenParams"] = worldgenParams;
 	}

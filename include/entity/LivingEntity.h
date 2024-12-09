@@ -15,8 +15,8 @@ namespace Game3 {
 			bool isInvincible() const { return getMaxHealth() == INVINCIBLE; }
 
 			void onSpawn() override;
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			void renderUpper(const RendererContext &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
@@ -37,8 +37,8 @@ namespace Game3 {
 			virtual void kill();
 			virtual void onAttack(const std::shared_ptr<LivingEntity> &attacker);
 			virtual std::vector<ItemStackPtr> getDrops();
-			virtual bool canAbsorbGenes(const nlohmann::json &) const;
-			virtual void absorbGenes(const nlohmann::json &);
+			virtual bool canAbsorbGenes(const boost::json::value &) const;
+			virtual void absorbGenes(const boost::json::value &);
 			virtual void iterateGenes(const std::function<void(Gene &)> &);
 			virtual void iterateGenes(const std::function<void(const Gene &)> &) const;
 
@@ -51,10 +51,10 @@ namespace Game3 {
 			LivingEntity();
 
 			static float getBaseSpeed();
-			static bool checkGenes(const nlohmann::json &, std::unordered_set<std::string> &&);
+			static bool checkGenes(const boost::json::value &, std::unordered_set<std::string> &&);
 
 			template <typename T>
-			inline void absorbGene(T &gene, const nlohmann::json &json, const std::string &name) {
+			inline void absorbGene(T &gene, const boost::json::value &json, const std::string &name) {
 				gene = T::fromJSON(json.at(name));
 			}
 	};

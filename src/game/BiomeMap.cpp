@@ -1,12 +1,13 @@
 #include "game/BiomeMap.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <zstd.h>
 
 namespace Game3 {
-	void to_json(nlohmann::json &json, const BiomeMap &tilemap) {
-		json["height"] = tilemap.height;
-		json["width"]  = tilemap.width;
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const BiomeMap &tilemap) {
+		auto &object = json.emplace_object();
+		object["height"] = tilemap.height;
+		object["width"]  = tilemap.width;
 
 		// TODO: fix endianness issues
 		const auto tiles_size = tilemap.tiles.size() * sizeof(tilemap.tiles[0]);
@@ -16,18 +17,18 @@ namespace Game3 {
 		if (ZSTD_isError(result))
 			throw std::runtime_error("Couldn't compress tiles");
 		buffer.resize(result);
-		json["tiles"] = std::move(buffer);
+		object["tiles"] = boost::json::value_from(buffer);
 	}
 
-	void from_json(const nlohmann::json &json, BiomeMap &tilemap) {
-		tilemap.height = json.at("height");
-		tilemap.width  = json.at("width");
+	void from_json(const boost::json::value &json, BiomeMap &tilemap) {
+		tilemap.height = static_cast<int>(json.at("height").as_int64());
+		tilemap.width  = static_cast<int>(json.at("width").as_int64());
 
 		// TODO: fix endianness issues
 		tilemap.tiles.clear();
 		const size_t out_size = ZSTD_DStreamOutSize();
 		std::vector<uint8_t> out_buffer(out_size);
-		std::vector<uint8_t> bytes = json.at("tiles");
+		std::vector<uint8_t> bytes = boost::json::value_to<std::vector<uint8_t>>(json.at("tiles"));
 
 		auto context = std::unique_ptr<ZSTD_DCtx, size_t(*)(ZSTD_DCtx *)>(ZSTD_createDCtx(), ZSTD_freeDCtx);
 		auto stream = std::unique_ptr<ZSTD_DStream, size_t(*)(ZSTD_DStream *)>(ZSTD_createDStream(), ZSTD_freeDStream);

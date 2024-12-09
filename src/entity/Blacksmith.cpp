@@ -33,26 +33,29 @@ namespace Game3 {
 		return Entity::create<Blacksmith>(overworld_realm, house_realm, house_position, std::move(keep_));
 	}
 
-	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	std::shared_ptr<Blacksmith> Blacksmith::fromJSON(const GamePtr &game, const boost::json::value &json) {
 		auto out = Entity::create<Blacksmith>();
 		out->absorbJSON(game, json);
 		return out;
 	}
 
-	void Blacksmith::toJSON(nlohmann::json &json) const {
+	void Blacksmith::toJSON(boost::json::value &json) const {
 		Entity::toJSON(json);
 		Worker::toJSON(json);
 		Merchant::toJSON(json);
-		if (0.f < actionTime)
-			json["actionTime"] = actionTime;
+		if (0.f < actionTime) {
+			json.as_object()["actionTime"] = actionTime;
+		}
 	}
 
-	void Blacksmith::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Blacksmith::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		Merchant::absorbJSON(game, json);
-		if (json.contains("actionTime"))
-			actionTime = json.at("actionTime");
+		const auto &object = json.as_object();
+		if (auto iter = object.find("actionTime"); iter != object.end()) {
+			actionTime = iter->value().as_double();
+		}
 	}
 
 	bool Blacksmith::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
@@ -179,7 +182,8 @@ namespace Game3 {
 			pathfind(house->getTileEntity<Teleporter>()->position);
 		} else {
 			phase = 8;
-			pathfind(destination = house->extraData.at("furnace"));
+			destination = boost::json::value_to<Position>(house->extraData.at("furnace"));
+			pathfind(destination);
 		}
 	}
 
@@ -244,7 +248,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (!pathfind(destination = realm->extraData.at("furnace").get<Position>() + Position(1, 0))) {
+		destination = boost::json::value_to<Position>(realm->extraData.at("furnace")) + Position(1, 0);
+
+		if (!pathfind(destination)) {
 			// throw std::runtime_error("Blacksmith couldn't pathfind to forge");
 			stuck = true;
 			return;
@@ -285,10 +291,12 @@ namespace Game3 {
 	}
 
 	void Blacksmith::goToCounter() {
-		if (!pathfind(destination = getRealm()->extraData.at("counter").get<Position>()))
+		destination = boost::json::value_to<Position>(getRealm()->extraData.at("counter"));
+		if (!pathfind(destination)) {
 			stuck = true;
-		else
+		} else {
 			phase = 9;
+		}
 	}
 
 	void Blacksmith::startSelling() {

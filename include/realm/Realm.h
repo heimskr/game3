@@ -23,7 +23,7 @@
 #include "ui/Modifiers.h"
 #include "util/RWLock.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <climits>
 #include <memory>
@@ -49,13 +49,13 @@ namespace Game3 {
 	struct RealmDetails: NamedRegisterable {
 		Identifier tilesetName;
 		RealmDetails():
-			NamedRegisterable(Identifier()) {}
+			NamedRegisterable(Identifier{}) {}
 		RealmDetails(Identifier identifier_, Identifier tileset_name):
 			NamedRegisterable(std::move(identifier_)),
 			tilesetName(std::move(tileset_name)) {}
 	};
 
-	void from_json(const nlohmann::json &, RealmDetails &);
+	void from_json(const boost::json::value &, RealmDetails &);
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		private:
@@ -83,7 +83,7 @@ namespace Game3 {
 			Lockable<std::unordered_set<EntityPtr>, SharedRecursiveMutex> entities;
 			Lockable<std::unordered_map<GlobalID, EntityPtr>> entitiesByGID;
 			Lockable<WeakSet<Player>> players;
-			nlohmann::json extraData;
+			boost::json::value extraData;
 			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
@@ -111,7 +111,7 @@ namespace Game3 {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
-			static std::shared_ptr<Realm> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, bool full_data = false);
+			static std::shared_ptr<Realm> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &, bool full_data = false);
 
 			static std::string getSQL();
 
@@ -237,7 +237,7 @@ namespace Game3 {
 			virtual std::unique_ptr<RealmRenderer> getRenderer();
 
 			/** Full data doesn't include terrain, entities or tile entities. */
-			virtual void toJSON(nlohmann::json &, bool full_data) const;
+			virtual void toJSON(boost::json::value &, bool full_data) const;
 
 			void queueEntityInit(EntityPtr, const Position &);
 
@@ -334,7 +334,7 @@ namespace Game3 {
 			void initTexture();
 
 			/** Full data doesn't include terrain, entities or tile entities. */
-			virtual void absorbJSON(const nlohmann::json &, bool full_data);
+			virtual void absorbJSON(const boost::json::value &, bool full_data);
 
 		private:
 			struct ChunkPackets {

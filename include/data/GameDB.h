@@ -82,7 +82,7 @@ namespace Game3 {
 
 			void writeTilesetMeta(const Tileset &, bool use_transaction = true);
 			/** Returns whether anything was found. */
-			bool readTilesetMeta(const std::string &hash, nlohmann::json &, bool do_lock = true);
+			bool readTilesetMeta(const std::string &hash, boost::json::value &, bool do_lock = true);
 
 			inline bool isOpen() {
 				return database != nullptr;

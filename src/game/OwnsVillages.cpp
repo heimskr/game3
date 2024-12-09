@@ -2,7 +2,7 @@
 #include "game/Game.h"
 #include "realm/Realm.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <SQLiteCpp/SQLiteCpp.h>
 
 #include <optional>
@@ -49,9 +49,9 @@ namespace Game3 {
 			statement.bind(2, village->getRealmID());
 			statement.bind(3, std::string(village->getChunkPosition()));
 			statement.bind(4, std::string(village->getPosition()));
-			statement.bind(5, nlohmann::json(village->options).dump());
-			statement.bind(6, nlohmann::json(village->getRichness()).dump());
-			statement.bind(7, nlohmann::json(village->getResources()).dump());
+			statement.bind(5, boost::json::serialize(boost::json::value_from(village->options)));
+			statement.bind(6, boost::json::serialize(boost::json::value_from(village->getRichness())));
+			statement.bind(7, boost::json::serialize(boost::json::value_from(village->getResources())));
 			statement.bind(8, village->getName());
 			statement.bind(9, int64_t(village->getLabor()));
 			statement.bind(10, village->getRandomValue());
@@ -77,9 +77,9 @@ namespace Game3 {
 			RealmID realm_id(query.getColumn(1).getInt());
 			ChunkPosition chunk_position(query.getColumn(2).getString());
 			Position position(query.getColumn(3).getString());
-			VillageOptions options(nlohmann::json::parse(query.getColumn(4).getString()));
-			Richness richness(nlohmann::json::parse(query.getColumn(5).getString()));
-			Resources resources(nlohmann::json::parse(query.getColumn(6).getString()));
+			auto options = boost::json::value_to<VillageOptions>(boost::json::parse(query.getColumn(4).getString()));
+			auto richness = boost::json::value_to<Richness>(boost::json::parse(query.getColumn(5).getString()));
+			auto resources = boost::json::value_to<Resources>(boost::json::parse(query.getColumn(6).getString()));
 			std::string name(query.getColumn(7));
 			LaborAmount labor(query.getColumn(8).getInt64());
 			double randomValue(query.getColumn(9).getDouble());

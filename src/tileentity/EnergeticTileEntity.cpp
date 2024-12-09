@@ -64,12 +64,12 @@ namespace Game3 {
 		});
 	}
 
-	void EnergeticTileEntity::toJSON(nlohmann::json &json) const {
+	void EnergeticTileEntity::toJSON(boost::json::value &json) const {
 		auto lock = energyContainer->sharedLock();
 		json["energy"] = energyContainer->energy;
 	}
 
-	void EnergeticTileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
+	void EnergeticTileEntity::absorbJSON(const GamePtr &, const boost::json::value &json) {
 		const EnergyAmount amount = json.at("energy");
 		auto lock = energyContainer->uniqueLock();
 		energyContainer->energy = amount;

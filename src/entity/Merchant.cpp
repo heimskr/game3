@@ -15,20 +15,20 @@ namespace Game3 {
 		return Entity::create<Merchant>(std::move(type));
 	}
 
-	std::shared_ptr<Merchant> Merchant::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		auto out = Entity::create<Merchant>(json.at("id"));
+	std::shared_ptr<Merchant> Merchant::fromJSON(const GamePtr &game, const boost::json::value &json) {
+		auto out = Entity::create<Merchant>(boost::json::value_to<Identifier>(json.at("id")));
 		out->absorbJSON(game, json);
 		return out;
 	}
 
-	void Merchant::toJSON(nlohmann::json &json) const {
+	void Merchant::toJSON(boost::json::value &json) const {
 		Entity::toJSON(json);
-		json["greed"] = greed;
+		json.as_object()["greed"] = greed;
 	}
 
-	void Merchant::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Merchant::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		Entity::absorbJSON(game, json);
-		greed = json.at("greed");
+		greed = json.at("greed").as_double();
 	}
 
 	bool Merchant::onInteractNextTo(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) {
@@ -55,7 +55,7 @@ namespace Game3 {
 		buffer >> greed;
 	}
 
-	void to_json(nlohmann::json &json, const Merchant &merchant) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Merchant &merchant) {
 		merchant.toJSON(json);
 	}
 }

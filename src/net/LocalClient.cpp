@@ -8,7 +8,7 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -160,18 +160,18 @@ namespace Game3 {
 	}
 
 	void LocalClient::readTokens(const std::filesystem::path &path) {
-		tokenDatabase = nlohmann::json::parse(readFile(path));
+		tokenDatabase = boost::json::parse(readFile(path));
 		tokenDatabasePath = path;
 	}
 
 	void LocalClient::saveTokens() const {
 		assert(tokenDatabasePath);
-		std::ofstream(*tokenDatabasePath) << nlohmann::json(tokenDatabase).dump();
+		std::ofstream(*tokenDatabasePath) << boost::json::value(tokenDatabase).dump();
 	}
 
 	void LocalClient::saveTokens(const std::filesystem::path &path) {
 		tokenDatabasePath = path;
-		std::ofstream(path) << nlohmann::json(tokenDatabase).dump();
+		std::ofstream(path) << boost::json::value(tokenDatabase).dump();
 	}
 
 	bool LocalClient::hasHostname() const {

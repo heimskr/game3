@@ -90,8 +90,9 @@ namespace Game3 {
 	}
 
 	void ClientInventory::setActive(Slot new_active, bool force) {
-		if (!std::dynamic_pointer_cast<Player>(weakOwner.lock()))
+		if (!std::dynamic_pointer_cast<Player>(weakOwner.lock())) {
 			throw std::runtime_error("Can't set the active slot of a non-player inventory");
+		}
 
 		if (force) {
 			activeSlot = new_active;
@@ -168,8 +169,9 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}
 		const auto gid = buffer.take<GlobalID>();
-		if (inventory.hasOwner())
+		if (inventory.hasOwner()) {
 			inventory.getOwner()->setGID(gid);
+		}
 		inventory.setSlotCount(buffer.take<Slot>());
 		inventory.activeSlot = buffer.take<Slot>();
 		inventory.index = buffer.take<InventoryID>();
@@ -177,10 +179,13 @@ namespace Game3 {
 		return buffer;
 	}
 
-	void to_json(nlohmann::json &json, const ClientInventory &inventory) {
-		for (const auto &[key, val]: inventory.getStorage())
-			json["storage"][std::to_string(key)] = *val;
-		json["slotCount"]  = inventory.getSlotCount();
-		json["activeSlot"] = inventory.activeSlot.load();
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ClientInventory &inventory) {
+		auto &object = json.emplace_object();
+		auto &storage = object["storage"].emplace_object();
+		for (const auto &[slot, stack]: inventory.getStorage()) {
+			storage[std::to_string(slot)] = boost::json::value_from(*stack);
+		}
+		object["slotCount"]  = inventory.getSlotCount();
+		object["activeSlot"] = inventory.activeSlot.load();
 	}
 }

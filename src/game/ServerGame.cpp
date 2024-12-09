@@ -395,7 +395,7 @@ namespace Game3 {
 				if (!realm)
 					return {false, "No realm."};
 				const Position position = player->getPosition() + player->getDirection();
-				nlohmann::json json = nlohmann::json::parse(trim(std::string_view(command).substr(1)));
+				boost::json::value json = boost::json::parse(trim(std::string_view(command).substr(1)));
 				if (realm->hasTileEntityAt(position))
 					return {false, "Tile entity already present."};
 				GamePtr game = realm->getGame();
@@ -422,10 +422,10 @@ namespace Game3 {
 					}
 				}
 
-				nlohmann::json data;
+				boost::json::value data;
 				if (3 < words.size()) {
 					try {
-						data = nlohmann::json::parse(join(std::span(words.begin() + 3, words.end()), " "));
+						data = boost::json::parse(join(std::span(words.begin() + 3, words.end()), " "));
 					} catch (const std::exception &err) {
 						ERROR("{}", err.what());
 						return {false, "Couldn't parse data as JSON."};

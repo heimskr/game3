@@ -9,12 +9,12 @@ namespace Game3 {
 		tileProvider.updateChunk(chunk_position);
 	}
 
-	void ShadowRealm::absorbJSON(const nlohmann::json &json, bool full_data) {
+	void ShadowRealm::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
 		worldgenParams = json.at("worldgenParams");
 	}
 
-	void ShadowRealm::toJSON(nlohmann::json &json, bool full_data) const {
+	void ShadowRealm::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
 		json["worldgenParams"] = worldgenParams;
 	}

@@ -23,16 +23,16 @@ namespace Game3 {
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
-	void Animal::toJSON(nlohmann::json &json) const {
+	void Animal::toJSON(boost::json::value &json) const {
 		LivingEntity::toJSON(json);
 
-		nlohmann::json &genes = json["genes"];
+		auto &genes = json.as_object()["genes"].emplace_object();
 		iterateGenes([&](const Gene &gene) {
-			genes[gene.getName()] = gene;
+			genes[gene.getName()] = boost::json::value_from(gene);
 		});
 	}
 
-	void Animal::absorbJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	void Animal::absorbJSON(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 		LivingEntity::absorbJSON(game, json);
 
 		absorbGenes(json.at("genes"));

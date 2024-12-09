@@ -84,7 +84,7 @@ namespace Game3 {
 		react();
 	}
 
-	void ChemicalReactor::toJSON(nlohmann::json &json) const {
+	void ChemicalReactor::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -125,7 +125,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void ChemicalReactor::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void ChemicalReactor::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -268,7 +268,7 @@ namespace Game3 {
 			};
 
 			for (const auto &[reactant, count]: reactants) {
-				stacks.push_back(ItemStack::create(game, chemical_item, count, nlohmann::json{{"formula", reactant}}));
+				stacks.push_back(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", reactant}}));
 				const ItemCount in_inventory = inventory_copy->count(stacks.back(), slot_predicate);
 				if (in_inventory < count)
 					return false;
@@ -288,7 +288,7 @@ namespace Game3 {
 			};
 
 			for (const auto &[product, count]: products)
-				if (auto leftover = inventory_copy->add(ItemStack::create(game, chemical_item, count, nlohmann::json{{"formula", product}}), predicate))
+				if (auto leftover = inventory_copy->add(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", product}}), predicate))
 					return false;
 		}
 

@@ -14,13 +14,13 @@ namespace Game3 {
 		tileProvider.updateChunk(chunk_position);
 	}
 
-	void ShipRealm::absorbJSON(const nlohmann::json &json, bool full_data) {
+	void ShipRealm::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
 		worldgenParams = json.at("worldgenParams");
 		shipID = json.at("shipID");
 	}
 
-	void ShipRealm::toJSON(nlohmann::json &json, bool full_data) const {
+	void ShipRealm::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
 		json["shipID"] = shipID;
 		json["worldgenParams"] = worldgenParams;

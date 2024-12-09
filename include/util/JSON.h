@@ -1,7 +1,7 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
-	std::string stringifyWithBigInt(const nlohmann::json &);
+	std::string stringifyWithBigInt(const boost::json::value &);
 }

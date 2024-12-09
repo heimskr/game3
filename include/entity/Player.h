@@ -46,8 +46,8 @@ namespace Game3 {
 			void destroy() override;
 
 			HitPoints getMaxHealth() const override;
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			bool isPlayer() const override { return true; }
 			void tick(const TickArgs &) override;
 			void remove() override {}
@@ -108,7 +108,7 @@ namespace Game3 {
 		friend class Entity;
 	};
 
-	void to_json(nlohmann::json &, const Player &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Player &);
 
 	using PlayerPtr = std::shared_ptr<Player>;
 }

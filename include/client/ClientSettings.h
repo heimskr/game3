@@ -3,7 +3,7 @@
 #include "game/SimulationOptions.h"
 #include "types/Types.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <functional>
 #include <string>
@@ -37,6 +37,6 @@ namespace Game3 {
 		void apply() const;
 	};
 
-	void from_json(const nlohmann::json &, ClientSettings &);
-	void to_json(nlohmann::json &, const ClientSettings &);
+	void from_json(const boost::json::value &, ClientSettings &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ClientSettings &);
 }

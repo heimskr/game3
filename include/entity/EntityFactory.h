@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "types/Types.h"
 #include "entity/Entity.h"
@@ -21,7 +21,7 @@ namespace Game3 {
 			EntityFactory(Identifier, decltype(function));
 
 			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &);
-			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &, const nlohmann::json &);
+			std::shared_ptr<Entity> operator()(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			template <typename T>
 			static EntityFactory create(const Identifier &id = T::ID()) {

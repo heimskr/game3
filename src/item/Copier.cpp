@@ -143,7 +143,7 @@ namespace Game3 {
 			TileEntityPtr tile_entity = realm->tileEntityAt(position);
 			if (!tile_entity)
 				continue;
-			nlohmann::json json;
+			boost::json::value json;
 			tile_entity->toJSON(json);
 			json.erase("gid");
 			json.erase("position");

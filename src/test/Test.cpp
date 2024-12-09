@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	void testQuadtree() {
@@ -174,7 +174,7 @@ namespace Game3 {
 
 	void testPlayerJSON() {
 		auto player = Entity::create<ServerPlayer>();
-		std::cout << nlohmann::json(*player).dump() << '\n';
+		std::cout << boost::json::value(*player).dump() << '\n';
 	}
 
 	void testLockableWeakPtr() {

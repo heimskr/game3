@@ -18,29 +18,35 @@ namespace Game3 {
 		keep(std::move(keep_)),
 		keepPosition(keep->position) {}
 
-	void Worker::toJSON(nlohmann::json &json) const {
+	void Worker::toJSON(boost::json::value &json) const {
 		LivingEntity::toJSON(json);
-		json["phase"] = phase;
-		json["overworldRealm"] = overworldRealm;
-		json["house"][0] = houseRealm;
-		json["house"][1] = housePosition;
-		json["keepPosition"] = keep->position;
+		auto &object = json.as_object();
+		object["phase"] = phase;
+		object["overworldRealm"] = overworldRealm;
+		auto &house_array = object["house"].emplace_array();
+		house_array[0] = boost::json::value_from(houseRealm);
+		house_array[1] = boost::json::value_from(housePosition);
+		object["keepPosition"] = boost::json::value_from(keep->position);
 		if (stuck)
-			json["stuck"] = stuck;
-		json["destination"] = destination;
+			object["stuck"] = stuck;
+		object["destination"] = boost::json::value_from(destination);
 	}
 
-	void Worker::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Worker::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		LivingEntity::absorbJSON(game, json);
-		phase          = json.at("phase");
-		overworldRealm = json.at("overworldRealm");
-		houseRealm     = json.at("house").at(0);
-		housePosition  = json.at("house").at(1);
-		keepPosition   = json.at("keepPosition");
-		if (json.contains("destination"))
-			destination = json.at("destination");
-		if (json.contains("stuck"))
-			stuck = json.at("stuck");
+		const auto &object = json.as_object();
+		const auto &house_array = object.at("house").as_array();
+		phase          = static_cast<Phase>(object.at("phase").as_uint64());
+		overworldRealm = boost::json::value_to<RealmID>(object.at("overworldRealm"));
+		houseRealm     = boost::json::value_to<RealmID>(house_array.at(0));
+		housePosition  = boost::json::value_to<Position>(house_array.at(1));
+		keepPosition   = boost::json::value_to<Position>(object.at("keepPosition"));
+		if (auto iter = object.find("destination"); iter != object.end()) {
+			destination = boost::json::value_to<Position>(iter->value());
+		}
+		if (auto iter = object.find("stuck"); iter != object.end()) {
+			stuck = iter->value().as_bool();
+		}
 	}
 
 	void Worker::initAfterLoad(Game &game) {
@@ -144,7 +150,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (!pathfind(destination = realm->extraData.at("bed"))) {
+		destination = boost::json::value_to<Position>(realm->extraData.at("bed"));
+
+		if (!pathfind(destination)) {
 			// throw std::runtime_error("Worker couldn't pathfind to bed");
 			stuck = true;
 			return;

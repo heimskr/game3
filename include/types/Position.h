@@ -12,7 +12,7 @@
 #include <ostream>
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Buffer;
@@ -64,8 +64,8 @@ namespace Game3 {
 
 	std::ostream & operator<<(std::ostream &, const Position &);
 
-	void to_json(nlohmann::json &, const Position &);
-	void from_json(const nlohmann::json &, Position &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Position &);
+	Position tag_invoke(boost::json::value_to_tag<Position>, const boost::json::value &);
 	Buffer & operator+=(Buffer &, const Position &);
 	Buffer & operator<<(Buffer &, const Position &);
 	Buffer & operator>>(Buffer &, Position &);

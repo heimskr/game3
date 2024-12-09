@@ -47,7 +47,7 @@ namespace Game3 {
 
 		for (const auto &[count, string]: inputs) {
 			if (string.find(':') == std::string::npos)
-				out.push_back(ItemStack::create(game, "base:item/chemical", count, nlohmann::json{{"formula", string}}));
+				out.push_back(ItemStack::create(game, "base:item/chemical", count, boost::json::value{{"formula", string}}));
 			else
 				out.push_back(ItemStack::create(game, Identifier(string), count));
 		}

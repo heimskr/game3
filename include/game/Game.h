@@ -23,7 +23,7 @@
 #include <utility>
 #include <variant>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Window;
@@ -94,8 +94,8 @@ namespace Game3 {
 			void add(ModuleFactory &&);
 			void add(MinigameFactory &&);
 			void traverseData(const std::filesystem::path &);
-			void loadData(const nlohmann::json &);
-			void addRecipe(const nlohmann::json &);
+			void loadData(const boost::json::value &);
+			void addRecipe(const boost::json::value &);
 			RealmID newRealmID() const;
 			double getTotalSeconds() const;
 			double getHour() const;
@@ -125,7 +125,7 @@ namespace Game3 {
 			using GameArgument = std::variant<std::shared_ptr<Window>, std::pair<std::shared_ptr<Server>, size_t>>;
 
 			static std::shared_ptr<Game> create(Side, const GameArgument &);
-			static std::shared_ptr<Game> fromJSON(Side, const nlohmann::json &, const GameArgument &);
+			static std::shared_ptr<Game> fromJSON(Side, const boost::json::value &, const GameArgument &);
 
 			ClientGame & toClient();
 			const ClientGame & toClient() const;
@@ -172,7 +172,7 @@ namespace Game3 {
 			}
 	};
 
-	void to_json(nlohmann::json &, const Game &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Game &);
 
 	using GamePtr = std::shared_ptr<Game>;
 }

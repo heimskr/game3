@@ -3,7 +3,7 @@
 #include "realm/Cave.h"
 #include "tile/CaveTile.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	CaveTile::CaveTile(Identifier identifier_, ItemStackPtr stack_, Identifier floor_):

@@ -117,7 +117,7 @@ namespace Game3 {
 				return;
 	}
 
-	void GeothermalGenerator::toJSON(nlohmann::json &json) const {
+	void GeothermalGenerator::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
@@ -155,7 +155,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void GeothermalGenerator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void GeothermalGenerator::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);

@@ -22,7 +22,7 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <atomic>
 #include <functional>
@@ -97,13 +97,13 @@ namespace Game3 {
 				return out;
 			}
 
-			static std::shared_ptr<Entity> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<Entity> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 			static std::shared_ptr<Entity> fromBuffer(const std::shared_ptr<Game> &, Buffer &);
 
 			static std::string getSQL();
 
-			virtual void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
-			virtual void toJSON(nlohmann::json &) const;
+			virtual void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &);
+			virtual void toJSON(boost::json::value &) const;
 			virtual void init(const std::shared_ptr<Game> &);
 			virtual void render(const RendererContext &);
 			virtual void renderUpper(const RendererContext &);
@@ -279,7 +279,7 @@ namespace Game3 {
 			bool setHeld(Slot, Held &);
 	};
 
-	void to_json(nlohmann::json &, const Entity &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Entity &);
 
 	using EntityPtr = std::shared_ptr<Entity>;
 	using WeakEntityPtr = std::weak_ptr<Entity>;

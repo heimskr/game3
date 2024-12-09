@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #ifdef USING_VCPKG
 #include "lib/stb/stb_image.h"
@@ -26,7 +26,7 @@ namespace Game3 {
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
 			dirs.insert(entry);
 
-		std::unordered_map<std::string, nlohmann::json> json_map;
+		std::unordered_map<std::string, boost::json::value> json_map;
 		std::set<std::string> short_autotiles;
 		std::set<std::string> non_autotiles;
 		std::set<std::string> tall_autotiles;
@@ -43,7 +43,7 @@ namespace Game3 {
 			if (!std::filesystem::is_directory(dir))
 				continue;
 
-			nlohmann::json json = nlohmann::json::parse(readFile(dir / "tile.json"));
+			boost::json::value json = boost::json::parse(readFile(dir / "tile.json"));
 			std::string name = dir.filename();
 
 			const Identifier tilename = json.at("tilename");
@@ -52,7 +52,7 @@ namespace Game3 {
 			out.categories["base:category/all_tiles"].insert(tilename);
 
 			if (auto categories = json.find("categories"); categories != json.end()) {
-				for (const nlohmann::json &category_json: *categories) {
+				for (const boost::json::value &category_json: *categories) {
 					Identifier category{category_json};
 					out.categories[category].insert(tilename);
 					out.inverseCategories[tilename].insert(std::move(category));
@@ -66,7 +66,7 @@ namespace Game3 {
 		}
 
 		if (std::filesystem::exists(base_dir / "tileset.json")) {
-			nlohmann::json tileset_meta = nlohmann::json::parse(readFile(base_dir / "tileset.json"));
+			boost::json::value tileset_meta = boost::json::parse(readFile(base_dir / "tileset.json"));
 
 			if (auto autotiles_iter = tileset_meta.find("autotiles"); autotiles_iter != tileset_meta.end()) {
 				for (const auto &[autotile, member]: autotiles_iter->items()) {

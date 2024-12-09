@@ -11,7 +11,7 @@ namespace Game3 {
 		innerRealmID(inner_realm_id),
 		entrance(entrance) {}
 
-	void Building::toJSON(nlohmann::json &json) const {
+	void Building::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["innerRealmID"] = innerRealmID;
 		json["entrance"] = entrance;
@@ -28,7 +28,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Building::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Building::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		innerRealmID = json.at("innerRealmID");
 		entrance = json.at("entrance");

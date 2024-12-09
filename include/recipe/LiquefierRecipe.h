@@ -6,7 +6,7 @@
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	struct LiquefierRecipe: Recipe<ItemStackPtr, FluidStack> {

@@ -5,7 +5,7 @@
 #include "registry/Registries.h"
 #include "tile/MineableTile.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	MineableTile::MineableTile(Identifier identifier_, ItemStackPtr stack_, bool consumable_):

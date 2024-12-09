@@ -1,11 +1,11 @@
 #include "util/JSON.h"
 #include "util/Util.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	namespace {
-		void stringifyWithBigInt(const nlohmann::json &json, std::string &string) {
+		void stringifyWithBigInt(const boost::json::value &json, std::string &string) {
 			if (json.is_object()) {
 				string += '{';
 				bool first = true;
@@ -57,7 +57,7 @@ namespace Game3 {
 		}
 	}
 
-	std::string stringifyWithBigInt(const nlohmann::json &json) {
+	std::string stringifyWithBigInt(const boost::json::value &json) {
 		std::string out;
 		stringifyWithBigInt(json, out);
 		return out;

@@ -62,7 +62,7 @@ namespace Game3 {
 			if (weak_agent) {
 				ERROR("Found TileEntity {} in allAgents, even though getAgent<TileEntity> returned null!", globalID);
 				if (auto entity = std::dynamic_pointer_cast<Entity>(weak_agent->lock())) {
-					nlohmann::json entity_json;
+					boost::json::value entity_json;
 					entity->toJSON(entity_json);
 					INFO("Entity found with same global ID:\n\e[32m{}\e[39m", entity_json.dump());
 				} else {
@@ -74,7 +74,7 @@ namespace Game3 {
 					}
 				}
 
-				nlohmann::json tile_entity_json;
+				boost::json::value tile_entity_json;
 				tileEntity->toJSON(tile_entity_json);
 				INFO("Tile entity data:\n\e[31m{}\e[39m", tile_entity_json.dump());
 				assert(false);

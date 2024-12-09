@@ -213,14 +213,16 @@ namespace Game3 {
 		return os << '(' << position.row << ", " << position.column << ')';
 	}
 
-	void to_json(nlohmann::json &json, const Position &position) {
-		json[0] = position.row;
-		json[1] = position.column;
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Position &position) {
+		auto &array = json.emplace_array();
+		array.emplace_back(position.row);
+		array.emplace_back(position.column);
 	}
 
-	void from_json(const nlohmann::json &json, Position &position) {
-		position.row = json.at(0);
-		position.column = json.at(1);
+	Position tag_invoke(boost::json::value_to_tag<Position>, const boost::json::value &json) {
+		auto row = static_cast<Position::IntType>(json.at(0).as_int64());
+		auto column = static_cast<Position::IntType>(json.at(1).as_int64());
+		return {row, column};
 	}
 
 	template <>

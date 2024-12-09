@@ -31,11 +31,11 @@ namespace Game3 {
 		queueBroadcast(true);
 	}
 
-	void DirectedTileEntity::toJSON(nlohmann::json &json) const {
+	void DirectedTileEntity::toJSON(boost::json::value &json) const {
 		json["direction"] = tileDirection;
 	}
 
-	void DirectedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &json) {
+	void DirectedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &json) {
 		setDirection(json.at("direction"));
 	}
 

@@ -1,6 +1,6 @@
 #include "worldgen/WorldGen.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	namespace WorldGen {
@@ -11,7 +11,7 @@ namespace Game3 {
 		return -.05;
 	}
 
-	void from_json(const nlohmann::json &json, WorldGenParams &params) {
+	void from_json(const boost::json::value &json, WorldGenParams &params) {
 		params.wetness = json.at("wetness");
 		params.stoneLevel = json.at("stoneLevel");
 		params.forestThreshold = json.at("forestThreshold");
@@ -19,7 +19,7 @@ namespace Game3 {
 		params.biomeZoom = json.at("biomeZoom");
 	}
 
-	void to_json(nlohmann::json &json, const WorldGenParams &params) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const WorldGenParams &params) {
 		json["wetness"] = params.wetness;
 		json["stoneLevel"] = params.stoneLevel;
 		json["forestThreshold"] = params.forestThreshold;

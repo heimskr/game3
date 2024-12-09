@@ -15,7 +15,7 @@ namespace Game3 {
 			void generateChunk(const ChunkPosition &) override;
 
 		protected:
-			void absorbJSON(const nlohmann::json &, bool full_data) override;
-			void toJSON(nlohmann::json &, bool full_data) const override;
+			void absorbJSON(const boost::json::value &, bool full_data) override;
+			void toJSON(boost::json::value &, bool full_data) const override;
 	};
 }

@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	class Realm;
@@ -21,12 +21,12 @@ namespace Game3 {
 
 			void ingest(std::string_view);
 			/** Applies a patch to all the tile entity JSONs. */
-			void patch(const nlohmann::json &);
+			void patch(const boost::json::value &);
 			void paste(const std::shared_ptr<Realm> &, const Position &anchor, bool destructive = true, const std::function<void()> &pre_send = {});
 
 		private:
 			std::vector<Identifier> identifiers;
 			std::map<Position, std::array<Identifier *, LAYER_COUNT>> tiles;
-			std::map<Position, nlohmann::json> tileEntityJSON;
+			std::map<Position, boost::json::value> tileEntityJSON;
 	};
 }

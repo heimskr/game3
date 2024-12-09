@@ -96,12 +96,12 @@ namespace Game3 {
 		});
 	}
 
-	void FluidHoldingTileEntity::toJSON(nlohmann::json &json) const {
+	void FluidHoldingTileEntity::toJSON(boost::json::value &json) const {
 		auto lock = fluidContainer->levels.sharedLock();
 		json["fluidLevels"] = fluidContainer->levels.getBase();
 	}
 
-	void FluidHoldingTileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
+	void FluidHoldingTileEntity::absorbJSON(const GamePtr &, const boost::json::value &json) {
 		fluidContainer->levels = json.at("fluidLevels").get<FluidContainer::Map>();
 	}
 

@@ -51,7 +51,7 @@ namespace Game3 {
 		enqueueTick(PERIOD);
 	}
 
-	void Autofarmer::toJSON(nlohmann::json &json) const {
+	void Autofarmer::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -79,7 +79,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Autofarmer::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Autofarmer::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);

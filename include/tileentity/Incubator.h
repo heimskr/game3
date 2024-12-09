@@ -18,8 +18,8 @@ namespace Game3 {
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
@@ -34,7 +34,7 @@ namespace Game3 {
 			Incubator(Identifier tile_id, Position);
 			Incubator(Position);
 
-			static LivingEntityPtr makeEntity(const GamePtr &, const nlohmann::json &genes);
+			static LivingEntityPtr makeEntity(const GamePtr &, const boost::json::value &genes);
 
 		friend class TileEntity;
 	};

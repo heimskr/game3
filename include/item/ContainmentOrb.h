@@ -24,6 +24,6 @@ namespace Game3 {
 			/** Returns whether the stack contains a valid (empty or otherwise) containment orb. */
 			static bool validate(const ItemStackPtr &);
 			static bool isEmpty(const ItemStackPtr &);
-			static void saveToJSON(const EntityPtr &, nlohmann::json &, bool can_modify = false);
+			static void saveToJSON(const EntityPtr &, boost::json::value &, bool can_modify = false);
 	};
 }

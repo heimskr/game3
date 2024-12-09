@@ -33,7 +33,7 @@
 // #define PROFILE_TICKS
 
 namespace Game3 {
-	void from_json(const nlohmann::json &json, RealmDetails &details) {
+	void from_json(const boost::json::value &json, RealmDetails &details) {
 		details.tilesetName = json.at("tileset");
 	}
 
@@ -97,7 +97,7 @@ namespace Game3 {
 
 	void Realm::initTexture() {}
 
-	RealmPtr Realm::fromJSON(const GamePtr &game, const nlohmann::json &json, bool full_data) {
+	RealmPtr Realm::fromJSON(const GamePtr &game, const boost::json::value &json, bool full_data) {
 		const RealmType type = json.at("type");
 		auto factory = game->registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
@@ -116,7 +116,7 @@ namespace Game3 {
 		)";
 	}
 
-	void Realm::absorbJSON(const nlohmann::json &json, bool full_data) {
+	void Realm::absorbJSON(const boost::json::value &json, bool full_data) {
 		auto shared = shared_from_this();
 		id = json.at("id");
 		type = json.at("type");
@@ -139,7 +139,7 @@ namespace Game3 {
 			{
 				auto tile_entities_lock = tileEntities.uniqueLock();
 				auto by_gid_lock = tileEntitiesByGID.uniqueLock();
-				for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, nlohmann::json>>()) {
+				for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, boost::json::value>>()) {
 					auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 					tileEntities.emplace(Position(position_string), tile_entity);
 					tileEntitiesByGID[tile_entity->globalID] = tile_entity;
@@ -1268,7 +1268,7 @@ namespace Game3 {
 		return *tileProvider.getTileset(*game);
 	}
 
-	void Realm::toJSON(nlohmann::json &json, bool full_data) const {
+	void Realm::toJSON(boost::json::value &json, bool full_data) const {
 		json["id"] = id;
 		json["type"] = type;
 		json["seed"] = seed;
@@ -1281,12 +1281,12 @@ namespace Game3 {
 
 		if (full_data) {
 			auto &tile_entities = json["tileEntities"];
-			tile_entities = std::unordered_map<std::string, nlohmann::json>{};
+			tile_entities = std::unordered_map<std::string, boost::json::value>{};
 			for (const auto &[position, tile_entity]: tileEntities)
 				tile_entities[position.simpleString()] = *tile_entity;
-			json["entities"] = std::vector<nlohmann::json>();
+			json["entities"] = std::vector<boost::json::value>();
 			for (const auto &entity: entities) {
-				nlohmann::json entity_json;
+				boost::json::value entity_json;
 				entity->toJSON(entity_json);
 				json["entities"].push_back(std::move(entity_json));
 			}

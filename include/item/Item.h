@@ -90,7 +90,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Item> item;
 			ItemCount count = 1;
-			Lockable<boost::json::object> data;
+			Lockable<boost::json::value> data;
 
 			template <typename... Args>
 			static std::shared_ptr<ItemStack> create(Args &&...args) {
@@ -166,9 +166,9 @@ namespace Game3 {
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Game> &);
 			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
-			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, boost::json::object data_);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, boost::json::value data_);
 			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount = 1);
-			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, boost::json::object data_);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, boost::json::value data_);
 
 			void absorbGame(Game &);
 

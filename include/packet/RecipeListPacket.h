@@ -13,7 +13,7 @@ namespace Game3 {
 			static PacketID ID() { return 53; }
 
 			Identifier recipeType;
-			std::vector<nlohmann::json> recipes;
+			std::vector<boost::json::value> recipes;
 
 			RecipeListPacket() = default;
 			RecipeListPacket(Identifier recipe_type, const CraftingRecipeRegistry &registry):
@@ -27,6 +27,6 @@ namespace Game3 {
 			void handle(const std::shared_ptr<ClientGame> &) override;
 
 		private:
-			static std::vector<nlohmann::json> getRecipes(const CraftingRecipeRegistry &);
+			static std::vector<boost::json::value> getRecipes(const CraftingRecipeRegistry &);
 	};
 }

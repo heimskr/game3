@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Game;
@@ -50,10 +50,11 @@ namespace Game3 {
 
 			std::vector<ItemStackPtr> getStacks() const;
 
-			static Products fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
-
 		private:
 			std::vector<std::unique_ptr<Product>> products;
 
+		friend Products tag_invoke(boost::json::value_to_tag<Products>, const boost::json::value &, const std::shared_ptr<Game> &);
 	};
+
+	Products tag_invoke(boost::json::value_to_tag<Products>, const boost::json::value &, const std::shared_ptr<Game> &);
 }

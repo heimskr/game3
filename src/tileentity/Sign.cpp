@@ -13,7 +13,7 @@ namespace Game3 {
 	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):
 		TileEntity(std::move(tilename), ID(), position_, false), text(std::move(text_)), name(std::move(name_)) {}
 
-	void Sign::toJSON(nlohmann::json &json) const {
+	void Sign::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["text"] = text;
 		json["name"] = name;
@@ -24,7 +24,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Sign::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Sign::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		text = json.at("text");
 		name = json.at("name");

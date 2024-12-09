@@ -7,7 +7,6 @@
 		"zstd",
 		"openssl",
 		"stb",
-		"nlohmann-json",
 		"libnoise",
 		"cxxopts",
 		{

@@ -7,11 +7,11 @@
 #include <string>
 #include <unordered_set>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	namespace {
-		bool isMatch(const std::filesystem::path &path, nlohmann::json &json, bool &is_crop) {
+		bool isMatch(const std::filesystem::path &path, boost::json::value &json, bool &is_crop) {
 			const std::string filename = path.filename().string();
 			bool good = false;
 
@@ -38,7 +38,7 @@ namespace Game3 {
 				}
 			}
 
-			json = nlohmann::json::parse(readFile(path / "tile.json"));
+			json = boost::json::parse(readFile(path / "tile.json"));
 
 			if (good)
 				return true;
@@ -48,7 +48,7 @@ namespace Game3 {
 			};
 
 			if (auto iter = json.find("categories"); iter != json.end())
-				for (const nlohmann::json &category: *iter)
+				for (const boost::json::value &category: *iter)
 					if (category_matches.contains(category.get<std::string>()))
 						return true;
 
@@ -62,12 +62,12 @@ namespace Game3 {
 				continue;
 
 			const std::filesystem::path path = entry.path();
-			nlohmann::json json;
+			boost::json::value json;
 			bool is_crop = false;
 			if (!isMatch(path, json, is_crop))
 				continue;
 
-			nlohmann::json &categories = json["categories"];
+			boost::json::value &categories = json["categories"];
 
 			std::set<std::string> categories_set;
 			if (!categories.is_null())

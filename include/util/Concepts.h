@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	template <typename T>
@@ -35,7 +35,7 @@ namespace Game3 {
 		requires !Set<T>;
 		requires !std::same_as<T, std::string>;
 		requires !std::same_as<T, std::string_view>;
-		requires !std::same_as<T, nlohmann::json>;
+		requires !std::same_as<T, boost::json::value>;
 	};
 
 	template <typename T>
@@ -69,4 +69,7 @@ namespace Game3 {
 
 	template <typename T>
 	concept Duration = is_chrono_duration<T>::value;
+
+	template <typename T>
+	concept EnumClass = !std::is_convertible_v<T, int> && std::is_enum_v<T>;
 }

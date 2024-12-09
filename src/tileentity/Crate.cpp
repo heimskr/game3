@@ -22,7 +22,7 @@ namespace Game3 {
 		return name;
 	}
 
-	void Crate::toJSON(nlohmann::json &json) const {
+	void Crate::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["name"] = name;
 		json["itemName"] = itemName;
@@ -47,7 +47,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Crate::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Crate::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		assert(game->getSide() == Side::Server);
 		name = json.at("name");

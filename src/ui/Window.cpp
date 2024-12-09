@@ -117,7 +117,7 @@ namespace Game3 {
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
 
 			try {
-				settings = nlohmann::json::parse(readFile("settings.json"));
+				settings = boost::json::parse(readFile("settings.json"));
 			} catch (const std::ios_base::failure &) {}
 
 			settings.apply();
@@ -328,7 +328,7 @@ namespace Game3 {
 
 	void Window::saveSettings() {
 		std::ofstream ofs("settings.json");
-		nlohmann::json json;
+		boost::json::value json;
 		{
 			auto lock = settings.sharedLock();
 			json = settings;

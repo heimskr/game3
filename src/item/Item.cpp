@@ -149,7 +149,7 @@ namespace Game3 {
 		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, boost::json::object data_):
+	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, boost::json::value data_):
 	item(std::move(item_)), count(count_), data(std::move(data_)), weakGame(game) {
 		assert(item);
 		item->initStack(*game, *this);
@@ -161,7 +161,7 @@ namespace Game3 {
 		item->initStack(*game, *this);
 	}
 
-	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count, boost::json::object data):
+	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count, boost::json::value data):
 		item(game->registry<ItemRegistry>().at(id)), count(count), data(std::move(data)), weakGame(game) {
 			assert(item != nullptr);
 			item->initStack(*game, *this);
@@ -198,7 +198,8 @@ namespace Game3 {
 
 	ItemStackPtr ItemStack::withDurability(const GamePtr &game, const ItemID &id, Durability durability) {
 		ItemStackPtr out = ItemStack::create(game, id, 1);
-		auto &array = out->data["durability"].emplace_array();
+		auto &object = out->data.emplace_object();
+		auto &array = object["durability"].emplace_array();
 		array.emplace_back(durability);
 		array.emplace_back(durability);
 		return out;
@@ -213,7 +214,8 @@ namespace Game3 {
 			return false;
 		}
 
-		auto &durability = data["durability"].at(0);
+		auto &object = data.as_object();
+		auto &durability = object["durability"].at(0);
 		auto new_durability = std::max(0, boost::json::value_to<Durability>(durability) - amount);
 		durability = new_durability;
 		return new_durability == 0;
@@ -224,8 +226,10 @@ namespace Game3 {
 	}
 
 	bool ItemStack::hasDurability() const {
-		if (auto iter = data.find("durability"); iter != data.end()) {
-			return 0 <= iter->value().as_array().at(1).as_double();
+		if (const auto *object = data.if_object()) {
+			if (auto iter = object->find("durability"); iter != object->end()) {
+				return 0 <= iter->value().as_array().at(1).as_double();
+			}
 		}
 
 		return false;
@@ -236,7 +240,8 @@ namespace Game3 {
 			return 1.;
 		}
 
-		const auto &array = data.at("durability").as_array();
+		const auto &object = data.as_object();
+		const auto &array = object.at("durability").as_array();
 		return array[0].as_double() / array.at(1).as_double();
 	}
 
@@ -264,9 +269,17 @@ namespace Game3 {
 			const auto &extra = array[2];
 			if (extra.is_string() && extra == "with_durability") {
 				const Durability durability = dynamic_cast<HasMaxDurability &>(*stack->item).maxDurability;
-				auto &durability_array = stack->data["durability"].emplace_array();
-				durability_array.emplace_back(durability);
-				durability_array.emplace_back(durability);
+				boost::json::object *object = nullptr;
+				if (stack->data.is_null()) {
+					object = &stack->data.emplace_object();
+				} else {
+					object = stack->data.if_object();
+				}
+				if (object) {
+					auto &durability_array = (*object)["durability"].emplace_array();
+					durability_array.emplace_back(durability);
+					durability_array.emplace_back(durability);
+				}
 			} else {
 				stack->data = extra;
 			}
@@ -377,7 +390,7 @@ namespace Game3 {
 		auto &array = json.as_array();
 		array[0] = boost::json::value_from(stack.item->identifier);
 		array[1] = stack.count;
-		if (!stack.data.empty()) {
+		if (!stack.data.is_null()) {
 			array[2] = stack.data;
 		}
 	}

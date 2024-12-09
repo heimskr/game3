@@ -22,9 +22,9 @@ namespace Game3 {
 
 			ItemCount itemsInsertable(const ItemStackPtr &, Direction, Slot) override;
 
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 			bool onInteractNextTo(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) override;
-			void absorbJSON(const GamePtr &, const nlohmann::json &) override;
+			void absorbJSON(const GamePtr &, const boost::json::value &) override;
 
 			void setInventory(Slot slot_count) override;
 

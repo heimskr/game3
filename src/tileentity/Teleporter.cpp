@@ -13,7 +13,7 @@ namespace Game3 {
 		targetRealm(target_realm),
 		targetPosition(target_position) {}
 
-	void Teleporter::toJSON(nlohmann::json &json) const {
+	void Teleporter::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["targetRealm"] = targetRealm;
 		json["targetPosition"] = targetPosition;
@@ -30,7 +30,7 @@ namespace Game3 {
 		});
 	}
 
-	void Teleporter::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Teleporter::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		targetRealm = json.at("targetRealm");
 		targetPosition = json.at("targetPosition");

@@ -26,7 +26,7 @@ namespace Game3 {
 
 		GamePtr game = weakGame.lock();
 
-		if (!game) {	
+		if (!game) {
 			if (auto realm = weakRealm.lock()) {
 				game = realm->getGame();
 			}
@@ -72,7 +72,7 @@ namespace Game3 {
 		return Entity::create<ServerPlayer>();
 	}
 
-	std::shared_ptr<ServerPlayer> ServerPlayer::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	std::shared_ptr<ServerPlayer> ServerPlayer::fromJSON(const GamePtr &game, const boost::json::value &json) {
 		auto out = Entity::create<ServerPlayer>();
 		out->absorbJSON(game, json);
 		return out;

@@ -11,10 +11,10 @@ namespace Game3 {
 
 			std::string getName() const override { return "Building"; }
 
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			void teleport(const std::shared_ptr<Entity> &);
 			std::shared_ptr<Realm> getInnerRealm() const;
 

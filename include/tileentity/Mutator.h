@@ -17,9 +17,9 @@ namespace Game3 {
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) override;
 
 			void init(Game &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 
 			FluidAmount getMaxLevel(FluidID) override;
 			bool canInsertFluid(FluidStack, Direction) override;

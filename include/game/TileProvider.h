@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "Constants.h"
 #include "types/Position.h"
@@ -189,8 +189,8 @@ namespace Game3 {
 
 			void ensureAllChunks(Position);
 
-			void toJSON(nlohmann::json &, bool full_data = false) const;
-			void absorbJSON(const nlohmann::json &, bool full_data = false);
+			void toJSON(boost::json::value &, bool full_data = false) const;
+			void absorbJSON(const boost::json::value &, bool full_data = false);
 
 			template <typename T>
 			static T access(const Chunk<T> &chunk, int64_t row, int64_t column) {

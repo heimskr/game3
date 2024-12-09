@@ -76,7 +76,7 @@ namespace Game3 {
 		react();
 	}
 
-	void Disruptor::toJSON(nlohmann::json &json) const {
+	void Disruptor::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -109,7 +109,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Disruptor::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Disruptor::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -220,7 +220,7 @@ namespace Game3 {
 		size_t total_atom_count = 0;
 
 		for (const auto &[atom, count]: *atom_counts) {
-			if (output_span.add(ItemStack::create(game, chemical_item, count, nlohmann::json{{"formula", atom}})))
+			if (output_span.add(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", atom}})))
 				return false;
 			total_atom_count += count;
 		}

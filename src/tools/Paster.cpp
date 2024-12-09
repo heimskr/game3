@@ -91,15 +91,15 @@ namespace Game3 {
 				anchor.column = parseNumber<Index>(position_string.substr(comma + 1));
 			}
 
-			tileEntityJSON.emplace(anchor, nlohmann::json::parse(line.substr(equals + 1)));
+			tileEntityJSON.emplace(anchor, boost::json::parse(line.substr(equals + 1)));
 		}
 	}
 
-	void Paster::patch(const nlohmann::json &patch) {
+	void Paster::patch(const boost::json::value &patch) {
 		for (auto &[position, json]: tileEntityJSON) {
 			try {
 				json.patch_inplace(patch);
-			} catch (const nlohmann::json::exception &) {
+			} catch (const boost::json::value::exception &) {
 				// Ignore unsuccessful patches.
 			}
 		}

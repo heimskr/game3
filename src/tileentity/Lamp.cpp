@@ -18,12 +18,12 @@ namespace Game3 {
 	Lamp::Lamp(Position position_):
 		Lamp(TILE_ID_OFF, position_) {}
 
-	void Lamp::toJSON(nlohmann::json &json) const {
+	void Lamp::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["on"] = on;
 	}
 
-	void Lamp::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Lamp::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		on = json.at("on");
 		cachedTile = -1;

@@ -104,7 +104,7 @@ namespace Game3 {
 		inventory->notifyOwner({});
 	}
 
-	void Incubator::toJSON(nlohmann::json &json) const {
+	void Incubator::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
@@ -132,7 +132,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Incubator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Incubator::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
@@ -203,7 +203,7 @@ namespace Game3 {
 		return TileEntity::getGame();
 	}
 
-	LivingEntityPtr Incubator::makeEntity(const GamePtr &game, const nlohmann::json &genes) {
+	LivingEntityPtr Incubator::makeEntity(const GamePtr &game, const boost::json::value &genes) {
 		auto species_iter = genes.find("species");
 		if (species_iter == genes.end()) {
 			ERROR(3, "No species.");

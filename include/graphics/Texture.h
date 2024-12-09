@@ -2,7 +2,7 @@
 
 #include "registry/Registerable.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <filesystem>
 #include <span>
@@ -45,7 +45,7 @@ namespace Game3 {
 			void destroy();
 
 			static std::string filterToString(int);
-			static int stringToFilter(const std::string &);
+			static int stringToFilter(std::string_view);
 
 		private:
 			bool valid = false;
@@ -55,8 +55,8 @@ namespace Game3 {
 
 	TexturePtr cacheTexture(const std::filesystem::path &, bool alpha = true, int filter = -1);
 	TexturePtr cacheTexture(const char *, bool alpha = true, int filter = -1);
-	TexturePtr cacheTexture(const nlohmann::json &);
+	TexturePtr cacheTexture(const boost::json::value &);
 
-	void to_json(nlohmann::json &, const TexturePtr &);
-	void from_json(const nlohmann::json &, TexturePtr &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const TexturePtr &);
+	TexturePtr tag_invoke(boost::json::value_to_tag<TexturePtr>, const boost::json::value &);
 }

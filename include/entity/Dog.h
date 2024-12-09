@@ -23,7 +23,7 @@ namespace Game3 {
 				return Entity::create<Dog>();
 			}
 
-			static std::shared_ptr<Dog> fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+			static std::shared_ptr<Dog> fromJSON(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 				auto out = Entity::create<Dog>();
 				out->absorbJSON(game, json);
 				return out;
@@ -34,8 +34,8 @@ namespace Game3 {
 			/** You do not get to kill the dog. */
 			HitPoints getMaxHealth() const override { return INVINCIBLE; }
 
-			bool canAbsorbGenes(const nlohmann::json &) const override;
-			void absorbGenes(const nlohmann::json &) override;
+			bool canAbsorbGenes(const boost::json::value &) const override;
+			void absorbGenes(const boost::json::value &) override;
 			void iterateGenes(const std::function<void(Gene &)> &) override;
 			void iterateGenes(const std::function<void(const Gene &)> &) const override;
 

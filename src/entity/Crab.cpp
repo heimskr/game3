@@ -13,11 +13,11 @@ namespace Game3 {
 		{8, "base:texture/crab_blue"},
 	};
 
-	bool Crab::canAbsorbGenes(const nlohmann::json &genes) const {
+	bool Crab::canAbsorbGenes(const boost::json::value &genes) const {
 		return checkGenes(genes, {"species", "breed"});
 	}
 
-	void Crab::absorbGenes(const nlohmann::json &genes) {
+	void Crab::absorbGenes(const boost::json::value &genes) {
 		absorbGene(breed, genes, "breed");
 		texture = nullptr;
 	}

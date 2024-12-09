@@ -8,7 +8,7 @@
 #include "threading/ThreadContext.h"
 #include "tile/FenceGateTile.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	bool FenceGateTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {

@@ -4,13 +4,13 @@
 #include "util/Demangle.h"
 #include "util/Timer.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	void filterTest() {
 		auto game = Game::create(Side::Client, nullptr);
 
-		std::vector<nlohmann::json> datas {
+		std::vector<boost::json::value> datas {
 			{},
 			{{"formula", ""}},
 			{{"formula", "Ca5(PO4)3OH"}},

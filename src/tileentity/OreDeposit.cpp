@@ -19,7 +19,7 @@ namespace Game3 {
 		maxUses(max_uses),
 		cooldown(cooldown_) {}
 
-	Ore Ore::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	Ore Ore::fromJSON(const GamePtr &game, const boost::json::value &json) {
 		return {
 			Identifier(), // Should be filled in later by the registry add methods
 			ItemStack::fromJSON(game, json.at(0)),
@@ -36,7 +36,7 @@ namespace Game3 {
 		oreType(ore.identifier),
 		uses(uses_) {}
 
-	void OreDeposit::toJSON(nlohmann::json &json) const {
+	void OreDeposit::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["oreType"] = oreType;
 		json["ready"] = ready;
@@ -44,7 +44,7 @@ namespace Game3 {
 			json["uses"] = uses;
 	}
 
-	void OreDeposit::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void OreDeposit::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		oreType = json.at("oreType");
 		tileID = getOre(*game).tilename;

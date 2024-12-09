@@ -30,17 +30,18 @@ namespace Game3 {
 		return out;
 	}
 
-	Products Products::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	Products tag_invoke(boost::json::value_to_tag<Products>, const boost::json::value &json, const std::shared_ptr<Game> &game) {
 		Products out;
 
-		for (const nlohmann::json &item: json) {
-			const std::string type = item.at(0);
-			if (type == "constant")
-				out.products.emplace_back(std::make_unique<ConstantProduct>(ItemStack::fromJSON(game, item.at(1)), item.at(2)));
-			else if (type == "exponential")
-				out.products.emplace_back(std::make_unique<ExponentialProduct>(ItemStack::fromJSON(game, item.at(1)), item.at(2), item.at(3)));
-			else
-				throw std::invalid_argument("Invalid product type: \"" + type + '"');
+		for (const boost::json::value &item: json.as_array()) {
+			std::string type(item.at(0).as_string());
+			if (type == "constant") {
+				out.products.emplace_back(std::make_unique<ConstantProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), item.at(2)));
+			} else if (type == "exponential") {
+				out.products.emplace_back(std::make_unique<ExponentialProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), item.at(2), item.at(3)));
+			} else {
+				throw std::invalid_argument(std::format("Invalid product type: \"{}\"", type));
+			}
 		}
 
 		return out;

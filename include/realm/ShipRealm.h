@@ -19,8 +19,8 @@ namespace Game3 {
 			ShipRealm() = delete;
 			ShipRealm(const std::shared_ptr<Game> &, RealmID, GlobalID ship_id, int seed_);
 
-			void absorbJSON(const nlohmann::json &, bool full_data) override;
-			void toJSON(nlohmann::json &, bool full_data) const override;
+			void absorbJSON(const boost::json::value &, bool full_data) override;
+			void toJSON(boost::json::value &, bool full_data) const override;
 
 		friend class Realm;
 	};

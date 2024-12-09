@@ -10,7 +10,7 @@ namespace Game3 {
 		TileEntity(std::move(tilename), ID(), position_, false),
 		targetEntity(target_entity) {}
 
-	void EntityBuilding::toJSON(nlohmann::json &json) const {
+	void EntityBuilding::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["targetEntity"] = targetEntity;
 	}
@@ -41,7 +41,7 @@ namespace Game3 {
 		entity->teleport(target->getPosition(), target->getRealm(), MovementContext{.isTeleport = true});
 	}
 
-	void EntityBuilding::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void EntityBuilding::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		targetEntity = json.at("targetEntity");
 	}

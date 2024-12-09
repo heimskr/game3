@@ -140,14 +140,6 @@
 			}]
 		},
 		{
-			"name": "nlohmann-json",
-			"buildsystem": "meson",
-			"sources": [{
-				"type": "git",
-				"url": "https://github.com/nlohmann/json.git"
-			}]
-		},
-		{
 			"name": "stb",
 			"buildsystem": "simple",
 			"build-commands": [

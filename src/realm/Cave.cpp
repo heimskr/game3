@@ -97,7 +97,7 @@ namespace Game3 {
 		return vector;
 	}
 
-	void Cave::absorbJSON(const nlohmann::json &json, bool full_data) {
+	void Cave::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
 		parentRealm = json.at("parentRealm");
 		if (auto iter = json.find("entranceCount"); iter != json.end()) {
@@ -107,7 +107,7 @@ namespace Game3 {
 		}
 	}
 
-	void Cave::toJSON(nlohmann::json &json, bool full_data) const {
+	void Cave::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
 		json["parentRealm"] = parentRealm;
 		if (entranceCount != 1) {

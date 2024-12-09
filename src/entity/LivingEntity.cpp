@@ -18,23 +18,29 @@ namespace Game3 {
 		health = getMaxHealth();
 	}
 
-	void LivingEntity::toJSON(nlohmann::json &json) const {
+	void LivingEntity::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
 		auto this_lock = sharedLock();
-		json["health"] = health;
-		json["luck"] = luckStat;
+		object["health"] = health;
+		object["luck"] = luckStat;
 	}
 
-	void LivingEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
-		if (json.is_null())
+	void LivingEntity::absorbJSON(const GamePtr &, const boost::json::value &json) {
+		if (json.is_null()) {
 			return;
+		}
+
+		const auto &object = json.as_object();
 
 		auto this_lock = uniqueLock();
 
-		if (auto iter = json.find("health"); iter != json.end())
-			health = *iter;
+		if (auto *value = object.if_contains("health")) {
+			health = boost::json::value_to<HitPoints>(*value);
+		}
 
-		if (auto iter = json.find("luck"); iter != json.end())
-			luckStat = *iter;
+		if (auto *value = object.if_contains("luck")) {
+			luckStat = value->as_double();
+		}
 	}
 
 	void LivingEntity::renderUpper(const RendererContext &renderers) {
@@ -147,22 +153,26 @@ namespace Game3 {
 		const double luck = getLuck();
 
 		for (int roll = 0; roll < defense; ++roll) {
-			if (damage == 0)
+			if (damage == 0) {
 				break;
+			}
 
-			if (defense_distribution(threadContext.rng) < 10 * luck)
+			if (defense_distribution(threadContext.rng) < 10 * luck) {
 				--damage;
+			}
 		}
 
 		Color color{1, 0, 0, 1};
-		if (damage == 0)
+		if (damage == 0) {
 			color = {0, 0, 1, 1};
+		}
 
 		RealmPtr realm = getRealm();
 		realm->spawn<TextParticle>(getPosition(), std::to_string(damage), color, .666f);
 
-		if (damage == 0)
+		if (damage == 0) {
 			return false;
+		}
 
 		spawnBlood(3);
 
@@ -182,8 +192,9 @@ namespace Game3 {
 
 		RealmPtr realm = getRealm();
 
-		for (const ItemStackPtr &stack: getDrops())
+		for (const ItemStackPtr &stack: getDrops()) {
 			stack->spawn(Place{getPosition(), realm});
+		}
 
 		queueDestruction();
 	}
@@ -220,11 +231,11 @@ namespace Game3 {
 		return {};
 	}
 
-	bool LivingEntity::canAbsorbGenes(const nlohmann::json &) const {
+	bool LivingEntity::canAbsorbGenes(const boost::json::value &) const {
 		return false;
 	}
 
-	void LivingEntity::absorbGenes(const nlohmann::json &) {}
+	void LivingEntity::absorbGenes(const boost::json::value &) {}
 
 	float LivingEntity::getBaseSpeed() {
 		return 1.5;
@@ -234,12 +245,16 @@ namespace Game3 {
 
 	void LivingEntity::iterateGenes(const std::function<void(const Gene &)> &) const {}
 
-	bool LivingEntity::checkGenes(const nlohmann::json &genes, std::unordered_set<std::string> &&names) {
-		if (genes.size() != names.size())
-			return false;
+	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {
+		const auto &object = genes.as_object();
 
-		for (const auto &[key, value]: genes.items())
+		if (object.size() != names.size()) {
+			return false;
+		}
+
+		for (const auto &[key, value]: object) {
 			names.erase(key);
+		}
 
 		return names.size() == 0;
 	}

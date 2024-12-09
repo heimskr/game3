@@ -15,7 +15,7 @@ namespace Game3 {
 	CraftingStation::CraftingStation(Identifier tile_id, const Position &position_, Identifier station_type, Identifier item_name):
 		TileEntity(std::move(tile_id), ID(), position_, true), stationType(std::move(station_type)), itemName(std::move(item_name)) {}
 
-	void CraftingStation::toJSON(nlohmann::json &json) const {
+	void CraftingStation::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		json["stationType"] = stationType;
 		json["itemName"] = itemName;
@@ -41,7 +41,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void CraftingStation::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void CraftingStation::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		stationType = json.at("stationType");
 		itemName = json.at("itemName");

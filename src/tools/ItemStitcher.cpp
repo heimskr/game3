@@ -13,7 +13,7 @@
 
 #include <cmath>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #ifdef USING_VCPKG
 #include "lib/stb/stb_image.h"
@@ -31,7 +31,7 @@ namespace Game3 {
 			if (std::filesystem::is_directory(entry))
 				dirs.insert(entry);
 
-		std::unordered_map<std::string, nlohmann::json> jsons;
+		std::unordered_map<std::string, boost::json::value> jsons;
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
 
 		TexturePtr texture = std::make_shared<Texture>(itemset_name);
@@ -51,7 +51,7 @@ namespace Game3 {
 		std::set<std::string> names_2x2;
 
 		if (std::filesystem::exists(base_dir / "itemset.json")) {
-			const nlohmann::json itemset_meta = nlohmann::json::parse(readFile(base_dir / "itemset.json"));
+			const boost::json::value itemset_meta = boost::json::parse(readFile(base_dir / "itemset.json"));
 
 			if (auto iter = itemset_meta.find("name"); iter != itemset_meta.end())
 				out.name = *iter;
@@ -60,7 +60,7 @@ namespace Game3 {
 		for (const std::filesystem::path &dir: dirs) {
 			std::string name = dir.filename();
 			std::filesystem::path png_path = base_dir / name / "item.png";
-			jsons[name] = nlohmann::json::parse(readFile(dir / "item.json"));
+			jsons[name] = boost::json::parse(readFile(dir / "item.json"));
 
 			int width{}, height{}, channels{};
 			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
@@ -108,7 +108,7 @@ namespace Game3 {
 
 		auto handle_json = [&](const std::string &name, int scale) {
 			if (auto iter = jsons.find(name); iter != jsons.end()) {
-				const nlohmann::json &json = iter->second;
+				const boost::json::value &json = iter->second;
 				hasher += json.dump();
 				Identifier id = json.at("id");
 

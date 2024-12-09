@@ -5,8 +5,6 @@
 #include "graphics/Texture.h"
 #include "util/Util.h"
 
-#include <unordered_map>
-
 #define STB_IMAGE_IMPLEMENTATION
 #ifdef USING_VCPKG
 #include "lib/stb/stb_image.h"
@@ -14,7 +12,9 @@
 #include "lib/stb/stb_image.h"
 #endif
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
+
+#include <unordered_map>
 
 namespace Game3 {
 	static constexpr GLint DEFAULT_FILTER = GL_NEAREST;
@@ -176,12 +176,12 @@ namespace Game3 {
 		return cacheTexture(std::filesystem::path(path), alpha, filter);
 	}
 
-	std::shared_ptr<Texture> cacheTexture(const nlohmann::json &json) {
-		const std::string path = json.at(0);
+	std::shared_ptr<Texture> cacheTexture(const boost::json::value &json) {
+		std::string path(json.at(0).as_string());
 		if (auto iter = textureCache.find(path); iter != textureCache.end()) {
 			return iter->second;
 		}
-		return textureCache.try_emplace(path, json.get<TexturePtr>()).first->second;
+		return textureCache.try_emplace(std::move(path), boost::json::value_to<TexturePtr>(json)).first->second;
 	}
 
 	std::string Texture::filterToString(int filter) {
@@ -194,7 +194,7 @@ namespace Game3 {
 		}
 	}
 
-	int Texture::stringToFilter(const std::string &string) {
+	int Texture::stringToFilter(std::string_view string) {
 		if (string == "nearest") {
 			return GL_NEAREST;
 		}
@@ -206,15 +206,17 @@ namespace Game3 {
 		throw std::runtime_error(std::format("Unrecognized filter: {}", string));
 	}
 
-	void to_json(nlohmann::json &json, const TexturePtr &texture) {
-		json[0] = texture->path;
-		json[1] = texture->alpha;
-		json[2] = Texture::filterToString(texture->filter);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const TexturePtr &texture) {
+		auto &array = json.emplace_array();
+		array.emplace_back(texture->path);
+		array.emplace_back(texture->alpha);
+		array.emplace_back(Texture::filterToString(texture->filter));
 	}
 
-	void from_json(const nlohmann::json &json, TexturePtr &texture) {
-		bool alpha = 1 < json.size()? json.at(1).get<bool>() : true;
-		int filter = 2 < json.size()? Texture::stringToFilter(json.at(2)) : GL_NEAREST;
-		texture = cacheTexture(json.at(0), alpha, filter);
+	TexturePtr tag_invoke(boost::json::value_to_tag<TexturePtr>, const boost::json::value &json) {
+		const auto &array = json.as_array();
+		bool alpha = 1 < array.size()? array.at(1).as_bool() : true;
+		int filter = 2 < array.size()? Texture::stringToFilter(std::string_view(array.at(2).as_string())) : GL_NEAREST;
+		return cacheTexture(std::filesystem::path(std::string_view(json.at(0).as_string())), alpha, filter);
 	}
 }

@@ -1,13 +1,13 @@
 #include "game/Resource.h"
 #include "threading/ThreadContext.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
-	Resource::Resource(Identifier identifier_, const nlohmann::json &json):
+	Resource::Resource(Identifier identifier_, const boost::json::value &json):
 		NamedRegisterable(std::move(identifier_)),
-		richnessRange(json.at("richnessRange")),
-		likelihood(json.at("likelihood")),
+		richnessRange(boost::json::value_to<decltype(richnessRange)>(json.at("richnessRange"))),
+		likelihood(boost::json::value_to<decltype(likelihood)>(json.at("likelihood"))),
 		cap(findCap(json)) {}
 
 	double Resource::sampleRichness(double factor) const {
@@ -20,9 +20,10 @@ namespace Game3 {
 		return percent(threadContext.rng) < likelihood;
 	}
 
-	double Resource::findCap(const nlohmann::json &json) {
-		if (auto iter = json.find("cap"); iter != json.end())
-			return iter->get<double>();
+	double Resource::findCap(const boost::json::value &json) {
+		if (auto *value = json.as_object().if_contains("cap")) {
+			return value->as_double();
+		}
 		return 100;
 	}
 }

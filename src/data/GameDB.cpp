@@ -17,7 +17,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	GameDB::GameDB(const ServerGamePtr &game):
@@ -319,12 +319,12 @@ namespace Game3 {
 		if (force_migrate)
 			std::filesystem::remove(".force-migrate");
 
-		std::unordered_map<std::string, nlohmann::json> meta_cache;
+		std::unordered_map<std::string, boost::json::value> meta_cache;
 
-		auto get_meta = [&](const std::string &hash) -> const nlohmann::json & {
+		auto get_meta = [&](const std::string &hash) -> const boost::json::value & {
 			if (auto iter = meta_cache.find(hash); iter != meta_cache.end())
 				return iter->second;
-			nlohmann::json json;
+			boost::json::value json;
 			readTilesetMeta(hash, json, false);
 			return meta_cache[hash] = std::move(json);
 		};
@@ -336,9 +336,9 @@ namespace Game3 {
 			if (tileset.getHash() == realm_tileset_hash)
 				return;
 
-			const nlohmann::json &meta = get_meta(realm_tileset_hash);
-			const std::unordered_map<TileID, Identifier> old_map = meta.at("names");
-			const std::unordered_map<Identifier, Identifier> autotiles = meta.at("autotiles");
+			const boost::json::value &meta = get_meta(realm_tileset_hash);
+			const auto old_map = boost::json::value_to<std::unordered_map<TileID, Identifier>>(meta.at("names"));
+			const auto autotiles = boost::json::value_to<std::unordered_map<Identifier, Identifier>>(meta.at("autotiles"));
 
 			INFO("Auto-migrating tiles for realm {}", realm->id);
 
@@ -411,7 +411,7 @@ namespace Game3 {
 			raw_json = query.getColumn(0).getString();
 		}
 
-		RealmPtr realm = Realm::fromJSON(game, nlohmann::json::parse(raw_json), false);
+		RealmPtr realm = Realm::fromJSON(game, boost::json::parse(raw_json), false);
 
 		{
 			SQLite::Statement query{*database, "SELECT tileEntityID, encoded, globalID FROM tileEntities WHERE realmID = ?"};
@@ -481,7 +481,7 @@ namespace Game3 {
 	void GameDB::writeRealmMeta(const RealmPtr &realm, bool use_transaction) {
 		assert(database);
 
-		nlohmann::json json;
+		boost::json::value json;
 		realm->toJSON(json, false);
 
 		auto db_lock = database.uniqueLock();
@@ -493,7 +493,7 @@ namespace Game3 {
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realms VALUES (?, ?, ?)"};
 
 		statement.bind(1, realm->id);
-		statement.bind(2, json.dump());
+		statement.bind(2, boost::json::serialize(json));
 		statement.bind(3, realm->getTileset().getHash());
 
 		statement.exec();
@@ -796,11 +796,11 @@ namespace Game3 {
 
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO tilesets VALUES (?, ?)"};
 
-		nlohmann::json json;
+		boost::json::value json;
 		tileset.getMeta(json);
 
 		statement.bind(1, tileset.getHash());
-		statement.bind(2, json.dump());
+		statement.bind(2, boost::json::serialize(json));
 
 		statement.exec();
 
@@ -808,7 +808,7 @@ namespace Game3 {
 			transaction->commit();
 	}
 
-	bool GameDB::readTilesetMeta(const std::string &hash, nlohmann::json &json, bool do_lock) {
+	bool GameDB::readTilesetMeta(const std::string &hash, boost::json::value &json, bool do_lock) {
 		assert(database);
 
 		std::unique_lock<std::recursive_mutex> db_lock;
@@ -820,7 +820,7 @@ namespace Game3 {
 		query.bind(1, hash);
 
 		if (query.executeStep()) {
-			json = nlohmann::json::parse(query.getColumn(0).getString());
+			json = boost::json::parse(query.getColumn(0).getString());
 			return true;
 		}
 

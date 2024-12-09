@@ -71,29 +71,33 @@ namespace Game3 {
 		return MAX_HEALTH;
 	}
 
-	void Player::toJSON(nlohmann::json &json) const {
+	void Player::toJSON(boost::json::value &json) const {
 		Entity::toJSON(json);
 		LivingEntity::toJSON(json);
-		json["isPlayer"] = true;
-		json["displayName"] = displayName;
-		json["spawnPosition"] = spawnPosition.copyBase();
-		json["spawnRealmID"] = spawnRealmID;
-		json["timeSinceAttack"] = timeSinceAttack;
-		if (0.f < tooldown)
-			json["tooldown"] = tooldown;
+		auto &object = json.as_object();
+		object["isPlayer"] = true;
+		object["displayName"] = displayName;
+		object["spawnPosition"] = boost::json::value_from(spawnPosition.copyBase());
+		object["spawnRealmID"] = spawnRealmID;
+		object["timeSinceAttack"] = timeSinceAttack;
+		if (0.f < tooldown) {
+			object["tooldown"] = tooldown;
+		}
 	}
 
-	void Player::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Player::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		Entity::absorbJSON(game, json);
 		LivingEntity::absorbJSON(game, json);
-		displayName = json.at("displayName");
-		spawnPosition = json.at("spawnPosition");
-		spawnRealmID = json.at("spawnRealmID");
-		timeSinceAttack = json.at("timeSinceAttack");
-		if (auto iter = json.find("tooldown"); iter != json.end())
-			tooldown = *iter;
-		else
+		const auto &object = json.as_object();
+		displayName = object.at("displayName").as_string();
+		spawnPosition = object.at("spawnPosition");
+		spawnRealmID = object.at("spawnRealmID");
+		timeSinceAttack = object.at("timeSinceAttack").as_double();
+		if (auto *value = object.if_contains("tooldown")) {
+			tooldown = value->as_double();;
+		} else {
 			tooldown = 0.f;
+		}
 	}
 
 	void Player::tick(const TickArgs &args) {
@@ -414,7 +418,7 @@ namespace Game3 {
 		continuousInteractionModifiers = {};
 	}
 
-	void to_json(nlohmann::json &json, const Player &player) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Player &player) {
 		player.toJSON(json);
 	}
 }

@@ -47,7 +47,7 @@ namespace Game3 {
 		enqueueTick(PERIOD);
 	}
 
-	void CreativeGenerator::toJSON(nlohmann::json &json) const {
+	void CreativeGenerator::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 	}
@@ -63,7 +63,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void CreativeGenerator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void CreativeGenerator::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 	}

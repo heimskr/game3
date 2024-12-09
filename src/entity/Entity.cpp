@@ -1,6 +1,5 @@
 #include "Log.h"
-#include "types/Position.h"
-#include "graphics/Tileset.h"
+#include "algorithm/AStar.h"
 #include "data/Identifier.h"
 #include "entity/ClientPlayer.h"
 #include "entity/Entity.h"
@@ -14,6 +13,8 @@
 #include "graphics/ItemTexture.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
 #include "packet/EntityPacket.h"
@@ -22,8 +23,8 @@
 #include "packet/HeldItemSetPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "types/Position.h"
 #include "ui/Window.h"
-#include "algorithm/AStar.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 
@@ -37,8 +38,8 @@ namespace Game3 {
 		textureID(std::move(texture_id)),
 		variety(variety_) {}
 
-	EntityPtr Entity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		auto factory = game->registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
+	EntityPtr Entity::fromJSON(const GamePtr &game, const boost::json::value &json) {
+		auto factory = game->registry<EntityFactoryRegistry>().at(boost::json::value_to<EntityType>(json.at("type")));
 		assert(factory);
 		auto out = (*factory)(game, json);
 		out->absorbJSON(game, json);
@@ -103,67 +104,101 @@ namespace Game3 {
 		}
 	}
 
-	void Entity::toJSON(nlohmann::json &json) const {
+	void Entity::toJSON(boost::json::value &json) const {
 		auto this_lock = sharedLock();
-		json["type"]      = type;
-		json["position"]  = position;
-		json["realmID"]   = realmID;
-		json["direction"] = direction;
-		json["age"]       = age;
+		auto &object = json.emplace_object();
+		object["type"]      = boost::json::value_from(type);
+		object["position"]  = boost::json::value_from(position);
+		object["realmID"]   = realmID;
+		object["direction"] = boost::json::value_from(direction);
+		object["age"]       = age;
+
 		if (const InventoryPtr inventory = getInventory(0)) {
 			// TODO: move JSONification to StorageInventory
-			if (getSide() == Side::Client)
-				json["inventory"] = static_cast<ClientInventory &>(*inventory);
-			else
-				json["inventory"] = static_cast<ServerInventory &>(*inventory);
+			if (getSide() == Side::Client) {
+				object["inventory"] = boost::json::value_from(static_cast<ClientInventory &>(*inventory));
+			} else {
+				object["inventory"] = boost::json::value_from(static_cast<ServerInventory &>(*inventory));
+			}
 		}
 
 		{
 			auto path_lock = path.sharedLock();
-			if (!path.empty())
-				json["path"] = path;
+			if (!path.empty()) {
+				object["path"] = boost::json::value_from(path);
+			}
 		}
 
-		if (money != 0)
-			json["money"] = money;
-		if (0 <= heldLeft.slot)
-			json["heldLeft"] = heldLeft.slot;
-		if (0 <= heldRight.slot)
-			json["heldRight"] = heldRight.slot;
-		if (customTexture)
-			json["customTexture"] = customTexture;
+		if (money != 0) {
+			object["money"] = money;
+		}
+
+		if (0 <= heldLeft.slot) {
+			object["heldLeft"] = heldLeft.slot;
+		}
+
+		if (0 <= heldRight.slot) {
+			object["heldRight"] = heldRight.slot;
+		}
+
+		if (customTexture) {
+			object["customTexture"] = boost::json::value_from(customTexture);
+		}
 	}
 
-	void Entity::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
-		if (json.is_null())
+	void Entity::absorbJSON(const GamePtr &game, const boost::json::value &json) {
+		if (json.is_null()) {
 			return; // Hopefully this is because the Entity is being constructed in EntityPacket::decode.
+		}
+
+		const auto &object = json.as_object();
 
 		auto this_lock = uniqueLock();
 
-		if (auto iter = json.find("type"); iter != json.end())
-			type = *iter;
-		if (auto iter = json.find("position"); iter != json.end())
-			position = iter->get<Position>();
-		if (auto iter = json.find("realmID"); iter != json.end())
-			realmID = *iter;
-		if (auto iter = json.find("direction"); iter != json.end())
-			direction = *iter;
-		if (auto iter = json.find("inventory"); iter != json.end())
-			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
-		if (auto iter = json.find("path"); iter != json.end()) {
-			auto path_lock = path.uniqueLock();
-			path = iter->get<std::list<Direction>>();
+		if (auto iter = object.find("type"); iter != object.end()) {
+			type = boost::json::value_to<EntityType>(iter->value());
 		}
-		if (auto iter = json.find("money"); iter != json.end())
-			money = *iter;
-		if (auto iter = json.find("heldLeft"); iter != json.end())
-			heldLeft.slot = *iter;
-		if (auto iter = json.find("heldRight"); iter != json.end())
-			heldRight.slot = *iter;
-		if (auto iter = json.find("customTexture"); iter != json.end())
-			customTexture = *iter;
-		if (auto iter = json.find("age"); iter != json.end())
-			age = *iter;
+
+		if (auto iter = object.find("position"); iter != object.end()) {
+			position = boost::json::value_to<Position>(iter->value());
+		}
+
+		if (auto iter = object.find("realmID"); iter != object.end()) {
+			realmID = boost::json::value_to<RealmID>(iter->value());
+		}
+
+		if (auto iter = object.find("direction"); iter != object.end()) {
+			direction = boost::json::value_to<Direction>(iter->value());
+		}
+
+		if (auto iter = object.find("inventory"); iter != object.end()) {
+			setInventory(std::make_shared<ServerInventory>(boost::json::value_to<ServerInventory>(iter->value(), std::pair{game, shared_from_this()})) , 0);
+		}
+
+		if (auto iter = object.find("path"); iter != object.end()) {
+			auto path_lock = path.uniqueLock();
+			path = boost::json::value_to<std::list<Direction>>(iter->value());
+		}
+
+		if (auto iter = object.find("money"); iter != object.end()) {
+			money = boost::json::value_to<MoneyCount>(iter->value());
+		}
+
+		if (auto iter = object.find("heldLeft"); iter != object.end()) {
+			heldLeft.slot = boost::json::value_to<Slot>(iter->value());
+		}
+
+		if (auto iter = object.find("heldRight"); iter != object.end()) {
+			heldRight.slot = boost::json::value_to<Slot>(iter->value());
+		}
+
+		if (auto iter = object.find("customTexture"); iter != object.end()) {
+			customTexture = boost::json::value_to<Identifier>(iter->value());
+		}
+
+		if (auto iter = object.find("age"); iter != object.end()) {
+			age = iter->value().as_double();
+		}
 
 		increaseUpdateCounter();
 	}
@@ -1394,7 +1429,7 @@ namespace Game3 {
 		customTexture = identifier;
 	}
 
-	void to_json(nlohmann::json &json, const Entity &entity) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Entity &entity) {
 		entity.toJSON(json);
 	}
 }

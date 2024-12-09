@@ -7,6 +7,8 @@
 #include "types/ChunkPosition.h"
 #include "ui/Modifiers.h"
 
+#include <any>
+
 namespace Game3 {
 	class Game;
 	class ItemStack;

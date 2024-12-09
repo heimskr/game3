@@ -4,7 +4,7 @@
 #include <memory>
 #include <random>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "types/Types.h"
 #include "types/ChunkPosition.h"
@@ -34,8 +34,8 @@ namespace Game3 {
 		}
 	};
 
-	void from_json(const nlohmann::json &, WorldGenParams &);
-	void to_json(nlohmann::json &, const WorldGenParams &);
+	void from_json(const boost::json::value &, WorldGenParams &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const WorldGenParams &);
 
 	namespace WorldGen {
 		extern ThreadPool pool;

@@ -14,7 +14,7 @@ namespace Game3 {
 				return Entity::create<Eye>();
 			}
 
-			static std::shared_ptr<Eye> fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+			static std::shared_ptr<Eye> fromJSON(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 				auto out = Entity::create<Eye>();
 				out->absorbJSON(game, json);
 				return out;

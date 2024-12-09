@@ -2,7 +2,7 @@
 #include "game/Game.h"
 #include "net/Buffer.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 
@@ -55,9 +55,10 @@ namespace Game3 {
 		return out;
 	}
 
-	FluidStack FluidStack::fromJSON(const Game &game, const nlohmann::json &json) {
+	FluidStack FluidStack::fromJSON(const Game &game, const boost::json::value &json) {
 		const auto &registry = game.registry<FluidRegistry>();
-		return FluidStack(registry.at(json.at(0).get<Identifier>())->registryID, json.at(1));
+		auto id = static_cast<FluidID>(registry.at(boost::json::value_to<Identifier>(json.at(0)))->registryID);
+		return {id, boost::json::value_to<FluidAmount>(json.at(1))};
 	}
 
 // Buffer specializations

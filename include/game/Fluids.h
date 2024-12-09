@@ -5,7 +5,7 @@
 #include "types/Types.h"
 #include "data/Identifier.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 #include <ostream>
 #include <string>
 
@@ -57,7 +57,7 @@ namespace Game3 {
 
 		auto operator<=>(const FluidStack &) const = default;
 
-		static FluidStack fromJSON(const Game &, const nlohmann::json &);
+		static FluidStack fromJSON(const Game &, const boost::json::value &);
 	};
 
 	template <typename T>

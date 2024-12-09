@@ -13,8 +13,8 @@ namespace Game3 {
 			registry.add(game, json);
 	}
 
-	std::vector<nlohmann::json> RecipeListPacket::getRecipes(const CraftingRecipeRegistry &registry) {
-		std::vector<nlohmann::json> out;
+	std::vector<boost::json::value> RecipeListPacket::getRecipes(const CraftingRecipeRegistry &registry) {
+		std::vector<boost::json::value> out;
 		auto lock = registry.sharedLock();
 		for (const auto &recipe: registry) {
 			out.emplace_back(*recipe);

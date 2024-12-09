@@ -59,7 +59,7 @@ namespace Game3 {
 				return;
 	}
 
-	void Centrifuge::toJSON(nlohmann::json &json) const {
+	void Centrifuge::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
@@ -85,7 +85,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Centrifuge::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Centrifuge::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);

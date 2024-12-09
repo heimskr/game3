@@ -15,10 +15,10 @@ namespace Game3 {
 
 			static std::shared_ptr<Blacksmith> create(const std::shared_ptr<Game> &);
 			static std::shared_ptr<Blacksmith> create(const std::shared_ptr<Game> &, RealmID overworld_realm, RealmID house_realm, Position house_position, std::shared_ptr<Building> keep_);
-			static std::shared_ptr<Blacksmith> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<Blacksmith> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void tick(const TickArgs &) override;
 			std::string getName() const override { return "Blacksmith"; }

@@ -76,7 +76,7 @@ namespace Game3 {
 		}
 	}
 
-	void EternalFountain::toJSON(nlohmann::json &json) const {
+	void EternalFountain::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
@@ -102,7 +102,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void EternalFountain::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void EternalFountain::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);

@@ -18,7 +18,7 @@ namespace Game3 {
 		HasInventory::setInventory(Inventory::create(shared_from_this(), 1), 0);
 	}
 
-	void Microscope::toJSON(nlohmann::json &json) const {
+	void Microscope::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 	}
@@ -41,7 +41,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Microscope::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Microscope::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 	}

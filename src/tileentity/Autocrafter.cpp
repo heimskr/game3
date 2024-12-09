@@ -217,7 +217,7 @@ namespace Game3 {
 		});
 	}
 
-	void Autocrafter::toJSON(nlohmann::json &json) const {
+	void Autocrafter::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -225,7 +225,7 @@ namespace Game3 {
 		json["stationInventory"] = dynamic_cast<ServerInventory &>(*stationInventory);
 	}
 
-	void Autocrafter::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Autocrafter::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);

@@ -98,7 +98,7 @@ namespace Game3 {
 		return stack->data.empty();
 	}
 
-	void ContainmentOrb::saveToJSON(const EntityPtr &entity, nlohmann::json &json, bool can_modify) {
+	void ContainmentOrb::saveToJSON(const EntityPtr &entity, boost::json::value &json, bool can_modify) {
 		json["type"] = entity->type;
 		json["containedName"] = entity->getName();
 

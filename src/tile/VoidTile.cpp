@@ -5,7 +5,7 @@
 #include "registry/Registries.h"
 #include "tile/VoidTile.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	VoidTile::VoidTile():

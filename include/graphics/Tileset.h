@@ -3,6 +3,8 @@
 #include "types/Types.h"
 #include "registry/Registerable.h"
 
+#include <boost/json/fwd.hpp>
+
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -10,8 +12,7 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <nlohmann/json_fwd.hpp>
+#include <vector>
 
 namespace Game3 {
 	class Texture;
@@ -86,7 +87,7 @@ namespace Game3 {
 			std::optional<std::reference_wrapper<const Identifier>> maybe(TileID) const;
 
 			/** Produces a limited amount of JSON about the tileset. */
-			void getMeta(nlohmann::json &) const;
+			void getMeta(boost::json::value &) const;
 
 			static std::string getSQL();
 
