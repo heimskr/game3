@@ -635,7 +635,7 @@ namespace Game3 {
 				std::shared_lock biome_lock(chunkMutexes[getIndex(layer)]);
 				for (auto &[position, chunk]: chunkMaps[getIndex(layer)]) {
 					auto chunk_lock = chunk.sharedLock();
-					tile_array.emplace_back(std::make_pair(std::make_tuple(getIndex(layer), position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
+					tile_array.emplace_back(boost::json::value_from(std::make_pair(std::make_tuple(getIndex(layer), position.x, position.y), compress(std::span(chunk.data(), chunk.size())))));
 				}
 			}
 			data.push_back(std::move(tile_array));
@@ -645,7 +645,7 @@ namespace Game3 {
 				std::shared_lock biome_lock(biomeMutex);
 				for (auto &[position, chunk]: biomeMap) {
 					auto chunk_lock = chunk.sharedLock();
-					biome_array.emplace_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
+					biome_array.emplace_back(boost::json::value_from(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size())))));
 				}
 			}
 			data.push_back(std::move(biome_array));
@@ -655,7 +655,7 @@ namespace Game3 {
 				std::shared_lock path_lock(pathMutex);
 				for (auto &[position, chunk]: pathMap) {
 					auto chunk_lock = chunk.sharedLock();
-					path_array.emplace_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size()))));
+					path_array.emplace_back(boost::json::value_from(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(chunk.data(), chunk.size())))));
 				}
 			}
 			data.push_back(std::move(path_array));
@@ -673,7 +673,7 @@ namespace Game3 {
 							packed.emplace_back(fluid_tile);
 						}
 					}
-					fluid_array.emplace_back(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(packed.data(), packed.size()))));
+					fluid_array.emplace_back(boost::json::value_from(std::make_pair(std::make_pair(position.x, position.y), compress(std::span(packed.data(), packed.size())))));
 				}
 			}
 			data.push_back(std::move(fluid_array));

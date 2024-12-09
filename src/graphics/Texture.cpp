@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
+#include "lib/JSON.h"
 #include "util/Util.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -11,8 +12,6 @@
 #else
 #include "lib/stb/stb_image.h"
 #endif
-
-#include <boost/json.hpp>
 
 #include <unordered_map>
 

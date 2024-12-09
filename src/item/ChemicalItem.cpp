@@ -70,8 +70,10 @@ namespace Game3 {
 	}
 
 	std::string ChemicalItem::getFormula(const ItemStack &stack) {
-		if (auto iter = stack.data.find("formula"); iter != stack.data.end() && !iter->value().is_null()) {
-			return std::string(iter->value().as_string());
+		if (const auto *data = stack.data.if_object()) {
+			if (auto *value = data->if_contains("formula"); value && value->is_string()) {
+				return std::string(value->as_string());
+			}
 		}
 		return {};
 	}

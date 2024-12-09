@@ -15,8 +15,9 @@ namespace Game3 {
 	std::vector<ItemStackPtr> ExponentialProduct::sample() const {
 		ItemCount count = start;
 
-		while (std::uniform_real_distribution(0., 1.)(threadContext.rng) <= chance)
+		while (std::uniform_real_distribution(0., 1.)(threadContext.rng) <= chance) {
 			++count;
+		}
 
 		return {stack->withCount(count)};
 	}
@@ -24,9 +25,11 @@ namespace Game3 {
 	std::vector<ItemStackPtr> Products::getStacks() const {
 		std::vector<ItemStackPtr> out;
 		out.reserve(products.size());
-		for (const auto &product: products)
-			for (const ItemStackPtr &stack: product->sample())
+		for (const auto &product: products) {
+			for (const ItemStackPtr &stack: product->sample()) {
 				out.push_back(stack);
+			}
+		}
 		return out;
 	}
 
@@ -36,9 +39,9 @@ namespace Game3 {
 		for (const boost::json::value &item: json.as_array()) {
 			std::string type(item.at(0).as_string());
 			if (type == "constant") {
-				out.products.emplace_back(std::make_unique<ConstantProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), item.at(2)));
+				out.products.emplace_back(std::make_unique<ConstantProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2))));
 			} else if (type == "exponential") {
-				out.products.emplace_back(std::make_unique<ExponentialProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), item.at(2), item.at(3)));
+				out.products.emplace_back(std::make_unique<ExponentialProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2)), item.at(3).as_double()));
 			} else {
 				throw std::invalid_argument(std::format("Invalid product type: \"{}\"", type));
 			}
