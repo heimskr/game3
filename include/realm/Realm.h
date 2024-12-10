@@ -55,7 +55,7 @@ namespace Game3 {
 			tilesetName(std::move(tileset_name)) {}
 	};
 
-	void from_json(const boost::json::value &, RealmDetails &);
+	RealmDetails tag_invoke(boost::json::value_to_tag<RealmDetails>, const boost::json::value &);
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		private:

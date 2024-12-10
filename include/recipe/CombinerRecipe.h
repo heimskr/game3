@@ -26,7 +26,7 @@ namespace Game3 {
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftover) override;
 		/** Doesn't lock either container. Computationally expensive. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(boost::json::value &) const override;
+		void toJSON(boost::json::value &, const std::shared_ptr<Game> &) const override;
 	};
 
 	struct CombinerRecipeRegistry: NamedRegistry<CombinerRecipe> {

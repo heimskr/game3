@@ -27,12 +27,12 @@ namespace Game3 {
 		/** Doesn't lock either container. Computationally expensive (makes a copy of the output inventory). */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
 
-		void toJSON(boost::json::value &) const override;
+		void toJSON(boost::json::value &, const std::shared_ptr<Game> &) const override;
 
 		static DissolverRecipe fromJSON(const std::shared_ptr<Game> &, const Identifier &, const boost::json::value &);
 	};
 
-	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const DissolverRecipe &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const DissolverRecipe &, const std::shared_ptr<Game> &);
 
 	struct DissolverRecipeRegistry: NamedRegistry<DissolverRecipe> {
 		static Identifier ID() { return {"base", "registry/dissolver"}; }

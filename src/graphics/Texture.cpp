@@ -207,7 +207,7 @@ namespace Game3 {
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const TexturePtr &texture) {
 		auto &array = json.emplace_array();
-		array.emplace_back(texture->path);
+		array.emplace_back(boost::json::value_from(texture->path));
 		array.emplace_back(texture->alpha);
 		array.emplace_back(Texture::filterToString(texture->filter));
 	}

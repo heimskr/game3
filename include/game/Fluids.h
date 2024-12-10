@@ -56,9 +56,10 @@ namespace Game3 {
 		explicit operator std::string() const;
 
 		auto operator<=>(const FluidStack &) const = default;
-
-		static FluidStack fromJSON(const Game &, const boost::json::value &);
 	};
+
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const FluidStack &, const GamePtr &);
+	FluidStack tag_invoke(boost::json::value_to_tag<FluidStack>, const boost::json::value &, const GamePtr &);
 
 	template <typename T>
 	T popBuffer(Buffer &);

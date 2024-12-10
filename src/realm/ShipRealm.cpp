@@ -2,6 +2,7 @@
 
 #include "entity/Ship.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "realm/ShipRealm.h"
 #include "worldgen/ShipRealmGen.h"
 
@@ -16,13 +17,14 @@ namespace Game3 {
 
 	void ShipRealm::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
-		worldgenParams = json.at("worldgenParams");
-		shipID = json.at("shipID");
+		worldgenParams = boost::json::value_to<WorldGenParams>(json.at("worldgenParams"));
+		shipID = boost::json::value_to<GlobalID>(json.at("shipID"));
 	}
 
 	void ShipRealm::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
-		json["shipID"] = shipID;
-		json["worldgenParams"] = worldgenParams;
+		auto &object = ensureObject(json);
+		object["shipID"] = shipID;
+		object["worldgenParams"] = boost::json::value_from(worldgenParams);
 	}
 }

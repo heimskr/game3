@@ -52,15 +52,15 @@ namespace Game3 {
 		return true;
 	}
 
-	void GeothermalRecipe::toJSON(boost::json::value &json) const {
+	void GeothermalRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
 		auto &object = json.emplace_object();
 		object["type"] = boost::json::value_from(GeothermalRecipeRegistry::ID());
-		object["input"] = boost::json::value_from(input);
+		object["input"] = boost::json::value_from(input, game);
 		object["output"] = boost::json::value_from(output);
 	}
 
-	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const GeothermalRecipe &recipe) {
-		recipe.toJSON(json);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const GeothermalRecipe &recipe, const GamePtr &game) {
+		recipe.toJSON(json, game);
 	}
 
 	GeothermalRecipe tag_invoke(boost::json::value_to_tag<GeothermalRecipe>, const boost::json::value &json, const std::shared_ptr<Game> &game) {

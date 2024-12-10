@@ -336,9 +336,9 @@ namespace Game3 {
 
 		boost::json::serializer serializer;
 		serializer.reset(&json);
-		char buf[513];
+		char buffer[512];
 		while (!serializer.done()) {
-			ofs << serializer.read(buf);
+			ofs << serializer.read(buffer);
 		}
 	}
 

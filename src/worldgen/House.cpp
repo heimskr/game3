@@ -1,6 +1,7 @@
 #include "entity/Miner.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -33,7 +34,7 @@ namespace Game3::WorldGen {
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
 		realm->setTile(Layer::Objects, bed_position, choose(beds, rng), false);
-		realm->extraData["bed"] = bed_position;
+		ensureObject(realm->extraData)["bed"] = boost::json::value_from(bed_position);
 
 		// const auto house_position = entrance - Position(1, 0);
 		// realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,

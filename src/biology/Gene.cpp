@@ -33,7 +33,7 @@ namespace Game3 {
 			return std::make_unique<StringGene>(StringGene::fromJSON(json));
 		}
 
-		throw std::invalid_argument(std::format("Unknown gene type: \"{}\"", type));
+		return nullptr;
 	}
 
 // FloatGene

@@ -9,16 +9,21 @@ namespace Game3 {
 		auto &registry = game->registry<CraftingRecipeRegistry>();
 		auto lock = registry.uniqueLock();
 		registry.clear();
-		for (const auto &json: recipes)
+		for (const auto &json: recipes) {
 			registry.add(game, json);
+		}
 	}
 
-	std::vector<boost::json::value> RecipeListPacket::getRecipes(const CraftingRecipeRegistry &registry) {
+	std::vector<boost::json::value> RecipeListPacket::getRecipes(const CraftingRecipeRegistry &registry, const GamePtr &game) {
 		std::vector<boost::json::value> out;
 		auto lock = registry.sharedLock();
 		for (const auto &recipe: registry) {
-			out.emplace_back(*recipe);
-			out.back().erase("type");
+			boost::json::value recipe_json;
+			recipe->toJSON(recipe_json, game);
+			out.emplace_back(std::move(recipe_json));
+			auto *object = out.back().if_object();
+			assert(object != nullptr);
+			object->erase("type");
 		}
 		return out;
 	}

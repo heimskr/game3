@@ -6,20 +6,26 @@
 
 #include <filesystem>
 #include <format>
+#include <ostream>
 
 namespace Game3 {
+	namespace JSON = boost::json;
+
 	template <EnumClass EC>
-	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, EC ec) {
-		json = boost::json::value_from(static_cast<std::underlying_type_t<EC>>(ec));
+	void tag_invoke(JSON::value_from_tag, JSON::value &json, EC ec) {
+		json = JSON::value_from(static_cast<std::underlying_type_t<EC>>(ec));
 	}
 
 	template <EnumClass EC>
-	EC tag_invoke(boost::json::value_to_tag<EC>, const boost::json::value &json) {
-		return static_cast<EC>(boost::json::value_to<std::underlying_type_t<EC>>(json));
+	EC tag_invoke(JSON::value_to_tag<EC>, const JSON::value &json) {
+		return static_cast<EC>(JSON::value_to<std::underlying_type_t<EC>>(json));
 	}
 
-	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const std::filesystem::path &path);
-	std::filesystem::path tag_invoke(boost::json::value_to_tag<std::filesystem::path>, const boost::json::value &);
+	void tag_invoke(JSON::value_from_tag, JSON::value &json, const std::filesystem::path &path);
+	std::filesystem::path tag_invoke(JSON::value_to_tag<std::filesystem::path>, const JSON::value &);
+
+	JSON::object & ensureObject(JSON::value &);
+	void serializeJSON(const JSON::value &, std::ostream &);
 }
 
 template <>

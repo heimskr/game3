@@ -106,7 +106,7 @@ namespace Game3 {
 		return DissolverRecipe(identifier, ItemStack::create(game, identifier, 1), json);
 	}
 
-	void DissolverRecipe::toJSON(boost::json::value &json) const {
+	void DissolverRecipe::toJSON(boost::json::value &json, const GamePtr &) const {
 		assert(dissolverResult);
 		auto &object = json.emplace_object();
 		object["type"] = boost::json::value_from(DissolverRecipeRegistry::ID());
@@ -114,7 +114,7 @@ namespace Game3 {
 		object["output"] = boost::json::value_from(*dissolverResult);
 	}
 
-	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const DissolverRecipe &recipe) {
-		recipe.toJSON(json);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const DissolverRecipe &recipe, const GamePtr &game) {
+		recipe.toJSON(json, game);
 	}
 }

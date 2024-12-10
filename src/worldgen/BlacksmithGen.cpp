@@ -1,6 +1,7 @@
 #include "graphics/Tileset.h"
 #include "entity/Blacksmith.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/CraftingStation.h"
@@ -24,19 +25,22 @@ namespace Game3::WorldGen {
 		realm->setTile(Layer::Objects, {1, 5}, "base:tile/anvil", false);
 		TileEntity::spawn<CraftingStation>(realm, "base:tile/furnace", Position(1, 3), "base:station/furnace");
 		TileEntity::spawn<CraftingStation>(realm, "base:tile/anvil",   Position(1, 5), "base:station/anvil");
-		realm->extraData["furnace"] = Position(1, 3);
-		realm->extraData["anvil"]   = Position(1, 5);
+
+		auto &extra = ensureObject(realm->extraData);
+
+		extra["furnace"] = boost::json::value_from(Position(1, 3));
+		extra["anvil"]   = boost::json::value_from(Position(1, 5));
 
 		realm->setTile(Layer::Objects, {height / 2, width / 2 - 1}, "base:tile/counter_w",  false);
 		realm->setTile(Layer::Objects, {height / 2, width / 2},     "base:tile/counter_we", false);
 		realm->setTile(Layer::Objects, {height / 2, width / 2 + 1}, "base:tile/counter_e",  false);
-		realm->extraData["counter"] = Position(height / 2 - 1, width / 2);
+		extra["counter"] = boost::json::value_from(Position(height / 2 - 1, width / 2));
 
 		const auto &beds = realm->getTileset().getTilesByCategory("base:category/beds");
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(1, choose(edges, rng));
 		realm->setTile(Layer::Objects, bed_position, choose(beds, rng), false);
-		realm->extraData["bed"] = bed_position;
+		extra["bed"] = boost::json::value_from(bed_position);
 
 		// const Position building_position = entrance - Position(1, 0);
 		// realm->spawn<Blacksmith>(bed_position, parent_realm->id, realm->id, building_position, parent_realm->closestTileEntity<Building>(building_position,

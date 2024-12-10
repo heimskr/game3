@@ -22,12 +22,12 @@ namespace Game3 {
 	Ore Ore::fromJSON(const GamePtr &game, const boost::json::value &json) {
 		return {
 			Identifier(), // Should be filled in later by the registry add methods
-			ItemStack::fromJSON(game, json.at(0)),
-			json.at(1),
-			json.at(2),
-			json.at(3),
-			json.at(4),
-			json.at(5)
+			boost::json::value_to<ItemStackPtr>(json.at(0), game),
+			boost::json::value_to<Identifier>(json.at(1)),
+			boost::json::value_to<Identifier>(json.at(2)),
+			static_cast<float>(json.at(3).as_double()),
+			static_cast<uint32_t>(json.at(4).as_uint64()),
+			static_cast<float>(json.at(5).as_double()),
 		};
 	}
 
@@ -38,21 +38,25 @@ namespace Game3 {
 
 	void OreDeposit::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["oreType"] = oreType;
-		json["ready"] = ready;
-		if (uses != 0)
-			json["uses"] = uses;
+		auto &object = json.as_object();
+		object["oreType"] = boost::json::value_from(oreType);
+		object["ready"] = ready;
+		if (uses != 0) {
+			object["uses"] = static_cast<uint64_t>(uses);
+		}
 	}
 
 	void OreDeposit::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		oreType = json.at("oreType");
+		const auto &object = json.as_object();
+		oreType = boost::json::value_to<Identifier>(object.at("oreType"));
 		tileID = getOre(*game).tilename;
-		ready = json.contains("ready");
-		if (auto iter = json.find("uses"); iter != json.end())
-			uses = *iter;
-		else
+		ready = object.contains("ready");
+		if (auto *value = object.if_contains("uses")) {
+			uses = value->as_uint64();
+		} else {
 			uses = 0;
+		}
 	}
 
 	void OreDeposit::tick(const TickArgs &args) {

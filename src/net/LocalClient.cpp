@@ -1,5 +1,6 @@
 #include "Log.h"
 #include "game/ClientGame.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "packet/Packet.h"
@@ -7,8 +8,6 @@
 #include "packet/PacketFactory.h"
 #include "util/FS.h"
 #include "util/Util.h"
-
-#include <boost/json.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -160,18 +159,19 @@ namespace Game3 {
 	}
 
 	void LocalClient::readTokens(const std::filesystem::path &path) {
-		tokenDatabase = boost::json::parse(readFile(path));
+		tokenDatabase = boost::json::value_to<decltype(tokenDatabase)>(boost::json::parse(readFile(path)));
 		tokenDatabasePath = path;
 	}
 
 	void LocalClient::saveTokens() const {
 		assert(tokenDatabasePath);
-		std::ofstream(*tokenDatabasePath) << boost::json::value(tokenDatabase).dump();
+		std::ofstream stream{*tokenDatabasePath};
+		serializeJSON(boost::json::value_from(tokenDatabase), stream);
 	}
 
-	void LocalClient::saveTokens(const std::filesystem::path &path) {
-		tokenDatabasePath = path;
-		std::ofstream(path) << boost::json::value(tokenDatabase).dump();
+	void LocalClient::saveTokens(std::filesystem::path path) {
+		tokenDatabasePath = std::move(path);
+		saveTokens();
 	}
 
 	bool LocalClient::hasHostname() const {

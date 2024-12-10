@@ -24,7 +24,7 @@ namespace Game3 {
 
 		auto get = [&](const char *key, auto member) {
 			if (auto iter = object.find(key); iter != object.end()) {
-				out.*member = boost::json::value_to<std::decay_t<decltype(settings.*member)>>(iter->value());
+				out.*member = boost::json::value_to<std::decay_t<decltype(out.*member)>>(iter->value());
 			}
 		};
 

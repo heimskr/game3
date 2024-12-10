@@ -1,4 +1,5 @@
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Stockpile.h"
 #include "tileentity/Teleporter.h"
@@ -42,7 +43,7 @@ namespace Game3::WorldGen {
 
 		auto exit_door = TileEntity::spawn<Teleporter>(realm, choose(doors, rng), exit_position, parent_realm, entrance);
 		assert(exit_door);
-		exit_door->extraData["exit"] = true;
+		ensureObject(exit_door->extraData)["exit"] = true;
 
 		realm->setTile(Layer::Objects, Position(height - 2, 1), "base:tile/stockpile_w", false);
 		realm->setTile(Layer::Objects, Position(height - 2, 2), "base:tile/stockpile_e", false);

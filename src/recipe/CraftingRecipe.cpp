@@ -110,7 +110,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void CraftingRecipe::toJSON(boost::json::value &json) const {
+	void CraftingRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
 		boost::json::value_from(*this, json);
 	}
 

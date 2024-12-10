@@ -28,11 +28,15 @@ namespace Game3 {
 		ChemicalReactor("base:tile/chemical_reactor"_id, position_) {}
 
 	bool ChemicalReactor::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
-		if (slot >= Slot(INPUT_CAPACITY))
+		if (slot >= Slot(INPUT_CAPACITY)) {
 			return false;
+		}
 
-		if (auto chemical = std::dynamic_pointer_cast<ChemicalItem>(stack->item))
-			return stack->data.contains("formula");
+		if (std::dynamic_pointer_cast<ChemicalItem>(stack->item)) {
+			if (const auto *object = stack->data.if_object()) {
+				return object->contains("formula");
+			}
+		}
 
 		return false;
 	}
@@ -54,8 +58,9 @@ namespace Game3 {
 			assert(buffer != nullptr);
 			const std::string new_equation = buffer->take<std::string>();
 			const bool success = setEquation(new_equation);
-			if (source)
+			if (source) {
 				sendMessage(source, "ModuleMessage", ChemicalReactorModule::ID(), "EquationSet", success);
+			}
 
 		} else {
 			TileEntity::handleMessage(source, name, data);
@@ -69,8 +74,9 @@ namespace Game3 {
 
 	void ChemicalReactor::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || realm->getSide() != Side::Server)
+		if (!realm || realm->getSide() != Side::Server) {
 			return;
+		}
 
 		Ticker ticker{*this, args};
 
@@ -89,14 +95,15 @@ namespace Game3 {
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 		auto equation_lock = equation.sharedLock();
-		if (equation)
-			json["equation"] = equation->getText();
+		if (equation) {
+			json.as_object()["equation"] = boost::json::value_from(equation->getText());
+		}
 	}
 
 	bool ChemicalReactor::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
-		if (getSide() == Side::Client)
+		if (getSide() == Side::Client) {
 			return false;
-
+		}
 
 		if (modifiers.onlyAlt()) {
 			{
@@ -129,7 +136,7 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
-		setEquation(json.at("equation"));
+		setEquation(std::string(json.at("equation").as_string()));
 	}
 
 	void ChemicalReactor::encode(Game &game, Buffer &buffer) {
@@ -138,8 +145,9 @@ namespace Game3 {
 		EnergeticTileEntity::encode(game, buffer);
 		auto lock = equation.uniqueLock();
 		std::optional<std::string> equation_text;
-		if (equation)
+		if (equation) {
 			equation_text = equation->getText();
+		}
 		buffer << equation_text;
 	}
 
@@ -196,8 +204,9 @@ namespace Game3 {
 
 	std::string ChemicalReactor::getEquation() {
 		auto lock = equation.sharedLock();
-		if (equation)
+		if (equation) {
 			return equation->getText();
+		}
 		return {};
 	}
 
@@ -235,14 +244,16 @@ namespace Game3 {
 
 		{
 			auto energy_lock = energyContainer->sharedLock();
-			if (energyContainer->energy < ENERGY_PER_ATOM)
+			if (energyContainer->energy < ENERGY_PER_ATOM) {
 				return false;
+			}
 		}
 
 		{
 			auto equation_lock = equation.uniqueLock();
-			if (!equation || !equation->isBalanced())
+			if (!equation || !equation->isBalanced()) {
 				return false;
+			}
 		}
 
 		fillReactants();
@@ -270,14 +281,16 @@ namespace Game3 {
 			for (const auto &[reactant, count]: reactants) {
 				stacks.push_back(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", reactant}}));
 				const ItemCount in_inventory = inventory_copy->count(stacks.back(), slot_predicate);
-				if (in_inventory < count)
+				if (in_inventory < count) {
 					return false;
+				}
 			}
 
 			for (const ItemStackPtr &stack: stacks) {
 				const ItemCount removed = inventory_copy->remove(stack, predicate);
-				if (stack->count != removed)
+				if (stack->count != removed) {
 					throw std::runtime_error("Couldn't remove stack from ChemicalReactor (" + std::to_string(stack->count) + " in stack != " + std::to_string(removed) + " removed)");
+				}
 			}
 		}
 
@@ -287,9 +300,11 @@ namespace Game3 {
 				return range.contains(slot);
 			};
 
-			for (const auto &[product, count]: products)
-				if (auto leftover = inventory_copy->add(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", product}}), predicate))
+			for (const auto &[product, count]: products) {
+				if (auto leftover = inventory_copy->add(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", product}}), predicate)) {
 					return false;
+				}
+			}
 		}
 
 		shared_inventory_lock.unlock();
@@ -298,8 +313,9 @@ namespace Game3 {
 			auto equation_lock = equation.uniqueLock();
 			auto energy_lock = energyContainer->uniqueLock();
 			EnergyAmount to_consume = equation->getAtomCount() * ENERGY_PER_ATOM;
-			if (!energyContainer->remove(to_consume))
+			if (!energyContainer->remove(to_consume)) {
 				return false;
+			}
 			EnergeticTileEntity::queueBroadcast();
 		}
 
@@ -320,8 +336,9 @@ namespace Game3 {
 			auto equation_lock = equation.sharedLock();
 			assert(equation);
 			auto unique_lock = reactants.uniqueLock();
-			for (const auto &[reactant, count]: equation->getReactants())
+			for (const auto &[reactant, count]: equation->getReactants()) {
 				reactants[reactant] += count;
+			}
 		}
 	}
 
@@ -332,8 +349,9 @@ namespace Game3 {
 			auto equation_lock = equation.sharedLock();
 			assert(equation);
 			auto unique_lock = products.uniqueLock();
-			for (const auto &[product, count]: equation->getProducts())
+			for (const auto &[product, count]: equation->getProducts()) {
 				products[product] += count;
+			}
 		}
 	}
 }

@@ -26,8 +26,9 @@ namespace Game3 {
 		TileEntity::toJSON(json);
 		json["name"] = name;
 		json["itemName"] = itemName;
-		if (InventoryPtr inventory = getInventory(0))
-			json["inventory"] = dynamic_cast<ExpandedServerInventory &>(*inventory);
+		if (InventoryPtr inventory = getInventory(0)) {
+			json["inventory"] = boost::json::value_from(dynamic_cast<ExpandedServerInventory &>(*inventory));
+		}
 	}
 
 	bool Crate::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {

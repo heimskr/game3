@@ -55,8 +55,15 @@ namespace Game3 {
 		return out;
 	}
 
-	FluidStack FluidStack::fromJSON(const Game &game, const boost::json::value &json) {
-		const auto &registry = game.registry<FluidRegistry>();
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const FluidStack &stack, const GamePtr &game) {
+		const auto &registry = game->registry<FluidRegistry>();
+		auto &array = json.emplace_array();
+		array.emplace_back(boost::json::value_from(registry.at(static_cast<size_t>(stack.id))->identifier));
+		array.emplace_back(stack.amount);
+	}
+
+	FluidStack tag_invoke(boost::json::value_to_tag<FluidStack>, const boost::json::value &json, const GamePtr &game) {
+		const auto &registry = game->registry<FluidRegistry>();
 		auto id = static_cast<FluidID>(registry.at(boost::json::value_to<Identifier>(json.at(0)))->registryID);
 		return {id, boost::json::value_to<FluidAmount>(json.at(1))};
 	}

@@ -2,6 +2,7 @@
 #include "container/Quadtree.h"
 #include "entity/ServerPlayer.h"
 #include "game/TileProvider.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "threading/LockableSharedPtr.h"
 #include "threading/LockableWeakPtr.h"
@@ -11,8 +12,6 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	void testQuadtree() {
@@ -174,7 +173,8 @@ namespace Game3 {
 
 	void testPlayerJSON() {
 		auto player = Entity::create<ServerPlayer>();
-		std::cout << boost::json::value(*player).dump() << '\n';
+		serializeJSON(boost::json::value_from(*player), std::cout);
+		std::cout << '\n';
 	}
 
 	void testLockableWeakPtr() {

@@ -85,10 +85,10 @@ namespace Game3 {
 		return true;
 	}
 
-	void CombinerRecipe::toJSON(boost::json::value &json) const {
+	void CombinerRecipe::toJSON(boost::json::value &json, const GamePtr &) const {
 		auto &object = json.emplace_object();
 		object["type"] = boost::json::value_from(CombinerRecipeRegistry::ID());
 		object["input"] = boost::json::value_from(input);
-		object["output"] = {outputID, outputCount};
+		object["output"] = boost::json::array{boost::json::value_from(outputID), outputCount};
 	}
 }

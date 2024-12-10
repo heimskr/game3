@@ -13,6 +13,7 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/GenericClient.h"
 #include "packet/ErrorPacket.h"
 #include "packet/InteractPacket.h"
@@ -26,15 +27,16 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
-#include <iostream>
 #include <thread>
 #include <unordered_set>
 
 // #define PROFILE_TICKS
 
 namespace Game3 {
-	void from_json(const boost::json::value &json, RealmDetails &details) {
-		details.tilesetName = json.at("tileset");
+	RealmDetails tag_invoke(boost::json::value_to_tag<RealmDetails>, const boost::json::value &json) {
+		RealmDetails details;
+		details.tilesetName = boost::json::value_to<Identifier>(json.at("tileset"));
+		return details;
 	}
 
 	Realm::Realm(const GamePtr &game): weakGame(game) {
@@ -98,7 +100,7 @@ namespace Game3 {
 	void Realm::initTexture() {}
 
 	RealmPtr Realm::fromJSON(const GamePtr &game, const boost::json::value &json, bool full_data) {
-		const RealmType type = json.at("type");
+		RealmType type = boost::json::value_to<RealmType>(json.at("type"));
 		auto factory = game->registry<RealmFactoryRegistry>().at(type);
 		assert(factory);
 		auto out = (*factory)(game);
@@ -118,15 +120,16 @@ namespace Game3 {
 
 	void Realm::absorbJSON(const boost::json::value &json, bool full_data) {
 		auto shared = shared_from_this();
-		id = json.at("id");
-		type = json.at("type");
-		seed = json.at("seed");
-		generatedChunks = json.at("generatedChunks");
-		outdoors = json.at("outdoors");
+		id = json.at("id").as_int64();
+		type = boost::json::value_to<RealmType>(json.at("type"));
+		seed = json.at("seed").as_int64();
+		generatedChunks = boost::json::value_to<decltype(generatedChunks)>(json.at("generatedChunks"));
+		outdoors = json.at("outdoors").as_bool();
 		tileProvider.clear();
 
-		if (json.contains("extra"))
-			extraData = json.at("extra");
+		if (const auto *extra = json.as_object().if_contains("extra")) {
+			extraData = *extra;
+		}
 
 		initRendererTileProviders();
 		initTexture();
@@ -139,7 +142,7 @@ namespace Game3 {
 			{
 				auto tile_entities_lock = tileEntities.uniqueLock();
 				auto by_gid_lock = tileEntitiesByGID.uniqueLock();
-				for (const auto &[position_string, tile_entity_json]: json.at("tileEntities").get<std::unordered_map<std::string, boost::json::value>>()) {
+				for (const auto &[position_string, tile_entity_json]: boost::json::value_to<std::unordered_map<std::string, boost::json::value>>(json.at("tileEntities"))) {
 					auto tile_entity = TileEntity::fromJSON(game, tile_entity_json);
 					tileEntities.emplace(Position(position_string), tile_entity);
 					tileEntitiesByGID[tile_entity->globalID] = tile_entity;
@@ -153,7 +156,7 @@ namespace Game3 {
 				auto entities_lock = entities.uniqueLock();
 				auto by_gid_lock = entitiesByGID.uniqueLock();
 				entities.clear();
-				for (const auto &entity_json: json.at("entities")) {
+				for (const auto &entity_json: json.at("entities").as_array()) {
 					auto entity = *entities.insert(Entity::fromJSON(game, entity_json)).first;
 					entity->setRealm(shared);
 					entitiesByGID[entity->globalID] = entity;
@@ -1269,26 +1272,29 @@ namespace Game3 {
 	}
 
 	void Realm::toJSON(boost::json::value &json, bool full_data) const {
-		json["id"] = id;
-		json["type"] = type;
-		json["seed"] = seed;
-		json["outdoors"] = outdoors;
-		json["generatedChunks"] = generatedChunks;
-		if (!extraData.empty())
-			json["extra"] = extraData;
+		auto &object = ensureObject(json);
 
-		tileProvider.toJSON(json["provider"], full_data);
+		object["id"] = id;
+		object["type"] = boost::json::value_from(type);
+		object["seed"] = seed;
+		object["outdoors"] = outdoors;
+		object["generatedChunks"] = boost::json::value_from(generatedChunks);
+		if (!extraData.is_null()) {
+			object["extra"] = extraData;
+		}
+
+		tileProvider.toJSON(object["provider"], full_data);
 
 		if (full_data) {
-			auto &tile_entities = json["tileEntities"];
-			tile_entities = std::unordered_map<std::string, boost::json::value>{};
-			for (const auto &[position, tile_entity]: tileEntities)
-				tile_entities[position.simpleString()] = *tile_entity;
-			json["entities"] = std::vector<boost::json::value>();
+			auto &tile_entities = object["tileEntities"].emplace_object();
+			for (const auto &[position, tile_entity]: tileEntities) {
+				tile_entities[position.simpleString()] = boost::json::value_from(*tile_entity);
+			}
+			auto &entities_object = object["entities"].emplace_array();
 			for (const auto &entity: entities) {
 				boost::json::value entity_json;
 				entity->toJSON(entity_json);
-				json["entities"].push_back(std::move(entity_json));
+				entities_object.emplace_back(std::move(entity_json));
 			}
 		}
 	}

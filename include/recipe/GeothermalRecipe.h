@@ -22,10 +22,10 @@ namespace Game3 {
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(boost::json::value &) const override;
+		void toJSON(boost::json::value &, const std::shared_ptr<Game> &) const override;
 	};
 
-	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const GeothermalRecipe &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const GeothermalRecipe &, const std::shared_ptr<Game> &);
 	GeothermalRecipe tag_invoke(boost::json::value_to_tag<GeothermalRecipe>, const boost::json::value &, const std::shared_ptr<Game> &);
 
 	class GeothermalRecipeRegistry: public UnnamedJSONRegistry<GeothermalRecipe> {

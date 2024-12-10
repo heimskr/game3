@@ -179,7 +179,7 @@ namespace Game3 {
 		client.send(make<EntityMoneyChangedPacket>(*player));
 		client.send(make<SelfTeleportedPacket>(realm->id, player->getPosition()));
 		client.send(make<TimePacket>(game->time));
-		client.send(make<RecipeListPacket>(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>()));
+		client.send(make<RecipeListPacket>(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>(), game));
 		client.send(make<KnownItemsPacket>(*player));
 		auto lock = game->players.sharedLock();
 		const auto packet = make<EntityPacket>(player);

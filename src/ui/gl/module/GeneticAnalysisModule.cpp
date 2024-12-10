@@ -103,10 +103,8 @@ namespace Game3 {
 			return;
 		}
 
-		std::unique_ptr<Gene> gene;
-		try {
-			gene = Gene::fromJSON(*iter);
-		} catch (const std::exception &) {
+		std::unique_ptr<Gene> gene = Gene::fromJSON(*gene_json);
+		if (!gene) {
 			return;
 		}
 
@@ -116,13 +114,24 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::analyzeTemplate(const ItemStackPtr &stack) {
-		auto iter = stack->data.find("genes");
-		if (iter == stack->data.end())
+		auto *object = stack->data.if_object();
+		if (!object) {
 			return;
+		}
+
+		auto *genes = object->if_contains("genes");
+		if (!genes) {
+			return;
+		}
+
+		auto *genes_object = genes->if_object();
+		if (!genes_object) {
+			return;
+		}
 
 		bool first = true;
 
-		for (const auto &[name, gene_json]: iter->items()) {
+		for (const auto &[name, gene_json]: *genes_object) {
 			std::unique_ptr<Gene> gene;
 			try {
 				gene = Gene::fromJSON(gene_json);

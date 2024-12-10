@@ -5,13 +5,12 @@
 #include "graphics/ItemSet.h"
 #include "graphics/Texture.h"
 #include "registry/Registries.h"
+#include "lib/JSON.h"
 #include "threading/ThreadContext.h"
 #include "tools/ItemStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Util.h"
-
-#include <cmath>
 
 #include <boost/json.hpp>
 
@@ -23,13 +22,17 @@
 #include "lib/stb/stb_image_write.h"
 #endif
 
+#include <cmath>
+
 namespace Game3 {
 	ItemSet itemStitcher(ItemTextureRegistry *texture_registry, ResourceRegistry *resource_registry, const std::filesystem::path &base_dir, Identifier itemset_name, std::string *png_out) {
 		std::set<std::filesystem::path> dirs;
 
-		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
-			if (std::filesystem::is_directory(entry))
+		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir)) {
+			if (std::filesystem::is_directory(entry)) {
 				dirs.insert(entry);
+			}
+		}
 
 		std::unordered_map<std::string, boost::json::value> jsons;
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
@@ -42,7 +45,7 @@ namespace Game3 {
 		ItemSet out(itemset_name);
 		Hasher hasher(Hasher::Algorithm::SHA3_512);
 
-		constexpr static size_t base_size = 16;
+		constexpr size_t base_size = 16;
 
 		size_t count_1x1 = 0;
 		size_t count_2x2 = 0;
@@ -51,10 +54,11 @@ namespace Game3 {
 		std::set<std::string> names_2x2;
 
 		if (std::filesystem::exists(base_dir / "itemset.json")) {
-			const boost::json::value itemset_meta = boost::json::parse(readFile(base_dir / "itemset.json"));
+			boost::json::value itemset_meta = boost::json::parse(readFile(base_dir / "itemset.json"));
 
-			if (auto iter = itemset_meta.find("name"); iter != itemset_meta.end())
-				out.name = *iter;
+			if (auto *value = ensureObject(itemset_meta).if_contains("name")) {
+				out.name = value->as_string();
+			}
 		}
 
 		for (const std::filesystem::path &dir: dirs) {
@@ -108,16 +112,25 @@ namespace Game3 {
 
 		auto handle_json = [&](const std::string &name, int scale) {
 			if (auto iter = jsons.find(name); iter != jsons.end()) {
-				const boost::json::value &json = iter->second;
-				hasher += json.dump();
-				Identifier id = json.at("id");
+				hasher += boost::json::serialize(iter->second);
 
-				if (texture_registry)
-					texture_registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), int(scale * base_size), int(scale * base_size)});
+				const auto *object = iter->second.if_object();
+				if (!object) {
+					return;
+				}
 
-				if (resource_registry)
-					if (auto iter = json.find("resource"); iter != json.end())
-						resource_registry->add(id, Resource{id, *iter});
+				Identifier id = boost::json::value_to<Identifier>(object->at("id"));
+
+				if (texture_registry) {
+					texture_registry->add(id, ItemTexture{id, texture, static_cast<int>(x_index), static_cast<int>(y_index), static_cast<int>(scale * base_size), static_cast<int>(scale * base_size)});
+				}
+
+				if (resource_registry) {
+					if (const auto *value = object->if_contains("resource")) {
+						Resource resource{id, *value};
+						resource_registry->add(std::move(id), std::move(resource));
+					}
+				}
 			}
 		};
 

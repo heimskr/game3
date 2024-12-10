@@ -2,6 +2,8 @@
 #include "util/Crypto.h"
 #include "util/Math.h"
 
+#include <boost/json.hpp>
+
 #include <cassert>
 #include <cstring>
 #include <memory>
@@ -97,6 +99,15 @@ namespace Game3 {
 		checkAlive();
 		EVP_DigestUpdate(context, input.data(), input.size());
 		return *this;
+	}
+
+	Hasher & Hasher::operator+=(const boost::json::value &json) {
+		boost::json::serializer serializer;
+		serializer.reset(&json);
+		char buffer[512];
+		while (!serializer.done()) {
+			*this += static_cast<std::string_view>(serializer.read(buffer));
+		}
 	}
 
 	template<>

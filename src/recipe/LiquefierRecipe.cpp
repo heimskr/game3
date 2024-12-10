@@ -95,11 +95,11 @@ namespace Game3 {
 		return true;
 	}
 
-	void LiquefierRecipe::toJSON(boost::json::value &json) const {
+	void LiquefierRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
 		auto &object = json.emplace_object();
 		object["type"] = boost::json::value_from(LiquefierRecipeRegistry::ID());
 		object["input"] = boost::json::value_from(input);
-		object["output"] = boost::json::value_from(output);
+		object["output"] = boost::json::value_from(output, game);
 	}
 
 	LiquefierRecipe tag_invoke(boost::json::value_to_tag<LiquefierRecipe>, const boost::json::value &json, const GamePtr &game) {

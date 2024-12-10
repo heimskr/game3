@@ -53,7 +53,7 @@ namespace Game3 {
 			std::optional<Token> getToken(const std::string &hostname, const std::string &username) const;
 			void readTokens(const std::filesystem::path &);
 			void saveTokens() const;
-			void saveTokens(const std::filesystem::path &);
+			void saveTokens(std::filesystem::path);
 			bool hasHostname() const;
 			const std::string & getHostname() const;
 			void setBuffering(bool);

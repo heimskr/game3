@@ -105,8 +105,8 @@ namespace Game3 {
 	}
 
 	void Entity::toJSON(boost::json::value &json) const {
+		auto &object = ensureObject(json);
 		auto this_lock = sharedLock();
-		auto &object = json.emplace_object();
 		object["type"]      = boost::json::value_from(type);
 		object["position"]  = boost::json::value_from(position);
 		object["realmID"]   = realmID;

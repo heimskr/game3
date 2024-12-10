@@ -22,7 +22,7 @@ namespace Game3 {
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(boost::json::value &) const override;
+		void toJSON(boost::json::value &, const GamePtr &) const override;
 	};
 
 	struct BiomassLiquefierRecipeRegistry: NamedRegistry<BiomassLiquefierRecipe> {

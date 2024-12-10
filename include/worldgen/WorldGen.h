@@ -34,7 +34,7 @@ namespace Game3 {
 		}
 	};
 
-	void from_json(const boost::json::value &, WorldGenParams &);
+	WorldGenParams tag_invoke(boost::json::value_to_tag<WorldGenParams>, const boost::json::value &);
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const WorldGenParams &);
 
 	namespace WorldGen {

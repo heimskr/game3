@@ -8,7 +8,7 @@ namespace Game3 {
 		if (requirement.is<AttributeRequirement>()) {
 			const auto &[attribute, count] = requirement.get<AttributeRequirement>();
 			auto &array = json.emplace_array();
-			array.emplace_back(attribute);
+			array.emplace_back(boost::json::value_from(attribute));
 			array.emplace_back(count);
 		} else {
 			boost::json::value_from(requirement.get<ItemStackPtr>(), json);

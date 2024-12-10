@@ -113,7 +113,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void BiomassLiquefierRecipe::toJSON(boost::json::value &json) const {
+	void BiomassLiquefierRecipe::toJSON(boost::json::value &json, const GamePtr &) const {
 		// TODO: is this correct?
 		json = boost::json::value_from(output);
 	}

@@ -319,7 +319,7 @@ namespace Game3 {
 
 		if (auto iter = object.find("storage"); iter != object.end()) {
 			for (const auto &[key, val]: iter->value().as_object()) {
-				out.storage.emplace(parseUlong(static_cast<std::string_view>(key)), boost::json::value_to<ItemStack>(val, game));
+				out.storage.emplace(parseUlong(static_cast<std::string_view>(key)), boost::json::value_to<ItemStackPtr>(val, game));
 			}
 		}
 

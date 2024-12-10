@@ -57,10 +57,10 @@ namespace Game3 {
 		return result;
 	}
 
-	void CentrifugeRecipe::toJSON(boost::json::value &json) const {
+	void CentrifugeRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
 		auto &object = json.emplace_object();
 		object["type"] = boost::json::value_from(CentrifugeRecipeRegistry::ID());
-		object["input"] = boost::json::value_from(input);
+		object["input"] = boost::json::value_from(input, game);
 		auto &output = object["output"].emplace_array();
 		for (const auto &[item, weight]: weightMap) {
 			output.emplace_back(boost::json::value{weight, item});

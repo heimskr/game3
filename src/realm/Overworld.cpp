@@ -1,5 +1,4 @@
-#include <iostream>
-
+#include "lib/JSON.h"
 #include "realm/Overworld.h"
 #include "worldgen/Overworld.h"
 
@@ -11,11 +10,11 @@ namespace Game3 {
 
 	void Overworld::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
-		worldgenParams = json.at("worldgenParams");
+		worldgenParams = boost::json::value_to<WorldGenParams>(json.at("worldgenParams"));
 	}
 
 	void Overworld::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
-		json["worldgenParams"] = worldgenParams;
+		ensureObject(json)["worldgenParams"] = boost::json::value_from(worldgenParams);
 	}
 }
