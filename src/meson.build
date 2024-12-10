@@ -67,7 +67,7 @@ elif build_machine.system() == 'linux'
 endif
 
 if build_machine.system() == 'darwin'
-	link_args += ['-L/usr/local/opt/llvm/lib/c++']
+	link_args += ['-L/opt/homebrew/Cellar/llvm/19.1.2/lib/c++']
 else
 	game3_deps += cxx.find_library('m')
 endif

@@ -117,7 +117,7 @@ namespace Game3 {
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
 
 			try {
-				settings = boost::json::parse(readFile("settings.json"));
+				settings = boost::json::value_to<ClientSettings>(boost::json::parse(readFile("settings.json")));
 			} catch (const std::ios_base::failure &) {}
 
 			settings.apply();
@@ -331,9 +331,15 @@ namespace Game3 {
 		boost::json::value json;
 		{
 			auto lock = settings.sharedLock();
-			json = settings;
+			json = boost::json::value_from(settings);
 		}
-		ofs << json.dump();
+
+		boost::json::serializer serializer;
+		serializer.reset(&json);
+		char buf[513];
+		while (!serializer.done()) {
+			ofs << serializer.read(buf);
+		}
 	}
 
 	void Window::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {

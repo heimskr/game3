@@ -17,12 +17,14 @@ namespace Game3 {
 		Logger::level = logLevel;
 	}
 
-	void from_json(const boost::json::value &json, ClientSettings &settings) {
+	ClientSettings tag_invoke(boost::json::value_to_tag<ClientSettings>, const boost::json::value &json) {
 		const auto &object = json.as_object();
+
+		ClientSettings out;
 
 		auto get = [&](const char *key, auto member) {
 			if (auto iter = object.find(key); iter != object.end()) {
-				settings.*member = boost::json::value_to<std::decay_t<decltype(settings.*member)>>(iter->value());
+				out.*member = boost::json::value_to<std::decay_t<decltype(settings.*member)>>(iter->value());
 			}
 		};
 
@@ -38,6 +40,8 @@ namespace Game3 {
 		get("showFPS", &ClientSettings::showFPS);
 		get("capFPS", &ClientSettings::capFPS);
 		get("specialEffects", &ClientSettings::specialEffects);
+
+		return out;
 	}
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ClientSettings &settings) {

@@ -80,6 +80,10 @@ namespace Game3 {
 		return true;
 	}
 
+	bool ItemFilter::Config::operator==(const Config &other) const {
+		return this == &other || (count == other.count && comparator == other.comparator && data == other.data);
+	}
+
 	template <>
 	std::string Buffer::getType(const ItemFilter::Config &, bool) {
 		return {'\xe4'};

@@ -29,7 +29,7 @@ namespace Game3 {
 					data(std::move(data)), comparator(comparator), count(count) {}
 
 				bool operator()(const ItemStackPtr &, const Inventory &, bool strict) const;
-				bool operator<(const Config &) const;
+				bool operator==(const Config &) const;
 			};
 
 			ItemFilter();

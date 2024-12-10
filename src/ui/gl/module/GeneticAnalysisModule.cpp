@@ -29,8 +29,9 @@ namespace Game3 {
 	void GeneticAnalysisModule::update(const ItemStackPtr &stack) {
 		clearText();
 
-		if (!stack)
+		if (!stack) {
 			return;
+		}
 
 		if (ContainmentOrb::validate(stack)) {
 			ponderOrb(stack);
@@ -64,12 +65,14 @@ namespace Game3 {
 			return;
 		}
 
-		if (entity->isPlayer())
+		if (entity->isPlayer()) {
 			return;
+		}
 
 		auto living = std::dynamic_pointer_cast<LivingEntity>(entity);
-		if (!living)
+		if (!living) {
 			return;
+		}
 
 		std::vector<std::string> descriptions;
 
@@ -90,9 +93,15 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::analyzeGene(const ItemStackPtr &stack) {
-		auto iter = stack->data.find("gene");
-		if (iter == stack->data.end())
+		const auto *object = stack->data.if_object();
+		if (!object) {
 			return;
+		}
+
+		const auto *gene_json = object->if_contains("gene");
+		if (!gene_json) {
+			return;
+		}
 
 		std::unique_ptr<Gene> gene;
 		try {

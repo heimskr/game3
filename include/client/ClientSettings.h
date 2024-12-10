@@ -37,6 +37,6 @@ namespace Game3 {
 		void apply() const;
 	};
 
-	void from_json(const boost::json::value &, ClientSettings &);
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ClientSettings &);
+	ClientSettings tag_invoke(boost::json::value_to_tag<ClientSettings>, const boost::json::value &);
 }

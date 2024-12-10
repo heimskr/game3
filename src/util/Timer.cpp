@@ -68,7 +68,7 @@ namespace Game3 {
 				if (1 < count) {
 					std::print(std::cerr, " (average: \e[33m{}\e[39m over \e[1m{}\e[22m instances)", nanos / count / 1e9, count);
 				}
-				std::println(std::cerr);
+				std::println(std::cerr, "");
 			}
 		}
 	}
