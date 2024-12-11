@@ -1,9 +1,8 @@
-#include <iostream>
-
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "packet/DisplayTextPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
@@ -15,8 +14,9 @@ namespace Game3 {
 
 	void Sign::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["text"] = text;
-		json["name"] = name;
+		auto &object = ensureObject(json);
+		object["text"] = text;
+		object["name"] = name;
 	}
 
 	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
@@ -26,8 +26,8 @@ namespace Game3 {
 
 	void Sign::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		text = json.at("text");
-		name = json.at("name");
+		text = json.at("text").as_string();
+		name = json.at("name").as_string();
 	}
 
 	void Sign::encode(Game &game, Buffer &buffer) {

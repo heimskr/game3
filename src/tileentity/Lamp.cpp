@@ -1,7 +1,8 @@
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "pipes/DataNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/Lamp.h"
@@ -20,19 +21,20 @@ namespace Game3 {
 
 	void Lamp::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["on"] = on;
+		ensureObject(json)["on"] = on;
 	}
 
 	void Lamp::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		on = json.at("on");
+		on = json.at("on").as_bool();
 		cachedTile = -1;
 		cachedUpperTile = -1;
 	}
 
 	void Lamp::setOn(bool new_value) {
-		if (on == new_value)
+		if (on == new_value) {
 			return;
+		}
 		on = new_value;
 		cachedTile = -1;
 		cachedUpperTile = -1;

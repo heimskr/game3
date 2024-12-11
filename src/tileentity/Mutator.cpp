@@ -24,19 +24,28 @@ namespace Game3 {
 	void Mutator::mutate(float strength) {
 		// Ensure we have an inventory.
 		InventoryPtr inventory = getInventory(0);
-		if (!inventory)
+		if (!inventory) {
 			return;
+		}
 
 		// Ensure we have a gene.
 		ItemStackPtr stack = (*inventory)[0];
-		if (!stack || stack->getID() != "base:item/gene")
+		if (!stack || stack->getID() != "base:item/gene") {
 			return;
+		}
 
 		// Ensure the gene actually has genetic data.
 		auto data_lock = stack->data.uniqueLock();
-		auto data_iter = stack->data.find("gene");
-		if (data_iter == stack->data.end())
+
+		auto *object = stack->data.if_object();
+		if (!object) {
 			return;
+		}
+
+		auto *data_value = object->if_contains("gene");
+		if (!data_value) {
+			return;
+		}
 
 		findMutagen();
 
@@ -62,12 +71,12 @@ namespace Game3 {
 		// Mutate the gene.
 		std::unique_ptr<Gene> gene;
 		try {
-			gene = Gene::fromJSON(*data_iter);
+			gene = Gene::fromJSON(*data_value);
 		} catch (const std::exception &err) {
 			ERROR("Gene decoding failed in Mutator::mutate: {}", err.what());
 		}
 		gene->mutate(strength);
-		gene->toJSON(*data_iter);
+		gene->toJSON(*data_value);
 		inventory->notifyOwner({});
 	}
 
@@ -83,12 +92,18 @@ namespace Game3 {
 			return nullptr;
 
 		auto data_lock = stack->data.sharedLock();
-		auto iter = stack->data.find("gene");
-		if (iter == stack->data.end())
+		const auto *object = stack->data.if_object();
+		if (!object) {
 			return nullptr;
+		}
+
+		const auto *value = object->if_contains("gene");
+		if (!value) {
+			return nullptr;
+		}
 
 		try {
-			return Gene::fromJSON(*iter);
+			return Gene::fromJSON(*value);
 		} catch (const std::exception &err) {
 			ERROR("Gene decoding failed in Mutator::getGene: {}", err.what());
 			return nullptr;
@@ -177,7 +192,8 @@ namespace Game3 {
 	}
 
 	void Mutator::findMutagen() {
-		if (!mutagenID)
+		if (!mutagenID) {
 			mutagenID = getGame()->registry<FluidRegistry>().at("base:fluid/mutagen")->registryID;
+		}
 	}
 }

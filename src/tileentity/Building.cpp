@@ -2,6 +2,7 @@
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/SpriteRenderer.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 
@@ -13,8 +14,9 @@ namespace Game3 {
 
 	void Building::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["innerRealmID"] = innerRealmID;
-		json["entrance"] = entrance;
+		auto &object = ensureObject(json);
+		object["innerRealmID"] = innerRealmID;
+		object["entrance"] = boost::json::value_from(entrance);
 	}
 
 	bool Building::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
@@ -30,8 +32,8 @@ namespace Game3 {
 
 	void Building::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		innerRealmID = json.at("innerRealmID");
-		entrance = json.at("entrance");
+		innerRealmID = boost::json::value_to<RealmID>(json.at("innerRealmID"));
+		entrance = boost::json::value_to<Position>(json.at("entrance"));
 	}
 
 	void Building::teleport(const std::shared_ptr<Entity> &entity) {

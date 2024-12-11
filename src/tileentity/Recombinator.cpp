@@ -6,6 +6,7 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "item/ContainmentOrb.h"
+#include "lib/JSON.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
@@ -85,7 +86,7 @@ namespace Game3 {
 		bool was_empty = !output;
 
 		if (was_empty) {
-			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, boost::json::value{{"genes", std::map<std::string, boost::json::value>()}});
+			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, boost::json::value{{"genes", boost::json::object{}}});
 		} else if (output->getID() != "base:item/genetic_template") {
 			return false;
 		}
@@ -95,14 +96,14 @@ namespace Game3 {
 		for (const ItemStackPtr &stack: {first, second}) {
 			if (stack->getID() == "base:item/gene") {
 				boost::json::value &gene = stack->data.at("gene");
-				combined_genes.try_emplace(gene.at("name"), gene, stack == first);
+				combined_genes.try_emplace(std::string(gene.at("name").as_string()), gene, stack == first);
 			} else {
-				for (const auto &[name, gene]: stack->data.at("genes").items())
+				for (const auto &[name, gene]: stack->data.at("genes").as_object())
 					combined_genes.try_emplace(name, gene, stack == first);
 			}
 		}
 
-		boost::json::value &genes = output->data.at("genes");
+		boost::json::object &genes = ensureObject(output->data.at("genes"));
 
 		bool any_from_first  = false;
 		bool any_from_second = false;

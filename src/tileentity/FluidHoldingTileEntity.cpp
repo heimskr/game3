@@ -1,5 +1,6 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "lib/JSON.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
@@ -29,27 +30,34 @@ namespace Game3 {
 		auto &levels = fluidContainer->levels;
 		{
 			auto lock = levels.sharedLock();
-			if (levels.empty())
+			if (levels.empty()) {
 				return std::nullopt;
+			}
 		}
 
 		auto lock = levels.uniqueLock();
 		auto iter = levels.begin();
 
 		// Advance through possible fluids until we find an acceptable one.
-		if (predicate)
-			while (iter != levels.end() && !predicate(iter->first))
+		if (predicate) {
+			while (iter != levels.end() && !predicate(iter->first)) {
 				++iter;
+			}
+		}
 
-		if (iter == levels.end())
+		if (iter == levels.end()) {
 			return std::nullopt;
+		}
 
 		const FluidID id = iter->first;
 		const FluidAmount to_remove = std::min(max_amount? max_amount(id) : std::numeric_limits<FluidAmount>::max(), iter->second);
 
-		if (remove)
-			if (0 == (iter->second -= to_remove))
+		if (remove) {
+			iter->second -= to_remove;
+			if (iter->second == 0) {
 				levels.erase(iter);
+			}
+		}
 
 		return FluidStack(id, to_remove);
 	}
@@ -69,8 +77,9 @@ namespace Game3 {
 
 	void FluidHoldingTileEntity::fluidsUpdated() {
 		auto realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
 			return;
+		}
 
 		if (realm->getSide() == Side::Server) {
 			increaseUpdateCounter();
@@ -86,23 +95,25 @@ namespace Game3 {
 
 		player->send(make<TileEntityPacket>(getSelf()));
 
-		if (!silent)
+		if (!silent) {
 			player->send(make<OpenModuleForAgentPacket>(FluidsModule::ID(), getGID(), true));
+		}
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
-			if (auto self = weak_self.lock())
+			if (auto self = weak_self.lock()) {
 				safeDynamicCast<FluidHoldingTileEntity>(self)->removeObserver(safeDynamicCast<Player>(entity));
+			}
 			return true;
 		});
 	}
 
 	void FluidHoldingTileEntity::toJSON(boost::json::value &json) const {
 		auto lock = fluidContainer->levels.sharedLock();
-		json["fluidLevels"] = fluidContainer->levels.getBase();
+		ensureObject(json)["fluidLevels"] = boost::json::value_from(fluidContainer->levels.getBase());
 	}
 
 	void FluidHoldingTileEntity::absorbJSON(const GamePtr &, const boost::json::value &json) {
-		fluidContainer->levels = json.at("fluidLevels").get<FluidContainer::Map>();
+		fluidContainer->levels = boost::json::value_to<FluidContainer::Map>(json.at("fluidLevels"));
 	}
 
 	void FluidHoldingTileEntity::encode(Game &, Buffer &buffer) {
@@ -115,10 +126,11 @@ namespace Game3 {
 	}
 
 	void FluidHoldingTileEntity::broadcast(bool force) {
-		if (force)
+		if (force) {
 			TileEntity::broadcast(true);
-		else
+		} else {
 			broadcast(make<TileEntityPacket>(getSelf()));
+		}
 	}
 
 	void FluidHoldingTileEntity::broadcast(const std::shared_ptr<TileEntityPacket> &packet) {

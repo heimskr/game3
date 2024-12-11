@@ -77,14 +77,21 @@ namespace Game3 {
 			return;
 		}
 
-		auto genes_iter = genetic_template->data.find("genes");
-		if (genes_iter == genetic_template->data.end()) {
+		const auto *object = genetic_template->data.if_object();
+		if (!object) {
+			ERROR(3, "Template doesn't have an object as data.");
+			return;
+		}
+
+		const auto *genes_value = object->if_contains("genes");
+		if (!genes_value) {
 			ERROR(3, "No genes.");
 			return;
 		}
 
-		if (!biomassID)
+		if (!biomassID) {
 			biomassID = args.game->getFluid("base:fluid/liquid_biomass")->registryID;
+		}
 
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
 		auto fluid_iter = fluidContainer->levels.find(*biomassID);
@@ -93,7 +100,7 @@ namespace Game3 {
 			return;
 		}
 
-		LivingEntityPtr entity = makeEntity(args.game, *genes_iter);
+		LivingEntityPtr entity = makeEntity(args.game, *genes_value);
 		if (!entity) {
 			ERROR(3, "Couldn't make entity.");
 			return;
@@ -204,13 +211,19 @@ namespace Game3 {
 	}
 
 	LivingEntityPtr Incubator::makeEntity(const GamePtr &game, const boost::json::value &genes) {
-		auto species_iter = genes.find("species");
-		if (species_iter == genes.end()) {
+		const auto *object = genes.if_object();
+		if (!object) {
+			ERROR(3, "No object.");
+			return nullptr;
+		}
+
+		auto species_value = object->if_contains("species");
+		if (!species_value) {
 			ERROR(3, "No species.");
 			return nullptr;
 		}
 
-		Identifier species = species_iter->at("value");
+		Identifier species = boost::json::value_to<Identifier>(species_value->at("value"));
 		if (species.empty()) {
 			ERROR(3, "Empty species.");
 			return nullptr;

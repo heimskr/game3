@@ -1,9 +1,8 @@
-#include <iostream>
-
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Teleporter.h"
 
@@ -15,8 +14,9 @@ namespace Game3 {
 
 	void Teleporter::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["targetRealm"] = targetRealm;
-		json["targetPosition"] = targetPosition;
+		auto &object = ensureObject(json);
+		object["targetRealm"] = targetRealm;
+		object["targetPosition"] = boost::json::value_from(targetPosition);
 	}
 
 	void Teleporter::onOverlap(const std::shared_ptr<Entity> &entity) {
@@ -32,8 +32,8 @@ namespace Game3 {
 
 	void Teleporter::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		targetRealm = json.at("targetRealm");
-		targetPosition = json.at("targetPosition");
+		targetRealm = boost::json::value_to<RealmID>(json.at("targetRealm"));
+		targetPosition = boost::json::value_to<Position>(json.at("targetPosition"));
 	}
 
 	void Teleporter::encode(Game &game, Buffer &buffer) {

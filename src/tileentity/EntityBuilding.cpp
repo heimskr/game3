@@ -1,7 +1,8 @@
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/EntityBuilding.h"
 
@@ -12,7 +13,7 @@ namespace Game3 {
 
 	void EntityBuilding::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["targetEntity"] = targetEntity;
+		ensureObject(json)["targetEntity"] = targetEntity;
 	}
 
 	bool EntityBuilding::onInteractOn(const PlayerPtr &player, Modifiers, const ItemStackPtr &, Hand) {
@@ -43,7 +44,7 @@ namespace Game3 {
 
 	void EntityBuilding::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		targetEntity = json.at("targetEntity");
+		targetEntity = boost::json::value_to<GlobalID>(json.at("targetEntity"));
 	}
 
 	void EntityBuilding::encode(Game &game, Buffer &buffer) {

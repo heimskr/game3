@@ -37,36 +37,42 @@ namespace Game3 {
 
 	void Sequencer::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || realm->getSide() != Side::Server)
+		if (!realm || realm->getSide() != Side::Server) {
 			return;
+		}
 
 		Ticker ticker{*this, args};
 		enqueueTick(PERIOD);
 
 		const EnergyAmount consumed_energy = ENERGY_PER_ACTION;
 		auto energy_lock = energyContainer->uniqueLock();
-		if (consumed_energy > energyContainer->energy)
+		if (consumed_energy > energyContainer->energy) {
 			return;
+		}
 
 		const InventoryPtr inventory = getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 
 		// We need a filled containment orb in the first slot.
 		ItemStackPtr orb = (*inventory)[0];
-		if (!ContainmentOrb::validate(orb) || ContainmentOrb::isEmpty(orb))
+		if (!ContainmentOrb::validate(orb) || ContainmentOrb::isEmpty(orb)) {
 			return;
+		}
 
 		// We need at least one free spot for the gene.
-		if (inventory->slotsOccupied() >= inventory->getSlotCount())
+		if (inventory->slotsOccupied() >= inventory->getSlotCount()) {
 			return;
+		}
 
 		EntityPtr entity = ContainmentOrb::makeEntity(orb);
-		if (!entity)
+		if (!entity) {
 			return;
+		}
 
 		LivingEntityPtr living = std::dynamic_pointer_cast<LivingEntity>(entity);
-		if (!living)
+		if (!living) {
 			return;
+		}
 
 		// Randomly select a gene from what's available.
 		std::vector<const Gene *> gene_pointers;
@@ -75,12 +81,13 @@ namespace Game3 {
 			gene_pointers.push_back(&gene);
 		});
 
-		if (gene_pointers.empty())
+		if (gene_pointers.empty()) {
 			return;
+		}
 
 		const Gene &gene = *choose(gene_pointers, threadContext.rng);
 		ItemStackPtr gene_stack = ItemStack::create(getGame(), "base:item/gene");
-		gene.toJSON(gene_stack->data["gene"]);
+		gene.toJSON(gene_stack->data.at("gene"));
 
 		const bool has_leftovers = inventory->add(gene_stack) != nullptr;
 		assert(!has_leftovers);
