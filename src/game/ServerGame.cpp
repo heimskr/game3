@@ -1,5 +1,4 @@
 #include "Log.h"
-#include "threading/ThreadContext.h"
 #include "entity/Animal.h"
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
@@ -19,6 +18,7 @@
 #include "packet/TileEntityPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
+#include "threading/ThreadContext.h"
 #include "util/Cast.h"
 #include "util/Demangle.h"
 #include "util/Timer.h"
@@ -62,28 +62,34 @@ namespace Game3 {
 	}
 
 	bool ServerGame::tick() {
-		if (!Game::tick())
+		if (!Game::tick()) {
 			return false;
+		}
 
 		std::unordered_map<Player *, std::unique_ptr<BufferGuard>> guards;
 		guards.reserve(players.size());
 
 		for (const auto &player: players)
-			if (auto client = player->toServer()->weakClient.lock())
+			if (auto client = player->toServer()->weakClient.lock()) {
 				guards.emplace(player.get(), client->bufferGuard());
+			}
 
-		for (const auto &[weak_client, packet]: packetQueue.steal())
-			if (auto client = weak_client.lock())
+		for (const auto &[weak_client, packet]: packetQueue.steal()) {
+			if (auto client = weak_client.lock()) {
 				handlePacket(*client, *packet);
+			}
+		}
 
 		// const std::size_t max_jobs = realms.size() * 2;
 
 		for (auto &[id, realm]: realms) {
-			// if (max_jobs <= pool.jobCount())
+			// if (max_jobs <= pool.jobCount()) {
 			// 	break;
+			// }
 			// pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, std::size_t) {
-			// 	if (RealmPtr realm = weak_realm.lock())
+			// 	if (RealmPtr realm = weak_realm.lock()) {
 					realm->tick(delta);
+			// 	}
 			// });
 		}
 
@@ -97,8 +103,9 @@ namespace Game3 {
 		for (const auto &player: players) {
 			player->ticked = false;
 
-			if (time_packet)
+			if (time_packet) {
 				player->send(time_packet);
+			}
 
 			if (player->inventoryUpdated) {
 				player->send(make<InventoryPacket>(player->getInventory(0)));
@@ -113,8 +120,9 @@ namespace Game3 {
 				player->toServer()->weakClient.reset();
 				player->clearQueues();
 
-				for (const auto &[id, realm]: realms)
+				for (const auto &[id, realm]: realms) {
 					realm->eviscerate(player, true);
+				}
 
 				if (auto count = player.use_count(); count != 1) {
 					WARN("Player {} ref count: {} (should be 1). Current realm: {} (realmID) or {} (getRealm()->id)", reinterpret_cast<void *>(player.get()), count, player->realmID, player->getRealm()->id);
@@ -137,17 +145,21 @@ namespace Game3 {
 		for (const auto &player: players) {
 			{
 				auto shared_lock = player->knownEntities.sharedLock();
-				if (player->knownEntities.empty())
+				if (player->knownEntities.empty()) {
 					continue;
+				}
 			}
 			auto unique_lock = player->knownEntities.uniqueLock();
 			std::vector<std::weak_ptr<Entity>> to_remove;
 			to_remove.reserve(player->knownEntities.size() / 4);
-			for (const auto &weak_entity: player->knownEntities)
-				if (!weak_entity.lock())
+			for (const auto &weak_entity: player->knownEntities) {
+				if (!weak_entity.lock()) {
 					to_remove.push_back(weak_entity);
-			for (const auto &weak_entity: to_remove)
+				}
+			}
+			for (const auto &weak_entity: to_remove) {
 				player->knownEntities.erase(weak_entity);
+			}
 		}
 	}
 
@@ -176,10 +188,11 @@ namespace Game3 {
 
 		auto lock = players.sharedLock();
 		for (const auto &player: players) {
-			if (player->knowsRealm(new_realm->id))
+			if (player->knowsRealm(new_realm->id)) {
 				player->send(moved_packet);
-			else
+			} else {
 				player->send(changing_packet);
+			}
 		}
 	}
 
@@ -255,8 +268,9 @@ namespace Game3 {
 		assert(server);
 		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
-		for (const GenericClientPtr &client: clients)
+		for (const GenericClientPtr &client: clients) {
 			client->send(packet);
+		}
 	}
 
 	void ServerGame::remove(const ServerPlayerPtr &player) {
@@ -296,12 +310,14 @@ namespace Game3 {
 			std::shared_ptr<Server> server = getServer();
 			auto &clients = server->getClients();
 			auto lock = clients.sharedLock();
-			for (const GenericClientPtr &client: clients)
+			for (const GenericClientPtr &client: clients) {
 				client->send(packet);
+			}
 		} else {
 			auto lock = players.sharedLock();
-			for (const ServerPlayerPtr &player: players)
+			for (const ServerPlayerPtr &player: players) {
 				player->send(packet);
+			}
 		}
 	}
 
@@ -323,8 +339,9 @@ namespace Game3 {
 
 	std::optional<ssize_t> ServerGame::getRule(const std::string &key) const {
 		auto lock = gameRules.sharedLock();
-		if (auto iter = gameRules.find(key); iter != gameRules.end())
+		if (auto iter = gameRules.find(key); iter != gameRules.end()) {
 			return std::make_optional(iter->second);
+		}
 		return std::nullopt;
 	}
 
@@ -337,8 +354,9 @@ namespace Game3 {
 			// Teleport players to the shadow realm.
 			auto lock = realm->players.uniqueLock();
 			for (const auto &weak_player: realm->players) {
-				if (PlayerPtr player = weak_player.lock())
+				if (PlayerPtr player = weak_player.lock()) {
 					player->teleport(Position{32, 32}, shadow_realm);
+				}
 			}
 		}
 
@@ -363,8 +381,9 @@ namespace Game3 {
 	}
 
 	std::tuple<bool, std::string> ServerGame::commandHelper(GenericClient &client, const std::string &command) {
-		if (command.empty())
+		if (command.empty()) {
 			return {false, "Command is empty."};
+		}
 
 		const auto words = split(command, " ", false);
 		const auto &first = words.at(0);
@@ -378,11 +397,13 @@ namespace Game3 {
 			if (command[0] == ':') {
 				std::string_view message = trim(std::string_view(command).substr(1));
 
-				if (message.empty() || message == " ")
+				if (message.empty() || message == " ") {
 					return {true, ""};
+				}
 
-				if (message[0] == ' ')
+				if (message[0] == ' ') {
 					message.remove_prefix(1);
+				}
 
 				INFO("[{}] {}", player->username, message);
 				broadcast(make<ChatMessageSentPacket>(player->getGID(), std::string(message)), true);
@@ -392,12 +413,14 @@ namespace Game3 {
 			if (command[0] == '!') {
 				// Place a tile entity in front of the player
 				RealmPtr realm = player->getRealm();
-				if (!realm)
+				if (!realm) {
 					return {false, "No realm."};
+				}
 				const Position position = player->getPosition() + player->getDirection();
 				boost::json::value json = boost::json::parse(trim(std::string_view(command).substr(1)));
-				if (realm->hasTileEntityAt(position))
+				if (realm->hasTileEntityAt(position)) {
 					return {false, "Tile entity already present."};
+				}
 				GamePtr game = realm->getGame();
 				TileEntityPtr tile_entity = TileEntity::fromJSON(game, json);
 				tile_entity->position = position;
@@ -435,8 +458,9 @@ namespace Game3 {
 				std::string item_name(words.at(1));
 				const std::size_t colon = item_name.find(':');
 
-				if (colon == item_name.npos)
+				if (colon == item_name.npos) {
 					item_name = "base:item/" + std::string(item_name);
+				}
 
 				if (auto item = registry<ItemRegistry>()[Identifier(item_name)]) {
 					player->give(ItemStack::create(shared_from_this(), item, count, std::move(data)));
@@ -447,18 +471,20 @@ namespace Game3 {
 			}
 
 			if (first == "heldL" || first == "heldR") {
-				if (words.size() != 2)
+				if (words.size() != 2) {
 					return {false, "Invalid number of arguments."};
+				}
 				Slot slot = -1;
 				try {
 					slot = parseNumber<Slot>(words.at(1));
 				} catch (const std::invalid_argument &) {
 					return {false, "Invalid slot."};
 				}
-				if (first == "heldL")
+				if (first == "heldL") {
 					player->setHeldLeft(slot);
-				else
+				} else {
 					player->setHeldRight(slot);
+				}
 				return {true, "Set held slot to " + std::to_string(slot)};
 			}
 
@@ -468,8 +494,9 @@ namespace Game3 {
 			}
 
 			if (first == "go") {
-				if (words.size() != 3)
+				if (words.size() != 3) {
 					return {false, "Invalid number of arguments."};
+				}
 
 				Index row = 0;
 				Index column = 0;
@@ -501,10 +528,11 @@ namespace Game3 {
 					ss << "Player is moving ";
 					bool first = true;
 					for (const char *move: moves) {
-						if (first)
+						if (first) {
 							first = false;
-						else
+						} else {
 							ss << ", ";
+						}
 						ss << move;
 					}
 					ss << ". Offset: " << player->offset.x << ", " << player->offset.y << ", " << player->offset.z;
@@ -515,15 +543,17 @@ namespace Game3 {
 			}
 
 			if (first == "submerge" || first == "terrain" || first == "objects" || first == "obj") {
-				if (words.size() != 2)
+				if (words.size() != 2) {
 					return {false, "Invalid number of arguments."};
+				}
 				std::string_view word = words.at(1);
 				Identifier identifier = word.find(':') == std::string_view::npos? "base:tile/" + std::string(word) : word;
 				Layer layer = Layer::Objects;
-				if (first == "submerge")
+				if (first == "submerge") {
 					layer = Layer::Submerged;
-				else if (first == "terrain")
+				} else if (first == "terrain") {
 					layer = Layer::Terrain;
+				}
 				player->getRealm()->setTile(layer, player->getPosition(), identifier);
 				return {true, ""};
 			}
@@ -545,8 +575,9 @@ namespace Game3 {
 			}
 
 			if (first == "pm") {
-				if (1 < words.size())
+				if (1 < words.size()) {
 					player->getRealm()->remakePathMap(player->getChunk());
+				}
 
 				TileProvider &provider = player->getRealm()->tileProvider;
 				auto &path_chunk = provider.getPathChunk(player->getChunk());
@@ -564,11 +595,13 @@ namespace Game3 {
 			}
 
 			if (first == "stop") {
-				if (player->username != "heimskr")
+				if (player->username != "heimskr") {
 					return {false, "No thanks."};
+				}
 				auto server = weakServer.lock();
-				if (!server)
+				if (!server) {
 					return {false, "Couldn't lock server."};
+				}
 				server->stop();
 				return {true, "Stopped server."};
 			}
@@ -582,20 +615,23 @@ namespace Game3 {
 
 			if (first == "goto") {
 				auto server = weakServer.lock();
-				if (!server)
+				if (!server) {
 					return {false, "Couldn't lock server."};
+				}
 
-				if (words.size() != 2)
+				if (words.size() != 2) {
 					return {false, "Invalid number of arguments."};
+				}
 
 				ServerPlayerPtr other_player;
 				{
 					const std::string other_username(words.at(1));
 					auto lock = playerMap.sharedLock();
-					if (auto iter = playerMap.find(other_username); iter != playerMap.end())
+					if (auto iter = playerMap.find(other_username); iter != playerMap.end()) {
 						other_player = iter->second;
-					else
+					} else {
 						return {false, "Couldn't find player " + other_username + "."};
+					}
 				}
 
 				player->teleport(other_player->getPosition(), other_player->getRealm(), {
@@ -606,8 +642,9 @@ namespace Game3 {
 			}
 
 			if (first == "realm") {
-				if (words.size() != 2)
+				if (words.size() != 2) {
 					return {false, "Invalid number of arguments."};
+				}
 
 				RealmID id{};
 
@@ -633,21 +670,24 @@ namespace Game3 {
 			}
 
 			if (first == "texture") {
-				if (words.size() != 1 && words.size() != 2)
+				if (words.size() != 1 && words.size() != 2) {
 					return {false, "Invalid number of arguments."};
+				}
 
 				Identifier choice;
 
-				if (words.size() < 2)
+				if (words.size() < 2) {
 					choice = "base:entity/player";
-				else if (words[1].find(':') != std::string_view::npos)
+				} else if (words[1].find(':') != std::string_view::npos) {
 					choice = words[1];
-				else
+				} else {
 					choice = Identifier("base:entity/" + std::string(words[1]));
+				}
 
 				auto &textures = registry<EntityTextureRegistry>();
-				if (!textures.contains(choice))
+				if (!textures.contains(choice)) {
 					return {false, "Invalid entity texture."};
+				}
 
 				player->changeTexture(choice);
 				player->increaseUpdateCounter();
@@ -665,8 +705,9 @@ namespace Game3 {
 			if (first == "online") {
 				std::set<std::string> display_names;
 				players.withShared([&](const auto &players) {
-					for (const auto &iterated_player: players)
+					for (const auto &iterated_player: players) {
 						display_names.insert(iterated_player->displayName);
+					}
 				});
 				return {true, "Online players: " + join(display_names, ", ")};
 			}
@@ -676,9 +717,12 @@ namespace Game3 {
 				std::vector<EntityPtr> entities;
 
 				auto has_arg = [&](const char *arg) {
-					for (const std::string_view &word: words)
-						if (word == arg)
+					for (const std::string_view &word: words) {
+						if (word == arg) {
 							return true;
+						}
+					}
+
 					return false;
 				};
 
@@ -688,12 +732,17 @@ namespace Game3 {
 
 				for (const auto &[gid, weak_agent]: allAgents) {
 					if (AgentPtr agent = weak_agent.lock()) {
-						if (GlobalID agent_gid = agent->getGID(); gid != agent_gid)
+						if (GlobalID agent_gid = agent->getGID(); gid != agent_gid) {
 							WARN("Agent {} is stored in allAgents with key {}", agent_gid, gid);
-						if (auto entity = std::dynamic_pointer_cast<Entity>(agent))
-							if (!exclude_animals || !std::dynamic_pointer_cast<Animal>(entity))
-								if (!exclude_items || !std::dynamic_pointer_cast<ItemEntity>(entity))
+						}
+
+						if (auto entity = std::dynamic_pointer_cast<Entity>(agent)) {
+							if (!exclude_animals || !std::dynamic_pointer_cast<Animal>(entity)) {
+								if (!exclude_items || !std::dynamic_pointer_cast<ItemEntity>(entity)) {
 									entities.push_back(entity);
+								}
+							}
+						}
 					}
 				}
 
@@ -703,20 +752,24 @@ namespace Game3 {
 					const std::string left_demangled  = DEMANGLE(left_ref);
 					const std::string right_demangled = DEMANGLE(right_ref);
 
-					if (left_demangled < right_demangled)
+					if (left_demangled < right_demangled) {
 						return true;
+					}
 
-					if (left_demangled > right_demangled)
+					if (left_demangled > right_demangled) {
 						return false;
+					}
 
 					const std::string left_name  = left->getName();
 					const std::string right_name = right->getName();
 
-					if (left_name < right_name)
+					if (left_name < right_name) {
 						return true;
+					}
 
-					if (left_name > right_name)
+					if (left_name > right_name) {
 						return false;
+					}
 
 					return left->getGID() < right->getGID();
 				});
@@ -741,17 +794,22 @@ namespace Game3 {
 			if (first == "tiles") {
 				RealmPtr realm = player->getRealm();
 				Tileset &tileset = realm->getTileset();
-				for (const Layer layer: allLayers)
-					if (auto tile = realm->tryTile(layer, player->position))
+				for (const Layer layer: allLayers) {
+					if (auto tile = realm->tryTile(layer, player->position)) {
 						INFO("{} \e[2m→\e[22m {} \e[2m/\e[22m {}", getIndex(layer), *tile, tileset[*tile]);
+					}
+				}
 				return {true, ""};
 			}
 
 			if (first == "regen") {
-				if (player->username != "heimskr")
+				if (player->username != "heimskr") {
 					return {false, "No thanks."};
-				if (words.size() != 3)
+				}
+
+				if (words.size() != 3) {
 					return {false, "Incorrect parameter count."};
+				}
 
 				ChunkPosition chunk_position;
 				try {
@@ -770,16 +828,18 @@ namespace Game3 {
 			}
 
 			if (first == "rule") {
-				if (words.size() != 3)
+				if (words.size() != 3) {
 					return {false, "Incorrect parameter count."};
+				}
 
 				std::string value_word{};
-				if (words[2] == "true")
+				if (words[2] == "true") {
 					value_word = "1";
-				else if (words[2] == "false")
+				} else if (words[2] == "false") {
 					value_word = "0";
-				else
+				} else {
 					value_word = words[2];
+				}
 
 				ssize_t value{};
 				try {
@@ -793,16 +853,18 @@ namespace Game3 {
 			}
 
 			if (first == "spawn") {
-				if (words.size() != 2)
+				if (words.size() != 2) {
 					return {false, "Incorrect parameter count."};
+				}
 
 				Identifier entity_id;
 				std::string_view name = words[1];
 
-				if (name.find(':') == std::string::npos)
+				if (name.find(':') == std::string::npos) {
 					entity_id = Identifier("base:entity/" + std::string(name));
-				else
+				} else {
 					entity_id = name;
+				}
 
 				auto factory = registry<EntityFactoryRegistry>().maybe(entity_id);
 				if (!factory)
@@ -817,8 +879,9 @@ namespace Game3 {
 			}
 
 			if (first == "set_money") {
-				if (words.size() != 2)
+				if (words.size() != 2) {
 					return {false, "Incorrect parameter count."};
+				}
 
 				MoneyCount value{};
 				try {
@@ -836,6 +899,17 @@ namespace Game3 {
 		}
 
 		return {false, "Unknown command."};
+	}
+
+	void ServerGame::broadcast(const Place &place, const PacketPtr &packet) {
+		auto lock = players.sharedLock();
+		for (const ServerPlayerPtr &player: players) {
+			if (player->canSee(place.realm->id, place.position)) {
+				if (auto client = player->toServer()->weakClient.lock()) {
+					client->send(packet);
+				}
+			}
+		}
 	}
 
 	Token ServerGame::generateRandomToken() {

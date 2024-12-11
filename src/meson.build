@@ -20,7 +20,7 @@ game3_deps = [
 	dependency('liblz4'),
 	dependency('glm'),
 	dependency('glfw3'),
-	dependency('boost'),
+	dependency('boost', modules: ['json']),
 	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
@@ -67,7 +67,7 @@ elif build_machine.system() == 'linux'
 endif
 
 if build_machine.system() == 'darwin'
-	link_args += ['-L/opt/homebrew/Cellar/llvm/19.1.2/lib/c++']
+	link_args += ['-L/opt/homebrew/Cellar/llvm/19.1.5/lib/c++']
 else
 	game3_deps += cxx.find_library('m')
 endif

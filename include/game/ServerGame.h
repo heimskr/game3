@@ -4,7 +4,6 @@
 #include "entity/ServerPlayer.h"
 #include "game/Fluids.h"
 #include "game/Game.h"
-#include "net/GenericClient.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "threading/ThreadPool.h"
@@ -79,13 +78,7 @@ namespace Game3 {
 				return *database;
 			}
 
-			void broadcast(const Place &place, const PacketPtr &packet) {
-				auto lock = players.sharedLock();
-				for (const ServerPlayerPtr &player: players)
-					if (player->canSee(place.realm->id, place.position))
-						if (auto client = player->toServer()->weakClient.lock())
-							client->send(packet);
-			}
+			void broadcast(const Place &, const PacketPtr &);
 
 			static Token generateRandomToken();
 
