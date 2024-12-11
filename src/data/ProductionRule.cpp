@@ -1,7 +1,6 @@
 #include "data/ProductionRule.h"
 #include "item/Item.h"
-
-#include <boost/json.hpp>
+#include "lib/JSON.h"
 
 namespace Game3 {
 	ProductionRule::ProductionRule(const std::shared_ptr<Game> &game, const boost::json::value &json) {
@@ -14,7 +13,7 @@ namespace Game3 {
 			}
 
 			if (auto iter = object->find("cap"); iter != object->end()) {
-				cap = iter->value().as_double();
+				cap = getDouble(iter->value());
 			}
 
 			if (auto iter = object->find("biomes"); iter != object->end()) {
@@ -23,12 +22,12 @@ namespace Game3 {
 
 			if (auto iter = object->find("randomRange"); iter != object->end()) {
 				if (const auto *array = iter->value().if_array()) {
-					randomRange.emplace((*array)[0].as_double(), array->at(1).as_double());
+					randomRange.emplace(getDouble((*array)[0]), getDouble(array->at(1)));
 				}
 			}
 
 			if (auto iter = object->find("richnessEffect"); iter != object->end()) {
-				richnessEffect = iter->value().as_double();
+				richnessEffect = getDouble(iter->value());
 			}
 		}
 	}

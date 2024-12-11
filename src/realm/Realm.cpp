@@ -120,9 +120,9 @@ namespace Game3 {
 
 	void Realm::absorbJSON(const boost::json::value &json, bool full_data) {
 		auto shared = shared_from_this();
-		id = json.at("id").as_int64();
+		id = getInt64(json.at("id"));
 		type = boost::json::value_to<RealmType>(json.at("type"));
-		seed = json.at("seed").as_int64();
+		seed = getInt64(json.at("seed"));
 		generatedChunks = boost::json::value_to<decltype(generatedChunks)>(json.at("generatedChunks"));
 		outdoors = json.at("outdoors").as_bool();
 		tileProvider.clear();

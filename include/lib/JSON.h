@@ -46,3 +46,28 @@ struct std::formatter<boost::json::value> {
 		return ctx.out();
 	}
 };
+
+namespace Game3 {
+	template <typename T>
+	T getNumber(const JSON::value &json) {
+		if (const double *value = json.if_double()) {
+			return static_cast<T>(*value);
+		}
+
+		if (const int64_t *value = json.if_int64()) {
+			return static_cast<T>(*value);
+		}
+
+		if (const uint64_t *value = json.if_uint64()) {
+			return static_cast<T>(*value);
+		}
+
+		throw std::invalid_argument(std::format("Not a number: {}", json));
+	}
+
+	constexpr auto getDouble = getNumber<double>;
+	constexpr auto getUint64 = getNumber<uint64_t>;
+	constexpr auto getInt64 = getNumber<int64_t>;
+
+	std::string getString(const JSON::value &);
+}

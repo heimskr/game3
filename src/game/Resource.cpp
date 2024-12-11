@@ -1,7 +1,6 @@
 #include "game/Resource.h"
+#include "lib/JSON.h"
 #include "threading/ThreadContext.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	Resource::Resource(Identifier identifier_, const boost::json::value &json):
@@ -22,7 +21,7 @@ namespace Game3 {
 
 	double Resource::findCap(const boost::json::value &json) {
 		if (auto *value = json.as_object().if_contains("cap")) {
-			return value->as_double();
+			return getDouble(*value);
 		}
 		return 100;
 	}

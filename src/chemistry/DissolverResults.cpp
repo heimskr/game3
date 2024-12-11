@@ -1,10 +1,9 @@
 #include "Log.h"
 #include "chemistry/DissolverResults.h"
 #include "item/Item.h"
+#include "lib/JSON.h"
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	std::vector<ItemStackPtr> DissolverResult::getResult(const std::shared_ptr<Game> &game) {
@@ -88,7 +87,7 @@ namespace Game3 {
 		const auto &array = json.as_array();
 		for (size_t i = 1; i < array.size(); ++i) {
 			const auto &item = array.at(i).as_array();
-			members.emplace_back(item.at(0).as_double(), DissolverResult::fromJSON(item.at(1)));
+			members.emplace_back(getDouble(item.at(0)), DissolverResult::fromJSON(item.at(1)));
 		}
 	}
 

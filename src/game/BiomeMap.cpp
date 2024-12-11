@@ -1,6 +1,6 @@
 #include "game/BiomeMap.h"
+#include "lib/JSON.h"
 
-#include <boost/json.hpp>
 #include <zstd.h>
 
 namespace Game3 {
@@ -21,8 +21,8 @@ namespace Game3 {
 	}
 
 	void from_json(const boost::json::value &json, BiomeMap &tilemap) {
-		tilemap.height = static_cast<int>(json.at("height").as_int64());
-		tilemap.width  = static_cast<int>(json.at("width").as_int64());
+		tilemap.height = getNumber<int>(json.at("height"));
+		tilemap.width  = getNumber<int>(json.at("width"));
 
 		// TODO: fix endianness issues
 		tilemap.tiles.clear();

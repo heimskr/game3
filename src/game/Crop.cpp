@@ -1,5 +1,6 @@
 #include "game/Crop.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 
 #include <cassert>
 
@@ -21,7 +22,7 @@ namespace Game3 {
 			getCustomType(json),
 			boost::json::value_to<std::vector<Identifier>>(json.at("stages")),
 			boost::json::value_to<Products>(json.at("products"), game),
-			json.at("chance").as_double(),
+			getDouble(json.at("chance")),
 			getCanSpawnInTown(json),
 			getCustomData(json)
 		) {}

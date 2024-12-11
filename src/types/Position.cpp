@@ -2,6 +2,7 @@
 #include "entity/Player.h"
 #include "game/TileProvider.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "util/Util.h"
@@ -220,8 +221,8 @@ namespace Game3 {
 	}
 
 	Position tag_invoke(boost::json::value_to_tag<Position>, const boost::json::value &json) {
-		auto row = static_cast<Position::IntType>(json.at(0).as_int64());
-		auto column = static_cast<Position::IntType>(json.at(1).as_int64());
+		auto row = getNumber<Position::IntType>(json.at(0));
+		auto column = getNumber<Position::IntType>(json.at(1));
 		return {row, column};
 	}
 

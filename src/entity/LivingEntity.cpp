@@ -6,6 +6,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/RenderOptions.h"
+#include "lib/JSON.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
 #include "threading/ThreadContext.h"
 
@@ -39,7 +40,7 @@ namespace Game3 {
 		}
 
 		if (auto *value = object.if_contains("luck")) {
-			luckStat = value->as_double();
+			luckStat = getDouble(*value);
 		}
 	}
 

@@ -1,6 +1,5 @@
+#include "lib/JSON.h"
 #include "worldgen/WorldGen.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	namespace WorldGen {
@@ -13,11 +12,11 @@ namespace Game3 {
 
 	WorldGenParams tag_invoke(boost::json::value_to_tag<WorldGenParams>, const boost::json::value &json) {
 		WorldGenParams out;
-		out.wetness = json.at("wetness").as_double();
-		out.stoneLevel = json.at("stoneLevel").as_double();
-		out.forestThreshold = json.at("forestThreshold").as_double();
-		out.antiforestThreshold = json.at("antiforestThreshold").as_double();
-		out.biomeZoom = json.at("biomeZoom").as_double();
+		out.wetness = getDouble(json.at("wetness"));
+		out.stoneLevel = getDouble(json.at("stoneLevel"));
+		out.forestThreshold = getDouble(json.at("forestThreshold"));
+		out.antiforestThreshold = getDouble(json.at("antiforestThreshold"));
+		out.biomeZoom = getDouble(json.at("biomeZoom"));
 		return out;
 	}
 

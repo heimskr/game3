@@ -7,6 +7,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
@@ -54,7 +55,7 @@ namespace Game3 {
 		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
 		const auto &object = json.as_object();
-		harvestingTime = object.at("harvestingTime").as_double();
+		harvestingTime = getDouble(object.at("harvestingTime"));
 		if (auto *value = object.if_contains("chosenResource")) {
 			chosenResource = boost::json::value_to<Position>(*value);
 		}

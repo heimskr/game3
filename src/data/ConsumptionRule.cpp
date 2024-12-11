@@ -1,6 +1,5 @@
 #include "data/ConsumptionRule.h"
-
-#include <boost/json.hpp>
+#include "lib/JSON.h"
 
 namespace Game3 {
 	namespace {
@@ -17,7 +16,7 @@ namespace Game3 {
 				throw std::invalid_argument("Invalid laborMax: " + boost::json::serialize(json));
 			}
 
-			return json.as_double();
+			return getDouble(json);
 		}
 	}
 
@@ -37,7 +36,7 @@ namespace Game3 {
 		}
 
 		if (auto iter = object.find("rate"); iter != object.end()) {
-			rate = iter->value().as_double();
+			rate = getDouble(iter->value());
 		}
 
 		if (auto iter = object.find("ignoreLabor"); iter != object.end()) {

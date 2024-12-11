@@ -197,7 +197,7 @@ namespace Game3 {
 		}
 
 		if (auto iter = object.find("age"); iter != object.end()) {
-			age = iter->value().as_double();
+			age = getDouble(iter->value());
 		}
 
 		increaseUpdateCounter();

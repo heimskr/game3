@@ -5,6 +5,7 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graph/Graph.h"
+#include "lib/JSON.h"
 #include "recipe/BiomassLiquefierRecipe.h"
 #include "recipe/CombinerRecipe.h"
 #include "recipe/DissolverRecipe.h"
@@ -133,7 +134,7 @@ namespace Game3 {
 
 			auto &textures = registry<EntityTextureRegistry>();
 			for (const auto &[key, value]: json.at(1).as_object()) {
-				textures.add(Identifier(key), EntityTexture(Identifier(key), boost::json::value_to<Identifier>(value.at(0)), static_cast<uint8_t>(value.at(1).as_uint64())));
+				textures.add(Identifier(key), EntityTexture(Identifier(key), boost::json::value_to<Identifier>(value.at(0)), getNumber<uint8_t>(value.at(1))));
 			}
 
 		} else if (type == "base:ore_map") {
@@ -145,9 +146,9 @@ namespace Game3 {
 				ItemStackPtr ore_stack = boost::json::value_to<ItemStackPtr>(value.at(0), self);
 				Identifier tilename = boost::json::value_to<Identifier>(value.at(1));
 				Identifier regen_tilename = boost::json::value_to<Identifier>(value.at(2));
-				float tooldown_multiplier = static_cast<float>(value.at(3).as_double());
-				uint32_t max_uses = static_cast<uint32_t>(value.at(4).as_uint64());
-				float cooldown = static_cast<float>(value.at(5).as_double());
+				float tooldown_multiplier = getNumber<float>(value.at(3));
+				uint32_t max_uses = getNumber<uint32_t>(value.at(4));
+				float cooldown = getNumber<float>(value.at(5));
 				Ore ore(ore_key, std::move(ore_stack), std::move(tilename), std::move(regen_tilename), tooldown_multiplier, max_uses, cooldown);
 				ores.add(std::move(ore_key), std::move(ore));
 			}
@@ -181,7 +182,7 @@ namespace Game3 {
 					} else if (array.size() == 2) {
 						texture = std::make_shared<Texture>(texture_key, std::move(path), value.at(1).as_bool());
 					} else {
-						texture = std::make_shared<Texture>(texture_key, std::move(path), value.at(1).as_bool(), static_cast<int>(value.at(2).as_int64()));
+						texture = std::make_shared<Texture>(texture_key, std::move(path), value.at(1).as_bool(), getNumber<int>(value.at(2)));
 					}
 
 					texture->init();

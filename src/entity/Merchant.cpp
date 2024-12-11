@@ -1,8 +1,7 @@
-#include <iostream>
-
 #include "entity/Merchant.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "ui/Window.h"
@@ -28,7 +27,7 @@ namespace Game3 {
 
 	void Merchant::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		Entity::absorbJSON(game, json);
-		greed = json.at("greed").as_double();
+		greed = getDouble(json.at("greed"));
 	}
 
 	bool Merchant::onInteractNextTo(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) {

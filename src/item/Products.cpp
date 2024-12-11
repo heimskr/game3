@@ -1,4 +1,5 @@
 #include "item/Products.h"
+#include "lib/JSON.h"
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
@@ -41,7 +42,7 @@ namespace Game3 {
 			if (type == "constant") {
 				out.products.emplace_back(std::make_unique<ConstantProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2))));
 			} else if (type == "exponential") {
-				out.products.emplace_back(std::make_unique<ExponentialProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2)), item.at(3).as_double()));
+				out.products.emplace_back(std::make_unique<ExponentialProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2)), getDouble(item.at(3))));
 			} else {
 				throw std::invalid_argument(std::format("Invalid product type: \"{}\"", type));
 			}

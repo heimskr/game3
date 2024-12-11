@@ -1,10 +1,11 @@
-#include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "item/Tool.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "ui/Window.h"
@@ -25,9 +26,9 @@ namespace Game3 {
 			boost::json::value_to<ItemStackPtr>(json.at(0), game),
 			boost::json::value_to<Identifier>(json.at(1)),
 			boost::json::value_to<Identifier>(json.at(2)),
-			static_cast<float>(json.at(3).as_double()),
-			static_cast<uint32_t>(json.at(4).as_uint64()),
-			static_cast<float>(json.at(5).as_double()),
+			getNumber<float>(json.at(3)),
+			getNumber<uint32_t>(json.at(4)),
+			getNumber<float>(json.at(5)),
 		};
 	}
 

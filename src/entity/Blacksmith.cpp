@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "algorithm/Stonks.h"
 #include "entity/Blacksmith.h"
 #include "entity/Merchant.h"
@@ -9,6 +7,7 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
@@ -54,7 +53,7 @@ namespace Game3 {
 		Merchant::absorbJSON(game, json);
 		const auto &object = json.as_object();
 		if (auto iter = object.find("actionTime"); iter != object.end()) {
-			actionTime = iter->value().as_double();
+			actionTime = getDouble(iter->value());
 		}
 	}
 

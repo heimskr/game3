@@ -1,8 +1,7 @@
 #include "biology/Gene.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "threading/ThreadContext.h"
-
-#include <boost/json.hpp>
 
 #include <format>
 #include <random>
@@ -42,7 +41,7 @@ namespace Game3 {
 		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
 
 	FloatGene FloatGene::fromJSON(const boost::json::value &json) {
-		return FloatGene(std::string(json.at("name").as_string()), json.at("minimum").as_double(), json.at("maximum").as_double(), json.at("value").as_double());
+		return FloatGene(getString(json.at("name")), getDouble(json.at("minimum")), getDouble(json.at("maximum")), getDouble(json.at("value")));
 	}
 
 	void FloatGene::toJSON(boost::json::value &json) const {
@@ -99,7 +98,7 @@ namespace Game3 {
 		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
 
 	LongGene LongGene::fromJSON(const boost::json::value &json) {
-		return LongGene(std::string(json.at("name").as_string()), json.at("minimum").as_double(), json.at("maximum").as_double(), json.at("value").as_double());
+		return LongGene(getString(json.at("name")), getDouble(json.at("minimum")), getDouble(json.at("maximum")), getDouble(json.at("value")));
 	}
 
 	void LongGene::toJSON(boost::json::value &json) const {
@@ -156,7 +155,7 @@ namespace Game3 {
 		Gene(std::move(name_)), value(clamp(value_)) {}
 
 	CircularGene CircularGene::fromJSON(const boost::json::value &json) {
-		return CircularGene(std::string(json.at("name").as_string()), json.at("value").as_double());
+		return CircularGene(getString(json.at("name")), getDouble(json.at("value")));
 	}
 
 	void CircularGene::toJSON(boost::json::value &json) const {

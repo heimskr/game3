@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Log.h"
 #include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
@@ -10,6 +8,7 @@
 #include "game/ServerGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
@@ -96,9 +95,9 @@ namespace Game3 {
 		displayName = object.at("displayName").as_string();
 		spawnPosition = boost::json::value_to<Position>(object.at("spawnPosition"));
 		spawnRealmID = object.at("spawnRealmID");
-		timeSinceAttack = object.at("timeSinceAttack").as_double();
+		timeSinceAttack = getDouble(object.at("timeSinceAttack"));
 		if (auto *value = object.if_contains("tooldown")) {
-			tooldown = value->as_double();;
+			tooldown = getDouble(*value);;
 		} else {
 			tooldown = 0.f;
 		}

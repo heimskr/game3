@@ -1,6 +1,5 @@
+#include "lib/JSON.h"
 #include "types/VillageOptions.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	VillageOptions::VillageOptions(int width_, int height_, int padding_):
@@ -14,9 +13,9 @@ namespace Game3 {
 	}
 
 	VillageOptions tag_invoke(boost::json::value_to_tag<VillageOptions>, const boost::json::value &json) {
-		int width   = static_cast<int>(json.at("width").as_int64());
-		int height  = static_cast<int>(json.at("height").as_int64());
-		int padding = static_cast<int>(json.at("padding").as_int64());
+		int width   = getNumber<int>(json.at("width"));
+		int height  = getNumber<int>(json.at("height"));
+		int padding = getNumber<int>(json.at("padding"));
 		return {width, height, padding};
 	}
 }

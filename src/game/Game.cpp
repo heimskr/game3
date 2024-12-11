@@ -6,6 +6,7 @@
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "ui/gl/module/AutocrafterModule.h"
 #include "ui/gl/module/ChemicalReactorModule.h"
 #include "ui/gl/module/CombinerModule.h"
@@ -189,7 +190,7 @@ namespace Game3 {
 		}
 
 		if (auto *value = object.if_contains("hourOffset")) {
-			out->hourOffset = value->as_double();
+			out->hourOffset = getDouble(*value);
 		} else {
 			out->hourOffset = 0;
 		}
@@ -201,7 +202,7 @@ namespace Game3 {
 		}
 
 		if (auto *value = object.if_contains("cavesGenerated")) {
-			out->cavesGenerated = value->as_uint64();
+			out->cavesGenerated = getNumber<size_t>(*value);
 		} else {
 			out->cavesGenerated = 0;
 		}

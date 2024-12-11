@@ -9,8 +9,7 @@
 #include "types/Types.h"
 #include "util/Math.h"
 
-#include <asio.hpp>
-#include <asio/ssl.hpp>
+#include "lib/ASIO.h"
 
 #include <atomic>
 #include <deque>

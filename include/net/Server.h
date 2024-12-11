@@ -3,8 +3,7 @@
 #include "types/Types.h"
 #include "threading/Lockable.h"
 
-#include <asio.hpp>
-#include <asio/ssl.hpp>
+#include "lib/ASIO.h"
 
 #include <atomic>
 #include <condition_variable>

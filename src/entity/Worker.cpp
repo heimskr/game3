@@ -1,6 +1,7 @@
 #include "threading/ThreadContext.h"
 #include "entity/Worker.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -36,7 +37,7 @@ namespace Game3 {
 		LivingEntity::absorbJSON(game, json);
 		const auto &object = json.as_object();
 		const auto &house_array = object.at("house").as_array();
-		phase          = static_cast<Phase>(object.at("phase").as_uint64());
+		phase          = getNumber<Phase>(object.at("phase"));
 		overworldRealm = boost::json::value_to<RealmID>(object.at("overworldRealm"));
 		houseRealm     = boost::json::value_to<RealmID>(house_array.at(0));
 		housePosition  = boost::json::value_to<Position>(house_array.at(1));

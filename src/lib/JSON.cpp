@@ -25,4 +25,8 @@ namespace Game3 {
 			stream << serializer.read(buffer);
 		}
 	}
+
+	std::string getString(const JSON::value &json) {
+		return std::string(json.as_string());
+	}
 }

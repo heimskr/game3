@@ -5,13 +5,12 @@
 #include "graphics/ItemTexture.h"
 #include "item/HasMaxDurability.h"
 #include "item/Item.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "util/Cast.h"
 #include "util/Util.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 
@@ -228,7 +227,7 @@ namespace Game3 {
 	bool ItemStack::hasDurability() const {
 		if (const auto *object = data.if_object()) {
 			if (auto iter = object->find("durability"); iter != object->end()) {
-				return 0 <= iter->value().as_array().at(1).as_double();
+				return 0 <= getDouble(iter->value().as_array().at(1));
 			}
 		}
 
@@ -242,7 +241,7 @@ namespace Game3 {
 
 		const auto &object = data.as_object();
 		const auto &array = object.at("durability").as_array();
-		return array[0].as_double() / array.at(1).as_double();
+		return getDouble(array[0]) / getDouble(array.at(1));
 	}
 
 	std::string ItemStack::getTooltip() const {
@@ -264,7 +263,7 @@ namespace Game3 {
 		auto &array = json.as_array();
 		const Identifier id = boost::json::value_to<Identifier>(json.at(0), game);
 		stack->item = game->registry<ItemRegistry>()[id];
-		stack->count = 1 < array.size()? array[1].as_uint64() : 1;
+		stack->count = 1 < array.size()? getUint64(array[1]) : 1;
 		if (2 < array.size()) {
 			const auto &extra = array[2];
 			if (extra.is_string() && extra == "with_durability") {

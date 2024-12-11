@@ -1,10 +1,11 @@
 #include "Log.h"
-#include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tileentity/ItemSpawner.h"
@@ -31,8 +32,8 @@ namespace Game3 {
 
 	void ItemSpawner::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		minimumTime = json.at("minimumTime").as_double();
-		maximumTime = json.at("maximumTime").as_double();
+		minimumTime = getDouble(json.at("minimumTime"));
+		maximumTime = getDouble(json.at("maximumTime"));
 		for (const auto &spawnable: json.at("spawnables").as_array())
 			spawnables.emplace_back(boost::json::value_to<ItemStackPtr>(spawnable, game));
 	}
