@@ -1,14 +1,13 @@
 #include "Log.h"
-#include "types/Position.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "threading/ThreadContext.h"
 #include "tile/FenceGateTile.h"
-
-#include <boost/json.hpp>
+#include "types/Position.h"
 
 namespace Game3 {
 	bool FenceGateTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {

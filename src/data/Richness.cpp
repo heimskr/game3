@@ -1,6 +1,7 @@
 #include "data/Richness.h"
 #include "game/Game.h"
 #include "game/Resource.h"
+#include "lib/JSON.h"
 
 namespace Game3 {
 	std::optional<double> Richness::operator[](const Identifier &identifier) const {

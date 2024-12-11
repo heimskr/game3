@@ -3,6 +3,7 @@
 #ifdef GAME3_ENABLE_SCRIPTING
 #include "Log.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "scripting/ObjectWrap.h"
 #include "scripting/ScriptEngine.h"
@@ -12,7 +13,6 @@
 #include "util/Util.h"
 
 #include <libplatform/libplatform.h>
-#include <boost/json.hpp>
 
 #include <cassert>
 #include <sstream>

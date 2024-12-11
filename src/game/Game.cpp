@@ -25,8 +25,6 @@
 #include "util/Timer.h"
 #include "util/Util.h"
 
-#include <boost/json.hpp>
-
 namespace Game3 {
 	Game::Game():
 		debugMode(false) {}

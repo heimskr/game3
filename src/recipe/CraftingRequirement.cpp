@@ -1,7 +1,6 @@
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "recipe/CraftingRequirement.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const CraftingRequirement &requirement) {

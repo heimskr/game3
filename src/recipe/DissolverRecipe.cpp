@@ -1,10 +1,10 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "lib/JSON.h"
 #include "recipe/DissolverRecipe.h"
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
 
-#include <boost/json.hpp>
 
 #include "chemskr/Chemskr.h"
 

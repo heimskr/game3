@@ -40,6 +40,6 @@ namespace Game3 {
 
     using StringSet = std::unordered_set<std::string, StringHasher, StringPred>;
 
-    // void tag_invoke(boost::json::value_from_tag, boost::json::value &, const StringSet &);
-    // StringSet tag_invoke(boost::json::value_to_tag<StringSet>, const boost::json::value &);
+    void tag_invoke(boost::json::value_from_tag, boost::json::value &, const StringSet &);
+    StringSet tag_invoke(boost::json::value_to_tag<StringSet>, const boost::json::value &);
 }

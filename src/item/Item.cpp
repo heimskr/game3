@@ -386,12 +386,16 @@ namespace Game3 {
 	}
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ItemStack &stack) {
-		auto &array = json.as_array();
-		array[0] = boost::json::value_from(stack.item->identifier);
-		array[1] = stack.count;
+		auto &array = json.emplace_array();
+		array.emplace_back(boost::json::value_from(stack.item->identifier));
+		array.emplace_back(stack.count);
 		if (!stack.data.is_null()) {
-			array[2] = stack.data;
+			array.emplace_back(stack.data);
 		}
+	}
+
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ItemStackPtr &stack) {
+		tag_invoke(boost::json::value_from_tag{}, json, *stack);
 	}
 
 	template <>

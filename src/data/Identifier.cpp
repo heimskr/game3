@@ -1,7 +1,6 @@
 #include "data/Identifier.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	std::string Identifier::getPath() const {

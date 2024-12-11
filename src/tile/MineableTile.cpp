@@ -1,11 +1,10 @@
 #include "Log.h"
-#include "types/Position.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "registry/Registries.h"
+#include "lib/JSON.h"
 #include "tile/MineableTile.h"
-
-#include <boost/json.hpp>
+#include "types/Position.h"
 
 namespace Game3 {
 	MineableTile::MineableTile(Identifier identifier_, ItemStackPtr stack_, bool consumable_):

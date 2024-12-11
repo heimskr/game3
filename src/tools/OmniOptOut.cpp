@@ -1,8 +1,7 @@
 #include "Log.h"
 #include "container/StringSet.h"
+#include "lib/JSON.h"
 #include "util/FS.h"
-
-#include <boost/json.hpp>
 
 #include <filesystem>
 #include <fstream>

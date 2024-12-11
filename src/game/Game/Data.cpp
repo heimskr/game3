@@ -173,12 +173,11 @@ namespace Game3 {
 						throw std::invalid_argument("Expected Texture JSON size to be 1, 2 or 3, not " + std::to_string(array.size()));
 					}
 
-					std::filesystem::path path(std::string_view(array[0].as_string()));
+					std::filesystem::path path(getString(array[0]));
 					TexturePtr texture;
 
 					if (array.size() == 1) {
 						texture = std::make_shared<Texture>(texture_key, std::move(path));
-						textures.add(Identifier(key), std::make_shared<Texture>(Identifier(key), std::move(path)))->init();
 					} else if (array.size() == 2) {
 						texture = std::make_shared<Texture>(texture_key, std::move(path), value.at(1).as_bool());
 					} else {

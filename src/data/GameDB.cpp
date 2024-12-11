@@ -5,6 +5,7 @@
 #include "game/ServerGame.h"
 #include "game/Village.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "tileentity/TileEntity.h"
@@ -16,8 +17,6 @@
 #include <filesystem>
 #include <iomanip>
 #include <sstream>
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	GameDB::GameDB(const ServerGamePtr &game):

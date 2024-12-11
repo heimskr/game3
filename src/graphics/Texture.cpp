@@ -45,7 +45,7 @@ namespace Game3 {
 		alpha = channels == 4;
 		format = alpha? GL_RGBA : GL_RGB;
 		if (raw == nullptr) {
-			throw std::runtime_error("Couldn't load image from " + path.string());
+			throw std::runtime_error(std::format("Couldn't load image from \"{}\"", path.string()));
 		}
 		init(std::shared_ptr<uint8_t[]>(raw, stbi_image_free), width, height);
 	}

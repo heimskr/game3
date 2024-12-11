@@ -191,6 +191,7 @@ namespace Game3 {
 	ItemStackPtr makeForBuffer<ItemStackPtr>(Buffer &);
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ItemStack &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ItemStackPtr &);
 	ItemStackPtr tag_invoke(boost::json::value_to_tag<ItemStackPtr>, const boost::json::value &, const GamePtr &);
 }
 

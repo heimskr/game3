@@ -1,8 +1,8 @@
 #include "game/OwnsVillages.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 
-#include <boost/json.hpp>
 #include <SQLiteCpp/SQLiteCpp.h>
 
 #include <optional>

@@ -1,10 +1,9 @@
 #include "Log.h"
 #include "client/ClientSettings.h"
 #include "game/ClientGame.h"
+#include "lib/JSON.h"
 #include "ui/Window.h"
 #include "util/Timer.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	void ClientSettings::apply(ClientGame &) const {

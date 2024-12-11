@@ -1,7 +1,6 @@
 #include "chemistry/CombinerInput.h"
 #include "item/Item.h"
-
-#include <boost/json.hpp>
+#include "lib/JSON.h"
 
 namespace Game3 {
 	CombinerInput tag_invoke(boost::json::value_to_tag<CombinerInput>, const boost::json::value &json, ItemCount *output_count_out) {

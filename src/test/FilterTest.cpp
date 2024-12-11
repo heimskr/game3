@@ -1,10 +1,9 @@
 #include "game/ClientGame.h"
 #include "game/ServerInventory.h"
+#include "lib/JSON.h"
 #include "pipes/ItemFilter.h"
 #include "util/Demangle.h"
 #include "util/Timer.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	void filterTest() {

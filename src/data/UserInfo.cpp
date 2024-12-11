@@ -1,6 +1,5 @@
 #include "data/UserInfo.h"
-
-#include <boost/json.hpp>
+#include "lib/JSON.h"
 
 namespace Game3 {
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const UserInfo &user_info) {

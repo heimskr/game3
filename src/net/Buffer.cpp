@@ -3,12 +3,11 @@
 #include "game/Fluids.h"
 #include "game/ServerInventory.h"
 #include "item/Item.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "pipes/ItemFilter.h"
 #include "types/Position.h"
 #include "util/Util.h"
-
-#include <boost/json.hpp>
 
 #include <cassert>
 #include <cstring>

@@ -2,6 +2,7 @@
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/RemoteClient.h"
 #include "packet/TileEntityPacket.h"
@@ -10,8 +11,6 @@
 #include "tileentity/TileEntityFactory.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
-
-#include <boost/json.hpp>
 
 namespace Game3 {
 	void TileEntity::destroy() {

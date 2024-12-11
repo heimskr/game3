@@ -1,9 +1,8 @@
 #include "graphics/Color.h"
 #include "lib/ok_color.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "util/Util.h"
-
-#include <boost/json.hpp>
 
 #include <algorithm>
 #include <cmath>

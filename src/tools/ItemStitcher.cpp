@@ -12,8 +12,6 @@
 #include "util/FS.h"
 #include "util/Util.h"
 
-#include <boost/json.hpp>
-
 #ifdef USING_VCPKG
 #include "lib/stb/stb_image.h"
 #include "lib/stb/stb_image_write.h"

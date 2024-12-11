@@ -1,9 +1,8 @@
 #include "Log.h"
-#include "types/Position.h"
+#include "lib/JSON.h"
 #include "realm/Cave.h"
 #include "tile/CaveTile.h"
-
-#include <boost/json.hpp>
+#include "types/Position.h"
 
 namespace Game3 {
 	CaveTile::CaveTile(Identifier identifier_, ItemStackPtr stack_, Identifier floor_):

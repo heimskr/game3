@@ -1,11 +1,10 @@
 #include "Log.h"
-#include "types/Position.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
+#include "lib/JSON.h"
 #include "registry/Registries.h"
 #include "tile/VoidTile.h"
-
-#include <boost/json.hpp>
+#include "types/Position.h"
 
 namespace Game3 {
 	VoidTile::VoidTile():
