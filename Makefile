@@ -37,13 +37,10 @@ else
 endif
 
 TRIPLET      ?= x64-linux
-DEPS         := libzstd glu libevent_openssl openssl libevent_pthreads freetype2
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
 CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Isubprojects/chemskr/include -Ibuilddir -Ibuilddir/subprojects/chemskr -Idiscord $(LTO) $(PROFILING)
-INCLUDES     := $(shell pkg-config --cflags $(DEPS))
-LIBS         := $(shell pkg-config --libs   $(DEPS))
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp)
