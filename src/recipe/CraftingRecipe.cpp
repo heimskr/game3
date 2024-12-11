@@ -16,18 +16,21 @@ namespace Game3 {
 
 	bool CraftingRecipe::canCraft(const std::shared_ptr<Container> &input_container) {
 		auto inventory = std::dynamic_pointer_cast<Inventory>(input_container);
-		if (!inventory)
+		if (!inventory) {
 			return false;
+		}
 
 		for (const CraftingRequirement &requirement: input) {
 			if (requirement.is<ItemStackPtr>()) {
 				ItemStackPtr stack = requirement.get<ItemStackPtr>();
-				if (0 < stack->count && inventory->count(stack) < stack->count)
+				if (0 < stack->count && inventory->count(stack) < stack->count) {
 					return false;
+				}
 			} else {
 				const auto &[attribute, count] = requirement.get<AttributeRequirement>();
-				if (0 < count && inventory->countAttribute(attribute) < count)
+				if (0 < count && inventory->countAttribute(attribute) < count) {
 					return false;
+				}
 			}
 		}
 
@@ -47,8 +50,9 @@ namespace Game3 {
 		auto inventory_in  = std::dynamic_pointer_cast<Inventory>(input_container);
 		auto inventory_out = std::dynamic_pointer_cast<Inventory>(output_container);
 
-		if (!inventory_in || !inventory_out || !canCraft(input_container))
+		if (!inventory_in || !inventory_out || !canCraft(input_container)) {
 			return false;
+		}
 
 		PlayerPtr out_player = std::dynamic_pointer_cast<Player>(inventory_out->getOwner());
 
@@ -59,32 +63,40 @@ namespace Game3 {
 			// If they're the same, we need to copy the inventory early to check for
 			// removability and insertability, regardless of the number of outputs.
 			std::unique_ptr<Inventory> copy = inventory_in->copy();
-			for (const CraftingRequirement &requirement: input)
+			for (const CraftingRequirement &requirement: input) {
 				copy->remove(requirement);
+				}
 
-			for (const ItemStackPtr &stack: output)
-				if (copy->add(stack))
+			for (const ItemStackPtr &stack: output) {
+				if (copy->add(stack)) {
 					return false;
+				}
+			}
 
 			inventory_in->replace(std::move(*copy));
 
-			if (out_player)
-				for (const ItemStackPtr &stack: output)
+			if (out_player) {
+				for (const ItemStackPtr &stack: output) {
 					out_player->addKnownItem(stack);
+				}
+			}
 
 			return true;
 		}
 
 		if (output.size() == 1) {
 			// If there's just one output, we can check whether it's insertable without having to copy the output inventory.
-			if (!inventory_out->canInsert(output[0]))
+			if (!inventory_out->canInsert(output[0])) {
 				return false;
+			}
 
-			for (const CraftingRequirement &requirement: input)
+			for (const CraftingRequirement &requirement: input) {
 				inventory_in->remove(requirement);
+			}
 
-			if (out_player)
+			if (out_player) {
 				out_player->addKnownItem(output[0]);
+			}
 
 			inventory_out->add(output[0]);
 			return true;
@@ -95,22 +107,27 @@ namespace Game3 {
 		// If that succeeds, proceed to remove the ingredients from the input inventory and replace
 		// the output inventory with the copy.
 		std::unique_ptr<Inventory> out_copy = inventory_out->copy();
-		for (const ItemStackPtr &stack: output)
-			if (out_copy->add(stack))
+		for (const ItemStackPtr &stack: output) {
+			if (out_copy->add(stack)) {
 				return false;
+			}
+		}
 
-		for (const CraftingRequirement &requirement: input)
+		for (const CraftingRequirement &requirement: input) {
 			inventory_in->remove(requirement);
+		}
 
-		if (out_player)
-			for (const ItemStackPtr &stack: output)
+		if (out_player) {
+			for (const ItemStackPtr &stack: output) {
 				out_player->addKnownItem(stack);
+			}
+		}
 
 		inventory_out->replace(std::move(*out_copy));
 		return true;
 	}
 
-	void CraftingRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
+	void CraftingRecipe::toJSON(boost::json::value &json, const GamePtr &) const {
 		boost::json::value_from(*this, json);
 	}
 
