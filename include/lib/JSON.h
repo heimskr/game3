@@ -29,6 +29,17 @@ struct std::formatter<boost::json::value> {
 	}
 };
 
+template <>
+struct std::formatter<boost::json::string> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(const boost::json::string &json, auto &ctx) const {
+		return std::format_to(ctx.out(), "{}", static_cast<std::string_view>(json));
+	}
+};
+
 namespace Game3 {
 	namespace JSON = boost::json;
 

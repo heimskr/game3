@@ -5,7 +5,9 @@
 #include <boost/json/fwd.hpp>
 
 #include <filesystem>
+#include <memory>
 #include <span>
+#include <string>
 
 namespace GL {
 	class Texture;

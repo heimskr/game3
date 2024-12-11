@@ -1,40 +1,10 @@
 #include "config.h"
 #include "graphics/HSL.h"
+#include "lib/PNG.h"
 #include "tools/Flasker.h"
 #include "util/Util.h"
 
 #include <sstream>
-
-#ifdef USING_VCPKG
-#include "lib/stb/stb_image.h"
-#else
-#include "lib/stb/stb_image.h"
-#endif
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#endif
-
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#ifdef USING_VCPKG
-#include "lib/stb/stb_image_write.h"
-#else
-#include "lib/stb/stb_image_write.h"
-#endif
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 namespace Game3 {
 	// Credit for RGB to HSL: https://www.programmingalgorithms.com/algorithm/rgb-to-hsl/cpp/

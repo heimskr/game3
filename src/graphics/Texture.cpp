@@ -4,14 +4,8 @@
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
 #include "lib/JSON.h"
+#include "lib/PNG.h"
 #include "util/Util.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#ifdef USING_VCPKG
-#include "lib/stb/stb_image.h"
-#else
-#include "lib/stb/stb_image.h"
-#endif
 
 #include <unordered_map>
 
@@ -40,14 +34,12 @@ namespace Game3 {
 			return;
 		}
 
-		int channels = 0;
-		uint8_t *raw = stbi_load(path.c_str(), &width, &height, &channels, 0);
-		alpha = channels == 4;
-		format = alpha? GL_RGBA : GL_RGB;
-		if (raw == nullptr) {
-			throw std::runtime_error(std::format("Couldn't load image from \"{}\"", path.string()));
-		}
-		init(std::shared_ptr<uint8_t[]>(raw, stbi_image_free), width, height);
+		png::image<png::rgba_pixel> image(path.c_str());
+		width = static_cast<int>(image.get_width());
+		height = static_cast<int>(image.get_height());
+		alpha = true;
+		format = GL_RGBA;
+		init(getRaw(image), width, height);
 	}
 
 	void Texture::init(int data_width, int data_height) {
