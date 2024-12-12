@@ -13,7 +13,7 @@
 namespace Game3::WorldGen {
 	void generateArcade(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, Position entrance) {
 		auto guard = realm->guardGeneration();
-		realm->markGenerated(0, 0);
+		realm->markGenerated(ChunkPosition{0, 0});
 		Timer timer("GenerateArcade");
 
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});

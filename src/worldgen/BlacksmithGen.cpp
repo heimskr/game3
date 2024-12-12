@@ -17,7 +17,7 @@ namespace Game3::WorldGen {
 
 		auto guard = realm->guardGeneration();
 
-		realm->markGenerated(0, 0);
+		realm->markGenerated(ChunkPosition{0, 0});
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		generateIndoors(realm, rng, parent_realm, width, height, entrance, -1);
 

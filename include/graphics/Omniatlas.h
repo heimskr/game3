@@ -13,7 +13,5 @@ namespace Game3 {
 			TexturePtr texture;
 
 			Omniatlas(const std::filesystem::path &);
-
-
 	};
 }

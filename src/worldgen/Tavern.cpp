@@ -13,7 +13,7 @@
 namespace Game3::WorldGen {
 	void generateTavern(const RealmPtr &realm, std::default_random_engine &rng, const RealmPtr &parent_realm, Index width, Index height, const Position &entrance) {
 		auto guard = realm->guardGeneration();
-		realm->markGenerated(0, 0);
+		realm->markGenerated(ChunkPosition{0, 0});
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		Timer timer("GenerateTavern");
 

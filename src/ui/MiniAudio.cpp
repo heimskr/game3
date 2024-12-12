@@ -2,8 +2,11 @@
 
 #include "ui/MiniAudio.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #include <miniaudio/extras/miniaudio_libopus.h>
 #include <miniaudio/extras/miniaudio_libvorbis.h>
+#pragma GCC diagnostic pop
 
 #include <format>
 
