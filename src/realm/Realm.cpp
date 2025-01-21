@@ -178,15 +178,17 @@ namespace Game3 {
 	}
 
 	void Realm::onBlur() {
-		if (getSide() == Side::Client && focused.exchange(false))
+		if (getSide() == Side::Client && focused.exchange(false)) {
 			snoozePending = true;
+		}
 	}
 
 	void Realm::onRemove() {}
 
 	void Realm::createRenderers() {
-		if (getSide() != Side::Client)
+		if (getSide() != Side::Client) {
 			return;
+		}
 
 		getGame()->toClient().activateContext();
 		baseRenderers.emplace();
@@ -194,11 +196,13 @@ namespace Game3 {
 	}
 
 	bool Realm::prerender() {
-		if (getSide() != Side::Client)
+		if (getSide() != Side::Client) {
 			return false;
+		}
 
-		if (!focused)
+		if (!focused) {
 			onFocus();
+		}
 
 		ClientGame &game = getGame()->toClient();
 		PlayerPtr player = game.getPlayer();
@@ -383,8 +387,9 @@ namespace Game3 {
 	}
 
 	EntityPtr Realm::add(const EntityPtr &entity, const Position &position) {
-		if (auto found = getEntity(entity->getGID()))
+		if (auto found = getEntity(entity->getGID())) {
 			return found;
+		}
 		auto shared = shared_from_this();
 		{
 			auto lock = entities.uniqueLock();
@@ -395,8 +400,9 @@ namespace Game3 {
 			entitiesByGID[entity->globalID] = entity;
 		}
 		entity->firstTeleport = true;
-		if (entity->isPlayer() && entity->weakRealm.lock())
+		if (entity->isPlayer() && entity->weakRealm.lock()) {
 			safeDynamicCast<Player>(entity)->stopMoving();
+		}
 		entity->setRealm(shared);
 		entity->teleport(position, MovementContext{.excludePlayer = entity->getGID(), .clearOffset = false, .isTeleport = true});
 		entity->firstTeleport = false;
@@ -414,8 +420,9 @@ namespace Game3 {
 	TileEntityPtr Realm::add(const TileEntityPtr &tile_entity) {
 		{
 			auto lock = tileEntities.sharedLock();
-			if (tileEntities.contains(tile_entity->position))
+			if (tileEntities.contains(tile_entity->position)) {
 				return nullptr;
+			}
 		}
 		tile_entity->setRealm(shared_from_this());
 		if (!tile_entity->initialized) {
@@ -451,22 +458,27 @@ namespace Game3 {
 	}
 
 	void Realm::tick(float delta) {
-		if (ticking.exchange(true))
+		if (ticking.exchange(true)) {
 			return;
+		}
 
 #ifdef PROFILE_TICKS
 		Timer realm_timer{"TickRealm"};
 #endif
 
-		for (const auto &[entity, position]: entityInitializationQueue.steal())
+		for (const auto &[entity, position]: entityInitializationQueue.steal()) {
 			initEntity(entity, position);
+		}
 
-		for (const auto &[entity, position]: entityAdditionQueue.steal())
+		for (const auto &[entity, position]: entityAdditionQueue.steal()) {
 			add(entity, position);
+		}
 
-		for (const auto &stolen: tileEntityAdditionQueue.steal())
-			if (auto locked = stolen.lock())
+		for (const auto &stolen: tileEntityAdditionQueue.steal()) {
+			if (auto locked = stolen.lock()) {
 				add(locked);
+			}
+		}
 
 		GamePtr game = getGame();
 		const TickArgs args{game, game->getCurrentTick(), delta};
@@ -479,8 +491,9 @@ namespace Game3 {
 				guards.reserve(players.size());
 				for (const auto &weak_player: players) {
 					if (auto player = weak_player.lock()) {
-						if (auto client = player->toServer()->weakClient.lock())
+						if (auto client = player->toServer()->weakClient.lock()) {
 							guards.emplace_back(client->bufferGuard());
+						}
 
 						if (!player->ticked && player->tryInitialTick()) {
 							player->ticked = true;
@@ -493,8 +506,9 @@ namespace Game3 {
 			{
 				auto lock = villages.sharedLock();
 				for (const VillagePtr &village: villages) {
-					if (village->tryInitialTick())
+					if (village->tryInitialTick()) {
 						village->tick(args);
+					}
 				}
 			}
 
@@ -544,38 +558,52 @@ namespace Game3 {
 					for (size_t i = 0; i < game->randomTicksPerChunk; ++i) {
 						const Position position(chunk.y * CHUNK_SIZE + distribution(threadContext.rng), chunk.x * CHUNK_SIZE + distribution(threadContext.rng));
 
-						for (const Layer layer: mainLayers)
-							if (auto tile_id = tileProvider.tryTile(layer, position); tile_id && *tile_id != 0)
+						for (const Layer layer: mainLayers) {
+							if (auto tile_id = tileProvider.tryTile(layer, position); tile_id && *tile_id != 0) {
 								game->getTile(tileset[*tile_id])->randomTick({position, shared, nullptr});
+							}
+						}
 					}
 				}
 			}
 
-			for (const auto &stolen: entityRemovalQueue.steal())
-				if (auto locked = stolen.lock())
+			for (const auto &stolen: entityRemovalQueue.steal()) {
+				if (auto locked = stolen.lock()) {
 					remove(locked);
+				}
+			}
 
-			for (const auto &stolen: entityDestructionQueue.steal())
-				if (auto locked = stolen.lock())
+			for (const auto &stolen: entityDestructionQueue.steal()) {
+				if (auto locked = stolen.lock()) {
 					locked->destroy();
+				}
+			}
 
-			for (const auto &stolen: tileEntityRemovalQueue.steal())
-				if (auto locked = stolen.lock())
+			for (const auto &stolen: tileEntityRemovalQueue.steal()) {
+				if (auto locked = stolen.lock()) {
 					remove(locked);
+				}
+			}
 
-			for (const auto &stolen: tileEntityDestructionQueue.steal())
-				if (auto locked = stolen.lock())
+			for (const auto &stolen: tileEntityDestructionQueue.steal()) {
+				if (auto locked = stolen.lock()) {
 					locked->destroy();
+				}
+			}
 
-			for (const auto &stolen: playerRemovalQueue.steal())
-				if (auto locked = stolen.lock())
+			for (const auto &stolen: playerRemovalQueue.steal()) {
+				if (auto locked = stolen.lock()) {
 					removePlayer(locked);
+				}
+			}
 
-			for (const auto &stolen: generalQueue.steal())
+			for (auto &&stolen: generalQueue.steal()) {
 				stolen();
+			}
 
 			if (!tileProvider.generationQueue.empty()) {
 				const auto chunk_position = tileProvider.generationQueue.take();
+				auto lock = generatedChunks.uniqueLock();
 				if (!generatedChunks.contains(chunk_position)) {
 					tileProvider.ensureAllChunks(chunk_position);
 					generateChunk(chunk_position);
@@ -584,9 +612,11 @@ namespace Game3 {
 					auto lock = chunkRequests.uniqueLock();
 					if (auto iter = chunkRequests.find(chunk_position); iter != chunkRequests.end()) {
 						std::unordered_set<std::shared_ptr<GenericClient>> strong;
-						for (const auto &weak: iter->second)
-							if (auto locked = weak.lock())
+						for (const auto &weak: iter->second) {
+							if (auto locked = weak.lock()) {
 								strong.insert(locked);
+							}
+						}
 						sendToMany(strong, chunk_position);
 						chunkRequests.erase(iter);
 					}
@@ -612,8 +642,9 @@ namespace Game3 {
 		} else {
 
 			auto player = getGame()->toClient().getPlayer();
-			if (!player)
+			if (!player) {
 				return;
+			}
 
 			const auto player_cpos = player->getPosition().getChunk();
 
@@ -1248,8 +1279,9 @@ namespace Game3 {
 		}
 
 		if (--threadContext.updateNeighborsDepth == 0) {
-			if (getSide() == Side::Client)
+			if (getSide() == Side::Client) {
 				queueReupload();
+			}
 			threadContext.updatedLayers.clear();
 		}
 	}
@@ -1310,12 +1342,17 @@ namespace Game3 {
 	}
 
 	bool Realm::isWalkable(Index row, Index column, const Tileset &tileset) {
-		for (const Layer layer: collidingLayers)
-			if (std::optional<TileID> tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile) || tileset.isSolid(*tile))
+		for (const Layer layer: collidingLayers) {
+			if (std::optional<TileID> tile = tryTile(layer, {row, column}); !tile || !tileset.isWalkable(*tile) || tileset.isSolid(*tile)) {
 				return false;
+			}
+		}
+
 		auto lock = tileEntities.sharedLock();
-		if (auto iter = tileEntities.find({row, column}); iter != tileEntities.end() && iter->second->solid)
+		if (auto iter = tileEntities.find({row, column}); iter != tileEntities.end() && iter->second->solid) {
 			return false;
+		}
+
 		return true;
 	}
 
@@ -1342,15 +1379,18 @@ namespace Game3 {
 
 		if (auto entities_ptr = getEntities(chunk_position)) {
 			entity_packets.reserve(entities_ptr->size());
-			for (const WeakEntityPtr &weak_entity: *entities_ptr)
-				if (EntityPtr entity = weak_entity.lock())
+			for (const WeakEntityPtr &weak_entity: *entities_ptr) {
+				if (EntityPtr entity = weak_entity.lock()) {
 					entity_packets.emplace_back(make<EntityPacket>(entity));
+				}
+			}
 		}
 
 		if (auto tile_entities_ptr = getTileEntities(chunk_position)) {
 			tile_entity_packets.reserve(tile_entities_ptr->size());
-			for (const auto &tile_entity: *tile_entities_ptr)
+			for (const auto &tile_entity: *tile_entities_ptr) {
 				tile_entity_packets.emplace_back(make<TileEntityPacket>(tile_entity));
+			}
 		}
 
 		return {std::move(chunk_tiles), std::move(entity_packets), std::move(tile_entity_packets)};
@@ -1358,10 +1398,13 @@ namespace Game3 {
 
 	void Realm::remakePathMap() {
 		const auto &tileset = getTileset();
-		for (auto &[chunk_position, path_chunk]: tileProvider.pathMap)
-			for (int64_t row = 0; row < CHUNK_SIZE; ++row)
-				for (int64_t column = 0; column < CHUNK_SIZE; ++column)
+		for (auto &[chunk_position, path_chunk]: tileProvider.pathMap) {
+			for (int64_t row = 0; row < CHUNK_SIZE; ++row) {
+				for (int64_t column = 0; column < CHUNK_SIZE; ++column) {
 					path_chunk[row * CHUNK_SIZE + column] = isWalkable(row, column, tileset);
+				}
+			}
+		}
 	}
 
 	void Realm::remakePathMap(const ChunkRange &range) {
@@ -1375,9 +1418,11 @@ namespace Game3 {
 		const auto &tileset = getTileset();
 		auto &path_chunk = tileProvider.getPathChunk(position);
 		auto lock = path_chunk.uniqueLock();
-		for (int64_t row = 0; row < CHUNK_SIZE; ++row)
-			for (int64_t column = 0; column < CHUNK_SIZE; ++column)
+		for (int64_t row = 0; row < CHUNK_SIZE; ++row) {
+			for (int64_t column = 0; column < CHUNK_SIZE; ++column) {
 				path_chunk[row * CHUNK_SIZE + column] = isWalkable(position.y * CHUNK_SIZE + row, position.x * CHUNK_SIZE + column, tileset);
+			}
+		}
 	}
 
 	void Realm::remakePathMap(Position position) {
@@ -1388,13 +1433,17 @@ namespace Game3 {
 	}
 
 	void Realm::markGenerated(const ChunkRange &range) {
-		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y)
-			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x)
+		auto lock = generatedChunks.uniqueLock();
+		for (auto y = range.topLeft.y; y <= range.bottomRight.y; ++y) {
+			for (auto x = range.topLeft.x; x <= range.bottomRight.x; ++x) {
 				generatedChunks.emplace(x, y);
+			}
+		}
 	}
 
 	void Realm::markGenerated(ChunkPosition chunk_position) {
-		generatedChunks.insert(chunk_position);
+		auto lock = generatedChunks.uniqueLock();
+		generatedChunks.emplace(chunk_position);
 	}
 
 	bool Realm::isVisible(const Position &position) {
@@ -1403,8 +1452,9 @@ namespace Game3 {
 		return std::ranges::any_of(players, [chunk_pos](const auto &weak_player) {
 			if (auto player = weak_player.lock()) {
 				const auto player_chunk_pos = player->getPosition().getChunk();
-				if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2)
+				if (player_chunk_pos.x - REALM_DIAMETER / 2 <= chunk_pos.x && chunk_pos.x <= player_chunk_pos.x + REALM_DIAMETER / 2) {
 					return player_chunk_pos.y - REALM_DIAMETER / 2 <= chunk_pos.y && chunk_pos.y <= player_chunk_pos.y + REALM_DIAMETER / 2;
+				}
 			}
 
 			return false;
@@ -1753,10 +1803,17 @@ namespace Game3 {
 		assert(getSide() == Side::Server);
 		const auto packet = make<PlaySoundPacket>(id, position, pitch);
 		getPlayers().withShared([&](const WeakSet<Player> &set) {
-			for (const auto &weak_player: set)
-				if (auto player = weak_player.lock())
+			for (const auto &weak_player: set) {
+				if (auto player = weak_player.lock()) {
 					player->send(packet);
+				}
+			}
 		});
+	}
+
+	bool Realm::isChunkGenerated(ChunkPosition chunk_position) const {
+		auto lock = generatedChunks.sharedLock();
+		return generatedChunks.contains(chunk_position);
 	}
 
 	bool Realm::rightClick(const Position &position, double x, double y) {

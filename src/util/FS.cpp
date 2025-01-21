@@ -33,4 +33,22 @@ namespace Game3 {
 		stream.close();
 		return out;
 	}
+
+	bool isSubpath(const std::filesystem::path &base, std::filesystem::path to_check) {
+		if (base == to_check) {
+			return true;
+		}
+
+		const std::filesystem::path root("/");
+
+		while (to_check != root && !to_check.empty()) {
+			if (to_check == base) {
+				return true;
+			}
+
+			to_check = to_check.parent_path();
+		}
+
+		return false;
+	}
 }

@@ -11,7 +11,7 @@
 namespace Game3::WorldGen {
 	void generateKeep(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, RealmID parent_realm, Index width, Index height, const Position &entrance, VillageID village_id) {
 		Timer timer("GenerateKeep");
-		realm->markGenerated(0, 0);
+		realm->markGenerated(ChunkPosition{0, 0});
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
 		auto guard = realm->guardGeneration();
 

@@ -11,7 +11,7 @@ namespace Game3 {
 	class Datapack {
 		public:
 			std::string id;
-			Version version;
+			SemanticVersion version;
 			std::vector<Dependency> dependencies;
 	};
 }

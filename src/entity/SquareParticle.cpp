@@ -13,8 +13,9 @@ namespace Game3 {
 		Entity(ID()), initialVelocity(initial_velocity), size(size), color(color), depth(depth), lingerTime(linger_time) {}
 
 	void SquareParticle::render(const RendererContext &renderers) {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();

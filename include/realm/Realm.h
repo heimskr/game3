@@ -88,7 +88,7 @@ namespace Game3 {
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			int64_t seed = 0;
-			std::unordered_set<ChunkPosition> generatedChunks;
+			Lockable<std::unordered_set<ChunkPosition>> generatedChunks;
 			Lockable<std::unordered_set<ChunkPosition>> visibleChunks;
 			Lockable<std::unordered_set<ChunkPosition>> pathmapUpdateSet;
 
@@ -219,9 +219,9 @@ namespace Game3 {
 			void queueStaticLightingTexture();
 			/** Server-side only. */
 			void playSound(const Position &, const Identifier &, float pitch = 1) const;
+			bool isChunkGenerated(ChunkPosition) const;
 
 			inline const auto & getPlayers() const { return players; }
-			inline void markGenerated(auto x, auto y) { generatedChunks.emplace(x, y); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline auto guardGeneration() { return GenerationGuard(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }

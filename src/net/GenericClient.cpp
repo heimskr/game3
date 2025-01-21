@@ -26,12 +26,21 @@ namespace Game3 {
 			return;
 		}
 
-		try {
-			realm.sendToOne(*this, chunk_position);
-		} catch (const std::out_of_range &) {
-			if (!can_request)
-				throw;
-			realm.requestChunk(chunk_position, shared_from_this());
+		if (realm.isChunkGenerated(chunk_position)) {
+			try {
+				realm.sendToOne(*this, chunk_position);
+				return;
+			} catch (const std::out_of_range &) {
+				if (!can_request) {
+					throw;
+				}
+			}
 		}
+
+		if (!can_request) {
+			throw std::out_of_range("Cannot generate missing chunk");
+		}
+
+		realm.requestChunk(chunk_position, shared_from_this());
 	}
 }

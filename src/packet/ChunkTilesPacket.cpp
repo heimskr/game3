@@ -67,15 +67,16 @@ namespace Game3 {
 		for (const Layer layer: allLayers) {
 			auto &chunk = provider.getTileChunk(layer, chunkPosition);
 			const size_t offset = getIndex(layer) * CHUNK_SIZE * CHUNK_SIZE;
-			chunk = std::vector<TileID>(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
+			auto lock = chunk.uniqueLock();
+			chunk.assign(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
+			if (layer == Layer::Terrain) {
+				std::unordered_set<TileID> set(chunk.begin(), chunk.end());
+			}
 		}
 
 		provider.getFluidChunk(chunkPosition) = std::move(fluids);
-
 		provider.setPathChunk(chunkPosition, std::move(pathmap));
-
 		provider.setUpdateCounter(chunkPosition, updateCounter);
-
 		game->chunkReceived(chunkPosition);
 		realm->queueReupload();
 		realm->queueStaticLightingTexture();
