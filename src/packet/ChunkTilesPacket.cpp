@@ -53,11 +53,13 @@ namespace Game3 {
 	}
 
 	void ChunkTilesPacket::handle(const ClientGamePtr &game) {
-		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT)
+		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT) {
 			throw PacketError("Invalid tile count in ChunkTilesPacket: " + std::to_string(tiles.size()));
+		}
 
-		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
+		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE) {
 			throw PacketError("Invalid fluid count in ChunkTilesPacket: " + std::to_string(fluids.size()));
+		}
 
 		RealmPtr realm = game->getRealm(realmID);
 		TileProvider &provider = realm->tileProvider;

@@ -1,7 +1,6 @@
 #include "Log.h"
 #include "graphics/Omniatlas.h"
-
-#include "pngpp/png.hpp"
+#include "lib/PNG.h"
 
 #include <cmath>
 

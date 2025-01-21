@@ -22,8 +22,10 @@ namespace Game3 {
 	}
 
 	void Timer::stop() {
-		if (stopped)
+		if (stopped) {
 			return;
+		}
+
 		auto lock = uniqueLock();
 		times[name] += difference();
 		++counts[name];
@@ -36,8 +38,9 @@ namespace Game3 {
 	}
 
 	void Timer::summary(double threshold) {
-		if (!globalEnabled)
+		if (!globalEnabled) {
 			return;
+		}
 
 		auto lock = sharedLock();
 

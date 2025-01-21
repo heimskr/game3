@@ -50,8 +50,9 @@ namespace Game3 {
 
 			inline std::optional<T> tryTake() {
 				std::unique_lock lock(mutex);
-				if (std::deque<T>::empty())
+				if (std::deque<T>::empty()) {
 					return std::nullopt;
+				}
 				auto out = std::make_optional(std::move(std::deque<T>::front()));
 				std::deque<T>::pop_front();
 				return out;
