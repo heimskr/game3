@@ -8,6 +8,7 @@
 #include "item/Item.h"
 #include "packet/PlaySoundPacket.h"
 #include "realm/Realm.h"
+#include "threading/ThreadContext.h"
 
 namespace Game3 {
 	template <typename T>

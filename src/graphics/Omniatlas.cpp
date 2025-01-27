@@ -6,7 +6,7 @@
 #include <cmath>
 
 namespace Game3 {
-	Omniatlas::Omniatlas(const std::filesystem::path &dir) {
+	Omniatlas::Omniatlas(const std::filesystem::path &dir, ItemTextureRegistry *, ResourceRegistry *) {
 		std::unordered_map<std::filesystem::path, png::image<png::rgba_pixel>> item_images, other_images;
 		std::size_t tile_count = 0;
 

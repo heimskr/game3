@@ -8,10 +8,13 @@
 #include <vector>
 
 namespace Game3 {
+	struct ItemTextureRegistry;
+	struct ResourceRegistry;
+
 	class Omniatlas {
 		public:
 			TexturePtr texture;
 
-			Omniatlas(const std::filesystem::path &);
+			Omniatlas(const std::filesystem::path &, ItemTextureRegistry * = nullptr, ResourceRegistry * = nullptr);
 	};
 }
