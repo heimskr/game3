@@ -12,7 +12,7 @@ namespace Game3 {
 		height(height),
 		minigame(std::move(minigame)) {
 			assert(this->minigame != nullptr);
-			setTitle(this->minigame->getName());
+			setTitle(this->minigame->getGameName());
 		}
 
 	void MinigameDialog::init() {
