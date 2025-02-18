@@ -72,8 +72,9 @@ namespace Game3 {
 			throw MiniAudio::AudioError("Failed to initialize sound", result);
 		}
 
-		if (pitch != 1.f)
+		if (pitch != 1.f) {
 			ma_sound_set_pitch(&sound, pitch);
+		}
 
 		return sound;
 	}
