@@ -312,7 +312,9 @@ namespace Game3 {
 		absorbGame(game);
 		buffer << item->identifier;
 		buffer << count;
-		buffer << boost::json::serialize(data);
+		data.withShared([&](const boost::json::value &json) {
+			buffer << boost::json::serialize(json);
+		});
 	}
 
 	void ItemStack::decode(Game &game, Buffer &buffer) {

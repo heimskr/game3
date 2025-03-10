@@ -104,6 +104,7 @@ namespace Game3 {
 		inline bool isGrounded() const { return z < 0.01; }
 
 		bool operator==(const Vector3 &) const;
+		explicit operator bool() const;
 
 		Vector3 & operator+=(const Vector3 &);
 		Vector3 & operator-=(const Vector3 &);

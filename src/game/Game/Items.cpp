@@ -26,6 +26,7 @@
 #include "item/FilledFlask.h"
 #include "item/Floor.h"
 #include "item/Flower.h"
+#include "item/FluidGun.h"
 #include "item/Furniture.h"
 #include "item/GeothermalGeneratorItem.h"
 #include "item/Hammer.h"
@@ -138,6 +139,8 @@ namespace Game3 {
 
 		add(std::make_shared<Floor>("base:item/floor",       "Floor",       "base:tile/floor",       4, 64));
 		add(std::make_shared<Floor>("base:item/stone_tiles", "Stone Tiles", "base:tile/stone_tiles", 4, 64));
+
+		add(std::make_shared<FluidGun>("base:item/fluid_gun", "Fluid Gun", 999, 1)); // TODO: cost
 
 		add(std::make_shared<FluidPipeItem>(4));
 

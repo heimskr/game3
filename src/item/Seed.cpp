@@ -1,10 +1,10 @@
 #include "Log.h"
-#include "types/Position.h"
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Seed.h"
 #include "realm/Realm.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	Seed::Seed(ItemID id_, std::string name_, Identifier crop_tilename, MoneyCount base_price, ItemCount max_count):
