@@ -67,7 +67,7 @@ namespace Game3 {
 			/** Called when the user uses the item via the context menu or via a keyboard shortcut. Returns true iff propagation should stop. */
 			virtual bool use(Slot, const ItemStackPtr &, const std::shared_ptr<Player> &, Modifiers);
 
-			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers);
+			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }

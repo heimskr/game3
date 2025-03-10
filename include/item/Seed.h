@@ -10,7 +10,7 @@ namespace Game3 {
 			Seed(ItemID id_, std::string name_, Identifier crop_tilename, MoneyCount base_price, ItemCount max_count = 64);
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool plant(InventoryPtr, Slot, const ItemStackPtr &, const Place &) override;
 	};
 }

@@ -14,15 +14,16 @@ namespace Game3 {
 		Action action{};
 		Position position;
 		Modifiers modifiers;
+		std::pair<float, float> offsets{};
 
 		DragPacket() = default;
-		DragPacket(Action action_, const Position &position_, Modifiers modifiers_):
-			action(action_), position(position_), modifiers(modifiers_) {}
+		DragPacket(Action action, const Position &position, Modifiers modifiers, std::pair<float, float> offsets):
+			action(action), position(position), modifiers(modifiers), offsets(offsets) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << action << position << modifiers; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> action >> position >> modifiers; }
+		void encode(Game &, Buffer &buffer) const override { buffer << action << position << modifiers << offsets.first << offsets.second; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> action >> position >> modifiers >> offsets.first >> offsets.second; }
 
 		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
 	};

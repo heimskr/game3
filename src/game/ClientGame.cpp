@@ -70,24 +70,30 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragStart(double x, double y, Modifiers modifiers) {
-		Position position = translateCanvasCoordinates(x, y);
+		double x_offset{}, y_offset{};
+		Position position = translateCanvasCoordinates(x, y, &x_offset, &y_offset);
 		lastDragPosition = position;
-		getClient()->send(make<DragPacket>(DragPacket::Action::Start, position, modifiers));
+		std::pair<float, float> offsets{x_offset, y_offset};
+		getClient()->send(make<DragPacket>(DragPacket::Action::Start, position, modifiers, offsets));
 	}
 
 	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
-		Position position = translateCanvasCoordinates(x, y);
+		double x_offset{}, y_offset{};
+		Position position = translateCanvasCoordinates(x, y, &x_offset, &y_offset);
 		if (lastDragPosition && *lastDragPosition != position) {
 			lastDragPosition = position;
-			getClient()->send(make<DragPacket>(DragPacket::Action::Update, position, modifiers));
+			std::pair<float, float> offsets{x_offset, y_offset};
+			getClient()->send(make<DragPacket>(DragPacket::Action::Update, position, modifiers, offsets));
 		}
 	}
 
 	void ClientGame::dragEnd(double x, double y, Modifiers modifiers) {
 		if (lastDragPosition) {
-			Position position = translateCanvasCoordinates(x, y);
+			double x_offset{}, y_offset{};
+			Position position = translateCanvasCoordinates(x, y, &x_offset, &y_offset);
 			lastDragPosition.reset();
-			getClient()->send(make<DragPacket>(DragPacket::Action::End, position, modifiers));
+			std::pair<float, float> offsets{x_offset, y_offset};
+			getClient()->send(make<DragPacket>(DragPacket::Action::End, position, modifiers, offsets));
 		}
 	}
 

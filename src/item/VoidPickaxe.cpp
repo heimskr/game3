@@ -25,12 +25,14 @@ namespace Game3 {
 
 		for (const Layer layer: reverse(allLayers)) {
 			std::optional<TileID> tile = place.get(layer);
-			if (!tile || *tile == 0)
+			if (!tile || *tile == 0) {
 				continue;
+			}
 
 			ItemStackPtr stack;
-			if (tileset.getItemStack(game, tileset[*tile], stack))
+			if (tileset.getItemStack(game, tileset[*tile], stack)) {
 				player->give(stack, slot);
+			}
 
 			place.set(layer, 0);
 			return true;
@@ -39,9 +41,10 @@ namespace Game3 {
 		return false;
 	}
 
-	bool VoidPickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
-		if (modifiers.onlyShift())
-			return use(slot, stack, place, modifiers, {0.f, 0.f});
+	bool VoidPickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		if (modifiers.onlyShift()) {
+			return use(slot, stack, place, modifiers, offsets);
+		}
 		return false;
 	}
 }

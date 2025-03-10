@@ -13,7 +13,7 @@ namespace Game3 {
 	bool FluidGun::use(Slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float> offsets) {
 		GamePtr game = stack->getGame();
 
-		constexpr static double scale = 10.5;
+		constexpr static double scale = 2;
 		const Position relative = place.position - place.player->getPosition();
 		Vector3 velocity(relative.column + (0.5 - offsets.first), relative.row + (0.5 - offsets.second), 16.0);
 		velocity.x *= scale;
@@ -33,7 +33,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool FluidGun::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	bool FluidGun::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		return use(slot, stack, place, modifiers, offsets);
 	}
 }
