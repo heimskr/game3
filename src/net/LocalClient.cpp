@@ -57,14 +57,14 @@ namespace Game3 {
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
 		assert(!isReady());
 #ifdef USE_TLS
-		asio::io_service io_service;
-		asio::ip::tcp::resolver resolver(io_service);
+		asio::io_context io_context;
+		asio::ip::tcp::resolver resolver(io_context);
 
-		auto resolved = resolver.resolve(hostname, "");
+		asio::ip::basic_resolver_results<asio::ip::tcp> resolved = resolver.resolve(hostname, "");
 		if (resolved.size() != 1)
 			throw std::runtime_error(std::format("Too {} resolution results: {}", resolved.empty()? "few" : "many", resolved.size()));
 		lastHostname = hostname;
-		auto endpoint = resolved->endpoint();
+		auto endpoint = resolved.begin()->endpoint();
 		endpoint.port(port);
 
 		asio::post(strand, [this, endpoint, shared = shared_from_this()] {

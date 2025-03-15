@@ -175,7 +175,7 @@ namespace Game3 {
 
 		strand.post([this, message = std::move(message)]() mutable {
 			queue(std::move(message));
-		});
+		}, asio::get_associated_allocator(strand));
 	}
 
 	void RemoteClient::startBuffering() {

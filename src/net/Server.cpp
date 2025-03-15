@@ -37,7 +37,7 @@ namespace Game3 {
 	threadCount(thread_count),
 	sslContext(asio::ssl::context::tls),
 	context(thread_count),
-	acceptor(context, asio::ip::tcp::endpoint(asio::ip::address::from_string(ip), port)),
+	acceptor(context, asio::ip::tcp::endpoint(asio::ip::make_address(ip), port)),
 	workGuard(asio::make_work_guard(context)) {
 		if (thread_count < 1) {
 			throw std::invalid_argument("Cannot instantiate a Server with a thread count of zero");
