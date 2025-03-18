@@ -167,16 +167,20 @@ namespace Game3 {
 
 				if (auto tile_entities = realm->getTileEntities(chunk)) {
 					auto lock = tile_entities->sharedLock();
-					for (const auto &tile_entity: *tile_entities)
-						if (!tile_entity->hasBeenSentTo(shared))
+					for (const auto &tile_entity: *tile_entities) {
+						if (!tile_entity->hasBeenSentTo(shared)) {
 							tile_entity->sendTo(client);
+						}
+					}
 				}
 
 				if (auto entities = realm->getEntities(chunk)) {
 					auto lock = entities->sharedLock();
-					for (const WeakEntityPtr &weak_entity: *entities)
-						if (EntityPtr entity = weak_entity.lock(); entity && !entity->hasBeenSentTo(shared))
+					for (const WeakEntityPtr &weak_entity: *entities) {
+						if (EntityPtr entity = weak_entity.lock(); entity && !entity->hasBeenSentTo(shared)) {
 							entity->sendTo(client);
+						}
+					}
 				}
 			}
 

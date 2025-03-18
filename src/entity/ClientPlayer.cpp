@@ -69,6 +69,20 @@ namespace Game3 {
 			move(Direction::Down, context);
 
 		direction = final_direction;
+
+		if (firing) {
+			if (InventoryPtr inventory = getInventory(0)) {
+				if (ItemStackPtr active = inventory->getActive()) {
+					Place place = getPlace();
+					ClientGamePtr game = getGame()->toClientPointer();
+					WindowPtr window = game->getWindow();
+					auto [x, y] = window->getMouseCoordinates<double>();
+					double x_offset{}, y_offset{};
+					place.position = game->translateCanvasCoordinates(x, y, &x_offset, &y_offset);
+					active->item->fire(inventory->activeSlot, active, place, window->getModifiers(), {x_offset, y_offset});
+				}
+			}
+		}
 	}
 
 	void ClientPlayer::render(const RendererContext &renderers) {
@@ -89,8 +103,8 @@ namespace Game3 {
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
-				.x = float(column) + x + .5,
-				.y = float(row) + y - z + health_offset - .25,
+				.x = static_cast<float>(column) + x + .5,
+				.y = static_cast<float>(row) + y - z + health_offset - .25,
 				.scaleX = .75,
 				.scaleY = .75,
 				.align = TextAlign::Center,

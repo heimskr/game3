@@ -1550,16 +1550,20 @@ namespace Game3 {
 
 		{
 			auto lock = entities.sharedLock();
-			for (const auto &entity: entities)
-				if (player->canSee(*entity))
+			for (const auto &entity: entities) {
+				if (player->canSee(*entity)) {
 					entity->sendTo(client);
+				}
+			}
 		}
 
 		{
 			auto lock = tileEntities.sharedLock();
-			for (const auto &[tile_position, tile_entity]: tileEntities)
-				if (player->canSee(*tile_entity))
+			for (const auto &[tile_position, tile_entity]: tileEntities) {
+				if (player->canSee(*tile_entity)) {
 					tile_entity->sendTo(client);
+				}
+			}
 		}
 	}
 
@@ -1800,15 +1804,18 @@ namespace Game3 {
 	}
 
 	void Realm::playSound(const Position &position, const Identifier &id, float pitch) const {
-		assert(getSide() == Side::Server);
-		const auto packet = make<PlaySoundPacket>(id, position, pitch);
-		getPlayers().withShared([&](const WeakSet<Player> &set) {
-			for (const auto &weak_player: set) {
-				if (auto player = weak_player.lock()) {
-					player->send(packet);
+		if (getSide() == Side::Server) {
+			const auto packet = make<PlaySoundPacket>(id, position, pitch);
+			getPlayers().withShared([&](const WeakSet<Player> &set) {
+				for (const auto &weak_player: set) {
+					if (auto player = weak_player.lock()) {
+						player->send(packet);
+					}
 				}
-			}
-		});
+			});
+		} else {
+			getGame()->toClient().playSound(id, pitch);
+		}
 	}
 
 	bool Realm::isChunkGenerated(ChunkPosition chunk_position) const {
@@ -1901,9 +1908,11 @@ namespace Game3 {
 			if (!entity->visiblePlayers.empty()) {
 				const auto packet = make<EntityPacket>(entity);
 				for (const auto &weak_player: entity->visiblePlayers) {
-					if (auto player = weak_player.lock()) {
-						player->notifyOfRealm(*this);
-						player->send(packet);
+					if (PlayerPtr player = weak_player.lock()) {
+						if (player != entity->excludedPlayer) {
+							player->notifyOfRealm(*this);
+							player->send(packet);
+						}
 					}
 				}
 			}

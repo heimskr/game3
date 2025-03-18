@@ -426,6 +426,10 @@ namespace Game3 {
 		return knownItems.contains(item_id);
 	}
 
+	void Player::setFiring(bool value) {
+		firing = value;
+	}
+
 	void Player::resetEphemeral() {
 		stopMoving();
 		continuousInteraction = false;

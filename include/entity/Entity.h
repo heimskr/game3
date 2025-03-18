@@ -86,6 +86,8 @@ namespace Game3 {
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
 			Atomic<float> age;
+			/** Packets about this entity won't be sent to this player because they have a client-side instance already and don't need updates. */
+			PlayerPtr excludedPlayer;
 
 			virtual void destroy();
 

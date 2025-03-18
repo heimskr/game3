@@ -779,6 +779,12 @@ namespace Game3 {
 			uiContext.mouseDown(button, x, y);
 
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
+				if (game) {
+					if (ClientPlayerPtr player = game->getPlayer()) {
+						player->setFiring(true);
+					}
+				}
+
 				dragStarted = false;
 				clickPosition.emplace(x, y);
 			} else if (button == GLFW_MOUSE_BUTTON_4 || button == GLFW_MOUSE_BUTTON_5) {
@@ -795,6 +801,12 @@ namespace Game3 {
 			}
 		} else if (action == GLFW_RELEASE) {
 			heldMouseButton.reset();
+
+			if (game) {
+				if (ClientPlayerPtr player = game->getPlayer()) {
+					player->setFiring(false);
+				}
+			}
 
 			bool result = uiContext.mouseUp(button, x, y);
 

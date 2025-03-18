@@ -69,6 +69,9 @@ namespace Game3 {
 
 			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
 
+			/** Called on the client every tick while the user is holding the mouse button on the world with the item selected. */
+			virtual bool fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
+
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 

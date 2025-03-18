@@ -137,6 +137,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Item::fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) {
+		return false;
+	}
+
 // ItemStack
 
 	ItemStack::ItemStack(const GamePtr &game):

@@ -241,6 +241,9 @@ namespace Game3 {
 		auto &clients = server->getClients();
 		auto lock = clients.sharedLock();
 		for (const auto &client: clients) {
+			if (PlayerPtr player = client->getPlayer(); player && player == entity.excludedPlayer) {
+				continue;
+			}
 			client->send(packet);
 		}
 	}

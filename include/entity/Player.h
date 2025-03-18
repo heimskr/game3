@@ -22,11 +22,11 @@ namespace Game3 {
 
 			/** Not encoded. */
 			Lockable<std::string> username;
+			std::string displayName;
+			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
 			/** Definitely not encoded. */
 			Token token = -1;
-			std::string displayName;
 			float tooldown = 0;
-			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
 			float movementSpeed = 10;
 			float timeSinceAttack = 0;
 			std::atomic_bool movingUp = false;
@@ -36,6 +36,8 @@ namespace Game3 {
 			/** When moving with shift held, the player will interact with each spot moved to. */
 			bool continuousInteraction = false;
 			bool ticked = false;
+			/** Whether the player is clicking and holding on the world. */
+			bool firing = false;
 			Atomic<RealmID> spawnRealmID;
 			Lockable<Position> spawnPosition;
 			std::optional<Place> lastContinuousInteraction;
@@ -92,6 +94,7 @@ namespace Game3 {
 			bool addKnownItem(const Identifier &);
 			void setKnownItems(std::set<Identifier>);
 			bool hasKnownItem(const Identifier &) const;
+			virtual void setFiring(bool);
 
 			inline std::string getUsername() const { return username.copyBase(); }
 			inline const auto & getKnownItems() const { return knownItems; }

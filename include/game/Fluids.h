@@ -25,6 +25,7 @@ namespace Game3 {
 	};
 
 	using FluidInt = uint64_t;
+	using FluidPtr = std::shared_ptr<Fluid>;
 
 	struct FluidTile {
 		static constexpr FluidLevel FULL = 1000;

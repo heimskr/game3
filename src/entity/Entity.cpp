@@ -355,10 +355,11 @@ namespace Game3 {
 		}
 
 		if (texture == nullptr && game->getSide() == Side::Client) {
-			if (customTexture)
+			if (customTexture) {
 				changeTexture(customTexture);
-			else
+			} else {
 				texture = getTexture();
+			}
 		}
 
 		InventoryPtr inventory = getInventory(0);
@@ -376,17 +377,20 @@ namespace Game3 {
 				assert(here == *this_inventory || there == *this_inventory);
 
 				return [this, &here, here_slot, &there, there_slot, this_inventory] {
-					for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
-						if (here_slot == held.slot)
+					for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
+						if (here_slot == held.slot) {
 							setHeld(here == there? there_slot : -1, held);
+						}
+					}
 				};
 			};
 
 			inventory->onMove = [this, weak_inventory = std::weak_ptr(inventory)](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool) -> std::function<void()> {
 				InventoryPtr inventory = weak_inventory.lock();
 
-				if (!inventory)
+				if (!inventory) {
 					return [] {};
+				}
 
 				return [this, &source, source_slot, &destination, destination_slot, inventory] {
 					if (source == *inventory && destination == *inventory) {
@@ -1198,25 +1202,36 @@ namespace Game3 {
 			return;
 
 		const auto packet = make<EntityMoneyChangedPacket>(*this);
-		for (const auto &weak_player: visiblePlayers)
-			if (PlayerPtr player = weak_player.lock())
+		for (const auto &weak_player: visiblePlayers) {
+			if (PlayerPtr player = weak_player.lock()) {
 				player->send(packet);
+			}
+		}
 	}
 
 	void Entity::sendTo(GenericClient &client, UpdateCounter threshold) {
-		if (threshold == 0 || getUpdateCounter() < threshold) {
-			RealmPtr realm = getRealm();
-			client.getPlayer()->notifyOfRealm(*realm);
-			client.send(make<EntityPacket>(getSelf()));
-			onSend(client.getPlayer());
+		if (threshold != 0 && threshold <= getUpdateCounter()) {
+			return;
 		}
+
+		PlayerPtr player = client.getPlayer();
+		if (player == excludedPlayer) {
+			return;
+		}
+		player->notifyOfRealm(*getRealm());
+		client.send(make<EntityPacket>(getSelf()));
+		onSend(player);
 	}
 
 	void Entity::sendToVisible() {
 		auto lock = visiblePlayers.sharedLock();
-		for (const auto &weak_player: visiblePlayers)
-			if (PlayerPtr player = weak_player.lock())
-				sendTo(*player->toServer()->getClient());
+		for (const auto &weak_player: visiblePlayers) {
+			if (PlayerPtr player = weak_player.lock()) {
+				if (player != excludedPlayer) {
+					sendTo(*player->toServer()->getClient());
+				}
+			}
+		}
 	}
 
 	bool Entity::setHeld(Slot new_value, Held &held) {
@@ -1231,8 +1246,9 @@ namespace Game3 {
 
 		if (new_value < 0) {
 			held.slot = -1;
-			if (is_client)
+			if (is_client) {
 				held.texture.reset();
+			}
 			return true;
 		}
 
@@ -1241,8 +1257,9 @@ namespace Game3 {
 		if (!inventory->contains(new_value)) {
 			WARN("Can't equip slot {}: no item in inventory", new_value);
 			held.slot = -1;
-			if (is_client)
+			if (is_client) {
 				held.texture.reset();
+			}
 			return false;
 		}
 

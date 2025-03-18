@@ -456,6 +456,10 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Viewport width
 	- `i32` Viewport height
 
+68. **Set Firing**: tells the server that the client is or isn't holding down the mouse on the world.
+
+	- `bool` Firing
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

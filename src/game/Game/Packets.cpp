@@ -66,6 +66,7 @@
 #include "packet/AddKnownItemPacket.h"
 #include "packet/SubmitScorePacket.h"
 #include "packet/OpenMinigamePacket.h"
+#include "packet/SetFiringPacket.h"
 
 namespace Game3 {
 	void Game::addPacketFactories() {
@@ -142,5 +143,6 @@ namespace Game3 {
 		add(PacketFactory::create<AddKnownItemPacket>());
 		add(PacketFactory::create<SubmitScorePacket>());
 		add(PacketFactory::create<OpenMinigamePacket>());
+		add(PacketFactory::create<SetFiringPacket>());
 	}
 }
