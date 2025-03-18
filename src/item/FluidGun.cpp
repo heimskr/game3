@@ -15,15 +15,18 @@ namespace Game3 {
 
 	static auto makeParticle(const GamePtr &game, const FluidPtr &fluid, const Place &place, std::pair<float, float> offsets) {
 		auto [x_offset, y_offset] = offsets;
-		Position relative = place.position - place.player->getPosition();
+		PlayerPtr player = place.player;
+		Vector3 player_offset = player->getOffset();
+		Position relative = place.position - player->getPosition();
 		Vector3 velocity(relative.column + (0.5 - x_offset), relative.row + (0.5 - y_offset), 16.0);
+		velocity -= player_offset * Vector3(1, 1, 0);
 		velocity.x *= scale;
 		velocity.y *= scale;
 		velocity.z /= scale;
-		auto entity = SquareParticle::create(game, velocity, 0.25, fluid->color);
+		auto entity = SquareParticle::create(game, velocity, 0.333, fluid->color);
 		entity->spawning = true;
 		entity->setRealm(place.realm);
-		entity->offset.z = place.player->getOffset().z;
+		entity->offset = player_offset;
 		return entity;
 	}
 

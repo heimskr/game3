@@ -108,8 +108,10 @@ namespace Game3 {
 
 		Vector3 & operator+=(const Vector3 &);
 		Vector3 & operator-=(const Vector3 &);
+		Vector3 & operator*=(const Vector3 &);
 		Vector3 operator+(const Vector3 &) const;
 		Vector3 operator-(const Vector3 &) const;
+		Vector3 operator*(const Vector3 &) const;
 	};
 
 	Buffer & operator+=(Buffer &, const Vector3 &);
