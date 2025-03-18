@@ -11,22 +11,26 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	constexpr static double scale = 2;
+	constexpr static double velocityScale = 2;
+	constexpr static double jitterScale = 0.2;
 
 	static auto makeParticle(const GamePtr &game, const FluidPtr &fluid, const Place &place, std::pair<float, float> offsets) {
 		auto [x_offset, y_offset] = offsets;
 		PlayerPtr player = place.player;
 		Vector3 player_offset = player->getOffset();
 		Position relative = place.position - player->getPosition();
+		const auto x_jitter = threadContext.random(-jitterScale, jitterScale);
+		const auto y_jitter = threadContext.random(-jitterScale, jitterScale);
+		Vector3 jitter(x_jitter, y_jitter, 0);
 		Vector3 velocity(relative.column + (0.5 - x_offset), relative.row + (0.5 - y_offset), 16.0);
-		velocity -= player_offset * Vector3(1, 1, 0);
-		velocity.x *= scale;
-		velocity.y *= scale;
-		velocity.z /= scale;
+		velocity -= player_offset * Vector3(1, 1, 0) - jitter;
+		velocity.x *= velocityScale;
+		velocity.y *= velocityScale;
+		velocity.z /= velocityScale;
 		auto entity = SquareParticle::create(game, velocity, 0.333, fluid->color);
 		entity->spawning = true;
 		entity->setRealm(place.realm);
-		entity->offset = player_offset;
+		entity->offset = player_offset - jitter;
 		return entity;
 	}
 
