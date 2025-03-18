@@ -22,12 +22,12 @@ namespace Game3 {
 		message(std::move(message)) {}
 
 	void LoginStatusPacket::encode(Game &, Buffer &buffer) const {
-		buffer << success << globalID << username << displayName << playerDataBuffer << message;
+		buffer << success << globalID << username << displayName << message << playerDataBuffer;
 	}
 
 	void LoginStatusPacket::decode(Game &game, Buffer &buffer) {
 		playerDataBuffer.context = game.shared_from_this();
-		buffer >> success >> globalID >> username >> displayName >> playerDataBuffer >> message;
+		buffer >> success >> globalID >> username >> displayName >> message >> playerDataBuffer;
 	}
 
 	void LoginStatusPacket::handle(const ClientGamePtr &game) {
