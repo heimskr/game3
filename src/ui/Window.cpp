@@ -776,10 +776,10 @@ namespace Game3 {
 		if (action == GLFW_PRESS) {
 			heldMouseButton = button;
 
-			uiContext.mouseDown(button, x, y);
+			bool result = uiContext.mouseDown(button, x, y);
 
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
-				if (game) {
+				if (!result && game) {
 					if (ClientPlayerPtr player = game->getPlayer()) {
 						player->setFiring(true);
 					}
