@@ -13,6 +13,8 @@
 namespace Game3 {
 	constexpr static double velocityScale = 2;
 	constexpr static double jitterScale = 0.2;
+	constexpr static double sizeBase = 0.333;
+	constexpr static double sizeVariance = 0.8;
 
 	static auto makeParticle(const GamePtr &game, const FluidPtr &fluid, const Place &place, std::pair<float, float> offsets) {
 		auto [x_offset, y_offset] = offsets;
@@ -27,7 +29,7 @@ namespace Game3 {
 		velocity.x *= velocityScale;
 		velocity.y *= velocityScale;
 		velocity.z /= velocityScale;
-		auto entity = SquareParticle::create(game, velocity, 0.333, fluid->color);
+		auto entity = SquareParticle::create(game, velocity, threadContext.random(sizeBase * sizeVariance, sizeBase / sizeVariance), fluid->color);
 		entity->spawning = true;
 		entity->setRealm(place.realm);
 		entity->offset = player_offset - jitter;
