@@ -11,7 +11,8 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	constexpr static double velocityScale = 2;
+	constexpr static double velocityBase = 2;
+	constexpr static double velocityVariance = 0.8;
 	constexpr static double jitterScale = 0.2;
 	constexpr static double sizeBase = 0.333;
 	constexpr static double sizeVariance = 0.8;
@@ -26,11 +27,12 @@ namespace Game3 {
 		const Vector3 jitter(x_jitter, y_jitter, 0);
 		Vector3 velocity(relative.column + (0.5 - x_offset), relative.row + (0.5 - y_offset), 16.0);
 		velocity -= player_offset * Vector3(1, 1, 0) - jitter;
-		velocity.x *= velocityScale;
-		velocity.y *= velocityScale;
-		velocity.z /= velocityScale;
+		const double velocity_scale = threadContext.random(velocityBase * velocityVariance, velocityBase / velocityVariance);
+		velocity.x *= velocity_scale;
+		velocity.y *= velocity_scale;
+		velocity.z /= velocity_scale;
 		const double size = threadContext.random(sizeBase * sizeVariance, sizeBase / sizeVariance);
-		auto entity = SquareParticle::create(game, velocity, size, fluid->color);
+		auto entity = SquareParticle::create(game, velocity, size, fluid->color, 0, 2);
 		entity->spawning = true;
 		entity->setRealm(place.realm);
 		entity->offset = player_offset - jitter;
@@ -63,10 +65,10 @@ namespace Game3 {
 			static std::chrono::system_clock::time_point last_play{};
 			auto now = std::chrono::system_clock::now();
 			auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_play).count();
-			if (diff > 1000) {
+			if (diff > 80) {
 				last_play = now;
-				constexpr static float variance = .9;
-				place.realm->playSound(place.position, "base:sound/bing_chilling", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+				constexpr static float variance = .8;
+				place.realm->playSound(place.position, "base:sound/hit", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
 			}
 		}
 
