@@ -1,12 +1,13 @@
-#include "types/Position.h"
 #include "entity/Player.h"
+#include "game/Fluids.h"
 #include "game/TileProvider.h"
 #include "graphics/Tileset.h"
 #include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
-#include "util/Util.h"
 #include "types/ChunkPosition.h"
+#include "types/Position.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	Position::Position(std::string_view string) {
@@ -167,9 +168,14 @@ namespace Game3 {
 		return realm->tryTile(layer, position);
 	}
 
+	std::optional<FluidTile> Place::getFluid() const {
+		return realm->tryFluid(position);
+	}
+
 	std::optional<std::reference_wrapper<const Identifier>> Place::getName(Layer layer) const {
-		if (auto tile = realm->tryTile(layer, position))
+		if (auto tile = realm->tryTile(layer, position)) {
 			return realm->getTileset()[*tile];
+		}
 		return std::nullopt;
 	}
 
@@ -179,6 +185,10 @@ namespace Game3 {
 
 	void Place::set(Layer layer, const Identifier &tilename) const {
 		realm->setTile(layer, position, tilename);
+	}
+
+	void Place::setFluid(FluidTile fluid_tile) const {
+		realm->setFluid(position, fluid_tile);
 	}
 
 	bool Place::isPathable() const {

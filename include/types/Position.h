@@ -20,6 +20,7 @@ namespace Game3 {
 	class Realm;
 	class TileEntity;
 	struct ChunkPosition;
+	struct FluidTile;
 
 	struct Position {
 		using IntType = Index;
@@ -80,9 +81,11 @@ namespace Game3 {
 			position(std::move(position)), realm(std::move(realm)), player(std::move(player)) {}
 
 		std::optional<TileID> get(Layer) const;
+		std::optional<FluidTile> getFluid() const;
 		std::optional<std::reference_wrapper<const Identifier>> getName(Layer) const;
 		void set(Layer, TileID) const;
 		void set(Layer, const Identifier &) const;
+		void setFluid(FluidTile) const;
 		bool isPathable() const;
 		std::shared_ptr<TileEntity> getTileEntity() const;
 		Place withPosition(Position) const;

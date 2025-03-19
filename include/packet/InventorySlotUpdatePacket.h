@@ -14,7 +14,8 @@ namespace Game3 {
 		ItemStackPtr stack;
 
 		InventorySlotUpdatePacket() = default;
-		InventorySlotUpdatePacket(Slot, const ItemStackPtr &);
+		InventorySlotUpdatePacket(Slot slot, ItemStackPtr stack):
+			slot(slot), stack(stack->copy()) {}
 
 		PacketID getID() const override { return ID(); }
 

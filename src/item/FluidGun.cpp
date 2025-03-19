@@ -10,6 +10,7 @@
 #include "packet/InventorySlotUpdatePacket.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
+#include "types/PackedTime.h"
 #include "types/Position.h"
 #include "ui/Window.h"
 
@@ -21,15 +22,17 @@ namespace Game3 {
 	constexpr static double jitterScale = 0.2;
 	constexpr static double sizeBase = 0.333;
 	constexpr static double sizeVariance = 0.8;
-	constexpr static FluidAmount shotCostBase = 100; // adjusted based on the tick rate to be the amount per second
+	constexpr static FluidAmount shotCostBase = 200; // adjusted based on the tick rate to be the amount per second
 
 	static inline double getCost(Tick tick_frequency) {
 		return static_cast<double>(shotCostBase) / tick_frequency;
 	}
 
-	static std::pair<FluidPtr, double> getFluidGunData(const GamePtr &game, const ItemStackPtr &stack) {
-		FluidPtr fluid;
+	static std::tuple<FluidPtr, double, PackedTime> getFluidGunData(const GamePtr &game, const ItemStackPtr &stack) {
+		FluidPtr fluid{};
 		double amount{};
+		PackedTime last_slurp = PackedTime::now();
+
 		stack->data.withShared([&](const boost::json::value &data) {
 			if (auto lookup_result = data.try_at("fluid")) {
 				if (auto string_result = lookup_result->try_as_string()) {
@@ -40,12 +43,18 @@ namespace Game3 {
 			if (auto lookup_result = data.try_at("level")) {
 				amount = getNumber<FluidAmount>(*lookup_result);
 			}
+
+			if (auto lookup_result = data.try_at("lastSlurp")) {
+				last_slurp = getUint64(*lookup_result);
+			}
 		});
 
-		return {fluid, amount};
+		return {fluid, amount, last_slurp};
 	}
 
-	static void setFluidGunData(const ItemStackPtr &stack, const FluidPtr &fluid, double amount) {
+	static void setFluidGunData(const PlayerPtr &player, Slot slot, const ItemStackPtr &stack, const FluidPtr &fluid, double amount, std::optional<PackedTime> last_slurp) {
+		// INFO("Setting fluid gun to {} x {}", fluid->identifier, amount);
+
 		stack->data.withUnique([&](boost::json::value &json) {
 			boost::json::object *object = json.if_object();
 			if (!object) {
@@ -54,7 +63,12 @@ namespace Game3 {
 
 			(*object)["fluid"] = boost::json::value_from(fluid->identifier);
 			(*object)["level"] = boost::json::value_from(amount);
+			if (last_slurp) {
+				(*object)["lastSlurp"] = boost::json::value_from(last_slurp->milliseconds);
+			}
 		});
+
+		player->send(make<InventorySlotUpdatePacket>(slot, stack));
 	}
 
 	static auto makeParticle(const GamePtr &game, const FluidPtr &fluid, const Place &place, std::pair<float, float> offsets) {
@@ -79,22 +93,24 @@ namespace Game3 {
 		return entity;
 	}
 
-	bool FluidGun::fireGun(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {
-		assert(stack != nullptr);
-		GamePtr game = place.player->getGame();
-		assert(game->getSide() == Side::Server);
-
+	bool FluidGun::fireGun(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {
 		if (modifiers.shift) {
-			// pick up fluid from world
-			return true;
+			return false;
 		}
 
-		auto [fluid, amount] = getFluidGunData(game, stack);
+		assert(stack != nullptr);
+		GamePtr game = place.getGame();
+		assert(game->getSide() == Side::Server);
+
+		auto [fluid, amount, last_slurp] = getFluidGunData(game, stack);
 		const double cost = getCost(tick_frequency);
 
 		if (!fluid || amount < cost) {
 			return false;
 		}
+
+		amount -= cost;
+		setFluidGunData(place.player, slot, stack, fluid, amount, last_slurp);
 
 		auto entity = makeParticle(game, fluid, place, offsets);
 		entity->excludedPlayer = place.player;
@@ -102,16 +118,63 @@ namespace Game3 {
 		return true;
 	}
 
-	bool FluidGun::fire(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool FluidGun::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+		if (!modifiers.shift) {
+			return false;
+		}
+
 		assert(stack != nullptr);
-		GamePtr game = place.player->getGame();
+		GamePtr game = place.getGame();
+		assert(game->getSide() == Side::Server);
+
+		RealmPtr realm = place.realm;
+		auto [fluid, amount, last_slurp] = getFluidGunData(game, stack);
+
+		if (last_slurp.timeSince() < std::chrono::milliseconds(250)) {
+			return true;
+		}
+
+		if (std::optional<FluidTile> tile = place.getFluid(); tile && tile->level > 0) {
+			if (tile->isInfinite()) {
+				if (fluid && fluid->registryID == tile->id) {
+					amount += FluidTile::FULL;
+				} else {
+					fluid = game->getFluid(tile->id);
+					amount = FluidTile::FULL;
+				}
+			} else {
+				if (fluid && fluid->registryID == tile->id) {
+					amount += tile->level;
+				} else {
+					fluid = game->getFluid(tile->id);
+					amount = tile->level;
+				}
+				tile->level = 0;
+				place.setFluid(*tile);
+			}
+
+			setFluidGunData(place.player, slot, stack, fluid, amount, PackedTime::now());
+		}
+
+		return true;
+	}
+
+	bool FluidGun::fire(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		if (modifiers.shift) {
+			return false;
+		}
+
+		assert(stack != nullptr);
+		GamePtr game = place.getGame();
 		assert(game->getSide() == Side::Client);
 
-		auto [fluid, amount] = getFluidGunData(game, stack);
+		auto [fluid, amount, last_slurp] = getFluidGunData(game, stack);
 
 		auto tick_frequency = static_cast<uint16_t>(game->toClient().getWindow()->settings.withShared([](const ClientSettings &settings) {
 			return settings.tickFrequency;
 		}));
+
+		game->toClient().send(make<UseFluidGunPacket>(place.position, offsets.first, offsets.second, modifiers, tick_frequency));
 
 		const double cost = getCost(tick_frequency);
 
@@ -121,7 +184,6 @@ namespace Game3 {
 
 		auto entity = makeParticle(game, fluid, place, offsets);
 		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());
-		game->toClient().send(make<UseFluidGunPacket>(place.position, offsets.first, offsets.second, modifiers, tick_frequency));
 
 		static std::chrono::system_clock::time_point last_play{};
 		auto now = std::chrono::system_clock::now();
