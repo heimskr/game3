@@ -28,7 +28,7 @@ namespace Game3 {
 		return static_cast<double>(shotCostBase) / tick_frequency;
 	}
 
-	static std::tuple<FluidPtr, double, PackedTime> getFluidGunData(const GamePtr &game, const ItemStackPtr &stack) {
+	static std::tuple<FluidPtr, double, PackedTime> getFluidGunData(const GamePtr &game, const ConstItemStackPtr &stack) {
 		FluidPtr fluid{};
 		double amount{};
 		PackedTime last_slurp = PackedTime::now();
@@ -91,29 +91,18 @@ namespace Game3 {
 		return entity;
 	}
 
-	bool FluidGun::fireGun(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {
-		if (modifiers.shift) {
-			return false;
+	std::string FluidGun::getTooltip(const ConstItemStackPtr &stack) {
+		if (!stack->hasGame()) {
+			return name;
 		}
 
-		assert(stack != nullptr);
-		GamePtr game = place.getGame();
-		assert(game->getSide() == Side::Server);
+		auto [fluid, amount, last_slurp] = getFluidGunData(stack->getGame(), stack);
 
-		auto [fluid, amount, last_slurp] = getFluidGunData(game, stack);
-		const double cost = getCost(tick_frequency);
-
-		if (!fluid || amount < cost) {
-			return false;
+		if (!fluid || amount == 0) {
+			return name;
 		}
 
-		amount -= cost;
-		setFluidGunData(place.player, slot, stack, fluid, amount, last_slurp);
-
-		auto entity = makeParticle(game, fluid, place, offsets);
-		entity->excludedPlayer = place.player;
-		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());
-		return true;
+		return std::format("{} ({} x {:.2f})", name, fluid->name, amount);
 	}
 
 	bool FluidGun::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
@@ -196,6 +185,31 @@ namespace Game3 {
 			place.realm->playSound(place.position, "base:sound/hit", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
 		}
 
+		return true;
+	}
+
+	bool FluidGun::fireGun(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {
+		if (modifiers.shift) {
+			return false;
+		}
+
+		assert(stack != nullptr);
+		GamePtr game = place.getGame();
+		assert(game->getSide() == Side::Server);
+
+		auto [fluid, amount, last_slurp] = getFluidGunData(game, stack);
+		const double cost = getCost(tick_frequency);
+
+		if (!fluid || amount < cost) {
+			return false;
+		}
+
+		amount -= cost;
+		setFluidGunData(place.player, slot, stack, fluid, amount, last_slurp);
+
+		auto entity = makeParticle(game, fluid, place, offsets);
+		entity->excludedPlayer = place.player;
+		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());
 		return true;
 	}
 }
