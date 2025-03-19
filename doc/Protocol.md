@@ -460,6 +460,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 
 	- `bool` Firing
 
+69. **Use Fluid Gun**: tells the server to activate the client's held fluid gun.
+
+	- `i64` Position Y
+	- `i64` Position X
+	- `f32` Offset X
+	- `f32` Offset Y
+	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
+	- `u16` Tick frequency
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

@@ -7,7 +7,8 @@ namespace Game3 {
 		public:
 			using Item::Item;
 
-			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool fireGun(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, uint16_t tick_frequency);
+
 			bool fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 	};
 }

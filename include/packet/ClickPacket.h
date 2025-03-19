@@ -15,8 +15,8 @@ namespace Game3 {
 		Modifiers modifiers;
 
 		ClickPacket() = default;
-		ClickPacket(const Position &position_, float offset_x, float offset_y, Modifiers modifiers_):
-			position(position_), offsetX(offset_x), offsetY(offset_y), modifiers(modifiers_) {}
+		ClickPacket(const Position &position, float offsetX, float offsetY, Modifiers modifiers):
+			position(position), offsetX(offsetX), offsetY(offsetY), modifiers(modifiers) {}
 
 		PacketID getID() const override { return ID(); }
 

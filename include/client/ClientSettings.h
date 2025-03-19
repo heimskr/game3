@@ -17,18 +17,18 @@ namespace Game3 {
 
 	struct ClientSettings {
 		std::string hostname = "::1";
-		uint16_t port = 12255;
 		std::string username;
-		bool alertOnConnection = true;
+		std::size_t fpsSmoothing = 200;
 		Tick tickFrequency = DEFAULT_CLIENT_TICK_FREQUENCY;
+		double mystery = 1;
+		int logLevel = 1;
+		uint16_t port = 12255;
+		bool alertOnConnection = true;
 		bool renderLighting = false;
 		bool hideTimers = true;
-		int logLevel = 1;
-		std::size_t fpsSmoothing = 200;
 		bool showFPS = true;
 		bool capFPS = true;
 		bool specialEffects = true;
-		double mystery = 1;
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;

@@ -7,13 +7,14 @@
 
 namespace Game3 {
 	void InventorySlotUpdatePacket::handle(const ClientGamePtr &game) {
-		if (auto player = game->getPlayer()) {
+		if (ClientPlayerPtr player = game->getPlayer()) {
 			if (InventoryPtr inventory = player->getInventory(0)) {
 				auto inventory_lock = inventory->uniqueLock();
-				if (auto stack_pointer = (*inventory)[slot])
+				if (ItemStackPtr stack_pointer = (*inventory)[slot]) {
 					*stack_pointer = *stack;
-				else
+				} else {
 					inventory->add(stack, slot);
+				}
 			}
 		}
 	}

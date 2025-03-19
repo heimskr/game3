@@ -7,10 +7,10 @@ namespace Game3 {
 	class Buffer;
 
 	struct Modifiers {
-		bool shift = false;
-		bool ctrl  = false;
-		bool alt   = false;
-		bool super = false;
+		bool shift: 1 = false;
+		bool ctrl:  1 = false;
+		bool alt:   1 = false;
+		bool super: 1 = false;
 
 		Modifiers() = default;
 		Modifiers(uint8_t);

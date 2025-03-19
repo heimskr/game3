@@ -5,10 +5,15 @@
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"
 #include "item/FluidGun.h"
-#include "packet/ClickPacket.h"
+#include "lib/JSON.h"
+#include "packet/UseFluidGunPacket.h"
+#include "packet/InventorySlotUpdatePacket.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "types/Position.h"
+#include "ui/Window.h"
+
+#include <tuple>
 
 namespace Game3 {
 	constexpr static double velocityBase = 2;
@@ -16,6 +21,41 @@ namespace Game3 {
 	constexpr static double jitterScale = 0.2;
 	constexpr static double sizeBase = 0.333;
 	constexpr static double sizeVariance = 0.8;
+	constexpr static FluidAmount shotCostBase = 100; // adjusted based on the tick rate to be the amount per second
+
+	static inline double getCost(Tick tick_frequency) {
+		return static_cast<double>(shotCostBase) / tick_frequency;
+	}
+
+	static std::pair<FluidPtr, double> getFluidGunData(const GamePtr &game, const ItemStackPtr &stack) {
+		FluidPtr fluid;
+		double amount{};
+		stack->data.withShared([&](const boost::json::value &data) {
+			if (auto lookup_result = data.try_at("fluid")) {
+				if (auto string_result = lookup_result->try_as_string()) {
+					fluid = game->getFluid(Identifier(*string_result));
+				}
+			}
+
+			if (auto lookup_result = data.try_at("level")) {
+				amount = getNumber<FluidAmount>(*lookup_result);
+			}
+		});
+
+		return {fluid, amount};
+	}
+
+	static void setFluidGunData(const ItemStackPtr &stack, const FluidPtr &fluid, double amount) {
+		stack->data.withUnique([&](boost::json::value &json) {
+			boost::json::object *object = json.if_object();
+			if (!object) {
+				object = &json.emplace_object();
+			}
+
+			(*object)["fluid"] = boost::json::value_from(fluid->identifier);
+			(*object)["level"] = boost::json::value_from(amount);
+		});
+	}
 
 	static auto makeParticle(const GamePtr &game, const FluidPtr &fluid, const Place &place, std::pair<float, float> offsets) {
 		auto [x_offset, y_offset] = offsets;
@@ -39,12 +79,23 @@ namespace Game3 {
 		return entity;
 	}
 
-	bool FluidGun::use(Slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float> offsets) {
+	bool FluidGun::fireGun(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {
 		assert(stack != nullptr);
 		GamePtr game = place.player->getGame();
 		assert(game->getSide() == Side::Server);
 
-		auto fluid = game->getFluid("base:fluid/lava");
+		if (modifiers.shift) {
+			// pick up fluid from world
+			return true;
+		}
+
+		auto [fluid, amount] = getFluidGunData(game, stack);
+		const double cost = getCost(tick_frequency);
+
+		if (!fluid || amount < cost) {
+			return false;
+		}
+
 		auto entity = makeParticle(game, fluid, place, offsets);
 		entity->excludedPlayer = place.player;
 		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());
@@ -56,20 +107,29 @@ namespace Game3 {
 		GamePtr game = place.player->getGame();
 		assert(game->getSide() == Side::Client);
 
-		auto fluid = game->getFluid("base:fluid/lava");
+		auto [fluid, amount] = getFluidGunData(game, stack);
+
+		auto tick_frequency = static_cast<uint16_t>(game->toClient().getWindow()->settings.withShared([](const ClientSettings &settings) {
+			return settings.tickFrequency;
+		}));
+
+		const double cost = getCost(tick_frequency);
+
+		if (!fluid || amount < cost) {
+			return false;
+		}
+
 		auto entity = makeParticle(game, fluid, place, offsets);
 		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());
-		game->toClient().send(make<ClickPacket>(place.position, offsets.first, offsets.second, modifiers));
+		game->toClient().send(make<UseFluidGunPacket>(place.position, offsets.first, offsets.second, modifiers, tick_frequency));
 
-		{
-			static std::chrono::system_clock::time_point last_play{};
-			auto now = std::chrono::system_clock::now();
-			auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_play).count();
-			if (diff > 80) {
-				last_play = now;
-				constexpr static float variance = .8;
-				place.realm->playSound(place.position, "base:sound/hit", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
-			}
+		static std::chrono::system_clock::time_point last_play{};
+		auto now = std::chrono::system_clock::now();
+		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_play).count();
+		if (diff > 80) {
+			last_play = now;
+			constexpr static float variance = .8;
+			place.realm->playSound(place.position, "base:sound/hit", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
 		}
 
 		return true;

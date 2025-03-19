@@ -8,13 +8,15 @@
 
 namespace Game3 {
 	void ClickPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
-		auto player = client.getPlayer();
-		if (!player)
+		ServerPlayerPtr player = client.getPlayer();
+		if (!player) {
 			return;
+		}
 
-		const InventoryPtr inventory = player->getInventory(0);
+		InventoryPtr inventory = player->getInventory(0);
 
-		if (ItemStackPtr stack = inventory->getActive())
+		if (ItemStackPtr stack = inventory->getActive()) {
 			stack->item->use(inventory->activeSlot, stack, Place{position, player->getRealm(), player}, modifiers, {offsetX, offsetY});
+		}
 	}
 }
