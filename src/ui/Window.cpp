@@ -561,7 +561,24 @@ namespace Game3 {
 
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
 		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
-		lastModifiers = modifiers;
+
+		if (action != CUSTOM_REPEAT) {
+			lastModifiers = modifiers;
+		}
+
+		if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+			const bool held = action == GLFW_PRESS;
+
+			if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
+				lastModifiers.shift = held;
+			} else if (key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL) {
+				lastModifiers.ctrl = held;
+			} else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT) {
+				lastModifiers.alt = held;
+			} else if (key == GLFW_KEY_LEFT_SUPER || key == GLFW_KEY_RIGHT_SUPER) {
+				lastModifiers.super = held;
+			}
+		}
 
 		if (action == GLFW_PRESS) {
 			heldKeys.insert(key);
