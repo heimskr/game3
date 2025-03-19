@@ -22,7 +22,7 @@ namespace Game3 {
 	constexpr static double jitterScale = 0.2;
 	constexpr static double sizeBase = 0.333;
 	constexpr static double sizeVariance = 0.8;
-	constexpr static FluidAmount shotCostBase = 200; // adjusted based on the tick rate to be the amount per second
+	constexpr static FluidAmount shotCostBase = 250; // adjusted based on the tick rate to be the amount per second
 
 	static inline double getCost(Tick tick_frequency) {
 		return static_cast<double>(shotCostBase) / tick_frequency;
@@ -53,8 +53,6 @@ namespace Game3 {
 	}
 
 	static void setFluidGunData(const PlayerPtr &player, Slot slot, const ItemStackPtr &stack, const FluidPtr &fluid, double amount, std::optional<PackedTime> last_slurp) {
-		// INFO("Setting fluid gun to {} x {}", fluid->identifier, amount);
-
 		stack->data.withUnique([&](boost::json::value &json) {
 			boost::json::object *object = json.if_object();
 			if (!object) {
@@ -157,6 +155,10 @@ namespace Game3 {
 		}
 
 		return true;
+	}
+
+	bool FluidGun::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		return use(slot, stack, place, modifiers, offsets);
 	}
 
 	bool FluidGun::fire(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {

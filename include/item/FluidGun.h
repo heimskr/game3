@@ -10,6 +10,7 @@ namespace Game3 {
 			bool fireGun(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, uint16_t tick_frequency);
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 
 			bool fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 	};
