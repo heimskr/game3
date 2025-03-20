@@ -177,7 +177,7 @@ namespace Game3 {
 
 		if (auto iter = object.find("path"); iter != object.end()) {
 			auto path_lock = path.uniqueLock();
-			path = boost::json::value_to<std::list<Direction>>(iter->value());
+			path = boost::json::value_to<std::deque<Direction>>(iter->value());
 		}
 
 		if (auto iter = object.find("money"); iter != object.end()) {
@@ -855,7 +855,7 @@ namespace Game3 {
 			getRealm()->queueDestruction(getSelf());
 	}
 
-	PathResult Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out, size_t loop_max) {
+	PathResult Entity::pathfind(const Position &start, const Position &goal, std::deque<Direction> &out, size_t loop_max) {
 		std::vector<Position> positions;
 
 		if (start == goal)

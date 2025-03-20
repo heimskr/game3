@@ -33,7 +33,7 @@ namespace Game3 {
 			});
 		}
 
-		entity->path = std::list<Direction>{path.begin(), path.end()};
+		entity->path = std::deque<Direction>{path.begin(), path.end()};
 		entity->setUpdateCounter(newCounter);
 	}
 }

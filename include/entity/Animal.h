@@ -37,7 +37,6 @@ namespace Game3 {
 
 			bool firstWander = true;
 			Tick wanderTick = 0;
-			std::optional<std::list<Direction>> wanderPath;
 			std::atomic_bool attemptingWander = false;
 
 			static ThreadPool threadPool;

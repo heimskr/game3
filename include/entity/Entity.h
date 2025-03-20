@@ -73,7 +73,7 @@ namespace Game3 {
 			Lockable<Vector3> offset;
 			/** Only the z component is handled in the default Entity tick method. */
 			Lockable<Vector3> velocity;
-			Lockable<std::list<Direction>> path;
+			Lockable<std::deque<Direction>> path;
 			Lockable<WeakSet<Entity>> visibleEntities;
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
@@ -160,7 +160,7 @@ namespace Game3 {
 			 *  The function returns true if it should be removed from the move queue. */
 			void queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)>);
 			void queueDestruction();
-			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
+			PathResult pathfind(const Position &start, const Position &goal, std::deque<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getMovementSpeed() const;
 			std::shared_ptr<Game> getGame() const override;
