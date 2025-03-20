@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "biology/Gene.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/ServerInventory.h"
 #include "item/Item.h"
 #include "lib/JSON.h"

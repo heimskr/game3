@@ -1,4 +1,4 @@
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/Game.h"
 #include "net/Buffer.h"
 
@@ -8,13 +8,17 @@ namespace Game3 {
 
 // Fluid
 
-	Fluid::Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Color color, Identifier flask_name):
-		NamedRegisterable(std::move(identifier_)),
-		name(std::move(name_)),
-		tilesetName(std::move(tileset_name)),
-		tilename(std::move(tilename_)),
-		flaskName(std::move(flask_name)),
+	Fluid::Fluid(Identifier identifier, std::string name, Identifier tilesetName, Identifier tilename, Color color, Identifier flaskName):
+		NamedRegisterable(std::move(identifier)),
+		name(std::move(name)),
+		tilesetName(std::move(tilesetName)),
+		tilename(std::move(tilename)),
+		flaskName(std::move(flaskName)),
 		color(color) {}
+
+	Fluid::~Fluid() = default;
+
+	void Fluid::onCollision(const std::shared_ptr<LivingEntity> &) {}
 
 // FluidTile
 
@@ -32,6 +36,7 @@ namespace Game3 {
 
 	FluidTile::operator std::string() const {
 		std::string out = "FluidTile(";
+		out.reserve(out.size() + 5 + 2 + 5 + 2 + 1 + 1);
 		out += std::to_string(id);
 		out += ", ";
 		out += std::to_string(level);
@@ -126,5 +131,4 @@ namespace Game3 {
 		fluid_stack.amount = buffer.take<FluidAmount>();
 		return buffer;
 	}
-
 }

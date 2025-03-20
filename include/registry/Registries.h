@@ -23,7 +23,7 @@ namespace Game3 {
 	class Tileset;
 	class TileEntityFactory;
 	struct EntityTexture;
-	struct Fluid;
+	class Fluid;
 	struct Ore;
 	struct RealmDetails;
 	struct SoundPath;

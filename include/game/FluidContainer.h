@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game/Container.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "threading/Lockable.h"
 #include "threading/LockableWeakPtr.h"
 

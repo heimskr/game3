@@ -12,7 +12,7 @@
 #include "types/Types.h"
 #include "data/ChunkSet.h"
 #include "types/ChunkPosition.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "util/Math.h"

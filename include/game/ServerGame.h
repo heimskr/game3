@@ -2,7 +2,7 @@
 
 #include "data/GameDB.h"
 #include "entity/ServerPlayer.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/Game.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"

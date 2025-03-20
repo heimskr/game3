@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/ChunkPosition.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
 

@@ -14,7 +14,7 @@ namespace Game3 {
 	class HasFluids;
 	class Label;
 	class ProgressBar;
-	struct Fluid;
+	class Fluid;
 
 	class FluidsModule: public Module {
 		public:

@@ -1,6 +1,6 @@
 #include "algorithm/AStar.h"
 #include "game/ClientGame.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"

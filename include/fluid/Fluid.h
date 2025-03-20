@@ -1,27 +1,33 @@
 #pragma once
 
-#include "Chunk.h"
+#include "data/Identifier.h"
+#include "game/Chunk.h"
 #include "graphics/Color.h"
 #include "types/Types.h"
-#include "data/Identifier.h"
 
 #include <boost/json/fwd.hpp>
+
 #include <ostream>
 #include <string>
 
 namespace Game3 {
 	class Buffer;
 	class Game;
+	class LivingEntity;
 
-	struct Fluid: NamedRegisterable {
-		std::string name;
-		Identifier tilesetName;
-		Identifier tilename;
-		Identifier flaskName;
-		Color color;
+	class Fluid: public NamedRegisterable {
+		public:
+			std::string name;
+			Identifier tilesetName;
+			Identifier tilename;
+			Identifier flaskName;
+			Color color;
 
-		Fluid() = delete;
-		Fluid(Identifier identifier_, std::string name_, Identifier tileset_name, Identifier tilename_, Color color, Identifier flask_name = {});
+			Fluid(Identifier identifier, std::string name, Identifier tilesetName, Identifier tilename, Color color, Identifier flaskName = {});
+
+			virtual ~Fluid();
+
+			virtual void onCollision(const std::shared_ptr<LivingEntity> &);
 	};
 
 	using FluidInt = uint64_t;

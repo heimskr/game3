@@ -1,7 +1,7 @@
 #pragma once
 
 #include "data/Identifier.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "item/Item.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"

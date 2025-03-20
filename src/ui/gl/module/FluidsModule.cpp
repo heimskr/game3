@@ -1,6 +1,6 @@
 #include "game/Agent.h"
 #include "game/ClientGame.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/FluidContainer.h"
 #include "game/HasFluids.h"
 #include "ui/gl/module/FluidsModule.h"

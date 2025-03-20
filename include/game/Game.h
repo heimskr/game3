@@ -80,6 +80,7 @@ namespace Game3 {
 			void addPacketFactories();
 			void addLocalCommandFactories();
 			void addTiles();
+			void addFluids();
 			size_t addSounds(const std::filesystem::path &);
 			void addModuleFactories();
 			void addMinigameFactories();

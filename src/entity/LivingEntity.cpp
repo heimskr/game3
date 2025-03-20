@@ -27,9 +27,9 @@ namespace Game3 {
 
 		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
 
-		for (const auto &[identifier, status_effect]: statusEffects) {
-			status_effect->apply(self, args.delta);
-		}
+		std::erase_if(statusEffects, [&](const auto &item) {
+			return item.second->apply(self, args.delta);
+		});
 	}
 
 	void LivingEntity::toJSON(boost::json::value &json) const {

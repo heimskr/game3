@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "interface/HasFluidType.h"
 #include "item/Item.h"
 

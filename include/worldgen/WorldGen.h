@@ -8,7 +8,7 @@
 
 #include "types/Types.h"
 #include "types/ChunkPosition.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "threading/ThreadPool.h"
 
 namespace Game3 {

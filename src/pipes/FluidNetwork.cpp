@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "pipes/FluidNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"

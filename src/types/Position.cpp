@@ -1,5 +1,5 @@
 #include "entity/Player.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/TileProvider.h"
 #include "graphics/Tileset.h"
 #include "lib/JSON.h"
