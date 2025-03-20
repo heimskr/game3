@@ -172,7 +172,7 @@ namespace Game3 {
 		}
 
 		if (auto iter = object.find("inventory"); iter != object.end()) {
-			setInventory(std::make_shared<ServerInventory>(boost::json::value_to<ServerInventory>(iter->value(), std::pair{game, shared_from_this()})) , 0);
+			setInventory(std::make_shared<ServerInventory>(boost::json::value_to<ServerInventory>(iter->value(), std::pair{game, shared_from_this()})), 0);
 		}
 
 		if (auto iter = object.find("path"); iter != object.end()) {

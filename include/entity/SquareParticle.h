@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity/Entity.h"
-#include "graphics/TextRenderer.h"
+#include "graphics/Color.h"
 
 namespace Game3 {
 	class SquareParticle: public Entity {

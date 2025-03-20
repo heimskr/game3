@@ -1,6 +1,6 @@
 #include "Log.h"
 #include "entity/Player.h"
-#include "entity/SquareParticle.h"
+#include "entity/FluidParticle.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "graphics/RendererContext.h"
@@ -24,7 +24,7 @@ namespace Game3 {
 	constexpr static double velocityBase = 2;
 	constexpr static double velocityVariance = 0.8;
 	constexpr static double jitterScale = 0.2;
-	constexpr static double sizeBase = 0.333;
+	constexpr static double sizeBase = 0.166;
 	constexpr static double sizeVariance = 0.8;
 	constexpr static double shotCostBase = 250; // adjusted based on the tick rate to be the amount per second
 	constexpr static double capacity = shotCostBase * 60;
@@ -89,7 +89,7 @@ namespace Game3 {
 		velocity.y *= velocity_scale;
 		velocity.z /= velocity_scale;
 		const double size = threadContext.random(sizeBase * sizeVariance, sizeBase / sizeVariance);
-		auto entity = SquareParticle::create(game, velocity, size, fluid->color, 0, 2);
+		auto entity = FluidParticle::create(game, fluid->registryID, velocity, size, fluid->color, 0, 2);
 		entity->spawning = true;
 		entity->setRealm(place.realm);
 		entity->offset = player_offset - jitter;
