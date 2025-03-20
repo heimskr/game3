@@ -23,7 +23,6 @@ namespace Game3 {
 	void LivingEntity::tick(const TickArgs &args) {
 		Entity::tick(args);
 
-
 		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
 
 		if (getSide() == Side::Server) {

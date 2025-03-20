@@ -205,21 +205,29 @@ namespace Game3 {
 
 	void Entity::tick(const TickArgs &args) {
 		if (!weakRealm.lock()) {
-			if (args.game->getSide() == Side::Server)
+			if (args.game->getSide() == Side::Server) {
 				teleport(Position{32, 32}, args.game->getRealm(-1));
+			}
 			tryEnqueueTick();
 			return;
 		}
 
+		bool path_drained = false;
 		{
 			auto shared_lock = path.sharedLock();
 			if (!path.empty() && move(path.front())) {
 				// Please no data race kthx.
 				shared_lock.unlock();
 				auto unique_lock = path.uniqueLock();
-				if (!path.empty())
+				if (!path.empty()) {
 					path.pop_front();
+					path_drained = path.empty();
+				}
 			}
+		}
+
+		if (path_drained && args.game->getSide() == Side::Server) {
+			args.game->toServer().entityTeleported(*this, MovementContext{.clearOffset = false});
 		}
 
 		const auto delta = args.delta;
@@ -232,15 +240,17 @@ namespace Game3 {
 			auto &z = offset.z;
 			const auto speed = getMovementSpeed();
 
-			if (x < 0.)
+			if (x < 0.) {
 				x = std::min(x + delta * speed, 0.);
-			else if (0. < x)
+			} else if (0. < x) {
 				x = std::max(x - delta * speed, 0.);
+			}
 
-			if (y < 0.)
+			if (y < 0.) {
 				y = std::min(y + delta * speed, 0.);
-			else if (0. < y)
+			} else if (0. < y) {
 				y = std::max(y - delta * speed, 0.);
+			}
 
 			auto velocity_lock = velocity.uniqueLock();
 
@@ -257,14 +267,20 @@ namespace Game3 {
 			}
 
 			if (!old_grounded && offset.isGrounded()) {
-				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
+				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
 					tile_entity->onOverlap(getSelf());
+				}
+
+				if (args.game->getSide() == Side::Server) {
+					args.game->toServer().entityTeleported(*this, MovementContext{.clearOffset = false});
+				}
 			}
 
-			if (z == 0.)
+			if (z == 0.) {
 				velocity.z = 0;
-			else
+			} else {
 				velocity.z -= 32 * delta;
+			}
 
 			position.withUnique([&offset = offset](Position &position) {
 				using I = Position::IntType;
@@ -280,8 +296,9 @@ namespace Game3 {
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
 
-		if (EntityPtr rider = getRider())
+		if (EntityPtr rider = getRider()) {
 			updateRider(rider);
+		}
 
 		tryEnqueueTick();
 	}
