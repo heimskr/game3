@@ -230,12 +230,12 @@ namespace Game3 {
 		Position position = getPosition();
 
 		std::uniform_real_distribution y_distribution(-0.15, 0.15);
-		std::uniform_real_distribution z_distribution(16., 32.);
+		std::uniform_real_distribution z_distribution(6., 10.);
 		std::uniform_real_distribution depth_distribution(-0.5, 0.0);
 		std::uniform_real_distribution red_distribution(0.333, 1.0);
 
 		for (double x: {-1, +1}) {
-			std::uniform_real_distribution x_distribution(x - 0.2, x + 0.2);
+			std::uniform_real_distribution x_distribution(x - 1.0, x + 1.0);
 			for (size_t i = 0; i < count; ++i) {
 				Vector3 velocity{
 					x_distribution(threadContext.rng),
