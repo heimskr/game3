@@ -104,7 +104,7 @@ namespace Game3 {
 	}
 
 	void Player::tick(const TickArgs &args) {
-		Entity::tick(args);
+		LivingEntity::tick(args);
 
 		const auto delta = args.delta;
 

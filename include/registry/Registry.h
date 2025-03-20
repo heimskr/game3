@@ -166,36 +166,57 @@ namespace Game3 {
 
 			inline std::shared_ptr<T> maybe(const Identifier &id) const {
 				auto iter = items.find(id);
-				if (iter == items.end())
+				if (iter == items.end()) {
 					return {};
+				}
 				return iter->second;
 			}
 
 			inline std::shared_ptr<T> maybe(size_t counter) const {
-				if (counter < byCounter.size())
+				if (counter < byCounter.size()) {
 					return byCounter[counter];
+				}
 				return {};
 			}
 
-			inline std::shared_ptr<T> operator[](size_t counter) const {
+			inline const std::shared_ptr<T> & operator[](size_t counter) const {
 				return at(counter);
 			}
 
-			inline std::shared_ptr<T> at(size_t counter) const {
+			inline const std::shared_ptr<T> & at(size_t counter) const {
 				return byCounter.at(counter);
 			}
 
-			inline std::shared_ptr<T> operator[](const Identifier &id) const {
+			inline const std::shared_ptr<T> & operator[](const Identifier &id) const {
 				return at(id);
 			}
 
-			inline std::shared_ptr<T> at(const Identifier &id) const {
-				try {
-					return items.at(id);
-				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"{}\" in registry {}", id, identifier);
-					return {};
-				}
+			inline const std::shared_ptr<T> & at(const Identifier &id) const {
+				return items.at(id);
+			}
+
+			inline std::shared_ptr<T> & operator[](size_t counter) {
+				return at(counter);
+			}
+
+			inline std::shared_ptr<T> & at(size_t counter) {
+				return byCounter.at(counter);
+			}
+
+			inline std::shared_ptr<T> & operator[](const Identifier &id) {
+				return at(id);
+			}
+
+			inline std::shared_ptr<T> & at(const Identifier &id) {
+				return items.at(id);
+			}
+
+			inline auto find(const Identifier &id) const {
+				return items.find(id);
+			}
+
+			inline auto find(const Identifier &id) {
+				return items.find(id);
 			}
 
 			inline void clear() {

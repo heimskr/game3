@@ -93,7 +93,7 @@ namespace Game3 {
 			}
 		}
 
-		Entity::tick(args);
+		LivingEntity::tick(args);
 	}
 
 	HitPoints Animal::getMaxHealth() const {

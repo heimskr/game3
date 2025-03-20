@@ -432,8 +432,9 @@ namespace Game3 {
 	}
 
 	void Entity::render(const RendererContext &renderers) {
-		if (texture == nullptr || !isVisible())
+		if (texture == nullptr || !isVisible()) {
 			return;
+		}
 
 		GamePtr game = getGame();
 		SpriteRenderer &sprite_renderer = renderers.batchSprite;
@@ -469,13 +470,12 @@ namespace Game3 {
 
 		double fluid_offset = 0.;
 
-		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
+		if (std::optional<FluidTile> fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
 			fluid_offset = std::sin(game->time * 1.5) + .5;
 			renderHeight = 10. + fluid_offset;
 		} else {
 			renderHeight = 16.;
 		}
-
 
 		const double x = column + offset_x;
 		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
@@ -1284,8 +1284,9 @@ namespace Game3 {
 
 	std::function<void(const TickArgs &)> Entity::getTickFunction() {
 		return [weak = getWeakSelf()](const TickArgs &args) {
-			if (EntityPtr entity = weak.lock())
+			if (EntityPtr entity = weak.lock()) {
 				entity->tick(args);
+			}
 		};
 	}
 

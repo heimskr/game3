@@ -7,6 +7,8 @@ namespace Game3 {
 		Fluid(std::move(fluid)) {}
 
 	void Lava::onCollision(const std::shared_ptr<LivingEntity> &target) {
-		target->inflictStatusEffect(std::make_unique<Burning>(4.0, 2.0), true);
+		if (target->getSide() == Side::Server) {
+			target->inflictStatusEffect(std::make_unique<Burning>(3.0, 1.0), false);
+		}
 	}
 }

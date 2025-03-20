@@ -79,6 +79,7 @@ namespace Game3 {
 		addTiles();
 		addModuleFactories();
 		addMinigameFactories();
+		addFluids();
 	}
 
 	void Game::initEntities() {

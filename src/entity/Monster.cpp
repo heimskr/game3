@@ -22,7 +22,7 @@ namespace Game3 {
 		Entity("base:invalid/Monster") {}
 
 	void Monster::tick(const TickArgs &args) {
-		Entity::tick(args);
+		LivingEntity::tick(args);
 
 		const auto delta = args.delta;
 

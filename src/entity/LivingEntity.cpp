@@ -21,11 +21,22 @@ namespace Game3 {
 	}
 
 	void LivingEntity::tick(const TickArgs &args) {
+		Entity::tick(args);
+
+
+		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+
+		if (getSide() == Side::Server) {
+			if (std::optional<FluidTile> fluid_tile = getRealm()->tileProvider.copyFluidTile(getPosition()); fluid_tile && 0 < fluid_tile->level) {
+				FluidPtr fluid = getGame()->getFluid(fluid_tile->id);
+				assert(fluid != nullptr);
+				fluid->onCollision(self);
+			}
+		}
+
 		if (statusEffects.empty()) {
 			return;
 		}
-
-		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
 
 		std::erase_if(statusEffects, [&](const auto &item) {
 			return item.second->apply(self, args.delta);
