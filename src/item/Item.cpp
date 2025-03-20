@@ -308,8 +308,8 @@ namespace Game3 {
 		item->onDestroy(game, shared_from_this());
 	}
 
-	void ItemStack::renderEffects(const RendererContext &context, const Position &position, Modifiers modifiers) {
-		item->renderEffects(context, position, modifiers, shared_from_this());
+	void ItemStack::renderEffects(Window &window, const RendererContext &renderers, const Position &position, Modifiers modifiers) {
+		item->renderEffects(window, renderers, position, modifiers, shared_from_this());
 	}
 
 	void ItemStack::encode(Game &game, Buffer &buffer) {

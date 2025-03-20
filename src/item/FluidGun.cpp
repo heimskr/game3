@@ -3,6 +3,7 @@
 #include "entity/SquareParticle.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
+#include "graphics/RendererContext.h"
 #include "graphics/Tileset.h"
 #include "item/FluidGun.h"
 #include "lib/JSON.h"
@@ -12,6 +13,9 @@
 #include "threading/ThreadContext.h"
 #include "types/PackedTime.h"
 #include "types/Position.h"
+#include "ui/gl/widget/Hotbar.h"
+#include "ui/gl/widget/ProgressBar.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 
 #include <tuple>
@@ -22,16 +26,17 @@ namespace Game3 {
 	constexpr static double jitterScale = 0.2;
 	constexpr static double sizeBase = 0.333;
 	constexpr static double sizeVariance = 0.8;
-	constexpr static FluidAmount shotCostBase = 250; // adjusted based on the tick rate to be the amount per second
+	constexpr static double shotCostBase = 250; // adjusted based on the tick rate to be the amount per second
+	constexpr static double capacity = shotCostBase * 60;
 
 	static inline double getCost(Tick tick_frequency) {
-		return static_cast<double>(shotCostBase) / tick_frequency;
+		return shotCostBase / tick_frequency;
 	}
 
 	static std::tuple<FluidPtr, double, PackedTime> getFluidGunData(const GamePtr &game, const ConstItemStackPtr &stack) {
 		FluidPtr fluid{};
 		double amount{};
-		PackedTime last_slurp = PackedTime::now();
+		PackedTime last_slurp{0};
 
 		stack->data.withShared([&](const boost::json::value &data) {
 			if (auto lookup_result = data.try_at("fluid")) {
@@ -117,26 +122,28 @@ namespace Game3 {
 		RealmPtr realm = place.realm;
 		auto [fluid, amount, last_slurp] = getFluidGunData(game, stack);
 
-		if (last_slurp.timeSince() < std::chrono::milliseconds(250)) {
+		if (last_slurp.timeSince() < std::chrono::milliseconds(100)) {
 			return true;
 		}
 
 		if (std::optional<FluidTile> tile = place.getFluid(); tile && tile->level > 0) {
 			if (tile->isInfinite()) {
+				const double to_slurp = std::min<double>(FluidTile::FULL, capacity - amount);
 				if (fluid && fluid->registryID == tile->id) {
-					amount += FluidTile::FULL;
+					amount += to_slurp;
 				} else {
 					fluid = game->getFluid(tile->id);
 					amount = FluidTile::FULL;
 				}
 			} else {
+				const double to_slurp = std::min<double>(tile->level, capacity - amount);
 				if (fluid && fluid->registryID == tile->id) {
-					amount += tile->level;
+					amount += to_slurp;
 				} else {
 					fluid = game->getFluid(tile->id);
 					amount = tile->level;
 				}
-				tile->level = 0;
+				tile->level -= to_slurp;
 				place.setFluid(*tile);
 			}
 
@@ -179,13 +186,25 @@ namespace Game3 {
 		static std::chrono::system_clock::time_point last_play{};
 		auto now = std::chrono::system_clock::now();
 		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_play).count();
-		if (diff > 80) {
+		if (diff > 90) {
 			last_play = now;
 			constexpr static float variance = .8;
 			place.realm->playSound(place.position, "base:sound/hit", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
 		}
 
 		return true;
+	}
+
+	void FluidGun::renderEffects(Window &window, const RendererContext &renderers, const Position &, Modifiers, const ItemStackPtr &stack) const {
+		const auto [fluid, amount, last_slurp] = getFluidGunData(window.game, stack);
+		UIContext &ui = window.uiContext;
+		Rectangle rectangle = ui.getHotbar()->getLastRectangle();
+		rectangle.y -= rectangle.height + 8;
+		constexpr static double shrinkage = 3.0;
+		rectangle.y += rectangle.height * (1.0 - 1.0 / shrinkage);
+		rectangle.height /= shrinkage;
+		Color color = fluid? fluid->color : Color{};
+		ProgressBar(ui, UI_SCALE, color, amount / capacity).render(renderers, rectangle);
 	}
 
 	bool FluidGun::fireGun(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {

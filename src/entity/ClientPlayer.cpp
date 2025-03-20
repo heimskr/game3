@@ -151,7 +151,7 @@ namespace Game3 {
 		if (InventoryPtr inventory = getInventory(0)) {
 			if (ItemStackPtr active = inventory->getActive()) {
 				auto window = getGame()->toClient().getWindow();
-				active->renderEffects(renderers, window->getHoveredPosition(), window->getModifiers());
+				active->renderEffects(*window, renderers, window->getHoveredPosition(), window->getModifiers());
 			}
 		}
 	}

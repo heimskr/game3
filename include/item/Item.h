@@ -21,6 +21,7 @@ namespace Game3 {
 	class Player;
 	class Realm;
 	class Texture;
+	class Window;
 	struct Place;
 	struct Position;
 	struct RendererContext;
@@ -77,7 +78,7 @@ namespace Game3 {
 
 			virtual void onDestroy(Game &, const ItemStackPtr &) const {}
 
-			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
+			virtual void renderEffects(Window &, const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
 
 			// virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
@@ -152,7 +153,7 @@ namespace Game3 {
 			void onDestroy();
 			void onDestroy(Game &);
 
-			void renderEffects(const RendererContext &, const Position &, Modifiers);
+			void renderEffects(Window &, const RendererContext &, const Position &, Modifiers);
 
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);

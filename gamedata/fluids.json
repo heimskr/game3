@@ -31,7 +31,7 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/deeper_water",
 				"flask":    "base:item/water_flask",
-				"color":    "#0000ff"
+				"color":    "#44aaaa"
 			}],
 			["base:fluid/brine", {
 				"name":     "Brine",

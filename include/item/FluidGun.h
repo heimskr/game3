@@ -11,6 +11,7 @@ namespace Game3 {
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			void renderEffects(Window &, const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const override;
 
 			bool fireGun(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, uint16_t tick_frequency);
 	};

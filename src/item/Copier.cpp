@@ -232,7 +232,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Copier::renderEffects(const RendererContext &context, const Position &mouse_position, Modifiers modifiers, const ItemStackPtr &stack) const {
+	void Copier::renderEffects(Window &, const RendererContext &context, const Position &mouse_position, Modifiers modifiers, const ItemStackPtr &stack) const {
 		RectangleRenderer &rectangle = context.rectangle;
 
 		std::unordered_set<Position> positions = getPositions(*stack);
