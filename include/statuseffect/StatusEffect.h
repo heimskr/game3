@@ -5,8 +5,9 @@
 #include <memory>
 
 namespace Game3 {
-	struct Color;
+	class Buffer;
 	class LivingEntity;
+	struct Color;
 
 	// Living entities hold separate instances of `StatusEffect` subclasses.
 	// They're not meant to be singletons as e.g. Tiles and Items are.
@@ -20,6 +21,10 @@ namespace Game3 {
 			virtual void onRemove(const std::shared_ptr<LivingEntity> &);
 
 			virtual void modifyColor(Color &);
+
+			virtual void encode(Buffer &) = 0;
+
+			virtual void decode(Buffer &) = 0;
 
 		protected:
 			StatusEffect(Identifier identifier);

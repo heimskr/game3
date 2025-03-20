@@ -29,4 +29,12 @@ namespace Game3 {
 		color = ok.convert<Color>();
 		color = Color{"#ff0000"};
 	}
+
+	void Burning::encode(Buffer &buffer) {
+		buffer << ID() << duration << severity << accumulatedDamage;
+	}
+
+	void Burning::decode(Buffer &buffer) {
+		buffer >> duration >> severity >> accumulatedDamage;
+	}
 }

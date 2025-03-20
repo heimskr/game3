@@ -16,6 +16,10 @@ namespace Game3 {
 
 			void modifyColor(Color &) final;
 
+			void encode(Buffer &) final;
+
+			void decode(Buffer &) final;
+
 		private:
 			float accumulatedDamage{};
 	};
