@@ -172,6 +172,10 @@ namespace Game3 {
 	bool LivingEntity::takeDamage(HitPoints damage) {
 		assert(getSide() == Side::Server);
 
+		if (isInvincible()) {
+			return false;
+		}
+
 		std::uniform_int_distribution<int> defense_distribution(0, 99);
 
 		const int defense = getDefense();
