@@ -25,7 +25,8 @@ namespace Game3 {
 			return;
 		}
 
-		auto self = std::static_pointer_cast<LivingEntity>(shared_from_this());
+		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+
 		for (const auto &[identifier, status_effect]: statusEffects) {
 			status_effect->apply(self, args.delta);
 		}

@@ -897,6 +897,29 @@ namespace Game3 {
 				return {true, ""};
 			}
 
+			if (first == "infinifluid") {
+				if (words.size() != 2) {
+					return {false, "Incorrect parameter count."};
+				}
+
+				Identifier fluid_id;
+				std::string_view name = words[1];
+
+				if (name.contains(':')) {
+					fluid_id = name;
+				} else {
+					fluid_id = Identifier("base:fluid/" + std::string(name));
+				}
+
+				FluidPtr fluid = getFluid(fluid_id);
+				if (!fluid) {
+					return {false, "No such fluid."};
+				}
+
+				player->getPlace().setFluid({static_cast<FluidID>(fluid->registryID), FluidTile::FULL, true});
+				return {true, ""};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}
