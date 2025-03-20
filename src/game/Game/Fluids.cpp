@@ -1,4 +1,5 @@
 #include "fluid/Lava.h"
+#include "fluid/Water.h"
 #include "game/Game.h"
 
 namespace Game3 {
@@ -6,7 +7,7 @@ namespace Game3 {
 	static bool replaceFluid(FluidRegistry &registry) {
 		if (auto iter = registry.find(T::ID()); iter != registry.end()) {
 			size_t id = iter->second->registryID;
-			registry.at(id) = iter->second = std::make_shared<Lava>(std::move(*iter->second));
+			registry.at(id) = iter->second = std::make_shared<T>(std::move(*iter->second));
 			return true;
 		}
 
@@ -17,5 +18,6 @@ namespace Game3 {
 		auto &reg = registry<FluidRegistry>();
 
 		replaceFluid<Lava>(reg);
+		replaceFluid<Water>(reg);
 	}
 }

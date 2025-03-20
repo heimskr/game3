@@ -6,7 +6,6 @@ namespace {
 }
 
 namespace Game3 {
-
 	void Chicken::tick(const TickArgs &args) {
 		if (args.game->getSide() == Side::Server) {
 			const Tick current_tick = args.game->getCurrentTick();

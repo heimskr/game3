@@ -1,9 +1,10 @@
 #include "entity/LivingEntity.h"
+#include "graphics/Color.h"
 #include "statuseffect/Burning.h"
 
 namespace Game3 {
 	Burning::Burning(float duration, float severity):
-		StatusEffect("base:statuseffect/burning"),
+		StatusEffect(ID()),
 		duration(duration),
 		severity(severity) {}
 
@@ -19,5 +20,13 @@ namespace Game3 {
 
 		duration -= delta;
 		return duration <= 0;
+	}
+
+	void Burning::modifyColor(Color &color) {
+		OKHsv ok = color.convert<OKHsv>();
+		ok.hue = 0;
+		ok.saturation = 1;
+		color = ok.convert<Color>();
+		color = Color{"#ff0000"};
 	}
 }

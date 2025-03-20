@@ -33,6 +33,8 @@ namespace Game3 {
 			}
 		}
 
+		auto lock = statusEffects.uniqueLock();
+
 		if (statusEffects.empty()) {
 			return;
 		}
@@ -129,6 +131,18 @@ namespace Game3 {
 
 	bool LivingEntity::isAffectedByKnockback() const {
 		return true;
+	}
+
+	Color LivingEntity::getColor() const {
+		Color color = Entity::getColor();
+
+		statusEffects.withUnique([&](const auto &map) {
+			for (const auto &[identifier, effect]: map) {
+				effect->modifyColor(color);
+			}
+		});
+
+		return color;
 	}
 
 	bool LivingEntity::canShowHealthBar() const {
@@ -275,12 +289,21 @@ namespace Game3 {
 	void LivingEntity::iterateGenes(const std::function<void(const Gene &)> &) const {}
 
 	void LivingEntity::inflictStatusEffect(std::unique_ptr<StatusEffect> &&effect, bool can_overwrite) {
+		auto lock = statusEffects.uniqueLock();
 		auto iter = statusEffects.find(effect->identifier);
 		if (iter == statusEffects.end()) {
 			Identifier identifier = effect->identifier;
 			statusEffects.emplace(std::move(identifier), std::move(effect));
 		} else if (can_overwrite) {
 			iter->second = std::move(effect);
+		}
+	}
+
+	void LivingEntity::removeStatusEffect(const Identifier &identifier) {
+		auto lock = statusEffects.uniqueLock();
+		if (auto iter = statusEffects.find(identifier); iter != statusEffects.end()) {
+			iter->second->onRemove(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
+			statusEffects.erase(iter);
 		}
 	}
 

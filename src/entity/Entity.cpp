@@ -507,6 +507,7 @@ namespace Game3 {
 			.offsetY = texture_y_offset,
 			.sizeX = 16.,
 			.sizeY = std::min(16., renderHeight + 8. * offset_z),
+			.color = getColor(),
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -733,6 +734,10 @@ namespace Game3 {
 
 	bool Entity::isAffectedByKnockback() const {
 		return false;
+	}
+
+	Color Entity::getColor() const {
+		return Color{"#ffffff"};
 	}
 
 	void Entity::focus(Window &window, bool is_autofocus) {

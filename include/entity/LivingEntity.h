@@ -24,6 +24,7 @@ namespace Game3 {
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 			bool isAffectedByKnockback() const override;
+			Color getColor() const override;
 
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;
@@ -45,9 +46,10 @@ namespace Game3 {
 			virtual void iterateGenes(const std::function<void(Gene &)> &);
 			virtual void iterateGenes(const std::function<void(const Gene &)> &) const;
 			virtual void inflictStatusEffect(std::unique_ptr<StatusEffect> &&, bool can_overwrite);
+			virtual void removeStatusEffect(const Identifier &);
 
 		protected:
-			std::unordered_map<Identifier, std::unique_ptr<StatusEffect>> statusEffects;
+			Lockable<std::unordered_map<Identifier, std::unique_ptr<StatusEffect>>> statusEffects;
 			double luckStat = 0;
 			/** Affects attack speed. */
 			float speedStat = getBaseSpeed();

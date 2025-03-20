@@ -5,4 +5,8 @@ namespace Game3 {
 		NamedRegisterable(std::move(identifier)) {}
 
 	StatusEffect::~StatusEffect() = default;
+
+	void StatusEffect::onRemove(const std::shared_ptr<LivingEntity> &) {}
+
+	void StatusEffect::modifyColor(Color &) {}
 }
