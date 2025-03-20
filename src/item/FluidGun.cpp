@@ -93,6 +93,7 @@ namespace Game3 {
 		entity->spawning = true;
 		entity->setRealm(place.realm);
 		entity->offset = player_offset - jitter;
+		entity->setThrower(player);
 		return entity;
 	}
 

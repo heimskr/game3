@@ -847,8 +847,9 @@ namespace Game3 {
 			auto lock = entity_set->sharedLock();
 			for (const WeakEntityPtr &weak_entity: *entity_set) {
 				EntityPtr entity = weak_entity.lock();
-				if (entity && entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity))
+				if (entity && entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity)) {
 					out.push_back(entity);
+				}
 			}
 		});
 

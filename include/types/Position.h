@@ -130,6 +130,7 @@ namespace Game3 {
 		Vector2d(Position);
 
 		double magnitude() const;
+		double distance(const Vector2d &) const;
 
 		bool operator==(const Vector2d &) const;
 

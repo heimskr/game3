@@ -44,11 +44,12 @@ namespace Game3 {
 		if (LivingEntityPtr living = std::dynamic_pointer_cast<LivingEntity>(target)) {
 			hasHit = true;
 
-			if (living->offset.getBase().isGrounded()) { // don't really care about data races here
-				applyKnockback(living, 0.2);
-				if (FluidPtr fluid = getGame()->getFluid(fluidID)) {
-					fluid->onCollision(living);
-				}
+			if (FluidPtr fluid = getGame()->getFluid(fluidID)) {
+				fluid->onCollision(living);
+			}
+
+			if (living->offset.isGrounded()) { // don't really care about data races here
+				applyKnockback(living, 0.1);
 			}
 		}
 	}

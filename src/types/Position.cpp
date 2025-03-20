@@ -347,6 +347,10 @@ namespace Game3 {
 		return std::sqrt(x * x + y * y);
 	}
 
+	double Vector2d::distance(const Vector2d &other) const {
+		return std::sqrt(std::pow(other.x - x, 2) + std::pow(other.y - y, 2));
+	}
+
 	bool Vector2d::operator==(const Vector2d &other) const {
 		return this == &other || (x == other.x && y == other.y);
 	}
