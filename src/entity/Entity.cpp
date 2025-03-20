@@ -272,7 +272,10 @@ namespace Game3 {
 				}
 
 				if (args.game->getSide() == Side::Server) {
-					args.game->toServer().entityTeleported(*this, MovementContext{.clearOffset = false});
+					args.game->toServer().entityTeleported(*this, MovementContext{
+						.excludePlayer = isPlayer()? getGID() : -1,
+						.clearOffset = false,
+					});
 				}
 			}
 

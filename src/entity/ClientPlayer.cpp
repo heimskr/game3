@@ -191,8 +191,9 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::jump() {
-		if (getRidden())
+		if (getRidden()) {
 			return;
+		}
 
 		double z{};
 		{
