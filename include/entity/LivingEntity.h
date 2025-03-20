@@ -1,9 +1,11 @@
 #pragma once
 
 #include "entity/Entity.h"
+#include "statuseffect/StatusEffect.h"
 
 namespace Game3 {
 	class Gene;
+	class StatusEffect;
 
 	class LivingEntity: public virtual Entity {
 		public:
@@ -14,6 +16,7 @@ namespace Game3 {
 			virtual HitPoints getMaxHealth() const { return 0; }
 			bool isInvincible() const { return getMaxHealth() == INVINCIBLE; }
 
+			void tick(const TickArgs &) override;
 			void onSpawn() override;
 			void toJSON(boost::json::value &) const override;
 			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
@@ -41,12 +44,14 @@ namespace Game3 {
 			virtual void absorbGenes(const boost::json::value &);
 			virtual void iterateGenes(const std::function<void(Gene &)> &);
 			virtual void iterateGenes(const std::function<void(const Gene &)> &) const;
+			virtual void inflictStatusEffect(std::unique_ptr<StatusEffect> &&, bool can_overwrite);
 
 		protected:
-			int defenseStat = 0;
+			std::unordered_map<Identifier, std::unique_ptr<StatusEffect>> statusEffects;
 			double luckStat = 0;
 			/** Affects attack speed. */
 			float speedStat = getBaseSpeed();
+			int defenseStat = 0;
 
 			LivingEntity();
 

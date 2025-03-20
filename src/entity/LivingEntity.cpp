@@ -8,6 +8,7 @@
 #include "graphics/RenderOptions.h"
 #include "lib/JSON.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
+#include "statuseffect/StatusEffect.h"
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
@@ -17,6 +18,17 @@ namespace Game3 {
 	void LivingEntity::onSpawn() {
 		Entity::onSpawn();
 		health = getMaxHealth();
+	}
+
+	void LivingEntity::tick(const TickArgs &args) {
+		if (statusEffects.empty()) {
+			return;
+		}
+
+		auto self = std::static_pointer_cast<LivingEntity>(shared_from_this());
+		for (const auto &[identifier, status_effect]: statusEffects) {
+			status_effect->apply(self, args.delta);
+		}
 	}
 
 	void LivingEntity::toJSON(boost::json::value &json) const {
@@ -47,8 +59,9 @@ namespace Game3 {
 	void LivingEntity::renderUpper(const RendererContext &renderers) {
 		Entity::renderUpper(renderers);
 
-		if (!canShowHealthBar())
+		if (!canShowHealthBar()) {
 			return;
+		}
 
 		RectangleRenderer &rectangle = renderers.rectangle;
 
@@ -245,6 +258,16 @@ namespace Game3 {
 	void LivingEntity::iterateGenes(const std::function<void(Gene &)> &) {}
 
 	void LivingEntity::iterateGenes(const std::function<void(const Gene &)> &) const {}
+
+	void LivingEntity::inflictStatusEffect(std::unique_ptr<StatusEffect> &&effect, bool can_overwrite) {
+		auto iter = statusEffects.find(effect->identifier);
+		if (iter == statusEffects.end()) {
+			Identifier identifier = effect->identifier;
+			statusEffects.emplace(std::move(identifier), std::move(effect));
+		} else if (can_overwrite) {
+			iter->second = std::move(effect);
+		}
+	}
 
 	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {
 		const auto &object = genes.as_object();

@@ -44,5 +44,6 @@ namespace Game3 {
 		registries.add<BiomassLiquefierRecipeRegistry>();
 		registries.add<AttributeExemplarRegistry>();
 		registries.add<MinigameFactoryRegistry>();
+		registries.add<StatusEffectRegistry>();
 	}
 }
