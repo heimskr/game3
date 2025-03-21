@@ -1226,6 +1226,16 @@ namespace Game3 {
 	}
 
 	void Entity::broadcastPacket(const PacketPtr &packet) {
+		if (getSide() != Side::Server) {
+			return;
+		}
+
+		if (isPlayer()) {
+			PlayerPtr player = std::dynamic_pointer_cast<Player>(shared_from_this());
+			assert(player != nullptr);
+			player->send(packet);
+		}
+
 		auto lock = visiblePlayers.sharedLock();
 		if (visiblePlayers.empty()) {
 			return;
