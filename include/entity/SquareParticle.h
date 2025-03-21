@@ -16,6 +16,7 @@ namespace Game3 {
 				return Entity::create<SquareParticle>(std::forward<Args>(args)...);
 			}
 
+			void renderShadow(const RendererContext &) override;
 			void render(const RendererContext &) override;
 			void tick(const TickArgs &) override;
 			bool shouldPersist() const override { return false; }

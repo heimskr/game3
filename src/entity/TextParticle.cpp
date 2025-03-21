@@ -14,6 +14,8 @@ namespace Game3 {
 	TextParticle::TextParticle(UString text, Color color, double linger_time, TextAlign align):
 		Entity(ID()), text(std::move(text)), color(color), lingerTime(linger_time), align(align) {}
 
+	void TextParticle::renderShadow(const RendererContext &) {}
+
 	void TextParticle::render(const RendererContext &renderers) {
 		if (!isVisible() || text.empty())
 			return;

@@ -12,6 +12,8 @@ namespace Game3 {
 	SquareParticle::SquareParticle(const Vector3 &initial_velocity, float size, Color color, double depth, double linger_time):
 		Entity(ID()), initialVelocity(initial_velocity), size(size), color(color), depth(depth), lingerTime(linger_time) {}
 
+	void SquareParticle::renderShadow(const RendererContext &) {}
+
 	void SquareParticle::render(const RendererContext &renderers) {
 		if (!isVisible()) {
 			return;
