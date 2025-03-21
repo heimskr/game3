@@ -121,6 +121,7 @@ namespace Game3 {
 
 		shader.set("model", model);
 		shader.set("spriteColor", options.color);
+		shader.set("spriteComposite", options.composite);
 		const double multiplier_x = 2. / texture->width;
 		const double multiplier_y = 2. / texture->height;
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);

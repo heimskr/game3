@@ -23,6 +23,7 @@ namespace Game3 {
 			std::shared_ptr<Texture> getTexture() override;
 			void onHit(const EntityPtr &target) final;
 			int getZIndex() const final;
+			ShadowParams getShadowParams() const final;
 
 			void encode(Buffer &) final;
 			void decode(Buffer &) final;

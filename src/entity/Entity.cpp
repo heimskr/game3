@@ -10,6 +10,7 @@
 #include "game/Game.h"
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
+#include "graphics/CircleRenderer.h"
 #include "graphics/ItemTexture.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
@@ -500,6 +501,8 @@ namespace Game3 {
 		const double x = column + offset_x;
 		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
 
+		const auto [multiplier, composite] = getColors();
+
 		RenderOptions main_options{
 			.x = x,
 			.y = y,
@@ -507,7 +510,8 @@ namespace Game3 {
 			.offsetY = texture_y_offset,
 			.sizeX = 16.,
 			.sizeY = std::min(16., renderHeight + 8. * offset_z),
-			.color = getColor(),
+			.color = multiplier,
+			.composite = composite,
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -569,6 +573,24 @@ namespace Game3 {
 	void Entity::renderUpper(const RendererContext &) {}
 
 	void Entity::renderLighting(const RendererContext &) {}
+
+	void Entity::renderShadow(const RendererContext &renderers) {
+		const ShadowParams params = getShadowParams();
+		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
+
+		Vector2d shadow_position(getPosition());
+		shadow_position.x += offset_x + params.baseX;
+		shadow_position.y += offset_y + params.baseY;
+		const double shadow_size = params.sizeMinuend - std::clamp(offset_z / params.sizeDivisor, params.sizeClampMin, params.sizeClampMax);
+
+		renderers.circle.drawOnMap({
+			.x = shadow_position.x,
+			.y = shadow_position.y,
+			.sizeX = shadow_size / params.divisorX,
+			.sizeY = shadow_size / params.divisorY,
+			.color{"#00000077"},
+		});
+	}
 
 	bool Entity::move(Direction move_direction, MovementContext context) {
 		if (EntityPtr ridden = getRidden()) {
@@ -736,8 +758,12 @@ namespace Game3 {
 		return false;
 	}
 
-	Color Entity::getColor() const {
-		return Color{"#ffffff"};
+	std::pair<Color, Color> Entity::getColors() const {
+		return {Color{"#ffffff"}, Color{"#00000000"}};
+	}
+
+	ShadowParams Entity::getShadowParams() const {
+		return {};
 	}
 
 	void Entity::focus(Window &window, bool is_autofocus) {

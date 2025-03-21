@@ -106,6 +106,7 @@ namespace Game3 {
 		shader.bind();
 		shader.set("model", makeMapModel(options, texture->width, texture->height, realm->getTileset(), *window));
 		shader.set("spriteColor", options.color);
+		shader.set("spriteComposite", options.composite);
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);
 
 		texture->bind(0);
@@ -142,6 +143,7 @@ namespace Game3 {
 		shader.bind();
 		shader.set("model", makeMapModel(options, texture_width, texture_height, realm->getTileset(), *window));
 		shader.set("spriteColor", options.color);
+		shader.set("spriteComposite", options.composite);
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture_width, size_y / texture_height);
 
 		texture.bind(0);
@@ -277,7 +279,8 @@ namespace Game3 {
 
 		shader.bind();
 		shader.set("model", model);
-		shader.set("spriteColor", options.color.red, options.color.green, options.color.blue, options.color.alpha);
+		shader.set("spriteColor", options.color);
+		shader.set("spriteComposite", options.composite);
 		const double multiplier = 1.;
 		const double multiplier_x = multiplier / texture_width;
 		const double multiplier_y = multiplier / texture_height;

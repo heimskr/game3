@@ -5,6 +5,7 @@
 #include "game/HasDimensions.h"
 #include "game/HasInventory.h"
 #include "game/Tickable.h"
+#include "graphics/ShadowParams.h"
 #include "graphics/Texture.h"
 #include "item/Item.h"
 #include "packet/EntityMoneyChangedPacket.h"
@@ -111,6 +112,7 @@ namespace Game3 {
 			virtual void render(const RendererContext &);
 			virtual void renderUpper(const RendererContext &);
 			virtual void renderLighting(const RendererContext &);
+			virtual void renderShadow(const RendererContext &);
 			virtual void tick(const TickArgs &);
 			/** Whether the entity should be included in save data. */
 			virtual bool shouldPersist() const { return true; }
@@ -208,7 +210,9 @@ namespace Game3 {
 			/** Returns whether the entity is on the ground and not in the air. */
 			virtual bool isGrounded() const;
 			virtual bool isAffectedByKnockback() const;
-			virtual Color getColor() const;
+			/** Returns [multiplier, composite]. */
+			virtual std::pair<Color, Color> getColors() const;
+			virtual ShadowParams getShadowParams() const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */

@@ -15,7 +15,7 @@ namespace Game3 {
 
 			bool apply(const std::shared_ptr<LivingEntity> &, float delta) final;
 
-			void modifyColor(Color &) final;
+			void modifyColors(Color &multiplier, Color &composite) final;
 
 			void encode(Buffer &) final;
 

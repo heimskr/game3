@@ -8,5 +8,5 @@ namespace Game3 {
 
 	void StatusEffect::onRemove(const std::shared_ptr<LivingEntity> &) {}
 
-	void StatusEffect::modifyColor(Color &) {}
+	void StatusEffect::modifyColors(Color &, Color &) {}
 }

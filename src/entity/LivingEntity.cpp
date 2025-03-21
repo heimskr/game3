@@ -136,16 +136,16 @@ namespace Game3 {
 		return true;
 	}
 
-	Color LivingEntity::getColor() const {
-		Color color = Entity::getColor();
+	std::pair<Color, Color> LivingEntity::getColors() const {
+		auto [multiplier, composite] = Entity::getColors();
 
 		statusEffects.withUnique([&](const auto &map) {
 			for (const auto &[identifier, effect]: map) {
-				effect->modifyColor(color);
+				effect->modifyColors(multiplier, composite);
 			}
 		});
 
-		return color;
+		return {multiplier, composite};
 	}
 
 	bool LivingEntity::canShowHealthBar() const {

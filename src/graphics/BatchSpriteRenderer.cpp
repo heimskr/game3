@@ -68,7 +68,7 @@ namespace Game3 {
 	}
 
 	void BatchSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, double x, double y, double scale, double angle, double alpha) {
-		drawOnMap(texture, RenderOptions {
+		drawOnMap(texture, RenderOptions{
 			.x = x,
 			.y = y,
 			.sizeX = double(texture->width),
@@ -76,7 +76,7 @@ namespace Game3 {
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color = {1.f, 1.f, 1.f, float(alpha)}
+			.color{1.f, 1.f, 1.f, static_cast<float>(alpha)}
 		});
 	}
 
@@ -172,7 +172,7 @@ namespace Game3 {
 		std::vector<float> data = generateData(texture, options);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
 		atlas.lastDataCount = data.size();
-		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4});
+		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4, 4});
 		return atlas;
 	}
 
@@ -205,6 +205,10 @@ namespace Game3 {
 				data.push_back(item->offsetY * 2. / texture_height);
 				data.push_back(item->sizeX / texture_width);
 				data.push_back(item->sizeY / texture_height);
+				data.push_back(item->composite.red);
+				data.push_back(item->composite.green);
+				data.push_back(item->composite.blue);
+				data.push_back(item->composite.alpha);
 			}
 		}
 

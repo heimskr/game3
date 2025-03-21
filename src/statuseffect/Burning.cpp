@@ -27,8 +27,8 @@ namespace Game3 {
 		return duration <= 0;
 	}
 
-	void Burning::modifyColor(Color &color) {
-		color = Color{"#ff7700"};
+	void Burning::modifyColors(Color &, Color &composite) {
+		composite = Color{"#ff7700aa"};
 	}
 
 	void Burning::encode(Buffer &buffer) {

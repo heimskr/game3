@@ -48,6 +48,8 @@ namespace Game3 {
 		const double x = column + offset_x;
 		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
 
+		const auto [multiplier, composite] = getColors();
+
 		RenderOptions main_options{
 			.x = x,
 			.y = y,
@@ -55,6 +57,8 @@ namespace Game3 {
 			.offsetY = texture_y_offset,
 			.sizeX = 16.,
 			.sizeY = std::min(16., renderHeight + 8. * offset_z),
+			.color = multiplier,
+			.composite = composite,
 		};
 
 		if (!heldLeft && !heldRight) {

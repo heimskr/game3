@@ -9,9 +9,11 @@ layout(location = 5) in float spriteDegrees; // options.angle
 layout(location = 6) in vec4  inSpriteColor; // options.color
 layout(location = 7) in vec2  spriteSize;    // options.size{X, Y}
 layout(location = 8) in vec4  inSpecialPosition;
+layout(location = 9) in vec4  inSpriteComposite; // options.composite
 
 out vec2 texCoords;
 out vec4 spriteColor;
+out vec4 spriteComposite;
 out vec4 specialPosition;
 
 uniform mat4 projection;
@@ -79,6 +81,7 @@ void main() {
 	texCoords = position;
 	spriteColor = inSpriteColor;
 	specialPosition = inSpecialPosition;
+	spriteComposite = inSpriteComposite;
 
 	gl_Position = model * vec4(position, 0.0, 1.0);
 }

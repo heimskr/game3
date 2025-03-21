@@ -270,6 +270,13 @@ namespace Game3 {
 			if (auto entities_in_chunk = getEntities(chunk_position)) {
 				auto lock = entities_in_chunk->sharedLock();
 				for (const WeakEntityPtr &weak_entity: *entities_in_chunk) {
+					if (EntityPtr entity = weak_entity.lock()) {
+						if (!entity->isInFluid()) {
+							entity->renderShadow(renderers); CHECKGL
+						}
+					}
+				}
+				for (const WeakEntityPtr &weak_entity: *entities_in_chunk) {
 					EntityPtr entity = weak_entity.lock();
 					if (entity && entity != player) {
 						rendered_entities.insert(entity);

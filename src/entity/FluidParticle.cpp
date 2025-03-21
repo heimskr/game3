@@ -58,6 +58,12 @@ namespace Game3 {
 		return 2;
 	}
 
+	ShadowParams FluidParticle::getShadowParams() const {
+		return {
+			.baseY = 0.2,
+		};
+	}
+
 	void FluidParticle::encode(Buffer &buffer) {
 		Projectile::encode(buffer);
 		buffer << size;

@@ -24,7 +24,7 @@ namespace Game3 {
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 			bool isAffectedByKnockback() const override;
-			Color getColor() const override;
+			std::pair<Color, Color> getColors() const override;
 
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;

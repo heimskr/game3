@@ -20,7 +20,7 @@ namespace Game3 {
 
 			virtual void onRemove(const std::shared_ptr<LivingEntity> &);
 
-			virtual void modifyColor(Color &);
+			virtual void modifyColors(Color &multiplier, Color &composite);
 
 			virtual void encode(Buffer &) = 0;
 
