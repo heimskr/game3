@@ -84,6 +84,7 @@ namespace Game3 {
 			size_t addSounds(const std::filesystem::path &);
 			void addModuleFactories();
 			void addMinigameFactories();
+			void addStatusEffectFactories();
 			virtual void initialSetup(const std::filesystem::path &dir = "gamedata");
 			void initEntities();
 			void initInteractionSets();
@@ -94,6 +95,7 @@ namespace Game3 {
 			void add(LocalCommandFactory &&);
 			void add(ModuleFactory &&);
 			void add(MinigameFactory &&);
+			void add(StatusEffectFactory &&);
 			void traverseData(const std::filesystem::path &);
 			void loadData(const boost::json::value &);
 			void addRecipe(const boost::json::value &);

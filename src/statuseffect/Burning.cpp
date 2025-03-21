@@ -3,19 +3,24 @@
 #include "statuseffect/Burning.h"
 
 namespace Game3 {
+	Burning::Burning():
+		StatusEffect(ID()) {}
+
 	Burning::Burning(float duration, float severity):
 		StatusEffect(ID()),
 		duration(duration),
 		severity(severity) {}
 
 	bool Burning::apply(const std::shared_ptr<LivingEntity> &target, float delta) {
-		accumulatedDamage += delta * severity;
-		float integral{};
-		std::modf(accumulatedDamage, &integral);
+		if (target->getSide() == Side::Server) {
+			accumulatedDamage += delta * severity;
+			float integral{};
+			std::modf(accumulatedDamage, &integral);
 
-		if (integral >= 1.0) {
-			target->takeDamage(static_cast<HitPoints>(integral));
-			accumulatedDamage -= integral;
+			if (integral >= 1.0) {
+				target->takeDamage(static_cast<HitPoints>(integral));
+				accumulatedDamage -= integral;
+			}
 		}
 
 		duration -= delta;
@@ -23,15 +28,11 @@ namespace Game3 {
 	}
 
 	void Burning::modifyColor(Color &color) {
-		OKHsv ok = color.convert<OKHsv>();
-		ok.hue = 0;
-		ok.saturation = 1;
-		color = ok.convert<Color>();
-		color = Color{"#ff0000"};
+		color = Color{"#ff7700"};
 	}
 
 	void Burning::encode(Buffer &buffer) {
-		buffer << ID() << duration << severity << accumulatedDamage;
+		buffer << duration << severity << accumulatedDamage;
 	}
 
 	void Burning::decode(Buffer &buffer) {

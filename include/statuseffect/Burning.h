@@ -10,6 +10,7 @@ namespace Game3 {
 			float duration{};
 			float severity{};
 
+			Burning();
 			Burning(float duration, float severity);
 
 			bool apply(const std::shared_ptr<LivingEntity> &, float delta) final;

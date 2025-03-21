@@ -17,7 +17,7 @@ namespace Game3 {
 	class RealmFactory;
 	class RegisterableIdentifier;
 	class Resource;
-	class StatusEffect;
+	class StatusEffectFactory;
 	class Texture;
 	class Tile;
 	class Tileset;
@@ -144,8 +144,8 @@ namespace Game3 {
 		MinigameFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 
-	struct StatusEffectRegistry: NamedRegistry<StatusEffect> {
-		static Identifier ID() { return {"base", "registry/status_effect"}; }
-		StatusEffectRegistry(): NamedRegistry(ID()) {}
+	struct StatusEffectFactoryRegistry: NamedRegistry<StatusEffectFactory> {
+		static Identifier ID() { return {"base", "registry/status_effect_factory"}; }
+		StatusEffectFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 }

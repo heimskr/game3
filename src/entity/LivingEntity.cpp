@@ -120,6 +120,7 @@ namespace Game3 {
 		buffer << health;
 		buffer << defenseStat;
 		buffer << luckStat;
+		buffer << statusEffects;
 	}
 
 	void LivingEntity::decode(Buffer &buffer) {
@@ -127,6 +128,7 @@ namespace Game3 {
 		buffer >> health;
 		buffer >> defenseStat;
 		buffer >> luckStat;
+		buffer >> statusEffects;
 	}
 
 	bool LivingEntity::isAffectedByKnockback() const {

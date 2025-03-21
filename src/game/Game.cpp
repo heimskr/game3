@@ -80,6 +80,7 @@ namespace Game3 {
 		addModuleFactories();
 		addMinigameFactories();
 		addFluids();
+		addStatusEffectFactories();
 	}
 
 	void Game::initEntities() {

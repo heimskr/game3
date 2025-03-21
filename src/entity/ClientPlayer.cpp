@@ -86,8 +86,9 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::render(const RendererContext &renderers) {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		TextRenderer &text = renderers.text;
 

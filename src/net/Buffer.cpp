@@ -14,6 +14,9 @@
 #include <iomanip>
 
 namespace Game3 {
+	constexpr static char SIMPLE_TYPES_MIN = '\xe0';
+	constexpr static char SIMPLE_TYPES_MAX = '\xea';
+
 	Buffer::Buffer(Side target):
 		target(target) {}
 
@@ -244,7 +247,7 @@ namespace Game3 {
 
 	std::string Buffer::popType() {
 		const char first = popBuffer<char>(*this);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe9'))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX))
 			return {first};
 		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
 			return first + popType();
@@ -259,7 +262,7 @@ namespace Game3 {
 
 	std::string Buffer::peekType(size_t to_skip) {
 		const char first = peek<char>(to_skip);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe9'))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX))
 			return {first};
 		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
 			return first + peekType(to_skip + 1);
@@ -364,7 +367,7 @@ namespace Game3 {
 			assert(!type.empty());
 
 			char first = type[0];
-			if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || ('\xe0' <= first && first <= '\xe9'))
+			if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX))
 				return type.substr(0, 1);
 
 			if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))

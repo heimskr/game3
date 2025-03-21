@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity/Entity.h"
-#include "statuseffect/StatusEffect.h"
+#include "statuseffect/StatusEffectMap.h"
 
 namespace Game3 {
 	class Gene;
@@ -49,7 +49,7 @@ namespace Game3 {
 			virtual void removeStatusEffect(const Identifier &);
 
 		protected:
-			Lockable<std::unordered_map<Identifier, std::unique_ptr<StatusEffect>>> statusEffects;
+			Lockable<StatusEffectMap> statusEffects;
 			double luckStat = 0;
 			/** Affects attack speed. */
 			float speedStat = getBaseSpeed();
