@@ -26,6 +26,8 @@ namespace Game3 {
 
 			virtual void decode(Buffer &) = 0;
 
+			virtual std::unique_ptr<StatusEffect> copy() const = 0;
+
 		protected:
 			StatusEffect(Identifier identifier);
 	};

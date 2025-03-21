@@ -47,6 +47,8 @@ namespace Game3 {
 			virtual void iterateGenes(const std::function<void(const Gene &)> &) const;
 			virtual void inflictStatusEffect(std::unique_ptr<StatusEffect> &&, bool can_overwrite);
 			virtual void removeStatusEffect(const Identifier &);
+			virtual void setStatusEffects(StatusEffectMap);
+			virtual StatusEffectMap copyStatusEffects() const;
 
 		protected:
 			Lockable<StatusEffectMap> statusEffects;

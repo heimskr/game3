@@ -217,6 +217,7 @@ namespace Game3 {
 			inline MoneyCount getMoney() const { return money; }
 			virtual void setMoney(MoneyCount);
 			virtual void broadcastMoney();
+			virtual void broadcastPacket(const PacketPtr &);
 
 			void sendTo(GenericClient &, UpdateCounter threshold = 0);
 			void sendToVisible();

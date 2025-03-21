@@ -38,4 +38,8 @@ namespace Game3 {
 	void Burning::decode(Buffer &buffer) {
 		buffer >> duration >> severity >> accumulatedDamage;
 	}
+
+	std::unique_ptr<StatusEffect> Burning::copy() const {
+		return std::make_unique<Burning>(*this);
+	}
 }

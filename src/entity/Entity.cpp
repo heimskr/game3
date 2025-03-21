@@ -1222,11 +1222,15 @@ namespace Game3 {
 	}
 
 	void Entity::broadcastMoney() {
-		auto lock = visiblePlayers.sharedLock();
-		if (visiblePlayers.empty())
-			return;
+		broadcastPacket(make<EntityMoneyChangedPacket>(*this));
+	}
 
-		const auto packet = make<EntityMoneyChangedPacket>(*this);
+	void Entity::broadcastPacket(const PacketPtr &packet) {
+		auto lock = visiblePlayers.sharedLock();
+		if (visiblePlayers.empty()) {
+			return;
+		}
+
 		for (const auto &weak_player: visiblePlayers) {
 			if (PlayerPtr player = weak_player.lock()) {
 				player->send(packet);

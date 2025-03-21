@@ -19,11 +19,11 @@ namespace Game3 {
 		UseFluidGunPacket(const Position &position, float offsetX, float offsetY, Modifiers modifiers, uint16_t tickFrequency):
 			position(position), offsetX(offsetX), offsetY(offsetY), modifiers(modifiers), tickFrequency(tickFrequency) {}
 
-		PacketID getID() const override { return ID(); }
+		PacketID getID() const final { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << position << offsetX << offsetY << modifiers << tickFrequency; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> position >> offsetX >> offsetY >> modifiers >> tickFrequency; }
+		void encode(Game &, Buffer &buffer) const final { buffer << position << offsetX << offsetY << modifiers << tickFrequency; }
+		void decode(Game &, Buffer &buffer)       final { buffer >> position >> offsetX >> offsetY >> modifiers >> tickFrequency; }
 
-		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
+		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) final;
 	};
 }

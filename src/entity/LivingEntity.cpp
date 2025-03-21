@@ -8,6 +8,7 @@
 #include "graphics/RenderOptions.h"
 #include "lib/JSON.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
+#include "packet/StatusEffectsPacket.h"
 #include "statuseffect/StatusEffect.h"
 #include "threading/ThreadContext.h"
 
@@ -299,6 +300,7 @@ namespace Game3 {
 		} else if (can_overwrite) {
 			iter->second = std::move(effect);
 		}
+		broadcastPacket(make<StatusEffectsPacket>(*this));
 	}
 
 	void LivingEntity::removeStatusEffect(const Identifier &identifier) {
@@ -306,7 +308,26 @@ namespace Game3 {
 		if (auto iter = statusEffects.find(identifier); iter != statusEffects.end()) {
 			iter->second->onRemove(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
 			statusEffects.erase(iter);
+			broadcastPacket(make<StatusEffectsPacket>(*this));
 		}
+	}
+
+	void LivingEntity::setStatusEffects(StatusEffectMap value) {
+		statusEffects = std::move(value);
+		if (getSide() == Side::Server) {
+			broadcastPacket(make<StatusEffectsPacket>(*this));
+		}
+	}
+
+	StatusEffectMap LivingEntity::copyStatusEffects() const {
+		StatusEffectMap out;
+		statusEffects.withShared([&](const StatusEffectMap &map) {
+			out.reserve(map.size());
+			for (const auto &[identifier, effect]: map) {
+				out[identifier] = effect->copy();
+			}
+		});
+		return out;
 	}
 
 	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {

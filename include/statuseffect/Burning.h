@@ -21,6 +21,8 @@ namespace Game3 {
 
 			void decode(Buffer &) final;
 
+			std::unique_ptr<StatusEffect> copy() const final;
+
 		private:
 			float accumulatedDamage{};
 	};

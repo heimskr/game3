@@ -469,6 +469,11 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
 	- `u16` Tick frequency
 
+70. **Status Effects**: tells a client what status effects a living entity currently has.
+
+	- `u64` Global ID
+	- `StatusEffectMap`
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.
