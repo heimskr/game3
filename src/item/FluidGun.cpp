@@ -129,10 +129,12 @@ namespace Game3 {
 		}
 
 		std::optional<FluidTile> fluid_tile = place.getFluid();
+		bool can_set = true;
 
 		if (!fluid_tile || fluid_tile->level == 0) {
 			if (TilePtr tile = place.getTile(Layer::Terrain)) {
 				fluid_tile = tile->yieldFluid(place);
+				can_set = false;
 			}
 		}
 
@@ -154,7 +156,9 @@ namespace Game3 {
 					amount = fluid_tile->level;
 				}
 				fluid_tile->level -= to_slurp;
-				place.setFluid(*fluid_tile);
+				if (can_set) {
+					place.setFluid(*fluid_tile);
+				}
 			}
 
 			setFluidGunData(place.player, slot, stack, fluid, amount, PackedTime::now());

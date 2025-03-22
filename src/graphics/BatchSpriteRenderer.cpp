@@ -134,6 +134,7 @@ namespace Game3 {
 	}
 
 	void BatchSpriteRenderer::flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) {
+		assert(texture != nullptr);
 		Atlas *atlas_ptr = nullptr;
 
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
