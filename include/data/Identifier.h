@@ -60,10 +60,33 @@ namespace Game3 {
 		/** Returns "baz" for "base:foo/bar/baz". */
 		std::string getPostPath() const;
 
-		bool operator==(const char *) const;
-		bool operator==(std::string_view) const;
-		bool operator==(const Identifier &) const;
-		bool operator<(const Identifier &) const;
+		constexpr inline bool operator==(const char *combined) const {
+			return *this == std::string_view(combined);
+		}
+
+		constexpr bool operator==(std::string_view combined) const {
+			const size_t colon = combined.find(':');
+			if (colon == std::string_view::npos)
+				return false;
+			return space == combined.substr(0, colon) && name == combined.substr(colon + 1);
+		}
+
+		constexpr inline bool operator==(const Identifier &other) const {
+			return this == &other || (space == other.space && name == other.name);
+		}
+
+		constexpr bool operator<(const Identifier &other) const {
+			if (this == &other)
+				return false;
+
+			if (space < other.space)
+				return true;
+
+			if (space > other.space)
+				return false;
+
+			return name < other.name;
+		}
 	};
 
 	std::ostream & operator<<(std::ostream &, const Identifier &);

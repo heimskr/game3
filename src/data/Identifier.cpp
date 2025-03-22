@@ -24,34 +24,6 @@ namespace Game3 {
 		return name.substr(slash + 1);
 	}
 
-	bool Identifier::operator==(const char *combined) const {
-		return *this == std::string_view(combined);
-	}
-
-	bool Identifier::operator==(std::string_view combined) const {
-		const size_t colon = combined.find(':');
-		if (colon == std::string_view::npos)
-			return false;
-		return space == combined.substr(0, colon) && name == combined.substr(colon + 1);
-	}
-
-	bool Identifier::operator==(const Identifier &other) const {
-		return this == &other || (space == other.space && name == other.name);
-	}
-
-	bool Identifier::operator<(const Identifier &other) const {
-		if (this == &other)
-			return false;
-
-		if (space < other.space)
-			return true;
-
-		if (space > other.space)
-			return false;
-
-		return name < other.name;
-	}
-
 	std::ostream & operator<<(std::ostream &os, const Identifier &identifier) {
 		return os << identifier.space << ':' << identifier.name;
 	}

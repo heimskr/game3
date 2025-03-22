@@ -20,6 +20,7 @@
 #include "item/CreativeGeneratorItem.h"
 #include "item/DisruptorItem.h"
 #include "item/DissolverItem.h"
+#include "item/Drink.h"
 #include "item/EmptyFlask.h"
 #include "item/EntitySpawnItem.h"
 #include "item/EternalFountainItem.h"
@@ -121,6 +122,8 @@ namespace Game3 {
 
 		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 
+		add(std::make_shared<Drink<"base:fluid/milk", 12>>("base:item/milk_flask", "Milk", 4, 64));
+
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
 
 		add(std::make_shared<EntitySpawnItem>("base:item/ship", "Ship", 999, "base:entity/ship")); // TODO: cost
@@ -131,7 +134,6 @@ namespace Game3 {
 
 		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"));
 		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
-		add(std::make_shared<FilledFlask>("base:item/milk_flask",  "Milk Flask",  4, "base:fluid/milk"));
 		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
 		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
 		add(std::make_shared<FilledFlask>("base:item/liquid_biomass_flask", "Liquid Biomass Flask", 32, "base:fluid/liquid_biomass"));

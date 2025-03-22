@@ -33,6 +33,7 @@ game3_deps = [
 inc_dirs = [
 	include_directories('..' / 'include'),
 	include_directories('..' / 'voronoi' / 'src'),
+	include_directories('..' / 'subprojects' / 'fixed_string' / 'include'),
 ]
 
 link_with = [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')]

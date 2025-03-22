@@ -22,3 +22,6 @@
 [submodule "subprojects/pngpp"]
 	path = subprojects/pngpp
 	url = https://github.com/heimskr/pngpp.git
+[submodule "subprojects/fixed_string"]
+	path = subprojects/fixed_string
+	url = https://github.com/unterumarmung/fixed_string.git

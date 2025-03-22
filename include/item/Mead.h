@@ -1,18 +1,10 @@
-#pragma once
-
-#include "interface/HasFluidType.h"
-#include "item/Food.h"
+#include "item/Drink.h"
 
 namespace Game3 {
-	class Mead: public Food, public HasFluidType {
+	class Mead: public Drink<"base:fluid/mead"> {
 		public:
-			using Food::Food;
+			using Drink::Drink;
 
-			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-			HitPoints getHealedPoints(const std::shared_ptr<Player> &) override;
-
-			using Food::use;
-
-			Identifier getFluidType() const override { return "base:fluid/mead"; }
+			HitPoints getHealedPoints(const std::shared_ptr<Player> &player) override;
 	};
 }
