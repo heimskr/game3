@@ -920,6 +920,15 @@ namespace Game3 {
 				return {true, ""};
 			}
 
+			if (first == "heal") {
+				if (words.size() != 1) {
+					return {false, "Incorrect parameter count."};
+				}
+
+				player->setHealth(player->getMaxHealth());
+				return {true, ""};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}
