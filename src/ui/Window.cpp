@@ -402,10 +402,10 @@ namespace Game3 {
 			});
 		});
 
-		drawGL();
+		render();
 	}
 
-	void Window::drawGL() {
+	void Window::render() {
 		const float x_factor = getXFactor();
 		const float y_factor = getYFactor();
 		auto [width, height] = getDimensions();

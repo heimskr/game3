@@ -133,7 +133,7 @@ namespace Game3 {
 			RendererContext getRendererContext();
 
 			void tick();
-			void drawGL();
+			void render();
 			void closeGame();
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
