@@ -105,7 +105,9 @@ namespace Game3 {
 		if (button == LEFT_BUTTON && slot >= 0) {
 			if (inventory && inventory->getOwner() == ui.getPlayer()) {
 				if (modifiers.onlyCtrl()) {
-					ui.getGame()->getPlayer()->send(make<UseItemPacket>(slot, modifiers));
+					if (stack) {
+						ui.getGame()->getPlayer()->send(make<UseItemPacket>(slot, modifiers));
+					}
 				} else {
 					ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
 				}
