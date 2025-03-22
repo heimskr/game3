@@ -11,6 +11,7 @@
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/Hotbar.h"
+#include "ui/gl/widget/StatusEffectsDisplay.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -41,6 +42,8 @@ namespace Game3 {
 				constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
 				hotbar->render(context, (window.getWidth() - width) / 2, window.getHeight() - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 			}
+
+			StatusEffectsDisplay(*this).render(context, internalScissorStack.getTop().rectangle);
 		}
 
 		for (const DialogPtr &dialog: dialogs) {

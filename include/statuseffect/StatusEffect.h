@@ -6,7 +6,9 @@
 
 namespace Game3 {
 	class Buffer;
+	class ClientGame;
 	class LivingEntity;
+	class Texture;
 	struct Color;
 
 	// Living entities hold separate instances of `StatusEffect` subclasses.
@@ -27,6 +29,8 @@ namespace Game3 {
 			virtual void decode(Buffer &) = 0;
 
 			virtual std::unique_ptr<StatusEffect> copy() const = 0;
+
+			virtual std::shared_ptr<Texture> getTexture(const std::shared_ptr<ClientGame> &);
 
 		protected:
 			StatusEffect(Identifier identifier);

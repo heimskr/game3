@@ -1,4 +1,5 @@
 #include "entity/LivingEntity.h"
+#include "game/ClientGame.h"
 #include "graphics/Color.h"
 #include "statuseffect/Pickled.h"
 
@@ -29,5 +30,13 @@ namespace Game3 {
 
 	std::unique_ptr<StatusEffect> Pickled::copy() const {
 		return std::make_unique<Pickled>(*this);
+	}
+
+	std::shared_ptr<Texture> Pickled::getTexture(const std::shared_ptr<ClientGame> &game) {
+		if (!cachedTexture) {
+			cachedTexture = game->itemRegistry->at("base:item/pickle")->getTexture(*game, {});
+		}
+
+		return cachedTexture;
 	}
 }

@@ -74,8 +74,10 @@ namespace Game3 {
 	}
 
 	bool Aligner::onChildrenUpdated() {
-		if (!Widget::onChildrenUpdated())
+		if (!Widget::onChildrenUpdated()) {
 			return false;
+		}
+
 		markDirty();
 		return true;
 	}

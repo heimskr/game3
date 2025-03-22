@@ -9,4 +9,8 @@ namespace Game3 {
 	void StatusEffect::onRemove(const std::shared_ptr<LivingEntity> &) {}
 
 	void StatusEffect::modifyColors(Color &, Color &) {}
+
+	std::shared_ptr<Texture> StatusEffect::getTexture(const std::shared_ptr<ClientGame> &) {
+		return {};
+	}
 }

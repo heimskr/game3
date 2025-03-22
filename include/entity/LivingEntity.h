@@ -3,6 +3,8 @@
 #include "entity/Entity.h"
 #include "statuseffect/StatusEffectMap.h"
 
+#include <functional>
+
 namespace Game3 {
 	class Gene;
 	class StatusEffect;
@@ -49,6 +51,8 @@ namespace Game3 {
 			virtual void removeStatusEffect(const Identifier &);
 			virtual void setStatusEffects(StatusEffectMap);
 			virtual StatusEffectMap copyStatusEffects() const;
+			/** Returns whether iteration was stopped by the supplied function returning true. */
+			virtual bool iterateStatusEffects(const std::function<bool(const Identifier &, const std::unique_ptr<StatusEffect> &)> &) const;
 
 		protected:
 			Lockable<StatusEffectMap> statusEffects;

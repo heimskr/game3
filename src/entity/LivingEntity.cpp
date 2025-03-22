@@ -330,6 +330,18 @@ namespace Game3 {
 		return out;
 	}
 
+	bool LivingEntity::iterateStatusEffects(const std::function<bool(const Identifier &, const std::unique_ptr<StatusEffect> &)> &function) const {
+		return statusEffects.withShared([&](const StatusEffectMap &map) {
+			for (const auto &[identifier, effect]: map) {
+				if (function(identifier, effect)) {
+					return true;
+				}
+			}
+
+			return false;
+		});
+	}
+
 	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {
 		const auto &object = genes.as_object();
 

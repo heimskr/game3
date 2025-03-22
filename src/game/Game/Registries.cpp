@@ -14,7 +14,7 @@ namespace Game3 {
 	void Game::initRegistries() {
 		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
-		registries.add<ItemRegistry>();
+		itemRegistry = registries.add<ItemRegistry>();
 		registries.add<ItemTextureRegistry>();
 		registries.add<TextureRegistry>();
 		registries.add<EntityTextureRegistry>();
