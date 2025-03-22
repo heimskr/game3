@@ -9,6 +9,7 @@
 #include "graphics/TextRenderer.h"
 #include "item/Item.h"
 #include "packet/SetActiveSlotPacket.h"
+#include "packet/UseItemPacket.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
@@ -101,9 +102,16 @@ namespace Game3 {
 	}
 
 	bool ItemSlot::click(int button, int x, int y, Modifiers modifiers) {
-		if (button == LEFT_BUTTON && slot >= 0 && inventory && inventory->getOwner() == ui.getPlayer()) {
-			ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
-			return true;
+		if (button == LEFT_BUTTON && slot >= 0) {
+			if (inventory && inventory->getOwner() == ui.getPlayer()) {
+				if (modifiers.onlyCtrl()) {
+					ui.getGame()->getPlayer()->send(make<UseItemPacket>(slot, modifiers));
+				} else {
+					ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
+				}
+
+				return true;
+			}
 		}
 
 		return Widget::click(button, x, y, modifiers);
