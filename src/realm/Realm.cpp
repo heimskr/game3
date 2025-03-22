@@ -1170,8 +1170,9 @@ namespace Game3 {
 	}
 
 	bool Realm::hasFluid(const Position &position, FluidLevel minimum) const {
-		if (auto fluid = tileProvider.copyFluidTile(position))
+		if (auto fluid = tileProvider.copyFluidTile(position)) {
 			return minimum <= fluid->level;
+		}
 		return false;
 	}
 

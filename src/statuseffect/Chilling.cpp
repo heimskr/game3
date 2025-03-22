@@ -24,18 +24,11 @@ namespace Game3 {
 	}
 
 	void Chilling::onAdd(const std::shared_ptr<LivingEntity> &entity) {
-		if (const float old = entity->baseSpeed; old > 1.0) {
-			wasAdded = true;
-			entity->baseSpeed = old * CHILL_SLOWING_FACTOR;
-		} else {
-			wasAdded = false;
-		}
+		entity->speedMultiplier = CHILL_SLOWING_FACTOR;
 	}
 
 	void Chilling::onRemove(const std::shared_ptr<LivingEntity> &entity) {
-		if (wasAdded) {
-			entity->baseSpeed = entity->baseSpeed / CHILL_SLOWING_FACTOR;
-		}
+		entity->speedMultiplier = 1.0;
 	}
 
 	void Chilling::modifyColors(Color &, Color &composite) {

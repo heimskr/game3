@@ -20,8 +20,5 @@ namespace Game3 {
 			void encode(Buffer &) final;
 			void decode(Buffer &) final;
 			std::unique_ptr<StatusEffect> copy() const final;
-
-		private:
-			bool wasAdded = false;
 	};
 }
