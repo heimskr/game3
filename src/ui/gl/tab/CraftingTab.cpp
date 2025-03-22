@@ -99,7 +99,7 @@ namespace Game3 {
 
 		GamePtr game = ui.getGame();
 		auto &exemplars = game->registry<AttributeExemplarRegistry>();
-		auto &items = game->registry<ItemRegistry>();
+		auto &items = *game->itemRegistry;
 
 		std::size_t column = 1;
 

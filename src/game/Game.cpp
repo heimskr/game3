@@ -96,7 +96,7 @@ namespace Game3 {
 	}
 
 	void Game::add(std::shared_ptr<Item> item) {
-		registry<ItemRegistry>().add(item->identifier, item);
+		itemRegistry->add(item->identifier, item);
 		for (const auto &attribute: item->attributes)
 			itemsByAttribute[attribute].insert(item);
 	}

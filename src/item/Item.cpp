@@ -159,13 +159,13 @@ namespace Game3 {
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_):
-	item(game->registry<ItemRegistry>().at(id)), count(count_), weakGame(game) {
+	item(game->itemRegistry->at(id)), count(count_), weakGame(game) {
 		assert(item);
 		item->initStack(*game, *this);
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count, boost::json::value data):
-		item(game->registry<ItemRegistry>().at(id)), count(count), data(std::move(data)), weakGame(game) {
+		item(game->itemRegistry->at(id)), count(count), data(std::move(data)), weakGame(game) {
 			assert(item != nullptr);
 			item->initStack(*game, *this);
 		}
@@ -209,7 +209,7 @@ namespace Game3 {
 	}
 
 	ItemStackPtr ItemStack::withDurability(const GamePtr &game, const ItemID &id) {
-		return withDurability(game, id, dynamic_cast<HasMaxDurability &>(*game->registry<ItemRegistry>()[id]).maxDurability);
+		return withDurability(game, id, dynamic_cast<HasMaxDurability &>(*(*game->itemRegistry)[id]).maxDurability);
 	}
 
 	bool ItemStack::reduceDurability(Durability amount) {
@@ -266,7 +266,7 @@ namespace Game3 {
 		auto stack = ItemStack::create(game);
 		auto &array = json.as_array();
 		const Identifier id = boost::json::value_to<Identifier>(json.at(0), game);
-		stack->item = game->registry<ItemRegistry>()[id];
+		stack->item = (*game->itemRegistry)[id];
 		stack->count = 1 < array.size()? getUint64(array[1]) : 1;
 		if (2 < array.size()) {
 			const auto &extra = array[2];
@@ -323,7 +323,7 @@ namespace Game3 {
 
 	void ItemStack::decode(Game &game, Buffer &buffer) {
 		absorbGame(game);
-		item = game.registry<ItemRegistry>()[buffer.take<Identifier>()];
+		item = (*game.itemRegistry)[buffer.take<Identifier>()];
 		buffer >> count;
 		data = boost::json::parse(buffer.take<std::string>());
 	}
@@ -387,7 +387,7 @@ namespace Game3 {
 		const Identifier item_id = buffer.take<Identifier>();
 		stack->count = buffer.take<ItemCount>();
 		stack->data = buffer.take<boost::json::value>();
-		stack->item = stack->getGame()->registry<ItemRegistry>().at(item_id);
+		stack->item = stack->getGame()->itemRegistry->at(item_id);
 		return buffer;
 	}
 

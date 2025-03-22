@@ -262,7 +262,7 @@ namespace Game3 {
 		auto shared_inventory_lock = inventory->sharedLock();
 
 		GamePtr game = getGame();
-		auto &item_registry = game->registry<ItemRegistry>();
+		auto &item_registry = *game->itemRegistry;
 		std::shared_ptr<Item> chemical_item = item_registry["base:item/chemical"_id];
 		std::unique_ptr<Inventory> inventory_copy = inventory->copy();
 		inventory_copy->setOwner({});

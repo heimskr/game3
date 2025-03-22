@@ -227,7 +227,7 @@ namespace Game3 {
 			return false;
 		}
 
-		std::shared_ptr<Item> chemical_item = game->registry<ItemRegistry>()["base:item/chemical"_id];
+		std::shared_ptr<Item> chemical_item = (*game->itemRegistry)["base:item/chemical"_id];
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		inventory_copy->setOwner({});
 

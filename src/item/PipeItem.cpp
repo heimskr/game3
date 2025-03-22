@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	std::shared_ptr<Item> getPipeItem(const Game &game, Substance pipe_type) {
-		const auto &registry = game.registry<ItemRegistry>();
+		const auto &registry = *game.itemRegistry;
 		switch (pipe_type) {
 			case Substance::Item:   return registry[ItemPipeItem::ID()];
 			case Substance::Fluid:  return registry[FluidPipeItem::ID()];

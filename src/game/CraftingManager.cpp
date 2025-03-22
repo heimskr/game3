@@ -80,7 +80,7 @@ namespace Game3 {
 
 		GamePtr game = player.getGame();
 		auto &recipe_registry = game->registry<CraftingRecipeRegistry>();
-		auto &item_registry = game->registry<ItemRegistry>();
+		auto &item_registry = *game->itemRegistry;
 
 		// Maps attributes to item IDs.
 		std::multimap<Identifier, Identifier> attribute_index;
