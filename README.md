@@ -5,17 +5,7 @@ A 2D game made with OpenGL. No engine because I'd prefer to do things my own way
 
 ## Screenshots
 
-![Player in the forest](https://github.com/heimskr/game3/blob/master/screenshots/1.png?raw=true)
-
-![Player in a house](https://github.com/heimskr/game3/blob/master/screenshots/2.png?raw=true)
-
-![Players constructing machines near lava](https://github.com/heimskr/game3/blob/master/screenshots/3.png?raw=true)
-
-![Players chatting in the water](https://github.com/heimskr/game3/blob/master/screenshots/4.png?raw=true)
-
-![Player standing in a field](https://github.com/heimskr/game3/blob/master/screenshots/5.png?raw=true)
-
-![Player inspecting a factory](https://github.com/heimskr/game3/blob/master/screenshots/6.png?raw=true)
+See [the game3 website](https://ucsc.io/game3/) for screenshots and more information.
 
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
@@ -45,5 +35,4 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
 	- You will need to implement dependency checking to make sure plugins are loaded in the right order and that there are no cycles;
 		[Graph::topoSort](https://github.com/heimskr/game3/blob/master/include/graph/Graph.h) may help with that.
 	- Bonus points if you can get interop with other languages (e.g., Rust or Zig) working. This will likely be difficult because plugins will typically need to extend classes like Entity, TileEntity or Realm that have virtual methods.
-- Redo the UI to be done in OpenGL or an OpenGL-based framework instead of GTK.
 - Rewrite the "engine" to be based on Vulkan or SDL2 instead of OpenGL.
