@@ -11,6 +11,10 @@ namespace Game3 {
 		duration(duration),
 		severity(severity) {}
 
+	std::string Burning::getName() const {
+		return "Burning";
+	}
+
 	bool Burning::apply(const std::shared_ptr<LivingEntity> &target, float delta) {
 		if (target->getSide() == Side::Server) {
 			accumulatedDamage += delta * severity;

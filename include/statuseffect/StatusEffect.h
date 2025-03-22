@@ -3,6 +3,7 @@
 #include "registry/Registerable.h"
 
 #include <memory>
+#include <string>
 
 namespace Game3 {
 	class Buffer;
@@ -16,6 +17,8 @@ namespace Game3 {
 	class StatusEffect: public NamedRegisterable {
 		public:
 			virtual ~StatusEffect();
+
+			virtual std::string getName() const = 0;
 
 			/** Returns whether the effect should be cleared. */
 			virtual bool apply(const std::shared_ptr<LivingEntity> &, float delta) = 0;

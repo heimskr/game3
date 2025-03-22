@@ -10,7 +10,7 @@ namespace Game3 {
 		Widget(ui, scale) {}
 
 	void Icon::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (fixedHeight > 0) {
+		if (fixedHeight >= 0) {
 			height = fixedHeight;
 		}
 
@@ -43,7 +43,7 @@ namespace Game3 {
 				tooltipTextChanged = false;
 				tooltip->setText(*tooltipText);
 			}
-			tooltip->setRegion(std::nullopt);
+			tooltip->setRegion(lastRectangle);
 			tooltip->show(*this);
 		} else {
 			tooltip->hide(*this);
@@ -58,7 +58,7 @@ namespace Game3 {
 		float size{};
 
 		if (orientation == Orientation::Horizontal) {
-			if (fixedWidth) {
+			if (fixedWidth >= 0) {
 				size = fixedWidth;
 			} else if (iconTexture) {
 				size = scale * iconTexture->width;
@@ -66,7 +66,7 @@ namespace Game3 {
 				size = scale * 16;
 			}
 		} else {
-			if (fixedHeight) {
+			if (fixedHeight >= 0) {
 				size = fixedHeight;
 			} else if (iconTexture) {
 				size = scale * iconTexture->height;

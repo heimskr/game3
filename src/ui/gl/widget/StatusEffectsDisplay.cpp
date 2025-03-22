@@ -2,6 +2,7 @@
 #include "game/ClientGame.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
+#include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/StatusEffectsDisplay.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -27,24 +28,24 @@ namespace Game3 {
 			return;
 		}
 
-		const double padding = DISPLAY_PADDING * scale;
-		const double subscale = scale * 0.75;
+		const float padding = DISPLAY_PADDING * scale;
+		const float subscale = scale * 0.75;
 
 		x = width;
 		y = padding;
 
-		player->iterateStatusEffects([&](const Identifier &identifier, const std::unique_ptr<StatusEffect> &effect) -> bool {
+		player->iterateStatusEffects([&](const Identifier &, const std::unique_ptr<StatusEffect> &effect) -> bool {
 			if (TexturePtr texture = effect->getTexture(game)) {
-				x -= texture->width * subscale + padding;
-				renderers.singleSprite.drawOnScreen(texture, RenderOptions{
-					.x = x,
-					.y = y,
-					.sizeX = -1.0,
-					.sizeY = -1.0,
-					.scaleX = subscale,
-					.scaleY = subscale,
-					.invertY = false,
-				});
+				const float icon_width = texture->width * subscale;
+				const float icon_height = texture->height * subscale;
+
+				x -= icon_width + padding;
+
+				Icon icon(ui, scale);
+				icon.setFixedSize(icon_width, icon_height);
+				icon.setIconTexture(std::move(texture));
+				icon.setTooltipText(effect->getName());
+				icon.render(renderers, x, y, icon_width, icon_height);
 			}
 			return false;
 		});

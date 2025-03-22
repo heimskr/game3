@@ -11,6 +11,10 @@ namespace Game3 {
 		StatusEffect(ID()),
 		duration(duration) {}
 
+	std::string Pickled::getName() const {
+		return "Pickled";
+	}
+
 	bool Pickled::apply(const std::shared_ptr<LivingEntity> &, float delta) {
 		duration -= delta;
 		return duration <= 0;
