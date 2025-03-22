@@ -1,10 +1,12 @@
 #include "game/Game.h"
 #include "statuseffect/Burning.h"
+#include "statuseffect/Pickled.h"
 #include "statuseffect/StatusEffectFactory.h"
 
 namespace Game3 {
 	void Game::addStatusEffectFactories() {
 		add(StatusEffectFactory::create<Burning>());
+		add(StatusEffectFactory::create<Pickled>());
 	}
 
 	void Game::add(StatusEffectFactory &&factory) {

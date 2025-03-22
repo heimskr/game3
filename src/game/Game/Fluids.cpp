@@ -1,3 +1,4 @@
+#include "fluid/Brine.h"
 #include "fluid/Lava.h"
 #include "fluid/Water.h"
 #include "game/Game.h"
@@ -17,6 +18,7 @@ namespace Game3 {
 	void Game::addFluids() {
 		auto &reg = registry<FluidRegistry>();
 
+		replaceFluid<Brine>(reg);
 		replaceFluid<Lava>(reg);
 		replaceFluid<Water>(reg);
 	}
