@@ -5,6 +5,7 @@
 #include "client/ServerWrapper.h"
 #include "game/ClientGame.h"
 #include "graphics/Texture.h"
+#include "lib/JSON.h"
 #include "net/Server.h"
 #include "scripting/ScriptEngine.h"
 #include "tools/Flasker.h"
@@ -28,6 +29,8 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <vector>
@@ -251,6 +254,37 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--flask" && argc == 5) {
 			std::cout << generateFlask(dataRoot / "resources" / "flaskbase.png", dataRoot / "resources" / "flaskmask.png", argv[2], argv[3], argv[4]);
+			return 0;
+		}
+
+		if (arg1 == "--add-item" && argc == 5) {
+			std::string id = argv[2];
+			std::string_view credit = argv[3];
+			std::filesystem::path image_path = argv[4];
+
+			if (id.empty()) {
+				ERROR("ID is empty.");
+				return 1;
+			}
+
+			std::filesystem::path dir_path = "resources/items/" + id;
+
+			if (std::filesystem::exists(dir_path)) {
+				ERROR("{} already exists.", dir_path.c_str());
+				return 2;
+			}
+
+			std::filesystem::create_directory(dir_path);
+
+			boost::json::object object;
+			object["credit"] = credit;
+			object["id"] = "base:item/" + id;
+			std::ofstream item_json(dir_path / "item.json");
+			serializeJSON(object, item_json);
+
+			std::filesystem::copy_file(image_path, dir_path / "item.png");
+			SUCCESS("Stored image {} in {} with ID base:item/{}.", image_path.c_str(), dir_path.c_str(), id);
+			INFO("Items.cpp: add(std::make_shared<Item>(\"base:item/{}\", \"{}{}\", 999, 64)); // TODO: cost", id, char(std::toupper(id[0])), id.substr(1));
 			return 0;
 		}
 	}
