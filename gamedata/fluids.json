@@ -24,7 +24,7 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/milk",
 				"flask":    "base:item/milk_flask",
-				"color":    "#ffffff"
+				"color":    "#fffffe"
 			}],
 			["base:fluid/water", {
 				"name":     "Water",
