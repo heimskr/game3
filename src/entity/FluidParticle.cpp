@@ -49,7 +49,7 @@ namespace Game3 {
 			}
 
 			if (living->offset.isGrounded()) { // don't really care about data races here
-				applyKnockback(living, 0.1);
+				applyKnockback(living, 15.0);
 			}
 		}
 	}
@@ -62,6 +62,28 @@ namespace Game3 {
 		return {
 			.baseY = 0.2,
 		};
+	}
+
+	void FluidParticle::applyKnockback(const EntityPtr &target, float factor) {
+		target->velocity.withUnique([this, factor](Vector3 &target_velocity) {
+			auto lock = velocity.uniqueLock();
+			double magnitude = velocity.magnitude2D();
+			target_velocity.x += velocity.x / magnitude * factor;
+			target_velocity.y += velocity.y / magnitude * factor;
+			velocity.x = 0;
+			velocity.y = 0;
+			velocity.z = 0;
+		});
+
+		target->offset.withUnique([factor](Vector3 &offset) {
+			offset.z += factor / 10;
+		});
+
+		target->increaseUpdateCounter();
+		target->sendToVisible();
+
+		increaseUpdateCounter();
+		sendToVisible();
 	}
 
 	void FluidParticle::encode(Buffer &buffer) {

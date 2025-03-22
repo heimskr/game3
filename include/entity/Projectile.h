@@ -51,7 +51,7 @@ namespace Game3 {
 
 			std::shared_ptr<Texture> getTexture() override;
 			void setTexture(const ClientGamePtr &);
-			void applyKnockback(const EntityPtr &, float factor);
+			virtual void applyKnockback(const EntityPtr &, float factor);
 
 		friend class Entity;
 	};

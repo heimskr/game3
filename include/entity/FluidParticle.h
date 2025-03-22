@@ -24,6 +24,7 @@ namespace Game3 {
 			void onHit(const EntityPtr &target) final;
 			int getZIndex() const final;
 			ShadowParams getShadowParams() const final;
+			void applyKnockback(const EntityPtr &, float factor) final;
 
 			void encode(Buffer &) final;
 			void decode(Buffer &) final;
