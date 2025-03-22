@@ -926,6 +926,7 @@ namespace Game3 {
 				}
 
 				player->setHealth(player->getMaxHealth());
+				player->setStatusEffects({});
 				return {true, ""};
 			}
 

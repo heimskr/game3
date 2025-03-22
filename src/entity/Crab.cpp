@@ -61,8 +61,8 @@ namespace Game3 {
 					Position goal = start_position;
 
 					bool in_water = false;
-					if (std::optional<FluidTile> fluid = realm->tryFluid(start_position); fluid && fluid->level > 0) {
-						in_water = true;
+					if (std::optional<FluidTile> fluid = realm->tryFluid(start_position)) {
+						in_water = fluid->level > 0;
 					}
 
 					const TileID sand = realm->getTileset()["base:tile/sand"_id];
