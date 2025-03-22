@@ -110,8 +110,8 @@ namespace Game3 {
 		});
 	}
 
-	bool TextInput::click(int button, int x, int y) {
-		if (Widget::click(button, x, y))
+	bool TextInput::click(int button, int x, int y, Modifiers modifiers) {
+		if (Widget::click(button, x, y, modifiers))
 			return true;
 
 		if (button == LEFT_BUTTON) {

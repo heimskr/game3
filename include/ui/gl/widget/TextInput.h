@@ -29,7 +29,7 @@ namespace Game3 {
 			TextInput(UIContext &, float scale);
 
 			void render(const RendererContext &, float x, float y, float width, float height) final;
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 			bool charPressed(uint32_t character, Modifiers) final;
 			SizeRequestMode getRequestMode() const final;

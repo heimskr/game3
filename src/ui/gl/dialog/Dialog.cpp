@@ -27,27 +27,27 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Dialog::click(int button, int x, int y) {
+	bool Dialog::click(int button, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::click(button, x, y);
+			Widget::click(button, x, y, modifiers);
 			return true;
 		}
 
 		return false;
 	}
 
-	bool Dialog::mouseDown(int button, int x, int y) {
+	bool Dialog::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::mouseDown(button, x, y);
+			Widget::mouseDown(button, x, y, modifiers);
 			return true;
 		}
 
 		return false;
 	}
 
-	bool Dialog::mouseUp(int button, int x, int y) {
+	bool Dialog::mouseUp(int button, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::mouseUp(button, x, y);
+			Widget::mouseUp(button, x, y, modifiers);
 			return true;
 		}
 
@@ -81,9 +81,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Dialog::scroll(float x_delta, float y_delta, int x, int y) {
+	bool Dialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::scroll(x_delta, y_delta, x, y);
+			Widget::scroll(x_delta, y_delta, x, y, modifiers);
 			return true;
 		}
 

@@ -97,14 +97,14 @@ namespace Game3 {
 		tooltip->hide();
 	}
 
-	bool UIContext::click(int button, int x, int y) {
+	bool UIContext::click(int button, int x, int y, Modifiers modifiers) {
 		refocusDialogs(x, y);
 
-		if (contextMenu && contextMenu->click(button, x, y)) {
+		if (contextMenu && contextMenu->click(button, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y, modifiers)) {
 			return true;
 		}
 
@@ -112,52 +112,52 @@ namespace Game3 {
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
 			contained = contained || dialog->contains(x, y);
-			if (dialog->click(button, x, y)) {
+			if (dialog->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return (hotbar->contains(x, y) && hotbar->click(button, x, y)) || contained;
+		return (hotbar->contains(x, y) && hotbar->click(button, x, y, modifiers)) || contained;
 	}
 
-	bool UIContext::mouseDown(int button, int x, int y) {
-		if (contextMenu && contextMenu->mouseDown(button, x, y)) {
+	bool UIContext::mouseDown(int button, int x, int y, Modifiers modifiers) {
+		if (contextMenu && contextMenu->mouseDown(button, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y, modifiers)) {
 			return true;
 		}
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->mouseDown(button, x, y)) {
+			if (dialog->mouseDown(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->mouseDown(button, x, y);
+		return hotbar->contains(x, y) && hotbar->mouseDown(button, x, y, modifiers);
 	}
 
-	bool UIContext::mouseUp(int button, int x, int y) {
-		if (contextMenu && contextMenu->mouseUp(button, x, y)) {
+	bool UIContext::mouseUp(int button, int x, int y, Modifiers modifiers) {
+		if (contextMenu && contextMenu->mouseUp(button, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y, modifiers)) {
 			return true;
 		}
 
 		if (auto pressed = getPressedWidget()) {
-			return pressed->mouseUp(button, x, y);
+			return pressed->mouseUp(button, x, y, modifiers);
 		}
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->mouseUp(button, x, y)) {
+			if (dialog->mouseUp(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->mouseUp(button, x, y);
+		return hotbar->contains(x, y) && hotbar->mouseUp(button, x, y, modifiers);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
@@ -291,22 +291,22 @@ namespace Game3 {
 		return true;
 	}
 
-	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
-		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y)) {
+	bool UIContext::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
+		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->scroll(x_delta, y_delta, x, y)) {
+			if (dialog->scroll(x_delta, y_delta, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
+		return hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y, modifiers);
 	}
 
 	bool UIContext::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {

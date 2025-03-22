@@ -32,7 +32,7 @@ namespace Game3 {
 			using Module::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 			bool dragEnd(int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;

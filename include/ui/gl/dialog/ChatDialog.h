@@ -16,8 +16,7 @@ namespace Game3 {
 			void init() override;
 			void render(const RendererContext &) override;
 			Rectangle getPosition() const override;
-			bool click(int button, int x, int y) override;
-			bool scroll(float x_delta, float y_delta, int x, int y) override;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 			void onFocus() override;
 			void onBlur() override;

@@ -54,12 +54,12 @@ namespace Game3 {
 		}
 	}
 
-	bool Scroller::click(int button, int x, int y) {
+	bool Scroller::click(int button, int x, int y, Modifiers modifiers) {
 		if (lastVerticalScrollMouse || lastHorizontalScrollMouse) {
 			return false;
 		}
 
-		return firstChild && firstChild->click(button, x, y);
+		return firstChild && firstChild->click(button, x, y, modifiers);
 	}
 
 	bool Scroller::dragStart(int x, int y) {
@@ -132,7 +132,7 @@ namespace Game3 {
 		return firstChild && firstChild->dragEnd(x, y);
 	}
 
-	bool Scroller::scroll(float x_delta, float y_delta, int, int) {
+	bool Scroller::scroll(float x_delta, float y_delta, int, int, Modifiers) {
 		xOffset += (getNatural()? -x_delta : x_delta) * SCROLL_SPEED;
 		xOffset = std::min(0.f, xOffset);
 

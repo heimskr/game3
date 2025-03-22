@@ -135,33 +135,33 @@ namespace Game3 {
 		activeTab->onBlur();
 	}
 
-	bool OmniDialog::click(int button, int x, int y) {
+	bool OmniDialog::click(int button, int x, int y, Modifiers modifiers) {
 		if (!getPosition().contains(x, y)) {
 			return false;
 		}
 
-		if (activeTab && activeTab->click(button, x, y)) {
+		if (activeTab && activeTab->click(button, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::click(button, x, y);
+		return Dialog::click(button, x, y, modifiers);
 	}
 
-	bool OmniDialog::mouseDown(int button, int x, int y) {
+	bool OmniDialog::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		mouseDownPosition.emplace(x, y);
 
 		if (!getPosition().contains(x, y)) {
 			return false;
 		}
 
-		if (activeTab && activeTab->mouseDown(button, x, y)) {
+		if (activeTab && activeTab->mouseDown(button, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::mouseDown(button, x, y);
+		return Dialog::mouseDown(button, x, y, modifiers);
 	}
 
-	bool OmniDialog::mouseUp(int button, int x, int y) {
+	bool OmniDialog::mouseUp(int button, int x, int y, Modifiers modifiers) {
 		if (mouseDownPosition) {
 			const auto [mouse_down_x, mouse_down_y] = *mouseDownPosition;
 			mouseDownPosition.reset();
@@ -183,11 +183,11 @@ namespace Game3 {
 			return false;
 		}
 
-		if (activeTab && activeTab->mouseUp(button, x, y)) {
+		if (activeTab && activeTab->mouseUp(button, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::mouseUp(button, x, y);
+		return Dialog::mouseUp(button, x, y, modifiers);
 	}
 
 	bool OmniDialog::dragStart(int x, int y) {
@@ -226,16 +226,16 @@ namespace Game3 {
 		return Dialog::dragEnd(x, y);
 	}
 
-	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y) {
+	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (!getPosition().contains(x, y)) {
 			return false;
 		}
 
-		if (activeTab && activeTab->scroll(x_delta, y_delta, x, y)) {
+		if (activeTab && activeTab->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::scroll(x_delta, y_delta, x, y);
+		return Dialog::scroll(x_delta, y_delta, x, y, modifiers);
 	}
 
 	bool OmniDialog::hidesHotbar() const {

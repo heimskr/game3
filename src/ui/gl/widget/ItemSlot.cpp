@@ -100,13 +100,13 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlot::click(int button, int x, int y) {
+	bool ItemSlot::click(int button, int x, int y, Modifiers modifiers) {
 		if (button == LEFT_BUTTON && slot >= 0 && inventory && inventory->getOwner() == ui.getPlayer()) {
 			ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
 			return true;
 		}
 
-		return Widget::click(button, x, y);
+		return Widget::click(button, x, y, modifiers);
 	}
 
 	bool ItemSlot::dragStart(int x, int y) {

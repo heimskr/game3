@@ -24,7 +24,7 @@ namespace Game3 {
 			Rectangle getPosition() const override;
 			Rectangle getInnerRectangle() const;
 			void init() override;
-			bool click(int button, int x, int y) override;
+			bool click(int button, int x, int y, Modifiers) override;
 			bool dragStart(int x, int y) override;
 			bool dragUpdate(int x, int y) override;
 			bool dragEnd(int x, int y) override;

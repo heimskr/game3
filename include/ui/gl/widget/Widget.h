@@ -42,13 +42,13 @@ namespace Game3 {
 			/** Can return a pointer to nothing, itself or a new widget. */
 			virtual WidgetPtr getDragStartWidget();
 			/** `x` and `y` are absolute, not relative to the top left corner of the widget. */
-			virtual bool click(int button, int x, int y);
-			virtual bool mouseDown(int button, int x, int y);
-			virtual bool mouseUp(int button, int x, int y);
+			virtual bool click(int button, int x, int y, Modifiers);
+			virtual bool mouseDown(int button, int x, int y, Modifiers);
+			virtual bool mouseUp(int button, int x, int y, Modifiers);
 			virtual bool dragStart(int x, int y);
 			virtual bool dragUpdate(int x, int y);
 			virtual bool dragEnd(int x, int y);
-			virtual bool scroll(float x_delta, float y_delta, int x, int y);
+			virtual bool scroll(float x_delta, float y_delta, int x, int y, Modifiers);
 			virtual bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			virtual bool charPressed(uint32_t codepoint, Modifiers);
 			virtual SizeRequestMode getRequestMode() const = 0;

@@ -112,9 +112,7 @@ namespace Game3 {
 		}
 	}
 
-	bool InventoryModule::click(int button, int x, int y) {
-		const Modifiers modifiers = ui.window.getModifiers();
-
+	bool InventoryModule::click(int button, int x, int y, Modifiers modifiers) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (!widget->contains(x, y)) {
 				continue;
@@ -124,7 +122,7 @@ namespace Game3 {
 				return true;
 			}
 
-			if (widget->click(button, x, y)) {
+			if (widget->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}

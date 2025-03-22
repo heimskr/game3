@@ -90,12 +90,12 @@ namespace Game3 {
 		});
 	}
 
-	bool BaseDraggableDialog::click(int button, int x, int y) {
+	bool BaseDraggableDialog::click(int button, int x, int y, Modifiers modifiers) {
 		if (closeButton->contains(x, y)) {
-			return closeButton->click(button, x, y);
+			return closeButton->click(button, x, y, modifiers);
 		}
 
-		return Dialog::click(button, x, y);
+		return Dialog::click(button, x, y, modifiers);
 	}
 
 	bool BaseDraggableDialog::dragStart(int x, int y) {

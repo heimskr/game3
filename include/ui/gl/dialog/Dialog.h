@@ -41,13 +41,13 @@ namespace Game3 {
 			virtual void onClose();
 			virtual bool hidesHotbar() const;
 
-			bool click(int button, int x, int y) override;
-			bool mouseDown(int button, int x, int y) override;
-			bool mouseUp(int button, int x, int y) override;
+			bool click(int button, int x, int y, Modifiers) override;
+			bool mouseDown(int button, int x, int y, Modifiers) override;
+			bool mouseUp(int button, int x, int y, Modifiers) override;
 			bool dragStart(int x, int y) override;
 			bool dragUpdate(int x, int y) override;
 			bool dragEnd(int x, int y) override;
-			bool scroll(float x_delta, float y_delta, int x, int y) override;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) override;
 			bool contains(int x, int y) const override;
 
 			bool isFocused() const;

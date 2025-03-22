@@ -117,16 +117,12 @@ namespace Game3 {
 		return Rectangle(0, 0, -1, -1);
 	}
 
-	bool ChatDialog::click(int button, int x, int y) {
-		return Dialog::click(button, x, y);
-	}
-
-	bool ChatDialog::scroll(float x_delta, float y_delta, int x, int y) {
+	bool ChatDialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (!isFocused()) {
 			return false;
 		}
 
-		return Dialog::scroll(x_delta, y_delta, x, y);
+		return Dialog::scroll(x_delta, y_delta, x, y, modifiers);
 	}
 
 	bool ChatDialog::keyPressed(uint32_t key, Modifiers, bool) {

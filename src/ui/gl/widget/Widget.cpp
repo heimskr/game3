@@ -35,13 +35,13 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool Widget::click(int button, int x, int y) {
+	bool Widget::click(int button, int x, int y, Modifiers modifiers) {
 		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick) {
 			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
 		}
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->click(button, x, y)) {
+			if (child->contains(x, y) && child->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -49,9 +49,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::mouseDown(int button, int x, int y) {
+	bool Widget::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->mouseDown(button, x, y)) {
+			if (child->contains(x, y) && child->mouseDown(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -59,9 +59,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::mouseUp(int button, int x, int y) {
+	bool Widget::mouseUp(int button, int x, int y, Modifiers modifiers) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->mouseUp(button, x, y)) {
+			if (child->contains(x, y) && child->mouseUp(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -110,9 +110,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::scroll(float x_delta, float y_delta, int x, int y) {
+	bool Widget::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y)) {
+			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y, modifiers)) {
 				return true;
 			}
 		}

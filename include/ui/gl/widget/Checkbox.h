@@ -20,7 +20,7 @@ namespace Game3 {
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

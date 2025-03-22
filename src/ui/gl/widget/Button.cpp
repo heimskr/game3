@@ -108,22 +108,26 @@ namespace Game3 {
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
-	bool Button::click(int, int, int) {
+	bool Button::click(int, int, int, Modifiers) {
 		return false;
 	}
 
-	bool Button::mouseDown(int button, int, int) {
-		if (button != LEFT_BUTTON)
+	bool Button::mouseDown(int button, int, int, Modifiers) {
+		if (button != LEFT_BUTTON) {
 			return false;
+		}
 
 		pressed = true;
-		if (ClientGamePtr game = ui.getGame())
+
+		if (ClientGamePtr game = ui.getGame()) {
 			game->playSound("base:sound/click", threadContext.getPitch(1.25));
+		}
+
 		ui.setPressedWidget(shared_from_this());
 		return true;
 	}
 
-	bool Button::mouseUp(int button, int x, int y) {
+	bool Button::mouseUp(int button, int x, int y, Modifiers) {
 		if (button != LEFT_BUTTON)
 			return false;
 

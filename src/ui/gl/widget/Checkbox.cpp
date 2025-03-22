@@ -36,7 +36,7 @@ namespace Game3 {
 		}
 	}
 
-	bool Checkbox::click(int, int, int) {
+	bool Checkbox::click(int, int, int, Modifiers) {
 		setChecked(!getChecked());
 		return true;
 	}

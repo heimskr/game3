@@ -23,7 +23,7 @@ namespace Game3 {
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			std::shared_ptr<Widget> getDragStartWidget() final;
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 

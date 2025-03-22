@@ -784,7 +784,8 @@ namespace Game3 {
 	}
 
 	void Window::mouseButtonCallback(int button, int action, int mods) {
-		lastModifiers = Modifiers(mods);
+		Modifiers modifiers(mods);
+		lastModifiers = modifiers;
 
 		const auto [x_pos, y_pos] = getMouseCoordinates<double>();
 		const int x = static_cast<int>(std::floor(x_pos));
@@ -793,7 +794,7 @@ namespace Game3 {
 		if (action == GLFW_PRESS) {
 			heldMouseButton = button;
 
-			bool result = uiContext.mouseDown(button, x, y);
+			bool result = uiContext.mouseDown(button, x, y, modifiers);
 
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
 				if (!result && game) {
@@ -825,17 +826,17 @@ namespace Game3 {
 				}
 			}
 
-			bool result = uiContext.mouseUp(button, x, y);
+			bool result = uiContext.mouseUp(button, x, y, modifiers);
 
 			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
-				result = uiContext.click(button, x, y) || result;
+				result = uiContext.click(button, x, y, modifiers) || result;
 			} else {
 				result = uiContext.dragEnd(x, y) || result;
 				dragStarted = false;
 			}
 
 			if (!result && game) {
-				game->click(button, 1, x_pos, y_pos, lastModifiers);
+				game->click(button, 1, x_pos, y_pos, modifiers);
 			}
 		}
 	}
@@ -854,7 +855,7 @@ namespace Game3 {
 	void Window::scrollCallback(double x_delta, double y_delta) {
 		const auto [x, y] = getMouseCoordinates<double>();
 
-		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y))) {
+		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y), lastModifiers)) {
 			return;
 		}
 
