@@ -588,7 +588,7 @@ namespace Game3 {
 			.y = shadow_position.y,
 			.sizeX = shadow_size / params.divisorX,
 			.sizeY = shadow_size / params.divisorY,
-			.color{"#00000077"},
+			.color{"#00000044"},
 		});
 	}
 
