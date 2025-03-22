@@ -244,6 +244,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
 		add(std::make_shared<Item>("base:item/ticket",           "Ticket",              0, -1));
 		add(std::make_shared<Item>("base:item/pickle",           "Pickle",             10, 64));
+		add(std::make_shared<Item>("base:item/fire", "Fire", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
 
@@ -279,7 +280,6 @@ namespace Game3 {
 		add(std::make_shared<ProjectileItem<Egg>>("base:item/egg", "Egg", 16, 64));
 		add(std::make_shared<ProjectileItem<Snowball>>("base:item/snowball", "Snowball", 999, 64)); // TODO: cost
 		add(std::make_shared<ProjectileItem<Bomb>>("base:item/bomb", "Bomb", 32, 64));
-
 
 		add(std::make_shared<PumpItem>("base:item/pump", "Pump", 999, 64)); // TODO: cost
 

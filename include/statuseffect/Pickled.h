@@ -1,9 +1,9 @@
 #pragma once
 
-#include "statuseffect/StatusEffect.h"
+#include "statuseffect/TexturedStatusEffect.h"
 
 namespace Game3 {
-	class Pickled: public StatusEffect {
+	class Pickled: public TexturedStatusEffect {
 		public:
 			static Identifier ID() { return {"base", "statuseffect/pickled"}; }
 
@@ -18,9 +18,5 @@ namespace Game3 {
 			void encode(Buffer &) final;
 			void decode(Buffer &) final;
 			std::unique_ptr<StatusEffect> copy() const final;
-			std::shared_ptr<Texture> getTexture(const std::shared_ptr<ClientGame> &) final;
-
-		private:
-			std::shared_ptr<Texture> cachedTexture;
 	};
 }

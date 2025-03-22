@@ -1,9 +1,9 @@
 #pragma once
 
-#include "statuseffect/StatusEffect.h"
+#include "statuseffect/TexturedStatusEffect.h"
 
 namespace Game3 {
-	class Burning: public StatusEffect {
+	class Burning: public TexturedStatusEffect {
 		public:
 			static Identifier ID() { return {"base", "statuseffect/burning"}; }
 

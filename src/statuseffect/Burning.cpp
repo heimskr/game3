@@ -4,10 +4,10 @@
 
 namespace Game3 {
 	Burning::Burning():
-		StatusEffect(ID()) {}
+		Burning(0, 0) {}
 
 	Burning::Burning(float duration, float severity):
-		StatusEffect(ID()),
+		TexturedStatusEffect(ID(), "base:item/fire"),
 		duration(duration),
 		severity(severity) {}
 
