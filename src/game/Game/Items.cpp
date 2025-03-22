@@ -245,6 +245,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/ticket",           "Ticket",              0, -1));
 		add(std::make_shared<Item>("base:item/pickle",           "Pickle",             10, 64));
 		add(std::make_shared<Item>("base:item/fire", "Fire", 999, 64)); // TODO: cost
+		add(std::make_shared<Item>("base:item/bing", "Bing", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
 

@@ -11,7 +11,7 @@ namespace Game3 {
 		Chilling(0) {}
 
 	Chilling::Chilling(float duration):
-		TexturedStatusEffect(ID(), "base:item/snowball"),
+		TexturedStatusEffect(ID(), "base:item/bing"),
 		duration(duration) {}
 
 	std::string Chilling::getName() const {
