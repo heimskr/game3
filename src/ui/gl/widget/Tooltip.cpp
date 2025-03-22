@@ -54,6 +54,11 @@ namespace Game3 {
 		lastRectangle.width  = effective_width;
 		lastRectangle.height = effective_height;
 
+		if (x + effective_width > ui.getWidth() && x - effective_width >= 0) {
+			lastRectangle.x -= effective_width;
+			x -= effective_width;
+		}
+
 		rectangler(backgroundColor, Rectangle(x, y, effective_width, effective_height));
 
 		const Rectangle interior(x, y, effective_width, effective_height);
