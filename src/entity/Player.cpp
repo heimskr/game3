@@ -219,10 +219,6 @@ namespace Game3 {
 		return false;
 	}
 
-	float Player::getMovementSpeed() const {
-		return isInFluid()? movementSpeed * .5f : movementSpeed;
-	}
-
 	void Player::give(const ItemStackPtr &stack, Slot start) {
 		addKnownItem(stack);
 		const InventoryPtr inventory = getInventory(0);
@@ -262,7 +258,6 @@ namespace Game3 {
 		buffer << displayName;
 		buffer << tooldown;
 		buffer << stationTypes;
-		buffer << movementSpeed;
 		buffer << spawnRealmID;
 		buffer << spawnPosition;
 		buffer << timeSinceAttack;
@@ -278,7 +273,6 @@ namespace Game3 {
 		buffer >> displayName;
 		buffer >> tooldown;
 		buffer >> stationTypes;
-		buffer >> movementSpeed;
 		buffer >> spawnRealmID;
 		buffer >> spawnPosition;
 		buffer >> timeSinceAttack;

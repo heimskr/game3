@@ -948,7 +948,7 @@ namespace Game3 {
 	}
 
 	float Entity::getMovementSpeed() const {
-		return isInFluid()? MAX_SPEED * .5f : MAX_SPEED;
+		return isInFluid()? baseSpeed.load() * .5f : baseSpeed.load();
 	}
 
 	std::shared_ptr<Game> Entity::getGame() const {
@@ -1211,6 +1211,7 @@ namespace Game3 {
 		buffer << heldLeft.slot;
 		buffer << heldRight.slot;
 		buffer << customTexture;
+		buffer << baseSpeed;
 	}
 
 	void Entity::decode(Buffer &buffer) {
@@ -1232,8 +1233,11 @@ namespace Game3 {
 		const auto right_slot = buffer.take<Slot>();
 
 		buffer >> customTexture;
-		if (customTexture)
+		buffer >> baseSpeed;
+
+		if (customTexture) {
 			changeTexture(customTexture);
+		}
 
 		setHeldLeft(left_slot);
 		setHeldRight(right_slot);

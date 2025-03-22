@@ -41,7 +41,11 @@ namespace Game3 {
 		}
 
 		std::erase_if(statusEffects, [&](const auto &item) {
-			return item.second->apply(self, args.delta);
+			const bool remove = item.second->apply(self, args.delta);
+			if (remove) {
+				item.second->onRemove(self);
+			}
+			return remove;
 		});
 	}
 
@@ -292,10 +296,12 @@ namespace Game3 {
 	void LivingEntity::iterateGenes(const std::function<void(const Gene &)> &) const {}
 
 	void LivingEntity::inflictStatusEffect(std::unique_ptr<StatusEffect> &&effect, bool can_overwrite) {
+		assert(effect != nullptr);
 		auto lock = statusEffects.uniqueLock();
 		auto iter = statusEffects.find(effect->identifier);
 		if (iter == statusEffects.end()) {
 			Identifier identifier = effect->identifier;
+			effect->onAdd(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
 			statusEffects.emplace(std::move(identifier), std::move(effect));
 		} else if (can_overwrite) {
 			iter->second = std::move(effect);
@@ -313,7 +319,24 @@ namespace Game3 {
 	}
 
 	void LivingEntity::setStatusEffects(StatusEffectMap value) {
-		statusEffects = std::move(value);
+		auto lock = statusEffects.uniqueLock();
+		StatusEffectMap &base = statusEffects.getBase();
+		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+
+		for (const auto &[identifier, effect]: value) {
+			if (!statusEffects.contains(identifier)) {
+				effect->onAdd(self);
+			}
+		}
+
+		for (const auto &[identifier, effect]: base) {
+			if (!value.contains(identifier)) {
+				effect->onRemove(self);
+			}
+		}
+
+		base = std::move(value);
+
 		if (getSide() == Side::Server) {
 			broadcastPacket(make<StatusEffectsPacket>(*this));
 		}

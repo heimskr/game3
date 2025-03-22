@@ -2,6 +2,10 @@
 #include "graphics/Color.h"
 #include "statuseffect/Chilling.h"
 
+namespace {
+	constexpr float CHILL_SLOWING_FACTOR = 0.6;
+}
+
 namespace Game3 {
 	Chilling::Chilling():
 		Chilling(0) {}
@@ -17,6 +21,21 @@ namespace Game3 {
 	bool Chilling::apply(const std::shared_ptr<LivingEntity> &, float delta) {
 		duration -= delta;
 		return duration <= 0;
+	}
+
+	void Chilling::onAdd(const std::shared_ptr<LivingEntity> &entity) {
+		if (const float old = entity->baseSpeed; old > 1.0) {
+			wasAdded = true;
+			entity->baseSpeed = old * CHILL_SLOWING_FACTOR;
+		} else {
+			wasAdded = false;
+		}
+	}
+
+	void Chilling::onRemove(const std::shared_ptr<LivingEntity> &entity) {
+		if (wasAdded) {
+			entity->baseSpeed = entity->baseSpeed / CHILL_SLOWING_FACTOR;
+		}
 	}
 
 	void Chilling::modifyColors(Color &, Color &composite) {

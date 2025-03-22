@@ -27,7 +27,6 @@ namespace Game3 {
 			/** Definitely not encoded. */
 			Token token = -1;
 			float tooldown = 0;
-			float movementSpeed = 10;
 			float timeSinceAttack = 0;
 			std::atomic_bool movingUp = false;
 			std::atomic_bool movingRight = false;
@@ -60,7 +59,6 @@ namespace Game3 {
 			virtual void addMoney(MoneyCount) = 0;
 			/** Returns whether the player had enough money. If false, no change was made. */
 			virtual bool removeMoney(MoneyCount) = 0;
-			float getMovementSpeed() const override;
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			virtual void showText(const UString &text, const UString &name) = 0;
