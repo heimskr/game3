@@ -27,7 +27,7 @@ namespace Game3 {
 		registries.add<RealmDetailsRegistry>();
 		registries.add<PacketFactoryRegistry>();
 		registries.add<LocalCommandFactoryRegistry>();
-		registries.add<FluidRegistry>();
+		fluidRegistry = registries.add<FluidRegistry>();
 		tileRegistry = registries.add<TileRegistry>();
 		registries.add<CropRegistry>();
 		registries.add<CentrifugeRecipeRegistry>();

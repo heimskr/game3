@@ -1,5 +1,6 @@
 #include "entity/Player.h"
 #include "fluid/Fluid.h"
+#include "game/Game.h"
 #include "game/TileProvider.h"
 #include "graphics/Tileset.h"
 #include "lib/JSON.h"
@@ -193,6 +194,14 @@ namespace Game3 {
 
 	bool Place::isPathable() const {
 		return realm->isPathable(position);
+	}
+
+	std::shared_ptr<Tile> Place::getTile(Layer layer) const {
+		if (std::optional<TileID> tile_id = get(layer)) {
+			return realm->getGame()->getTile(realm->getTileset()[*tile_id]);
+		}
+
+		return {};
 	}
 
 	std::shared_ptr<TileEntity> Place::getTileEntity() const {

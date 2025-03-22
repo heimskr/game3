@@ -9,6 +9,7 @@
 #include "tile/FoodTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
+#include "tile/SnowTile.h"
 #include "tile/Tile.h"
 #include "tile/TorchTile.h"
 #include "tile/TreeTile.h"
@@ -30,6 +31,7 @@ namespace Game3 {
 		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
+		reg.add<SnowTile>();
 		reg.add<TorchTile>();
 		reg.add<VoidTile>();
 		reg.addMineable("base:tile/stone", ItemStack::create(self, "base:item/stone"), true);

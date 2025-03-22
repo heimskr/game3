@@ -11,6 +11,7 @@
 #include "packet/InventorySlotUpdatePacket.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
+#include "tile/Tile.h"
 #include "types/PackedTime.h"
 #include "types/Position.h"
 #include "ui/gl/widget/Hotbar.h"
@@ -127,25 +128,33 @@ namespace Game3 {
 			return true;
 		}
 
-		if (std::optional<FluidTile> tile = place.getFluid(); tile && tile->level > 0) {
-			if (tile->isInfinite()) {
+		std::optional<FluidTile> fluid_tile = place.getFluid();
+
+		if (!fluid_tile || fluid_tile->level == 0) {
+			if (TilePtr tile = place.getTile(Layer::Terrain)) {
+				fluid_tile = tile->yieldFluid(place);
+			}
+		}
+
+		if (fluid_tile) {
+			if (fluid_tile->isInfinite()) {
 				const double to_slurp = std::min<double>(FluidTile::FULL, capacity - amount);
-				if (fluid && fluid->registryID == tile->id) {
+				if (fluid && fluid->registryID == fluid_tile->id) {
 					amount += to_slurp;
 				} else {
-					fluid = game->getFluid(tile->id);
+					fluid = game->getFluid(fluid_tile->id);
 					amount = FluidTile::FULL;
 				}
 			} else {
-				const double to_slurp = std::min<double>(tile->level, capacity - amount);
-				if (fluid && fluid->registryID == tile->id) {
+				const double to_slurp = std::min<double>(fluid_tile->level, capacity - amount);
+				if (fluid && fluid->registryID == fluid_tile->id) {
 					amount += to_slurp;
 				} else {
-					fluid = game->getFluid(tile->id);
-					amount = tile->level;
+					fluid = game->getFluid(fluid_tile->id);
+					amount = fluid_tile->level;
 				}
-				tile->level -= to_slurp;
-				place.setFluid(*tile);
+				fluid_tile->level -= to_slurp;
+				place.setFluid(*fluid_tile);
 			}
 
 			setFluidGunData(place.player, slot, stack, fluid, amount, PackedTime::now());

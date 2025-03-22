@@ -60,6 +60,13 @@
 				"tilename": "base:tile/liquid_biomass",
 				"flask":    "base:item/liquid_biomass_flask",
 				"color":    "#45a600"
+			}],
+			["base:fluid/powdered_snow", {
+				"name":     "Powdered Snow",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/snow",
+				"flask":    "base:item/snowball",
+				"color":    "#eeeeff"
 			}]
 		]]
 	]

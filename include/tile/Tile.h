@@ -1,8 +1,9 @@
 #pragma once
 
-#include "types/Layer.h"
+#include "fluid/Fluid.h"
 #include "registry/Registerable.h"
 #include "threading/Lockable.h"
+#include "types/Layer.h"
 #include "types/Types.h"
 
 #include <optional>
@@ -12,6 +13,7 @@ namespace Game3 {
 	class EntityFactory;
 	class Game;
 	class ItemStack;
+	struct FluidTile;
 	struct Place;
 	struct RendererContext;
 
@@ -36,6 +38,8 @@ namespace Game3 {
 
 			/** Returns true if something meaningful happened, or false if Realm::updateNeighbors should default to autotiling. */
 			virtual bool update(const Place &, Layer) { return false; }
+
+			virtual std::optional<FluidTile> yieldFluid(const Place &) { return {}; }
 
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;

@@ -18,6 +18,7 @@ namespace Game3 {
 	class Buffer;
 	class Game;
 	class Realm;
+	class Tile;
 	class TileEntity;
 	struct ChunkPosition;
 	struct FluidTile;
@@ -87,6 +88,7 @@ namespace Game3 {
 		void set(Layer, const Identifier &) const;
 		void setFluid(FluidTile) const;
 		bool isPathable() const;
+		std::shared_ptr<Tile> getTile(Layer) const;
 		std::shared_ptr<TileEntity> getTileEntity() const;
 		Place withPosition(Position) const;
 
