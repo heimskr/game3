@@ -23,6 +23,8 @@ namespace Game3 {
 			/** Returns whether the effect should be cleared. */
 			virtual bool apply(const std::shared_ptr<LivingEntity> &, float delta) = 0;
 
+			virtual void replenish(const std::shared_ptr<LivingEntity> &);
+
 			virtual void onAdd(const std::shared_ptr<LivingEntity> &);
 
 			virtual void onRemove(const std::shared_ptr<LivingEntity> &);

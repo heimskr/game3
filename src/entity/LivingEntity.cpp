@@ -305,6 +305,8 @@ namespace Game3 {
 			statusEffects.emplace(std::move(identifier), std::move(effect));
 		} else if (can_overwrite) {
 			iter->second = std::move(effect);
+		} else {
+			iter->second->replenish(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
 		}
 		broadcastPacket(make<StatusEffectsPacket>(*this));
 	}

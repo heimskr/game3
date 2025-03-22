@@ -7,8 +7,7 @@ namespace Game3 {
 		Burning(0, 0) {}
 
 	Burning::Burning(float duration, float severity):
-		TexturedStatusEffect(ID(), "base:item/fire"),
-		duration(duration),
+		TimedStatusEffect(ID(), "base:item/fire", duration),
 		severity(severity) {}
 
 	std::string Burning::getName() const {
@@ -27,8 +26,7 @@ namespace Game3 {
 			}
 		}
 
-		duration -= delta;
-		return duration <= 0;
+		return TimedStatusEffect::apply(target, delta);
 	}
 
 	void Burning::modifyColors(Color &, Color &composite) {
@@ -36,11 +34,13 @@ namespace Game3 {
 	}
 
 	void Burning::encode(Buffer &buffer) {
-		buffer << duration << severity << accumulatedDamage;
+		TimedStatusEffect::encode(buffer);
+		buffer << severity << accumulatedDamage;
 	}
 
 	void Burning::decode(Buffer &buffer) {
-		buffer >> duration >> severity >> accumulatedDamage;
+		TimedStatusEffect::decode(buffer);
+		buffer >> severity >> accumulatedDamage;
 	}
 
 	std::unique_ptr<StatusEffect> Burning::copy() const {

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "statuseffect/TexturedStatusEffect.h"
+#include "statuseffect/TimedStatusEffect.h"
 
 namespace Game3 {
-	class Burning: public TexturedStatusEffect {
+	class Burning: public TimedStatusEffect {
 		public:
 			static Identifier ID() { return {"base", "statuseffect/burning"}; }
 
-			float duration{};
 			float severity{};
 
 			Burning();

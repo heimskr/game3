@@ -6,6 +6,8 @@ namespace Game3 {
 
 	StatusEffect::~StatusEffect() = default;
 
+	void StatusEffect::replenish(const std::shared_ptr<LivingEntity> &) {}
+
 	void StatusEffect::onAdd(const std::shared_ptr<LivingEntity> &) {}
 
 	void StatusEffect::onRemove(const std::shared_ptr<LivingEntity> &) {}
