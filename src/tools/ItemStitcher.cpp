@@ -60,15 +60,15 @@ namespace Game3 {
 		}
 
 		for (const std::filesystem::path &dir: dirs) {
-			std::string name = dir.filename();
+			std::string name = dir.filename().string();
 			std::filesystem::path png_path = base_dir / name / "item.png";
 			jsons[name] = boost::json::parse(readFile(dir / "item.json"));
 
 			int width{}, height{}, channels{};
-			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
+			images.emplace(name, stbi_load(png_path.string().c_str(), &width, &height, &channels, 4));
 
 			if (channels != 3 && channels != 4)
-				throw std::runtime_error(std::format("Invalid channel count for {} at {}: {} (expected 3 or 4)", name, png_path.c_str(), channels));
+				throw std::runtime_error(std::format("Invalid channel count for {} at {}: {} (expected 3 or 4)", name, png_path.string().c_str(), channels));
 
 			if (width == 16 && height == 16) {
 				++count_1x1;

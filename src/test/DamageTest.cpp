@@ -8,13 +8,13 @@
 #include <iostream>
 #include <map>
 #include <random>
-#include <sys/ioctl.h>
 #include <unistd.h>
 
 #include <boost/math/distributions/skew_normal.hpp>
 
 namespace Game3 {
 	void skewTest(double location, double scale, double shape) {
+#ifndef __MINGW32__
 		boost::math::skew_normal_distribution<double> distribution(location, scale, shape);
 
 		std::random_device dev;
@@ -34,9 +34,11 @@ namespace Game3 {
 		}
 
 		printHistogram(samples);
+#endif
 	}
 
 	void damageTest(HitPoints weapon_damage, int defense, int variability, double attacker_luck, double defender_luck) {
+#ifndef __MINGW32__ // I HATE WINDOWS
 		std::map<HitPoints, size_t> histogram;
 
 		for (int i = 0; i < 1'000'000; ++i) {
@@ -56,5 +58,6 @@ namespace Game3 {
 
 		printHistogram(histogram, 0.5);
 		std::cout << '\n';
+#endif
 	}
 }

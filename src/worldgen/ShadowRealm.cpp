@@ -28,7 +28,7 @@ namespace Game3::WorldGen {
 		for (Index row = range.rowMin(); row <= range.rowMax(); ++row) {
 			for (Index column = range.columnMin(); column <= range.columnMax(); ++column) {
 				std::unique_lock<std::shared_mutex> lock;
-				provider.findBiomeType(Position(row, column), &lock) = Biome::VOID;
+				provider.findBiomeType(Position(row, column), &lock) = Biome::VOID_REALM;
 			}
 		}
 

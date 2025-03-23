@@ -7,12 +7,12 @@
 namespace Game3 {
 	const std::map<BiomeType, std::shared_ptr<const Biome>> & Biome::getMap() {
 		static const std::map<BiomeType, std::shared_ptr<const Biome>> map {
-			{Biome::VOID,      std::make_shared<Biome>(VOID)},
-			{Biome::GRASSLAND, std::make_shared<Grassland>()},
-			{Biome::VOLCANIC,  std::make_shared<Volcanic>()},
-			{Biome::SNOWY,     std::make_shared<Snowy>()},
-			{Biome::DESERT,    std::make_shared<Desert>()},
-			{Biome::CAVE,      std::make_shared<Biome>(CAVE)},
+			{VOID_REALM, std::make_shared<Biome>(VOID_REALM)},
+			{GRASSLAND,  std::make_shared<Grassland>()},
+			{VOLCANIC,   std::make_shared<Volcanic>()},
+			{SNOWY,      std::make_shared<Snowy>()},
+			{DESERT,     std::make_shared<Desert>()},
+			{CAVE,       std::make_shared<Biome>(CAVE)},
 		};
 
 		return map;

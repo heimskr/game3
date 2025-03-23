@@ -188,7 +188,7 @@ namespace Game3 {
 
 	void Village::tick(const TickArgs &args) {
 		const GamePtr &game = args.game;
-		BiomeType biome = Biome::VOID;
+		BiomeType biome = Biome::VOID_REALM;
 		if (std::optional<BiomeType> found_biome = game->getRealm(realmID)->tileProvider.copyBiomeType(position))
 			biome = *found_biome;
 

@@ -38,7 +38,6 @@
 #include "item/LampItem.h"
 #include "item/Landfill.h"
 #include "item/LiquefierItem.h"
-#include "item/Mead.h"
 #include "item/MeleeWeapon.h"
 #include "item/MicroscopeItem.h"
 #include "item/Mutagen.h"
@@ -122,7 +121,7 @@ namespace Game3 {
 
 		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 
-		add(std::make_shared<Drink<"base:fluid/milk", 12>>("base:item/milk_flask", "Milk", 4, 64));
+		add(std::make_shared<Milk>("base:item/milk_flask", "Milk", 4, 64));
 
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
 

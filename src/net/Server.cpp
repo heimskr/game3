@@ -43,7 +43,7 @@ namespace Game3 {
 			throw std::invalid_argument("Cannot instantiate a Server with a thread count of zero");
 		}
 
-		sslContext.use_certificate_chain_file(certificate_path);
+		sslContext.use_certificate_chain_file(certificate_path.string());
 		sslContext.use_private_key_file(key_path.string(), asio::ssl::context::pem);
 	}
 

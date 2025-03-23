@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef __MINGW32__
+
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -81,3 +83,12 @@ namespace Game3 {
 		}
 	}
 }
+
+#else
+
+namespace Game3 {
+	template <typename Map>
+	void printHistogram(const Map &, double = 1.0) {}
+}
+
+#endif

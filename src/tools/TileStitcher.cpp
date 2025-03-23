@@ -45,7 +45,7 @@ namespace Game3 {
 			}
 
 			JSON::value json = JSON::parse(readFile(dir / "tile.json"));
-			std::string name = dir.filename();
+			std::string name = dir.filename().string();
 
 			Identifier tilename = JSON::value_to<Identifier>(json.at("tilename"));
 
@@ -113,7 +113,7 @@ namespace Game3 {
 		for (const auto &[name, json]: json_map) {
 			std::filesystem::path png_path = base_dir / name / "tile.png";
 			int width{}, height{}, channels{};
-			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
+			images.emplace(name, stbi_load(png_path.string().c_str(), &width, &height, &channels, 4));
 
 			Identifier tilename = JSON::value_to<Identifier>(json.at("tilename"));
 

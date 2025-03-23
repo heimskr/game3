@@ -889,12 +889,16 @@ namespace Game3 {
 				type.insert(0, "-T");
 				const char *typearg = type.c_str();
 
+#ifdef __MINGW32__
+				WARN("You don't get nice graphs on Windows. Get yourself a real operating system.");
+#else
 				if (fork() == 0) {
 					if (4096 <= allEdges().size())
 						execlp("dot", "dot", typearg, path.c_str(), "-o", out_path.c_str(), nullptr);
 					else
 						execlp("sfdp", "sfdp", "-x", "-Goverlap=scale", typearg, path.c_str(), "-o", out_path.c_str(), nullptr);
 				}
+#endif
 			}
 
 			typename decltype(labelMap)::iterator begin() {

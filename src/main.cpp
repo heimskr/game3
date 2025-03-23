@@ -270,7 +270,7 @@ int main(int argc, char **argv) {
 			std::filesystem::path dir_path = "resources/items/" + id;
 
 			if (std::filesystem::exists(dir_path)) {
-				ERR("{} already exists.", dir_path.c_str());
+				ERR("{} already exists.", dir_path.string().c_str());
 				return 2;
 			}
 
@@ -283,7 +283,7 @@ int main(int argc, char **argv) {
 			serializeJSON(object, item_json);
 
 			std::filesystem::copy_file(image_path, dir_path / "item.png");
-			SUCCESS("Stored image {} in {} with ID base:item/{}.", image_path.c_str(), dir_path.c_str(), id);
+			SUCCESS("Stored image {} in {} with ID base:item/{}.", image_path.string().c_str(), dir_path.string().c_str(), id);
 			INFO("Items.cpp: add(std::make_shared<Item>(\"base:item/{}\", \"{}{}\", 999, 64)); // TODO: cost", id, char(std::toupper(id[0])), id.substr(1));
 			return 0;
 		}

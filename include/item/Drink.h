@@ -7,10 +7,8 @@
 #include "item/Food.h"
 #include "realm/Realm.h"
 
-#include "fixed_string.hpp"
-
 namespace Game3 {
-	template <fixstr::fixed_string ID, HitPoints HP = 0>
+	template <HitPoints HP = 0>
 	class Drink: public Food, public HasFluidType {
 		public:
 			using Food::Food;
@@ -40,10 +38,26 @@ namespace Game3 {
 				return false;
 			}
 
-			Identifier getFluidType() const override { return Identifier(ID); }
-
 			HitPoints getHealedPoints(const std::shared_ptr<Player> &) override {
 				return HP;
 			}
+	};
+
+	class Mead: public Drink<> {
+		public:
+			using Drink<>::Drink;
+
+			Identifier getFluidType() const override { return Identifier("base:fluid/mead"); }
+
+			HitPoints getHealedPoints(const std::shared_ptr<Player> &player) override {
+				return (player->getMaxHealth() - player->getHealth()) / 4;
+			}
+	};
+
+	class Milk: public Drink<12> {
+		public:
+			using Drink<12>::Drink;
+
+			Identifier getFluidType() const override { return Identifier("base:fluid/milk"); }
 	};
 }

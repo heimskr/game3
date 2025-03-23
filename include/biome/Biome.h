@@ -13,16 +13,15 @@ namespace Game3 {
 
 	class Biome {
 		public:
-#undef VOID // i hate you winnt.h
-			constexpr static BiomeType VOID      = 0;
-			constexpr static BiomeType GRASSLAND = 1;
-			constexpr static BiomeType VOLCANIC  = 2;
-			constexpr static BiomeType SNOWY     = 3;
-			constexpr static BiomeType DESERT    = 4;
-			constexpr static BiomeType CAVE      = 5;
-			constexpr static BiomeType GRIMSTONE = 6;
-			constexpr static BiomeType SHIP      = 7;
-			constexpr static BiomeType COUNT     = SHIP + 1;
+			constexpr static BiomeType VOID_REALM = 0;
+			constexpr static BiomeType GRASSLAND  = 1;
+			constexpr static BiomeType VOLCANIC   = 2;
+			constexpr static BiomeType SNOWY      = 3;
+			constexpr static BiomeType DESERT     = 4;
+			constexpr static BiomeType CAVE       = 5;
+			constexpr static BiomeType GRIMSTONE  = 6;
+			constexpr static BiomeType SHIP       = 7;
+			constexpr static BiomeType COUNT      = SHIP + 1;
 
 			BiomeType type;
 
