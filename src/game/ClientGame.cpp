@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "Options.h"
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
@@ -218,7 +218,7 @@ namespace Game3 {
 				getWindow()->error(warning.what());
 			} catch (const std::exception &err) {
 				Packet &packet_ref = *packet;
-				ERROR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
+				ERR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
 				throw;
 			}
 		}

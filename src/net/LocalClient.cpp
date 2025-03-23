@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "game/ClientGame.h"
 #include "lib/JSON.h"
 #include "net/Buffer.h"
@@ -239,7 +239,7 @@ namespace Game3 {
 			}
 
 			if (errc) {
-				ERROR("LocalClient write ({}): {} ({})", lastHostname, errc.message(), errc.value());
+				ERR("LocalClient write ({}): {} ({})", lastHostname, errc.message(), errc.value());
 			} else if (!empty) {
 				write();
 			}
@@ -312,7 +312,7 @@ namespace Game3 {
 			reading = true;
 			sslSock.async_read_some(asio::buffer(array), asio::bind_executor(strand, [this, shared](const asio::error_code &errc, std::size_t length) {
 				if (errc && errc.value() != 2) {
-					ERROR("LocalClient::doRead: {} ({})", errc.message(), errc.value());
+					ERR("LocalClient::doRead: {} ({})", errc.message(), errc.value());
 					close();
 					return;
 				}

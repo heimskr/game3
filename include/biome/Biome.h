@@ -13,6 +13,7 @@ namespace Game3 {
 
 	class Biome {
 		public:
+#undef VOID // i hate you winnt.h
 			constexpr static BiomeType VOID      = 0;
 			constexpr static BiomeType GRASSLAND = 1;
 			constexpr static BiomeType VOLCANIC  = 2;

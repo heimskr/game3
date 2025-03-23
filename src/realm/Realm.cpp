@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "algorithm/MarchingSquares.h"
 #include "biome/Biome.h"
 #include "entity/ClientPlayer.h"
@@ -984,7 +984,7 @@ namespace Game3 {
 			auto lock = entityInitializationQueue.sharedLock();
 			for (const auto &[to_init, position]: entityInitializationQueue.get()) {
 				if (to_init == entity) {
-					ERROR("{} {} inexplicably found in realm {}'s initialization queue", entity->getName(), entity->getGID(), id);
+					ERR("{} {} inexplicably found in realm {}'s initialization queue", entity->getName(), entity->getGID(), id);
 				}
 			}
 		}
@@ -993,7 +993,7 @@ namespace Game3 {
 			auto lock = entityAdditionQueue.sharedLock();
 			for (const auto &[to_add, position]: entityAdditionQueue.get()) {
 				if (to_add == entity) {
-					ERROR("{} {} inexplicably found in realm {}'s addition queue", entity->getName(), entity->getGID(), id);
+					ERR("{} {} inexplicably found in realm {}'s addition queue", entity->getName(), entity->getGID(), id);
 				}
 			}
 		}
@@ -1723,7 +1723,7 @@ namespace Game3 {
 					shared->reupload();
 					shared->reuploadPending = false;
 				} else {
-					ERROR("Expired in {}:{}", __FILE__, __LINE__);
+					ERR("Expired in {}:{}", __FILE__, __LINE__);
 				}
 			});
 		}

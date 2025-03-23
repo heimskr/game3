@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ZIP8
 
-#include "Log.h"
+#include "util/Log.h"
 #include "util/FS.h"
 #include "util/Util.h"
 #include "zip8.h"

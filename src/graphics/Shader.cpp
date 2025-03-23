@@ -1,9 +1,10 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/Color.h"
 #include "graphics/GL.h"
 #include "graphics/Shader.h"
 #include "types/Position.h"
 #include "types/Types.h"
+#include "util/Debug.h"
 #include "util/Util.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -32,12 +33,12 @@ namespace Game3 {
 				}
 
 				if (is_link) {
-					ERROR("Shader.cpp: error with handle {} (name = \"{}\", linking): {}", handle, name, info.data());
+					ERR("Shader.cpp: error with handle {} (name = \"{}\", linking): {}", handle, name, info.data());
 				} else {
-					ERROR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
+					ERR("Shader.cpp: error with handle {} (name = \"{}\"): {}", handle, name, info.data());
 				}
 
-				raise(SIGTRAP);
+				Break();
 			}
 		}
 	}

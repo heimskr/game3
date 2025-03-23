@@ -1,5 +1,5 @@
 #include "config.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "Options.h"
 #include "client/RichPresence.h"
 #include "client/ServerWrapper.h"
@@ -263,14 +263,14 @@ int main(int argc, char **argv) {
 			std::filesystem::path image_path = argv[4];
 
 			if (id.empty()) {
-				ERROR("ID is empty.");
+				ERR("ID is empty.");
 				return 1;
 			}
 
 			std::filesystem::path dir_path = "resources/items/" + id;
 
 			if (std::filesystem::exists(dir_path)) {
-				ERROR("{} already exists.", dir_path.c_str());
+				ERR("{} already exists.", dir_path.c_str());
 				return 2;
 			}
 
@@ -295,7 +295,7 @@ int main(int argc, char **argv) {
 	const std::filesystem::path old_path = std::filesystem::current_path();
 
 	if (!glfwInit()) {
-		ERROR("Can't initialize GLFW");
+		ERR("Can't initialize GLFW");
 		return 1;
 	}
 
@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
 	if (!glfw_window) {
 		const char *message = "???";
 		int code = glfwGetError(&message);
-		ERROR("Can't create GLFW window: {} ({})", message, code);
+		ERR("Can't create GLFW window: {} ({})", message, code);
 		glfwTerminate();
 		return 2;
 	}

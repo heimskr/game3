@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Log.h"
+#include "util/Log.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
 #include "threading/HasMutex.h"
@@ -409,7 +409,7 @@ namespace Game3 {
 				try {
 					return items.at(number);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"{}\" in registry {}", number, identifier);
+					ERR("Couldn't find \"{}\" in registry {}", number, identifier);
 					return {};
 				}
 			}
@@ -483,7 +483,7 @@ namespace Game3 {
 				try {
 					return items.at(name);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"{}\" in registry {}", name, identifier);
+					ERR("Couldn't find \"{}\" in registry {}", name, identifier);
 					return {};
 				}
 			}

@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
@@ -44,7 +44,7 @@ namespace Game3 {
 		}
 
 		sslContext.use_certificate_chain_file(certificate_path);
-		sslContext.use_private_key_file(key_path, asio::ssl::context::pem);
+		sslContext.use_private_key_file(key_path.string(), asio::ssl::context::pem);
 	}
 
 	Server::~Server() {
@@ -61,7 +61,7 @@ namespace Game3 {
 		INFO(3, "Accepting.");
 		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
 			if (errc) {
-				ERROR("Server accept: {}", errc.message());
+				ERR("Server accept: {}", errc.message());
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
 				auto client = std::make_shared<RemoteClient>(shared_from_this(), ip, ++lastID, std::move(socket));
@@ -230,9 +230,11 @@ namespace Game3 {
 
 		global_server = Server::create("::0", port, "private.crt", "private.key", secret, 2);
 
+#ifndef __MINGW32__
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 		}
+#endif
 
 		std::thread stop_thread([] {
 			std::unique_lock lock(stopMutex);

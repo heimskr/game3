@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "error/AuthenticationError.h"
 #include "game/ClientGame.h"
 #include "net/LocalClient.h"

@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "client/ServerWrapper.h"
 #include "game/ServerGame.h"
 #include "game/SimulationOptions.h"
@@ -17,8 +17,6 @@
 #include <fstream>
 #include <random>
 
-#include <sys/mman.h>
-
 // #define REDIRECT_LOGS
 
 #include "config.h"
@@ -30,6 +28,7 @@ namespace {
 	void setCurrentThreadName(const char *name) {
 #ifdef __APPLE__
 		pthread_setname_np(name);
+#elif defined(__MINGW32__)
 #else
 		pthread_setname_np(pthread_self(), name);
 #endif
@@ -76,8 +75,11 @@ namespace Game3 {
 		else
 			std::ofstream(".localsecret") << (secret = generateSecret(8));
 
-		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+#ifndef __MINGW32__
+		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
+		}
+#endif
 
 		logDataPipe.emplace();
 #ifdef REDIRECT_LOGS
@@ -290,7 +292,7 @@ namespace Game3 {
 		try {
 			generateCertPair(certificate_path, key_path);
 		} catch (const std::runtime_error &error) {
-			ERROR("Certificate generation failed: {}", error.what());
+			ERR("Certificate generation failed: {}", error.what());
 			return false;
 		}
 

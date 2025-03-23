@@ -1,5 +1,5 @@
 #include "config.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "game/Resource.h"
 #include "graphics/GL.h"
 #include "graphics/ItemSet.h"

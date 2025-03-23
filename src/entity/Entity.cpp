@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "algorithm/AStar.h"
 #include "data/Identifier.h"
 #include "entity/ClientPlayer.h"
@@ -366,9 +366,9 @@ namespace Game3 {
 			if (game->allAgents.contains(globalID)) {
 				if (auto locked = game->allAgents.at(globalID).lock()) {
 					auto &locked_ref = *locked;
-					ERROR("globalID[{}], allAgents<{}>, type[this={}, other={}], this={}, other={}", globalID, game->allAgents.size(), DEMANGLE(*this), DEMANGLE(locked_ref), reinterpret_cast<void *>(this), reinterpret_cast<void *>(locked.get()));
+					ERR("globalID[{}], allAgents<{}>, type[this={}, other={}], this={}, other={}", globalID, game->allAgents.size(), DEMANGLE(*this), DEMANGLE(locked_ref), reinterpret_cast<void *>(this), reinterpret_cast<void *>(locked.get()));
 				} else {
-					ERROR("globalID[{}], allAgents<{}>, type[this={}, other=expired]", globalID, game->allAgents.size(), DEMANGLE(*this));
+					ERR("globalID[{}], allAgents<{}>, type[this={}, other=expired]", globalID, game->allAgents.size(), DEMANGLE(*this));
 				}
 				assert(!game->allAgents.contains(globalID));
 			}

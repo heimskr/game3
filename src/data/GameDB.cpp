@@ -378,7 +378,7 @@ namespace Game3 {
 							tile_id = 0;
 						} else {
 							Identifier tilename = old_map.at(old_tile);
-							ERROR("Canceling tile migration; tile {} ({}) is missing from the new tileset. Create .force-migrate to force migration.", tilename, old_tile);
+							ERR("Canceling tile migration; tile {} ({}) is missing from the new tileset. Create .force-migrate to force migration.", tilename, old_tile);
 							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old_tile) + ')');
 						}
 					}
@@ -558,7 +558,7 @@ namespace Game3 {
 			return true;
 		}
 
-		ERROR("Couldn't read user: {}", query.getErrorMsg());
+		ERR("Couldn't read user: {}", query.getErrorMsg());
 
 		return false;
 	}

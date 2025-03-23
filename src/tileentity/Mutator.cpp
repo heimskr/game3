@@ -73,7 +73,7 @@ namespace Game3 {
 		try {
 			gene = Gene::fromJSON(*data_value);
 		} catch (const std::exception &err) {
-			ERROR("Gene decoding failed in Mutator::mutate: {}", err.what());
+			ERR("Gene decoding failed in Mutator::mutate: {}", err.what());
 		}
 		gene->mutate(strength);
 		gene->toJSON(*data_value);
@@ -105,7 +105,7 @@ namespace Game3 {
 		try {
 			return Gene::fromJSON(*value);
 		} catch (const std::exception &err) {
-			ERROR("Gene decoding failed in Mutator::getGene: {}", err.what());
+			ERR("Gene decoding failed in Mutator::getGene: {}", err.what());
 			return nullptr;
 		}
 	}

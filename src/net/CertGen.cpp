@@ -32,27 +32,27 @@ namespace Game3 {
 			throw std::runtime_error("Failed to sign certificate");
 		}
 
-		FILE *pkey_file = fopen(key_path.c_str(), "wb");
+		FILE *pkey_file = fopen(key_path.string().c_str(), "wb");
 
 		if (!pkey_file) {
-			throw std::runtime_error(std::format("Couldn't open {} for writing", key_path.c_str()));
+			throw std::runtime_error(std::format("Couldn't open {} for writing", key_path.string().c_str()));
 		}
 
 		if (!PEM_write_PrivateKey(pkey_file, pkey.get(), nullptr, nullptr, 0, nullptr, nullptr)) {
 			fclose(pkey_file);
-			throw std::runtime_error(std::format("Couldn't write private key to {}", key_path.c_str()));
+			throw std::runtime_error(std::format("Couldn't write private key to {}", key_path.string().c_str()));
 		}
 
 		fclose(pkey_file);
 
-		FILE *x509_file = fopen(certificate_path.c_str(), "wb");
+		FILE *x509_file = fopen(certificate_path.string().c_str(), "wb");
 		if (!x509_file) {
-			throw std::runtime_error(std::format("Couldn't open {} for writing", certificate_path.c_str()));
+			throw std::runtime_error(std::format("Couldn't open {} for writing", certificate_path.string().c_str()));
 		}
 
 		if (!PEM_write_X509(x509_file, x509.get())) {
 			fclose(x509_file);
-			throw std::runtime_error(std::format("Couldnt' write certificate to {}", certificate_path.c_str()));
+			throw std::runtime_error(std::format("Couldnt' write certificate to {}", certificate_path.string().c_str()));
 		}
 
 		fclose(x509_file);

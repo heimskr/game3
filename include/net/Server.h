@@ -12,7 +12,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <poll.h>
 #include <set>
 #include <shared_mutex>
 #include <string>

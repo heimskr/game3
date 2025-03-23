@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "biology/Gene.h"
 #include "fluid/Fluid.h"
 #include "game/ServerInventory.h"
@@ -200,10 +200,10 @@ namespace Game3 {
 	char popBuffer<char>(Buffer &buffer) {
 		std::span span = buffer.getSpan();
 		if (span.empty()) {
-			ERROR("Buffer size: {:L}", buffer.bytes.size());
-			ERROR("Skip: {:L}", buffer.skip);
-			ERROR("Span size: {:L}", span.size());
-			ERROR("Span size_bytes: {:L}", span.size_bytes());
+			ERR("Buffer size: {:L}", buffer.bytes.size());
+			ERR("Skip: {:L}", buffer.skip);
+			ERR("Span size: {:L}", span.size());
+			ERR("Span size_bytes: {:L}", span.size_bytes());
 			INFO("{}", hexString(buffer.bytes, true));
 			throw std::out_of_range("Buffer is empty");
 		}

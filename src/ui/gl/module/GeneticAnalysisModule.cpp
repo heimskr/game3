@@ -61,7 +61,7 @@ namespace Game3 {
 		try {
 			entity = ContainmentOrb::makeEntity(stack);
 		} catch (const std::exception &err) {
-			ERROR("Couldn't create entity from containment orb in GeneticAnalysisModule: {}", err.what());
+			ERR("Couldn't create entity from containment orb in GeneticAnalysisModule: {}", err.what());
 			return;
 		}
 

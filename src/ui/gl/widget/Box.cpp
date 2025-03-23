@@ -76,7 +76,7 @@ namespace Game3 {
 					child_height = pair.second;
 					to_add = vertical? child_height : child_width;
 					if (to_add < 0) {
-						// ERROR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
+						// ERR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
 						// assert(0 <= to_add);
 					}
 				}
@@ -106,7 +106,7 @@ namespace Game3 {
 			}
 
 			if (to_add < 0) {
-				ERROR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
+				ERR("[Box.cpp:{}] to_add for {} in {} is {}", __LINE__, child->describe(), describe(), to_add);
 				to_add = 0;
 				// assert(0 <= to_add);
 			}

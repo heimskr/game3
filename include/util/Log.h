@@ -20,7 +20,7 @@ namespace Game3 {
 	template <typename... Args>
 	void WARN(Args &&...) {}
 	template <typename... Args>
-	void ERROR(Args &&...) {}
+	void ERR(Args &&...) {}
 	template <typename... Args>
 	void SPAM(Args &&...) {}
 	template <typename... Args>
@@ -69,16 +69,16 @@ namespace Game3 {
 	}
 
 	template <typename... Args>
-	void ERROR(std::format_string<Args...> format, Args &&...args) {
+	void ERR(std::format_string<Args...> format, Args &&...args) {
 		DECLARE_STREAM;
 		std::print(stream, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_ERROR_MIDDLE);
 		std::println(stream, format, std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
-	void ERROR(int level, std::format_string<Args...> format, Args &&...args) {
+	void ERR(int level, std::format_string<Args...> format, Args &&...args) {
 		if (level <= Logger::level) {
-			ERROR(format, std::forward<Args>(args)...);
+			ERR(format, std::forward<Args>(args)...);
 		}
 	}
 

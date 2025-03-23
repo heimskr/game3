@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Entity.h"
 #include "game/ClientGame.h"
 #include "packet/EntitySetPathPacket.h"
@@ -10,13 +10,13 @@ namespace Game3 {
 	void EntitySetPathPacket::handle(const ClientGamePtr &game) {
 		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
-			ERROR("EntitySetPathPacket: can't find realm {}", realmID);
+			ERR("EntitySetPathPacket: can't find realm {}", realmID);
 			return;
 		}
 
 		EntityPtr entity = game->getAgent<Entity>(globalID);
 		if (!entity) {
-			ERROR("EntitySetPathPacket: can't find entity {}", globalID);
+			ERR("EntitySetPathPacket: can't find entity {}", globalID);
 			return;
 		}
 

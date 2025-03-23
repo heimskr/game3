@@ -1,6 +1,6 @@
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/TextRenderer.h"

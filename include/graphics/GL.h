@@ -554,7 +554,7 @@ namespace GL {
 				useInFB();
 				glReadBuffer(GL_COLOR_ATTACHMENT0);
 				glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.get());
-				const bool out = stbi_write_png(path.c_str(), width, height, 4, pixels.get(), width * 4);
+				const bool out = stbi_write_png(path.string().c_str(), width, height, 4, pixels.get(), width * 4);
 				fbo.undo();
 				return out;
 			}

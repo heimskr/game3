@@ -20,7 +20,7 @@ namespace Game3 {
 		auto factory = game->registry<EntityFactoryRegistry>().maybe(entityID);
 
 		if (!factory) {
-			ERROR("Couldn't spawn entity of type {}", entityID);
+			ERR("Couldn't spawn entity of type {}", entityID);
 			return true;
 		}
 

@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Animal.h"
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
@@ -453,7 +453,7 @@ namespace Game3 {
 					try {
 						data = boost::json::parse(join(std::span(words.begin() + 3, words.end()), " "));
 					} catch (const std::exception &err) {
-						ERROR("{}", err.what());
+						ERR("{}", err.what());
 						return {false, "Couldn't parse data as JSON."};
 					}
 				}

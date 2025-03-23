@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "container/Quadtree.h"
 #include "entity/ServerPlayer.h"
 #include "game/TileProvider.h"
@@ -206,7 +206,7 @@ namespace Game3 {
 			if (facing == expected)
 				SUCCESS("({}, {}) → {}", row, column, facing);
 			else
-				ERROR("({}, {}) → {}, expected {}", row, column, facing, expected);
+				ERR("({}, {}) → {}, expected {}", row, column, facing, expected);
 		};
 
 		check( 0,  0, Direction::Invalid);

@@ -175,7 +175,7 @@ namespace Game3 {
 			try {
 				Paster(std::string_view(tiles)).paste(place.realm, place.position);
 			} catch (const std::exception &err) {
-				ERROR("Couldn't paste: {}", err.what());
+				ERR("Couldn't paste: {}", err.what());
 			}
 			return true;
 		}

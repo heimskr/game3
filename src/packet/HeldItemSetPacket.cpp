@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Entity.h"
 #include "error/PlayerMissingError.h"
 #include "game/ClientGame.h"
@@ -8,13 +8,13 @@ namespace Game3 {
 	void HeldItemSetPacket::handle(const ClientGamePtr &game) {
 		RealmPtr realm = game->tryRealm(realmID);
 		if (!realm) {
-			ERROR("Couldn't find realm {} in HeldItemSetPacket handler", realmID);
+			ERR("Couldn't find realm {} in HeldItemSetPacket handler", realmID);
 			return;
 		}
 
 		EntityPtr entity = realm->getEntity(entityID);
 		if (!entity) {
-			ERROR("Couldn't find entity {} in realm {} in HeldItemSetPacket handler", entityID, realmID);
+			ERR("Couldn't find entity {} in realm {} in HeldItemSetPacket handler", entityID, realmID);
 			return;
 		}
 

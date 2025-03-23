@@ -302,7 +302,7 @@ namespace Game3 {
 			action(*this);
 		}
 
-		ERROR("Error: {}", message);
+		ERR("Error: {}", message);
 	}
 
 	Modifiers Window::getModifiers() const {
@@ -1096,7 +1096,7 @@ namespace Game3 {
 				seed = parseNumber<size_t>(trim(readFile(".seed")));
 				INFO("Using custom seed \e[1m{}\e[22m", seed);
 			} catch (const std::exception &err) {
-				ERROR("Failed to load seed from .seed: {}", err.what());
+				ERR("Failed to load seed from .seed: {}", err.what());
 			}
 		}
 

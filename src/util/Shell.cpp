@@ -1,7 +1,7 @@
 #ifdef _WIN32
 #warning "util/Shell is currently unimplemented for Windows."
 #else
-#include "Log.h"
+#include "util/Log.h"
 #include "util/PipeWrapper.h"
 #include "util/Shell.h"
 
@@ -48,7 +48,7 @@ namespace Game3 {
 			close(stderr_pipe[1]);
 
 			if (execvp(path.c_str(), cstrings.data()) == -1) {
-				ERROR("Path: {}", path.c_str());
+				ERR("Path: {}", path.c_str());
 				throw std::runtime_error("execvp failed: " + std::to_string(errno));
 			}
 
@@ -142,7 +142,7 @@ namespace Game3 {
 			close(stderr_pipe[1]);
 
 			if (execvp(path.c_str(), cstrings.data()) == -1) {
-				ERROR("Path: {}", path.c_str());
+				ERR("Path: {}", path.c_str());
 				throw std::runtime_error("execvp failed: " + std::to_string(errno));
 			}
 

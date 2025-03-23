@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
@@ -9,7 +9,7 @@ namespace Game3 {
 	void OpenModuleForAgentPacket::handle(const ClientGamePtr &game) {
 		AgentPtr agent = game->getAgent(agentGID);
 		if (!agent) {
-			ERROR("Couldn't find agent {} in OpenModuleForAgentPacket handler", agentGID);
+			ERR("Couldn't find agent {} in OpenModuleForAgentPacket handler", agentGID);
 			return;
 		}
 

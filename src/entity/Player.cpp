@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -64,7 +64,7 @@ namespace Game3 {
 		}
 
 		if (remaining != 0) {
-			ERROR("Player was still present in {} visible set{}!", remaining, remaining == 1? "" : "s");
+			ERR("Player was still present in {} visible set{}!", remaining, remaining == 1? "" : "s");
 		}
 
 		Entity::destroy();

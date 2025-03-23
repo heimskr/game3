@@ -1,7 +1,7 @@
 #include "config.h"
 
 #ifdef GAME3_ENABLE_SCRIPTING
-#include "Log.h"
+#include "util/Log.h"
 #include "game/Game.h"
 #include "lib/JSON.h"
 #include "net/Buffer.h"

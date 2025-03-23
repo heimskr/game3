@@ -25,3 +25,12 @@
 [submodule "subprojects/fixed_string"]
 	path = subprojects/fixed_string
 	url = https://github.com/unterumarmung/fixed_string.git
+[submodule "subprojects/FastNoise2"]
+	path = subprojects/FastNoise2
+	url = https://github.com/Auburn/FastNoise2.git
+[submodule "subprojects/glm"]
+	path = subprojects/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "subprojects/libnoise"]
+	path = subprojects/libnoise
+	url = https://github.com/qknight/libnoise.git

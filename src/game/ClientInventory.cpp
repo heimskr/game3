@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -117,7 +117,7 @@ namespace Game3 {
 					return;
 				}
 
-				ERROR("Expired in {}:{}", __FILE__, __LINE__);
+				ERR("Expired in {}:{}", __FILE__, __LINE__);
 			});
 		}
 	}

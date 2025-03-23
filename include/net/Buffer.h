@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Log.h"
+#include "util/Log.h"
 #include "types/Types.h"
 #include "util/Concepts.h"
 #include "util/Demangle.h"
@@ -171,11 +171,11 @@ namespace Game3 {
 				std::span span = getSpan().subspan(to_skip);
 
 				if (span.size_bytes() < sizeof(T)) {
-					ERROR("Buffer size: {:L}", bytes.size());
-					ERROR("Skip: {:L}", skip);
-					ERROR("Span size: {:L}", span.size());
-					ERROR("Span size_bytes: {:L}", span.size_bytes());
-					ERROR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
+					ERR("Buffer size: {:L}", bytes.size());
+					ERR("Skip: {:L}", skip);
+					ERR("Span size: {:L}", span.size());
+					ERR("Span size_bytes: {:L}", span.size_bytes());
+					ERR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
 					throw std::out_of_range("Buffer is too empty");
 				}
 
@@ -377,11 +377,11 @@ namespace Game3 {
 		std::span span = buffer.getSpan();
 
 		if (span.size_bytes() < sizeof(T)) {
-			ERROR("Buffer size: {:L}", buffer.bytes.size());
-			ERROR("Skip: {:L}", buffer.skip);
-			ERROR("Span size: {:L}", span.size());
-			ERROR("Span size_bytes: {:L}", span.size_bytes());
-			ERROR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
+			ERR("Buffer size: {:L}", buffer.bytes.size());
+			ERR("Skip: {:L}", buffer.skip);
+			ERR("Span size: {:L}", span.size());
+			ERR("Span size_bytes: {:L}", span.size_bytes());
+			ERR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
 			throw std::out_of_range("Buffer is too empty");
 		}
 

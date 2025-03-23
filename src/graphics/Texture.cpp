@@ -1,6 +1,6 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.full_source/texture.cpp
 #include "config.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
 #include "lib/JSON.h"
@@ -34,7 +34,7 @@ namespace Game3 {
 			return;
 		}
 
-		png::image<png::rgba_pixel> image(path.c_str());
+		png::image<png::rgba_pixel> image(path.string().c_str());
 		width = static_cast<int>(image.get_width());
 		height = static_cast<int>(image.get_height());
 		alpha = true;
@@ -118,7 +118,7 @@ namespace Game3 {
 		const std::size_t expected_byte_count = width * height * (alpha? 4 : 3);
 
 		if (pixels.size() != expected_byte_count) {
-			ERROR("width = {}, height = {}", width, height);
+			ERR("width = {}, height = {}", width, height);
 			throw std::runtime_error(std::format("Expected {} pixel bytes, got {}", expected_byte_count, pixels.size()));
 		}
 
@@ -140,7 +140,7 @@ namespace Game3 {
 	void Texture::dump(const std::filesystem::path &dump_path) {
 		assert(valid);
 		const int channels = alpha? 4 : 3;
-		stbi_write_png(dump_path.c_str(), width, height, channels, data.get(), width * channels);
+		stbi_write_png(dump_path.string().c_str(), width, height, channels, data.get(), width * channels);
 	}
 
 	void Texture::destroy() {

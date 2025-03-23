@@ -1,11 +1,12 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/GL.h"
+#include "util/Debug.h"
 
 namespace GL {
 	void checkGL(GLenum err, const char *file, int line) {
 		if (err) {
-			Game3::ERROR("\x1b[31mError at {}:{}: {}\x1b[39m", file, line, reinterpret_cast<const char *>(gluErrorString(err)));
-			raise(SIGTRAP);
+			Game3::ERR("\x1b[31mError at {}:{}: {}\x1b[39m", file, line, reinterpret_cast<const char *>(gluErrorString(err)));
+			Game3::Break();
 		}
 	}
 

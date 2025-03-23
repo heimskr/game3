@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "algorithm/Voronoi.h"
 #include "graphics/Tileset.h"
 #include "game/Game.h"

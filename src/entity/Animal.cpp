@@ -71,7 +71,7 @@ namespace Game3 {
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
 			SUCCESS("  In chunk.");
 		else
-			ERROR("  Not in chunk.");
+			ERR("  Not in chunk.");
 		INFO("  First wander: {}", firstWander);
 		INFO("  Attempting wander: {:s}", attemptingWander.load());
 		return true;

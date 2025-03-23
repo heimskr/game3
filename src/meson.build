@@ -4,10 +4,13 @@ if get_option('discord_rich_presence') == true
 	game3_sources += run_command('discord-grabber.sh', check: true).stdout().strip().split('\n')
 endif
 
+cmake = import('cmake')
+
 chemskr = subproject('chemskr')
 namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
+# fastnoise2 = cmake.subproject('FastNoise2')
 
 game3_deps = [
 	dependency('glibmm-2.68'),
@@ -16,12 +19,12 @@ game3_deps = [
 	dependency('freetype2'),
 	dependency('libzstd'),
 	dependency('gl'),
+	dependency('glfw3'),
 	dependency('asio'),
 	dependency('liblz4'),
-	dependency('glm'),
-	dependency('glfw3'),
 	dependency('boost', modules: ['json']),
-	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
+	# fastnoise2.dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
+	# dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
 	chemskr.get_variable('chemskr'),
@@ -65,6 +68,10 @@ if get_option('vcpkg_triplet') != ''
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
 elif build_machine.system() == 'linux'
 	link_args += '-lnoise'
+elif build_machine.system() == 'cygwin'
+	link_args += '../subprojects/FastNoise2/build/lib/libFastNoise.a'
+	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
+	inc_dirs += include_directories('..' / 'subprojects' / 'libnoise' / 'src')
 endif
 
 if build_machine.system() == 'darwin'

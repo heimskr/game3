@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"

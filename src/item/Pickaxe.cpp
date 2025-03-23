@@ -1,5 +1,5 @@
 #include "types/Direction.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "types/Position.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"

@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "entity/ServerPlayer.h"
 #include "game/ClientGame.h"
@@ -26,13 +26,13 @@ namespace Game3 {
 
 	void AgentMessagePacket::handle(const ClientGamePtr &game) {
 		if (!Agent::validateGID(globalID)) {
-			ERROR("Can't send message to player: invalid GID");
+			ERR("Can't send message to player: invalid GID");
 			return;
 		}
 
 		AgentPtr source = game->getAgent(globalID);
 		if (!source) {
-			ERROR("Can't send message to player: agent not found");
+			ERR("Can't send message to player: agent not found");
 			return;
 		}
 

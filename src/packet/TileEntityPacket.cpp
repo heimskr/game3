@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Entity.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
@@ -61,7 +61,7 @@ namespace Game3 {
 			tileEntity->decode(*game, storedBuffer);
 
 			if (weak_agent) {
-				ERROR("Found TileEntity {} in allAgents, even though getAgent<TileEntity> returned null!", globalID);
+				ERR("Found TileEntity {} in allAgents, even though getAgent<TileEntity> returned null!", globalID);
 				if (auto entity = std::dynamic_pointer_cast<Entity>(weak_agent->lock())) {
 					boost::json::value entity_json;
 					entity->toJSON(entity_json);
