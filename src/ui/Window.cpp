@@ -116,6 +116,11 @@ namespace Game3 {
 
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
 
+#ifdef __MINGW32__
+			xScale = 1;
+			yScale = 1;
+#endif
+
 			try {
 				settings = boost::json::value_to<ClientSettings>(boost::json::parse(readFile("settings.json")));
 			} catch (const std::ios_base::failure &) {}
