@@ -26,6 +26,7 @@
 #include "jc_voronoi.h"
 
 #include <GLFW/glfw3.h>
+#include <GL/glut.h>
 
 #include <cstdlib>
 #include <ctime>
@@ -319,6 +320,11 @@ int main(int argc, char **argv) {
 	glfwMaximizeWindow(glfw_window);
 	glfwMakeContextCurrent(glfw_window);
 	glfwSwapInterval(1);
+	
+	if (GLenum err = glewInit(); GLEW_OK != err) {
+		ERR("Error: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
+		return 1;
+	}
 
 	auto window = std::make_shared<Window>(*glfw_window);
 

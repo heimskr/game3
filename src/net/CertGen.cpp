@@ -25,7 +25,7 @@ namespace Game3 {
 
 		ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), 1);
 		X509_gmtime_adj(X509_get_notBefore(x509.get()), 0);
-		X509_gmtime_adj(X509_get_notAfter(x509.get()), 3153600000); // 100 years
+		X509_gmtime_adj(X509_get_notAfter(x509.get()), 315360000); // 10 years
 		X509_set_pubkey(x509.get(), pkey.get());
 
 		if (!X509_sign(x509.get(), pkey.get(), EVP_sha256())) {

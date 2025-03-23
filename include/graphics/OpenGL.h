@@ -7,8 +7,12 @@
 #define HIDE_CHECKGL
 #include <OpenGL/gl3.h>
 #include <OpenGL/glu.h>
-#else
+#elif defined(__MINGW32__)
 #include <GL/glew.h>
+#include <GL/wglext.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif

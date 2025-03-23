@@ -399,7 +399,7 @@ namespace Game3 {
 
 	void ClientGame::initialSetup(const std::filesystem::path &dir) {
 		Game::initialSetup(dir);
-		omniatlas.emplace("resources");
+		// omniatlas.emplace("resources");
 	}
 
 	void ClientGame::garbageCollect() {

@@ -19,6 +19,8 @@ game3_deps = [
 	dependency('freetype2'),
 	dependency('libzstd'),
 	dependency('gl'),
+	dependency('glew'),
+	dependency('freeglut'),
 	dependency('glfw3'),
 	dependency('asio'),
 	dependency('liblz4'),
@@ -68,9 +70,18 @@ if get_option('vcpkg_triplet') != ''
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
 elif build_machine.system() == 'linux'
 	link_args += '-lnoise'
-elif build_machine.system() == 'cygwin'
+elif build_machine.system() == 'windows'
+	link_args += '-L../subprojects/FastNoise2/build/lib'
 	link_args += '../subprojects/FastNoise2/build/lib/libFastNoise.a'
 	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
+	link_args += '-lws2_32'
+	link_args += '-lopengl32'
+	link_args += '-lwsock32'
+	link_args += '-lstdc++exp'
+	link_args += '-lcrypt32'
+	link_args += '-lgcc'
+	link_args += '-lglew32'
+	link_args += '-lglu32'
 	inc_dirs += include_directories('..' / 'subprojects' / 'libnoise' / 'src')
 endif
 

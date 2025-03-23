@@ -1371,6 +1371,7 @@ namespace Game3 {
 		return tickEnqueued(game->enqueue(getTickFunction()));
 	}
 
+#ifndef __MINGW32__
 	template <>
 	std::vector<Direction> Entity::copyPath<std::vector>() {
 		std::vector<Direction> out;
@@ -1379,6 +1380,7 @@ namespace Game3 {
 		out = {path.begin(), path.end()};
 		return out;
 	}
+#endif
 
 	void Entity::calculateVisibleEntities() {
 		if (getSide() != Side::Server)

@@ -342,12 +342,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemStack &, bool) {
+	std::string Buffer::getType<ItemStack>(const ItemStack &, bool) {
 		return {'\xe0'};
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemStackPtr &, bool) {
+	std::string Buffer::getType<ItemStackPtr>(const ItemStackPtr &, bool) {
 		return {'\xe0'};
 	}
 

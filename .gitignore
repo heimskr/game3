@@ -50,3 +50,6 @@ vgcore.*
 /old
 /.codechecker
 /go.sh
+/.vscode
+*.dll
+*.exe

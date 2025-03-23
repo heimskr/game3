@@ -11,6 +11,12 @@
 
 #include <iostream>
 
+#ifdef __MINGW32__
+const GLubyte * gluErrorString(GLenum) {
+	return reinterpret_cast<const GLubyte *>("???");
+}
+#endif
+
 namespace Game3 {
 	namespace {
 		void check(const std::string &name, int handle, bool is_link = false) {

@@ -250,6 +250,7 @@ namespace Game3 {
 		}
 	}
 
+#ifndef __MINGW32__
 	template <>
 	std::shared_ptr<Agent> Game::getAgent<Agent>(GlobalID gid) {
 		auto shared_lock = allAgents.sharedLock();
@@ -265,6 +266,7 @@ namespace Game3 {
 
 		return nullptr;
 	}
+#endif
 
 	void Game::associateWithRealm(const VillagePtr &village, RealmID realm_id) {
 		RealmPtr realm = getRealm(realm_id);

@@ -5,7 +5,11 @@
 namespace GL {
 	void checkGL(GLenum err, const char *file, int line) {
 		if (err) {
+#ifdef __MINGW32__
+			Game3::ERR("An OpenGL error occurred but you're on Windows so you don't get to know what it is.");
+#else
 			Game3::ERR("\x1b[31mError at {}:{}: {}\x1b[39m", file, line, reinterpret_cast<const char *>(gluErrorString(err)));
+#endif
 			Game3::Break();
 		}
 	}

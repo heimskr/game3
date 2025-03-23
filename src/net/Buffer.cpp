@@ -57,6 +57,7 @@ namespace Game3 {
 	template <> std::string Buffer::getType<double>  (const double   &, bool) { return {'\x0a'}; }
 	template <> std::string Buffer::getType<std::nullopt_t>(const std::nullopt_t &, bool in_container) { assert(!in_container); return {'\x0c'}; }
 
+#ifndef __MINGW32__
 	template <> Buffer & Buffer::appendType<bool>    (const bool     &, bool) { return *this += '\x01'; }
 	template <> Buffer & Buffer::appendType<uint8_t> (const uint8_t  &, bool) { return *this += '\x01'; }
 	template <> Buffer & Buffer::appendType<uint16_t>(const uint16_t &, bool) { return *this += '\x02'; }
@@ -70,6 +71,7 @@ namespace Game3 {
 	template <> Buffer & Buffer::appendType<float>   (const float    &, bool) { return *this += '\x09'; }
 	template <> Buffer & Buffer::appendType<double>  (const double   &, bool) { return *this += '\x0a'; }
 	template <> Buffer & Buffer::appendType<std::nullopt_t>(const std::nullopt_t &, bool in_container) { assert(!in_container); return *this += '\x0c'; }
+#endif
 
 	template <>
 	std::string Buffer::getType<std::string_view>(const std::string_view &string, bool in_container) {

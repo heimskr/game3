@@ -26,7 +26,7 @@ namespace Game3 {
 		close();
 		path = std::move(path_);
 		auto db_lock = database.uniqueLock();
-		database.getBase() = std::make_unique<SQLite::Database>(path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+		database.getBase() = std::make_unique<SQLite::Database>(path.string(), SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 
 		static_assert(LAYER_COUNT * sizeof(TileID) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 		static_assert(sizeof(BiomeType) * CHUNK_SIZE * CHUNK_SIZE < 65536);
