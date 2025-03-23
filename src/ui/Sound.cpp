@@ -93,8 +93,9 @@ namespace Game3 {
 		assert(pair);
 		auto &[decoder, data] = *pair;
 
-		if (auto result = ma_decoder_init_memory(data.data(), data.size(), &decoderConfig, &decoder); result != MA_SUCCESS)
+		if (auto result = ma_decoder_init_memory(data.data(), data.size(), &decoderConfig, &decoder); result != MA_SUCCESS) {
 			throw MiniAudio::AudioError("Failed to reinitialize decoder", result);
+		}
 
 		return decoder;
 	}

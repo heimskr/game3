@@ -1,5 +1,6 @@
 #include "config.h"
 #include "util/FS.h"
+#include "util/Log.h"
 
 #include <fstream>
 
@@ -18,7 +19,7 @@ namespace Game3 {
 
 		std::ifstream stream;
 		stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		stream.open(path);
+		stream.open(path, std::ios_base::in | std::ios_base::binary);
 		stream.exceptions(std::ifstream::goodbit);
 
 		if (!stream.is_open()) {
@@ -29,7 +30,12 @@ namespace Game3 {
 		std::string out;
 		out.reserve(stream.tellg());
 		stream.seekg(0, std::ios::beg);
-		out.assign(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
+		std::array<char, 4096> buffer;
+
+		std::streamsize bytes_read = 0;
+		while ((bytes_read = stream.readsome(buffer.data(), buffer.size())) > 0) {
+			out.append(buffer.data(), bytes_read);
+		}
 		stream.close();
 		return out;
 	}

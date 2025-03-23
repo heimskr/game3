@@ -27,7 +27,7 @@ namespace Game3 {
 	void SUCCESS(Args &&...) {}
 #else
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__MINGW32__)
 #define DECLARE_STREAM auto &stream = std::cerr
 #else
 #define DECLARE_STREAM std::osyncstream stream{std::cerr}
