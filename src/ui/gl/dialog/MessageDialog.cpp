@@ -21,42 +21,42 @@ namespace Game3 {
 	void MessageDialog::init() {
 		DraggableDialog::init();
 
-		vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 
-		buttonBox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 2, 0, Color{});
+		buttonBox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 		vbox->append(buttonBox);
 
-		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
+		auto spacer = std::make_shared<Label>(ui, selfScale);
 		spacer->setHorizontalExpand(true);
 		buttonBox->append(std::move(spacer));
 
 		if (buttonsType == ButtonsType::Cancel || buttonsType == ButtonsType::CancelOkay) {
-			auto cancel_button = std::make_shared<Button>(ui, UI_SCALE);
+			auto cancel_button = std::make_shared<Button>(ui, selfScale);
 			cancel_button->setText("Cancel");
 			cancel_button->setOnClick(makeSubmit(false));
 			buttonBox->append(std::move(cancel_button));
 		}
 
 		if (buttonsType == ButtonsType::Okay || buttonsType == ButtonsType::CancelOkay) {
-			auto okay_button = std::make_shared<Button>(ui, UI_SCALE);
+			auto okay_button = std::make_shared<Button>(ui, selfScale);
 			okay_button->setText("Okay");
 			okay_button->setOnClick(makeSubmit(true));
 			buttonBox->append(std::move(okay_button));
 		}
 
 		if (buttonsType == ButtonsType::No || buttonsType == ButtonsType::NoYes) {
-			auto no_button = std::make_shared<Icon>(ui, UI_SCALE);
+			auto no_button = std::make_shared<Icon>(ui, selfScale);
 			no_button->setIconTexture(cacheTexture("resources/gui/no.png"));
-			no_button->setFixedSize(8 * UI_SCALE, 8 * UI_SCALE);
+			no_button->setFixedSize(8 * selfScale, 8 * selfScale);
 			no_button->setOnClick(makeSubmit(false));
 			buttonBox->append(std::move(no_button));
 		}
 
 		if (buttonsType == ButtonsType::Yes || buttonsType == ButtonsType::NoYes) {
-			auto yes_button = std::make_shared<Icon>(ui, UI_SCALE);
+			auto yes_button = std::make_shared<Icon>(ui, selfScale);
 			yes_button->setIconTexture(cacheTexture("resources/gui/yes.png"));
-			yes_button->setFixedSize(8 * UI_SCALE, 8 * UI_SCALE);
+			yes_button->setFixedSize(8 * selfScale, 8 * selfScale);
 			yes_button->setOnClick(makeSubmit(true));
 			buttonBox->append(std::move(yes_button));
 		}
@@ -83,7 +83,7 @@ namespace Game3 {
 	std::shared_ptr<MessageDialog> MessageDialog::create(UIContext &ui, UString text, ButtonsType buttons_type) {
 		auto dialog = std::make_shared<MessageDialog>(ui, 750, 300, buttons_type);
 		dialog->init();
-		auto label = std::make_shared<Label>(ui, UI_SCALE);
+		auto label = std::make_shared<Label>(ui, 1);
 		label->setExpand(true, true);
 		label->setText(std::move(text));
 		dialog->setChild(std::move(label));

@@ -16,6 +16,8 @@ namespace Game3 {
 		x = anchor_rectangle.x + xOffset;
 		y = anchor_rectangle.y + yOffset;
 
+		const auto scale = getScale();
+
 		{
 			const float frame_scale = scale / 2;
 			auto saver = ui.scissorStack.pushAbsolute(Rectangle(x - 6 * frame_scale, y - 6 * frame_scale, lastWidth + 12 * frame_scale, lastHeight + 12 * frame_scale), renderers);

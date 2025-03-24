@@ -23,11 +23,11 @@ namespace Game3 {
 		Module(ui), fluidHaver(std::move(fluid_haver)), showHeader(show_header) {}
 
 	void FluidsModule::init() {
-		auto vbox = std::make_shared<Box>(ui, scale);
+		auto vbox = std::make_shared<Box>(ui, selfScale);
 		vbox->insertAtEnd(shared_from_this());
 
 		if (showHeader) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
 				label->setText(agent->getName());
 			else
@@ -37,7 +37,7 @@ namespace Game3 {
 
 		vbox->setHorizontalExpand(true);
 
-		grid = std::make_shared<Grid>(ui, scale);
+		grid = std::make_shared<Grid>(ui, selfScale);
 		grid->setHorizontalExpand(true);
 		grid->insertAtEnd(vbox);
 
@@ -62,11 +62,11 @@ namespace Game3 {
 	}
 
 	std::pair<std::shared_ptr<Label>, std::shared_ptr<ProgressBar>> FluidsModule::makePair(Color bar_interior) const {
-		auto bar = std::make_shared<ProgressBar>(ui, scale, bar_interior);
-		bar->setFixedHeight(12 * scale);
+		auto bar = std::make_shared<ProgressBar>(ui, selfScale, bar_interior);
+		bar->setFixedHeight(12 * selfScale);
 		bar->setHorizontalExpand(true);
 
-		auto label = std::make_shared<Label>(ui, scale);
+		auto label = std::make_shared<Label>(ui, selfScale);
 		label->setVerticalAlignment(Alignment::Center);
 
 		return std::make_pair(std::move(label), std::move(bar));

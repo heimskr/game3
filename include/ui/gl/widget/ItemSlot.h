@@ -15,8 +15,8 @@ namespace Game3 {
 		public:
 			sigc::signal<void(ItemSlot &self, const WidgetPtr &dragged)> onDrop;
 
-			ItemSlot(UIContext &, std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
-			ItemSlot(UIContext &, Slot, float size, float scale, bool active = false);
+			ItemSlot(UIContext &, std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float selfScale, bool active = false);
+			ItemSlot(UIContext &, Slot, float size, float selfScale, bool active = false);
 			ItemSlot(UIContext &, Slot = -1, bool active = false);
 
 			using Widget::render;

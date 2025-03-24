@@ -16,7 +16,7 @@ namespace Game3 {
 		GeneticAnalysisModule(ui) {}
 
 	void GeneticAnalysisModule::init() {
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 	}
 
@@ -81,7 +81,7 @@ namespace Game3 {
 		});
 
 		if (descriptions.empty()) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			label->setText("No genes found.");
 			label->insertAtEnd(vbox);
 			return;
@@ -155,7 +155,7 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::addLabel(const std::string &text) {
-		auto label = std::make_shared<Label>(ui, scale);
+		auto label = std::make_shared<Label>(ui, selfScale);
 		label->setText(text);
 		label->insertAtEnd(vbox);
 	}

@@ -58,13 +58,15 @@ namespace Game3 {
 			return;
 		}
 
+		const double scale = getScale();
+
 		renderers.singleSprite.drawOnScreen(display, RenderOptions{
 			.x = x,
 			.y = y,
 			.sizeX = -1,
 			.sizeY = -1,
-			.scaleX = static_cast<double>(UI_SCALE),
-			.scaleY = static_cast<double>(UI_SCALE),
+			.scaleX = scale,
+			.scaleY = scale,
 			.invertY = false,
 		});
 	}

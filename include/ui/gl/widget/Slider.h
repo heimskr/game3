@@ -16,7 +16,7 @@ namespace Game3 {
 		public:
 			sigc::signal<void(Slider &, double)> onValueUpdate;
 
-			Slider(UIContext &, float scale);
+			Slider(UIContext &, float selfScale = 1);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

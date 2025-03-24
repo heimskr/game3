@@ -44,10 +44,10 @@ namespace Game3 {
 				multiModule->init();
 				geneticAnalysisModule->init();
 
-				vbox = std::make_shared<Box>(ui, scale);
+				vbox = std::make_shared<Box>(ui, selfScale);
 				vbox->setHorizontalExpand(true);
 
-				header = std::make_shared<Label>(ui, scale);
+				header = std::make_shared<Label>(ui, selfScale);
 				header->setText(tileEntity->getName());
 				header->insertAtEnd(vbox);
 

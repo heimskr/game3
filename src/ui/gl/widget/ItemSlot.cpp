@@ -16,21 +16,23 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	ItemSlot::ItemSlot(UIContext &ui, InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
-		Widget(ui, scale),
+	ItemSlot::ItemSlot(UIContext &ui, InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float selfScale, bool active):
+		Widget(ui, selfScale),
 		inventory(std::move(inventory)),
 		stack(std::move(stack)),
 		slot(slot),
 		size(size),
 		active(active) {}
 
-	ItemSlot::ItemSlot(UIContext &ui, Slot slot, float size, float scale, bool active):
-		ItemSlot(ui, nullptr, nullptr, slot, size, scale, active) {}
+	ItemSlot::ItemSlot(UIContext &ui, Slot slot, float size, float selfScale, bool active):
+		ItemSlot(ui, nullptr, nullptr, slot, size, selfScale, active) {}
 
 	ItemSlot::ItemSlot(UIContext &ui, Slot slot, bool active):
 		ItemSlot(ui, slot, INNER_SLOT_SIZE, SLOT_SCALE, active) {}
 
 	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		const auto scale = getScale();
+
 		if (width < 0) {
 			width = size * scale;
 		}
@@ -146,7 +148,7 @@ namespace Game3 {
 	}
 
 	void ItemSlot::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
-		minimum = natural = size * scale;
+		minimum = natural = size * selfScale;
 	}
 
 	void ItemSlot::setStack(ItemStackPtr new_stack) {

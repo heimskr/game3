@@ -10,7 +10,7 @@
 namespace Game3 {
 	class Hotbar: public Widget {
 		public:
-			Hotbar(UIContext &, float scale);
+			Hotbar(UIContext &, float selfScale);
 
 			void init() final;
 			using Widget::render;

@@ -12,11 +12,11 @@ namespace {
 }
 
 namespace Game3 {
-	Scroller::Scroller(UIContext &ui, float scale, Color scrollbar_color):
-		Widget(ui, scale), scrollbarColor(scrollbar_color) {}
+	Scroller::Scroller(UIContext &ui, float selfScale, Color scrollbar_color):
+		Widget(ui, selfScale), scrollbarColor(scrollbar_color) {}
 
-	Scroller::Scroller(UIContext &ui, float scale):
-		Scroller(ui, scale, DEFAULT_SCROLLBAR_COLOR) {}
+	Scroller::Scroller(UIContext &ui, float selfScale):
+		Scroller(ui, selfScale, DEFAULT_SCROLLBAR_COLOR) {}
 
 	void Scroller::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		float dummy{};
@@ -210,7 +210,7 @@ namespace Game3 {
 	}
 
 	float Scroller::getBarThickness() const {
-		return 2 * scale;
+		return 2 * selfScale;
 	}
 
 	float Scroller::getVerticalOffset() const {

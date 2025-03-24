@@ -12,8 +12,8 @@ namespace {
 }
 
 namespace Game3 {
-	Slider::Slider(UIContext &ui, float scale):
-		Widget(ui, scale),
+	Slider::Slider(UIContext &ui, float selfScale):
+		Widget(ui, selfScale),
 		barColor(DEFAULT_BAR_COLOR),
 		handleColor(DEFAULT_HANDLE_COLOR) {}
 
@@ -177,10 +177,10 @@ namespace Game3 {
 	}
 
 	float Slider::getBarHeight() const {
-		return scale * 2;
+		return selfScale * 2;
 	}
 
 	float Slider::getHandleSize() const {
-		return scale * 4;
+		return selfScale * 4;
 	}
 }

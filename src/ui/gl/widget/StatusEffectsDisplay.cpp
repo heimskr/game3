@@ -13,7 +13,7 @@ namespace {
 
 namespace Game3 {
 	StatusEffectsDisplay::StatusEffectsDisplay(UIContext &ui):
-		Widget(ui, UI_SCALE) {}
+		Widget(ui, 1) {}
 
 	void StatusEffectsDisplay::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(renderers, x, y, width, height);
@@ -27,6 +27,8 @@ namespace Game3 {
 		if (!player) {
 			return;
 		}
+
+		const auto scale = getScale();
 
 		const float padding = DISPLAY_PADDING * scale;
 		const float subscale = scale * 0.75;

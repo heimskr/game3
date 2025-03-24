@@ -347,17 +347,17 @@ int main(int argc, char **argv) {
 		"resources/tileset/lava/tile.png",
 	};
 
-	TexturePtr stone = cacheTexture(choose(paths, std::random_device{}));
+	TexturePtr background = cacheTexture(choose(paths, std::random_device{}));
 
 	while (!glfwWindowShouldClose(glfw_window)) {
 		GL::clear(0, 0, 0);
 		if (!window->game) {
 			constexpr float strength = 0.3;
-			window->singleSpriteRenderer.drawOnScreen(stone, RenderOptions{
+			window->singleSpriteRenderer.drawOnScreen(background, RenderOptions{
 				.sizeX = static_cast<double>(window->getWidth()),
 				.sizeY = static_cast<double>(window->getHeight()),
-				.scaleX = 2 * UI_SCALE,
-				.scaleY = 2 * UI_SCALE,
+				.scaleX = 2 * window->uiContext.scale,
+				.scaleY = 2 * window->uiContext.scale,
 				.color{strength, strength, strength, 1},
 				.invertY = false,
 				.wrapMode = GL_REPEAT,

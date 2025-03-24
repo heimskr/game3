@@ -39,9 +39,9 @@ namespace {
 }
 
 namespace Game3 {
-	TextInput::TextInput(UIContext &ui, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		Widget(ui, scale),
-		HasFixedSize(-1, scale * TEXT_INPUT_HEIGHT_FACTOR),
+	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
+		Widget(ui, selfScale),
+		HasFixedSize(-1, selfScale * TEXT_INPUT_HEIGHT_FACTOR),
 		thickness(thickness),
 		borderColor(border_color),
 		interiorColor(interior_color),
@@ -49,14 +49,14 @@ namespace Game3 {
 		cursorColor(cursor_color),
 		focusedCursorColor(cursorColor.darken(3)) {}
 
-	TextInput::TextInput(UIContext &ui, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
-		TextInput(ui, scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
+		TextInput(ui, selfScale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
-	TextInput::TextInput(UIContext &ui, float scale, float thickness):
-		TextInput(ui, scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
+	TextInput::TextInput(UIContext &ui, float selfScale, float thickness):
+		TextInput(ui, selfScale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
-	TextInput::TextInput(UIContext &ui, float scale):
-		TextInput(ui, scale, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(UIContext &ui, float selfScale):
+		TextInput(ui, selfScale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (width < -1 || height < -1) {
@@ -85,6 +85,10 @@ namespace Game3 {
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
+
+		const auto scale = getScale();
+
+		INFO("selfScale({}) * ui.scale({}) = {}", selfScale, ui.scale, scale);
 
 		const float start = thickness * scale;
 		// TODO: check for negative sizes
@@ -211,7 +215,7 @@ namespace Game3 {
 	}
 
 	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
-		const float border = 2 * thickness * scale;
+		const float border = 2 * thickness * selfScale;
 
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth) {
@@ -402,11 +406,11 @@ namespace Game3 {
 	}
 
 	float TextInput::getTextScale() const {
-		return scale / 16;
+		return selfScale / 16;
 	}
 
 	float TextInput::getXPadding() const {
-		return thickness * scale;
+		return thickness * selfScale;
 	}
 
 	float TextInput::getBoundary() const {
@@ -414,7 +418,7 @@ namespace Game3 {
 	}
 
 	float TextInput::getCursorPosition() const {
-		return getXPadding() - xOffset * scale + cursorXOffset * getTextScale();
+		return getXPadding() - xOffset * selfScale + cursorXOffset * getTextScale();
 	}
 
 	void TextInput::adjustCursorOffset(float offset) {
@@ -437,9 +441,9 @@ namespace Game3 {
 		const float boundary = getBoundary();
 
 		if (visual > boundary) {
-			xOffset += (visual - boundary + getXPadding() * 2) / scale;
+			xOffset += (visual - boundary + getXPadding() * 2) / selfScale;
 		} else if (visual < getXPadding()) {
-			xOffset -= (getXPadding() - visual) / scale;
+			xOffset -= (getXPadding() - visual) / selfScale;
 		}
 
 		cursorFixQueued = false;
@@ -466,12 +470,12 @@ namespace Game3 {
 		if (relevant.empty())
 			return;
 
-		auto dropdown = std::make_shared<AutocompleteDropdown>(ui, scale);
+		auto dropdown = std::make_shared<AutocompleteDropdown>(ui, selfScale);
 		dropdown->init();
 		dropdown->setParent(std::dynamic_pointer_cast<Autocompleter>(shared_from_this()));
 		dropdown->setOrigin({lastRectangle.x, lastRectangle.y + lastRectangle.height});
 		dropdown->setSuggestions(std::move(relevant));
-		dropdown->setFixedSize(lastRectangle.width, scale * 50);
+		dropdown->setFixedSize(lastRectangle.width, selfScale * 50);
 		// dropdown->queueConstrainSize();
 		ui.setAutocompleteDropdown(std::move(dropdown));
 	}

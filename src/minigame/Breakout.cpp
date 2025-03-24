@@ -30,7 +30,7 @@ namespace Game3 {
 		rowCount(6) {}
 
 	Breakout::Breakout(UIContext &ui):
-		Breakout(ui, UI_SCALE) {}
+		Breakout(ui, 1) {}
 
 	void Breakout::tick(double delta) {
 		if (submitQueued) {

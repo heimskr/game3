@@ -211,7 +211,7 @@ namespace Game3 {
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
 		if (!omniDialog) {
-			omniDialog = make<OmniDialog>(uiContext, UI_SCALE);
+			omniDialog = make<OmniDialog>(uiContext);
 		}
 		return omniDialog;
 	}

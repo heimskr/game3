@@ -22,9 +22,13 @@
 
 namespace Game3 {
 	UIContext::UIContext(Window &window):
+		UIContext(window, UI_SCALE) {}
+
+	UIContext::UIContext(Window &window, float scale):
 		window(window),
+		scale(scale),
 		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE / window.xScale)),
-		tooltip(std::make_shared<Tooltip>(*this, UI_SCALE)) {
+		tooltip(std::make_shared<Tooltip>(*this, 1)) {
 			hotbar->setName("Hotbar");
 			hotbar->init();
 			tooltip->init();

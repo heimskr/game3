@@ -27,11 +27,11 @@ namespace {
 }
 
 namespace Game3 {
-	OmniDialog::OmniDialog(UIContext &ui, float scale):
+	OmniDialog::OmniDialog(UIContext &ui, float selfScale):
 		Dialog(ui) {
-			inventoryTab = std::make_shared<InventoryTab>(ui, scale);
-			craftingTab = std::make_shared<CraftingTab>(ui, scale);
-			settingsTab = std::make_shared<SettingsTab>(ui, scale);
+			inventoryTab = std::make_shared<InventoryTab>(ui, selfScale);
+			craftingTab = std::make_shared<CraftingTab>(ui, selfScale);
+			settingsTab = std::make_shared<SettingsTab>(ui, selfScale);
 			tabs = {inventoryTab, craftingTab, settingsTab};
 			activeTab = inventoryTab;
 			tabRectangles.resize(tabs.size());
@@ -49,6 +49,8 @@ namespace Game3 {
 		Rectangle rectangle = getPosition();
 		const Rectangle original_rectangle = rectangle;
 		RectangleRenderer &rectangler = renderers.rectangle;
+
+		const float scale = getScale();
 
 		{
 			auto saver = stack.pushRelative(rectangle, renderers);

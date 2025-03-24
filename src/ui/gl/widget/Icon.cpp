@@ -61,17 +61,17 @@ namespace Game3 {
 			if (fixedWidth >= 0) {
 				size = fixedWidth;
 			} else if (iconTexture) {
-				size = scale * iconTexture->width;
+				size = selfScale * iconTexture->width;
 			} else {
-				size = scale * 16;
+				size = selfScale * 16;
 			}
 		} else {
 			if (fixedHeight >= 0) {
 				size = fixedHeight;
 			} else if (iconTexture) {
-				size = scale * iconTexture->height;
+				size = selfScale * iconTexture->height;
 			} else {
-				size = scale * 16;
+				size = selfScale * 16;
 			}
 		}
 

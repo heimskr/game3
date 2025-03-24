@@ -29,14 +29,14 @@ namespace Game3 {
 
 		ClientGamePtr game = getGame();
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical);
 		vbox->insertAtEnd(shared_from_this());
 
-		header = std::make_shared<Label>(ui, scale);
+		header = std::make_shared<Label>(ui, selfScale);
 		header->setText(reactor->getName());
 		vbox->append(header);
 
-		formulaInput = std::make_shared<TextInput>(ui, scale);
+		formulaInput = std::make_shared<TextInput>(ui, selfScale);
 		formulaInput->setText(reactor->getEquation());
 		formulaInput->onSubmit.connect([this](TextInput &, const UString &equation) {
 			setEquation(equation);

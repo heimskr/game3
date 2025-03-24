@@ -32,7 +32,7 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		constexpr auto scale = UI_SCALE;
+		const auto scale = getScale();
 
 		titleRectangle = position + Rectangle(scale, scale, position.width - 9 * scale, 7 * scale);
 		bodyRectangle = position + Rectangle(scale, 9 * scale, position.width - 2 * scale, position.height - 10 * scale);
@@ -72,13 +72,14 @@ namespace Game3 {
 	}
 
 	Rectangle BaseDraggableDialog::getInnerRectangle() const {
+		const auto scale = getScale();
 		return getPosition() + Rectangle(2 * scale, 10 * scale, position.width - 4 * scale, position.height - 12 * scale);
 	}
 
 	void BaseDraggableDialog::init() {
-		closeButton = std::make_shared<Icon>(ui, UI_SCALE);
+		closeButton = std::make_shared<Icon>(ui, selfScale);
 		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
-		closeButton->setFixedSize(3.5 * UI_SCALE);
+		closeButton->setFixedSize(3.5 * selfScale);
 		closeButton->init();
 		closeButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button != LEFT_BUTTON)
@@ -133,7 +134,7 @@ namespace Game3 {
 	}
 
 	float DraggableDialog::getTitleScale() const {
-		return UI_SCALE / 16;
+		return getScale() / 16;
 	}
 
 	const UString & DraggableDialog::getTitle() const {

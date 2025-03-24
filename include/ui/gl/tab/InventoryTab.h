@@ -11,7 +11,7 @@ namespace Game3 {
 
 	class InventoryTab: public Tab {
 		public:
-			InventoryTab(UIContext &, float scale);
+			InventoryTab(UIContext &, float selfScale);
 
 			void init() final;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

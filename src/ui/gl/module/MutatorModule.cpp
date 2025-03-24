@@ -29,22 +29,22 @@ namespace Game3 {
 		fluidsModule->init();
 		geneInfoModule->init();
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 5, 0, Color{});
 		vbox->setHorizontalExpand(true);
 
-		header = std::make_shared<Label>(ui, scale);
+		header = std::make_shared<Label>(ui, selfScale);
 		header->setText(mutator->getName());
 		header->setHorizontalAlignment(Alignment::Center);
 		header->setHorizontalExpand(true);
 		header->insertAtEnd(vbox);
 
-		hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
+		hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal);
 
 		inventoryModule->insertAtEnd(hbox);
 
-		mutateButton = std::make_shared<Button>(ui, scale);
+		mutateButton = std::make_shared<Button>(ui, selfScale);
 		mutateButton->setText("Mutate");
-		mutateButton->setFixedHeight(10 * scale);
+		mutateButton->setFixedHeight(10 * selfScale);
 		mutateButton->setVerticalAlignment(Alignment::Center);
 		mutateButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button != LEFT_BUTTON)

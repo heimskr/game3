@@ -31,14 +31,14 @@ namespace Game3 {
 
 		ClientGamePtr game = getGame();
 
-		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+		auto vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical);
 		vbox->insertAtEnd(shared_from_this());
 
-		auto header = std::make_shared<Label>(ui, scale);
+		auto header = std::make_shared<Label>(ui, selfScale);
 		header->setText(autocrafter->getName());
 		header->insertAtEnd(vbox);
 
-		identifierInput = std::make_shared<TextInput>(ui, scale);
+		identifierInput = std::make_shared<TextInput>(ui, selfScale);
 		identifierInput->setText(autocrafter->getTarget().copyBase().str());
 		identifierInput->onSubmit.connect([this](TextInput &, const UString &text) {
 			setTarget(text.raw());

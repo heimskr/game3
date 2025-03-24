@@ -23,7 +23,7 @@ namespace Game3 {
 
 	class Widget: public std::enable_shared_from_this<Widget>, public HasExpand {
 		public:
-			Widget(UIContext &, float scale);
+			Widget(UIContext &, float selfScale);
 
 			Widget(const Widget &) = delete;
 			Widget(Widget &&) noexcept = delete;
@@ -83,7 +83,7 @@ namespace Game3 {
 
 		protected:
 			UIContext &ui;
-			float scale{};
+			float selfScale{};
 			std::optional<std::pair<int, int>> dragOrigin;
 			Rectangle lastRectangle{-1, -1, -1, -1};
 			WidgetPtr firstChild;

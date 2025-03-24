@@ -61,6 +61,8 @@ namespace Game3 {
 			}
 		}
 
+		const auto scale = getScale();
+
 		const float bar_width = shown_progress * (width - 2 * scale);
 		const float top_height = .6f * (height - 2 * scale);
 		const float bottom_height = .4f * (height - 2 * scale);
@@ -111,10 +113,10 @@ namespace Game3 {
 	}
 
 	float ProgressBar::getDefaultWidth() const {
-		return 30 * scale;
+		return 30 * selfScale;
 	}
 
 	float ProgressBar::getDefaultHeight() const {
-		return 10 * scale;
+		return 10 * selfScale;
 	}
 }

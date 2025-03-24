@@ -13,14 +13,14 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Hotbar::Hotbar(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+	Hotbar::Hotbar(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	void Hotbar::init() {
 		WidgetPtr self = shared_from_this();
 
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
+			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, selfScale, false));
 			slot_widget->onDrop.connect([this](ItemSlot &self, const WidgetPtr &widget) {
 				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(widget); dragged && dragged.get() != &self) {
 					ClientPlayerPtr player = ui.getPlayer();
@@ -30,8 +30,8 @@ namespace Game3 {
 			slot_widget->insertAtEnd(self);
 		}
 
-		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
-		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
+		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, selfScale / 2, false);
+		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, selfScale / 2, false);
 
 		heldLeft->insertAtEnd(self);
 		heldRight->insertAtEnd(self);
@@ -70,6 +70,7 @@ namespace Game3 {
 
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
+		const auto scale = getScale();
 		const float offset = SLOT_PADDING * scale / 3;
 		const float held_scale = heldLeft->getScale();
 		Widget::render(renderers, x, y, width + 2 * offset + INNER_SLOT_SIZE * held_scale + 2 * SLOT_PADDING * held_scale, height);
@@ -168,9 +169,9 @@ namespace Game3 {
 
 	void Hotbar::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
-			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
+			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * selfScale + HOTBAR_BORDER * 2;
 		} else {
-			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
+			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING) * selfScale + HOTBAR_BORDER * 2;
 		}
 	}
 

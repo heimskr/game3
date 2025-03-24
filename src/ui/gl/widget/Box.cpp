@@ -9,18 +9,18 @@ namespace {
 }
 
 namespace Game3 {
-	Box::Box(UIContext &ui, float scale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
-		ChildDependentExpandingWidget<Widget>(ui, scale),
+	Box::Box(UIContext &ui, float selfScale, Orientation orientation, float padding, float separator_thickness, Color separator_color):
+		ChildDependentExpandingWidget<Widget>(ui, selfScale),
 		orientation(orientation),
 		padding(padding),
 		separatorThickness(separator_thickness),
 		separatorColor(separator_color) {}
 
-	Box::Box(UIContext &ui, float scale, Orientation orientation, float padding):
-		Box(ui, scale, orientation, padding, padding == 0? 0 : DEFAULT_SEPARATOR_THICKNESS, padding == 0? Color{} : DEFAULT_SEPARATOR_COLOR) {}
+	Box::Box(UIContext &ui, float selfScale, Orientation orientation, float padding):
+		Box(ui, selfScale, orientation, padding, padding == 0? 0 : DEFAULT_SEPARATOR_THICKNESS, padding == 0? Color{} : DEFAULT_SEPARATOR_COLOR) {}
 
-	Box::Box(UIContext &ui, float scale, Orientation orientation):
-		Box(ui, scale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
+	Box::Box(UIContext &ui, float selfScale, Orientation orientation):
+		Box(ui, selfScale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
 
 	void Box::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (width < -1 || height < -1) {
@@ -37,9 +37,11 @@ namespace Game3 {
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 
+		const auto elfS = getScale();
+
 		const bool vertical = orientation == Orientation::Vertical;
-		const float separator_width = vertical? width : separatorThickness * scale;
-		const float separator_height = vertical? separatorThickness * scale : height;
+		const float separator_width = vertical? width : separatorThickness * elfS;
+		const float separator_height = vertical? separatorThickness * elfS : height;
 		float &coordinate = vertical? y : x;
 		float &size = vertical? height : width;
 
@@ -48,13 +50,13 @@ namespace Game3 {
 		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
 			if (child != firstChild) {
 				if (separatorThickness > 0) {
-					coordinate += padding * scale;
+					coordinate += padding * elfS;
 					rectangler(separatorColor, x, y, separator_width, separator_height);
-					coordinate += (padding + separatorThickness) * scale;
-					size -= (2 * padding + separatorThickness) * scale;
+					coordinate += (padding + separatorThickness) * elfS;
+					size -= (2 * padding + separatorThickness) * elfS;
 				} else {
-					coordinate += padding * scale;
-					size -= padding * scale;
+					coordinate += padding * elfS;
+					size -= padding * elfS;
 				}
 			}
 
@@ -132,7 +134,7 @@ namespace Game3 {
 		childMeasurements.resize(childCount, {-1, -1});
 
 		if (measure_orientation == orientation) {
-			minimum = natural = (childCount - 1) * scale * (0 < separatorThickness? 2 * padding + separatorThickness : padding);
+			minimum = natural = (childCount - 1) * selfScale * (0 < separatorThickness? 2 * padding + separatorThickness : padding);
 			const float original_minimum = minimum;
 
 			float accumulated_nonexpanding_natural = 0;

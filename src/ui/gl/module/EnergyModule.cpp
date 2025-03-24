@@ -14,11 +14,11 @@ namespace Game3 {
 		Module(ui), energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)), showHeader(show_header) {}
 
 	void EnergyModule::init() {
-		auto vbox = std::make_shared<Box>(ui, scale);
+		auto vbox = std::make_shared<Box>(ui, selfScale);
 		vbox->setSeparatorThickness(0);
 
 		if (showHeader) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			if (auto agent = std::dynamic_pointer_cast<Agent>(energyHaver))
 				label->setText(agent->getName());
 			else
@@ -26,16 +26,16 @@ namespace Game3 {
 			label->insertAtEnd(vbox);
 		}
 
-		auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal);
+		auto hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal);
 		hbox->setSeparatorThickness(0);
 
-		auto label = std::make_shared<Label>(ui, scale);
+		auto label = std::make_shared<Label>(ui, selfScale);
 		label->setText("Energy");
 		label->setVerticalAlignment(Alignment::Center);
 		label->insertAtEnd(hbox);
 
-		bar = std::make_shared<ProgressBar>(ui, scale);
-		bar->setFixedHeight(12 * scale);
+		bar = std::make_shared<ProgressBar>(ui, selfScale);
+		bar->setFixedHeight(12 * selfScale);
 		bar->setHorizontalExpand(true);
 		bar->insertAtEnd(hbox);
 

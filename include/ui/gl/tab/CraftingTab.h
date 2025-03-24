@@ -12,7 +12,7 @@ namespace Game3 {
 
 	class RecipeRow: public Box {
 		public:
-			RecipeRow(UIContext &, float scale, std::shared_ptr<CraftingRecipe>);
+			RecipeRow(UIContext &, float selfScale, std::shared_ptr<CraftingRecipe>);
 
 			void init() final;
 

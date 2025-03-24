@@ -22,7 +22,7 @@ namespace Game3 {
 	void MathGame::init() {
 		equationColor = MATH_GAME_FOREGROUND;
 
-		input = std::make_shared<TextInput>(ui, scale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND, MATH_GAME_FOREGROUND, MATH_GAME_FOREGROUND);
+		input = std::make_shared<TextInput>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND, MATH_GAME_FOREGROUND, MATH_GAME_FOREGROUND);
 		input->onSubmit.connect([this](TextInput &, const UString &text) {
 			if (!equation) {
 				return;
@@ -47,7 +47,7 @@ namespace Game3 {
 		});
 		input->insertAtEnd(shared_from_this());
 
-		bar = std::make_shared<ProgressBar>(ui, scale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND.darken(), MATH_GAME_BACKGROUND.darken(3));
+		bar = std::make_shared<ProgressBar>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND.darken(), MATH_GAME_BACKGROUND.darken(3));
 		bar->insertAtEnd(shared_from_this());
 
 		setSize(gameWidth, gameHeight);
@@ -120,6 +120,7 @@ namespace Game3 {
 
 	void MathGame::setSize(int width, int height) {
 		Minigame::setSize(width, height);
+		const float scale = getScale();
 		input->setFixedSize(width - 2 * scale, 10 * scale);
 		bar->setFixedSize(width - 2 * scale, 8 * scale);
 	}

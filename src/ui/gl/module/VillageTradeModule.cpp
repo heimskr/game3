@@ -24,27 +24,27 @@ namespace Game3 {
 	void VillageTradeModule::init() {
 		assert(village);
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 
-		villageName = std::make_shared<Label>(ui, scale);
+		villageName = std::make_shared<Label>(ui, selfScale);
 		villageName->setText(village->getName());
 		villageName->setHorizontalAlignment(Alignment::Center);
 		villageName->setHorizontalExpand(true);
 		vbox->append(villageName);
 
-		laborLabel = std::make_shared<Label>(ui, scale);
+		laborLabel = std::make_shared<Label>(ui, selfScale);
 		laborLabel->setHorizontalAlignment(Alignment::Center);
 		laborLabel->setHorizontalExpand(true);
 		vbox->append(laborLabel);
 
-		sellRow = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		sellRow = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 		sellRow->setExpand(true, false);
 
-		totalPriceLabel = std::make_shared<Label>(ui, scale);
-		unitPriceLabel = std::make_shared<Label>(ui, scale);
+		totalPriceLabel = std::make_shared<Label>(ui, selfScale);
+		unitPriceLabel = std::make_shared<Label>(ui, selfScale);
 
-		sellLabelBox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
+		sellLabelBox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 		sellLabelBox->setExpand(true, false);
 		sellLabelBox->append(totalPriceLabel);
 		sellLabelBox->append(unitPriceLabel);
@@ -62,15 +62,15 @@ namespace Game3 {
 			}
 		});
 
-		sellCount = std::make_shared<TextInput>(ui, scale);
+		sellCount = std::make_shared<TextInput>(ui, selfScale);
 		sellCount->setText("0");
-		sellCount->setFixedWidth(16 * scale);
+		sellCount->setFixedWidth(16 * selfScale);
 		sellCount->setVerticalAlignment(Alignment::Center);
 
-		sellButton = std::make_shared<Button>(ui, scale);
+		sellButton = std::make_shared<Button>(ui, selfScale);
 		sellButton->setText("Sell");
 		sellButton->setVerticalAlignment(Alignment::Center);
-		sellButton->setFixedHeight(10 * scale);
+		sellButton->setFixedHeight(10 * selfScale);
 		sellButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button == LEFT_BUTTON)
 				sell();
@@ -268,7 +268,7 @@ namespace Game3 {
 				iter->second->setAmount(amount);
 				iter->second->updateLabel();
 			} else if (1.0 <= amount) {
-				auto row = std::make_shared<VillageTradeRow>(ui, scale, game, village->getID(), *game->getItem(resource), amount);
+				auto row = std::make_shared<VillageTradeRow>(ui, selfScale, game, village->getID(), *game->getItem(resource), amount);
 				row->init();
 				vbox->append(row);
 				rows[resource] = std::move(row);
@@ -276,8 +276,8 @@ namespace Game3 {
 		}
 	}
 
-	VillageTradeRow::VillageTradeRow(UIContext &ui, float scale, const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
-		Box(ui, scale, Orientation::Horizontal, 2, 0, Color{}),
+	VillageTradeRow::VillageTradeRow(UIContext &ui, float selfScale, const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
+		Box(ui, selfScale, Orientation::Horizontal, 2, 0, Color{}),
 		weakGame(game),
 		villageID(village_id),
 		resource(item.identifier),
@@ -289,12 +289,12 @@ namespace Game3 {
 		assert(game);
 
 		itemSlot = std::make_shared<ItemSlot>(ui);
-		quantityLabel = std::make_shared<Label>(ui, scale);
-		transferAmount = std::make_shared<TextInput>(ui, scale);
-		buyButton = std::make_shared<Button>(ui, scale);
+		quantityLabel = std::make_shared<Label>(ui, selfScale);
+		transferAmount = std::make_shared<TextInput>(ui, selfScale);
+		buyButton = std::make_shared<Button>(ui, selfScale);
 
 		buyButton->setText("Buy");
-		buyButton->setFixedHeight(10 * scale);
+		buyButton->setFixedHeight(10 * selfScale);
 		buyButton->setVerticalAlignment(Alignment::Center);
 		itemSlot->setStack(ItemStack::create(game, resource, ItemCount(-1)));
 		updateLabel();
@@ -302,7 +302,7 @@ namespace Game3 {
 		quantityLabel->setFixedWidth(64);
 		quantityLabel->setVerticalAlignment(Alignment::Center);
 		transferAmount->setText("0");
-		transferAmount->setFixedWidth(16 * scale);
+		transferAmount->setFixedWidth(16 * selfScale);
 		transferAmount->setVerticalAlignment(Alignment::Center);
 
 		transferAmount->onChange.connect([this](TextInput &, const UString &) {

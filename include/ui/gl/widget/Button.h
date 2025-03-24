@@ -10,9 +10,9 @@
 namespace Game3 {
 	class Button: public Widget, public HasFixedSize, public HasAlignment {
 		public:
-			Button(UIContext &, float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			Button(UIContext &, float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			Button(UIContext &, float scale, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float selfScale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float selfScale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float selfScale = 1, TexturePtr texture = getDefaultTexture());
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

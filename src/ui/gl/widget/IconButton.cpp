@@ -6,14 +6,17 @@
 namespace Game3 {
 	void IconButton::setIconTexture(TexturePtr new_icon_texture) {
 		iconTexture = std::move(new_icon_texture);
-		if (iconTexture)
+		if (iconTexture) {
 			iconTexture->init();
+		}
 	}
 
 	void IconButton::renderLabel(const RendererContext &renderers, const Rectangle &rectangle) {
-		if (!iconTexture)
+		if (!iconTexture) {
 			return;
+		}
 
+		const auto scale = getScale();
 		const float width  = rectangle.width  - scale;
 		const float height = rectangle.height - scale;
 
@@ -29,10 +32,11 @@ namespace Game3 {
 	}
 
 	float IconButton::getWidth(const RendererContext &, float height) const {
-		if (!iconTexture)
+		if (!iconTexture) {
 			return -1;
+		}
 
-		height -= 2 * scale;
+		height -= 2 * selfScale;
 		return static_cast<float>(iconTexture->width) / static_cast<float>(iconTexture->height) * height;
 	}
 }

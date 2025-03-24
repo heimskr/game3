@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	Dialog::Dialog(UIContext &ui):
-		Widget(ui, UI_SCALE) {}
+		Widget(ui, 1) {}
 
 	SizeRequestMode Dialog::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;

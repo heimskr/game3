@@ -28,9 +28,11 @@ namespace Game3 {
 		public:
 			Window &window;
 			ScissorStack scissorStack;
+			float scale = 1;
 			bool renderingDraggedWidget = false;
 
 			UIContext(Window &);
+			UIContext(Window &, float scale);
 
 			void render(float mouse_x, float mouse_y);
 			std::shared_ptr<ClientGame> getGame() const;

@@ -16,13 +16,13 @@ namespace Game3 {
 		Dialog(ui) {}
 
 	void ConnectionDialog::init() {
-		auto vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
+		auto vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 
-		auto grid = std::make_shared<Grid>(ui, UI_SCALE);
+		auto grid = std::make_shared<Grid>(ui, selfScale);
 		grid->setRowSpacing(5);
 
 		auto make_label = [&](UString text) {
-			auto label = std::make_shared<Label>(ui, UI_SCALE, std::move(text));
+			auto label = std::make_shared<Label>(ui, selfScale, std::move(text));
 			label->setVerticalAlignment(Alignment::Center);
 			return label;
 		};
@@ -30,13 +30,13 @@ namespace Game3 {
 		grid->attach(make_label("Host"), 0, 0);
 		grid->attach(make_label("Port"), 1, 0);
 
-		hostInput = std::make_shared<TextInput>(ui, UI_SCALE);
+		hostInput = std::make_shared<TextInput>(ui, selfScale);
 		hostInput->setText(ui.window.settings.hostname);
 		hostInput->setHorizontalExpand(true);
 		hostInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
 		grid->attach(hostInput, 0, 1);
 
-		portInput = std::make_shared<IntegerInput>(ui, UI_SCALE);
+		portInput = std::make_shared<IntegerInput>(ui, selfScale);
 		portInput->setText(std::to_string(ui.window.settings.port));
 		portInput->setHorizontalExpand(true);
 		portInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
@@ -45,12 +45,12 @@ namespace Game3 {
 		vbox->append(std::move(grid));
 		vbox->insertAtEnd(shared_from_this());
 
-		auto hbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 2, 0, Color{});
+		auto hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 
-		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
+		auto spacer = std::make_shared<Label>(ui, selfScale);
 		spacer->setHorizontalExpand(true);
 
-		auto local_button = std::make_shared<Button>(ui, UI_SCALE);
+		auto local_button = std::make_shared<Button>(ui, selfScale);
 		local_button->setText("Local Play");
 		local_button->setOnClick([this](Widget &, int button, int, int) {
 			if (button != LEFT_BUTTON)
@@ -59,7 +59,7 @@ namespace Game3 {
 			return true;
 		});
 
-		auto connect_button = std::make_shared<Button>(ui, UI_SCALE);
+		auto connect_button = std::make_shared<Button>(ui, selfScale);
 		connect_button->setText("Connect");
 		connect_button->setOnClick([this](Widget &, int button, int, int) {
 			if (button != LEFT_BUTTON)
@@ -81,19 +81,20 @@ namespace Game3 {
 
 		{
 			Rectangle frame_position = position;
-			const int offset = 7 * scale;
+			const int offset = 7 * getScale();
 			frame_position.x -= offset;
 			frame_position.y -= offset;
 			frame_position.width += 2 * offset;
 			frame_position.height += 2 * offset;
 			auto saver = ui.scissorStack.pushAbsolute(frame_position, renderers);
-			ui.drawFrame(renderers, UI_SCALE, false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
+			ui.drawFrame(renderers, selfScale, false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
 		}
 
 		firstChild->render(renderers, getPosition());
 	}
 
 	Rectangle ConnectionDialog::getPosition() const {
+		// TODO: suspicious use of UI_SCALE
 		constexpr int width = 600 * UI_SCALE / 8;
 		constexpr int height = 284 * UI_SCALE / 8;
 		return Rectangle((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height);

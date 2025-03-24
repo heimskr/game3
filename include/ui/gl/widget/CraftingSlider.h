@@ -11,7 +11,7 @@ namespace Game3 {
 
 	class CraftingSlider: public Grid {
 		public:
-			CraftingSlider(UIContext &, float scale, std::shared_ptr<CraftingRecipe> recipe);
+			CraftingSlider(UIContext &, float selfScale, std::shared_ptr<CraftingRecipe> recipe);
 
 			void init() final;
 

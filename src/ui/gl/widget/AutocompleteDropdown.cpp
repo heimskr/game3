@@ -21,8 +21,8 @@ namespace Game3 {
 		AutocompleteDropdown(ui, scale, DEFAULT_EXTERIOR_COLOR, DEFAULT_INTERIOR_COLOR) {}
 
 	void AutocompleteDropdown::init() {
-		scroller = std::make_shared<Scroller>(ui, scale);
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+		scroller = std::make_shared<Scroller>(ui, selfScale);
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0, Color{});
 		scroller->setChild(vbox);
 		scroller->insertAtEnd(shared_from_this());
 	}
@@ -35,6 +35,8 @@ namespace Game3 {
 		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
+
+		const auto scale = getScale();
 
 		// Interior
 		rectangler.drawOnScreen(interiorColor, x + scale, y, width - 2 * scale, height - scale);
@@ -85,11 +87,12 @@ namespace Game3 {
 		suggestions = std::move(new_suggestions);
 		vbox->clearChildren();
 		for (const UString &suggestion: suggestions) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			label->setText(suggestion);
 			label->setOnClick([this, weak = std::weak_ptr(label)](Widget &, int button, int, int) {
-				if (auto label = weak.lock(); label && button == LEFT_BUTTON)
+				if (auto label = weak.lock(); label && button == LEFT_BUTTON) {
 					choose(label->getText());
+				}
 				return true;
 			});
 			label->insertAtEnd(vbox);
@@ -98,13 +101,15 @@ namespace Game3 {
 	}
 
 	void AutocompleteDropdown::constrainSize() {
-		if (!scroller)
+		if (!scroller) {
 			return;
+		}
 
 		WidgetPtr child = scroller->getFirstChild();
 
-		if (!child)
+		if (!child) {
 			return;
+		}
 
 		float minimum{}, natural{};
 		child->measure(ui.getRenderers(), Orientation::Vertical, fixedWidth, fixedHeight, minimum, natural);

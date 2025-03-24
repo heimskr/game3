@@ -8,8 +8,8 @@
 namespace Game3 {
 	class Scroller: public Widget {
 		public:
-			Scroller(UIContext &, float scale, Color scrollbar_color);
-			Scroller(UIContext &, float scale);
+			Scroller(UIContext &, float selfScale, Color scrollbar_color);
+			Scroller(UIContext &, float selfScale = 1);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

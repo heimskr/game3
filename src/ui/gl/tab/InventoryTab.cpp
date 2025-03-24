@@ -19,8 +19,8 @@ namespace {
 }
 
 namespace Game3 {
-	InventoryTab::InventoryTab(UIContext &ui, float scale):
-		Tab(ui, scale) {}
+	InventoryTab::InventoryTab(UIContext &ui, float selfScale):
+		Tab(ui, selfScale) {}
 
 	void InventoryTab::init() {
 		assert(!playerInventoryModule);
@@ -153,14 +153,14 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Scroller> InventoryTab::makePlayerScroller() {
-		auto scroller = make<Scroller>(ui, scale);
+		auto scroller = make<Scroller>(ui, selfScale);
 		scroller->setChild(playerInventoryModule);
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 
 	std::shared_ptr<Scroller> InventoryTab::makeModuleScroller() {
-		auto scroller = make<Scroller>(ui, scale);
+		auto scroller = make<Scroller>(ui, selfScale);
 		scroller->setChild(activeModule.copyBase());
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;

@@ -10,8 +10,8 @@
 #include <cassert>
 
 namespace Game3 {
-	Widget::Widget(UIContext &ui, float scale):
-		ui(ui), scale(scale) {}
+	Widget::Widget(UIContext &ui, float selfScale):
+		ui(ui), selfScale(selfScale) {}
 
 	void Widget::init() {}
 
@@ -129,7 +129,7 @@ namespace Game3 {
 	}
 
 	float Widget::getScale() const {
-		return scale;
+		return selfScale * ui.scale;
 	}
 
 	bool Widget::isDragging() const {

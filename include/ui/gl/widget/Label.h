@@ -9,7 +9,7 @@
 namespace Game3 {
 	class Label: public Widget, public HasAlignment, public HasFixedSize, public HasTooltipText {
 		public:
-			Label(UIContext &, float scale, UString text = {}, Color = {0, 0, 0, 1});
+			Label(UIContext &, float selfScale, UString text = {}, Color = {0, 0, 0, 1});
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) override;

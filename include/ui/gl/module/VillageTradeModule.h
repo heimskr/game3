@@ -13,7 +13,7 @@ namespace Game3 {
 
 	class VillageTradeRow: public Box {
 		public:
-			VillageTradeRow(UIContext &, float scale, const std::shared_ptr<ClientGame> &, VillageID, const Item &item, double amount_);
+			VillageTradeRow(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, VillageID, const Item &item, double amount_);
 
 			void init() final;
 			void setAmount(double);

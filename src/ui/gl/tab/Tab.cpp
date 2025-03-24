@@ -9,8 +9,8 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	Tab::Tab(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+	Tab::Tab(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	void Tab::renderIcon(const RendererContext &) {}
 
@@ -23,6 +23,8 @@ namespace Game3 {
 	}
 
 	void Tab::renderIconTexture(const RendererContext &renderers, const std::shared_ptr<Texture> &texture) {
+		const auto scale = getScale();
+
 		renderers.singleSprite.drawOnScreen(texture, RenderOptions{
 			.x = 5 * scale,
 			.y = 5 * scale,

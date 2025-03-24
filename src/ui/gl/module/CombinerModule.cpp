@@ -14,28 +14,31 @@ namespace Game3 {
 		CombinerModule(ui, game, safeDynamicCast<Combiner>(std::any_cast<AgentPtr>(argument))) {}
 
 	CombinerModule::CombinerModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Combiner> combiner):
-		Module(ui, game), combiner(std::move(combiner)) {}
+		Module(ui, game),
+		combiner(std::move(combiner)) {}
 
 	void CombinerModule::init() {
 		ClientGamePtr game = getGame();
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 5, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 
-		auto header = std::make_shared<Label>(ui, scale);
+		auto header = std::make_shared<Label>(ui, selfScale);
 		header->setText(combiner->getName());
 		header->setHorizontalAlignment(Alignment::Center);
 		vbox->append(header);
 
 		std::set<Identifier> item_names;
-		for (const auto &[id, recipe]: game->registry<CombinerRecipeRegistry>())
+		for (const auto &[id, recipe]: game->registry<CombinerRecipeRegistry>()) {
 			item_names.insert(id);
+		}
 
 		std::vector<UString> suggestions;
-		for (const Identifier &item_name: item_names)
+		for (const Identifier &item_name: item_names) {
 			suggestions.emplace_back(item_name.str());
+		}
 
-		textInput = std::make_shared<TextInput>(ui, scale);
+		textInput = std::make_shared<TextInput>(ui, selfScale);
 		textInput->setText(combiner->getTarget().copyBase().str());
 		textInput->setHorizontalExpand(true);
 		textInput->setSuggestions(std::move(suggestions));

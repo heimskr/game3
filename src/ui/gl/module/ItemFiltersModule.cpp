@@ -27,18 +27,18 @@ namespace Game3 {
 		Module(ui, game), place(place) {}
 
 	void ItemFiltersModule::init() {
-		vbox = make<Box>(ui, scale, Orientation::Vertical, 5, 0, Color{});
+		vbox = make<Box>(ui, selfScale, Orientation::Vertical, 5, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 		vbox->setName("ItemFiltersModule::vbox");
 
-		topHBox = make<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		topHBox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 		topHBox->setName("ItemFiltersModule::topHBox");
 		vbox->append(topHBox);
 
-		auto copy_button = make<Button>(ui, scale);
+		auto copy_button = make<Button>(ui, selfScale);
 		copy_button->setText("Copy");
 		copy_button->setAlignment(Alignment::Center);
-		copy_button->setFixedHeight(12 * scale);
+		copy_button->setFixedHeight(12 * selfScale);
 		copy_button->setOnClick([this](Widget &) {
 			copy();
 		});
@@ -52,26 +52,26 @@ namespace Game3 {
 			onDrop(widget);
 		});
 
-		auto paste_button = make<Button>(ui, scale);
+		auto paste_button = make<Button>(ui, selfScale);
 		paste_button->setText("Paste");
 		paste_button->setAlignment(Alignment::Center);
-		paste_button->setFixedHeight(12 * scale);
+		paste_button->setFixedHeight(12 * selfScale);
 		paste_button->setOnClick([this](Widget &) {
 			paste();
 		});
 		paste_button->insertAtEnd(topHBox);
 
-		secondHBox = make<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		secondHBox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 		secondHBox->setName("SecondHbox");
 		vbox->append(secondHBox);
 
-		whitelistCheckbox = make<Checkbox>(ui, scale);
-		whitelistCheckbox->setFixedSize(8 * scale);
+		whitelistCheckbox = make<Checkbox>(ui, selfScale);
+		whitelistCheckbox->setFixedSize(8 * selfScale);
 		whitelistCheckbox->insertAtEnd(secondHBox);
 		if (filter)
 			whitelistCheckbox->setChecked(filter->isAllowMode());
 
-		auto whitelist_label = make<Label>(ui, scale);
+		auto whitelist_label = make<Label>(ui, selfScale);
 		whitelist_label->setText("Whitelist");
 		whitelist_label->setHorizontalExpand(true);
 		whitelist_label->insertAtEnd(secondHBox);
@@ -81,13 +81,13 @@ namespace Game3 {
 			setWhitelist(whitelist);
 		});
 
-		strictCheckbox = make<Checkbox>(ui, scale);
-		strictCheckbox->setFixedSize(8 * scale);
+		strictCheckbox = make<Checkbox>(ui, selfScale);
+		strictCheckbox->setFixedSize(8 * selfScale);
 		strictCheckbox->insertAtEnd(secondHBox);
 		if (filter)
 			strictCheckbox->setChecked(filter->isStrict());
 
-		auto strict_label = make<Label>(ui, scale);
+		auto strict_label = make<Label>(ui, selfScale);
 		strict_label->setText("Strict");
 		strict_label->insertAtEnd(secondHBox);
 		strict_label->setOnClick([this](Widget &) {
@@ -245,7 +245,7 @@ namespace Game3 {
 	std::shared_ptr<Box> ItemFiltersModule::addHBox(const Identifier &id, const ItemFilter::Config &config) {
 		ClientGamePtr game = getGame();
 		ItemStackPtr stack = ItemStack::create(game, id, 1, config.data);
-		auto hbox = make<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 		auto image = makeImage(*stack);
 		auto label = makeLabel(*stack);
 		auto comparator = makeComparator(id, config);
@@ -266,20 +266,20 @@ namespace Game3 {
 
 	std::shared_ptr<Icon> ItemFiltersModule::makeImage(ItemStack &stack) {
 		ClientGamePtr game = getGame();
-		auto image = make<Icon>(ui, scale);
-		image->setFixedSize(8 * scale);
+		auto image = make<Icon>(ui, selfScale);
+		image->setFixedSize(8 * selfScale);
 		image->setIconTexture(stack.getTexture(*game));
 		return image;
 	}
 
 	std::shared_ptr<Label> ItemFiltersModule::makeLabel(const ItemStack &stack) {
-		auto label = make<Label>(ui, scale);
+		auto label = make<Label>(ui, selfScale);
 		label->setText(stack.getTooltip());
 		return label;
 	}
 
 	std::shared_ptr<Button> ItemFiltersModule::makeComparator(const Identifier &id, const ItemFilter::Config &config) {
-		auto button = make<Button>(ui, scale);
+		auto button = make<Button>(ui, selfScale);
 		button->setExpand(false, false);
 
 		if (config.comparator == ItemFilter::Comparator::Less) {
@@ -321,9 +321,9 @@ namespace Game3 {
 			return {};
 		}
 
-		auto threshold = make<TextInput>(ui, scale);
+		auto threshold = make<TextInput>(ui, selfScale);
 		threshold->setHorizontalExpand(true);
-		threshold->setFixedHeight(10 * scale);
+		threshold->setFixedHeight(10 * selfScale);
 		threshold->setText(std::to_string(config.count));
 		threshold->onChange.connect([this, id = id, config = config, threshold = threshold.get()](TextInput &, const UString &text) mutable {
 			setFilter();
@@ -348,7 +348,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Button> ItemFiltersModule::makeButton(const ItemStackPtr &stack) {
-		auto button = make<IconButton>(ui, scale);
+		auto button = make<IconButton>(ui, selfScale);
 		button->setIconTexture(cacheTexture("resources/gui/minus.png"));
 		button->setOnClick([this, stack = stack->copy()](Widget &) {
 			setFilter();

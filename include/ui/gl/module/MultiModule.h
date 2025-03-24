@@ -85,7 +85,7 @@ namespace Game3 {
 					}
 				}
 
-				box = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+				box = std::make_shared<Box>(ui, selfScale, Orientation::Vertical);
 				box->setHorizontalExpand(true);
 				box->insertAtEnd(shared_from_this());
 

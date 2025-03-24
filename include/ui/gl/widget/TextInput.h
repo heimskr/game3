@@ -23,10 +23,10 @@ namespace Game3 {
 			sigc::signal<void(TextInput &, const UString &)> onAcceptSuggestion;
 			std::function<bool(uint32_t, const UString::iterator &)> characterFilter;
 
-			TextInput(UIContext &, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
-			TextInput(UIContext &, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
-			TextInput(UIContext &, float scale, float thickness);
-			TextInput(UIContext &, float scale);
+			TextInput(UIContext &, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
+			TextInput(UIContext &, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
+			TextInput(UIContext &, float selfScale, float thickness);
+			TextInput(UIContext &, float selfScale = 1);
 
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			bool click(int button, int x, int y, Modifiers) final;

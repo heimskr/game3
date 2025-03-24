@@ -218,7 +218,7 @@ namespace Game3 {
 		rectangle.y += rectangle.height * (1.0 - 1.0 / shrinkage);
 		rectangle.height /= shrinkage;
 		Color color = fluid? fluid->color : Color{};
-		ProgressBar(ui, UI_SCALE, color, amount / capacity).render(renderers, rectangle);
+		ProgressBar(ui, 1, color, amount / capacity).render(renderers, rectangle);
 	}
 
 	bool FluidGun::fireGun(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {
