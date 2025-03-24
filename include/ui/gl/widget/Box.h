@@ -10,7 +10,7 @@ namespace Game3 {
 		public:
 			Box(UIContext &, float selfScale, Orientation, float padding, float separator_thickness, Color separator_color);
 			Box(UIContext &, float selfScale, Orientation, float padding);
-			Box(UIContext &, float selfScale = 1, Orientation = Orientation::Vertical);
+			Box(UIContext &, float selfScale, Orientation = Orientation::Vertical);
 
 			using ChildDependentExpandingWidget<Widget>::render;
 			void render(const RendererContext &, float x, float y, float width, float height) override;

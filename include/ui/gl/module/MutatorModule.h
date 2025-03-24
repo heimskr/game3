@@ -18,8 +18,8 @@ namespace Game3 {
 
 	class MutatorModule: public Module {
 		public:
-			MutatorModule(UIContext &, const ClientGamePtr &, const std::any &);
-			MutatorModule(UIContext &, const ClientGamePtr &, std::shared_ptr<Mutator>);
+			MutatorModule(UIContext &, float selfScale, const ClientGamePtr &, const std::any &);
+			MutatorModule(UIContext &, float selfScale, const ClientGamePtr &, std::shared_ptr<Mutator>);
 
 			static Identifier ID() { return {"base", "module/mutator"}; }
 

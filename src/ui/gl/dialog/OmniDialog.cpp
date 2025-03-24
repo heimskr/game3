@@ -28,7 +28,7 @@ namespace {
 
 namespace Game3 {
 	OmniDialog::OmniDialog(UIContext &ui, float selfScale):
-		Dialog(ui) {
+		Dialog(ui, selfScale) {
 			inventoryTab = std::make_shared<InventoryTab>(ui, selfScale);
 			craftingTab = std::make_shared<CraftingTab>(ui, selfScale);
 			settingsTab = std::make_shared<SettingsTab>(ui, selfScale);

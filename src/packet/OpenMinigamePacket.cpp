@@ -11,7 +11,7 @@ namespace Game3 {
 	void OpenMinigamePacket::handle(const std::shared_ptr<ClientGame> &game) {
 		game->getWindow()->queue([game, id = minigameID, width = gameWidth, height = gameHeight](Window &window) {
 			auto &registry = game->registry<MinigameFactoryRegistry>();
-			window.uiContext.emplaceDialog<MinigameDialog>((*registry.at(id))(game, {}), width, height);
+			window.uiContext.emplaceDialog<MinigameDialog>(1, (*registry.at(id))(game, {}), width, height);
 		});
 	}
 }

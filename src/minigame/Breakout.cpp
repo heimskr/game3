@@ -29,9 +29,6 @@ namespace Game3 {
 		paddleSpeed(8),
 		rowCount(6) {}
 
-	Breakout::Breakout(UIContext &ui):
-		Breakout(ui, 1) {}
-
 	void Breakout::tick(double delta) {
 		if (submitQueued) {
 			submitScore();

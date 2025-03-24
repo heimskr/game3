@@ -9,8 +9,8 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	TopDialog::TopDialog(UIContext &ui):
-		Dialog(ui) {}
+	TopDialog::TopDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {}
 
 	void TopDialog::init() {
 		hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 0);

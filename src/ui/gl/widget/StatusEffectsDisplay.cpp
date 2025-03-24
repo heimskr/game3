@@ -12,8 +12,8 @@ namespace {
 }
 
 namespace Game3 {
-	StatusEffectsDisplay::StatusEffectsDisplay(UIContext &ui):
-		Widget(ui, 1) {}
+	StatusEffectsDisplay::StatusEffectsDisplay(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	void StatusEffectsDisplay::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		Widget::render(renderers, x, y, width, height);

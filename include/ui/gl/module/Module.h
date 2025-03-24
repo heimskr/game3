@@ -15,10 +15,8 @@ namespace Game3 {
 
 	class Module: public ChildDependentExpandingWidget<Widget> {
 		public:
-			Module(UIContext &, std::weak_ptr<ClientGame>, float selfScale);
-			Module(UIContext &, std::weak_ptr<ClientGame>);
+			Module(UIContext &, float selfScale, std::weak_ptr<ClientGame>);
 			Module(UIContext &, float selfScale);
-			Module(UIContext &);
 
 			virtual ~Module() = default;
 

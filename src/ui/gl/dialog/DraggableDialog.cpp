@@ -24,8 +24,8 @@ namespace Game3 {
 		return content_height + 12 * scale;
 	}
 
-	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, int width, int height):
-		Dialog(ui),
+	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, float selfScale, int width, int height):
+		Dialog(ui, selfScale),
 		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height) {}
 
 	void BaseDraggableDialog::render(const RendererContext &renderers) {
@@ -134,7 +134,7 @@ namespace Game3 {
 	}
 
 	float DraggableDialog::getTitleScale() const {
-		return getScale() / 16;
+		return selfScale / 16;
 	}
 
 	const UString & DraggableDialog::getTitle() const {

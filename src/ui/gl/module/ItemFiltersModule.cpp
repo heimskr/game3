@@ -20,11 +20,11 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ItemFiltersModule::ItemFiltersModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const std::any &argument):
-		ItemFiltersModule(ui, game, std::any_cast<DirectedPlace>(argument)) {}
+	ItemFiltersModule::ItemFiltersModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &game, const std::any &argument):
+		ItemFiltersModule(ui, selfScale, game, std::any_cast<DirectedPlace>(argument)) {}
 
-	ItemFiltersModule::ItemFiltersModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const DirectedPlace &place):
-		Module(ui, game), place(place) {}
+	ItemFiltersModule::ItemFiltersModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &game, const DirectedPlace &place):
+		Module(ui, selfScale, game), place(place) {}
 
 	void ItemFiltersModule::init() {
 		vbox = make<Box>(ui, selfScale, Orientation::Vertical, 5, 0, Color{});

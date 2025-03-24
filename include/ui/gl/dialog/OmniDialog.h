@@ -21,7 +21,7 @@ namespace Game3 {
 			std::shared_ptr<Tab> settingsTab;
 			std::shared_ptr<Tab> activeTab;
 
-			OmniDialog(UIContext &, float selfScale = 1);
+			OmniDialog(UIContext &, float selfScale);
 
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;

@@ -5,9 +5,6 @@ namespace Game3 {
 	Minigame::Minigame(UIContext &ui, float selfScale):
 		Widget(ui, selfScale) {}
 
-	Minigame::Minigame(UIContext &ui):
-		Minigame(ui, 1) {}
-
 	void Minigame::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			minimum = natural = gameWidth;

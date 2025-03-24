@@ -10,7 +10,7 @@ namespace Game3 {
 
 	class ConnectionDialog: public Dialog {
 		public:
-			ConnectionDialog(UIContext &);
+			ConnectionDialog(UIContext &, float selfScale);
 
 			void init() final;
 			void render(const RendererContext &) final;

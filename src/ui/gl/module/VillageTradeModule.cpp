@@ -17,8 +17,8 @@
 #include <cassert>
 
 namespace Game3 {
-	VillageTradeModule::VillageTradeModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const std::any &argument):
-		Module(ui, game),
+	VillageTradeModule::VillageTradeModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &game, const std::any &argument):
+		Module(ui, selfScale, game),
 		village(std::any_cast<VillagePtr>(argument)) {}
 
 	void VillageTradeModule::init() {

@@ -11,7 +11,7 @@ namespace Game3 {
 
 	class ChatDialog: public Dialog {
 		public:
-			ChatDialog(UIContext &);
+			ChatDialog(UIContext &, float selfScale);
 
 			void init() override;
 			void render(const RendererContext &) override;

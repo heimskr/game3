@@ -7,8 +7,8 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Dialog::Dialog(UIContext &ui):
-		Widget(ui, 1) {}
+	Dialog::Dialog(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	SizeRequestMode Dialog::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;

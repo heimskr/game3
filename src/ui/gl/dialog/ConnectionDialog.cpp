@@ -12,8 +12,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ConnectionDialog::ConnectionDialog(UIContext &ui):
-		Dialog(ui) {}
+	ConnectionDialog::ConnectionDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {}
 
 	void ConnectionDialog::init() {
 		auto vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});

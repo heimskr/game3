@@ -22,8 +22,8 @@ namespace Game3 {
 
 	class ItemFiltersModule: public Module {
 		public:
-			ItemFiltersModule(UIContext &, const std::shared_ptr<ClientGame> &, const std::any &);
-			ItemFiltersModule(UIContext &, const std::shared_ptr<ClientGame> &, const DirectedPlace &);
+			ItemFiltersModule(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &);
+			ItemFiltersModule(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, const DirectedPlace &);
 
 			static Identifier ID() { return {"base", "module/item_filters"}; }
 

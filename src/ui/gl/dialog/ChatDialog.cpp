@@ -22,8 +22,8 @@ namespace Game3 {
 		constexpr int CHAT_TOGGLER_SIZE = 64; // TODO: make scalable
 	}
 
-	ChatDialog::ChatDialog(UIContext &ui):
-		Dialog(ui) {}
+	ChatDialog::ChatDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {}
 
 	void ChatDialog::init() {
 		scroller = std::make_shared<Scroller>(ui, selfScale, CHAT_SCROLLBAR_COLOR);

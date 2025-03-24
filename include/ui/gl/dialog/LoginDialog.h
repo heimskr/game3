@@ -15,7 +15,7 @@ namespace Game3 {
 		public:
 			sigc::signal<void(const UString &username, const UString &display_name)> signalSubmit;
 
-			LoginDialog(UIContext &);
+			LoginDialog(UIContext &, float selfScale);
 
 			void init() override;
 			void render(const RendererContext &) override;

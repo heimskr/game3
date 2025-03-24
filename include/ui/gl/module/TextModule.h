@@ -14,8 +14,8 @@ namespace Game3 {
 
 	class TextModule: public Module {
 		public:
-			TextModule(UIContext &, std::shared_ptr<ClientGame>, const std::any &);
-			TextModule(UIContext &, std::shared_ptr<ClientGame>, std::string);
+			TextModule(UIContext &, float selfScale, std::shared_ptr<ClientGame>, const std::any &);
+			TextModule(UIContext &, float selfScale, std::shared_ptr<ClientGame>, std::string);
 
 			static Identifier ID() { return {"base", "module/text"}; }
 

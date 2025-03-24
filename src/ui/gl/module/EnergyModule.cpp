@@ -7,11 +7,11 @@
 #include "ui/gl/widget/ProgressBar.h"
 
 namespace Game3 {
-	EnergyModule::EnergyModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument, bool show_header):
-		EnergyModule(ui, std::any_cast<AgentPtr>(argument), show_header) {}
+	EnergyModule::EnergyModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &argument, bool show_header):
+		EnergyModule(ui, selfScale, std::any_cast<AgentPtr>(argument), show_header) {}
 
-	EnergyModule::EnergyModule(UIContext &ui, const AgentPtr &agent, bool show_header):
-		Module(ui), energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)), showHeader(show_header) {}
+	EnergyModule::EnergyModule(UIContext &ui, float selfScale, const AgentPtr &agent, bool show_header):
+		Module(ui, selfScale), energyHaver(std::dynamic_pointer_cast<HasEnergy>(agent)), showHeader(show_header) {}
 
 	void EnergyModule::init() {
 		auto vbox = std::make_shared<Box>(ui, selfScale);
@@ -19,10 +19,11 @@ namespace Game3 {
 
 		if (showHeader) {
 			auto label = std::make_shared<Label>(ui, selfScale);
-			if (auto agent = std::dynamic_pointer_cast<Agent>(energyHaver))
+			if (auto agent = std::dynamic_pointer_cast<Agent>(energyHaver)) {
 				label->setText(agent->getName());
-			else
+			} else {
 				label->setText("???");
+			}
 			label->insertAtEnd(vbox);
 		}
 

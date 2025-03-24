@@ -12,7 +12,7 @@ namespace Game3 {
 
 	class Tab: public Widget {
 		public:
-			Tab(UIContext &, float scale);
+			Tab(UIContext &, float selfScale);
 
 			virtual void renderIcon(const RendererContext &);
 

@@ -17,7 +17,7 @@ namespace Game3 {
 			int width{};
 			int height{};
 
-			MinigameDialog(UIContext &ui, std::shared_ptr<Minigame> minigame, int width, int height);
+			MinigameDialog(UIContext &ui, float selfScale, std::shared_ptr<Minigame> minigame, int width, int height);
 			void init() override;
 			void render(const RendererContext &renderers) override;
 			void onClose() override;

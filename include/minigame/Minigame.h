@@ -15,7 +15,6 @@ namespace Game3 {
 			int gameHeight{};
 
 			Minigame(UIContext &, float scale);
-			Minigame(UIContext &);
 
 			virtual ~Minigame() = default;
 

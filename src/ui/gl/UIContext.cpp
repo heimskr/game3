@@ -47,7 +47,7 @@ namespace Game3 {
 				hotbar->render(context, (window.getWidth() - width) / 2, window.getHeight() - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
 			}
 
-			StatusEffectsDisplay(*this).render(context, internalScissorStack.getTop().rectangle);
+			StatusEffectsDisplay(*this, 1).render(context, internalScissorStack.getTop().rectangle);
 		}
 
 		for (const DialogPtr &dialog: dialogs) {
@@ -530,10 +530,10 @@ namespace Game3 {
 
 	std::shared_ptr<InventoryModule> UIContext::makePlayerInventoryModule() {
 		if (ClientPlayerPtr player = getPlayer()) {
-			return make<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+			return make<InventoryModule>(*this, 1, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
 		}
 
-		return make<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
+		return make<InventoryModule>(*this, 1, std::shared_ptr<ClientInventory>{});
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {

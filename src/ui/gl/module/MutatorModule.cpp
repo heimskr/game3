@@ -14,15 +14,15 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	MutatorModule::MutatorModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
-		MutatorModule(ui, game, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
+	MutatorModule::MutatorModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &argument):
+		MutatorModule(ui, selfScale, game, std::dynamic_pointer_cast<Mutator>(std::any_cast<AgentPtr>(argument))) {}
 
-	MutatorModule::MutatorModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Mutator> mutator):
-		Module(ui, game),
+	MutatorModule::MutatorModule(UIContext &ui, float selfScale, const ClientGamePtr &game, std::shared_ptr<Mutator> mutator):
+		Module(ui, selfScale, game),
 		mutator(std::move(mutator)),
-		inventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
-		fluidsModule(std::make_shared<FluidsModule>(ui, game, std::make_any<AgentPtr>(this->mutator), false)),
-		geneInfoModule(std::make_shared<GeneInfoModule>(ui, nullptr)) {}
+		inventoryModule(std::make_shared<InventoryModule>(ui, selfScale, std::static_pointer_cast<ClientInventory>(this->mutator->getInventory(0)))),
+		fluidsModule(std::make_shared<FluidsModule>(ui, selfScale, game, std::make_any<AgentPtr>(this->mutator), false)),
+		geneInfoModule(std::make_shared<GeneInfoModule>(ui, selfScale, nullptr)) {}
 
 	void MutatorModule::init() {
 		inventoryModule->init();

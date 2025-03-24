@@ -13,14 +13,14 @@
 #include <cassert>
 
 namespace Game3 {
-	FluidsModule::FluidsModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument, bool show_header):
-		FluidsModule(ui, std::any_cast<AgentPtr>(argument), show_header) {}
+	FluidsModule::FluidsModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &argument, bool show_header):
+		FluidsModule(ui, selfScale, std::any_cast<AgentPtr>(argument), show_header) {}
 
-	FluidsModule::FluidsModule(UIContext &ui, const AgentPtr &agent, bool show_header):
-		FluidsModule(ui, std::dynamic_pointer_cast<HasFluids>(agent), show_header) {}
+	FluidsModule::FluidsModule(UIContext &ui, float selfScale, const AgentPtr &agent, bool show_header):
+		FluidsModule(ui, selfScale, std::dynamic_pointer_cast<HasFluids>(agent), show_header) {}
 
-	FluidsModule::FluidsModule(UIContext &ui, std::shared_ptr<HasFluids> fluid_haver, bool show_header):
-		Module(ui), fluidHaver(std::move(fluid_haver)), showHeader(show_header) {}
+	FluidsModule::FluidsModule(UIContext &ui, float selfScale, std::shared_ptr<HasFluids> fluid_haver, bool show_header):
+		Module(ui, selfScale), fluidHaver(std::move(fluid_haver)), showHeader(show_header) {}
 
 	void FluidsModule::init() {
 		auto vbox = std::make_shared<Box>(ui, selfScale);

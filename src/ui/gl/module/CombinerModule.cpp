@@ -10,11 +10,11 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	CombinerModule::CombinerModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
-		CombinerModule(ui, game, safeDynamicCast<Combiner>(std::any_cast<AgentPtr>(argument))) {}
+	CombinerModule::CombinerModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &argument):
+		CombinerModule(ui, selfScale, game, safeDynamicCast<Combiner>(std::any_cast<AgentPtr>(argument))) {}
 
-	CombinerModule::CombinerModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Combiner> combiner):
-		Module(ui, game),
+	CombinerModule::CombinerModule(UIContext &ui, float selfScale, const ClientGamePtr &game, std::shared_ptr<Combiner> combiner):
+		Module(ui, selfScale, game),
 		combiner(std::move(combiner)) {}
 
 	void CombinerModule::init() {
@@ -50,7 +50,7 @@ namespace Game3 {
 		});
 		vbox->append(textInput);
 
-		multiModule = std::make_shared<MultiModule<Substance::Item, Substance::Energy>>(ui, game, std::static_pointer_cast<Agent>(combiner));
+		multiModule = std::make_shared<MultiModule<Substance::Item, Substance::Energy>>(ui, selfScale, game, std::static_pointer_cast<Agent>(combiner));
 		multiModule->init();
 		vbox->append(multiModule);
 	}

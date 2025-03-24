@@ -13,8 +13,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/combiner"}; }
 
-			CombinerModule(UIContext &, const ClientGamePtr &, const std::any &);
-			CombinerModule(UIContext &, const ClientGamePtr &, std::shared_ptr<Combiner>);
+			CombinerModule(UIContext &, float selfScale, const ClientGamePtr &, const std::any &);
+			CombinerModule(UIContext &, float selfScale, const ClientGamePtr &, std::shared_ptr<Combiner>);
 
 			Identifier getID() const final { return ID(); }
 			void init() final;

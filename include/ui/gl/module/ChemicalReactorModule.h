@@ -18,8 +18,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/chemical_reactor"}; }
 
-			ChemicalReactorModule(UIContext &, const ClientGamePtr &, const std::any &);
-			ChemicalReactorModule(UIContext &, const ClientGamePtr &, std::shared_ptr<ChemicalReactor>);
+			ChemicalReactorModule(UIContext &, float selfScale, const ClientGamePtr &, const std::any &);
+			ChemicalReactorModule(UIContext &, float selfScale, const ClientGamePtr &, std::shared_ptr<ChemicalReactor>);
 
 			Identifier getID() const final { return ID(); }
 			void init() final;

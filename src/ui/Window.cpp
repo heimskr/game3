@@ -211,21 +211,21 @@ namespace Game3 {
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
 		if (!omniDialog) {
-			omniDialog = make<OmniDialog>(uiContext);
+			omniDialog = make<OmniDialog>(uiContext, 1);
 		}
 		return omniDialog;
 	}
 
 	const std::shared_ptr<ChatDialog> & Window::getChatDialog() {
 		if (!chatDialog) {
-			chatDialog = make<ChatDialog>(uiContext);
+			chatDialog = make<ChatDialog>(uiContext, 1);
 		}
 		return chatDialog;
 	}
 
 	const std::shared_ptr<TopDialog> & Window::getTopDialog() {
 		if (!topDialog) {
-			topDialog = make<TopDialog>(uiContext);
+			topDialog = make<TopDialog>(uiContext, 1);
 		}
 		return topDialog;
 	}
@@ -276,7 +276,7 @@ namespace Game3 {
 
 		auto action = [message](Window &window) mutable {
 			window.activateContext();
-			window.uiContext.addDialog(MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None));
+			window.uiContext.addDialog(MessageDialog::create(window.uiContext, 1, std::move(message), ButtonsType::None));
 		};
 
 		if (do_queue) {
@@ -293,7 +293,7 @@ namespace Game3 {
 
 		auto action = [message, on_close = std::move(on_close)](Window &window) mutable {
 			window.activateContext();
-			auto dialog = MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None);
+			auto dialog = MessageDialog::create(window.uiContext, 1, std::move(message), ButtonsType::None);
 			dialog->setTitle("Error");
 			if (on_close) {
 				dialog->signalClose.connect(std::move(on_close));
@@ -349,12 +349,12 @@ namespace Game3 {
 
 	void Window::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
 		assert(inventory);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(uiContext, inventory));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(uiContext, 1, inventory));
 	}
 
 	void Window::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
 		assert(has_fluids);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(uiContext, has_fluids));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(uiContext, 1, has_fluids));
 	}
 
 	GlobalID Window::getExternalGID() const {
@@ -910,7 +910,7 @@ namespace Game3 {
 	void Window::goToTitle() {
 		omniDialog.reset();
 		uiContext.reset();
-		uiContext.emplaceDialog<ConnectionDialog>();
+		uiContext.emplaceDialog<ConnectionDialog>(1);
 	}
 
 	void Window::onGameLoaded() {
@@ -1137,7 +1137,7 @@ namespace Game3 {
 			if (LocalClientPtr client = weak.lock()) {
 				queue([this, client](Window &) {
 					activateContext();
-					auto dialog = make<LoginDialog>(uiContext);
+					auto dialog = make<LoginDialog>(uiContext, 1);
 
 					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
 						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
@@ -1194,7 +1194,7 @@ namespace Game3 {
 		}
 
 		activateContext();
-		auto dialog = make<LoginDialog>(uiContext);
+		auto dialog = make<LoginDialog>(uiContext, 1);
 
 		dialog->signalSubmit.connect([this, client, hostname](const UString &username, const UString &display_name) {
 			if (std::optional<Token> token = client->getToken(hostname, username.raw())) {

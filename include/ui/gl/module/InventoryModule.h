@@ -21,8 +21,8 @@ namespace Game3 {
 				InventoryID index;
 			};
 
-			InventoryModule(UIContext &, const std::shared_ptr<ClientGame> &, const std::any &);
-			InventoryModule(UIContext &, const std::shared_ptr<ClientInventory> &);
+			InventoryModule(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &);
+			InventoryModule(UIContext &, float selfScale, const std::shared_ptr<ClientInventory> &);
 
 			static Identifier ID() { return {"base", "module/inventory"}; }
 

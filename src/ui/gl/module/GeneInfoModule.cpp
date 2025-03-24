@@ -4,8 +4,8 @@
 #include "ui/gl/widget/Label.h"
 
 namespace Game3 {
-	GeneInfoModule::GeneInfoModule(UIContext &ui, GenePtr gene):
-		Module(ui), gene(std::move(gene)) {}
+	GeneInfoModule::GeneInfoModule(UIContext &ui, float selfScale, GenePtr gene):
+		Module(ui, selfScale), gene(std::move(gene)) {}
 
 	void GeneInfoModule::init() {
 		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0, Color{});

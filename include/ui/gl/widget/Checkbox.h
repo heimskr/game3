@@ -15,7 +15,7 @@ namespace Game3 {
 
 			Checkbox(UIContext &, float selfScale, Color top_color, Color bottom_color, Color check_color, Color interior_color);
 			Checkbox(UIContext &, float selfScale, Color primary_color, Color interior_color);
-			Checkbox(UIContext &, float selfScale = 1);
+			Checkbox(UIContext &, float selfScale);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

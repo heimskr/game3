@@ -40,7 +40,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/village_trade"}; }
 
-			VillageTradeModule(UIContext &, const std::shared_ptr<ClientGame> &, const std::any &);
+			VillageTradeModule(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &);
 
 			Identifier getID() const final { return ID(); }using Module::render;
 			void init() final;

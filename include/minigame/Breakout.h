@@ -13,7 +13,6 @@ namespace Game3 {
 			std::string getGameName() const final { return "Breakout"; }
 
 			Breakout(UIContext &, float scale);
-			Breakout(UIContext &);
 
 			void tick(double delta) final;
 			void render(const RendererContext &, float x, float y, float width, float height) final;

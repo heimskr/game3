@@ -16,8 +16,8 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/autocrafter"}; }
 
-			AutocrafterModule(UIContext &, const ClientGamePtr &, const std::any &);
-			AutocrafterModule(UIContext &, const ClientGamePtr &, std::shared_ptr<Autocrafter>);
+			AutocrafterModule(UIContext &, float selfScale, const ClientGamePtr &, const std::any &);
+			AutocrafterModule(UIContext &, float selfScale, const ClientGamePtr &, std::shared_ptr<Autocrafter>);
 
 			Identifier getID() const final { return ID(); }
 			void init() final;

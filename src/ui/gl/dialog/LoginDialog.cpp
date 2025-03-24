@@ -16,8 +16,8 @@ namespace Game3 {
 		constexpr int HEIGHT = 350;
 	}
 
-	LoginDialog::LoginDialog(UIContext &ui):
-		DraggableDialog(ui, WIDTH, HEIGHT) {
+	LoginDialog::LoginDialog(UIContext &ui, float selfScale):
+		DraggableDialog(ui, selfScale, WIDTH, HEIGHT) {
 			setTitle("Log In");
 		}
 

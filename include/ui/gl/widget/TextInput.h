@@ -26,7 +26,7 @@ namespace Game3 {
 			TextInput(UIContext &, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness);
 			TextInput(UIContext &, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color);
 			TextInput(UIContext &, float selfScale, float thickness);
-			TextInput(UIContext &, float selfScale = 1);
+			TextInput(UIContext &, float selfScale);
 
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			bool click(int button, int x, int y, Modifiers) final;

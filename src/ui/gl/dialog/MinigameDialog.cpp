@@ -6,8 +6,8 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	MinigameDialog::MinigameDialog(UIContext &ui, std::shared_ptr<Minigame> minigame, int width, int height):
-		DraggableDialog(ui, BaseDraggableDialog::getEffectiveWidth(width, 1), BaseDraggableDialog::getEffectiveHeight(height, 1)),
+	MinigameDialog::MinigameDialog(UIContext &ui, float selfScale, std::shared_ptr<Minigame> minigame, int width, int height):
+		DraggableDialog(ui, selfScale, BaseDraggableDialog::getEffectiveWidth(width, 1), BaseDraggableDialog::getEffectiveHeight(height, 1)),
 		width(width),
 		height(height),
 		minigame(std::move(minigame)) {

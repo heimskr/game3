@@ -34,11 +34,11 @@ namespace Game3 {
 		}
 	}
 
-	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument):
-		InventoryModule(ui, getInventoryArgument(argument)) {}
+	InventoryModule::InventoryModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &argument):
+		InventoryModule(ui, selfScale, getInventoryArgument(argument)) {}
 
-	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):
-		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
+	InventoryModule::InventoryModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientInventory> &inventory):
+		Module(ui, selfScale), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
 
 	void InventoryModule::init() {
 		assert(inventoryGetter);

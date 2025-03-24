@@ -18,7 +18,7 @@ namespace Game3 {
 
 			sigc::signal<void()> signalDismiss;
 
-			BaseDraggableDialog(UIContext &, int width, int height);
+			BaseDraggableDialog(UIContext &, float selfScale, int width, int height);
 
 			void render(const RendererContext &) override;
 			Rectangle getPosition() const override;

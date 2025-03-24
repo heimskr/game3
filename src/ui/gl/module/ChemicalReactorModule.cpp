@@ -18,11 +18,11 @@ namespace Game3 {
 		constexpr Color INVALID_FORMULA_TEXT_COLOR{"#ff0000"};
 	}
 
-	ChemicalReactorModule::ChemicalReactorModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
-		ChemicalReactorModule(ui, game, safeDynamicCast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {}
+	ChemicalReactorModule::ChemicalReactorModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &argument):
+		ChemicalReactorModule(ui, selfScale, game, safeDynamicCast<ChemicalReactor>(std::any_cast<AgentPtr>(argument))) {}
 
-	ChemicalReactorModule::ChemicalReactorModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<ChemicalReactor> reactor):
-		Module(ui, game), reactor(std::move(reactor)) {}
+	ChemicalReactorModule::ChemicalReactorModule(UIContext &ui, float selfScale, const ClientGamePtr &game, std::shared_ptr<ChemicalReactor> reactor):
+		Module(ui, selfScale, game), reactor(std::move(reactor)) {}
 
 	void ChemicalReactorModule::init() {
 		assert(reactor);
@@ -46,11 +46,11 @@ namespace Game3 {
 		});
 		vbox->append(formulaInput);
 
-		inventoryModule = std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(reactor->getInventory(0)));
+		inventoryModule = std::make_shared<InventoryModule>(ui, selfScale, std::static_pointer_cast<ClientInventory>(reactor->getInventory(0)));
 		inventoryModule->init();
 		vbox->append(inventoryModule);
 
-		energyModule = std::make_shared<EnergyModule>(ui, game, std::static_pointer_cast<Agent>(reactor), false);
+		energyModule = std::make_shared<EnergyModule>(ui, selfScale, game, std::static_pointer_cast<Agent>(reactor), false);
 		energyModule->init();
 		vbox->append(energyModule);
 	}

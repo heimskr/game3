@@ -12,8 +12,8 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	GeneticAnalysisModule::GeneticAnalysisModule(UIContext &ui, const ClientGamePtr &, const std::any &):
-		GeneticAnalysisModule(ui) {}
+	GeneticAnalysisModule::GeneticAnalysisModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &):
+		GeneticAnalysisModule(ui, selfScale, game) {}
 
 	void GeneticAnalysisModule::init() {
 		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0, Color{});

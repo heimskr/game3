@@ -59,10 +59,13 @@ namespace Game3 {
 		TextInput(ui, selfScale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		INFO("TextInput::render({}, {}, {}, {})", x, y, width, height);
 		if (width < -1 || height < -1) {
 			Widget::render(renderers, x, y, width, height);
 			return;
 		}
+
+		const auto scale = getScale();
 
 		const float original_height = height;
 
@@ -86,16 +89,12 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		const auto scale = getScale();
-
-		INFO("selfScale({}) * ui.scale({}) = {}", selfScale, ui.scale, scale);
-
-		const float start = thickness * scale;
+		const float start = thickness * selfScale;
 		// TODO: check for negative sizes
-		const Rectangle interior(x + start, y + start, width - 2 * start, height - 2 * start);
+		const Rectangle interior(x + start, y + start, width - 2 * start * scale, height - 2 * start * scale);
 
-		rectangler(borderColor, x, y, width, height * 0.6);
-		rectangler(borderColor.darken(), x, y + height * 0.6, width, height * 0.4);
+		rectangler(borderColor, x, y, width * scale, scale * height * 0.6);
+		rectangler(borderColor.darken(), x, y + height * 0.6, width * scale, scale * height * 0.4);
 		rectangler(interiorColor, interior);
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);

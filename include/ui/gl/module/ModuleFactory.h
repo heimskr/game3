@@ -25,7 +25,7 @@ namespace Game3 {
 			template <typename T>
 			static ModuleFactory create(const Identifier &id = T::ID()) {
 				return {id, [](const std::shared_ptr<ClientGame> &game, const std::any &argument) {
-					return std::make_shared<T>(getUIContext(*game), game, argument);
+					return std::make_shared<T>(getUIContext(*game), 1.f, game, argument);
 				}};
 			}
 	};

@@ -25,7 +25,7 @@ namespace Game3 {
 			template <typename T>
 			static MinigameFactory create(const Identifier &id = T::ID()) {
 				return {id, [](const std::shared_ptr<ClientGame> &game, const std::any &) {
-					auto out = std::make_shared<T>(getUIContext(*game));
+					auto out = std::make_shared<T>(getUIContext(*game), 1);
 					out->init();
 					return out;
 				}};

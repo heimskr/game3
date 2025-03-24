@@ -8,11 +8,11 @@
 #include "util/Defer.h"
 
 namespace Game3 {
-	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, const std::any &argument):
-		TextModule(ui, std::move(game), std::any_cast<std::string>(argument)) {}
+	TextModule::TextModule(UIContext &ui, float selfScale, std::shared_ptr<ClientGame> game, const std::any &argument):
+		TextModule(ui, selfScale, std::move(game), std::any_cast<std::string>(argument)) {}
 
-	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, std::string text):
-		Module(ui, game) {
+	TextModule::TextModule(UIContext &ui, float selfScale, std::shared_ptr<ClientGame> game, std::string text):
+		Module(ui, selfScale, game) {
 			setText(game->getUIContext(), std::move(text));
 		}
 

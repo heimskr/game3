@@ -2,17 +2,12 @@
 #include "ui/gl/Constants.h"
 
 namespace Game3 {
-	Module::Module(UIContext &ui, std::weak_ptr<ClientGame> weak_game, float selfScale):
-		ChildDependentExpandingWidget<Widget>(ui, selfScale), weakGame(std::move(weak_game)) {}
-
-	Module::Module(UIContext &ui, std::weak_ptr<ClientGame> weak_game):
-		Module(ui, std::move(weak_game), 1) {}
+	Module::Module(UIContext &ui, float selfScale, std::weak_ptr<ClientGame> weak_game):
+		ChildDependentExpandingWidget<Widget>(ui, selfScale),
+		weakGame(std::move(weak_game)) {}
 
 	Module::Module(UIContext &ui, float selfScale):
-		Module(ui, {}, selfScale) {}
-
-	Module::Module(UIContext &ui):
-		Module(ui, 1) {}
+		Module(ui, selfScale, {}) {}
 
 	void Module::reset() {}
 

@@ -10,8 +10,8 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	MessageDialog::MessageDialog(UIContext &ui, int width, int height, ButtonsType buttons_type):
-		DraggableDialog(ui, width, height), buttonsType(buttons_type) {}
+	MessageDialog::MessageDialog(UIContext &ui, float selfScale, int width, int height, ButtonsType buttons_type):
+		DraggableDialog(ui, selfScale, width, height), buttonsType(buttons_type) {}
 
 	void MessageDialog::render(const RendererContext &renderers) {
 		DraggableDialog::render(renderers);
@@ -80,8 +80,8 @@ namespace Game3 {
 		vbox->append(buttonBox);
 	}
 
-	std::shared_ptr<MessageDialog> MessageDialog::create(UIContext &ui, UString text, ButtonsType buttons_type) {
-		auto dialog = std::make_shared<MessageDialog>(ui, 750, 300, buttons_type);
+	std::shared_ptr<MessageDialog> MessageDialog::create(UIContext &ui, float selfScale, UString text, ButtonsType buttons_type) {
+		auto dialog = std::make_shared<MessageDialog>(ui, selfScale, 750, 300, buttons_type);
 		dialog->init();
 		auto label = std::make_shared<Label>(ui, 1);
 		label->setExpand(true, true);

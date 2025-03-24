@@ -25,7 +25,7 @@ namespace Game3 {
 
 	class Dialog: public Widget {
 		protected:
-			Dialog(UIContext &);
+			Dialog(UIContext &, float selfScale);
 
 		public:
 			sigc::signal<void()> signalClose;
