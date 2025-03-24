@@ -2,12 +2,17 @@
 #include "client/ClientSettings.h"
 #include "game/ClientGame.h"
 #include "lib/JSON.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "util/Timer.h"
 
 namespace Game3 {
-	void ClientSettings::apply(ClientGame &) const {
+	ClientSettings::ClientSettings():
+		uiScale(UI_SCALE) {}
+
+	void ClientSettings::apply(ClientGame &game) const {
 		glfwSwapInterval(capFPS? 1 : 0);
+		game.getWindow()->uiContext.scale = uiScale;
 		apply();
 	}
 
@@ -39,6 +44,7 @@ namespace Game3 {
 		get("showFPS", &ClientSettings::showFPS);
 		get("capFPS", &ClientSettings::capFPS);
 		get("specialEffects", &ClientSettings::specialEffects);
+		get("uiScale", &ClientSettings::uiScale);
 
 		return out;
 	}
@@ -59,5 +65,6 @@ namespace Game3 {
 		object["showFPS"] = settings.showFPS;
 		object["capFPS"] = settings.capFPS;
 		object["specialEffects"] = settings.specialEffects;
+		object["uiScale"] = settings.uiScale;
 	}
 }

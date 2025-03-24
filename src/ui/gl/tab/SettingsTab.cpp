@@ -187,6 +187,15 @@ namespace Game3 {
 			applySetting(&ClientSettings::mystery, value);
 		});
 
+		auto scale_slider = add_slider("UI Scale");
+		scale_slider->setRange(0.5, 16);
+		scale_slider->setStep(0.5);
+		scale_slider->setValue(settings.uiScale);
+		scale_slider->setDisplayDigits(1);
+		scale_slider->onRelease.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::uiScale, value);
+		});
+
 		auto level_slider = add_slider("Log Level");
 		level_slider->setRange(0, 3);
 		level_slider->setStep(1);

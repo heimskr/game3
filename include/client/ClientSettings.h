@@ -21,6 +21,7 @@ namespace Game3 {
 		std::size_t fpsSmoothing = 200;
 		Tick tickFrequency = DEFAULT_CLIENT_TICK_FREQUENCY;
 		double mystery = 1;
+		float uiScale = 1;
 		int logLevel = 1;
 		uint16_t port = 12255;
 		bool alertOnConnection = false;
@@ -29,6 +30,8 @@ namespace Game3 {
 		bool showFPS = true;
 		bool capFPS = true;
 		bool specialEffects = false;
+
+		ClientSettings();
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;

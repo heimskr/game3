@@ -18,7 +18,7 @@ namespace Game3 {
 		handleColor(DEFAULT_HANDLE_COLOR) {}
 
 	void Slider::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 
 		Widget::render(renderers, x, y, width, height);
 
@@ -78,6 +78,12 @@ namespace Game3 {
 		}
 
 		setValue(minimum + difference / lastRectangle.width * (maximum - minimum));
+		return true;
+	}
+
+	bool Slider::dragEnd(int x, int y) {
+		Widget::dragEnd(x, y);
+		onRelease(*this, value);
 		return true;
 	}
 
