@@ -26,7 +26,6 @@ namespace Game3 {
 	void Spacer::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
 			minimum = 0;
-			INFO("Spacer: for_width is {}", for_width);
 			natural = horizontalExpand && 0 < for_width? for_width : 1;
 		} else {
 			minimum = 0;

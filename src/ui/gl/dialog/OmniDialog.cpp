@@ -78,10 +78,12 @@ namespace Game3 {
 		auto saver = renderers.getSaver();
 
 		for (int i = 0; const std::shared_ptr<Tab> &tab: tabs) {
-			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i + 40;
-			const int y_offset = tab == activeTab? 2 * scale : 0;
+			constexpr int STRIDE = 22;
+			constexpr int WIDTH = 20;
+			const int x_offset = STRIDE * i * scale + 5 * scale;
+			const int y_offset = (tab == activeTab? 2 * scale : 0) - 16 * scale;
 
-			Rectangle tab_rectangle = original_rectangle + Rectangle(x_offset, UNSCALED * 5 / 4 - TOP_OFFSET + y_offset, TOP_OFFSET, TOP_OFFSET);
+			Rectangle tab_rectangle = original_rectangle + Rectangle(x_offset, y_offset, WIDTH * scale, WIDTH * scale);
 
 			{
 				auto saver = stack.pushRelative(tab_rectangle, renderers);
@@ -91,25 +93,30 @@ namespace Game3 {
 
 			if (tab == activeTab) {
 				auto saver = stack.pushRelative(original_rectangle, renderers);
-				rectangler.drawOnScreen(DEFAULT_BACKGROUND_COLOR, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * scale);
 
-				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_left.png", true), RenderOptions{
+				TexturePtr merge_left = cacheTexture("resources/gui/gui_merge_left.png", true);
+				const auto merge_width = merge_left->width * scale / 8;
+				const auto inner_width = WIDTH * scale - merge_width * 2 - scale / UNSCALE; // hmm
+
+				rectangler.drawOnScreen(DEFAULT_BACKGROUND_COLOR, x_offset + scale / UNSCALE + merge_width, 0, inner_width, 6 * scale);
+
+				renderers.singleSprite.drawOnScreen(merge_left, RenderOptions{
 					.x = double(x_offset + scale / UNSCALE),
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,
-					.scaleX = 1,
-					.scaleY = 1,
+					.scaleX = scale / 8,
+					.scaleY = scale / 8,
 					.invertY = false,
 				});
 
 				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_right.png", true), RenderOptions{
-					.x = double(x_offset - UNSCALED + TOP_OFFSET),
+					.x = double(x_offset + inner_width + merge_width),
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,
-					.scaleX = 1,
-					.scaleY = 1,
+					.scaleX = scale / 8,
+					.scaleY = scale / 8,
 					.invertY = false,
 				});
 			}
