@@ -18,6 +18,7 @@
 #include "packet/TileEntityPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
+#include "statuseffect/StatusEffectFactory.h"
 #include "threading/ThreadContext.h"
 #include "util/Cast.h"
 #include "util/Demangle.h"
@@ -928,6 +929,28 @@ namespace Game3 {
 				player->setHealth(player->getMaxHealth());
 				player->setStatusEffects({});
 				return {true, ""};
+			}
+
+			if (first == "status") {
+				if (words.size() != 2) {
+					return {false, "Incorrect parameter count."};
+				}
+
+				Identifier status_id;
+				std::string_view name = words[1];
+
+				if (name.contains(':')) {
+					status_id = name;
+				} else {
+					status_id = Identifier("base:statuseffect/" + std::string(name));
+				}
+
+				if (auto factory = registry<StatusEffectFactoryRegistry>().maybe(status_id)) {
+					player->inflictStatusEffect((*factory)(), true);
+					return {true, ""};
+				}
+
+				return {false, "No such status effect."};
 			}
 
 		} catch (const std::exception &err) {

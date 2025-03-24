@@ -91,6 +91,10 @@ namespace Game3 {
 			register_glyph(ch);
 		}
 
+		register_glyph(U'ǒ');
+		register_glyph(U'ī');
+		register_glyph(U'ó');
+
 		glGenVertexArrays(1, &vao); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL
 		glBindVertexArray(vao); CHECKGL

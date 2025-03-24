@@ -4,10 +4,10 @@
 
 namespace Game3 {
 	Burning::Burning():
-		Burning(0, 0) {}
+		Burning(6, 2) {}
 
 	Burning::Burning(float duration, float severity):
-		TimedStatusEffect(ID(), "base:item/fire", duration),
+		TimedStatusEffect(ID(), "base:item/huo", duration),
 		severity(severity) {}
 
 	std::string Burning::getName() const {

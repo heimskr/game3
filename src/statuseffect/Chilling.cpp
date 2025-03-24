@@ -8,7 +8,7 @@ namespace {
 
 namespace Game3 {
 	Chilling::Chilling():
-		Chilling(0) {}
+		Chilling(6) {}
 
 	Chilling::Chilling(float duration):
 		TimedStatusEffect(ID(), "base:item/bing", duration) {}
