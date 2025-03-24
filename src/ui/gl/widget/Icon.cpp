@@ -22,9 +22,6 @@ namespace Game3 {
 
 		Widget::render(renderers, x, y, width, height);
 
-		width *= ui.scale;
-		height *= ui.scale;
-
 		if (!iconTexture || shouldCull()) {
 			return;
 		}
@@ -62,19 +59,19 @@ namespace Game3 {
 
 		if (orientation == Orientation::Horizontal) {
 			if (fixedWidth >= 0) {
-				size = fixedWidth;
+				size = fixedWidth * ui.scale;
 			} else if (iconTexture) {
-				size = selfScale * iconTexture->width;
+				size = getScale() * iconTexture->width;
 			} else {
-				size = selfScale * 16;
+				size = getScale() * 16;
 			}
 		} else {
 			if (fixedHeight >= 0) {
-				size = fixedHeight;
+				size = fixedHeight * ui.scale;
 			} else if (iconTexture) {
-				size = selfScale * iconTexture->height;
+				size = getScale() * iconTexture->height;
 			} else {
-				size = selfScale * 16;
+				size = getScale() * 16;
 			}
 		}
 
