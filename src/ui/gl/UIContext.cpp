@@ -27,7 +27,7 @@ namespace Game3 {
 	UIContext::UIContext(Window &window, float scale):
 		window(window),
 		scale(scale),
-		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE / window.xScale)),
+		hotbar(std::make_shared<Hotbar>(*this, 0.75)),
 		tooltip(std::make_shared<Tooltip>(*this, 1)) {
 			hotbar->setName("Hotbar");
 			hotbar->init();
@@ -43,8 +43,12 @@ namespace Game3 {
 		if (ClientGamePtr game = getGame(); game != nullptr && game->getActiveRealm() != nullptr) {
 			if (std::ranges::none_of(dialogs, +[](const DialogPtr &dialog) { return dialog->hidesHotbar(); })) {
 				scissorStack = internalScissorStack;
-				constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-				hotbar->render(context, (window.getWidth() - width) / 2, window.getHeight() - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
+				float dummy{};
+				float natural_width{};
+				float natural_height{};
+				hotbar->measure(context, Orientation::Horizontal, window.getWidth(), window.getHeight(), dummy, natural_width);
+				hotbar->measure(context, Orientation::Vertical, window.getWidth(), window.getHeight(), dummy, natural_height);
+				hotbar->render(context, (window.getWidth() - natural_width) / 2, window.getHeight() - natural_height - hotbar->getScale(), -1, -1);
 			}
 
 			StatusEffectsDisplay(*this, 1).render(context, internalScissorStack.getTop().rectangle);

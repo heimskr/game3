@@ -30,7 +30,7 @@ namespace Game3 {
 		ProgressBar(ui, scale, DEFAULT_BAR_INTERIOR_COLOR, progress) {}
 
 	void ProgressBar::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
