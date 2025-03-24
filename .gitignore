@@ -53,3 +53,4 @@ vgcore.*
 /.vscode
 *.dll
 *.exe
+/game3_zip

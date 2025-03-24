@@ -180,11 +180,14 @@ depend:
 
 sinclude $(DEPFILE)
 
-zip: $(OUTPUT)
+winzip: game3.exe
+	strip game3.exe
 	rm -f game3.zip
-	mkdir Game3
-	cp -r resources Game3/resources
-	cp -r data Game3/data
-	cp $(OUTPUT) Game3/$(OUTPUT)
-	zip -r game3.zip Game3
-	rm -r Game3
+	mkdir -p game3_zip/Game3
+	cd game3_zip && \
+	cp -r ../resources Game3/resources && \
+	cp -r ../gamedata Game3/gamedata && \
+	cp ../game3.exe Game3/ && \
+	cp ../*.dll Game3/ && \
+	zip -r ../game3.zip Game3
+
