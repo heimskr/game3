@@ -31,7 +31,7 @@ namespace Game3 {
 		const auto scale = getScale();
 
 		const float padding = DISPLAY_PADDING * scale;
-		const float subscale = scale * 0.75;
+		const float subscale = selfScale * 0.75;
 
 		x = width;
 		y = padding;
@@ -41,7 +41,7 @@ namespace Game3 {
 				const float icon_width = texture->width * subscale;
 				const float icon_height = texture->height * subscale;
 
-				x -= icon_width + padding;
+				x -= icon_width * ui.scale + padding;
 
 				Icon icon(ui, scale);
 				icon.setFixedSize(icon_width, icon_height);
