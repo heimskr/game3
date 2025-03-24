@@ -6,6 +6,7 @@
 #include "packet/Packet.h"
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
+#include "threading/ThreadContext.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -84,6 +85,7 @@ namespace Game3 {
 		});
 
 		sslThread = std::thread([this] {
+			threadContext.rename("ClientSSL");
 #ifdef __APPLE__
 			pthread_setname_np("LocalClient ioContext");
 #elif defined(__linux__)

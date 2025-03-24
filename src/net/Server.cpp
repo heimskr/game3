@@ -15,6 +15,7 @@
 #include "realm/Overworld.h"
 #include "realm/ShadowRealm.h"
 #include "recipe/CraftingRecipe.h"
+#include "threading/ThreadContext.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -237,6 +238,7 @@ namespace Game3 {
 #endif
 
 		std::thread stop_thread([] {
+			threadContext.rename("ServerStop");
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [] { return !running.load(); });
 			global_server->stop();
@@ -294,6 +296,7 @@ namespace Game3 {
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {
+			threadContext.rename("ServerTick");
 			while (running) {
 				if (!game->tickingPaused)
 					game->tick();
@@ -305,6 +308,7 @@ namespace Game3 {
 		std::chrono::seconds save_period{120};
 
 		std::thread save_thread([&] {
+			threadContext.rename("ServerSave");
 			std::chrono::time_point last_save = std::chrono::system_clock::now();
 
 			while (running) {

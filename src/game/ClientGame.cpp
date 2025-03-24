@@ -345,6 +345,7 @@ namespace Game3 {
 		tickThreadLaunchWaiter.reset(1, true);
 
 		tickThread = std::thread([this] {
+			threadContext.rename("ClientTick");
 			while (active) {
 				try {
 					if (!tick()) {

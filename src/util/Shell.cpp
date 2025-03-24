@@ -90,6 +90,7 @@ namespace Game3 {
 		int child = -1;
 
 		std::thread thread([&] {
+			threadContext.rename("RunCommand");
 			auto until = std::chrono::system_clock::now() + timeout;
 			while (!child_quit) {
 				std::unique_lock lock(mutex);

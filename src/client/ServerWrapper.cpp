@@ -39,7 +39,7 @@ namespace Game3 {
 		stop();
 
 		runThread =	std::thread([this, overworld_seed] {
-			threadContext.rename("Run");
+			threadContext.rename("ServerRun");
 			threadActive = true;
 			run(overworld_seed);
 		});
@@ -73,18 +73,20 @@ namespace Game3 {
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 		}
-#endif
 
 		logDataPipe.emplace();
 #ifdef REDIRECT_LOGS
 		logFDWrapper.init(logDataPipe->writeEnd(), {STDOUT_FILENO, STDERR_FILENO});
+#endif
 #endif
 
 		port = 12255;
 		running = true;
 		server = Server::create("::0", port, CERT_PATH, KEY_PATH, secret, 2);
 
+#ifndef __MINGW32__
 		logThread = std::thread([this, fd = logDataPipe->readEnd(), control = logControlPipe.readEnd()] {
+			threadContext.rename("ServerLog");
 			fd_set fds{};
 			FD_ZERO(&fds);
 			FD_SET(control, &fds);
@@ -129,9 +131,10 @@ namespace Game3 {
 				fds_copy = fds;
 			}
 		});
+#endif
 
 		std::thread stop_thread([this] {
-			threadContext.rename("Stop");
+			threadContext.rename("ServerStop");
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [this] { return !running.load(); });
 			server->stop();
@@ -181,7 +184,7 @@ namespace Game3 {
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {
-			threadContext.rename("Tick");
+			threadContext.rename("ServerTick");
 			while (running) {
 				if (!game->tickingPaused) {
 					game->tick();
@@ -194,7 +197,7 @@ namespace Game3 {
 		std::chrono::seconds save_period{120};
 
 		std::thread save_thread([&] {
-			threadContext.rename("Save");
+			threadContext.rename("ServerSave");
 			std::chrono::time_point last_save = std::chrono::system_clock::now();
 
 			while (running) {
