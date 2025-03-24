@@ -67,6 +67,12 @@
 				"tilename": "base:tile/snow",
 				"flask":    "base:item/snowball",
 				"color":    "#eeeeff"
+			}],
+			["base:fluid/radon", {
+				"name":     "Radon",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/radon",
+				"color":    "#222222"
 			}]
 		]]
 	]
