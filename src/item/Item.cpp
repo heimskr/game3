@@ -148,19 +148,22 @@ namespace Game3 {
 
 	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_):
 	item(std::move(item_)), count(count_), weakGame(game) {
-		assert(item);
+		assert(item != nullptr);
+		assert(game != nullptr);
 		item->initStack(*game, *this);
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, std::shared_ptr<Item> item_, ItemCount count_, boost::json::value data_):
 	item(std::move(item_)), count(count_), data(std::move(data_)), weakGame(game) {
-		assert(item);
+		assert(item != nullptr);
+		assert(game != nullptr);
 		item->initStack(*game, *this);
 	}
 
 	ItemStack::ItemStack(const GamePtr &game, const ItemID &id, ItemCount count_):
 	item(game->itemRegistry->at(id)), count(count_), weakGame(game) {
-		assert(item);
+		assert(item != nullptr);
+		assert(game != nullptr);
 		item->initStack(*game, *this);
 	}
 

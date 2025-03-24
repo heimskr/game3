@@ -65,6 +65,8 @@ namespace Game3 {
 	}
 
 	void FluidParticle::applyKnockback(const EntityPtr &target, float factor) {
+		assert(target.get() != this);
+
 		target->velocity.withUnique([this, factor](Vector3 &target_velocity) {
 			auto lock = velocity.uniqueLock();
 			double magnitude = velocity.magnitude2D();

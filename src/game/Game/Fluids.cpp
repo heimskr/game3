@@ -1,5 +1,6 @@
 #include "fluid/Brine.h"
 #include "fluid/Lava.h"
+#include "fluid/Milk.h"
 #include "fluid/PowderedSnow.h"
 #include "fluid/Water.h"
 #include "game/Game.h"
@@ -21,6 +22,7 @@ namespace Game3 {
 
 		replaceFluid<Brine>(reg);
 		replaceFluid<Lava>(reg);
+		replaceFluid<Milk>(reg);
 		replaceFluid<PowderedSnow>(reg);
 		replaceFluid<Water>(reg);
 	}

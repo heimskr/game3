@@ -43,7 +43,7 @@ namespace Game3 {
 			}
 	};
 
-	class Mead: public Drink<> {
+	class MeadDrink: public Drink<> {
 		public:
 			using Drink<>::Drink;
 
@@ -54,7 +54,7 @@ namespace Game3 {
 			}
 	};
 
-	class Milk: public Drink<12> {
+	class MilkDrink: public Drink<12> {
 		public:
 			using Drink<12>::Drink;
 

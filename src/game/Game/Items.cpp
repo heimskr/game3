@@ -121,8 +121,6 @@ namespace Game3 {
 
 		add(std::make_shared<DissolverItem>("base:item/dissolver", "Dissolver", 999, 64)); // TODO: cost
 
-		add(std::make_shared<Milk>("base:item/milk_flask", "Milk", 4, 64));
-
 		add(std::make_shared<EmptyFlask>("base:item/flask", "Flask", 2, 64));
 
 		add(std::make_shared<EntitySpawnItem>("base:item/ship", "Ship", 999, "base:entity/ship")); // TODO: cost
@@ -260,7 +258,7 @@ namespace Game3 {
 
 		add(std::make_shared<LiquefierItem>("base:item/liquefier", "Liquefier", 999, 64)); // TODO: cost
 
-		add(std::make_shared<Mead>("base:item/mead", "Mead", 10, 16));
+		add(std::make_shared<MeadDrink>("base:item/mead", "Mead", 10, 16));
 
 		add(std::make_shared<MeleeWeapon>("base:item/iron_sword",    "Iron Sword",    150, 3, 1, 128));
 		add(std::make_shared<MeleeWeapon>("base:item/gold_sword",    "Gold Sword",    400, 8, 3,  64));
@@ -268,6 +266,8 @@ namespace Game3 {
 		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
 
 		add(std::make_shared<MicroscopeItem>("base:item/microscope", "Microscope", 999, 64)); // TODO: cost
+
+		add(std::make_shared<MilkDrink>("base:item/milk_flask", "Milk", 4, 64));
 
 		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, "base:fluid/mutagen", 64)); // TODO: cost
 

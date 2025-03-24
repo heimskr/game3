@@ -153,6 +153,8 @@ namespace Game3 {
 	}
 
 	void Projectile::applyKnockback(const EntityPtr &target, float factor) {
+		assert(target.get() != this);
+
 		target->velocity.withUnique([this, factor](Vector3 &target_velocity) {
 			auto lock = velocity.uniqueLock();
 			target_velocity.x += velocity.x;
