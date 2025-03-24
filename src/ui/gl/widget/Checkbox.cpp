@@ -1,6 +1,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "ui/gl/widget/Checkbox.h"
+#include "ui/gl/UIContext.h"
 
 namespace {
 	constexpr Game3::Color DEFAULT_PRIMARY_COLOR{"#926641"};
@@ -18,7 +19,7 @@ namespace Game3 {
 		Checkbox(ui, selfScale, DEFAULT_PRIMARY_COLOR, DEFAULT_INTERIOR_COLOR) {}
 
 	void Checkbox::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
@@ -49,13 +50,13 @@ namespace Game3 {
 	void Checkbox::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth) {
-				minimum = natural = fixedWidth;
+				minimum = natural = fixedWidth * ui.scale;
 			} else {
 				minimum = natural = for_width;
 			}
 		} else {
 			if (0 < fixedHeight) {
-				minimum = natural = fixedHeight;
+				minimum = natural = fixedHeight * ui.scale;
 			} else {
 				minimum = natural = for_height;
 			}
