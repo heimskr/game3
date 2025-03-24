@@ -150,15 +150,19 @@ namespace Game3 {
 	bool OmniDialog::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		mouseDownPosition.emplace(x, y);
 
-		if (!getPosition().contains(x, y)) {
-			return false;
+		if (getPosition().contains(x, y)) {
+			if (activeTab && activeTab->mouseDown(button, x, y, modifiers)) {
+				return true;
+			}
 		}
 
-		if (activeTab && activeTab->mouseDown(button, x, y, modifiers)) {
-			return true;
+		for (size_t i = 0; i < tabRectangles.size(); ++i) {
+			if (tabRectangles[i].contains(x, y)) {
+				return true;
+			}
 		}
 
-		return Dialog::mouseDown(button, x, y, modifiers);
+		return getPosition().contains(x, y) && Dialog::mouseDown(button, x, y, modifiers);
 	}
 
 	bool OmniDialog::mouseUp(int button, int x, int y, Modifiers modifiers) {

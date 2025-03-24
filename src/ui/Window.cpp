@@ -392,8 +392,9 @@ namespace Game3 {
 
 		handleKeys();
 
-		for (const auto &function: functionQueue.steal())
+		for (const auto &function: functionQueue.steal()) {
 			function(*this);
+		}
 
 		if (autofocus && game) {
 			if (ClientPlayerPtr player = game->getPlayer()) {

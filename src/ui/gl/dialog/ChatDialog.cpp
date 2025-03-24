@@ -33,8 +33,9 @@ namespace Game3 {
 		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0.5, CHAT_SEPARATOR_COLOR);
 
 		toggler->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			toggle(false);
 			return true;
 		});

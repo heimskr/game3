@@ -1,3 +1,4 @@
+#include "threading/ThreadContext.h"
 #include "util/Log.h"
 #include "util/PipeWrapper.h"
 #include "util/Shell.h"
