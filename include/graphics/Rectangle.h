@@ -41,6 +41,11 @@ namespace Game3 {
 		/** Ignores the width/height of the RHS and uses the width/height of the LHS. */
 		Rectangle operator-(const Rectangle &) const;
 
+		template <typename T>
+		Rectangle operator*(T scale) const {
+			return Rectangle(x, y, width * scale, height * scale);
+		}
+
 		/** Returns whether both the height and width of the rectangle are positive. */
 		operator bool() const;
 	};

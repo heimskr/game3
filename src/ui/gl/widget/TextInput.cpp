@@ -20,8 +20,9 @@ namespace {
 	bool isStopChar(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
 
-		if (unicharacter > std::numeric_limits<char>::max())
+		if (unicharacter > std::numeric_limits<char>::max()) {
 			return false;
+		}
 
 		static const std::string_view stops = "_.,/-=+ \t\n";
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
@@ -30,8 +31,9 @@ namespace {
 	bool isWhitespace(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
 
-		if (unicharacter > std::numeric_limits<char>::max())
+		if (unicharacter > std::numeric_limits<char>::max()) {
 			return false;
+		}
 
 		static const std::string_view stops = " \t\n";
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
@@ -59,18 +61,15 @@ namespace Game3 {
 		TextInput(ui, selfScale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		INFO("TextInput::render({}, {}, {}, {})", x, y, width, height);
 		if (width < -1 || height < -1) {
 			Widget::render(renderers, x, y, width, height);
 			return;
 		}
 
-		const auto scale = getScale();
-
 		const float original_height = height;
 
 		if (0 < fixedHeight) {
-			height = fixedHeight;
+			height = fixedHeight * ui.scale;
 		}
 
 		adjustCoordinate(Orientation::Horizontal, x, width, width);
@@ -89,12 +88,12 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		const float start = thickness * selfScale;
+		const float start = thickness * getScale();
 		// TODO: check for negative sizes
-		const Rectangle interior(x + start, y + start, width - 2 * start * scale, height - 2 * start * scale);
+		auto interior = Rectangle(x + start, y + start, width - 2 * start, height - 2 * start);
 
-		rectangler(borderColor, x, y, width * scale, scale * height * 0.6);
-		rectangler(borderColor.darken(), x, y + height * 0.6, width * scale, scale * height * 0.4);
+		rectangler(borderColor, Rectangle(x, y, width, height * 0.6));
+		rectangler(borderColor.darken(), Rectangle(x, y + height * 0.6, width, height * 0.4));
 		rectangler(interiorColor, interior);
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
@@ -102,8 +101,8 @@ namespace Game3 {
 		rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
 
 		texter(text, TextRenderOptions{
-			.x = start - xOffset * scale,
-			.y = scale * 2,
+			.x = start - xOffset * getScale(),
+			.y = getScale() * 2,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,
@@ -114,8 +113,9 @@ namespace Game3 {
 	}
 
 	bool TextInput::click(int button, int x, int y, Modifiers modifiers) {
-		if (Widget::click(button, x, y, modifiers))
+		if (Widget::click(button, x, y, modifiers)) {
 			return true;
+		}
 
 		if (button == LEFT_BUTTON) {
 			ui.focusWidget(shared_from_this());
@@ -218,14 +218,14 @@ namespace Game3 {
 
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth) {
-				minimum = natural = fixedWidth;
+				minimum = natural = fixedWidth * ui.scale;
 			} else {
 				minimum = border;
 				natural = std::min(for_width, border + renderers.text.textWidth(text, getTextScale()));
 			}
 		} else {
 			if (0 < fixedHeight) {
-				minimum = natural = fixedHeight;
+				minimum = natural = fixedHeight * ui.scale;
 			} else {
 				minimum = border;
 				natural = std::min(for_height, border + renderers.text.textHeight(text, getTextScale(), for_width - border));
@@ -272,8 +272,9 @@ namespace Game3 {
 		if (suggestions) {
 			std::string_view raw = text.raw();
 			for (const UString &suggestion: *suggestions) {
-				if (suggestion.length() > text.length() && suggestion.raw().starts_with(raw))
+				if (suggestion.length() > text.length() && suggestion.raw().starts_with(raw)) {
 					relevant.push_back(suggestion);
+				}
 			}
 		}
 
@@ -314,8 +315,9 @@ namespace Game3 {
 	}
 
 	void TextInput::eraseWord() {
-		if (cursor == 0)
+		if (cursor == 0) {
 			return;
+		}
 
 		// TODO: instead of erasing multiple times, search the string for how much to erase and erase it all in one go.
 
@@ -405,11 +407,11 @@ namespace Game3 {
 	}
 
 	float TextInput::getTextScale() const {
-		return selfScale / 16;
+		return getScale() / 16;
 	}
 
 	float TextInput::getXPadding() const {
-		return thickness * selfScale;
+		return thickness * getScale();
 	}
 
 	float TextInput::getBoundary() const {
@@ -417,7 +419,7 @@ namespace Game3 {
 	}
 
 	float TextInput::getCursorPosition() const {
-		return getXPadding() - xOffset * selfScale + cursorXOffset * getTextScale();
+		return getXPadding() - xOffset * getScale() + cursorXOffset * getTextScale();
 	}
 
 	void TextInput::adjustCursorOffset(float offset) {

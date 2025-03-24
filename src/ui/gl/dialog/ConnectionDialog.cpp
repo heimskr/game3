@@ -87,7 +87,7 @@ namespace Game3 {
 			frame_position.width += 2 * offset;
 			frame_position.height += 2 * offset;
 			auto saver = ui.scissorStack.pushAbsolute(frame_position, renderers);
-			ui.drawFrame(renderers, selfScale, false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
+			ui.drawFrame(renderers, getScale(), false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
 		}
 
 		firstChild->render(renderers, getPosition());
