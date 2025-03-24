@@ -26,7 +26,6 @@ game3_deps = [
 	dependency('liblz4'),
 	dependency('boost', modules: ['json']),
 	# fastnoise2.dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
-	# dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
 	chemskr.get_variable('chemskr'),
@@ -69,6 +68,7 @@ if get_option('vcpkg_triplet') != ''
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
 elif build_machine.system() == 'linux'
+	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 	link_args += '-lnoise'
 elif build_machine.system() == 'windows'
 	# link_args += '-L../subprojects/FastNoise2/build/lib'

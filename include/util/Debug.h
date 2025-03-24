@@ -7,7 +7,7 @@ namespace Game3 {
 #ifdef __MINGW32__
 		asm volatile("int3"); // ???
 #else
-		raise( SIGTRAP)
+		raise(SIGTRAP);
 #endif
 	}
 }

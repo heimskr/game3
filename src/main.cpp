@@ -324,10 +324,12 @@ int main(int argc, char **argv) {
 	glfwMakeContextCurrent(glfw_window);
 	glfwSwapInterval(1);
 
+#ifdef __MINGW32__
 	if (GLenum err = glewInit(); GLEW_OK != err) {
-		ERR("Error: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
+		ERR("GLEW failed: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
 		return 1;
 	}
+#endif
 
 	auto window = std::make_shared<Window>(*glfw_window);
 
