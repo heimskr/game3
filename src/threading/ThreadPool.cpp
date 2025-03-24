@@ -18,6 +18,7 @@ namespace Game3 {
 		for (size_t thread_index = 0; thread_index < size; ++thread_index) {
 			pool.emplace_back([this, thread_index] {
 				threadContext = {};
+				threadContext.rename(std::format("TP {}", thread_index));
 				size_t last_jobs_done = jobsDone.load();
 				while (active) {
 					{

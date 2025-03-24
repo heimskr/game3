@@ -8,6 +8,7 @@
 #include "lib/JSON.h"
 #include "net/Server.h"
 #include "scripting/ScriptEngine.h"
+#include "threading/ThreadContext.h"
 #include "tools/Flasker.h"
 #include "tools/ItemStitcher.h"
 #include "tools/Mazer.h"
@@ -51,6 +52,8 @@ namespace Game3 {
 
 int main(int argc, char **argv) {
 	using namespace Game3;
+
+	threadContext.rename("Main");
 
 #ifdef GAME3_ENABLE_SCRIPTING
 	ScriptEngine::init(argv[0]);
@@ -320,7 +323,7 @@ int main(int argc, char **argv) {
 	glfwMaximizeWindow(glfw_window);
 	glfwMakeContextCurrent(glfw_window);
 	glfwSwapInterval(1);
-	
+
 	if (GLenum err = glewInit(); GLEW_OK != err) {
 		ERR("Error: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
 		return 1;

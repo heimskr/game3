@@ -191,3 +191,6 @@ winzip: game3.exe
 	cp ../*.dll Game3/ && \
 	zip -r ../game3.zip Game3
 
+winja:
+	ninja -C builddir
+	cp builddir/src/game3.exe .

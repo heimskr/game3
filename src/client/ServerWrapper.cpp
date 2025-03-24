@@ -8,6 +8,7 @@
 #include "net/Server.h"
 #include "realm/Overworld.h"
 #include "realm/ShadowRealm.h"
+#include "threading/ThreadContext.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -24,17 +25,6 @@
 #define REDIRECT_LOGS
 #endif
 
-namespace {
-	void setCurrentThreadName(const char *name) {
-#ifdef __APPLE__
-		pthread_setname_np(name);
-#elif defined(__MINGW32__)
-#else
-		pthread_setname_np(pthread_self(), name);
-#endif
-	}
-}
-
 namespace Game3 {
 	namespace {
 		std::filesystem::path KEY_PATH{"localserver.key"};
@@ -49,31 +39,35 @@ namespace Game3 {
 		stop();
 
 		runThread =	std::thread([this, overworld_seed] {
-			setCurrentThreadName("RunThread");
+			threadContext.rename("Run");
 			threadActive = true;
 			run(overworld_seed);
 		});
 	}
 
 	void ServerWrapper::run(size_t overworld_seed) {
-		if (running)
+		if (running) {
 			throw std::runtime_error("Server is already running");
+		}
 
 		const bool key_exists  = std::filesystem::exists(KEY_PATH);
 		const bool cert_exists = std::filesystem::exists(CERT_PATH);
 
-		if (key_exists != cert_exists)
+		if (key_exists != cert_exists) {
 			throw std::runtime_error("Exactly one of localserver.key, localserver.crt exists (should be both or neither)");
+		}
 
-		if (!key_exists && !generateCertificate(CERT_PATH, KEY_PATH))
+		if (!key_exists && !generateCertificate(CERT_PATH, KEY_PATH)) {
 			throw std::runtime_error("Couldn't generate certificate/private key");
+		}
 
 		std::string secret;
 
-		if (std::filesystem::exists(".localsecret"))
+		if (std::filesystem::exists(".localsecret")) {
 			secret = readFile(".localsecret");
-		else
+		} else {
 			std::ofstream(".localsecret") << (secret = generateSecret(8));
+		}
 
 #ifndef __MINGW32__
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
@@ -107,24 +101,28 @@ namespace Game3 {
 				if (FD_ISSET(control, &fds_copy)) {
 					bytes_read = read(control, buffer.data(), buffer.size());
 
-					if (bytes_read == -1)
+					if (bytes_read == -1) {
 						throw std::runtime_error(std::format("Couldn't read from log control pipe ({})", errno));
+					}
 
-					if (0 < bytes_read && buffer[0] == 'r')
+					if (0 < bytes_read && buffer[0] == 'r') {
 						return;
+					}
 				}
 
 				if (FD_ISSET(fd, &fds_copy)) {
 					bytes_read = read(fd, buffer.data(), buffer.size());
 
-					if (bytes_read == -1)
+					if (bytes_read == -1) {
 						throw std::runtime_error(std::format("Couldn't read from log data pipe ({})", errno));
+					}
 
 					if (0 < bytes_read) {
 						std::string_view text{buffer.data(), size_t(bytes_read)};
 						logstream << text;
-						if (onLog)
+						if (onLog) {
 							onLog(text);
+						}
 					}
 				}
 
@@ -133,7 +131,7 @@ namespace Game3 {
 		});
 
 		std::thread stop_thread([this] {
-			setCurrentThreadName("StopThread");
+			threadContext.rename("Stop");
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [this] { return !running.load(); });
 			server->stop();
@@ -183,10 +181,11 @@ namespace Game3 {
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {
-			setCurrentThreadName("TickThread");
+			threadContext.rename("Tick");
 			while (running) {
-				if (!game->tickingPaused)
+				if (!game->tickingPaused) {
 					game->tick();
+				}
 				std::this_thread::sleep_for(std::chrono::milliseconds(SERVER_TICK_PERIOD));
 			}
 		});
@@ -195,7 +194,7 @@ namespace Game3 {
 		std::chrono::seconds save_period{120};
 
 		std::thread save_thread([&] {
-			setCurrentThreadName("SaveThread");
+			threadContext.rename("Save");
 			std::chrono::time_point last_save = std::chrono::system_clock::now();
 
 			while (running) {
@@ -226,8 +225,9 @@ namespace Game3 {
 	void ServerWrapper::stop() {
 		directRemoteClient.reset();
 
-		if (!game || !running)
+		if (!game || !running) {
 			return;
+		}
 
 		running = false;
 		started = false;
@@ -264,8 +264,9 @@ namespace Game3 {
 	}
 
 	Token ServerWrapper::getOmnitoken() const {
-		if (!server || !game)
+		if (!server || !game) {
 			throw std::runtime_error("Can't get omnitoken: server not available");
+		}
 		return game->getOmnitoken();
 	}
 

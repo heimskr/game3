@@ -62,6 +62,9 @@ namespace Game3 {
 				throw std::runtime_error("Game is null in ThreadContext");
 			}
 
+			void rename(const char *);
+			void rename(const std::string &);
+
 		private:
 			std::weak_ptr<Game> game;
 	};
