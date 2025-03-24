@@ -94,14 +94,14 @@ namespace Game3 {
 	void Slider::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth) {
-				minimum = natural = fixedWidth;
+				minimum = natural = fixedWidth * ui.scale;
 			} else {
 				minimum = 0;
 				natural = for_width;
 			}
 		} else {
 			if (0 < fixedHeight) {
-				minimum = natural = fixedHeight;
+				minimum = natural = fixedHeight * ui.scale;
 			} else {
 				minimum = 0;
 				natural = for_height;
@@ -183,10 +183,10 @@ namespace Game3 {
 	}
 
 	float Slider::getBarHeight() const {
-		return selfScale * 2;
+		return getScale() * 2;
 	}
 
 	float Slider::getHandleSize() const {
-		return selfScale * 4;
+		return getScale() * 4;
 	}
 }
