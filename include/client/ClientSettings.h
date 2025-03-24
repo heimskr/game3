@@ -23,12 +23,12 @@ namespace Game3 {
 		double mystery = 1;
 		int logLevel = 1;
 		uint16_t port = 12255;
-		bool alertOnConnection = true;
+		bool alertOnConnection = false;
 		bool renderLighting = false;
 		bool hideTimers = true;
 		bool showFPS = true;
 		bool capFPS = true;
-		bool specialEffects = true;
+		bool specialEffects = false;
 
 		/** Applies settings to a game instance. */
 		void apply(ClientGame &) const;
