@@ -52,7 +52,7 @@ namespace Game3 {
 		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 
 		auto saver = ui.scissorStack.pushRelative(titleRectangle, renderers);
-		const auto text_scale = static_cast<double>(getTitleScale());
+		const auto text_scale = static_cast<double>(getTitleScale()) * ui.scale;
 
 		texter.drawOnScreen(getTitle(), TextRenderOptions{
 			.x = static_cast<double>(titleRectangle.width) / 2.0,

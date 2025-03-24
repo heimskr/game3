@@ -6,8 +6,8 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Icon::Icon(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+	Icon::Icon(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	void Icon::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (fixedHeight >= 0) {
@@ -21,6 +21,9 @@ namespace Game3 {
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
 
 		Widget::render(renderers, x, y, width, height);
+
+		width *= ui.scale;
+		height *= ui.scale;
 
 		if (!iconTexture || shouldCull()) {
 			return;
