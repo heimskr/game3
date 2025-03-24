@@ -9,4 +9,4 @@
 - A Realm's generateChunk method must increase the chunk's update counter if it's 0.
 - There should be an active generation guard during calls to Biome::generate and Biome::postgen.
 - Luck stats must be in the range [0, 10].
-- Don't use UIContext::scale / Widget::getScale outside of rendering.
+- Don't use UIContext::scale / Widget::getScale outside of rendering and measurement.

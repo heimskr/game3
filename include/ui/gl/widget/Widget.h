@@ -53,7 +53,6 @@ namespace Game3 {
 			virtual bool charPressed(uint32_t codepoint, Modifiers);
 			virtual SizeRequestMode getRequestMode() const = 0;
 			virtual void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) = 0;
-			float getScale() const;
 			virtual bool isDragging() const;
 			virtual void onFocus();
 			virtual void onBlur();
@@ -80,6 +79,8 @@ namespace Game3 {
 			virtual std::string describe() const;
 
 			UIContext & getUI();
+
+			float getScale() const;
 
 		protected:
 			UIContext &ui;

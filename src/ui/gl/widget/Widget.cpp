@@ -128,10 +128,6 @@ namespace Game3 {
 		return false;
 	}
 
-	float Widget::getScale() const {
-		return selfScale * ui.scale;
-	}
-
 	bool Widget::isDragging() const {
 		return dragOrigin.has_value();
 	}
@@ -349,6 +345,10 @@ namespace Game3 {
 
 	UIContext & Widget::getUI() {
 		return ui;
+	}
+
+	float Widget::getScale() const {
+		return selfScale * ui.scale;
 	}
 
 	bool Widget::onChildrenUpdated() {

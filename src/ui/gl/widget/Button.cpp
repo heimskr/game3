@@ -33,7 +33,7 @@ namespace Game3 {
 		const float original_width = width;
 		const float original_height = height;
 
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 		float dummy{};
 		if (fixedHeight <= 0 && height < 0) {
 			measure(renderers, Orientation::Vertical, width, height, dummy, height);
@@ -130,8 +130,9 @@ namespace Game3 {
 	}
 
 	bool Button::mouseUp(int button, int x, int y, Modifiers) {
-		if (button != LEFT_BUTTON)
+		if (button != LEFT_BUTTON) {
 			return false;
+		}
 
 		if (pressed) {
 			pressed = false;
@@ -156,14 +157,14 @@ namespace Game3 {
 				return;
 			}
 
-			minimum = natural = getWidth(renderers, std::max(fixedHeight, getMinimumPreferredHeight()));
+			minimum = natural = getWidth(renderers, std::max(fixedHeight * ui.scale, getMinimumPreferredHeight()));
 		} else {
 			minimum = getMinimumPreferredHeight();
 
 			if (verticalExpand && 0 <= for_height) {
 				natural = for_height;
 			} else {
-				natural = std::max(minimum, fixedHeight);
+				natural = std::max(minimum, fixedHeight * ui.scale);
 			}
 		}
 	}
@@ -225,6 +226,6 @@ namespace Game3 {
 	}
 
 	float Button::getMinimumPreferredHeight() const {
-		return selfScale * 10;
+		return getScale() * 10;
 	}
 }

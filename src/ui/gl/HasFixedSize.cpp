@@ -31,4 +31,14 @@ namespace Game3 {
 			height = fixedHeight;
 		}
 	}
+
+	void HasFixedSize::fixSizes(float &width, float &height, float scale) {
+		if (width < 0 || 0 < fixedWidth) {
+			width = fixedWidth * scale;
+		}
+
+		if (height < 0 || 0 < fixedHeight) {
+			height = fixedHeight * scale;
+		}
+	}
 }

@@ -5,6 +5,7 @@
 #include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/IntegerInput.h"
 #include "ui/gl/widget/Label.h"
+#include "ui/gl/widget/Spacer.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -47,14 +48,15 @@ namespace Game3 {
 
 		auto hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 
-		auto spacer = std::make_shared<Label>(ui, selfScale);
-		spacer->setHorizontalExpand(true);
+		auto spacer = std::make_shared<Spacer>(ui, Orientation::Horizontal);
+		spacer->init();
 
 		auto local_button = std::make_shared<Button>(ui, selfScale);
 		local_button->setText("Local Play");
 		local_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			playLocally();
 			return true;
 		});
@@ -62,8 +64,9 @@ namespace Game3 {
 		auto connect_button = std::make_shared<Button>(ui, selfScale);
 		connect_button->setText("Connect");
 		connect_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			submit();
 			return true;
 		});
