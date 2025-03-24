@@ -163,10 +163,10 @@ namespace Game3 {
 	}
 
 	float Tooltip::getTextScale() const {
-		return selfScale / 16;
+		return getScale() / 16;
 	}
 
 	float Tooltip::getPadding() const {
-		return selfScale * 2;
+		return getScale() * 2;
 	}
 }
