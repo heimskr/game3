@@ -24,7 +24,7 @@ void SetThreadName(DWORD dwThreadID, const char* threadName) {
 #endif
 
 namespace Game3 {
-	thread_local ThreadContext threadContext;
+	thread_local ThreadContext threadContext{};
 
 	void ThreadContext::rename(const char *name) {
 #ifdef __MINGW32__
