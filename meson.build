@@ -17,7 +17,11 @@ add_project_arguments([
 	'-I' + source_root + '/subprojects/FastNoise2/include',
 ], language: 'cpp')
 
-project_cpp_args = ['-DV8_COMPRESS_POINTERS', '-DV8_ENABLE_SANDBOX', '-D_POSIX_C_SOURCE']
+project_cpp_args = ['-DV8_COMPRESS_POINTERS', '-DV8_ENABLE_SANDBOX']
+if build_machine.system() == 'windows'
+	project_cpp_args += '-D_POSIX_C_SOURCE'
+endif
+
 test_cpp_args = [
 	'-Wall',
 	'-Wextra',

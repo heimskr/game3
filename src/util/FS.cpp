@@ -30,12 +30,18 @@ namespace Game3 {
 		std::string out;
 		out.reserve(stream.tellg());
 		stream.seekg(0, std::ios::beg);
+#ifdef __APPLE__
+		// On My Machine™, the readsome trick just gives me an empty string.
+		// My apologies to the 0 people who play game3 on macOS.
+		out.assign(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
+#else
 		std::array<char, 4096> buffer;
 
 		std::streamsize bytes_read = 0;
 		while ((bytes_read = stream.readsome(buffer.data(), buffer.size())) > 0) {
 			out.append(buffer.data(), bytes_read);
 		}
+#endif
 		stream.close();
 		return out;
 	}

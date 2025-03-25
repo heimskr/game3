@@ -194,3 +194,14 @@ winzip: game3.exe
 winja:
 	ninja -C builddir
 	cp builddir/src/game3.exe .
+
+maczip:
+	cp builddir/src/game3 ./game3
+	strip game3
+	rm -f game3.zip
+	mkdir -p game3_zip/Game3
+	cd game3_zip && \
+	cp -r ../resources Game3/resources && \
+	cp -r ../gamedata Game3/gamedata && \
+	cp ../game3 Game3/ && \
+	zip -r ../game3.zip Game3
