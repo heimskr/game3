@@ -19,8 +19,8 @@ game3_deps = [
 	dependency('freetype2'),
 	dependency('libzstd'),
 	dependency('gl'),
-	dependency('glew'),
-	dependency('freeglut'),
+#	dependency('glew'),
+#	dependency('freeglut'),
 	dependency('glfw3'),
 	dependency('asio'),
 	dependency('liblz4'),
@@ -70,6 +70,8 @@ if get_option('vcpkg_triplet') != ''
 elif build_machine.system() == 'linux'
 	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 	link_args += '-lnoise'
+elif build_machine.system() == 'darwin'
+	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 elif build_machine.system() == 'windows'
 	# link_args += '-L../subprojects/FastNoise2/build/lib'
 	link_args += '../subprojects/FastNoise2/build2/lib/libFastNoise.a'

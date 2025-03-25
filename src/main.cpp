@@ -27,7 +27,9 @@
 #include "jc_voronoi.h"
 
 #include <GLFW/glfw3.h>
+#ifdef __MING32__
 #include <GL/glut.h>
+#endif
 
 #include <cstdlib>
 #include <ctime>
