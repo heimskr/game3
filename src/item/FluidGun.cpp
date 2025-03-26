@@ -12,6 +12,7 @@
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tile/Tile.h"
+#include "tileentity/FluidHoldingTileEntity.h"
 #include "types/PackedTime.h"
 #include "types/Position.h"
 #include "ui/gl/widget/Hotbar.h"
@@ -130,6 +131,15 @@ namespace Game3 {
 
 		std::optional<FluidTile> fluid_tile = place.getFluid();
 		bool can_set = true;
+
+		if (!fluid_tile || fluid_tile->level == 0) {
+			if (auto tile_entity = std::dynamic_pointer_cast<FluidHoldingTileEntity>(place.getTileEntity())) {
+				if (std::optional<FluidStack> fluid_stack = tile_entity->extractFluid(Direction::Down, true, FluidTile::FULL)) {
+					fluid_tile.emplace(fluid_stack->id, fluid_stack->amount);
+					can_set = false;
+				}
+			}
+		}
 
 		if (!fluid_tile || fluid_tile->level == 0) {
 			if (TilePtr tile = place.getTile(Layer::Terrain)) {
