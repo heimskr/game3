@@ -19,7 +19,7 @@ namespace Game3 {
 		constexpr Color CHAT_FOCUSED_TEXT_COLOR{"#ffffff"};
 		constexpr Color CHAT_UNFOCUSED_TEXT_COLOR{"#000000a0"};
 		constexpr Color CHAT_SEPARATOR_COLOR{"#ffffffa0"};
-		constexpr int CHAT_TOGGLER_SIZE = 64; // TODO: make scalable
+		constexpr int CHAT_TOGGLER_SIZE = 8;
 	}
 
 	ChatDialog::ChatDialog(UIContext &ui, float selfScale):
@@ -76,12 +76,13 @@ namespace Game3 {
 
 	void ChatDialog::render(const RendererContext &renderers) {
 		Rectangle position = getPosition();
-		position.width -= CHAT_TOGGLER_SIZE;
+		const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
+		position.width -= toggler_size;
 
 		Rectangle toggler_position = position;
-		toggler_position.y = position.y + position.height - CHAT_TOGGLER_SIZE;
-		toggler_position.width = CHAT_TOGGLER_SIZE;
-		toggler_position.height = CHAT_TOGGLER_SIZE;
+		toggler_position.y = position.y + position.height - toggler_size;
+		toggler_position.width = toggler_size;
+		toggler_position.height = toggler_size;
 
 		if (!isHidden) {
 			if (isFocused()) {
@@ -107,10 +108,11 @@ namespace Game3 {
 	Rectangle ChatDialog::getPosition() const {
 		if (const std::optional<float> &last_y = ui.getHotbar()->getLastY()) {
 			constexpr int height = 400;
-			Rectangle out(0, *last_y - height - 64, isHidden? CHAT_TOGGLER_SIZE : ui.getWidth() / 2, height);
+			const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
+			Rectangle out(0, *last_y - height - 64, isHidden? toggler_size : ui.getWidth() / 2, height);
 			if (isHidden) {
-				out.y += out.height - CHAT_TOGGLER_SIZE;
-				out.height = CHAT_TOGGLER_SIZE;
+				out.y += out.height - toggler_size;
+				out.height = toggler_size;
 			}
 			return out;
 		}
