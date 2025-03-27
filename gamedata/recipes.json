@@ -461,6 +461,10 @@
 				"input":  [["base:item/fire_opal", 4], ["base:item/diamond", 4]],
 				"output": [["base:item/teleportation_focus", 1]]
 			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/bean", 42], ["base:item/chili", 64]],
+				"output": [["base:item/bing", 1]]
+			}],
 			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
