@@ -1106,6 +1106,12 @@ namespace Game3 {
 			}
 		}
 
+		serverWrapper.onError = [this](const std::exception &exception) {
+			error(std::format("ServerWrapper error: {}", exception.what()), true);
+			serverWrapper.stop();
+			closeGame();
+		};
+
 		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {

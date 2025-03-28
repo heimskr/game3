@@ -23,6 +23,7 @@ namespace Game3 {
 	class ServerWrapper {
 		public:
 			std::function<void(std::string_view)> onLog;
+			std::function<void(const std::exception &)> onError;
 
 			ServerWrapper() = default;
 			~ServerWrapper();
