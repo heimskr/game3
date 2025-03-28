@@ -84,15 +84,17 @@ namespace Game3 {
 			}));
 		});
 
-		sslThread = std::thread([this] {
+		sslThread = std::thread([weak = weak_from_this()] {
 			threadContext.rename("ClientSSL");
 #ifdef __APPLE__
 			pthread_setname_np("LocalClient ioContext");
 #elif defined(__linux__)
 			pthread_setname_np(pthread_self(), "LocalClient ioContext");
 #endif
-			ioContext.run();
-			--sslWaiter;
+			if (LocalClientPtr client = weak.lock()) {
+				client->ioContext.run();
+				--client->sslWaiter;
+			}
 		});
 #else
 		INFO("Handshake done.");

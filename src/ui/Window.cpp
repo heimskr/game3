@@ -908,9 +908,11 @@ namespace Game3 {
 	}
 
 	void Window::goToTitle() {
-		omniDialog.reset();
-		uiContext.reset();
-		uiContext.emplaceDialog<ConnectionDialog>(1);
+		queue([](Window &window) {
+			window.omniDialog.reset();
+			window.uiContext.reset();
+			window.uiContext.emplaceDialog<ConnectionDialog>(1);
+		});
 	}
 
 	void Window::onGameLoaded() {
