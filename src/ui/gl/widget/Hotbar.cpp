@@ -70,10 +70,11 @@ namespace Game3 {
 
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
+		Widget::render(renderers, x, y, width, height);
+		width -= getRightSideWidth();
 		const auto scale = getScale();
 		const float offset = SLOT_PADDING * scale / 3;
 		const float held_scale = heldLeft->getScale();
-		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
@@ -168,10 +169,11 @@ namespace Game3 {
 	}
 
 	void Hotbar::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
+		const auto scale = getScale();
 		if (orientation == Orientation::Horizontal) {
-			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * getScale() + HOTBAR_BORDER * 2;
+			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING + HOTBAR_BORDER * 2) * scale + getRightSideWidth();
 		} else {
-			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING) * getScale() + HOTBAR_BORDER * 2;
+			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING + HOTBAR_BORDER * 2) * scale;
 		}
 	}
 
@@ -183,5 +185,15 @@ namespace Game3 {
 
 	const std::optional<float> & Hotbar::getLastY() const {
 		return lastY;
+	}
+
+	float Hotbar::getRightSideWidth() const {
+		const auto scale = getScale();
+		const auto offset = SLOT_PADDING * scale / 3;
+		const auto held_scale = heldLeft->getScale();
+		const auto held_size = INNER_SLOT_SIZE * held_scale;
+		const auto held_padding = SLOT_PADDING * held_scale;
+		const auto rectangle_size = held_size + 2 * held_padding + 2 * offset;
+		return 2 * offset + rectangle_size;
 	}
 }

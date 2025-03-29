@@ -30,5 +30,7 @@ namespace Game3 {
 			std::shared_ptr<ItemSlot> heldLeft;
 			std::shared_ptr<ItemSlot> heldRight;
 			std::optional<float> lastY;
+
+			float getRightSideWidth() const;
 	};
 }
