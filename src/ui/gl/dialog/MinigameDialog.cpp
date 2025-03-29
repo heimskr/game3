@@ -7,7 +7,7 @@
 
 namespace Game3 {
 	MinigameDialog::MinigameDialog(UIContext &ui, float selfScale, std::shared_ptr<Minigame> minigame, int width, int height):
-		DraggableDialog(ui, selfScale, BaseDraggableDialog::getEffectiveWidth(width, selfScale), BaseDraggableDialog::getEffectiveHeight(height, selfScale)),
+		DraggableDialog(ui, selfScale, BaseDraggableDialog::getEffectiveWidth(width * ui.scale / 8, selfScale * ui.scale), BaseDraggableDialog::getEffectiveHeight(height * ui.scale / 8, selfScale * ui.scale)),
 		width(width),
 		height(height),
 		minigame(std::move(minigame)) {
@@ -19,9 +19,13 @@ namespace Game3 {
 		DraggableDialog::init();
 
 		lastTime = std::chrono::system_clock::now();
-		minigame->setSize(width * selfScale, height * selfScale);
+		minigame->setSize(width * selfScale * ui.scale / 8, height * selfScale * ui.scale / 8);
 		minigame->reset();
 		minigame->insertAtEnd(shared_from_this());
+	}
+
+	void MinigameDialog::rescale(float scale) {
+		minigame->setSize(width * selfScale * scale / 8, height * selfScale * scale / 8);
 	}
 
 	void MinigameDialog::render(const RendererContext &renderers) {

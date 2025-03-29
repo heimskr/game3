@@ -33,7 +33,7 @@ namespace Game3::WorldGen {
 
 				static const std::array<std::tuple<Identifier, Identifier, int, int>, 3> machines{
 					std::tuple{"base:tile/arcade_machine_green", "base:minigame/breakout",    600, 600},
-					std::tuple{"base:tile/arcade_machine_red",   "base:minigame/flappy_bird", 64,  32},
+					std::tuple{"base:tile/arcade_machine_red",   "base:minigame/flappy_bird",  64,  32},
 					std::tuple{"base:tile/arcade_machine_blue",  "base:minigame/math",        600, 600},
 				};
 

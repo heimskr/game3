@@ -22,7 +22,7 @@ namespace Game3 {
 	void MathGame::init() {
 		equationColor = MATH_GAME_FOREGROUND;
 
-		input = std::make_shared<TextInput>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND, MATH_GAME_FOREGROUND, MATH_GAME_FOREGROUND);
+		input = make<TextInput>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND, MATH_GAME_FOREGROUND, MATH_GAME_FOREGROUND);
 		input->onSubmit.connect([this](TextInput &, const UString &text) {
 			if (!equation) {
 				return;
@@ -47,7 +47,7 @@ namespace Game3 {
 		});
 		input->insertAtEnd(shared_from_this());
 
-		bar = std::make_shared<ProgressBar>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND.darken(), MATH_GAME_BACKGROUND.darken(3));
+		bar = make<ProgressBar>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND.darken(), MATH_GAME_BACKGROUND.darken(3));
 		bar->insertAtEnd(shared_from_this());
 
 		setSize(gameWidth, gameHeight);
@@ -80,15 +80,17 @@ namespace Game3 {
 			validInput();
 		}
 
-		renderers.rectangle.drawOnScreen(MATH_GAME_BACKGROUND, x, y, gameWidth, gameHeight);
+		renderers.rectangle.drawOnScreen(MATH_GAME_BACKGROUND, x, y, width, height);
 
 		TextRenderer &texter = renderers.text;
 
-		y += 5;
+		y += 5 * ui.scale;
 		float text_height{};
 		texter.drawOnScreen(equation->text, TextRenderOptions{
-			.x = x + gameWidth / 2.0,
+			.x = x + width / 2.0,
 			.y = y,
+			.scaleX = ui.scale / 8,
+			.scaleY = ui.scale / 8,
 			.color = equationColor,
 			.align = TextAlign::Center,
 			.alignTop = true,
@@ -97,32 +99,32 @@ namespace Game3 {
 		});
 
 		texter.drawOnScreen(std::to_string(score), TextRenderOptions{
-			.x = x + 5,
-			.y = y + gameHeight - 10,
-			.scaleX = 0.5,
-			.scaleY = 0.5,
+			.x = x + 5 * ui.scale,
+			.y = y + height - 10 * ui.scale,
+			.scaleX = 0.5 * ui.scale / 8,
+			.scaleY = 0.5 * ui.scale / 8,
 			.color = MATH_GAME_FOREGROUND,
 			.alignTop = false,
 			.shadow{},
 		});
 
-		y += text_height + 5;
+		y += text_height + 5 + ui.scale;
 
-		const auto input_width = input->getFixedWidth();
-		const auto input_height = input->getFixedHeight();
-		input->render(renderers, x + (gameWidth - input_width) / 2.0, y, input_width, input_height);
+		const auto input_width = input->getFixedWidth() * ui.scale;
+		const auto input_height = input->getFixedHeight() * ui.scale;
+		input->render(renderers, x + (width - input_width) / 2.0, y, input_width, input_height);
 
-		y += input_height + 10;
+		y += input_height + 10 * ui.scale;
 
-		const auto bar_width = bar->getFixedWidth();
-		bar->render(renderers, x + (gameWidth - bar_width) / 2.0, y, bar_width, bar->getFixedHeight());
+		const auto bar_width = bar->getFixedWidth() * ui.scale;
+		const auto bar_height = bar->getFixedHeight() * ui.scale;
+		bar->render(renderers, x + (width - bar_width) / 2.0, y, bar_width, bar_height);
 	}
 
 	void MathGame::setSize(int width, int height) {
 		Minigame::setSize(width, height);
-		const float scale = getScale();
-		input->setFixedSize(width - 2 * scale, 10 * scale);
-		bar->setFixedSize(width - 2 * scale, 8 * scale);
+		input->setFixedSize(width / ui.scale - 2, 10);
+		bar->setFixedSize(width / ui.scale - 2, 8);
 	}
 
 	void MathGame::reset() {

@@ -11,7 +11,9 @@ namespace Game3 {
 
 	class Minigame: public Widget {
 		public:
+			/** Doesn't account for UI scale. */
 			int gameWidth{};
+			/** Doesn't account for UI scale. */
 			int gameHeight{};
 
 			Minigame(UIContext &, float scale);
