@@ -12,7 +12,11 @@ namespace Game3 {
 
 	void ClientSettings::apply(ClientGame &game) const {
 		glfwSwapInterval(capFPS? 1 : 0);
-		game.getWindow()->uiContext.setScale(uiScale);
+		apply(game.getWindow()->uiContext);
+	}
+
+	void ClientSettings::apply(UIContext &ui) const {
+		ui.setScale(uiScale);
 		apply();
 	}
 

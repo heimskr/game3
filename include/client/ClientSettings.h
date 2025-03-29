@@ -8,12 +8,9 @@
 #include <functional>
 #include <string>
 
-namespace Gtk {
-	class Window;
-}
-
 namespace Game3 {
 	class ClientGame;
+	class UIContext;
 
 	struct ClientSettings {
 		std::string hostname = "::1";
@@ -33,8 +30,11 @@ namespace Game3 {
 
 		ClientSettings();
 
-		/** Applies settings to a game instance. */
+		/** Applies game, UI and global settings. */
 		void apply(ClientGame &) const;
+
+		/** Applies UI and global settings. */
+		void apply(UIContext &) const;
 
 		/** Applies global settings. */
 		void apply() const;

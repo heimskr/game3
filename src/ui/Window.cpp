@@ -125,7 +125,7 @@ namespace Game3 {
 				settings = boost::json::value_to<ClientSettings>(boost::json::parse(readFile("settings.json")));
 			} catch (const std::ios_base::failure &) {}
 
-			settings.apply();
+			settings.apply(uiContext);
 
 			fbo.init();
 			textRenderer.initRenderData();
