@@ -136,7 +136,7 @@
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/iron_bar", 1]],
-				"output": [["base:item/item_pipe", 8]],
+				"output": [["base:item/item_pipe", 4]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
