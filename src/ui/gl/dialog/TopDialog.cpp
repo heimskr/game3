@@ -13,7 +13,7 @@ namespace Game3 {
 		Dialog(ui, selfScale) {}
 
 	void TopDialog::init() {
-		hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 0);
+		hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
 
 		abscond = make<Icon>(ui, selfScale);
 		abscond->setIconTexture(cacheTexture("resources/gui/abscond.png"));
@@ -38,7 +38,7 @@ namespace Game3 {
 
 	Rectangle TopDialog::getPosition() const {
 		float offset = selfScale;
-		return Rectangle(offset, offset, ui.getWidth() - 2 * offset, 16 * selfScale);
+		return Rectangle(0, 0, ui.getWidth(), 10 * getScale());
 	}
 
 	void TopDialog::onBlur() {
