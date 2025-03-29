@@ -133,8 +133,8 @@ namespace Game3 {
 	template <typename T, typename... Args>
 	requires std::derived_from<T, Widget>
 	std::shared_ptr<T> make(Args &&...args) {
-		auto dialog = std::make_shared<T>(std::forward<Args>(args)...);
-		dialog->init();
-		return dialog;
+		auto widget = std::make_shared<T>(std::forward<Args>(args)...);
+		widget->init();
+		return widget;
 	}
 }

@@ -50,7 +50,7 @@ namespace Game3 {
 		const Slot active_slot = inventory->activeSlot;
 		WidgetPtr self = shared_from_this();
 		for (Slot slot = 0; slot < slot_count; ++slot) {
-			auto &slot_widget = slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, selfScale, is_player && slot == active_slot));
+			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, selfScale, is_player && slot == active_slot));
 			slot_widget->insertAtEnd(self);
 		}
 	}

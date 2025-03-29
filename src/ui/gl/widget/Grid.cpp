@@ -1,4 +1,5 @@
 #include "ui/gl/widget/Grid.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	void Grid::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -17,6 +18,9 @@ namespace Game3 {
 
 		const float original_x = x;
 
+		const auto row_spacing = rowSpacing * getScale();
+		const auto column_spacing = columnSpacing * getScale();
+
 		for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {
 			x = original_x;
 			float max_height = 0;
@@ -27,11 +31,11 @@ namespace Game3 {
 				if (Widget *widget = widgetContainer[row, column]) {
 					widget->render(renderers, x, y, child_width, child_height);
 				}
-				x += child_width + columnSpacing;
+				x += child_width + column_spacing;
 			}
 
 			if (max_height > 0) {
-				y += max_height + rowSpacing;
+				y += max_height + row_spacing;
 			}
 		}
 	}
@@ -96,26 +100,28 @@ namespace Game3 {
 			column = &outer;
 			row = &inner;
 			sizes = &columnWidths;
-			spacing = columnSpacing;
+			spacing = columnSpacing * selfScale;
 		} else {
 			outer_size = widgetContainer.rows();
 			inner_size = widgetContainer.columns();
 			row = &outer;
 			column = &inner;
 			sizes = &rowHeights;
-			spacing = rowSpacing;
+			spacing = rowSpacing * selfScale;
 		}
 
-		if (!*sizes)
+		if (!*sizes) {
 			sizes->emplace();
+		}
 
 		(*sizes)->resize(outer_size);
 
 		std::size_t expand_count = 0;
 
 		auto get_size_container = [&] -> float & {
-			if (orientation == Orientation::Horizontal)
+			if (orientation == Orientation::Horizontal) {
 				return sizeContainer[*row, *column].first;
+			}
 			return sizeContainer[*row, *column].second;
 		};
 
