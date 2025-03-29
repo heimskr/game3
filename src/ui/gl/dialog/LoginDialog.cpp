@@ -73,6 +73,12 @@ namespace Game3 {
 		firstChild->render(renderers, bodyRectangle);
 	}
 
+	void LoginDialog::rescale(float new_scale) {
+		position.width = WIDTH * new_scale;
+		position.height = HEIGHT * new_scale;
+		Dialog::rescale(new_scale);
+	}
+
 	void LoginDialog::submit(bool go) {
 		if (go) {
 			signalSubmit(usernameInput->getText(), displayNameInput->getText());
@@ -85,8 +91,9 @@ namespace Game3 {
 
 	std::function<bool(Widget &, int, int, int)> LoginDialog::makeSubmit(bool go) {
 		return [this, go](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			submit(go);
 			return true;
 		};

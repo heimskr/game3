@@ -19,6 +19,7 @@ namespace Game3 {
 
 			void init() override;
 			void render(const RendererContext &) override;
+			void rescale(float new_scale) final;
 
 			static std::shared_ptr<LoginDialog> create(UIContext &, UString text, ButtonsType = ButtonsType::Okay);
 
