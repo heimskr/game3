@@ -122,9 +122,9 @@ namespace Game3 {
 				heldRight->setStack(nullptr);
 			}
 
-			const float held_size = INNER_SLOT_SIZE * heldLeft->getScale();
-			const float held_padding = SLOT_PADDING * heldLeft->getScale();
-			const float text_scale = heldLeft->getScale() / 8;
+			const float held_size = INNER_SLOT_SIZE * held_scale;
+			const float held_padding = SLOT_PADDING * held_scale;
+			const float text_scale = held_scale / 8;
 			const float rectangle_size = held_size + 2 * held_padding;
 
 			x += width + 2 * offset;

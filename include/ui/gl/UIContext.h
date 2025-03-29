@@ -81,6 +81,8 @@ namespace Game3 {
 			std::shared_ptr<ContextMenu> getContextMenu() const;
 			std::shared_ptr<Hotbar> getHotbar() const;
 			std::shared_ptr<InventoryModule> makePlayerInventoryModule();
+			void setScale(float);
+			void iterateChildren(const std::function<void(const WidgetPtr &)> &) const;
 
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});

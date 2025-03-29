@@ -113,6 +113,9 @@ namespace Game3 {
 			/** Returns false if updates are suppressed. */
 			virtual bool onChildrenUpdated();
 
+			/** Informs the widget that the UI's scale has changed. */
+			virtual void rescale(float new_scale);
+
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnClick(std::function<bool(Widget &)>);
 			virtual void setOnClick(std::function<void(Widget &)>);

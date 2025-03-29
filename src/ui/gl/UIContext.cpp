@@ -540,6 +540,31 @@ namespace Game3 {
 		return make<InventoryModule>(*this, 1, std::shared_ptr<ClientInventory>{});
 	}
 
+	void UIContext::setScale(float new_scale) {
+		scale = new_scale;
+		iterateChildren([new_scale](const WidgetPtr &widget) {
+			widget->rescale(new_scale);
+		});
+	}
+
+	void UIContext::iterateChildren(const std::function<void(const WidgetPtr &)> &iterator) const {
+		for (const DialogPtr &dialog: dialogs) {
+			iterator(dialog);
+		}
+
+		auto visit = [&](const WidgetPtr &widget) {
+			if (widget) {
+				iterator(widget);
+			}
+		};
+
+		visit(draggedWidget);
+		visit(hotbar);
+		visit(tooltip);
+		visit(autocompleteDropdown);
+		visit(contextMenu);
+	}
+
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {
 		const Rectangle rectangle = scissorStack.getTop().rectangle;
 		SingleSpriteRenderer &single = renderers.singleSprite;

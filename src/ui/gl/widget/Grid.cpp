@@ -100,14 +100,14 @@ namespace Game3 {
 			column = &outer;
 			row = &inner;
 			sizes = &columnWidths;
-			spacing = columnSpacing * selfScale;
+			spacing = columnSpacing * getScale();
 		} else {
 			outer_size = widgetContainer.rows();
 			inner_size = widgetContainer.columns();
 			row = &outer;
 			column = &inner;
 			sizes = &rowHeights;
-			spacing = rowSpacing * selfScale;
+			spacing = rowSpacing * getScale();
 		}
 
 		if (!*sizes) {
@@ -150,8 +150,9 @@ namespace Game3 {
 				accumulated_nonexpanding_natural += max_natural;
 			}
 
-			for (inner = 0; inner < inner_size; ++inner)
+			for (inner = 0; inner < inner_size; ++inner) {
 				get_size_container() = max_natural;
+			}
 
 			accumulated_minimum += max_minimum;
 			accumulated_natural += max_natural;
@@ -162,8 +163,9 @@ namespace Game3 {
 				float &size = (*sizes)->at(outer);
 				if (size == -1) {
 					size = (for_size - accumulated_nonexpanding_natural) / expand_count;
-					for (inner = 0; inner < inner_size; ++inner)
+					for (inner = 0; inner < inner_size; ++inner) {
 						get_size_container() = size;
+					}
 				}
 			}
 		}
@@ -174,8 +176,9 @@ namespace Game3 {
 	}
 
 	void Grid::remove(WidgetPtr child) {
-		if (child->getParent().get() != this)
+		if (child->getParent().get() != this) {
 			return;
+		}
 
 		Widget::remove(child);
 
@@ -207,8 +210,9 @@ namespace Game3 {
 			}
 		}
 
-		if (can_erase_row)
+		if (can_erase_row) {
 			widgetContainer.eraseRow(row_iter - widgetContainer.begin());
+		}
 
 		bool can_erase_column = true;
 		for (auto &row: widgetContainer) {
@@ -218,8 +222,9 @@ namespace Game3 {
 			}
 		}
 
-		if (can_erase_column)
+		if (can_erase_column) {
 			widgetContainer.eraseColumn(column);
+		}
 	}
 
 	void Grid::clearChildren() {
@@ -237,8 +242,9 @@ namespace Game3 {
 	}
 
 	void Grid::detach(std::size_t row, std::size_t column) {
-		if (widgetContainer.rows() <= row || widgetContainer.columns() <= column)
+		if (widgetContainer.rows() <= row || widgetContainer.columns() <= column) {
 			return;
+		}
 
 		Widget *&widget = widgetContainer.at(row, column);
 		if (widget) {
@@ -274,11 +280,13 @@ namespace Game3 {
 	}
 
 	WidgetPtr Grid::operator[](std::size_t row, std::size_t column) const {
-		if (widgetContainer.rows() <= row || widgetContainer.columns() < column)
+		if (widgetContainer.rows() <= row || widgetContainer.columns() < column) {
 			return {};
+		}
 
-		if (Widget *widget = widgetContainer.at(row, column))
+		if (Widget *widget = widgetContainer.at(row, column)) {
 			return widget->shared_from_this();
+		}
 
 		return {};
 	}

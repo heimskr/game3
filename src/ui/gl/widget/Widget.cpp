@@ -355,6 +355,12 @@ namespace Game3 {
 		return !suppressChildUpdates;
 	}
 
+	void Widget::rescale(float new_scale) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			child->rescale(new_scale);
+		}
+	}
+
 	bool Widget::shouldCull() const {
 		return !ui.scissorStack.getTop().rectangle.intersection(lastRectangle);
 	}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/gl/dialog/Dialog.h"
+#include "ui/gl/dialog/SizeCachingDialog.h"
 
 #include <memory>
 
