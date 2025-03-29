@@ -44,9 +44,6 @@ namespace Game3 {
 		adjustCoordinate(Orientation::Horizontal, x, width, size * scale);
 		adjustCoordinate(Orientation::Vertical, y, height, size * scale);
 
-		width = size * scale;
-		height = size * scale;
-
 		Widget::render(renderers, x, y, width, height);
 
 		if (!ui.renderingDraggedWidget) {
@@ -148,7 +145,7 @@ namespace Game3 {
 	}
 
 	void ItemSlot::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
-		minimum = natural = size * selfScale;
+		minimum = natural = size * getScale();
 	}
 
 	void ItemSlot::setStack(ItemStackPtr new_stack) {

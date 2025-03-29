@@ -11,6 +11,8 @@ namespace Game3 {
 		player(player) {}
 
 	KnownCraftingRecipes CraftingManager::getKnownRecipes() {
+		Timer timer{"GetKnownRecipes"};
+
 		if (!craftingRecipeIndex) {
 			craftingRecipeIndex = generateCraftingRecipeIndex();
 		}

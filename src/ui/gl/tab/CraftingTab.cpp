@@ -92,8 +92,8 @@ namespace Game3 {
 
 	void RecipeRow::init() {
 		auto grid = make<Grid>(ui, selfScale);
-		grid->setRowSpacing(8);
-		grid->setColumnSpacing(8);
+		grid->setRowSpacing(1);
+		grid->setColumnSpacing(1);
 		grid->attach(make<Label>(ui, selfScale, "In:"), 0, 0);
 		grid->attach(make<Label>(ui, selfScale, "Out:"), 1, 0);
 
