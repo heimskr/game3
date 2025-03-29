@@ -13,7 +13,9 @@ namespace Game3 {
 	Widget::Widget(UIContext &ui, float selfScale):
 		ui(ui), selfScale(selfScale) {}
 
-	void Widget::init() {}
+	void Widget::init() {
+		rescale(ui.scale);
+	}
 
 	const Rectangle & Widget::getLastRectangle() const {
 		return lastRectangle;

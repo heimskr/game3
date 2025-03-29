@@ -12,8 +12,8 @@
 
 namespace Game3 {
 	namespace {
-		constexpr int WIDTH = 600;
-		constexpr int HEIGHT = 350;
+		constexpr float WIDTH = 75;
+		constexpr float HEIGHT = 48;
 	}
 
 	LoginDialog::LoginDialog(UIContext &ui, float selfScale):
@@ -66,6 +66,8 @@ namespace Game3 {
 		vbox->insertAtEnd(shared_from_this());
 
 		ui.focusWidget(usernameInput);
+
+		recenter();
 	}
 
 	void LoginDialog::render(const RendererContext &renderers) {

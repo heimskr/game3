@@ -33,6 +33,8 @@ namespace Game3 {
 			virtual float getTitleScale() const = 0;
 			virtual const UString & getTitle() const = 0;
 
+			void recenter();
+
 		protected:
 			Rectangle position;
 			Rectangle titleRectangle;

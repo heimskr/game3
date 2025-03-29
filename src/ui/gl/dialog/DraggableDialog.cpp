@@ -77,6 +77,7 @@ namespace Game3 {
 	}
 
 	void BaseDraggableDialog::init() {
+		Dialog::init();
 		closeButton = std::make_shared<Icon>(ui, selfScale);
 		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
 		closeButton->setFixedSize(3.5 * selfScale);
@@ -131,6 +132,11 @@ namespace Game3 {
 		}
 
 		return false;
+	}
+
+	void BaseDraggableDialog::recenter() {
+		const auto [width, height] = position.size();
+		position = {(ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height};
 	}
 
 	float DraggableDialog::getTitleScale() const {

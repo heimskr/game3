@@ -48,6 +48,10 @@ namespace Game3 {
 
 		/** Returns whether both the height and width of the rectangle are positive. */
 		operator bool() const;
+
+		std::pair<int, int> size() const {
+			return {width, height};
+		}
 	};
 }
 

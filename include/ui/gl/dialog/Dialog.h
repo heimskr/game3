@@ -51,6 +51,7 @@ namespace Game3 {
 			bool contains(int x, int y) const override;
 
 			bool isFocused() const;
+			void recenter();
 
 		protected:
 			DialogPtr getSelf();
