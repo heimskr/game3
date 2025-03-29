@@ -336,18 +336,21 @@ namespace Game3 {
 	}
 
 	void Entity::setRider(const EntityPtr &rider) {
-		if (EntityPtr current_rider = getRider())
+		if (EntityPtr current_rider = getRider()) {
 			current_rider->setRidden(nullptr);
+		}
 
 		weakRider = rider;
 
-		if (rider)
+		if (rider) {
 			rider->setRidden(getSelf());
+		}
 
 		GamePtr game = getGame();
 
-		if (game->getSide() == Side::Server)
+		if (game->getSide() == Side::Server) {
 			game->toServer().broadcast(make<EntityRiddenPacket>(rider, *this));
+		}
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
@@ -359,7 +362,7 @@ namespace Game3 {
 		initialized = true;
 
 		weakGame = game;
-		auto shared = shared_from_this();
+		AgentPtr shared = shared_from_this();
 
 		{
 			auto lock = game->allAgents.uniqueLock();
@@ -638,8 +641,9 @@ namespace Game3 {
 				throw std::invalid_argument(std::format("Invalid direction: {}", move_direction));
 		}
 
-		if (!context.facingDirection)
+		if (!context.facingDirection) {
 			context.facingDirection = move_direction;
+		}
 
 		if (context.forcedPosition) {
 			new_position = *context.forcedPosition;
@@ -659,10 +663,11 @@ namespace Game3 {
 				offset = *context.forcedOffset;
 			} else if (can_move) {
 				auto lock = offset.uniqueLock();
-				if (horizontal)
+				if (horizontal) {
 					offset.x = x_offset;
-				else
+				} else {
 					offset.y = y_offset;
+				}
 			}
 
 			{
@@ -690,9 +695,10 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Realm> Entity::getRealm() const {
-		auto out = weakRealm.lock();
-		if (!out)
+		RealmPtr out = weakRealm.lock();
+		if (!out) {
 			throw std::runtime_error("Couldn't lock entity's realm");
+		}
 		return out;
 	}
 
@@ -716,8 +722,9 @@ namespace Game3 {
 	bool Entity::canMoveTo(const Place &place) const {
 		RealmPtr realm = place.realm;
 
-		if (!realm)
+		if (!realm) {
 			return false;
+		}
 
 		const Tileset &tileset = realm->getTileset();
 
@@ -773,11 +780,13 @@ namespace Game3 {
 		}
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
 			return;
+		}
 
-		if (!is_autofocus)
+		if (!is_autofocus) {
 			window.scale = 8.;
+		}
 
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
@@ -807,17 +816,20 @@ namespace Game3 {
 		if (context.forcedOffset) {
 			offset = *context.forcedOffset;
 		} else if (context.clearOffset) {
-			if (firstTeleport)
+			if (firstTeleport) {
 				offset = Vector3{0., 0., 0.};
-			else
+			} else {
 				offset = Vector3{0., 0., offset.z};
+			}
 		}
 
-		if (context.facingDirection)
+		if (context.facingDirection) {
 			direction = *context.facingDirection;
+		}
 
-		if (is_server)
+		if (is_server) {
 			increaseUpdateCounter();
+		}
 
 		realm->onMoved(shared, old_position, old_offset, new_position, getOffset());
 
@@ -848,8 +860,9 @@ namespace Game3 {
 			auto shared = getSelf();
 
 			GamePtr game = getGame();
-			if (game->getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets)
+			if (game->getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets) {
 				game->toServer().entityChangingRealms(*this, new_realm, new_position);
+			}
 
 			if (old_realm && old_realm != new_realm) {
 				old_realm->detach(shared);
@@ -892,31 +905,35 @@ namespace Game3 {
 	PathResult Entity::pathfind(const Position &start, const Position &goal, std::deque<Direction> &out, size_t loop_max) {
 		std::vector<Position> positions;
 
-		if (start == goal)
+		if (start == goal) {
 			return PathResult::Trivial;
+		}
 
-		if (!simpleAStar(getRealm(), start, goal, positions, loop_max))
+		if (!simpleAStar(getRealm(), start, goal, positions, loop_max)) {
 			return PathResult::Unpathable;
+		}
 
 		out.clear();
 		pathSeers.clear();
 
-		if (positions.size() < 2)
+		if (positions.size() < 2) {
 			return PathResult::Trivial;
+		}
 
 		for (auto iter = positions.cbegin() + 1, end = positions.cend(); iter != end; ++iter) {
 			const Position &prev = *(iter - 1);
 			const Position &next = *iter;
-			if (next.row == prev.row + 1)
+			if (next.row == prev.row + 1) {
 				out.push_back(Direction::Down);
-			else if (next.row == prev.row - 1)
+			} else if (next.row == prev.row - 1) {
 				out.push_back(Direction::Up);
-			else if (next.column == prev.column + 1)
+			} else if (next.column == prev.column + 1) {
 				out.push_back(Direction::Right);
-			else if (next.column == prev.column - 1)
+			} else if (next.column == prev.column - 1) {
 				out.push_back(Direction::Left);
-			else
+			} else {
 				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
+			}
 		}
 
 		pathfindGoal = goal;
@@ -952,19 +969,22 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Game> Entity::getGame() const {
-		if (auto locked = weakGame.lock())
+		if (auto locked = weakGame.lock()) {
 			return locked;
+		}
 
 		GamePtr game = getRealm()->getGame();
-		if (!game)
+		if (!game) {
 			throw std::runtime_error("Can't lock entity's game");
+		}
 		weakGame = game;
 		return game;
 	}
 
 	bool Entity::isVisible() const {
-		if (EntityPtr ridden = getRidden(); ridden && ridden->getRideType() == RideType::Hidden)
+		if (EntityPtr ridden = getRidden(); ridden && ridden->getRideType() == RideType::Hidden) {
 			return false;
+		}
 
 		const auto pos = getPosition();
 		auto realm = getRealm();
@@ -984,24 +1004,33 @@ namespace Game3 {
 	}
 
 	bool Entity::setHeldLeft(Slot new_value) {
-		if (0 <= new_value && heldRight.slot == new_value && !setHeld(-1, heldRight))
+		if (0 <= new_value && heldRight.slot == new_value && !setHeld(-1, heldRight)) {
 			return false;
+		}
+
 		return setHeld(new_value, heldLeft);
 	}
 
 	bool Entity::setHeldRight(Slot new_value) {
-		if (0 <= new_value && heldLeft.slot == new_value && !setHeld(-1, heldLeft))
+		if (0 <= new_value && heldLeft.slot == new_value && !setHeld(-1, heldLeft)) {
 			return false;
+		}
+
 		return setHeld(new_value, heldRight);
 	}
 
 	void Entity::unhold(Slot slot) {
-		if (slot < 0)
+		if (slot < 0) {
 			return;
-		if (heldLeft.slot == slot)
+		}
+
+		if (heldLeft.slot == slot) {
 			setHeldLeft(-1);
-		if (heldRight.slot == slot)
+		}
+
+		if (heldRight.slot == slot) {
 			setHeldRight(-1);
+		}
 	}
 
 	Side Entity::getSide() const {
@@ -1020,15 +1049,18 @@ namespace Game3 {
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
 		const auto realm = getRealm();
 
-		if (realm_id != (nextRealm == 0? realm->id : nextRealm.load()))
+		if (realm_id != (nextRealm == 0? realm->id : nextRealm.load())) {
 			return false;
+		}
 
 		const auto this_position = getChunk();
 		const auto other_position = pos.getChunk();
 
-		if (this_position.x - REALM_DIAMETER / 2 <= other_position.x && other_position.x <= this_position.x + REALM_DIAMETER / 2)
-			if (this_position.y - REALM_DIAMETER / 2 <= other_position.y && other_position.y <= this_position.y + REALM_DIAMETER / 2)
+		if (this_position.x - REALM_DIAMETER / 2 <= other_position.x && other_position.x <= this_position.x + REALM_DIAMETER / 2) {
+			if (this_position.y - REALM_DIAMETER / 2 <= other_position.y && other_position.y <= this_position.y + REALM_DIAMETER / 2) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -1076,21 +1108,22 @@ namespace Game3 {
 						visible->visibleEntities.erase(shared);
 					}
 
-					if (visible->isPlayer())
+					if (visible->isPlayer()) {
 						players_to_erase.emplace_back(safeDynamicCast<Player>(visible));
+					}
 				}
 			}
 		}
 
-		for (const auto &entity: entities_to_erase)
+		for (const auto &entity: entities_to_erase) {
 			visibleEntities.erase(entity);
-
-		{
-			auto players_lock = visiblePlayers.uniqueLock();
-
-			for (const auto &player: players_to_erase)
-				visiblePlayers.erase(player);
 		}
+
+		visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
+			for (const auto &player: players_to_erase) {
+				visible.erase(player);
+			}
+		});
 
 		if (auto realm = weakRealm.lock()) {
 			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
@@ -1101,12 +1134,18 @@ namespace Game3 {
 					auto chunk_lock = visible_at_chunk->sharedLock();
 					for (const WeakEntityPtr &weak_visible: *visible_at_chunk) {
 						EntityPtr visible = weak_visible.lock();
-						if (!visible || visible.get() == this)
+
+						if (!visible || visible.get() == this) {
 							continue;
+						}
+
 						assert(visible->getGID() != getGID());
 						visibleEntities.insert(visible);
-						if (visible->isPlayer())
+
+						if (visible->isPlayer()) {
 							visiblePlayers.emplace(safeDynamicCast<Player>(visible));
+						}
+
 						if (visible->otherEntityToLock != globalID) {
 							otherEntityToLock = visible->globalID;
 							{
@@ -1158,10 +1197,11 @@ namespace Game3 {
 	void Entity::setSeenPath(const PlayerPtr &player, bool seen) {
 		auto lock = pathSeers.uniqueLock();
 
-		if (seen)
+		if (seen) {
 			pathSeers.insert(player);
-		else
+		} else {
 			pathSeers.erase(player);
+		}
 	}
 
 	size_t Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
@@ -1289,6 +1329,7 @@ namespace Game3 {
 		if (player == excludedPlayer) {
 			return;
 		}
+
 		player->notifyOfRealm(*getRealm());
 		client.send(make<EntityPacket>(getSelf()));
 		onSend(player);
@@ -1383,12 +1424,14 @@ namespace Game3 {
 #endif
 
 	void Entity::calculateVisibleEntities() {
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return;
+		}
 
-		auto realm = weakRealm.lock();
-		if (!realm)
+		RealmPtr realm = weakRealm.lock();
+		if (!realm) {
 			return;
+		}
 
 		{
 			auto entities_lock = realm->entities.sharedLock();
@@ -1417,13 +1460,15 @@ namespace Game3 {
 	void Entity::jump() {
 		RealmPtr realm = getRealm();
 		GamePtr game = realm->getGame();
-		if (game->getSide() != Side::Server || getRidden())
+		if (game->getSide() != Side::Server || getRidden()) {
 			return;
+		}
 
 		{
 			auto velocity_lock = velocity.uniqueLock();
-			if (velocity.z != 0.)
+			if (velocity.z != 0.) {
 				return;
+			}
 
 			{
 				auto offset_lock = offset.sharedLock();
@@ -1433,10 +1478,12 @@ namespace Game3 {
 
 			velocity.z = getJumpSpeed();
 		}
+
 		increaseUpdateCounter();
 
-		if (TileEntityPtr tile_entity = realm->tileEntityAt(getPosition()))
+		if (TileEntityPtr tile_entity = realm->tileEntityAt(getPosition())) {
 			tile_entity->onOverlapEnd(getSelf());
+		}
 
 		game->toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});
 	}
