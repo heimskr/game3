@@ -285,6 +285,12 @@ namespace Game3 {
 		});
 	}
 
+	TileEntity::TileEntity(Identifier tileID, Identifier tileEntityID, Position position, bool solid):
+		tileID(std::move(tileID)),
+		tileEntityID(std::move(tileEntityID)),
+		position(position),
+		solid(solid) {}
+
 	std::function<void(const TickArgs &)> TileEntity::getTickFunction() {
 		return [weak = getWeakSelf()](const TickArgs &args) {
 			if (TileEntityPtr tile_entity = weak.lock())

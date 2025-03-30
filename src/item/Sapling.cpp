@@ -16,11 +16,13 @@ namespace Game3 {
 
 		Tileset &tileset = realm.getTileset();
 
-		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, getSoilCategory()))
+		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, getSoilCategory())) {
 			return false;
+		}
 
-		if (!place.isPathable() || place.get(Layer::Submerged) != 0)
+		if (!place.isPathable() || place.get(Layer::Submerged) != 0) {
 			return false;
+		}
 
 		const InventoryPtr inventory = player.getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();

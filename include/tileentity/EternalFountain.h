@@ -27,7 +27,7 @@ namespace Game3 {
 
 		private:
 			EternalFountain();
-			EternalFountain(Identifier tile_id, Position);
+			EternalFountain(Identifier tileID, Position);
 			EternalFountain(Position);
 
 		friend class TileEntity;

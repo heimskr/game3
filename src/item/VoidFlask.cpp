@@ -5,6 +5,7 @@
 #include "graphics/Tileset.h"
 #include "item/VoidFlask.h"
 #include "realm/Realm.h"
+#include "tileentity/FluidHoldingTileEntity.h"
 #include "types/Position.h"
 
 namespace Game3 {
@@ -12,9 +13,14 @@ namespace Game3 {
 		RealmPtr realm = place.realm;
 		assert(realm->getSide() == Side::Server);
 
-		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); tile && 0 < tile->level) {
+		if (std::optional<FluidTile> tile = place.getFluid(); tile && 0 < tile->level) {
 			tile->level = 0;
 			realm->setFluid(place.position, *tile);
+			return true;
+		}
+
+		if (auto tile_entity = std::dynamic_pointer_cast<FluidHoldingTileEntity>(place.getTileEntity())) {
+			tile_entity->setFluidLevels({});
 			return true;
 		}
 

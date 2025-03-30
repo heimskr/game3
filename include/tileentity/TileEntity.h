@@ -118,8 +118,7 @@ namespace Game3 {
 			bool tileLookupFailed = false;
 
 			TileEntity() = default;
-			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
-				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
+			TileEntity(Identifier tileID, Identifier tileEntityID, Position position, bool solid);
 
 			std::function<void(const TickArgs &)> getTickFunction();
 

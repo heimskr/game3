@@ -223,7 +223,7 @@ namespace Game3::WorldGen {
 		for (const Position &position : {entrance, entrance + Position(1, 0)}) {
 			realm->setTile(Layer::Objects, position, 0);
 			realm->setTile(Layer::Highest, position, 0);
-			if (realm->getTile(Layer::Terrain, position) == 0) {
+			if (realm->tryTile(Layer::Terrain, position) == 0) {
 				realm->setTile(Layer::Terrain, position, "base:tile/cave_dirt");
 			}
 		}

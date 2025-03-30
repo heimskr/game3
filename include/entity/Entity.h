@@ -58,7 +58,7 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasDimensions, public HasInventory, public Tickable, public HasMutex<SharedRecursiveMutex> {
+	class Entity: public Agent, public HasDimensions, public HasInventory, public Tickable, public HasMutex<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */

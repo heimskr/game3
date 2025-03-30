@@ -21,7 +21,7 @@ namespace Game3 {
 	struct NamedRegistryBase;
 	struct UnnamedRegistryBase;
 
-	class Registry: public NamedRegisterable, public HasMutex<>, public std::enable_shared_from_this<Registry> {
+	class Registry: public NamedRegisterable, public HasMutex<Registry>, public std::enable_shared_from_this<Registry> {
 		protected:
 			explicit Registry(Identifier identifier_): NamedRegisterable(std::move(identifier_)) {}
 

@@ -20,7 +20,7 @@ namespace Game3 {
 	struct CraftingRecipe;
 
 	/** Inventories should be locked appropriately (see HasMutex) when something is calling Inventory methods. The Inventory will not lock itself. */
-	class Inventory: public Container, public HasMutex<> {
+	class Inventory: public Container, public HasMutex<Inventory> {
 		protected:
 			Inventory();
 			Inventory(std::shared_ptr<Agent> owner, Slot active_slot = 0, InventoryID index_ = 0);

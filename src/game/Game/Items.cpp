@@ -52,6 +52,7 @@
 #include "item/Sapling.h"
 #include "item/SequencerItem.h"
 #include "item/Seed.h"
+#include "item/SulfuricAcidItem.h"
 #include "item/TankItem.h"
 #include "item/TerrainSeed.h"
 #include "item/Tool.h"
@@ -213,7 +214,6 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/eye",              "Eye",                24, 64));
 		add(std::make_shared<Item>("base:item/chromatin",        "Chromatin",           2, 64));
 		add(std::make_shared<Item>("base:item/fabric",           "Fabric",             20, 64));
-		add(std::make_shared<Item>("base:item/sulfuric_acid",    "Sulfuric Acid",      16, 64));
 		add(std::make_shared<Item>("base:item/gene",             "Gene",                1,  1));
 		add(std::make_shared<Item>("base:item/genetic_template", "Genetic Template",    1,  1));
 		add(std::make_shared<Item>("base:item/aluminum_ore",     "Aluminum Ore",       32, 64));
@@ -305,6 +305,8 @@ namespace Game3 {
 		add(std::make_shared<SequencerItem>("base:item/sequencer", "Sequencer", 999, 64)); // TODO: cost
 
 		add(std::make_shared<SnowySapling>("base:item/snowy_sapling", "Snowy Sapling", 5, 64));
+
+		add(std::make_shared<SulfuricAcidItem>("base:item/sulfuric_acid", "Sulfuric Acid", 16, 64));
 
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 

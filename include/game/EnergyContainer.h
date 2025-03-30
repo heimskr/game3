@@ -5,7 +5,7 @@
 #include "threading/HasMutex.h"
 
 namespace Game3 {
-	class EnergyContainer: public Container, public HasMutex<> {
+	class EnergyContainer: public Container, public HasMutex<EnergyContainer> {
 		public:
 			// I wish I could just use std::atomic for this.
 			EnergyAmount energy;

@@ -30,6 +30,7 @@ namespace Game3 {
 				}
 
 				sheep->sendToVisible();
+				return true;
 			}
 		}
 
