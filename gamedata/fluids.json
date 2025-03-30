@@ -73,6 +73,12 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/radon",
 				"color":    "#222222"
+			}],
+			["base:fluid/sulfuric_acid", {
+				"name":     "Sulfuric Acid",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/sulfuric_acid",
+				"color":    "#ccff33"
 			}]
 		]]
 	]

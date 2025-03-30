@@ -502,6 +502,10 @@
 			["base:registry/liquefier_recipe", {
 				"input":  ["base:item/chemical", 1, {"formula": "C3H7N3O2"}],
 				"output": ["base:fluid/mutagen", 250]
+			}],
+			["base:registry/liquefier_recipe", {
+				"input":  ["base:item/chemical", 1, {"formula": "H2SO4"}],
+				"output": ["base:fluid/sulfuric_acid", 100]
 			}]
 		]]
 	]
