@@ -49,8 +49,8 @@ namespace Game3 {
 	}
 
 	void FlappyBird::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		width = gameWidth;
-		height = gameHeight;
+		width = gameWidth * getScale();
+		height = gameHeight * getScale();
 
 		Minigame::render(renderers, x, y, width, height);
 
