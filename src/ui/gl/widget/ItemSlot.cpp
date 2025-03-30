@@ -28,7 +28,7 @@ namespace Game3 {
 		ItemSlot(ui, nullptr, nullptr, slot, size, selfScale, active) {}
 
 	ItemSlot::ItemSlot(UIContext &ui, Slot slot, bool active):
-		ItemSlot(ui, slot, INNER_SLOT_SIZE, SLOT_SCALE, active) {}
+		ItemSlot(ui, slot, INNER_SLOT_SIZE, 1, active) {}
 
 	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		const auto scale = getScale();
