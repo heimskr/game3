@@ -19,6 +19,15 @@
 #include <sstream>
 
 namespace Game3 {
+	template <template <typename...> typename M, typename K, typename V>
+	static M<K, V> loadKeyValuePairs(const boost::json::value &json) {
+		M<K, V> out;
+		for (const boost::json::value &value: json.as_array()) {
+			out.emplace(boost::json::value_to<K>(value.at(0)), boost::json::value_to<V>(value.at(1)));
+		}
+		return out;
+	}
+
 	GameDB::GameDB(const ServerGamePtr &game):
 		weakGame(game) {}
 
@@ -336,8 +345,20 @@ namespace Game3 {
 				return;
 
 			const boost::json::value &meta = get_meta(realm_tileset_hash);
-			const auto old_map = boost::json::value_to<std::unordered_map<TileID, Identifier>>(meta.at("names"));
-			const auto autotiles = boost::json::value_to<std::unordered_map<Identifier, Identifier>>(meta.at("autotiles"));
+
+			std::unordered_map<TileID, Identifier> old_map;
+			try {
+				old_map = boost::json::value_to<std::unordered_map<TileID, Identifier>>(meta.at("names"));
+			} catch (const boost::system::system_error &) {
+				old_map = loadKeyValuePairs<std::unordered_map, TileID, Identifier>(meta.at("names"));
+			}
+
+			std::unordered_map<Identifier, Identifier> autotiles;
+			try {
+				autotiles = boost::json::value_to<std::unordered_map<Identifier, Identifier>>(meta.at("autotiles"));
+			} catch (const boost::system::system_error &) {
+				autotiles = loadKeyValuePairs<std::unordered_map, Identifier, Identifier>(meta.at("autotiles"));
+			}
 
 			INFO("Auto-migrating tiles for realm {}", realm->id);
 

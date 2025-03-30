@@ -19,6 +19,7 @@
 #include <random>
 
 // #define REDIRECT_LOGS
+#define CATCH_SERVERWRAPPER
 
 #include "config.h"
 #ifdef IS_FLATPAK
@@ -46,7 +47,9 @@ namespace Game3 {
 	}
 
 	void ServerWrapper::run(size_t overworld_seed) {
+#ifdef CATCH_SERVERWRAPPER
 		try {
+#endif
 			if (running) {
 				throw std::runtime_error("Server is already running");
 			}
@@ -224,6 +227,7 @@ namespace Game3 {
 			tick_thread.join();
 			stop_thread.join();
 			save_thread.join();
+#ifdef CATCH_SERVERWRAPPER
 		} catch (const std::exception &error) {
 			if (onError) {
 				onError(error);
@@ -231,6 +235,7 @@ namespace Game3 {
 				throw;
 			}
 		}
+#endif
 	}
 
 	void ServerWrapper::stop() {

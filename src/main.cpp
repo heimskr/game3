@@ -263,7 +263,12 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if ((arg1 == "--add-item" || arg1 == "--add-tile") && argc == 5) {
+		if (arg1 == "--add-item" || arg1 == "--add-tile") {
+			if (argc != 5) {
+				std::println("Usage: {} {} <identifier> <credit> <image path>", argv[0], arg1);
+				return 1;
+			}
+
 			std::string id = argv[2];
 			std::string_view credit = argv[3];
 			std::filesystem::path image_path = argv[4];
