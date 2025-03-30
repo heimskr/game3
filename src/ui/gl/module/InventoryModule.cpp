@@ -22,11 +22,13 @@ namespace Game3 {
 			const InventoryModule::Argument *argument = std::any_cast<InventoryModule::Argument>(&any);
 			if (!argument) {
 				const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
-				if (!agent)
+				if (!agent) {
 					throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
+				}
 				auto has_inventory = std::dynamic_pointer_cast<HasInventory>(*agent);
-				if (!has_inventory)
+				if (!has_inventory) {
 					throw std::invalid_argument("Agent supplied to InventoryModule isn't castable to HasInventory");
+				}
 				return std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(0));
 			}
 			const auto [agent, index] = *argument;
@@ -162,9 +164,9 @@ namespace Game3 {
 		}
 
 		if (orientation == Orientation::Horizontal) {
-			minimum = natural = (getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * selfScale;
+			minimum = natural = (getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * getScale();
 		} else {
-			minimum = natural = (updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * selfScale;
+			minimum = natural = (updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * getScale();
 		}
 	}
 
