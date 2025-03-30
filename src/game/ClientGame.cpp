@@ -215,7 +215,9 @@ namespace Game3 {
 			try {
 				packet->handle(getSelf());
 			} catch (const Warning &warning) {
-				getWindow()->error(warning.what());
+				getWindow()->delay([warning = UString(warning.what())](Window &window) {
+					window.error(warning);
+				});
 			} catch (const std::exception &err) {
 				Packet &packet_ref = *packet;
 				ERR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
