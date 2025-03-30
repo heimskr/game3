@@ -5,6 +5,7 @@
 #include "game/Inventory.h"
 #include "packet/LoginStatusPacket.h"
 #include "packet/PacketError.h"
+#include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -46,6 +47,7 @@ namespace Game3 {
 			window->settings.username = username;
 		}
 		window->saveSettings();
+		window->uiContext.removeDialogs<ConnectionDialog>();
 		auto player = Entity::create<ClientPlayer>();
 		game->setPlayer(player);
 		player->setGID(globalID);
