@@ -28,10 +28,11 @@ namespace Game3 {
 
 		if (showHeader) {
 			auto label = std::make_shared<Label>(ui, selfScale);
-			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver))
+			if (auto agent = std::dynamic_pointer_cast<Agent>(fluidHaver)) {
 				label->setText(agent->getName());
-			else
+			} else {
 				label->setText("???");
+			}
 			label->insertAtEnd(vbox);
 		}
 

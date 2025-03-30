@@ -97,9 +97,9 @@ namespace Game3 {
 
 	void ProgressBar::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
-			minimum = natural = 0 < fixedWidth? fixedWidth : (horizontalExpand? for_width : getDefaultWidth());
+			minimum = natural = 0 < fixedWidth? fixedWidth * getScale() : (horizontalExpand? for_width : getDefaultWidth() * ui.scale);
 		} else {
-			minimum = natural = 0 < fixedHeight? fixedHeight : (verticalExpand? for_height : getDefaultHeight());
+			minimum = natural = 0 < fixedHeight? fixedHeight * getScale() : (verticalExpand? for_height : getDefaultHeight() * ui.scale);
 		}
 	}
 
