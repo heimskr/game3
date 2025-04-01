@@ -357,11 +357,11 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ClientPlayer> Player::toClient() {
-		return std::dynamic_pointer_cast<ClientPlayer>(shared_from_this());
+		return safeDynamicCast<ClientPlayer>(shared_from_this());
 	}
 
 	std::shared_ptr<ServerPlayer> Player::toServer() {
-		return std::dynamic_pointer_cast<ServerPlayer>(shared_from_this());
+		return safeDynamicCast<ServerPlayer>(shared_from_this());
 	}
 
 	void Player::addKnownRealm(RealmID realm_id) {

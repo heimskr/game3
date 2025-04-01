@@ -24,6 +24,7 @@
 #include "packet/HeldItemSetPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "tile/Tile.h"
 #include "types/Position.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
@@ -1460,6 +1461,7 @@ namespace Game3 {
 	void Entity::jump() {
 		RealmPtr realm = getRealm();
 		GamePtr game = realm->getGame();
+
 		if (game->getSide() != Side::Server || getRidden()) {
 			return;
 		}
@@ -1481,8 +1483,18 @@ namespace Game3 {
 
 		increaseUpdateCounter();
 
+		EntityPtr self = getSelf();
+
 		if (TileEntityPtr tile_entity = realm->tileEntityAt(getPosition())) {
-			tile_entity->onOverlapEnd(getSelf());
+			tile_entity->onOverlapEnd(self);
+		}
+
+		Place place = getPlace();
+
+		for (Layer layer: allLayers) {
+			if (TilePtr tile = place.getTile(layer)) {
+				tile->jumpedFrom(self, place, layer);
+			}
 		}
 
 		game->toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});

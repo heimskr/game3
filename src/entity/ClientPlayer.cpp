@@ -13,6 +13,7 @@
 #include "packet/MovePlayerPacket.h"
 #include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
+#include "tile/Tile.h"
 #include "ui/Window.h"
 
 #include <cmath>
@@ -209,8 +210,21 @@ namespace Game3 {
 			GamePtr game = getGame();
 			constexpr static float variance = .9f;
 			game->toClient().playSound("base:sound/jump", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
-			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
-				tile_entity->onOverlapEnd(getSelf());
+
+			EntityPtr self = getSelf();
+
+			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
+				tile_entity->onOverlapEnd(self);
+			}
+
+			Place place = getPlace();
+
+			for (Layer layer: allLayers) {
+				if (TilePtr tile = place.getTile(layer)) {
+					tile->jumpedFrom(self, place, layer);
+				}
+			}
+
 			send(make<JumpPacket>());
 		}
 	}
