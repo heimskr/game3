@@ -24,9 +24,7 @@ namespace Game3 {
 			std::modf(accumulatedDamage, &integral);
 
 			if (integral >= 1.0) {
-				target->getGame()->enqueue([target, integral](const TickArgs &) {
-					target->takeDamage(static_cast<HitPoints>(integral));
-				});
+				target->enqueueDamage(static_cast<HitPoints>(integral));
 				constexpr float variance = 0.95;
 				target->getRealm()->playSound(target->getPosition(), "base:sound/huo", 0.2f + threadContext.random(variance, 1.f / variance));
 				accumulatedDamage -= integral;

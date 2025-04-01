@@ -237,8 +237,20 @@ namespace Game3 {
 		return false;
 	}
 
+	void LivingEntity::enqueueDamage(HitPoints damage) {
+		getGame()->enqueue([weak = getWeakSelf(), old_kills = kills, damage](const TickArgs &) {
+			if (LivingEntityPtr self = weak.lock()) {
+				if (self->kills == old_kills) {
+					self->takeDamage(damage);
+				}
+			}
+		});
+	}
+
 	void LivingEntity::kill() {
 		assert(getSide() == Side::Server);
+
+		++kills;
 
 		RealmPtr realm = getRealm();
 
@@ -366,6 +378,14 @@ namespace Game3 {
 
 			return false;
 		});
+	}
+
+	std::shared_ptr<LivingEntity> LivingEntity::getSelf() {
+		return std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+	}
+
+	std::weak_ptr<LivingEntity> LivingEntity::getWeakSelf() {
+		return std::weak_ptr(getSelf());
 	}
 
 	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {

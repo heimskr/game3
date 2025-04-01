@@ -39,6 +39,7 @@ namespace Game3 {
 			virtual bool heal(HitPoints);
 			/** Returns whether the entity died. */
 			virtual bool takeDamage(HitPoints);
+			virtual void enqueueDamage(HitPoints);
 			virtual void spawnBlood(size_t count);
 			virtual void kill();
 			virtual void onAttack(const std::shared_ptr<LivingEntity> &attacker);
@@ -54,12 +55,17 @@ namespace Game3 {
 			/** Returns whether iteration was stopped by the supplied function returning true. */
 			virtual bool iterateStatusEffects(const std::function<bool(const Identifier &, const std::unique_ptr<StatusEffect> &)> &) const;
 
+			std::shared_ptr<LivingEntity> getSelf();
+			std::weak_ptr<LivingEntity> getWeakSelf();
+
 		protected:
 			Lockable<StatusEffectMap> statusEffects;
 			double luckStat = 0;
 			/** Affects attack speed. */
 			float speedStat = getBaseSpeed();
 			int defenseStat = 0;
+			/** Not synchronized. */
+			int kills = 0;
 
 			LivingEntity();
 

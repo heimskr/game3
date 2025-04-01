@@ -213,6 +213,8 @@ namespace Game3 {
 		WARN("Killing server player \e[1m{}\e[22m.", username);
 		ServerGame &game = getGame()->toServer();
 
+		++kills;
+
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
 		setStatusEffects({});
 

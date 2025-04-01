@@ -22,9 +22,7 @@ namespace Game3 {
 			std::modf(accumulatedDamage, &integral);
 
 			if (integral >= 1.0) {
-				target->getGame()->enqueue([target, integral](const TickArgs &) {
-					target->takeDamage(static_cast<HitPoints>(integral));
-				});
+				target->enqueueDamage(static_cast<HitPoints>(integral));
 				severity *= 1.05;
 				accumulatedDamage -= integral;
 			}
