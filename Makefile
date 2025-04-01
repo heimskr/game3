@@ -191,6 +191,20 @@ winzip: game3.exe
 	cp ../*.dll Game3/ && \
 	zip -r ../game3.zip Game3
 
+winzip_debug: builddir/src/game3.exe
+	cv2pdb64 $< game3.exe game3.pdb
+	rm -f game3.zip
+	mkdir -p game3_zip/Game3
+	cd game3_zip && \
+	cp -r ../resources Game3/resources && \
+	cp -r ../gamedata Game3/gamedata && \
+	cp -r ../src Game3/src && \
+	cp -r ../include Game3/include && \
+	cp ../game3.exe Game3/ && \
+	cp ../game3.pdb Game3/ && \
+	cp ../*.dll Game3/ && \
+	zip -r ../game3.zip Game3
+
 winja:
 	ninja -C builddir
 	cp builddir/src/game3.exe .

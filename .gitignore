@@ -55,3 +55,4 @@ vgcore.*
 *.exe
 /game3_zip
 /log*
+*.pdb

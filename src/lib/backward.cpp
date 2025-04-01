@@ -15,6 +15,7 @@
 // better, add the detection of the lib and the macro definition in your build
 // system)
 
+#ifndef __MINGW32__
 // - apt-get install libdw-dev ...
 // - g++/clang++ -ldw ...
 // #define BACKWARD_HAS_DW 1
@@ -32,11 +33,12 @@
 // - apt-get install libunwind-dev
 // - g++/clang++ -lunwind
 #define BACKWARD_HAS_LIBUNWIND 1
+#else
+#define BACKWARD_SYSTEM_WINDOWS
+#endif
 
 #include "backward.hpp"
 
 namespace backward {
-
-backward::SignalHandling sh;
-
-} // namespace backward
+	backward::SignalHandling sh;
+}

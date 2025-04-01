@@ -31,6 +31,7 @@
 #include <GLFW/glfw3.h>
 #ifdef __MING32__
 #include <GL/glut.h>
+// #define CATCH_MAIN
 #endif
 
 #include <cstdlib>
@@ -57,7 +58,7 @@ namespace Game3 {
 int main(int argc, char **argv) {
 	using namespace Game3;
 
-#ifdef __MINGW32__
+#ifdef CATCH_MAIN
 	try {
 #endif
 	threadContext.rename("Main");
@@ -408,7 +409,7 @@ int main(int argc, char **argv) {
 
 	Timer::summary();
 	richPresence.reset();
-#ifdef __MINGW32__
+#ifdef CATCH_MAIN
 	} catch (const std::exception &err) {
 		ERR("UNCAUGHT EXCEPTION ({}): {}", DEMANGLE(err), err.what());
 		static_cast<std::ofstream &>(Logger::fileStream() << std::endl).close();

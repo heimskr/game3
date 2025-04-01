@@ -28,12 +28,16 @@ game3_deps = [
 	# fastnoise2.dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
-	dependency('libunwind'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
+
+if build_machine.system() != 'windows'
+	# No clue why the libunwind package for MSYS2 doesn't include a .pc file. We just have to trust it's installed.
+	game3_deps += dependency('libunwind')
+endif
 
 inc_dirs = [
 	include_directories('..' / 'include'),
@@ -87,6 +91,8 @@ elif build_machine.system() == 'windows'
 	# link_args += '-lgcc'
 	link_args += '-lglew32'
 	link_args += '-lglu32'
+	link_args += '-lunwind'
+	link_args += '-ldbghelp'
 	inc_dirs += include_directories('..' / 'subprojects' / 'libnoise' / 'src')
 endif
 
