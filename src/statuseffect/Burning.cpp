@@ -1,6 +1,8 @@
 #include "entity/LivingEntity.h"
 #include "graphics/Color.h"
+#include "realm/Realm.h"
 #include "statuseffect/Burning.h"
+#include "threading/ThreadContext.h"
 
 namespace Game3 {
 	Burning::Burning():
@@ -22,6 +24,8 @@ namespace Game3 {
 
 			if (integral >= 1.0) {
 				target->takeDamage(static_cast<HitPoints>(integral));
+				constexpr float variance = 0.95;
+				target->getRealm()->playSound(target->getPosition(), "base:sound/huo", 0.2f + threadContext.random(variance, 1.f / variance));
 				accumulatedDamage -= integral;
 			}
 		}
