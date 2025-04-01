@@ -19,6 +19,7 @@
 #include "util/Crypto.h"
 #include "util/Defer.h"
 #include "util/FS.h"
+#include "util/Log.h"
 #include "util/Shell.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -55,6 +56,9 @@ namespace Game3 {
 int main(int argc, char **argv) {
 	using namespace Game3;
 
+#ifdef __MINGW32__
+	try {
+#endif
 	threadContext.rename("Main");
 
 #ifdef GAME3_ENABLE_SCRIPTING
@@ -403,5 +407,14 @@ int main(int argc, char **argv) {
 
 	Timer::summary();
 	richPresence.reset();
+#ifdef __MINGW32__
+	} catch (const std::exception &err) {
+		ERR("UNCAUGHT EXCEPTION: {}", err.what());
+		throw;
+	} catch (...) {
+		ERR("UNCAUGHT EXCEPTION (unknown type)");
+		throw;
+	}
+#endif
 	return 0;
 }
