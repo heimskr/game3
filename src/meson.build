@@ -28,6 +28,7 @@ game3_deps = [
 	# fastnoise2.dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
+	dependency('libunwind'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
@@ -38,11 +39,14 @@ inc_dirs = [
 	include_directories('..' / 'include'),
 	include_directories('..' / 'voronoi' / 'src'),
 	include_directories('..' / 'subprojects' / 'fixed_string' / 'include'),
+	include_directories('..' / 'subprojects' / 'backward-cpp'),
 ]
 
 link_with = [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')]
 
-link_args = []
+link_args = [
+	'-lbfd',
+]
 
 if get_option('enable_zip8')
 	zip8 = subproject('zip8')
@@ -73,7 +77,6 @@ elif build_machine.system() == 'linux'
 elif build_machine.system() == 'darwin'
 	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 elif build_machine.system() == 'windows'
-	# link_args += '-L../subprojects/FastNoise2/build/lib'
 	link_args += '../subprojects/FastNoise2/build2/lib/libFastNoise.a'
 	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
 	link_args += '-lws2_32'

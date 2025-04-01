@@ -34,3 +34,6 @@
 [submodule "subprojects/libnoise"]
 	path = subprojects/libnoise
 	url = https://github.com/qknight/libnoise.git
+[submodule "subprojects/backward-cpp"]
+	path = subprojects/backward-cpp
+	url = https://github.com/bombela/backward-cpp.git
