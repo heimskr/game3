@@ -964,6 +964,27 @@ namespace Game3 {
 				return {false, "No such status effect."};
 			}
 
+			if (first == "setspawn") {
+				if (words.size() == 1) {
+					player->spawnPosition = player->getPosition();
+					return {true, ""};
+				}
+
+				if (words.size() != 3) {
+					return {false, "Incorrect parameter count."};
+				}
+
+				try {
+					auto row = parseNumber<Index>(words[1]);
+					auto column = parseNumber<Index>(words[2]);
+					player->spawnPosition = {row, column};
+				} catch (const std::invalid_argument &) {
+					return {false, "Invalid parameters."};
+				}
+
+				return {true, ""};
+			}
+
 		} catch (const std::exception &err) {
 			return {false, err.what()};
 		}
