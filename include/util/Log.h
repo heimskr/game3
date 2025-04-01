@@ -39,13 +39,13 @@ namespace Game3 {
 #ifdef LOG_TO_FILE
 #define DECLARE_STREAMS auto &stream = std::cerr; [[maybe_unused]] auto &logfile = Logger::fileStream();
 #else
-#define DECLARE_STREAMS auto &stream = std::cerr
+#define DECLARE_STREAMS auto &stream = std::cerr;
 #endif
 #else
 #ifdef LOG_TO_FILE
 #define DECLARE_STREAMS std::osyncstream stream{std::cerr}; [[maybe_unused]] auto &logfile = Logger::fileStream();
 #else
-#define DECLARE_STREAMS std::osyncstream stream{std::cerr}
+#define DECLARE_STREAMS std::osyncstream stream{std::cerr};
 #endif
 #endif
 
