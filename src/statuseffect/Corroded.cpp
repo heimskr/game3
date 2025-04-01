@@ -1,6 +1,8 @@
 #include "entity/LivingEntity.h"
 #include "graphics/Color.h"
+#include "realm/Realm.h"
 #include "statuseffect/Corroded.h"
+#include "threading/ThreadContext.h"
 
 namespace Game3 {
 	Corroded::Corroded():
@@ -22,6 +24,8 @@ namespace Game3 {
 
 			if (integral >= 1.0) {
 				target->takeDamage(static_cast<HitPoints>(integral));
+				constexpr float variance = 0.95;
+				target->getRealm()->playSound(target->getPosition(), "base:sound/burn", 0.2f + threadContext.random(variance, 1.f / variance));
 				severity /= 1.05;
 				accumulatedDamage -= integral;
 			}
