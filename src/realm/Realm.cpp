@@ -1287,11 +1287,8 @@ namespace Game3 {
 			}
 		}
 
-		if (--threadContext.updateNeighborsDepth == 0) {
-			if (getSide() == Side::Client) {
-				queueReupload();
-			}
-			threadContext.updatedLayers.clear();
+		if (--threadContext.updateNeighborsDepth == 0 && getSide() == Side::Client) {
+			queueReupload();
 		}
 	}
 
@@ -1761,7 +1758,6 @@ namespace Game3 {
 
 			if (marched != tile) {
 				setTile(layer, position, marched, true, context);
-				threadContext.updatedLayers.insert(layer);
 			}
 		}
 	}
