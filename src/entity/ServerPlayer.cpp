@@ -214,6 +214,7 @@ namespace Game3 {
 		ServerGame &game = getGame()->toServer();
 
 		const bool keep_inventory = game.getRule("keepInventory").value_or(1) != 0;
+		setStatusEffects({});
 
 		if (!keep_inventory) {
 			setHeldLeft(-1);

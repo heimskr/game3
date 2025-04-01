@@ -340,6 +340,7 @@ namespace Game3 {
 		base = std::move(value);
 
 		if (getSide() == Side::Server) {
+			lock.unlock();
 			broadcastPacket(make<StatusEffectsPacket>(*this));
 		}
 	}

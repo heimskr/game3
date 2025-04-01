@@ -1,4 +1,5 @@
 #include "entity/LivingEntity.h"
+#include "game/Game.h"
 #include "graphics/Color.h"
 #include "statuseffect/Irradiated.h"
 
@@ -21,7 +22,9 @@ namespace Game3 {
 			std::modf(accumulatedDamage, &integral);
 
 			if (integral >= 1.0) {
-				target->takeDamage(static_cast<HitPoints>(integral));
+				target->getGame()->enqueue([target, integral](const TickArgs &) {
+					target->takeDamage(static_cast<HitPoints>(integral));
+				});
 				severity *= 1.05;
 				accumulatedDamage -= integral;
 			}

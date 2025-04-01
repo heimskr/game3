@@ -1,4 +1,5 @@
 #include "entity/LivingEntity.h"
+#include "game/Game.h"
 #include "graphics/Color.h"
 #include "realm/Realm.h"
 #include "statuseffect/Corroded.h"
@@ -23,7 +24,9 @@ namespace Game3 {
 			std::modf(accumulatedDamage, &integral);
 
 			if (integral >= 1.0) {
-				target->takeDamage(static_cast<HitPoints>(integral));
+				target->getGame()->enqueue([target, integral](const TickArgs &) {
+					target->takeDamage(static_cast<HitPoints>(integral));
+				});
 				constexpr float variance = 0.95;
 				target->getRealm()->playSound(target->getPosition(), "base:sound/burn", 0.2f + threadContext.random(variance, 1.f / variance));
 				severity /= 1.05;
