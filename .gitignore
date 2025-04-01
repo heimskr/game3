@@ -54,3 +54,4 @@ vgcore.*
 *.dll
 *.exe
 /game3_zip
+/log*

@@ -37,7 +37,6 @@ namespace Game3 {
 	}
 
 	Rectangle TopDialog::getPosition() const {
-		float offset = selfScale;
 		return Rectangle(0, 0, ui.getWidth(), 10 * getScale());
 	}
 

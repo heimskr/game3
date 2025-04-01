@@ -1,16 +1,24 @@
 #pragma once
 
 #include <format>
+#include <fstream>
 #include <iostream>
 #include <print>
 #include <string>
 #include <syncstream>
 
 // #define NO_LOGS
+#ifdef __MINGW32__
+#define LOG_TO_FILE
+#endif
 
 namespace Game3::Logger {
 	extern int level;
 	std::string getTimestamp();
+#ifdef LOG_TO_FILE
+	std::ofstream & fileStream();
+	std::string stripANSI(std::string_view);
+#endif
 }
 
 namespace Game3 {
@@ -28,9 +36,17 @@ namespace Game3 {
 #else
 
 #if defined(__APPLE__) || defined(__MINGW32__)
-#define DECLARE_STREAM auto &stream = std::cerr
+#ifdef LOG_TO_FILE
+#define DECLARE_STREAMS auto &stream = std::cerr; [[maybe_unused]] auto &logfile = Logger::fileStream();
 #else
-#define DECLARE_STREAM std::osyncstream stream{std::cerr}
+#define DECLARE_STREAMS auto &stream = std::cerr
+#endif
+#else
+#ifdef LOG_TO_FILE
+#define DECLARE_STREAMS std::osyncstream stream{std::cerr}; [[maybe_unused]] auto &logfile = Logger::fileStream();
+#else
+#define DECLARE_STREAMS std::osyncstream stream{std::cerr}
+#endif
 #endif
 
 #define LOG_START "\x1b[2m[\x1b[1m"
@@ -42,9 +58,16 @@ namespace Game3 {
 
 	template <typename... Args>
 	void INFO(std::format_string<Args...> format, Args &&...args) {
-		DECLARE_STREAM;
+		DECLARE_STREAMS
+#ifdef LOG_TO_FILE
+		std::string message = std::format(format, std::forward<Args>(args)...);
+		std::string stamp = Logger::getTimestamp();
+		std::println(stream, "{}{}{}{}", LOG_START, stamp, LOG_INFO_MIDDLE, message);
+		std::println(logfile, "[{}] (i) :: {}", stamp, Logger::stripANSI(message));
+#else
 		std::print(stream, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_INFO_MIDDLE);
 		std::println(stream, format, std::forward<Args>(args)...);
+#endif
 	}
 
 	template <typename... Args>
@@ -56,9 +79,16 @@ namespace Game3 {
 
 	template <typename... Args>
 	void WARN(std::format_string<Args...> format, Args &&...args) {
-		DECLARE_STREAM;
+		DECLARE_STREAMS
+#ifdef LOG_TO_FILE
+		std::string message = std::format(format, std::forward<Args>(args)...);
+		std::string stamp = Logger::getTimestamp();
+		std::println(stream, "{}{}{}{}", LOG_START, stamp, LOG_WARN_MIDDLE, message);
+		std::println(logfile, "[{}] (w) :: {}", stamp, Logger::stripANSI(message));
+#else
 		std::print(stream, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_WARN_MIDDLE);
 		std::println(stream, format, std::forward<Args>(args)...);
+#endif
 	}
 
 	template <typename... Args>
@@ -70,9 +100,16 @@ namespace Game3 {
 
 	template <typename... Args>
 	void ERR(std::format_string<Args...> format, Args &&...args) {
-		DECLARE_STREAM;
+		DECLARE_STREAMS
+#ifdef LOG_TO_FILE
+		std::string message = std::format(format, std::forward<Args>(args)...);
+		std::string stamp = Logger::getTimestamp();
+		std::println(stream, "{}{}{}{}", LOG_START, stamp, LOG_ERROR_MIDDLE, message);
+		std::println(logfile, "[{}] (e) :: {}", stamp, Logger::stripANSI(message));
+#else
 		std::print(stream, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_ERROR_MIDDLE);
 		std::println(stream, format, std::forward<Args>(args)...);
+#endif
 	}
 
 	template <typename... Args>
@@ -84,9 +121,16 @@ namespace Game3 {
 
 	template <typename... Args>
 	void SPAM(std::format_string<Args...> format, Args &&...args) {
-		DECLARE_STREAM;
+		DECLARE_STREAMS
+#ifdef LOG_TO_FILE
+		std::string message = std::format(format, std::forward<Args>(args)...);
+		std::string stamp = Logger::getTimestamp();
+		std::println(stream, "{}{}{}{}", LOG_START, stamp, LOG_SPAM_MIDDLE, message);
+		std::println(logfile, "[{}] (s) :: {}", stamp, Logger::stripANSI(message));
+#else
 		std::print(stream, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SPAM_MIDDLE);
 		std::println(stream, format, std::forward<Args>(args)...);
+#endif
 	}
 
 	template <typename... Args>
@@ -98,10 +142,17 @@ namespace Game3 {
 
 	template <typename... Args>
 	void SUCCESS(std::format_string<Args...> format, Args &&...args) {
-		DECLARE_STREAM;
+		DECLARE_STREAMS
+#ifdef LOG_TO_FILE
+		std::string message = std::format(format, std::forward<Args>(args)...);
+		std::string stamp = Logger::getTimestamp();
+		std::println(stream, "{}{}{}{}\x1b[39m", LOG_START, stamp, LOG_SUCCESS_MIDDLE, message);
+		std::println(logfile, "[{}] (i) :: {}", stamp, Logger::stripANSI(message));
+#else
 		std::print(stream, "{}{}{}", LOG_START, Logger::getTimestamp(), LOG_SUCCESS_MIDDLE);
 		std::print(stream, format, std::forward<Args>(args)...);
 		std::println(stream, "\x1b[39m");
+#endif
 	}
 
 	template <typename... Args>
@@ -111,5 +162,5 @@ namespace Game3 {
 		}
 	}
 #endif
-#undef DECLARE_STREAM
+#undef DECLARE_STREAMS
 }
