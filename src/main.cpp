@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
-		if (arg1 == "--add-item" || arg1 == "--add-tile") {
+		if (arg1 == "--add-item" || arg1 == "--add-tile" || arg1 == "--add-sound") {
 			if (argc != 5) {
 				std::println("Usage: {} {} <identifier> <credit> <image path>", argv[0], arg1);
 				return 1;
@@ -277,16 +277,16 @@ int main(int argc, char **argv) {
 
 			std::string id = argv[2];
 			std::string_view credit = argv[3];
-			std::filesystem::path image_path = argv[4];
+			std::filesystem::path file_path = argv[4];
 
 			if (id.empty()) {
 				ERR("ID is empty.");
 				return 1;
 			}
 
-			std::string type = arg1 == "--add-item"? "item" : "tile";
+			std::string type(arg1.substr(6));
 
-			std::filesystem::path dir_path = std::format("resources/{}/{}", type == "item"? "items" : "tileset", id);
+			std::filesystem::path dir_path = std::format("resources/{}/{}", type == "tile"? "tileset" : (type + 's'), id);
 
 			if (std::filesystem::exists(dir_path)) {
 				ERR("{} already exists.", dir_path.string().c_str());
@@ -299,12 +299,12 @@ int main(int argc, char **argv) {
 			if (!credit.empty()) {
 				object["credit"] = credit;
 			}
-			object[type == "item"? "id" : "tilename"] = "base:" + type + "/" + id;
+			object[type == "tile"? "tilename" : "id"] = "base:" + type + "/" + id;
 			std::ofstream json(dir_path / (type +".json"));
 			serializeJSON(object, json);
 
-			std::filesystem::copy_file(image_path, dir_path / (type + ".png"));
-			SUCCESS("Stored image {} in {} with ID base:{}/{}.", image_path.string().c_str(), dir_path.string().c_str(), type, id);
+			std::filesystem::copy_file(file_path, dir_path / (type == "sound"? "sound.opus" : (type + ".png")));
+			SUCCESS("Stored file {} in {} with ID base:{}/{}.", file_path.string().c_str(), dir_path.string().c_str(), type, id);
 			if (type == "item") {
 				INFO("Items.cpp: add(std::make_shared<Item>(\"base:item/{}\", \"{}{}\", 999, 64)); // TODO: cost", id, char(std::toupper(id[0])), id.substr(1));
 			}
