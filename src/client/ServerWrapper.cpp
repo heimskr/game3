@@ -1,5 +1,6 @@
 #include "util/Log.h"
 #include "client/ServerWrapper.h"
+#include "error/IncompatibleError.h"
 #include "game/ServerGame.h"
 #include "game/SimulationOptions.h"
 #include "net/CertGen.h"
@@ -19,7 +20,7 @@
 #include <random>
 
 // #define REDIRECT_LOGS
-#define CATCH_SERVERWRAPPER
+// #define CATCH_SERVERWRAPPER
 
 #include "config.h"
 #ifdef IS_FLATPAK
@@ -155,7 +156,15 @@ namespace Game3 {
 			std::filesystem::path world_path = "localworld.db";
 			const bool database_existed = std::filesystem::exists(world_path);
 
-			game->openDatabase(world_path);
+			try {
+				game->openDatabase(world_path);
+			} catch (const IncompatibleError &) {
+				failure = std::current_exception();
+				stop();
+				stop_thread.join();
+				startCV.notify_all();
+				return;
+			}
 			server->game = game;
 
 			if (overworld_seed == size_t(-1)) {
@@ -251,7 +260,11 @@ namespace Game3 {
 		saveCV.notify_all();
 
 		if (threadActive) {
-			runThread.join();
+			if (runThread.get_id() != std::this_thread::get_id()) {
+				runThread.join();
+			} else {
+				runThread.detach();
+			}
 			threadActive = false;
 		}
 
@@ -271,16 +284,24 @@ namespace Game3 {
 		return running;
 	}
 
+	bool ServerWrapper::hasFailed() const {
+		return static_cast<bool>(failure);
+	}
+
+	std::exception_ptr ServerWrapper::getFailure() const {
+		return failure;
+	}
+
 	bool ServerWrapper::waitUntilRunning(std::chrono::milliseconds timeout) {
 		std::unique_lock lock{startMutex};
 
 		if (timeout == std::chrono::milliseconds(0)) {
-			startCV.wait(lock, [this] { return threadActive && isRunning(); });
+			startCV.wait(lock, [this] { return hasFailed() || (threadActive && isRunning()); });
 		} else {
-			startCV.wait_for(lock, timeout, [this] { return threadActive && isRunning(); });
+			startCV.wait_for(lock, timeout, [this] { return hasFailed() || (threadActive && isRunning()); });
 		}
 
-		return isRunning();
+		return isRunning() && !hasFailed();
 	}
 
 	Token ServerWrapper::getOmnitoken() const {

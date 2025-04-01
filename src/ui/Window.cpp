@@ -1117,7 +1117,17 @@ namespace Game3 {
 		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
-			error("Server failed to start within 10 seconds.");
+			if (std::exception_ptr caught = serverWrapper.getFailure()) {
+				try {
+					std::rethrow_exception(caught);
+				} catch (const std::exception &err) {
+					error(std::format("Server failed to start: {}", err.what()));
+				} catch (...) {
+					error("Server failed to start due to an error.");
+				}
+			} else {
+				error("Server failed to start within 10 seconds.");
+			}
 			return;
 		}
 

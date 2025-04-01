@@ -31,6 +31,10 @@ namespace Game3 {
 	GameDB::GameDB(const ServerGamePtr &game):
 		weakGame(game) {}
 
+	int64_t GameDB::currentFormatVersion() {
+		return 1;
+	}
+
 	void GameDB::open(std::filesystem::path path_) {
 		close();
 		path = std::move(path_);
@@ -41,9 +45,12 @@ namespace Game3 {
 		static_assert(sizeof(BiomeType) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 		static_assert(sizeof(FluidInt) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 
-		// std::p
-
 		database->exec(R"(
+			CREATE TABLE IF NOT EXISTS misc (
+				key VARCHAR(64) PRIMARY KEY,
+				value MEDIUMTEXT
+			);
+
 			CREATE TABLE IF NOT EXISTS chunks (
 				realmID INT,
 				x INT,
@@ -74,12 +81,24 @@ namespace Game3 {
 		database.reset();
 	}
 
+	int64_t GameDB::getCompatibility() {
+		assert(database != nullptr);
+		auto lock = database.uniqueLock();
+		SQLite::Statement query{*database, "SELECT value FROM misc WHERE key = ?"};
+		query.bind(1, "formatVersion");
+		if (query.executeStep()) {
+			return parseNumber<int64_t>(query.getColumn(0).getString()) - currentFormatVersion();
+		}
+		return INT64_MIN;
+	}
+
 	void GameDB::writeAll() {
 		writeRules();
 		writeAllRealms();
 		ServerGamePtr game = getGame();
 		auto player_lock = game->players.sharedLock();
 		writeUsers(game->players);
+		writeMisc();
 	}
 
 	void GameDB::readAll() {
@@ -87,11 +106,23 @@ namespace Game3 {
 		readAllRealms();
 	}
 
+	void GameDB::writeMisc() {
+		auto lock = database.uniqueLock();
+		SQLite::Transaction transaction{*database};
+		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO misc VALUES (?, ?)"};
+		statement.bind(1, "formatVersion");
+		statement.bind(2, currentFormatVersion());
+		statement.exec();
+		statement.reset();
+		transaction.commit();
+	}
+
 	void GameDB::writeRules() {
 		ServerGamePtr game = getGame();
 		auto rules_lock = game->gameRules.sharedLock();
-		if (game->gameRules.empty())
+		if (game->gameRules.empty()) {
 			return;
+		}
 		auto lock = database.uniqueLock();
 		SQLite::Transaction transaction{*database};
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO rules VALUES (?, ?)"};

@@ -89,6 +89,7 @@ namespace Game3 {
 			ThreadPool pool;
 			std::unique_ptr<GameDB> database;
 			Token omnitoken = generateRandomToken();
+			bool databaseValid = false;
 
 			void handlePacket(GenericClient &, Packet &);
 			std::tuple<bool, std::string> commandHelper(GenericClient &, const std::string &);

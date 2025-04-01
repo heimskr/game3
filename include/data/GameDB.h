@@ -36,11 +36,20 @@ namespace Game3 {
 
 			GameDB(const std::shared_ptr<ServerGame> &);
 
+			static int64_t currentFormatVersion();
+
 			void open(std::filesystem::path);
 			void close();
 
+			/** <  0: this save is too old
+			 *  == 0: this save is compatible
+			 *  >  0: this save is too new    */
+			int64_t getCompatibility();
+
 			void writeAll();
 			void readAll();
+
+			void writeMisc();
 
 			void writeRules();
 			void readRules();

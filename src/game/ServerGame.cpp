@@ -3,6 +3,7 @@
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
 #include "entity/ServerPlayer.h"
+#include "error/IncompatibleError.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
 #include "net/Server.h"
@@ -29,10 +30,11 @@
 #include <random>
 
 namespace Game3 {
-	ServerGame::ServerGame(const std::shared_ptr<Server> &server_, std::size_t pool_size):
-	weakServer(server_), pool(pool_size) {
-		pool.start();
-	}
+	ServerGame::ServerGame(const std::shared_ptr<Server> &server, std::size_t pool_size):
+		weakServer(server),
+		pool(pool_size) {
+			pool.start();
+		}
 
 	ServerGame::~ServerGame() {
 		INFO(3, "\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
@@ -44,11 +46,13 @@ namespace Game3 {
 
 	void ServerGame::stop() {
 		pool.join();
-		INFO("Saving realms and users...");
-		assert(database);
-		database->writeAllRealms();
-		database->writeUsers(players);
-		SUCCESS(2, "Saved realms and users.");
+		if (databaseValid) {
+			INFO("Saving realms and users...");
+			assert(database);
+			database->writeAllRealms();
+			database->writeUsers(players);
+			SUCCESS(2, "Saved realms and users.");
+		}
 		Timer::summary();
 		Timer::clear();
 	}
@@ -307,6 +311,13 @@ namespace Game3 {
 	void ServerGame::openDatabase(std::filesystem::path path) {
 		assert(database);
 		database->open(std::move(path));
+		if (int64_t compatibility = database->getCompatibility()) {
+			ERR("Incompatible by {}", compatibility);
+			throw IncompatibleError(compatibility);
+		} else {
+			SUCCESS("Compatible.");
+		}
+		databaseValid = true;
 	}
 
 	void ServerGame::broadcast(const PacketPtr &packet, bool include_non_players) {

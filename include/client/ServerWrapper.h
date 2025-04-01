@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <exception>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -32,6 +33,8 @@ namespace Game3 {
 			void run(size_t overworld_seed = -1);
 			void stop();
 			bool isRunning() const;
+			bool hasFailed() const;
+			std::exception_ptr getFailure() const;
 			bool waitUntilRunning(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
 			inline uint16_t getPort() const { return port; }
 			Token getOmnitoken() const;
@@ -45,6 +48,7 @@ namespace Game3 {
 			std::optional<PipeWrapper> logDataPipe;
 			PipeWrapper logControlPipe;
 			CloningFDWrapper logFDWrapper;
+			std::exception_ptr failure;
 
 			uint16_t port{};
 
