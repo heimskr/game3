@@ -18,6 +18,7 @@
 #include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"
+#include "util/Demangle.h"
 #include "util/FS.h"
 #include "util/Log.h"
 #include "util/Shell.h"
@@ -409,10 +410,12 @@ int main(int argc, char **argv) {
 	richPresence.reset();
 #ifdef __MINGW32__
 	} catch (const std::exception &err) {
-		ERR("UNCAUGHT EXCEPTION: {}", err.what());
+		ERR("UNCAUGHT EXCEPTION ({}): {}", DEMANGLE(err), err.what());
+		static_cast<std::ofstream &>(Logger::fileStream() << std::endl).close();
 		throw;
 	} catch (...) {
 		ERR("UNCAUGHT EXCEPTION (unknown type)");
+		static_cast<std::ofstream &>(Logger::fileStream() << std::endl).close();
 		throw;
 	}
 #endif
