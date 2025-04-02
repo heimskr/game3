@@ -1,3 +1,5 @@
+# I can't believe I have to say this, but *do not open AI slop PRs*.
+
 [![wakatime](https://wakatime.com/badge/github/heimskr/game3.svg)](https://wakatime.com/badge/github/heimskr/game3)
 
 # Game3
