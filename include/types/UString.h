@@ -1,12 +1,16 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #include <glibmm/ustring.h>
+#pragma GCC diagnostic pop
 
 #include <format>
 #include <vector>
 
 namespace Game3 {
 	class TextRenderer;
+	class UStringSpan;
 
 	class UString: public Glib::ustring {
 		public:
@@ -19,9 +23,31 @@ namespace Game3 {
 			UString wrap(const TextRenderer &, float max_width, float text_scale) const;
 
 		private:
-			std::vector<std::pair<Glib::ustring::const_iterator, Glib::ustring::const_iterator>> getLines() const;
+			std::vector<UStringSpan> getLines() const;
 
 		friend class UStringTest;
+	};
+
+	class UStringSpan {
+		public:
+			using iterator = Glib::ustring::const_iterator;
+
+			iterator left;
+			iterator right;
+
+			UStringSpan(iterator left, iterator right);
+
+			explicit operator UString() const;
+			explicit operator std::string() const;
+
+			bool operator==(const UStringSpan &) const;
+			bool operator==(const UString &) const;
+
+			bool empty() const;
+			std::size_t size_bytes() const;
+
+			iterator begin() const { return left; }
+			iterator end() const { return right; }
 	};
 }
 

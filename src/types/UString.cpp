@@ -1,5 +1,3 @@
-#pragma GCC diagnostic ignored "-Wdeprecated-copy"
-
 #include "util/Log.h"
 #include "graphics/TextRenderer.h"
 #include "test/Testing.h"
@@ -141,8 +139,8 @@ namespace Game3 {
 		return output;
 	}
 
-	std::vector<std::pair<Glib::ustring::const_iterator, Glib::ustring::const_iterator>> UString::getLines() const {
-		std::vector<std::pair<Glib::ustring::const_iterator, Glib::ustring::const_iterator>> out;
+	std::vector<UStringSpan> UString::getLines() const {
+		std::vector<UStringSpan> out;
 
 		if (empty()) {
 			return out;
@@ -161,5 +159,70 @@ namespace Game3 {
 		}
 
 		return out;
+	}
+
+	UStringSpan::UStringSpan(iterator left, iterator right):
+		left(left),
+		right(right) {}
+
+	UStringSpan::operator UString() const {
+		auto iter = left;
+		UString string;
+		while (iter != right) {
+			string += *iter++;
+		}
+		return string;
+	}
+
+	UStringSpan::operator std::string() const {
+		return std::string(left.base(), right.base());
+	}
+
+	bool UStringSpan::operator==(const UStringSpan &other) const {
+		if (this == &other || (left == other.left && right == other.right)) {
+			return true;
+		}
+
+		if (size_bytes() != other.size_bytes()) {
+			return false;
+		}
+
+		auto this_iter = left;
+		auto that_iter = other.left;
+
+		while (this_iter != right && that_iter != other.right) {
+			if (*this_iter != *that_iter) {
+				return false;
+			}
+		}
+
+		return this_iter == right && that_iter == other.right;
+	}
+
+	bool UStringSpan::operator==(const UString &other) const {
+		if (size_bytes() != other.bytes()) {
+			return false;
+		}
+
+		auto iter = begin();
+		auto that = other.begin();
+
+		for (; iter != end() && that != other.end(); ++iter, ++that) {
+			if (*iter != *that) {
+				return false;
+			}
+		}
+
+		return iter == end() && that == other.end();
+	}
+
+	bool UStringSpan::empty() const {
+		return left.base() == right.base();
+	}
+
+	std::size_t UStringSpan::size_bytes() const {
+		std::ptrdiff_t difference = right.base() - left.base();
+		assert(difference >= 0);
+		return static_cast<std::size_t>(difference);
 	}
 }

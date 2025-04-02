@@ -1,5 +1,3 @@
-#pragma GCC diagnostic ignored "-Wdeprecated-copy"
-
 #include "test/Testing.h"
 #include "types/UString.h"
 
