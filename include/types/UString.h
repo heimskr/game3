@@ -6,6 +6,8 @@
 #pragma GCC diagnostic pop
 
 #include <format>
+#include <functional>
+#include <optional>
 #include <vector>
 
 namespace Game3 {
@@ -17,9 +19,18 @@ namespace Game3 {
 			using Glib::ustring::ustring;
 
 			UString(Glib::ustring &&) noexcept;
-			UString & operator=(Glib::ustring &&) noexcept;
+			UString(const UStringSpan &);
 
-			std::vector<UString> split(const UString &delimiter, Glib::ustring::size_type(UString::*finder)(const Glib::ustring &, Glib::ustring::size_type) const = &Glib::ustring::find) const;
+			using Glib::ustring::operator=;
+			UString & operator=(Glib::ustring &&) noexcept;
+			UString & operator=(const UStringSpan &);
+
+			using Glib::ustring::operator+=;
+			UString & operator+=(const UStringSpan &);
+
+			operator UStringSpan() const;
+
+			std::vector<UStringSpan> split(const UString &delimiter, Glib::ustring::size_type(UString::*finder)(const Glib::ustring &, Glib::ustring::size_type) const = &Glib::ustring::find) const;
 			UString wrap(const TextRenderer &, float max_width, float text_scale) const;
 
 		private:
@@ -39,12 +50,23 @@ namespace Game3 {
 
 			explicit operator UString() const;
 			explicit operator std::string() const;
+			explicit operator std::string_view() const;
 
 			bool operator==(const UStringSpan &) const;
 			bool operator==(const UString &) const;
+			bool operator==(std::string_view) const;
+			bool operator==(const char *) const;
 
 			bool empty() const;
 			std::size_t size_bytes() const;
+			/** Number of code points. Expensive! O(n). */
+			std::size_t size() const;
+
+			std::vector<UStringSpan> split(const UString &delimiter) const;
+			void split(const UString &delimiter, const std::function<void(UStringSpan)> &) const;
+
+			bool starts_with(const UStringSpan &) const;
+			iterator find(const UStringSpan &) const;
 
 			iterator begin() const { return left; }
 			iterator end() const { return right; }
@@ -70,5 +92,16 @@ struct std::formatter<Game3::UString> {
 
 	auto format(const auto &string, auto &ctx) const {
 		return std::format_to(ctx.out(), "{}", string.raw());
+	}
+};
+
+template <>
+struct std::formatter<Game3::UStringSpan> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(const auto &span, auto &ctx) const {
+		return std::format_to(ctx.out(), "{}", static_cast<std::string_view>(span));
 	}
 };

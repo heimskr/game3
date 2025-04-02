@@ -10,24 +10,16 @@ namespace Game3 {
 
 			void operator()(TestContext &context) {
 				UString string = "\nfoo\nbar\n\nbaz\n\n";
-				auto lines = string.getLines();
+				std::vector<UStringSpan> lines = string.getLines();
 
-				auto get_line = [&lines](std::size_t i) -> std::string {
-					auto [left, right] = lines.at(i);
-					UString string;
-					while (left != right) {
-						string += *left++;
-					}
-					return string.release();
-				};
-
-				context.expectEqual(lines.size(), 6uz);
-				context.expectEqual(get_line(0), "");
-				context.expectEqual(get_line(1), "foo");
-				context.expectEqual(get_line(2), "bar");
-				context.expectEqual(get_line(3), "");
-				context.expectEqual(get_line(4), "baz");
-				context.expectEqual(get_line(5), "");
+				if (context.expectEqual(lines.size(), 6uz)) {
+					context.expectEqual(lines[0], "");
+					context.expectEqual(lines[1], "foo");
+					context.expectEqual(lines[2], "bar");
+					context.expectEqual(lines[3], "");
+					context.expectEqual(lines[4], "baz");
+					context.expectEqual(lines[5], "");
+				}
 			}
 	};
 
