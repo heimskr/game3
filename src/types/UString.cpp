@@ -1,7 +1,8 @@
-#include "util/Log.h"
 #include "graphics/TextRenderer.h"
 #include "test/Testing.h"
 #include "types/UString.h"
+#include "util/Log.h"
+#include "util/Timer.h"
 
 namespace Game3 {
 	UString::UString(Glib::ustring &&other) noexcept {
@@ -77,6 +78,8 @@ namespace Game3 {
 	}
 
 	UString UString::wrap(const TextRenderer &texter, float max_width, float text_scale) const {
+		Timer timer{"UString::wrap"};
+
 		// Credit for this algorithm: Fayabella
 
 		std::map<UString, float> width_map;
@@ -95,85 +98,98 @@ namespace Game3 {
 		const float hyphen_width = char_width('-');
 		const float space_width = char_width(' ');
 
-		UString line;
 		UString output;
-		std::vector<UStringSpan> pieces = split(" ");
 
-		if (pieces.empty()) {
-			return {};
-		}
-
-		std::optional<float> line_width = 0;
-
-		auto get_line_width = [&] {
-			if (line_width) {
-				return *line_width;
-			}
-			return *(line_width = text_width(line));
-		};
-
-		std::optional<UString> word = pieces.front();
-
-		for (auto iter = pieces.begin(); iter != pieces.end();) {
-			if (!word) {
-				word = *iter;
+		for (bool first = true; UStringSpan span: UStringSpan(*this).split("\n")) {
+			if (first) {
+				first = false;
+			} else {
+				output += '\n';
 			}
 
-			const bool at_end = iter + 1 == pieces.end();
+			UString line;
 
-			if (get_line_width() + text_width(*word) + (at_end? 0 : space_width) <= max_width) {
-				line += *word;
-				if (!at_end) {
-					line += ' ';
-				}
-				line_width.reset();
-				word.reset();
-				++iter;
+			std::vector<UStringSpan> pieces = span.split(" ");
+
+			if (pieces.empty()) {
+				output += '\n';
 				continue;
 			}
 
-			if (word->length() >= 5 || line.empty()) {
-				if (get_line_width() + text_width(word->substr(0, 2)) + hyphen_width < max_width) {
-					for (std::size_t i = 0; i < word->size(); ++i) {
-						const auto character = word->at(i);
-						const auto width = char_width(character);
+			std::optional<float> line_width = 0;
 
-						if (get_line_width() + width + hyphen_width >= max_width || word->length() <= 3 + i) {
-							output += line;
-							output += '-';
-							output += '\n';
-							line.clear();
-							line_width = 0;
-							word->erase(0, i);
-							break;
-						}
+			auto get_line_width = [&] {
+				if (line_width) {
+					return *line_width;
+				}
+				return *(line_width = text_width(line));
+			};
 
-						line += character;
-						if (line_width) {
-							*line_width += width;
+			std::optional<UString> word = pieces.front();
+
+			for (auto iter = pieces.begin(); iter != pieces.end();) {
+				if (!word) {
+					word = *iter;
+				}
+
+				const bool at_end = iter + 1 == pieces.end();
+
+				if (get_line_width() + text_width(*word) + (at_end? 0 : space_width) <= max_width) {
+					line += *word;
+					if (!at_end) {
+						line += ' ';
+					}
+					line_width.reset();
+					word.reset();
+					++iter;
+					continue;
+				}
+
+				if (word->length() >= 5 || line.empty()) {
+					if (get_line_width() + text_width(word->substr(0, 2)) + hyphen_width < max_width) {
+						for (std::size_t i = 0; i < word->size(); ++i) {
+							const auto character = word->at(i);
+							const auto width = char_width(character);
+
+							if (get_line_width() + width + hyphen_width >= max_width || word->length() <= 3 + i) {
+								output += line;
+								output += '-';
+								output += '\n';
+								line.clear();
+								line_width = 0;
+								word->erase(0, i);
+								break;
+							}
+
+							line += character;
+							if (line_width) {
+								*line_width += width;
+							}
 						}
+					} else {
+						if (line.empty()) {
+							goto next_span;
+						}
+						output += line;
+						output += '\n';
+						line.clear();
+						line_width = 0;
 					}
 				} else {
 					if (line.empty()) {
-						return *this;
+						goto next_span;
 					}
 					output += line;
 					output += '\n';
 					line.clear();
 					line_width = 0;
 				}
-			} else {
-				if (line.empty()) {
-					return *this;
-				}
-				output += line;
-				output += '\n';
-				line.clear();
-				line_width = 0;
 			}
+
+			output += line;
+			next_span:
 		}
 
-		output += line;
 		return output;
 	}
 
