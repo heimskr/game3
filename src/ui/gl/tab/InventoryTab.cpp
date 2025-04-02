@@ -19,8 +19,8 @@ namespace {
 }
 
 namespace Game3 {
-	InventoryTab::InventoryTab(UIContext &ui, float scale):
-		Tab(ui, scale) {}
+	InventoryTab::InventoryTab(UIContext &ui, float selfScale):
+		Tab(ui, selfScale) {}
 
 	void InventoryTab::init() {
 		assert(!playerInventoryModule);
@@ -64,15 +64,15 @@ namespace Game3 {
 		renderIconTexture(renderers, cacheTexture("resources/gui/inventory.png"));
 	}
 
-	bool InventoryTab::click(int button, int x, int y) {
-		if (playerScroller->contains(x, y) && playerScroller->click(button, x, y)) {
+	bool InventoryTab::click(int button, int x, int y, Modifiers modifiers) {
+		if (playerScroller->contains(x, y) && playerScroller->click(button, x, y, modifiers)) {
 			return true;
 		}
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock)) {
 			if (moduleScroller->contains(x, y)) {
-				return moduleScroller->click(button, x, y);
+				return moduleScroller->click(button, x, y, modifiers);
 			}
 		}
 
@@ -108,15 +108,15 @@ namespace Game3 {
 		return false;
 	}
 
-	bool InventoryTab::scroll(float x_delta, float y_delta, int x, int y) {
-		if (playerScroller->contains(x, y) && playerScroller->scroll(x_delta, y_delta, x, y)) {
+	bool InventoryTab::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
+		if (playerScroller->contains(x, y) && playerScroller->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock)) {
 			if (moduleScroller->contains(x, y)) {
-				return moduleScroller->scroll(x_delta, y_delta, x, y);
+				return moduleScroller->scroll(x_delta, y_delta, x, y, modifiers);
 			}
 		}
 
@@ -153,14 +153,14 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Scroller> InventoryTab::makePlayerScroller() {
-		auto scroller = make<Scroller>(ui, scale);
+		auto scroller = make<Scroller>(ui, selfScale);
 		scroller->setChild(playerInventoryModule);
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;
 	}
 
 	std::shared_ptr<Scroller> InventoryTab::makeModuleScroller() {
-		auto scroller = make<Scroller>(ui, scale);
+		auto scroller = make<Scroller>(ui, selfScale);
 		scroller->setChild(activeModule.copyBase());
 		scroller->insertAtEnd(shared_from_this());
 		return scroller;

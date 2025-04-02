@@ -1,6 +1,4 @@
-#include <cassert>
-
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -18,6 +16,8 @@
 #include "tileentity/InventoriedTileEntity.h"
 #include "util/Cast.h"
 #include "util/Util.h"
+
+#include <cassert>
 
 namespace Game3 {
 	ServerInventory::ServerInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
@@ -310,14 +310,21 @@ namespace Game3 {
 		}
 	}
 
-	ServerInventory ServerInventory::fromJSON(const GamePtr &game, const nlohmann::json &json, const std::shared_ptr<Agent> &owner) {
+	ServerInventory tag_invoke(boost::json::value_to_tag<ServerInventory>, const boost::json::value &json, const std::pair<GamePtr, AgentPtr> &pair) {
+		const auto &[game, owner] = pair;
+
 		ServerInventory out(owner, 0);
 
-		if (auto iter = json.find("storage"); iter != json.end())
-			for (const auto &[key, val]: iter->items())
-				out.storage.emplace(parseUlong(key), ItemStack::fromJSON(game, val));
-		out.slotCount  = json.at("slotCount");
-		out.activeSlot = json.at("activeSlot");
+		const auto &object = json.as_object();
+
+		if (auto iter = object.find("storage"); iter != object.end()) {
+			for (const auto &[key, val]: iter->value().as_object()) {
+				out.storage.emplace(parseUlong(static_cast<std::string_view>(key)), boost::json::value_to<ItemStackPtr>(val, game));
+			}
+		}
+
+		out.slotCount  = boost::json::value_to<Slot>(object.at("slotCount"));
+		out.activeSlot = boost::json::value_to<Slot>(object.at("activeSlot"));
 
 		return out;
 	}
@@ -365,10 +372,15 @@ namespace Game3 {
 		return buffer;
 	}
 
-	void to_json(nlohmann::json &json, const ServerInventory &inventory) {
-		for (const auto &[key, val]: inventory.getStorage())
-			json["storage"][std::to_string(key)] = *val;
-		json["slotCount"]  = inventory.getSlotCount();
-		json["activeSlot"] = inventory.activeSlot.load();
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ServerInventory &inventory) {
+		auto &object = json.emplace_object();
+
+		auto &storage = object["storage"].as_object();
+		for (const auto &[key, val]: inventory.getStorage()) {
+			storage[std::to_string(key)] = boost::json::value_from(*val);
+		}
+
+		object["slotCount"]  = inventory.getSlotCount();
+		object["activeSlot"] = inventory.activeSlot.load();
 	}
 }

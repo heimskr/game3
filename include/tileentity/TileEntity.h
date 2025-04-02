@@ -9,10 +9,10 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
+#include <boost/json.hpp>
+
 #include <memory>
 #include <random>
-
-#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	class Buffer;
@@ -33,7 +33,7 @@ namespace Game3 {
 			Identifier tileEntityID;
 			Lockable<Position> position{-1, -1};
 			bool solid = false;
-			nlohmann::json extraData;
+			boost::json::value extraData;
 
 			template <typename T, typename... Args>
 			static std::shared_ptr<T> create(Args &&...args) {
@@ -59,7 +59,7 @@ namespace Game3 {
 			~TileEntity() override = default;
 			virtual void destroy();
 
-			static std::shared_ptr<TileEntity> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<TileEntity> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			static std::string getSQL();
 
@@ -110,7 +110,7 @@ namespace Game3 {
 			void tryBroadcast();
 			virtual void broadcast(bool force);
 
-			virtual void toJSON(nlohmann::json &) const;
+			virtual void toJSON(boost::json::value &) const;
 
 		protected:
 			TileID cachedTile = -1;
@@ -118,8 +118,7 @@ namespace Game3 {
 			bool tileLookupFailed = false;
 
 			TileEntity() = default;
-			TileEntity(Identifier tile_id, Identifier tile_entity_id, Position position_, bool solid_):
-				tileID(std::move(tile_id)), tileEntityID(std::move(tile_entity_id)), position(std::move(position_)), solid(solid_) {}
+			TileEntity(Identifier tileID, Identifier tileEntityID, Position position, bool solid);
 
 			std::function<void(const TickArgs &)> getTickFunction();
 
@@ -132,9 +131,9 @@ namespace Game3 {
 			Tick enqueueTick(std::chrono::nanoseconds);
 			Tick enqueueTick() override;
 
-			virtual void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			virtual void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
-			friend void to_json(nlohmann::json &, const TileEntity &);
+			friend void tag_invoke(boost::json::value_from_tag, boost::json::value &, const TileEntity &);
 
 		private:
 			bool spawnIn(const Place &);

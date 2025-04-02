@@ -1,5 +1,4 @@
-#include <iostream>
-
+#include "entity/Player.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/SpriteRenderer.h"
@@ -17,7 +16,7 @@ namespace Game3 {
 		return 64 * FluidTile::FULL;
 	}
 
-	void Tank::toJSON(nlohmann::json &json) const {
+	void Tank::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 	}
@@ -47,7 +46,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Tank::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Tank::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 	}

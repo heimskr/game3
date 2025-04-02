@@ -9,27 +9,30 @@
 #include "graphics/TextRenderer.h"
 #include "item/Item.h"
 #include "packet/SetActiveSlotPacket.h"
+#include "packet/UseItemPacket.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	ItemSlot::ItemSlot(UIContext &ui, InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float scale, bool active):
-		Widget(ui, scale),
+	ItemSlot::ItemSlot(UIContext &ui, InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float selfScale, bool active):
+		Widget(ui, selfScale),
 		inventory(std::move(inventory)),
 		stack(std::move(stack)),
 		slot(slot),
 		size(size),
 		active(active) {}
 
-	ItemSlot::ItemSlot(UIContext &ui, Slot slot, float size, float scale, bool active):
-		ItemSlot(ui, nullptr, nullptr, slot, size, scale, active) {}
+	ItemSlot::ItemSlot(UIContext &ui, Slot slot, float size, float selfScale, bool active):
+		ItemSlot(ui, nullptr, nullptr, slot, size, selfScale, active) {}
 
 	ItemSlot::ItemSlot(UIContext &ui, Slot slot, bool active):
-		ItemSlot(ui, slot, INNER_SLOT_SIZE, SLOT_SCALE, active) {}
+		ItemSlot(ui, slot, INNER_SLOT_SIZE, 1, active) {}
 
 	void ItemSlot::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		const auto scale = getScale();
+
 		if (width < 0) {
 			width = size * scale;
 		}
@@ -40,9 +43,6 @@ namespace Game3 {
 
 		adjustCoordinate(Orientation::Horizontal, x, width, size * scale);
 		adjustCoordinate(Orientation::Vertical, y, height, size * scale);
-
-		width = size * scale;
-		height = size * scale;
 
 		Widget::render(renderers, x, y, width, height);
 
@@ -100,13 +100,22 @@ namespace Game3 {
 		return stack? shared_from_this() : nullptr;
 	}
 
-	bool ItemSlot::click(int button, int x, int y) {
-		if (button == LEFT_BUTTON && slot >= 0 && inventory && inventory->getOwner() == ui.getPlayer()) {
-			ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
-			return true;
+	bool ItemSlot::click(int button, int x, int y, Modifiers modifiers) {
+		if (button == LEFT_BUTTON && slot >= 0) {
+			if (inventory && inventory->getOwner() == ui.getPlayer()) {
+				if (modifiers.onlyCtrl()) {
+					if (stack) {
+						ui.getGame()->getPlayer()->send(make<UseItemPacket>(slot, modifiers));
+					}
+				} else {
+					ui.getGame()->getPlayer()->send(make<SetActiveSlotPacket>(slot));
+				}
+
+				return true;
+			}
 		}
 
-		return Widget::click(button, x, y);
+		return Widget::click(button, x, y, modifiers);
 	}
 
 	bool ItemSlot::dragStart(int x, int y) {
@@ -136,7 +145,7 @@ namespace Game3 {
 	}
 
 	void ItemSlot::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
-		minimum = natural = size * scale;
+		minimum = natural = size * getScale();
 	}
 
 	void ItemSlot::setStack(ItemStackPtr new_stack) {

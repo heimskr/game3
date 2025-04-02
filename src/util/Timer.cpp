@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <print>
 
 #include "util/Timer.h"
 
@@ -21,8 +22,10 @@ namespace Game3 {
 	}
 
 	void Timer::stop() {
-		if (stopped)
+		if (stopped) {
 			return;
+		}
+
 		auto lock = uniqueLock();
 		times[name] += difference();
 		++counts[name];
@@ -35,21 +38,24 @@ namespace Game3 {
 	}
 
 	void Timer::summary(double threshold) {
-		if (!globalEnabled)
+		if (!globalEnabled) {
 			return;
+		}
 
 		auto lock = sharedLock();
 
 		if (!times.empty()) {
-			std::cerr << "Timer summary:\n";
+			std::println(std::cerr, "Timer summary:");
 
 			std::vector<const std::string *> names;
 			names.reserve(times.size());
 			size_t max_length = 0;
 
 			for (const auto &[name, nanos]: times) {
-				if (nanos.count() / 1e9 < threshold)
+				if (nanos.count() / 1e9 < threshold) {
 					continue;
+				}
+
 				names.push_back(&name);
 				max_length = std::max(name.size(), max_length);
 			}
@@ -60,11 +66,12 @@ namespace Game3 {
 
 			for (const std::string *name: names) {
 				const double nanos = times.at(*name).count();
-				std::cerr << std::format("    \e[1m{}{}\e[22m took \e[32m{}\e[39m seconds", *name, std::string(max_length - name->size(), ' '), nanos / 1e9);
+				std::print(std::cerr, "    \e[1m{}{}\e[22m took \e[32m{}\e[39m seconds", *name, std::string(max_length - name->size(), ' '), nanos / 1e9);
 				const size_t count = counts.at(*name);
-				if (1 < count)
-					std::cerr << std::format(" (average: \e[33m{}\e[39m over \e[1m{}\e[22m instances)", nanos / count / 1e9, count);
-				std::cerr << '\n';
+				if (1 < count) {
+					std::print(std::cerr, " (average: \e[33m{}\e[39m over \e[1m{}\e[22m instances)", nanos / count / 1e9, count);
+				}
+				std::println(std::cerr, "");
 			}
 		}
 	}

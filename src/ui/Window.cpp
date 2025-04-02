@@ -2,14 +2,17 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
+#include "graphics/RealmRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Tileset.h"
+#include "graphics/Util.h"
 #include "net/DirectLocalClient.h"
 #include "net/LocalClient.h"
 #include "packet/ContinuousInteractionPacket.h"
 #include "packet/LoginPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/SetHeldItemPacket.h"
+#include "threading/ThreadContext.h"
 #include "types/Position.h"
 #include "ui/gl/dialog/ChatDialog.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
@@ -29,8 +32,6 @@
 #include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
-
-#include "minigame/Breakout.h"
 
 #include <fstream>
 
@@ -79,7 +80,11 @@ namespace Game3 {
 
 	Window::Window(GLFWwindow &glfw_window):
 		glfwWindow(&glfw_window),
-		scale(8) {
+		scale(8),
+		causticsShader(readFile("resources/caustics.frag")),
+		waveShader(readFile("resources/wave.frag")),
+		colorDodgeShader(readFile("resources/color_dodge.frag")),
+		blurShader(readFile("resources/blur.frag")) {
 			glfwSetWindowUserPointer(glfwWindow, this);
 
 			glfwSetKeyCallback(glfwWindow, +[](GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
@@ -111,11 +116,16 @@ namespace Game3 {
 
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
 
+#ifdef __MINGW32__
+			xScale = 1;
+			yScale = 1;
+#endif
+
 			try {
-				settings = nlohmann::json::parse(readFile("settings.json"));
+				settings = boost::json::value_to<ClientSettings>(boost::json::parse(readFile("settings.json")));
 			} catch (const std::ios_base::failure &) {}
 
-			settings.apply();
+			settings.apply(uiContext);
 
 			fbo.init();
 			textRenderer.initRenderData();
@@ -201,21 +211,21 @@ namespace Game3 {
 
 	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
 		if (!omniDialog) {
-			omniDialog = make<OmniDialog>(uiContext, UI_SCALE);
+			omniDialog = make<OmniDialog>(uiContext, 1);
 		}
 		return omniDialog;
 	}
 
 	const std::shared_ptr<ChatDialog> & Window::getChatDialog() {
 		if (!chatDialog) {
-			chatDialog = make<ChatDialog>(uiContext);
+			chatDialog = make<ChatDialog>(uiContext, 1);
 		}
 		return chatDialog;
 	}
 
 	const std::shared_ptr<TopDialog> & Window::getTopDialog() {
 		if (!topDialog) {
-			topDialog = make<TopDialog>(uiContext);
+			topDialog = make<TopDialog>(uiContext, 1);
 		}
 		return topDialog;
 	}
@@ -266,7 +276,7 @@ namespace Game3 {
 
 		auto action = [message](Window &window) mutable {
 			window.activateContext();
-			window.uiContext.addDialog(MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None));
+			window.uiContext.addDialog(MessageDialog::create(window.uiContext, 1, std::move(message), ButtonsType::None));
 		};
 
 		if (do_queue) {
@@ -283,7 +293,7 @@ namespace Game3 {
 
 		auto action = [message, on_close = std::move(on_close)](Window &window) mutable {
 			window.activateContext();
-			auto dialog = MessageDialog::create(window.uiContext, std::move(message), ButtonsType::None);
+			auto dialog = MessageDialog::create(window.uiContext, 1, std::move(message), ButtonsType::None);
 			dialog->setTitle("Error");
 			if (on_close) {
 				dialog->signalClose.connect(std::move(on_close));
@@ -297,7 +307,7 @@ namespace Game3 {
 			action(*this);
 		}
 
-		ERROR("Error: {}", message);
+		ERR("Error: {}", message);
 	}
 
 	Modifiers Window::getModifiers() const {
@@ -323,22 +333,28 @@ namespace Game3 {
 
 	void Window::saveSettings() {
 		std::ofstream ofs("settings.json");
-		nlohmann::json json;
+		boost::json::value json;
 		{
 			auto lock = settings.sharedLock();
-			json = settings;
+			json = boost::json::value_from(settings);
 		}
-		ofs << json.dump();
+
+		boost::json::serializer serializer;
+		serializer.reset(&json);
+		char buffer[512];
+		while (!serializer.done()) {
+			ofs << serializer.read(buffer);
+		}
 	}
 
 	void Window::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
 		assert(inventory);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(uiContext, inventory));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(uiContext, 1, inventory));
 	}
 
 	void Window::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
 		assert(has_fluids);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(uiContext, has_fluids));
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(uiContext, 1, has_fluids));
 	}
 
 	GlobalID Window::getExternalGID() const {
@@ -376,8 +392,9 @@ namespace Game3 {
 
 		handleKeys();
 
-		for (const auto &function: functionQueue.steal())
+		for (const auto &function: functionQueue.steal()) {
 			function(*this);
+		}
 
 		if (autofocus && game) {
 			if (ClientPlayerPtr player = game->getPlayer()) {
@@ -391,17 +408,10 @@ namespace Game3 {
 			});
 		});
 
-		drawGL();
+		render();
 	}
 
-	Breakout breakout = [] {
-		Breakout out;
-		out.setSize(600, 600);
-		out.reset();
-		return out;
-	}();
-
-	void Window::drawGL() {
+	void Window::render() {
 		const float x_factor = getXFactor();
 		const float y_factor = getYFactor();
 		auto [width, height] = getDimensions();
@@ -462,11 +472,12 @@ namespace Game3 {
 			const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
 			const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
 
-			if (mainTexture.getWidth() != width || mainTexture.getHeight() != height) {
-				mainTexture.initRGBA(width, height, GL_NEAREST);
+			if (mainGLTexture.getWidth() != width || mainGLTexture.getHeight() != height) {
+				mainGLTexture.initRGBA(width, height, GL_NEAREST);
 				staticLightingTexture.initRGBA(x_static_size, y_static_size, GL_NEAREST);
 				dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
-				scratchTexture.initRGBA(width, height, GL_NEAREST);
+				scratchGLTexture.initRGBA(width, height, GL_NEAREST);
+				causticsGLTexture.initRGBA(width, height, GL_NEAREST);
 
 				GL::FBOBinder binder = fbo.getBinder();
 				dynamicLightingTexture.useInFB();
@@ -475,86 +486,16 @@ namespace Game3 {
 				if (realm) {
 					realm->queueStaticLightingTexture();
 				}
+
+				mainTexture = std::make_shared<Texture>();
+				mainTexture->init(mainGLTexture);
+
+				scratchTexture = std::make_shared<Texture>();
+				scratchTexture->init(scratchGLTexture);
 			}
 
-			bool do_lighting = settings.withShared([&](auto &settings) {
-				return settings.renderLighting;
-			});
-
 			if (realm) {
-				if (do_lighting) {
-					GL::FBOBinder binder = fbo.getBinder();
-					mainTexture.useInFB();
-					glViewport(0, 0, width, height); CHECKGL
-					GL::clear(.2, .2, .2);
-					RendererContext context = getRendererContext();
-					context.updateSize(width, height);
-
-					if (realm->prerender()) {
-						mainTexture.useInFB();
-						batchSpriteRenderer.update(*this);
-						singleSpriteRenderer.update(*this);
-						recolor.update(*this);
-						textRenderer.update(*this);
-						context.updateSize(getWidth(), getHeight());
-						glViewport(0, 0, width, height); CHECKGL
-						// Skip a frame to avoid glitchiness
-						return;
-					}
-
-					realm->render(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-					dynamicLightingTexture.useInFB();
-
-					realm->renderLighting(width, height, center, scale, context, game->getDivisor()); CHECKGL
-
-					scratchTexture.useInFB();
-					GL::clear(1, 1, 1);
-
-					singleSpriteRenderer.drawOnScreen(dynamicLightingTexture, RenderOptions{
-						.x = 0,
-						.y = 0,
-						.sizeX = -1,
-						.sizeY = -1,
-						.scaleX = 1,
-						.scaleY = 1,
-					});
-
-					ChunkPosition chunk = game->getPlayer()->getChunk() - ChunkPosition(1, 1);
-					const auto [static_y, static_x] = chunk.topLeft();
-					singleSpriteRenderer.drawOnMap(staticLightingTexture, RenderOptions{
-						.x = static_cast<double>(static_x),
-						.y = static_cast<double>(static_y),
-						.sizeX = -1,
-						.sizeY = -1,
-						.scaleX = 1. / x_factor,
-						.scaleY = 1. / y_factor,
-						.viewportX = -static_cast<double>(x_factor),
-						.viewportY = -static_cast<double>(y_factor),
-					});
-
-					binder.undo();
-
-					context.updateSize(width, height);
-					glViewport(0, 0, width, height); CHECKGL
-					multiplier(mainTexture, scratchTexture);
-				} else {
-					RendererContext context = getRendererContext();
-					glViewport(0, 0, width, height); CHECKGL
-					GL::clear(.2, .2, .2);
-					context.updateSize(width, height);
-
-					if (realm->prerender()) {
-						batchSpriteRenderer.update(*this);
-						singleSpriteRenderer.update(*this);
-						recolor.update(*this);
-						textRenderer.update(*this);
-						context.updateSize(width, height);
-					}
-
-					realm->render(width, height, center, scale, context, 1.f); CHECKGL
-				}
-
+				realm->getRenderer()->render(getRendererContext(), realm, *this);
 				realmBounds = game->getVisibleRealmBounds();
 			}
 		} else {
@@ -578,7 +519,15 @@ namespace Game3 {
 				has_been_nonzero = true;
 			}
 
-			OKHsv hsv{hue += 0.001, 1, 1, 1};
+			auto now = getTime();
+
+			if (lastRenderTime) {
+				hue += std::chrono::duration_cast<std::chrono::nanoseconds>(now - *lastRenderTime).count() / 1e9 * 144 * 0.001;
+			}
+
+			lastRenderTime = now;
+
+			OKHsv hsv{hue, 1, 1, 1};
 			constexpr int i_max = 32;
 			constexpr double offset_factor = 2;
 			constexpr double x_offset = offset_factor * i_max;
@@ -618,7 +567,24 @@ namespace Game3 {
 
 	void Window::keyCallback(int key, int scancode, int action, int raw_modifiers) {
 		const Modifiers modifiers(static_cast<uint8_t>(raw_modifiers));
-		lastModifiers = modifiers;
+
+		if (action != CUSTOM_REPEAT) {
+			lastModifiers = modifiers;
+		}
+
+		if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+			const bool held = action == GLFW_PRESS;
+
+			if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
+				lastModifiers.shift = held;
+			} else if (key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL) {
+				lastModifiers.ctrl = held;
+			} else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT) {
+				lastModifiers.alt = held;
+			} else if (key == GLFW_KEY_LEFT_SUPER || key == GLFW_KEY_RIGHT_SUPER) {
+				lastModifiers.super = held;
+			}
+		}
 
 		if (action == GLFW_PRESS) {
 			heldKeys.insert(key);
@@ -824,18 +790,25 @@ namespace Game3 {
 	}
 
 	void Window::mouseButtonCallback(int button, int action, int mods) {
-		lastModifiers = Modifiers(mods);
+		Modifiers modifiers(mods);
+		lastModifiers = modifiers;
 
 		const auto [x_pos, y_pos] = getMouseCoordinates<double>();
-		const auto x = static_cast<int>(std::floor(x_pos));
-		const auto y = static_cast<int>(std::floor(y_pos));
+		const int x = static_cast<int>(std::floor(x_pos));
+		const int y = static_cast<int>(std::floor(y_pos));
 
 		if (action == GLFW_PRESS) {
 			heldMouseButton = button;
 
-			uiContext.mouseDown(button, x, y);
+			bool result = uiContext.mouseDown(button, x, y, modifiers);
 
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
+				if (!result && game) {
+					if (ClientPlayerPtr player = game->getPlayer()) {
+						player->setFiring(true);
+					}
+				}
+
 				dragStarted = false;
 				clickPosition.emplace(x, y);
 			} else if (button == GLFW_MOUSE_BUTTON_4 || button == GLFW_MOUSE_BUTTON_5) {
@@ -853,17 +826,23 @@ namespace Game3 {
 		} else if (action == GLFW_RELEASE) {
 			heldMouseButton.reset();
 
-			bool result = uiContext.mouseUp(button, x, y);
+			if (game) {
+				if (ClientPlayerPtr player = game->getPlayer()) {
+					player->setFiring(false);
+				}
+			}
+
+			bool result = uiContext.mouseUp(button, x, y, modifiers);
 
 			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
-				result = uiContext.click(button, x, y) || result;
+				result = uiContext.click(button, x, y, modifiers) || result;
 			} else {
 				result = uiContext.dragEnd(x, y) || result;
 				dragStarted = false;
 			}
 
 			if (!result && game) {
-				game->click(button, 1, x_pos, y_pos, lastModifiers);
+				game->click(button, 1, x_pos, y_pos, modifiers);
 			}
 		}
 	}
@@ -882,7 +861,7 @@ namespace Game3 {
 	void Window::scrollCallback(double x_delta, double y_delta) {
 		const auto [x, y] = getMouseCoordinates<double>();
 
-		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y))) {
+		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y), lastModifiers)) {
 			return;
 		}
 
@@ -891,9 +870,9 @@ namespace Game3 {
 		const auto old_scale = scale;
 
 		if (y_delta < 0) {
-			scale /= 1.08 * -y_delta;
+			scale /= 1 + .08 * -y_delta;
 		} else if (y_delta > 0) {
-			scale *= 1.08 * y_delta;
+			scale *= 1 + .08 * y_delta;
 		}
 
 		const float width = lastWindowSize.first;
@@ -929,9 +908,11 @@ namespace Game3 {
 	}
 
 	void Window::goToTitle() {
-		omniDialog.reset();
-		uiContext.reset();
-		uiContext.emplaceDialog<ConnectionDialog>();
+		queue([](Window &window) {
+			window.omniDialog.reset();
+			window.uiContext.reset();
+			window.uiContext.emplaceDialog<ConnectionDialog>(1);
+		});
 	}
 
 	void Window::onGameLoaded() {
@@ -1123,14 +1104,30 @@ namespace Game3 {
 				seed = parseNumber<size_t>(trim(readFile(".seed")));
 				INFO("Using custom seed \e[1m{}\e[22m", seed);
 			} catch (const std::exception &err) {
-				ERROR("Failed to load seed from .seed: {}", err.what());
+				ERR("Failed to load seed from .seed: {}", err.what());
 			}
 		}
+
+		serverWrapper.onError = [this](const std::exception &exception) {
+			error(std::format("ServerWrapper error: {}", exception.what()), true);
+			serverWrapper.stop();
+			closeGame();
+		};
 
 		serverWrapper.runInThread(seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
-			error("Server failed to start within 10 seconds.");
+			if (std::exception_ptr caught = serverWrapper.getFailure()) {
+				try {
+					std::rethrow_exception(caught);
+				} catch (const std::exception &err) {
+					error(std::format("Server failed to start: {}", err.what()));
+				} catch (...) {
+					error("Server failed to start due to an error.");
+				}
+			} else {
+				error("Server failed to start within 10 seconds.");
+			}
 			return;
 		}
 
@@ -1158,7 +1155,7 @@ namespace Game3 {
 			if (LocalClientPtr client = weak.lock()) {
 				queue([this, client](Window &) {
 					activateContext();
-					auto dialog = make<LoginDialog>(uiContext);
+					auto dialog = make<LoginDialog>(uiContext, 1);
 
 					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
 						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
@@ -1215,7 +1212,7 @@ namespace Game3 {
 		}
 
 		activateContext();
-		auto dialog = make<LoginDialog>(uiContext);
+		auto dialog = make<LoginDialog>(uiContext, 1);
 
 		dialog->signalSubmit.connect([this, client, hostname](const UString &username, const UString &display_name) {
 			if (std::optional<Token> token = client->getToken(hostname, username.raw())) {

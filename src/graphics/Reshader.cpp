@@ -1,7 +1,10 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/Shader.h"
 #include "graphics/GL.h"
+#include "graphics/RenderOptions.h"
 #include "graphics/Reshader.h"
+#include "graphics/Texture.h"
+#include "graphics/Util.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
@@ -11,11 +14,16 @@
 
 namespace Game3 {
 	namespace {
-		const std::string & reshaderVert() { static auto out = readFile("resources/reshader.vert"); return out; }
+		const std::string & reshaderVert() { static auto out = readFile("resources/sprite.vert"); return out; }
 	}
 
-	Reshader::Reshader(std::string_view fragment): shader("reshader") {
-		shader.init(reshaderVert(), fragment); CHECKGL
+	Reshader::Reshader(std::string_view fragment_shader): shader("reshader") {
+		shader.init(reshaderVert(), fragment_shader); CHECKGL
+		initRenderData(); CHECKGL
+	}
+
+	Reshader::Reshader(std::string_view vertex_shader, std::string_view fragment_shader): shader("reshader") {
+		shader.init(vertex_shader, fragment_shader); CHECKGL
 		initRenderData(); CHECKGL
 	}
 
@@ -38,52 +46,58 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			backbufferWidth = backbuffer_width;
 			backbufferHeight = backbuffer_height;
-			glm::mat4 projection = glm::ortho(0.f, float(backbuffer_width), float(backbuffer_height), 0.f, -1.f, 1.f);
+			glm::mat4 projection = glm::ortho(0.f, static_cast<float>(backbuffer_width), static_cast<float>(backbuffer_height), 0.f, -1.f, 1.f);
 			shader.bind(); CHECKGL
 			shader.set("projection", projection); CHECKGL
 		}
 	}
 
 	void Reshader::bind() {
-		shader.bind(); CHECKGL
+		shader.bind();
 	}
 
-	void Reshader::operator()(GLuint texture) {
-		if (!initialized)
-			return;
-
-		shader.bind(); CHECKGL
-
-		const float width  = backbufferWidth;
-		const float height = backbufferHeight;
-
-		glm::mat4 model = glm::scale(glm::mat4(1.f), glm::vec3(width, height, 1.f));
-
-		shader.set("model", model);
-
-		glActiveTexture(GL_TEXTURE4); CHECKGL
-		glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
-		shader.set("txr", 4); CHECKGL
-
-		glBindVertexArray(quadVAO); CHECKGL
-		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
-		glBindVertexArray(0); CHECKGL
+	bool Reshader::drawOnScreen(GLuint texture) {
+		shader.bind();
+		return draw(texture, glm::scale(glm::mat4(1.f), glm::vec3(backbufferWidth, backbufferHeight, 1.f)));
 	}
 
-	void Reshader::operator()(const GL::Texture &texture) {
+	bool Reshader::drawOnScreen(const std::shared_ptr<Texture> &texture) {
+		assert(texture != nullptr);
+		assert(texture->id != 0);
+		return drawOnScreen(texture->id);
+	}
+
+	bool Reshader::drawOnScreen(const GL::Texture &texture) {
 		assert(texture.getHandle() != 0);
-		(*this)(texture.getHandle());
+		return drawOnScreen(texture.getHandle());
+	}
+
+	bool Reshader::drawOnMap(const TexturePtr &texture, const RenderOptions &options, const Tileset &tileset, const Window &window) {\
+		assert(texture != nullptr);
+		return drawOnMap(texture->id, texture->width, texture->height, options, tileset, window);
+	}
+
+	bool Reshader::drawOnMap(int width, int height, const RenderOptions &options, const Tileset &tileset, const Window &window) {\
+		return drawOnMap(0, width, height, options, tileset, window);
+	}
+
+	bool Reshader::drawOnMap(const GL::Texture &texture, const RenderOptions &options, const Tileset &tileset, const Window &window) {
+		return drawOnMap(texture.getHandle(), texture.getWidth(), texture.getHeight(), options, tileset, window);
 	}
 
 	void Reshader::initRenderData() {
-		static const float vertices[] {
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
-			0.f, 0.f, 0.f, 0.f,
+		if (initialized) {
+			glDeleteVertexArrays(1, &quadVAO); CHECKGL
+		}
 
-			0.f, 1.f, 0.f, 1.f,
-			1.f, 1.f, 1.f, 1.f,
-			1.f, 0.f, 1.f, 0.f,
+		static const float vertices[] {
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			0, 0, 0, 0,
+
+			0, 1, 0, 1,
+			1, 1, 1, 1,
+			1, 0, 1, 0,
 		};
 
 		glGenVertexArrays(1, &quadVAO); CHECKGL
@@ -103,5 +117,34 @@ namespace Game3 {
 			WARN("old_abb = {}", old_abb);
 		glBindVertexArray(0); CHECKGL
 		initialized = true;
+	}
+
+	bool Reshader::draw(GLuint texture, const glm::mat4 &model) {
+		if (!initialized) {
+			return false;
+		}
+
+		shader.set("model", model);
+
+		if (texture > 0) {
+			glActiveTexture(GL_TEXTURE1); CHECKGL
+			glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
+			shader.set("txr", 1); CHECKGL
+		}
+
+		if (shaderSetup) {
+			shaderSetup(shader, texture);
+		}
+
+		glBindVertexArray(quadVAO); CHECKGL
+		glDrawArrays(GL_TRIANGLES, 0, 6); CHECKGL
+		glBindVertexArray(0); CHECKGL
+
+		return true;
+	}
+
+	bool Reshader::drawOnMap(GLuint texture, int texture_width, int texture_height, const RenderOptions &options, const Tileset &tileset, const Window &window) {
+		shader.bind();
+		return draw(texture, makeMapModel(options, texture_width, texture_height, tileset, window));
 	}
 }

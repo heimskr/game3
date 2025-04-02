@@ -12,13 +12,13 @@ namespace {
 }
 
 namespace Game3 {
-	Slider::Slider(UIContext &ui, float scale):
-		Widget(ui, scale),
+	Slider::Slider(UIContext &ui, float selfScale):
+		Widget(ui, selfScale),
 		barColor(DEFAULT_BAR_COLOR),
 		handleColor(DEFAULT_HANDLE_COLOR) {}
 
 	void Slider::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 
 		Widget::render(renderers, x, y, width, height);
 
@@ -81,6 +81,12 @@ namespace Game3 {
 		return true;
 	}
 
+	bool Slider::dragEnd(int x, int y) {
+		Widget::dragEnd(x, y);
+		onRelease(*this, value);
+		return true;
+	}
+
 	SizeRequestMode Slider::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
@@ -88,14 +94,14 @@ namespace Game3 {
 	void Slider::measure(const RendererContext &, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth) {
-				minimum = natural = fixedWidth;
+				minimum = natural = fixedWidth * ui.scale;
 			} else {
 				minimum = 0;
 				natural = for_width;
 			}
 		} else {
 			if (0 < fixedHeight) {
-				minimum = natural = fixedHeight;
+				minimum = natural = fixedHeight * ui.scale;
 			} else {
 				minimum = 0;
 				natural = for_height;
@@ -177,10 +183,10 @@ namespace Game3 {
 	}
 
 	float Slider::getBarHeight() const {
-		return scale * 2;
+		return getScale() * 2;
 	}
 
 	float Slider::getHandleSize() const {
-		return scale * 4;
+		return getScale() * 4;
 	}
 }

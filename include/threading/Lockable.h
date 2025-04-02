@@ -7,7 +7,7 @@
 #include <mutex>
 #include <shared_mutex>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 namespace Game3 {
 	using DefaultMutex = SharedRecursiveMutex;
@@ -128,15 +128,9 @@ namespace Game3 {
 	};
 
 	template <typename T, typename M>
-	void to_json(nlohmann::json &json, const Lockable<T, M> &lockable) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
-		json = lockable.getBase();
-	}
-
-	template <typename T, typename M>
-	void from_json(const nlohmann::json &json, Lockable<T, M> &lockable) {
-		auto lock = lockable.uniqueLock();
-		lockable = json.get<T>();
+		json = boost::json::value_from(lockable.getBase());
 	}
 
 	template <typename T, typename M>

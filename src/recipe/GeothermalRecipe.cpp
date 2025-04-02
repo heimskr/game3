@@ -52,17 +52,18 @@ namespace Game3 {
 		return true;
 	}
 
-	void GeothermalRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = GeothermalRecipeRegistry::ID();
-		json["input"] = input;
-		json["output"] = output;
+	void GeothermalRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
+		auto &object = json.emplace_object();
+		object["type"] = boost::json::value_from(GeothermalRecipeRegistry::ID());
+		object["input"] = boost::json::value_from(input, game);
+		object["output"] = boost::json::value_from(output);
 	}
 
-	GeothermalRecipe GeothermalRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		return {FluidStack::fromJSON(*game, json.at("input")), json.at("output")};
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const GeothermalRecipe &recipe, const GamePtr &game) {
+		recipe.toJSON(json, game);
 	}
 
-	void to_json(nlohmann::json &json, const GeothermalRecipe &recipe) {
-		recipe.toJSON(json);
+	GeothermalRecipe tag_invoke(boost::json::value_to_tag<GeothermalRecipe>, const boost::json::value &json, const std::shared_ptr<Game> &game) {
+		return {boost::json::value_to<FluidStack>(json.at("input"), game), boost::json::value_to<EnergyAmount>(json.at("output"))};
 	}
 }

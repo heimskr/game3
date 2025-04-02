@@ -8,9 +8,9 @@
 namespace Game3 {
 	class Box: public ChildDependentExpandingWidget<Widget> {
 		public:
-			Box(UIContext &, float scale, Orientation, float padding, float separator_thickness, Color separator_color);
-			Box(UIContext &, float scale, Orientation, float padding);
-			Box(UIContext &, float scale, Orientation = Orientation::Vertical);
+			Box(UIContext &, float selfScale, Orientation, float padding, float separator_thickness, Color separator_color);
+			Box(UIContext &, float selfScale, Orientation, float padding);
+			Box(UIContext &, float selfScale, Orientation = Orientation::Vertical);
 
 			using ChildDependentExpandingWidget<Widget>::render;
 			void render(const RendererContext &, float x, float y, float width, float height) override;

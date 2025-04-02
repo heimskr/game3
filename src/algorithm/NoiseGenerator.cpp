@@ -1,6 +1,8 @@
 #include "algorithm/NoiseGenerator.h"
 
 namespace Game3 {
+	NoiseGenerator::NoiseGenerator() = default;
+
 	FastNoise2Generator::FastNoise2Generator():
 		NoiseGenerator(),
 		fastNoise(FastNoise::NewFromEncodedNodeTree(getNodeTree(), FastSIMD::Level_AVX512)) {}

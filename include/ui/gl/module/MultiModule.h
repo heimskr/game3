@@ -40,11 +40,12 @@ namespace Game3 {
 				return suffix;
 			}
 
-			MultiModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
-				MultiModule(ui, game, std::any_cast<AgentPtr>(argument)) {}
+			MultiModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &argument):
+				MultiModule(ui, selfScale, game, std::any_cast<AgentPtr>(argument)) {}
 
-			MultiModule(UIContext &ui, const ClientGamePtr &game, const AgentPtr &agent):
-				Module(ui, game), agent(std::move(agent)) {}
+			MultiModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const AgentPtr &agent):
+				Module(ui, selfScale, game),
+				agent(std::move(agent)) {}
 
 			Identifier getID() const final {
 				return ID();
@@ -60,7 +61,7 @@ namespace Game3 {
 							assert(inventoried);
 							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
 								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
-								auto inventory_module = std::make_shared<InventoryModule>(ui, std::move(inventory));
+								auto inventory_module = std::make_shared<InventoryModule>(ui, selfScale, std::move(inventory));
 								submodules.emplace_back(inventory_module);
 								if (firstInventoryModule == nullptr) {
 									firstInventoryModule = inventory_module;
@@ -71,12 +72,12 @@ namespace Game3 {
 
 						case Substance::Fluid: {
 							assert(std::dynamic_pointer_cast<FluidHoldingTileEntity>(agent));
-							submodules.emplace_back(std::make_shared<FluidsModule>(ui, agent, false));
+							submodules.emplace_back(std::make_shared<FluidsModule>(ui, selfScale, agent, false));
 							break;
 						}
 
 						case Substance::Energy: {
-							submodules.emplace_back(std::make_shared<EnergyModule>(ui, agent, false));
+							submodules.emplace_back(std::make_shared<EnergyModule>(ui, selfScale, agent, false));
 							break;
 						}
 
@@ -85,7 +86,7 @@ namespace Game3 {
 					}
 				}
 
-				box = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+				box = std::make_shared<Box>(ui, selfScale, Orientation::Vertical);
 				box->setHorizontalExpand(true);
 				box->insertAtEnd(shared_from_this());
 

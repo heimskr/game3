@@ -15,7 +15,8 @@ namespace Game3 {
 		double scaleX = 1.;
 		double scaleY = 1.;
 		double angle = 0.;
-		Color color{1., 1., 1., 1.};
+		Color color{"#ffffff"};
+		Color composite{"#00000000"};
 		bool invertY = true;
 		double viewportX = -1.;
 		double viewportY = -1.;

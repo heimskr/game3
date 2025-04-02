@@ -22,12 +22,11 @@ namespace Game3 {
 
 			/** Not encoded. */
 			Lockable<std::string> username;
+			std::string displayName;
+			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
 			/** Definitely not encoded. */
 			Token token = -1;
-			std::string displayName;
 			float tooldown = 0;
-			Lockable<std::unordered_set<Identifier>> stationTypes{{}};
-			float movementSpeed = 10;
 			float timeSinceAttack = 0;
 			std::atomic_bool movingUp = false;
 			std::atomic_bool movingRight = false;
@@ -36,6 +35,8 @@ namespace Game3 {
 			/** When moving with shift held, the player will interact with each spot moved to. */
 			bool continuousInteraction = false;
 			bool ticked = false;
+			/** Whether the player is clicking and holding on the world. */
+			bool firing = false;
 			Atomic<RealmID> spawnRealmID;
 			Lockable<Position> spawnPosition;
 			std::optional<Place> lastContinuousInteraction;
@@ -46,8 +47,8 @@ namespace Game3 {
 			void destroy() override;
 
 			HitPoints getMaxHealth() const override;
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			bool isPlayer() const override { return true; }
 			void tick(const TickArgs &) override;
 			void remove() override {}
@@ -58,7 +59,6 @@ namespace Game3 {
 			virtual void addMoney(MoneyCount) = 0;
 			/** Returns whether the player had enough money. If false, no change was made. */
 			virtual bool removeMoney(MoneyCount) = 0;
-			float getMovementSpeed() const override;
 			bool setTooldown(float multiplier);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			virtual void showText(const UString &text, const UString &name) = 0;
@@ -92,6 +92,7 @@ namespace Game3 {
 			bool addKnownItem(const Identifier &);
 			void setKnownItems(std::set<Identifier>);
 			bool hasKnownItem(const Identifier &) const;
+			virtual void setFiring(bool);
 
 			inline std::string getUsername() const { return username.copyBase(); }
 			inline const auto & getKnownItems() const { return knownItems; }
@@ -108,7 +109,7 @@ namespace Game3 {
 		friend class Entity;
 	};
 
-	void to_json(nlohmann::json &, const Player &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Player &);
 
 	using PlayerPtr = std::shared_ptr<Player>;
 }

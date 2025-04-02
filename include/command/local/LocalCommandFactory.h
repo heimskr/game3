@@ -1,11 +1,11 @@
 #pragma once
 
-#include <functional>
-#include <memory>
-
-#include "types/Types.h"
 #include "command/local/LocalCommand.h"
 #include "registry/Registerable.h"
+#include "types/Types.h"
+
+#include <functional>
+#include <memory>
 
 namespace Game3 {
 	class Game;

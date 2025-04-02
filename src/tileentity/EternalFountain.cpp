@@ -15,11 +15,11 @@ namespace Game3 {
 
 	EternalFountain::EternalFountain() = default;
 
-	EternalFountain::EternalFountain(Identifier tile_id, Position position_):
-		TileEntity(std::move(tile_id), ID(), position_, true) {}
+	EternalFountain::EternalFountain(Identifier tileID, Position position):
+		TileEntity(std::move(tileID), ID(), position, true) {}
 
-	EternalFountain::EternalFountain(Position position_):
-		EternalFountain("base:tile/eternal_fountain"_id, position_) {}
+	EternalFountain::EternalFountain(Position position):
+		EternalFountain("base:tile/eternal_fountain"_id, position) {}
 
 	size_t EternalFountain::getMaxFluidTypes() const {
 		return 100;
@@ -37,22 +37,22 @@ namespace Game3 {
 
 	void EternalFountain::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || realm->getSide() != Side::Server)
+		if (!realm || realm->getSide() != Side::Server) {
 			return;
+		}
 
 		Ticker ticker{*this, args};
 		enqueueTick(PERIOD);
 
 		const InventoryPtr inventory = getInventory(0);
 
-		ItemStackPtr stack;
-		{
-			auto inventory_lock = inventory->sharedLock();
-			stack = (*inventory)[0];
-		}
+		ItemStackPtr stack = inventory->withShared([](Inventory &inventory) {
+			return (inventory)[0];
+		});
 
-		if (!stack)
+		if (!stack) {
 			return;
+		}
 
 		Identifier fluid_type;
 
@@ -62,8 +62,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (fluid_type.empty())
+		if (fluid_type.empty()) {
 			return;
+		}
 
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
 		const auto fluid_id = args.game->getFluid(fluid_type)->registryID;
@@ -76,7 +77,7 @@ namespace Game3 {
 		}
 	}
 
-	void EternalFountain::toJSON(nlohmann::json &json) const {
+	void EternalFountain::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
@@ -102,7 +103,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void EternalFountain::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void EternalFountain::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
@@ -145,8 +146,9 @@ namespace Game3 {
 
 		std::erase_if(InventoriedTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
 			if (auto player = weak_player.lock()) {
-				if (!FluidHoldingTileEntity::observers.contains(player))
+				if (!FluidHoldingTileEntity::observers.contains(player)) {
 					player->send(packet);
+				}
 				return false;
 			}
 

@@ -4,13 +4,13 @@
 #include "threading/Lockable.h"
 #include "types/Types.h"
 
+#include <boost/json.hpp>
+
 #include <map>
 #include <memory>
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	class Buffer;
@@ -21,15 +21,15 @@ namespace Game3 {
 			enum class Comparator: uint8_t {None = 0, Less, Greater};
 
 			struct Config {
-				nlohmann::json data;
+				boost::json::value data;
 				Comparator comparator{};
 				ItemCount count{};
 
-				Config(nlohmann::json data_ = {}, Comparator comparator_ = {}, ItemCount count_ = {}):
-					data(std::move(data_)), comparator(comparator_), count(count_) {}
+				explicit Config(boost::json::value data = {}, Comparator comparator = {}, ItemCount count = {}):
+					data(std::move(data)), comparator(comparator), count(count) {}
 
 				bool operator()(const ItemStackPtr &, const Inventory &, bool strict) const;
-				bool operator<(const Config &) const;
+				bool operator==(const Config &) const;
 			};
 
 			ItemFilter();
@@ -75,7 +75,7 @@ namespace Game3 {
 			bool strict = false;
 
 			Lockable<std::set<Identifier>> items;
-			Lockable<std::map<Identifier, std::set<Config>>> configsByItem;
+			Lockable<std::map<Identifier, std::unordered_set<Config>>> configsByItem;
 
 		friend Buffer & operator+=(Buffer &, const ItemFilter &);
 		friend Buffer & operator<<(Buffer &, const ItemFilter &);
@@ -97,3 +97,15 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const ItemFilter &);
 	Buffer & operator>>(Buffer &, ItemFilter &);
 }
+
+template <>
+struct std::hash<Game3::ItemFilter::Config> {
+	size_t operator()(const Game3::ItemFilter::Config &config) const noexcept {
+		uintmax_t hash = std::hash<Game3::ItemCount>{}(config.count);
+		hash *= 0x1f1f1f1f1f1f1f1fuz;
+		hash ^= std::hash<Game3::ItemFilter::Comparator>{}(config.comparator);
+		hash *= 0x1f1f1f1f1f1f1f1fuz;
+		hash ^= std::hash<boost::json::value>{}(config.data);
+		return std::hash<uintmax_t>{}(hash);
+	}
+};

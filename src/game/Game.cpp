@@ -1,10 +1,12 @@
-#include "graphics/Tileset.h"
+#include "algorithm/AStar.h"
 #include "game/ClientGame.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "ui/gl/module/AutocrafterModule.h"
 #include "ui/gl/module/ChemicalReactorModule.h"
 #include "ui/gl/module/CombinerModule.h"
@@ -19,12 +21,9 @@
 #include "ui/gl/module/MutatorModule.h"
 #include "ui/gl/module/TextModule.h"
 #include "ui/gl/module/VillageTradeModule.h"
-#include "algorithm/AStar.h"
 #include "util/FS.h"
 #include "util/Timer.h"
 #include "util/Util.h"
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	Game::Game():
@@ -80,6 +79,8 @@ namespace Game3 {
 		addTiles();
 		addModuleFactories();
 		addMinigameFactories();
+		addFluids();
+		addStatusEffectFactories();
 	}
 
 	void Game::initEntities() {
@@ -95,7 +96,7 @@ namespace Game3 {
 	}
 
 	void Game::add(std::shared_ptr<Item> item) {
-		registry<ItemRegistry>().add(item->identifier, item);
+		itemRegistry->add(item->identifier, item);
 		for (const auto &attribute: item->attributes)
 			itemsByAttribute[attribute].insert(item);
 	}
@@ -105,10 +106,11 @@ namespace Game3 {
 		registry<ModuleFactoryRegistry>().add(shared->identifier, shared);
 	}
 
-	void Game::addRecipe(const nlohmann::json &json) {
-		const Identifier identifier = json.at(0);
-		if (identifier.getPathStart() != "ignore")
+	void Game::addRecipe(const boost::json::value &json) {
+		Identifier identifier(std::string_view(json.at(0).as_string()));
+		if (identifier.getPathStart() != "ignore") {
 			registries.at(identifier)->toUnnamed()->add(shared_from_this(), json.at(1));
+		}
 	}
 
 	RealmID Game::newRealmID() const {
@@ -153,11 +155,11 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Fluid> Game::getFluid(FluidID fluid_id) const {
-		return registry<FluidRegistry>().maybe(static_cast<size_t>(fluid_id));
+		return fluidRegistry->maybe(static_cast<size_t>(fluid_id));
 	}
 
 	std::shared_ptr<Fluid> Game::getFluid(const Identifier &identifier) const {
-		return registry<FluidRegistry>().maybe(identifier);
+		return fluidRegistry->maybe(identifier);
 	}
 
 	GamePtr Game::create(Side side, const GameArgument &argument) {
@@ -176,17 +178,35 @@ namespace Game3 {
 		return out;
 	}
 
-	GamePtr Game::fromJSON(Side side, const nlohmann::json &json, const GameArgument &argument) {
+	GamePtr Game::fromJSON(Side side, const boost::json::value &json, const GameArgument &argument) {
+		const auto &object = json.as_object();
 		auto out = create(side, argument);
 		out->initialSetup();
 		{
 			auto lock = out->realms.uniqueLock();
-			for (const auto &[string, realm_json]: json.at("realms").get<std::unordered_map<std::string, nlohmann::json>>())
+			for (const auto &[string, realm_json]: boost::json::value_to<std::unordered_map<std::string, boost::json::value>>(json.at("realms"))) {
 				out->realms.emplace(parseUlong(string), Realm::fromJSON(out, realm_json));
+			}
 		}
-		out->hourOffset = json.contains("hourOffset")? json.at("hourOffset").get<float>() : 0.f;
-		out->debugMode = json.contains("debugMode")? json.at("debugMode").get<bool>() : false;
-		out->cavesGenerated = json.contains("cavesGenerated")? json.at("cavesGenerated").get<decltype(Game::cavesGenerated)>() : 0;
+
+		if (auto *value = object.if_contains("hourOffset")) {
+			out->hourOffset = getDouble(*value);
+		} else {
+			out->hourOffset = 0;
+		}
+
+		if (auto *value = object.if_contains("debugMode")) {
+			out->debugMode = value->as_bool();
+		} else {
+			out->debugMode = false;
+		}
+
+		if (auto *value = object.if_contains("cavesGenerated")) {
+			out->cavesGenerated = getNumber<size_t>(*value);
+		} else {
+			out->cavesGenerated = 0;
+		}
+
 		return out;
 	}
 
@@ -216,23 +236,28 @@ namespace Game3 {
 		return std::static_pointer_cast<ServerGame>(shared_from_this());
 	}
 
-	void to_json(nlohmann::json &json, const Game &game) {
-		json["debugMode"] = game.debugMode;
-		json["realms"] = std::unordered_map<std::string, nlohmann::json>();
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Game &game) {
+		auto &object = json.emplace_object();
+
+		object["debugMode"] = game.debugMode;
+		auto &realms = object["realms"].emplace_object();
 		game.iterateRealms([&](const RealmPtr &realm) {
-			realm->toJSON(json["realms"][std::to_string(realm->id)], true);
+			realm->toJSON(realms[std::to_string(realm->id)], true);
 		});
-		json["hourOffset"] = game.getHour();
-		if (0 < game.cavesGenerated)
-			json["cavesGenerated"] = game.cavesGenerated;
+		object["hourOffset"] = game.getHour();
+		if (0 < game.cavesGenerated) {
+			object["cavesGenerated"] = game.cavesGenerated;
+		}
 	}
 
+#ifndef __MINGW32__
 	template <>
 	std::shared_ptr<Agent> Game::getAgent<Agent>(GlobalID gid) {
 		auto shared_lock = allAgents.sharedLock();
 		if (auto iter = allAgents.find(gid); iter != allAgents.end()) {
-			if (auto agent = iter->second.lock())
+			if (auto agent = iter->second.lock()) {
 				return agent;
+			}
 			// This should *probably* not result in a data race in practice...
 			shared_lock.unlock();
 			auto unique_lock = allAgents.uniqueLock();
@@ -241,6 +266,7 @@ namespace Game3 {
 
 		return nullptr;
 	}
+#endif
 
 	void Game::associateWithRealm(const VillagePtr &village, RealmID realm_id) {
 		RealmPtr realm = getRealm(realm_id);

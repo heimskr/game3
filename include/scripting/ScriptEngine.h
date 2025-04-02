@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef GAME3_ENABLE_SCRIPTING
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -76,7 +76,7 @@ namespace Game3 {
 
 			v8::Local<v8::External> wrap(void *);
 
-			nlohmann::json getJSON(v8::Local<v8::Value>);
+			boost::json::value getJSON(v8::Local<v8::Value>);
 
 			void clearContext();
 			void print(std::string_view);

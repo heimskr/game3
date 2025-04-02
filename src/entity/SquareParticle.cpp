@@ -12,9 +12,12 @@ namespace Game3 {
 	SquareParticle::SquareParticle(const Vector3 &initial_velocity, float size, Color color, double depth, double linger_time):
 		Entity(ID()), initialVelocity(initial_velocity), size(size), color(color), depth(depth), lingerTime(linger_time) {}
 
+	void SquareParticle::renderShadow(const RendererContext &) {}
+
 	void SquareParticle::render(const RendererContext &renderers) {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
@@ -51,9 +54,13 @@ namespace Game3 {
 
 	void SquareParticle::onSpawn() {
 		Entity::onSpawn();
-		auto lock = velocity.uniqueLock();
-		velocity.x = std::uniform_real_distribution(2.,  4.)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
-		velocity.z = std::uniform_real_distribution(8., 12.)(threadContext.rng);
+		if (initialVelocity) {
+			velocity = initialVelocity;
+		} else {
+			auto lock = velocity.uniqueLock();
+			velocity.x = std::uniform_real_distribution(2.,  4.)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
+			velocity.z = std::uniform_real_distribution(8., 12.)(threadContext.rng);
+		}
 	}
 
 	int SquareParticle::getZIndex() const {

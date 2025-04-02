@@ -27,14 +27,14 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", std::format("module/microscope/{}{}", S, Submodule::getSuffix())}; }
 
-			MicroscopeModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
-				MicroscopeModule(ui, game, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
+			MicroscopeModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &argument):
+				MicroscopeModule(ui, selfScale, game, std::dynamic_pointer_cast<InventoriedTileEntity>(std::any_cast<AgentPtr>(argument))) {}
 
-			MicroscopeModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<InventoriedTileEntity> tile_entity):
-				Module(ui, game),
+			MicroscopeModule(UIContext &ui, float selfScale, const ClientGamePtr &game, std::shared_ptr<InventoriedTileEntity> tile_entity):
+				Module(ui, selfScale, game),
 				tileEntity(std::move(tile_entity)),
-				multiModule(std::make_shared<Submodule>(ui, game, std::static_pointer_cast<Agent>(tileEntity))),
-				geneticAnalysisModule(std::make_shared<GeneticAnalysisModule>(ui)) {}
+				multiModule(std::make_shared<Submodule>(ui, selfScale, game, std::static_pointer_cast<Agent>(tileEntity))),
+				geneticAnalysisModule(std::make_shared<GeneticAnalysisModule>(ui, selfScale)) {}
 
 			Identifier getID() const final {
 				return ID();
@@ -44,10 +44,10 @@ namespace Game3 {
 				multiModule->init();
 				geneticAnalysisModule->init();
 
-				vbox = std::make_shared<Box>(ui, scale);
+				vbox = std::make_shared<Box>(ui, selfScale);
 				vbox->setHorizontalExpand(true);
 
-				header = std::make_shared<Label>(ui, scale);
+				header = std::make_shared<Label>(ui, selfScale);
 				header->setText(tileEntity->getName());
 				header->insertAtEnd(vbox);
 
@@ -70,8 +70,9 @@ namespace Game3 {
 			}
 
 			void updateResults() {
-				if (!tileEntity || !initialized)
+				if (!tileEntity || !initialized) {
 					return;
+				}
 
 				auto inventory = tileEntity->getInventory(0);
 				auto lock = inventory->sharedLock();

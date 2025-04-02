@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "types/Position.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
@@ -34,7 +34,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool TerrainSeed::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	bool TerrainSeed::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		return use(slot, stack, place, modifiers, offsets);
 	}
 }

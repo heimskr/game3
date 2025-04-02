@@ -1,14 +1,14 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "game/ClientGame.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "packet/Packet.h"
 #include "packet/PacketError.h"
 #include "packet/PacketFactory.h"
+#include "threading/ThreadContext.h"
 #include "util/FS.h"
 #include "util/Util.h"
-
-#include <nlohmann/json.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -58,14 +58,14 @@ namespace Game3 {
 	void LocalClient::connect(std::string_view hostname, uint16_t port) {
 		assert(!isReady());
 #ifdef USE_TLS
-		asio::io_service io_service;
-		asio::ip::tcp::resolver resolver(io_service);
+		asio::io_context io_context;
+		asio::ip::tcp::resolver resolver(io_context);
 
-		auto resolved = resolver.resolve(hostname, "");
+		asio::ip::basic_resolver_results<asio::ip::tcp> resolved = resolver.resolve(hostname, "");
 		if (resolved.size() != 1)
 			throw std::runtime_error(std::format("Too {} resolution results: {}", resolved.empty()? "few" : "many", resolved.size()));
 		lastHostname = hostname;
-		auto endpoint = resolved->endpoint();
+		auto endpoint = resolved.begin()->endpoint();
 		endpoint.port(port);
 
 		asio::post(strand, [this, endpoint, shared = shared_from_this()] {
@@ -84,14 +84,17 @@ namespace Game3 {
 			}));
 		});
 
-		sslThread = std::thread([this] {
+		sslThread = std::thread([weak = weak_from_this()] {
+			threadContext.rename("ClientSSL");
 #ifdef __APPLE__
 			pthread_setname_np("LocalClient ioContext");
 #elif defined(__linux__)
 			pthread_setname_np(pthread_self(), "LocalClient ioContext");
 #endif
-			ioContext.run();
-			--sslWaiter;
+			if (LocalClientPtr client = weak.lock()) {
+				client->ioContext.run();
+				--client->sslWaiter;
+			}
 		});
 #else
 		INFO("Handshake done.");
@@ -160,18 +163,19 @@ namespace Game3 {
 	}
 
 	void LocalClient::readTokens(const std::filesystem::path &path) {
-		tokenDatabase = nlohmann::json::parse(readFile(path));
+		tokenDatabase = boost::json::value_to<decltype(tokenDatabase)>(boost::json::parse(readFile(path)));
 		tokenDatabasePath = path;
 	}
 
 	void LocalClient::saveTokens() const {
 		assert(tokenDatabasePath);
-		std::ofstream(*tokenDatabasePath) << nlohmann::json(tokenDatabase).dump();
+		std::ofstream stream{*tokenDatabasePath};
+		serializeJSON(boost::json::value_from(tokenDatabase), stream);
 	}
 
-	void LocalClient::saveTokens(const std::filesystem::path &path) {
-		tokenDatabasePath = path;
-		std::ofstream(path) << nlohmann::json(tokenDatabase).dump();
+	void LocalClient::saveTokens(std::filesystem::path path) {
+		tokenDatabasePath = std::move(path);
+		saveTokens();
 	}
 
 	bool LocalClient::hasHostname() const {
@@ -239,7 +243,7 @@ namespace Game3 {
 			}
 
 			if (errc) {
-				ERROR("LocalClient write ({}): {} ({})", lastHostname, errc.message(), errc.value());
+				ERR("LocalClient write ({}): {} ({})", lastHostname, errc.message(), errc.value());
 			} else if (!empty) {
 				write();
 			}
@@ -312,7 +316,7 @@ namespace Game3 {
 			reading = true;
 			sslSock.async_read_some(asio::buffer(array), asio::bind_executor(strand, [this, shared](const asio::error_code &errc, std::size_t length) {
 				if (errc && errc.value() != 2) {
-					ERROR("LocalClient::doRead: {} ({})", errc.message(), errc.value());
+					ERR("LocalClient::doRead: {} ({})", errc.message(), errc.value());
 					close();
 					return;
 				}

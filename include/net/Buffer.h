@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Log.h"
+#include "util/Log.h"
 #include "types/Types.h"
 #include "util/Concepts.h"
 #include "util/Demangle.h"
+
+#include <boost/json/fwd.hpp>
 
 #include <bit>
 #include <cassert>
@@ -21,9 +23,6 @@
 #include <ranges>
 #include <span>
 #include <vector>
-
-#include <nlohmann/json_fwd.hpp>
-
 
 namespace Game3 {
 	class Buffer;
@@ -58,7 +57,7 @@ namespace Game3 {
 			}
 
 			template <typename T>
-			Buffer & appendType(const T &t, bool in_container) {
+			inline Buffer & appendType(const T &t, bool in_container) {
 				const auto type = getType(t, in_container);
 				bytes.insert(bytes.end(), type.begin(), type.end());
 				return *this;
@@ -69,14 +68,14 @@ namespace Game3 {
 			std::string getType(const T &, bool in_container);
 
 			template <Map M>
-			std::string getType(const M &, bool in_container) {
+			inline std::string getType(const M &, bool in_container) {
 				(void) in_container;
 				// Inelegant how it requires an instance of the type as an argument.
 				return '\x21' + getType(typename M::key_type(), true) + getType(typename M::mapped_type(), true);
 			}
 
 			template <LinearOrSet T>
-			std::string getType(const T &, bool in_container) {
+			inline std::string getType(const T &, bool in_container) {
 				(void) in_container;
 				// Same here.
 				return '\x20' + getType(typename T::value_type(), true);
@@ -84,19 +83,19 @@ namespace Game3 {
 
 			template <typename T>
 			requires std::is_enum_v<T>
-			std::string getType(const T &, bool in_container) {
+			inline std::string getType(const T &, bool in_container) {
 				return getType(std::underlying_type_t<T>(), in_container);
 			}
 
 			template <typename T>
-			std::string getType(const std::optional<T> &item, bool in_container) {
+			inline std::string getType(const std::optional<T> &item, bool in_container) {
 				if (in_container)
 					return "\x0b" + getType(T(), true);
 				return item.has_value()? "\x0b" : "\x0c";
 			}
 
 			template <typename T>
-			std::string getType(const std::shared_ptr<T> &item, bool in_container) {
+			inline std::string getType(const std::shared_ptr<T> &item, bool in_container) {
 				if (!item)
 					return getType(T(), in_container);
 				return getType(*item, in_container);
@@ -111,7 +110,7 @@ namespace Game3 {
 			Buffer & operator+=(std::same_as<double> auto);
 			Buffer & operator+=(std::same_as<std::string_view> auto);
 			Buffer & operator+=(std::same_as<std::string> auto const &);
-			Buffer & operator+=(std::same_as<nlohmann::json> auto const &);
+			Buffer & operator+=(std::same_as<boost::json::value> auto const &);
 
 			template <std::signed_integral T>
 			Buffer & operator+=(T item) {
@@ -172,11 +171,11 @@ namespace Game3 {
 				std::span span = getSpan().subspan(to_skip);
 
 				if (span.size_bytes() < sizeof(T)) {
-					ERROR("Buffer size: {:L}", bytes.size());
-					ERROR("Skip: {:L}", skip);
-					ERROR("Span size: {:L}", span.size());
-					ERROR("Span size_bytes: {:L}", span.size_bytes());
-					ERROR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
+					ERR("Buffer size: {:L}", bytes.size());
+					ERR("Skip: {:L}", skip);
+					ERR("Span size: {:L}", span.size());
+					ERR("Span size_bytes: {:L}", span.size_bytes());
+					ERR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
 					throw std::out_of_range("Buffer is too empty");
 				}
 
@@ -236,8 +235,8 @@ namespace Game3 {
 			size_t getSkip() const;
 			void setSkip(size_t);
 
-			nlohmann::json popJSON();
-			nlohmann::json popAllJSON();
+			boost::json::value popJSON();
+			boost::json::value popAllJSON();
 
 			Buffer & operator<<(bool);
 			Buffer & operator<<(uint8_t);
@@ -303,7 +302,7 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &, T &);
 
 	template <LinearOrSet T>
-	Buffer & operator>>(Buffer &buffer, T &out) {
+	inline Buffer & operator>>(Buffer &buffer, T &out) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(T(), false))) {
 			buffer.debug();
@@ -314,7 +313,7 @@ namespace Game3 {
 	}
 
 	template <Map M>
-	Buffer & operator>>(Buffer &buffer, M &out) {
+	inline Buffer & operator>>(Buffer &buffer, M &out) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(M(), false))) {
 			buffer.debug();
@@ -325,7 +324,7 @@ namespace Game3 {
 	}
 
 	template <Numeric T>
-	Buffer & operator>>(Buffer &buffer, T &out) {
+	inline Buffer & operator>>(Buffer &buffer, T &out) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(T(), false))) {
 			buffer.debug();
@@ -337,7 +336,7 @@ namespace Game3 {
 
 	template <typename T>
 	requires std::is_enum_v<T>
-	Buffer & operator>>(Buffer &buffer, T &out) {
+	inline Buffer & operator>>(Buffer &buffer, T &out) {
 		std::underlying_type_t<T> raw;
 		buffer >> raw;
 		out = static_cast<T>(raw);
@@ -345,7 +344,7 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	Buffer & operator>>(Buffer &buffer, std::optional<T> &out) {
+	inline Buffer & operator>>(Buffer &buffer, std::optional<T> &out) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(std::optional<T>(), false)))
 			throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(buffer.getType(std::make_optional<T>(), false), true) + "): " + hexString(type, true));
@@ -357,7 +356,7 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	Buffer & operator>>(Buffer &buffer, std::shared_ptr<T> &out) {
+	inline Buffer & operator>>(Buffer &buffer, std::shared_ptr<T> &out) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(std::optional<T>(), false)))
 			throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(buffer.getType(std::optional<T>(), true), true) + "): " + hexString(type, true));
@@ -374,15 +373,16 @@ namespace Game3 {
 	using BufferPtr = std::shared_ptr<Buffer>;
 
 	template <std::integral T>
-	T popBuffer(Buffer &buffer) {
+	requires (!std::same_as<T, bool>)
+	inline T popBuffer(Buffer &buffer) {
 		std::span span = buffer.getSpan();
 
 		if (span.size_bytes() < sizeof(T)) {
-			ERROR("Buffer size: {:L}", buffer.bytes.size());
-			ERROR("Skip: {:L}", buffer.skip);
-			ERROR("Span size: {:L}", span.size());
-			ERROR("Span size_bytes: {:L}", span.size_bytes());
-			ERROR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
+			ERR("Buffer size: {:L}", buffer.bytes.size());
+			ERR("Skip: {:L}", buffer.skip);
+			ERR("Span size: {:L}", span.size());
+			ERR("Span size_bytes: {:L}", span.size_bytes());
+			ERR("sizeof({}): {}", DEMANGLE(T), sizeof(T));
 			throw std::out_of_range("Buffer is too empty");
 		}
 
@@ -436,10 +436,10 @@ namespace Game3 {
 		return static_cast<T>(popBuffer<std::underlying_type_t<T>>(buffer));
 	}
 
-	Buffer & operator<<(Buffer &, std::same_as<nlohmann::json> auto const &);
+	Buffer & operator<<(Buffer &, std::same_as<boost::json::value> auto const &);
 
 	template <>
-	Buffer & operator>>(Buffer &, nlohmann::json &);
+	Buffer & operator>>(Buffer &, boost::json::value &);
 }
 
 template <>

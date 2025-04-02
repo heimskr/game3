@@ -8,6 +8,7 @@ out vec4 color;
 uniform sampler2D sprite;
 uniform sampler2D mask;
 uniform vec4 spriteColor;
+uniform vec4 spriteComposite;
 uniform vec4 texturePosition;
 uniform float hue;
 uniform float saturation;
@@ -262,6 +263,14 @@ vec3 srgb_to_okhsv(vec3 rgb) {
 	return vec3(h, s, v);
 }
 
+vec4 alphaComposite(vec4 bottom, vec4 top) {
+	float a0 = top.a + bottom.a * (1 - top.a);
+	return vec4(
+		(top.rgb * top.a + bottom.rgb * bottom.a * (1 - top.a)) / a0,
+		a0
+	);
+}
+
 void main() {
 	color = spriteColor * texture(sprite, TexCoords);
 	float mask_alpha = texture(mask, TexCoords).a;
@@ -284,4 +293,6 @@ void main() {
 
 		color.rgb = okhsv_to_srgb(hsv);
 	}
+
+	color = alphaComposite(color, vec4(spriteComposite.rgb, min(spriteComposite.a, color.a)));
 }

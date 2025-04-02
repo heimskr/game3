@@ -1,7 +1,6 @@
 #include "data/Identifier.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	std::string Identifier::getPath() const {
@@ -25,43 +24,15 @@ namespace Game3 {
 		return name.substr(slash + 1);
 	}
 
-	bool Identifier::operator==(const char *combined) const {
-		return *this == std::string_view(combined);
-	}
-
-	bool Identifier::operator==(std::string_view combined) const {
-		const size_t colon = combined.find(':');
-		if (colon == std::string_view::npos)
-			return false;
-		return space == combined.substr(0, colon) && name == combined.substr(colon + 1);
-	}
-
-	bool Identifier::operator==(const Identifier &other) const {
-		return this == &other || (space == other.space && name == other.name);
-	}
-
-	bool Identifier::operator<(const Identifier &other) const {
-		if (this == &other)
-			return false;
-
-		if (space < other.space)
-			return true;
-
-		if (space > other.space)
-			return false;
-
-		return name < other.name;
-	}
-
 	std::ostream & operator<<(std::ostream &os, const Identifier &identifier) {
 		return os << identifier.space << ':' << identifier.name;
 	}
 
-	void from_json(const nlohmann::json &json, Identifier &identifier) {
-		identifier = std::string_view(json.get<std::string>());
+	Identifier tag_invoke(boost::json::value_to_tag<Identifier>, const boost::json::value &json) {
+		return {static_cast<std::string_view>(json.get_string())};
 	}
 
-	void to_json(nlohmann::json &json, const Identifier &identifier) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Identifier &identifier) {
 		json = identifier.str();
 	}
 

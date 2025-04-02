@@ -14,13 +14,12 @@ namespace Game3 {
 	class FlappyBird: public Minigame {
 		public:
 			static Identifier ID() { return {"base", "minigame/flappy_bird"}; }
-			std::string getName() const final { return "Flappy Bird"; }
+			std::string getGameName() const final { return "Flappy Bird"; }
 
-			FlappyBird();
+			using Minigame::Minigame;
 
-			void tick(UIContext &, double delta) final;
-			void render(UIContext &, const RendererContext &) final;
-			void setSize(int width, int height) final;
+			void tick(double delta) final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void reset() final;
 
 		private:

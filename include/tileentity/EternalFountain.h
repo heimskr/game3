@@ -15,9 +15,9 @@ namespace Game3 {
 
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
@@ -27,7 +27,7 @@ namespace Game3 {
 
 		private:
 			EternalFountain();
-			EternalFountain(Identifier tile_id, Position);
+			EternalFountain(Identifier tileID, Position);
 			EternalFountain(Position);
 
 		friend class TileEntity;

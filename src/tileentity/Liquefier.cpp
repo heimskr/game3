@@ -62,7 +62,7 @@ namespace Game3 {
 		}
 	}
 
-	void Liquefier::toJSON(nlohmann::json &json) const {
+	void Liquefier::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -90,7 +90,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Liquefier::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Liquefier::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);

@@ -2,6 +2,7 @@
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
 #include "item/Copier.h"
+#include "lib/JSON.h"
 #include "net/Server.h"
 #include "net/RemoteClient.h"
 #include "packet/ErrorPacket.h"
@@ -32,7 +33,7 @@ namespace Game3 {
 			return;
 		}
 
-		stack->data["includeTileEntities"] = includeTileEntities;
+		ensureObject(stack->data)["includeTileEntities"] = includeTileEntities;
 		inventory->notifyOwner({});
 	}
 }

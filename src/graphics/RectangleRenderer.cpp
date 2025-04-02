@@ -83,9 +83,10 @@ namespace Game3 {
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		if (angle != 0) {
-			model = glm::translate(model, glm::vec3(width / 2, height / 2, 0)); // move origin of rotation to center of quad
-			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0, 0, 1)); // then rotate
-			model = glm::translate(model, glm::vec3(-width / 2, -height / 2, 0)); // move origin back
+			const float ws = window.scale / 4.;
+			model = glm::translate(model, glm::vec3(width * ws, height * ws, 0.f)); // move origin of rotation to center of quad
+			model = glm::rotate(model, static_cast<float>(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+			model = glm::translate(model, glm::vec3(-width * ws, -height * ws, 0.f)); // move origin back
 		}
 		model = glm::scale(model, glm::vec3(width * window.scale / 2., height * window.scale / 2., 1.f)); // last scale
 

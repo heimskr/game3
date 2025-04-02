@@ -33,8 +33,8 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Landfill::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	bool Landfill::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		return use(slot, stack, place, modifiers, offsets);
 	}
 
 	bool Landfill::canUseOnWorld() const {

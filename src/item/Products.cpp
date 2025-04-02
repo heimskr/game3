@@ -1,4 +1,5 @@
 #include "item/Products.h"
+#include "lib/JSON.h"
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
@@ -15,8 +16,9 @@ namespace Game3 {
 	std::vector<ItemStackPtr> ExponentialProduct::sample() const {
 		ItemCount count = start;
 
-		while (std::uniform_real_distribution(0., 1.)(threadContext.rng) <= chance)
+		while (std::uniform_real_distribution(0., 1.)(threadContext.rng) <= chance) {
 			++count;
+		}
 
 		return {stack->withCount(count)};
 	}
@@ -24,23 +26,26 @@ namespace Game3 {
 	std::vector<ItemStackPtr> Products::getStacks() const {
 		std::vector<ItemStackPtr> out;
 		out.reserve(products.size());
-		for (const auto &product: products)
-			for (const ItemStackPtr &stack: product->sample())
+		for (const auto &product: products) {
+			for (const ItemStackPtr &stack: product->sample()) {
 				out.push_back(stack);
+			}
+		}
 		return out;
 	}
 
-	Products Products::fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	Products tag_invoke(boost::json::value_to_tag<Products>, const boost::json::value &json, const std::shared_ptr<Game> &game) {
 		Products out;
 
-		for (const nlohmann::json &item: json) {
-			const std::string type = item.at(0);
-			if (type == "constant")
-				out.products.emplace_back(std::make_unique<ConstantProduct>(ItemStack::fromJSON(game, item.at(1)), item.at(2)));
-			else if (type == "exponential")
-				out.products.emplace_back(std::make_unique<ExponentialProduct>(ItemStack::fromJSON(game, item.at(1)), item.at(2), item.at(3)));
-			else
-				throw std::invalid_argument("Invalid product type: \"" + type + '"');
+		for (const boost::json::value &item: json.as_array()) {
+			std::string type(item.at(0).as_string());
+			if (type == "constant") {
+				out.products.emplace_back(std::make_unique<ConstantProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2))));
+			} else if (type == "exponential") {
+				out.products.emplace_back(std::make_unique<ExponentialProduct>(boost::json::value_to<ItemStackPtr>(item.at(1), game), boost::json::value_to<ItemCount>(item.at(2)), getDouble(item.at(3))));
+			} else {
+				throw std::invalid_argument(std::format("Invalid product type: \"{}\"", type));
+			}
 		}
 
 		return out;

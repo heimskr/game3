@@ -8,17 +8,17 @@
 namespace Game3 {
 	class Scroller: public Widget {
 		public:
-			Scroller(UIContext &, float scale, Color scrollbar_color);
-			Scroller(UIContext &, float scale);
+			Scroller(UIContext &, float selfScale, Color scrollbar_color);
+			Scroller(UIContext &, float selfScale);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 			bool dragStart(int x, int y) final;
 			bool dragUpdate(int x, int y) final;
 			bool dragEnd(int x, int y) final;
-			bool scroll(float x_delta, float y_delta, int x, int y) final;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

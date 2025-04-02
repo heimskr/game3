@@ -1,4 +1,5 @@
 #include "biology/Gene.h"
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "item/ContainmentOrb.h"
@@ -11,11 +12,11 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	GeneticAnalysisModule::GeneticAnalysisModule(UIContext &ui, const ClientGamePtr &, const std::any &):
-		GeneticAnalysisModule(ui) {}
+	GeneticAnalysisModule::GeneticAnalysisModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &):
+		GeneticAnalysisModule(ui, selfScale, game) {}
 
 	void GeneticAnalysisModule::init() {
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 	}
 
@@ -28,8 +29,9 @@ namespace Game3 {
 	void GeneticAnalysisModule::update(const ItemStackPtr &stack) {
 		clearText();
 
-		if (!stack)
+		if (!stack) {
 			return;
+		}
 
 		if (ContainmentOrb::validate(stack)) {
 			ponderOrb(stack);
@@ -59,16 +61,18 @@ namespace Game3 {
 		try {
 			entity = ContainmentOrb::makeEntity(stack);
 		} catch (const std::exception &err) {
-			ERROR("Couldn't create entity from containment orb in GeneticAnalysisModule: {}", err.what());
+			ERR("Couldn't create entity from containment orb in GeneticAnalysisModule: {}", err.what());
 			return;
 		}
 
-		if (entity->isPlayer())
+		if (entity->isPlayer()) {
 			return;
+		}
 
 		auto living = std::dynamic_pointer_cast<LivingEntity>(entity);
-		if (!living)
+		if (!living) {
 			return;
+		}
 
 		std::vector<std::string> descriptions;
 
@@ -77,7 +81,7 @@ namespace Game3 {
 		});
 
 		if (descriptions.empty()) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			label->setText("No genes found.");
 			label->insertAtEnd(vbox);
 			return;
@@ -89,14 +93,18 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::analyzeGene(const ItemStackPtr &stack) {
-		auto iter = stack->data.find("gene");
-		if (iter == stack->data.end())
+		const auto *object = stack->data.if_object();
+		if (!object) {
 			return;
+		}
 
-		std::unique_ptr<Gene> gene;
-		try {
-			gene = Gene::fromJSON(*iter);
-		} catch (const std::exception &) {
+		const auto *gene_json = object->if_contains("gene");
+		if (!gene_json) {
+			return;
+		}
+
+		std::unique_ptr<Gene> gene = Gene::fromJSON(*gene_json);
+		if (!gene) {
 			return;
 		}
 
@@ -106,13 +114,24 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::analyzeTemplate(const ItemStackPtr &stack) {
-		auto iter = stack->data.find("genes");
-		if (iter == stack->data.end())
+		auto *object = stack->data.if_object();
+		if (!object) {
 			return;
+		}
+
+		auto *genes = object->if_contains("genes");
+		if (!genes) {
+			return;
+		}
+
+		auto *genes_object = genes->if_object();
+		if (!genes_object) {
+			return;
+		}
 
 		bool first = true;
 
-		for (const auto &[name, gene_json]: iter->items()) {
+		for (const auto &[name, gene_json]: *genes_object) {
 			std::unique_ptr<Gene> gene;
 			try {
 				gene = Gene::fromJSON(gene_json);
@@ -136,7 +155,7 @@ namespace Game3 {
 	}
 
 	void GeneticAnalysisModule::addLabel(const std::string &text) {
-		auto label = std::make_shared<Label>(ui, scale);
+		auto label = std::make_shared<Label>(ui, selfScale);
 		label->setText(text);
 		label->insertAtEnd(vbox);
 	}

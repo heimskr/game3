@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/ChunkPosition.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "net/Buffer.h"
 #include "packet/Packet.h"
 
@@ -14,12 +14,13 @@ namespace Game3 {
 		uint64_t updateCounter = 0;
 		std::vector<TileID> tiles;
 		std::vector<FluidTile> fluids;
+		std::vector<uint8_t> pathmap;
 
 		ChunkTilesPacket() = default;
-		ChunkTilesPacket(const Realm &, ChunkPosition, uint64_t update_counter);
+		ChunkTilesPacket(Realm &, ChunkPosition, uint64_t update_counter);
 		ChunkTilesPacket(Realm &, ChunkPosition);
-		ChunkTilesPacket(RealmID realm_id, ChunkPosition chunk_position, uint64_t update_counter, std::vector<TileID> tiles_, std::vector<FluidTile> fluids_):
-			realmID(realm_id), chunkPosition(chunk_position), updateCounter(update_counter), tiles(std::move(tiles_)), fluids(std::move(fluids_)) {}
+		ChunkTilesPacket(RealmID realm_id, ChunkPosition chunk_position, uint64_t update_counter, std::vector<TileID> tiles, std::vector<FluidTile> fluids, std::vector<uint8_t> pathmap):
+			realmID(realm_id), chunkPosition(chunk_position), updateCounter(update_counter), tiles(std::move(tiles)), fluids(std::move(fluids)), pathmap(std::move(pathmap)) {}
 
 		PacketID getID() const override { return ID(); }
 

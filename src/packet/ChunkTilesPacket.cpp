@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "game/ClientGame.h"
 #include "game/TileProvider.h"
 #include "packet/ChunkTilesPacket.h"
@@ -11,7 +11,7 @@
 // #define DEBUG_COMPRESSION
 
 namespace Game3 {
-	ChunkTilesPacket::ChunkTilesPacket(const Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
+	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position, uint64_t update_counter):
 	realmID(realm.id), chunkPosition(chunk_position), updateCounter(update_counter) {
 		tiles.reserve(CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT);
 		for (const Layer layer: allLayers) {
@@ -20,9 +20,15 @@ namespace Game3 {
 			tiles.insert(tiles.end(), layer_tiles.begin(), layer_tiles.end());
 		}
 
-		const FluidChunk &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
-		auto lock = fluid_chunk.sharedLock();
-		fluids = fluid_chunk;
+		{
+			const FluidChunk &fluid_chunk = realm.tileProvider.getFluidChunk(chunk_position);
+			auto lock = fluid_chunk.sharedLock();
+			fluids = fluid_chunk;
+		}
+
+		const PathChunk &path_chunk = realm.tileProvider.getPathChunk(chunk_position);
+		auto lock = path_chunk.sharedLock();
+		pathmap = path_chunk;
 	}
 
 	ChunkTilesPacket::ChunkTilesPacket(Realm &realm, ChunkPosition chunk_position): ChunkTilesPacket(realm, chunk_position, 0) {
@@ -31,7 +37,7 @@ namespace Game3 {
 
 	void ChunkTilesPacket::encode(Game &, Buffer &buffer) const {
 		Buffer secondary{buffer.target};
-		secondary << realmID << chunkPosition << updateCounter << tiles << fluids;
+		secondary << realmID << chunkPosition << updateCounter << tiles << fluids << pathmap;
 		auto compressed = LZ4::compress(secondary.getSpan());
 #ifdef DEBUG_COMPRESSION
 		INFO("Compression: {} → {} ({})", secondary.getSpan().size_bytes(), compressed.size(), double(secondary.getSpan().size_bytes()) / compressed.size());
@@ -43,15 +49,17 @@ namespace Game3 {
 		Buffer secondary{buffer.target};
 		buffer >> secondary.bytes;
 		secondary.bytes = LZ4::decompress(secondary.getSpan());
-		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids;
+		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids >> pathmap;
 	}
 
 	void ChunkTilesPacket::handle(const ClientGamePtr &game) {
-		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT)
+		if (tiles.size() != CHUNK_SIZE * CHUNK_SIZE * LAYER_COUNT) {
 			throw PacketError("Invalid tile count in ChunkTilesPacket: " + std::to_string(tiles.size()));
+		}
 
-		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE)
+		if (fluids.size() != CHUNK_SIZE * CHUNK_SIZE) {
 			throw PacketError("Invalid fluid count in ChunkTilesPacket: " + std::to_string(fluids.size()));
+		}
 
 		RealmPtr realm = game->getRealm(realmID);
 		TileProvider &provider = realm->tileProvider;
@@ -59,13 +67,16 @@ namespace Game3 {
 		for (const Layer layer: allLayers) {
 			auto &chunk = provider.getTileChunk(layer, chunkPosition);
 			const size_t offset = getIndex(layer) * CHUNK_SIZE * CHUNK_SIZE;
-			chunk = std::vector<TileID>(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
+			auto lock = chunk.uniqueLock();
+			chunk.assign(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
+			if (layer == Layer::Terrain) {
+				std::unordered_set<TileID> set(chunk.begin(), chunk.end());
+			}
 		}
 
 		provider.getFluidChunk(chunkPosition) = std::move(fluids);
-
+		provider.setPathChunk(chunkPosition, std::move(pathmap));
 		provider.setUpdateCounter(chunkPosition, updateCounter);
-
 		game->chunkReceived(chunkPosition);
 		realm->queueReupload();
 		realm->queueStaticLightingTexture();

@@ -23,7 +23,7 @@
 #include "ui/Modifiers.h"
 #include "util/RWLock.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <climits>
 #include <memory>
@@ -41,6 +41,7 @@ namespace Game3 {
 	class Entity;
 	class Game;
 	class GenericClient;
+	struct RealmRenderer;
 	struct RendererContext;
 
 	using EntityPtr = std::shared_ptr<Entity>;
@@ -48,13 +49,13 @@ namespace Game3 {
 	struct RealmDetails: NamedRegisterable {
 		Identifier tilesetName;
 		RealmDetails():
-			NamedRegisterable(Identifier()) {}
+			NamedRegisterable(Identifier{}) {}
 		RealmDetails(Identifier identifier_, Identifier tileset_name):
 			NamedRegisterable(std::move(identifier_)),
 			tilesetName(std::move(tileset_name)) {}
 	};
 
-	void from_json(const nlohmann::json &, RealmDetails &);
+	RealmDetails tag_invoke(boost::json::value_to_tag<RealmDetails>, const boost::json::value &);
 
 	class Realm: public std::enable_shared_from_this<Realm> {
 		private:
@@ -82,19 +83,19 @@ namespace Game3 {
 			Lockable<std::unordered_set<EntityPtr>, SharedRecursiveMutex> entities;
 			Lockable<std::unordered_map<GlobalID, EntityPtr>> entitiesByGID;
 			Lockable<WeakSet<Player>> players;
-			nlohmann::json extraData;
+			boost::json::value extraData;
 			Position randomLand;
 			/** Whether the realm's rendering should be affected by the day-night cycle. */
 			bool outdoors = true;
 			int64_t seed = 0;
-			std::unordered_set<ChunkPosition> generatedChunks;
+			Lockable<std::unordered_set<ChunkPosition>> generatedChunks;
 			Lockable<std::unordered_set<ChunkPosition>> visibleChunks;
+			Lockable<std::unordered_set<ChunkPosition>> pathmapUpdateSet;
+
 			std::atomic_bool wakeupPending = false;
 			std::atomic_bool snoozePending = false;
-
 			std::atomic_bool reuploadPending = false;
 			std::atomic_bool renderersReady = false;
-
 			std::atomic_bool staticLightingQueued = false;
 
 			Realm(const Realm &) = delete;
@@ -110,7 +111,7 @@ namespace Game3 {
 				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 			}
 
-			static std::shared_ptr<Realm> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, bool full_data = false);
+			static std::shared_ptr<Realm> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &, bool full_data = false);
 
 			static std::string getSQL();
 
@@ -121,8 +122,8 @@ namespace Game3 {
 			virtual void onRemove();
 			void createRenderers();
 			bool prerender();
-			void render(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
-			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, RendererContext &, float game_time);
+			void render(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
+			void renderLighting(int width, int height, const std::pair<double, double> &center, float scale, const RendererContext &, float game_time);
 			virtual void clearLighting(float game_time);
 			/** Reuploads fluids and terrain in all layers. */
 			void reupload();
@@ -172,6 +173,7 @@ namespace Game3 {
 			std::optional<Position> getPathableAdjacent(const Position &) const;
 			bool isPathable(const Position &) const;
 			void setPathable(const Position &, bool);
+			uint64_t getPathmapUpdateCounter(ChunkPosition);
 			bool hasTileEntityAt(const Position &) const;
 			void damageGround(const Position &);
 			Tileset & getTileset() const;
@@ -217,9 +219,9 @@ namespace Game3 {
 			void queueStaticLightingTexture();
 			/** Server-side only. */
 			void playSound(const Position &, const Identifier &, float pitch = 1) const;
+			bool isChunkGenerated(ChunkPosition) const;
 
 			inline const auto & getPlayers() const { return players; }
-			inline void markGenerated(auto x, auto y) { generatedChunks.emplace(x, y); }
 			inline auto pauseUpdates() { return Pauser(shared_from_this()); }
 			inline auto guardGeneration() { return GenerationGuard(shared_from_this()); }
 			inline bool isClient() const { return getSide() == Side::Client; }
@@ -232,9 +234,10 @@ namespace Game3 {
 			/** Generates additional chunks for the infinite map after the initial worldgen of the realm. */
 			virtual void generateChunk(const ChunkPosition &) {}
 			virtual bool canSpawnMonsters() const;
+			virtual std::unique_ptr<RealmRenderer> getRenderer();
 
 			/** Full data doesn't include terrain, entities or tile entities. */
-			virtual void toJSON(nlohmann::json &, bool full_data) const;
+			virtual void toJSON(boost::json::value &, bool full_data) const;
 
 			void queueEntityInit(EntityPtr, const Position &);
 
@@ -331,7 +334,7 @@ namespace Game3 {
 			void initTexture();
 
 			/** Full data doesn't include terrain, entities or tile entities. */
-			virtual void absorbJSON(const nlohmann::json &, bool full_data);
+			virtual void absorbJSON(const boost::json::value &, bool full_data);
 
 		private:
 			struct ChunkPackets {

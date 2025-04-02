@@ -17,23 +17,23 @@ namespace {
 }
 
 namespace Game3 {
-	Button::Button(UIContext &ui, float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
-		Widget(ui, scale),
+	Button::Button(UIContext &ui, float selfScale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
+		Widget(ui, selfScale),
 		texture(std::move(texture)) {
 			setColors(top_border_color, bottom_border_color, text_color);
 		}
 
-	Button::Button(UIContext &ui, float scale, Color border_color, Color text_color, TexturePtr texture):
-		Button(ui, scale, border_color, border_color.darken(), text_color, std::move(texture)) {}
+	Button::Button(UIContext &ui, float selfScale, Color border_color, Color text_color, TexturePtr texture):
+		Button(ui, selfScale, border_color, border_color.darken(), text_color, std::move(texture)) {}
 
-	Button::Button(UIContext &ui, float scale, TexturePtr texture):
-		Button(ui, scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
+	Button::Button(UIContext &ui, float selfScale, TexturePtr texture):
+		Button(ui, selfScale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
 
 	void Button::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		const float original_width = width;
 		const float original_height = height;
 
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 		float dummy{};
 		if (fixedHeight <= 0 && height < 0) {
 			measure(renderers, Orientation::Vertical, width, height, dummy, height);
@@ -49,6 +49,8 @@ namespace Game3 {
 		if (shouldCull()) {
 			return;
 		}
+
+		const auto scale = getScale();
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		const Color &top_color = pressed? topBorderColorPressed : topBorderColor;
@@ -108,24 +110,29 @@ namespace Game3 {
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
 	}
 
-	bool Button::click(int, int, int) {
+	bool Button::click(int, int, int, Modifiers) {
 		return false;
 	}
 
-	bool Button::mouseDown(int button, int, int) {
-		if (button != LEFT_BUTTON)
+	bool Button::mouseDown(int button, int, int, Modifiers) {
+		if (button != LEFT_BUTTON) {
 			return false;
+		}
 
 		pressed = true;
-		if (ClientGamePtr game = ui.getGame())
+
+		if (ClientGamePtr game = ui.getGame()) {
 			game->playSound("base:sound/click", threadContext.getPitch(1.25));
+		}
+
 		ui.setPressedWidget(shared_from_this());
 		return true;
 	}
 
-	bool Button::mouseUp(int button, int x, int y) {
-		if (button != LEFT_BUTTON)
+	bool Button::mouseUp(int button, int x, int y, Modifiers) {
+		if (button != LEFT_BUTTON) {
 			return false;
+		}
 
 		if (pressed) {
 			pressed = false;
@@ -150,14 +157,14 @@ namespace Game3 {
 				return;
 			}
 
-			minimum = natural = getWidth(renderers, std::max(fixedHeight, getMinimumPreferredHeight()));
+			minimum = natural = getWidth(renderers, std::max(fixedHeight * ui.scale, getMinimumPreferredHeight()));
 		} else {
 			minimum = getMinimumPreferredHeight();
 
 			if (verticalExpand && 0 <= for_height) {
 				natural = for_height;
 			} else {
-				natural = std::max(minimum, fixedHeight);
+				natural = std::max(minimum, fixedHeight * ui.scale);
 			}
 		}
 	}
@@ -171,9 +178,11 @@ namespace Game3 {
 	}
 
 	void Button::renderLabel(const RendererContext &renderers, const Rectangle &rectangle) {
-		if (text.empty())
+		if (text.empty()) {
 			return;
+		}
 
+		const auto scale = getScale();
 		const float text_scale = getTextScale(renderers, rectangle.height - 2 * scale);
 		renderers.text.drawOnScreen(text, TextRenderOptions{
 			.x = rectangle.x + 2 * scale,
@@ -186,6 +195,8 @@ namespace Game3 {
 	}
 
 	float Button::getWidth(const RendererContext &renderers, float height) const {
+		const auto scale = getScale();
+
 		if (!text.empty()) {
 			const float text_scale = getTextScale(renderers, height - 6 * scale);
 			return scale * 6 + renderers.text.textWidth(text, text_scale);
@@ -215,6 +226,6 @@ namespace Game3 {
 	}
 
 	float Button::getMinimumPreferredHeight() const {
-		return scale * 10;
+		return getScale() * 10;
 	}
 }

@@ -26,8 +26,8 @@ namespace Game3 {
 			void energyUpdated() override;
 			void addObserver(const std::shared_ptr<Player> &, bool silent) override;
 
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
 			void broadcast(bool force) override;

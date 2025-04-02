@@ -1,6 +1,7 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
+#include "tile/BedTile.h"
 #include "tile/CaveTile.h"
 #include "tile/CropTile.h"
 #include "tile/DirtTile.h"
@@ -9,6 +10,7 @@
 #include "tile/FoodTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
+#include "tile/SnowTile.h"
 #include "tile/Tile.h"
 #include "tile/TorchTile.h"
 #include "tile/TreeTile.h"
@@ -30,12 +32,17 @@ namespace Game3 {
 		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
+		reg.add<SnowTile>();
 		reg.add<TorchTile>();
 		reg.add<VoidTile>();
+		reg.add<BedTile>("base:tile/bed1");
+		reg.add<BedTile>("base:tile/bed2");
+		reg.add<BedTile>("base:tile/bed3");
 		reg.addMineable("base:tile/stone", ItemStack::create(self, "base:item/stone"), true);
 
-		for (Identifier id: {"base:tile/gate_horizontal", "base:tile/gate_horizontal_n", "base:tile/gate_horizontal_s", "base:tile/gate_vertical", "base:tile/gate_vertical_e", "base:tile/gate_vertical_w"})
+		for (Identifier id: {"base:tile/gate_horizontal", "base:tile/gate_horizontal_n", "base:tile/gate_horizontal_s", "base:tile/gate_vertical", "base:tile/gate_vertical_e", "base:tile/gate_vertical_w"}) {
 			reg.add<FenceGateTile>(std::move(id));
+		}
 
 		reg.add("base:tile/cave_coal",     std::make_shared<CaveTile>("base:tile/cave_coal",     ItemStack::create(self, "base:item/coal", 4),     "base:tile/cave_dirt"));
 		reg.add("base:tile/cave_copper",   std::make_shared<CaveTile>("base:tile/cave_copper",   ItemStack::create(self, "base:item/copper_ore"),  "base:tile/cave_dirt"));

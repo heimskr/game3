@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
@@ -25,8 +25,9 @@ namespace Game3 {
 	}
 
 	void ItemEntity::setTexture(const GamePtr &game) {
-		if (getSide() != Side::Client)
+		if (getSide() != Side::Client) {
 			return;
+		}
 		std::shared_ptr<ItemTexture> item_texture = game->registry<ItemTextureRegistry>().at(stack->item->identifier);
 		texture = item_texture->getTexture();
 		texture->init();
@@ -44,44 +45,49 @@ namespace Game3 {
 		return Entity::create<ItemEntity>(std::move(stack));
 	}
 
-	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		if (json.is_null())
+	std::shared_ptr<ItemEntity> ItemEntity::fromJSON(const GamePtr &game, const boost::json::value &json) {
+		if (json.is_null()) {
 			return create(game, ItemStack::create(game));
-		auto out = create(game, ItemStack::fromJSON(game, json.at("stack")));
+		}
+		auto out = create(game, boost::json::value_to<ItemStackPtr>(json.at("stack"), game));
 		out->absorbJSON(game, json);
 		return out;
 	}
 
-	void ItemEntity::toJSON(nlohmann::json &json) const {
+	void ItemEntity::toJSON(boost::json::value &json) const {
 		Entity::toJSON(json);
-		json["stack"] = *getStack();
+		json.as_object()["stack"] = boost::json::value_from(*getStack());
 	}
 
 	void ItemEntity::init(const GamePtr &game) {
 		Entity::init(game);
-		if (!stack)
+		if (!stack) {
 			stack = ItemStack::create(game);
-		else if (stack->item && getSide() == Side::Client)
+		} else if (stack->item && getSide() == Side::Client) {
 			stack->item->getOffsets(*game, texture, offsetX, offsetY);
+		}
 	}
 
 	void ItemEntity::tick(const TickArgs &) {
-		if (firstTick)
+		if (firstTick) {
 			firstTick = false;
-		else
+		} else {
 			--secondsLeft;
+		}
 
-		if (secondsLeft <= 0)
+		if (secondsLeft <= 0) {
 			remove();
-		else
+		} else {
 			enqueueTick(std::chrono::seconds(1));
+		}
 	}
 
 	void ItemEntity::render(const RendererContext &renderers) {
 		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		if (texture == nullptr || needsTexture) {
 			if (needsTexture) {
@@ -108,8 +114,9 @@ namespace Game3 {
 	}
 
 	bool ItemEntity::interact(const std::shared_ptr<Player> &player) {
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return true;
+		}
 
 		if (ItemStackPtr leftover = player->getInventory(0)->add(stack)) {
 			stack = std::move(leftover);
@@ -128,8 +135,9 @@ namespace Game3 {
 	void ItemEntity::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		GamePtr game = getGame();
-		if (!stack)
+		if (!stack) {
 			stack = ItemStack::create(game);
+		}
 		stack->encode(*game, buffer);
 		buffer << secondsLeft;
 	}
@@ -137,13 +145,14 @@ namespace Game3 {
 	void ItemEntity::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		GamePtr game = getGame();
-		if (!stack)
+		if (!stack) {
 			stack = ItemStack::create(game);
+		}
 		stack->decode(*game, buffer);
 		buffer >> secondsLeft;
 	}
 
-	void to_json(nlohmann::json &json, const ItemEntity &item_entity) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ItemEntity &item_entity) {
 		item_entity.toJSON(json);
 	}
 }

@@ -1,10 +1,11 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "error/AuthenticationError.h"
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "packet/LoginStatusPacket.h"
 #include "packet/PacketError.h"
+#include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -22,12 +23,12 @@ namespace Game3 {
 		message(std::move(message)) {}
 
 	void LoginStatusPacket::encode(Game &, Buffer &buffer) const {
-		buffer << success << globalID << username << displayName << playerDataBuffer << message;
+		buffer << success << globalID << username << displayName << message << playerDataBuffer;
 	}
 
 	void LoginStatusPacket::decode(Game &game, Buffer &buffer) {
 		playerDataBuffer.context = game.shared_from_this();
-		buffer >> success >> globalID >> username >> displayName >> playerDataBuffer >> message;
+		buffer >> success >> globalID >> username >> displayName >> message >> playerDataBuffer;
 	}
 
 	void LoginStatusPacket::handle(const ClientGamePtr &game) {
@@ -46,6 +47,7 @@ namespace Game3 {
 			window->settings.username = username;
 		}
 		window->saveSettings();
+		window->uiContext.removeDialogs<ConnectionDialog>();
 		auto player = Entity::create<ClientPlayer>();
 		game->setPlayer(player);
 		player->setGID(globalID);

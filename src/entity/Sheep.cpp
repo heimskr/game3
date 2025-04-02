@@ -48,6 +48,8 @@ namespace Game3 {
 		const double x = column + offset_x;
 		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
 
+		const auto [multiplier, composite] = getColors();
+
 		RenderOptions main_options{
 			.x = x,
 			.y = y,
@@ -55,6 +57,8 @@ namespace Game3 {
 			.offsetY = texture_y_offset,
 			.sizeX = 16.,
 			.sizeY = std::min(16., renderHeight + 8. * offset_z),
+			.color = multiplier,
+			.composite = composite,
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -119,11 +123,11 @@ namespace Game3 {
 		renderers.recolor.drawOnMap(texture, mask, options, hue.getValue(), saturation.getValue(), valueMultiplier.getValue());
 	}
 
-	bool Sheep::canAbsorbGenes(const nlohmann::json &genes) const {
+	bool Sheep::canAbsorbGenes(const boost::json::value &genes) const {
 		return checkGenes(genes, {"hue", "saturation", "valueMultiplier", "species"});
 	}
 
-	void Sheep::absorbGenes(const nlohmann::json &genes) {
+	void Sheep::absorbGenes(const boost::json::value &genes) {
 		absorbGene(hue, genes, "hue");
 		absorbGene(saturation, genes, "saturation");
 		absorbGene(valueMultiplier, genes, "valueMultiplier");

@@ -45,9 +45,9 @@ namespace Game3 {
 		private:
 			void send(const PacketPtr &);
 
-			static ClientInventory fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, const std::shared_ptr<Agent> &);
+			static ClientInventory fromJSON(const std::shared_ptr<Game> &, const boost::json::value &, const std::shared_ptr<Agent> &);
 
-			friend void to_json(nlohmann::json &, const Inventory &);
+			friend void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Inventory &);
 	};
 
 	using ClientInventoryPtr = std::shared_ptr<ClientInventory>;
@@ -60,5 +60,5 @@ namespace Game3 {
 	Buffer & operator<<(Buffer &, const ClientInventory &);
 	Buffer & operator>>(Buffer &, ClientInventory &);
 
-	void to_json(nlohmann::json &, const ClientInventory &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ClientInventory &);
 }

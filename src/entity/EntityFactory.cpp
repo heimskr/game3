@@ -11,7 +11,7 @@ namespace Game3 {
 		return function(game);
 	}
 
-	std::shared_ptr<Entity> EntityFactory::operator()(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	std::shared_ptr<Entity> EntityFactory::operator()(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 		EntityPtr entity = (*this)(game);
 		entity->absorbJSON(game, json);
 		return entity;

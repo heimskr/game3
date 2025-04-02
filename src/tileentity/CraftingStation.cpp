@@ -15,15 +15,17 @@ namespace Game3 {
 	CraftingStation::CraftingStation(Identifier tile_id, const Position &position_, Identifier station_type, Identifier item_name):
 		TileEntity(std::move(tile_id), ID(), position_, true), stationType(std::move(station_type)), itemName(std::move(item_name)) {}
 
-	void CraftingStation::toJSON(nlohmann::json &json) const {
+	void CraftingStation::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["stationType"] = stationType;
-		json["itemName"] = itemName;
+		auto &object = json.as_object();
+		object["stationType"] = boost::json::value_from(stationType);
+		object["itemName"] = boost::json::value_from(itemName);
 	}
 
 	bool CraftingStation::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
-		if (player->getSide() != Side::Server)
+		if (player->getSide() != Side::Server) {
 			return false;
+		}
 
 		if (modifiers.onlyAlt()) {
 			getRealm()->queueDestruction(getSelf());
@@ -41,10 +43,10 @@ namespace Game3 {
 		return true;
 	}
 
-	void CraftingStation::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void CraftingStation::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		stationType = json.at("stationType");
-		itemName = json.at("itemName");
+		stationType = boost::json::value_to<Identifier>(json.at("stationType"));
+		itemName = boost::json::value_to<Identifier>(json.at("itemName"));
 	}
 
 	void CraftingStation::encode(Game &game, Buffer &buffer) {

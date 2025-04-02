@@ -1,10 +1,11 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
 #include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/IntegerInput.h"
 #include "ui/gl/widget/Label.h"
+#include "ui/gl/widget/Spacer.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -12,17 +13,17 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	ConnectionDialog::ConnectionDialog(UIContext &ui):
-		Dialog(ui) {}
+	ConnectionDialog::ConnectionDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {}
 
 	void ConnectionDialog::init() {
-		auto vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
+		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 
-		auto grid = std::make_shared<Grid>(ui, UI_SCALE);
+		auto grid = make<Grid>(ui, selfScale);
 		grid->setRowSpacing(5);
 
 		auto make_label = [&](UString text) {
-			auto label = std::make_shared<Label>(ui, UI_SCALE, std::move(text));
+			auto label = make<Label>(ui, selfScale, std::move(text));
 			label->setVerticalAlignment(Alignment::Center);
 			return label;
 		};
@@ -30,13 +31,13 @@ namespace Game3 {
 		grid->attach(make_label("Host"), 0, 0);
 		grid->attach(make_label("Port"), 1, 0);
 
-		hostInput = std::make_shared<TextInput>(ui, UI_SCALE);
+		hostInput = make<TextInput>(ui, selfScale);
 		hostInput->setText(ui.window.settings.hostname);
 		hostInput->setHorizontalExpand(true);
 		hostInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
 		grid->attach(hostInput, 0, 1);
 
-		portInput = std::make_shared<IntegerInput>(ui, UI_SCALE);
+		portInput = make<IntegerInput>(ui, selfScale);
 		portInput->setText(std::to_string(ui.window.settings.port));
 		portInput->setHorizontalExpand(true);
 		portInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
@@ -45,25 +46,26 @@ namespace Game3 {
 		vbox->append(std::move(grid));
 		vbox->insertAtEnd(shared_from_this());
 
-		auto hbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Horizontal, 2, 0, Color{});
+		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 
-		auto spacer = std::make_shared<Label>(ui, UI_SCALE);
-		spacer->setHorizontalExpand(true);
+		auto spacer = make<Spacer>(ui, Orientation::Horizontal);
 
-		auto local_button = std::make_shared<Button>(ui, UI_SCALE);
+		auto local_button = make<Button>(ui, selfScale);
 		local_button->setText("Local Play");
 		local_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			playLocally();
 			return true;
 		});
 
-		auto connect_button = std::make_shared<Button>(ui, UI_SCALE);
+		auto connect_button = make<Button>(ui, selfScale);
 		connect_button->setText("Connect");
 		connect_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			submit();
 			return true;
 		});
@@ -81,21 +83,22 @@ namespace Game3 {
 
 		{
 			Rectangle frame_position = position;
-			const int offset = 7 * scale;
+			const int offset = 7 * getScale();
 			frame_position.x -= offset;
 			frame_position.y -= offset;
 			frame_position.width += 2 * offset;
 			frame_position.height += 2 * offset;
 			auto saver = ui.scissorStack.pushAbsolute(frame_position, renderers);
-			ui.drawFrame(renderers, UI_SCALE, false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
+			ui.drawFrame(renderers, getScale(), false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
 		}
 
-		firstChild->render(renderers, getPosition());
+		firstChild->render(renderers, position);
 	}
 
 	Rectangle ConnectionDialog::getPosition() const {
-		constexpr int width = 600 * UI_SCALE / 8;
-		constexpr int height = 284 * UI_SCALE / 8;
+		int width = 600 * ui.scale / 8;
+		int height = 316 * ui.scale / 8;
+
 		return Rectangle((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height);
 	}
 

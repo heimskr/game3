@@ -14,7 +14,7 @@ namespace Game3 {
 	void Game::initRegistries() {
 		registries.clear();
 		registries.add<CraftingRecipeRegistry>();
-		registries.add<ItemRegistry>();
+		itemRegistry = registries.add<ItemRegistry>();
 		registries.add<ItemTextureRegistry>();
 		registries.add<TextureRegistry>();
 		registries.add<EntityTextureRegistry>();
@@ -27,7 +27,7 @@ namespace Game3 {
 		registries.add<RealmDetailsRegistry>();
 		registries.add<PacketFactoryRegistry>();
 		registries.add<LocalCommandFactoryRegistry>();
-		registries.add<FluidRegistry>();
+		fluidRegistry = registries.add<FluidRegistry>();
 		tileRegistry = registries.add<TileRegistry>();
 		registries.add<CropRegistry>();
 		registries.add<CentrifugeRecipeRegistry>();
@@ -44,5 +44,6 @@ namespace Game3 {
 		registries.add<BiomassLiquefierRecipeRegistry>();
 		registries.add<AttributeExemplarRegistry>();
 		registries.add<MinigameFactoryRegistry>();
+		registries.add<StatusEffectFactoryRegistry>();
 	}
 }

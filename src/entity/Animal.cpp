@@ -1,5 +1,6 @@
 #include "biology/Gene.h"
 #include "entity/Animal.h"
+#include "entity/Player.h"
 #include "game/Game.h"
 #include "graphics/TextRenderer.h"
 #include "net/Buffer.h"
@@ -22,16 +23,16 @@ namespace Game3 {
 	Animal::Animal():
 		Entity("base:invalid/Animal") {}
 
-	void Animal::toJSON(nlohmann::json &json) const {
+	void Animal::toJSON(boost::json::value &json) const {
 		LivingEntity::toJSON(json);
 
-		nlohmann::json &genes = json["genes"];
+		auto &genes = json.as_object()["genes"].emplace_object();
 		iterateGenes([&](const Gene &gene) {
-			genes[gene.getName()] = gene;
+			genes[gene.getName()] = boost::json::value_from(gene);
 		});
 	}
 
-	void Animal::absorbJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+	void Animal::absorbJSON(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 		LivingEntity::absorbJSON(game, json);
 
 		absorbGenes(json.at("genes"));
@@ -70,7 +71,7 @@ namespace Game3 {
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
 			SUCCESS("  In chunk.");
 		else
-			ERROR("  Not in chunk.");
+			ERR("  Not in chunk.");
 		INFO("  First wander: {}", firstWander);
 		INFO("  Attempting wander: {:s}", attemptingWander.load());
 		return true;
@@ -92,7 +93,7 @@ namespace Game3 {
 			}
 		}
 
-		Entity::tick(args);
+		LivingEntity::tick(args);
 	}
 
 	HitPoints Animal::getMaxHealth() const {

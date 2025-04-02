@@ -1,12 +1,10 @@
 #pragma once
 
 #include "data/Identifier.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "item/Item.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
-
-#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	struct GeothermalRecipe: Recipe<FluidStack, EnergyAmount> {
@@ -24,12 +22,11 @@ namespace Game3 {
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const std::shared_ptr<Game> &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(nlohmann::json &) const override;
-
-		static GeothermalRecipe fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+		void toJSON(boost::json::value &, const std::shared_ptr<Game> &) const override;
 	};
 
-	void to_json(nlohmann::json &, const GeothermalRecipe &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const GeothermalRecipe &, const std::shared_ptr<Game> &);
+	GeothermalRecipe tag_invoke(boost::json::value_to_tag<GeothermalRecipe>, const boost::json::value &, const std::shared_ptr<Game> &);
 
 	class GeothermalRecipeRegistry: public UnnamedJSONRegistry<GeothermalRecipe> {
 		public:

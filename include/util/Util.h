@@ -278,8 +278,12 @@ namespace Game3 {
 
 	template <size_t BL = 128>
 	std::string formatTime(const char *format, std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())) {
+#ifdef __MINGW32__
+		tm now_tm = *localtime(&now);
+#else
 		tm now_tm;
 		localtime_r(&now, &now_tm);
+#endif
 		std::array<char, BL> buffer;
 		strftime(buffer.data(), buffer.size() * sizeof(buffer[0]), format, &now_tm);
 		return buffer.data();

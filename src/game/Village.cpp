@@ -1,6 +1,7 @@
 #include "biome/Biome.h"
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
+#include "entity/Player.h"
 #include "game/Resource.h"
 #include "game/Game.h"
 #include "game/Village.h"
@@ -187,8 +188,7 @@ namespace Game3 {
 
 	void Village::tick(const TickArgs &args) {
 		const GamePtr &game = args.game;
-
-		BiomeType biome = Biome::VOID;
+		BiomeType biome = Biome::VOID_REALM;
 		if (std::optional<BiomeType> found_biome = game->getRealm(realmID)->tileProvider.copyBiomeType(position))
 			biome = *found_biome;
 

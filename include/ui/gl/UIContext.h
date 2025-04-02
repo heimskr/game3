@@ -28,22 +28,24 @@ namespace Game3 {
 		public:
 			Window &window;
 			ScissorStack scissorStack;
+			float scale = 1;
 			bool renderingDraggedWidget = false;
 
 			UIContext(Window &);
+			UIContext(Window &, float scale);
 
 			void render(float mouse_x, float mouse_y);
 			std::shared_ptr<ClientGame> getGame() const;
 			void onResize(int x, int y);
 			void reset();
 			/** Returns true iff the click accomplished something. */
-			bool click(int button, int x, int y);
-			bool mouseDown(int button, int x, int y);
-			bool mouseUp(int button, int x, int y);
+			bool click(int button, int x, int y, Modifiers);
+			bool mouseDown(int button, int x, int y, Modifiers);
+			bool mouseUp(int button, int x, int y, Modifiers);
 			bool dragStart(int x, int y);
 			bool dragUpdate(int x, int y);
 			bool dragEnd(int x, int y);
-			bool scroll(float x_delta, float y_delta, int x, int y);
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers);
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			bool charPressed(uint32_t character, Modifiers);
 			void setDraggedWidget(WidgetPtr);
@@ -74,11 +76,13 @@ namespace Game3 {
 			int getWidth() const;
 			int getHeight() const;
 			void removeDialog(const DialogPtr &);
-			void addDialog(DialogPtr);
+			void addDialog(const DialogPtr &);
 			const std::optional<std::pair<int, int>> & getDragOrigin() const;
 			std::shared_ptr<ContextMenu> getContextMenu() const;
 			std::shared_ptr<Hotbar> getHotbar() const;
 			std::shared_ptr<InventoryModule> makePlayerInventoryModule();
+			void setScale(float);
+			void iterateChildren(const std::function<void(const WidgetPtr &)> &) const;
 
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
@@ -98,6 +102,7 @@ namespace Game3 {
 				auto dialog = std::make_shared<T>(*this, std::forward<Args>(args)...);
 				dialog->init();
 				dialogs.emplace_back(dialog);
+				focusDialog(dialog);
 			}
 
 		private:

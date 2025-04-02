@@ -1,10 +1,11 @@
-#include "graphics/Tileset.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "item/Tool.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/OreDeposit.h"
 #include "ui/Window.h"
@@ -19,15 +20,15 @@ namespace Game3 {
 		maxUses(max_uses),
 		cooldown(cooldown_) {}
 
-	Ore Ore::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	Ore Ore::fromJSON(const GamePtr &game, const boost::json::value &json) {
 		return {
 			Identifier(), // Should be filled in later by the registry add methods
-			ItemStack::fromJSON(game, json.at(0)),
-			json.at(1),
-			json.at(2),
-			json.at(3),
-			json.at(4),
-			json.at(5)
+			boost::json::value_to<ItemStackPtr>(json.at(0), game),
+			boost::json::value_to<Identifier>(json.at(1)),
+			boost::json::value_to<Identifier>(json.at(2)),
+			getNumber<float>(json.at(3)),
+			getNumber<uint32_t>(json.at(4)),
+			getNumber<float>(json.at(5)),
 		};
 	}
 
@@ -36,23 +37,27 @@ namespace Game3 {
 		oreType(ore.identifier),
 		uses(uses_) {}
 
-	void OreDeposit::toJSON(nlohmann::json &json) const {
+	void OreDeposit::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["oreType"] = oreType;
-		json["ready"] = ready;
-		if (uses != 0)
-			json["uses"] = uses;
+		auto &object = json.as_object();
+		object["oreType"] = boost::json::value_from(oreType);
+		object["ready"] = ready;
+		if (uses != 0) {
+			object["uses"] = static_cast<uint64_t>(uses);
+		}
 	}
 
-	void OreDeposit::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void OreDeposit::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		oreType = json.at("oreType");
+		const auto &object = json.as_object();
+		oreType = boost::json::value_to<Identifier>(object.at("oreType"));
 		tileID = getOre(*game).tilename;
-		ready = json.contains("ready");
-		if (auto iter = json.find("uses"); iter != json.end())
-			uses = *iter;
-		else
+		ready = object.contains("ready");
+		if (auto *value = object.if_contains("uses")) {
+			uses = value->as_uint64();
+		} else {
 			uses = 0;
+		}
 	}
 
 	void OreDeposit::tick(const TickArgs &args) {

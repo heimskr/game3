@@ -1,8 +1,7 @@
 #include "biology/Gene.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "threading/ThreadContext.h"
-
-#include <nlohmann/json.hpp>
 
 #include <format>
 #include <random>
@@ -14,22 +13,26 @@ namespace Game3 {
 	Gene::Gene(std::string name_):
 		name(std::move(name_)) {}
 
-	std::unique_ptr<Gene> Gene::fromJSON(const nlohmann::json &json) {
-		const std::string type = json.at("type");
+	std::unique_ptr<Gene> Gene::fromJSON(const boost::json::value &json) {
+		std::string type(json.at("type").as_string());
 
-		if (type == "float")
+		if (type == "float") {
 			return std::make_unique<FloatGene>(FloatGene::fromJSON(json));
+		}
 
-		if (type == "long")
+		if (type == "long") {
 			return std::make_unique<LongGene>(LongGene::fromJSON(json));
+		}
 
-		if (type == "circular")
+		if (type == "circular") {
 			return std::make_unique<CircularGene>(CircularGene::fromJSON(json));
+		}
 
-		if (type == "string")
+		if (type == "string") {
 			return std::make_unique<StringGene>(StringGene::fromJSON(json));
+		}
 
-		throw std::invalid_argument(std::format("Unknown gene type: \"{}\"", type));
+		return nullptr;
 	}
 
 // FloatGene
@@ -37,16 +40,17 @@ namespace Game3 {
 	FloatGene::FloatGene(std::string name_, float minimum_, float maximum_, float value_):
 		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
 
-	FloatGene FloatGene::fromJSON(const nlohmann::json &json) {
-		return FloatGene(json.at("name"), json.at("minimum"), json.at("maximum"), json.at("value"));
+	FloatGene FloatGene::fromJSON(const boost::json::value &json) {
+		return FloatGene(getString(json.at("name")), getDouble(json.at("minimum")), getDouble(json.at("maximum")), getDouble(json.at("value")));
 	}
 
-	void FloatGene::toJSON(nlohmann::json &json) const {
-		json["type"] = "float";
-		json["name"] = name;
-		json["minimum"] = minimum;
-		json["maximum"] = maximum;
-		json["value"] = value;
+	void FloatGene::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["type"] = "float";
+		object["name"] = name;
+		object["minimum"] = minimum;
+		object["maximum"] = maximum;
+		object["value"] = value;
 	}
 
 	void FloatGene::mutate(float strength) {
@@ -93,16 +97,17 @@ namespace Game3 {
 	LongGene::LongGene(std::string name_, ValueType minimum_, ValueType maximum_, ValueType value_):
 		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
 
-	LongGene LongGene::fromJSON(const nlohmann::json &json) {
-		return LongGene(json.at("name"), json.at("minimum"), json.at("maximum"), json.at("value"));
+	LongGene LongGene::fromJSON(const boost::json::value &json) {
+		return LongGene(getString(json.at("name")), getDouble(json.at("minimum")), getDouble(json.at("maximum")), getDouble(json.at("value")));
 	}
 
-	void LongGene::toJSON(nlohmann::json &json) const {
-		json["type"] = "long";
-		json["name"] = name;
-		json["minimum"] = minimum;
-		json["maximum"] = maximum;
-		json["value"] = value;
+	void LongGene::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["type"] = "long";
+		object["name"] = name;
+		object["minimum"] = minimum;
+		object["maximum"] = maximum;
+		object["value"] = value;
 	}
 
 	void LongGene::mutate(float strength) {
@@ -149,14 +154,15 @@ namespace Game3 {
 	CircularGene::CircularGene(std::string name_, float value_):
 		Gene(std::move(name_)), value(clamp(value_)) {}
 
-	CircularGene CircularGene::fromJSON(const nlohmann::json &json) {
-		return CircularGene(json.at("name"), json.at("value"));
+	CircularGene CircularGene::fromJSON(const boost::json::value &json) {
+		return CircularGene(getString(json.at("name")), getDouble(json.at("value")));
 	}
 
-	void CircularGene::toJSON(nlohmann::json &json) const {
-		json["type"] = "circular";
-		json["name"] = name;
-		json["value"] = value;
+	void CircularGene::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["type"] = "circular";
+		object["name"] = name;
+		object["value"] = value;
 	}
 
 	void CircularGene::mutate(float strength) {
@@ -205,14 +211,15 @@ namespace Game3 {
 	StringGene::StringGene(std::string name_, std::string value_):
 		Gene(std::move(name_)), value(std::move(value_)) {}
 
-	StringGene StringGene::fromJSON(const nlohmann::json &json) {
-		return StringGene(json.at("name"), json.at("value"));
+	StringGene StringGene::fromJSON(const boost::json::value &json) {
+		return StringGene(std::string(json.at("name").as_string()), std::string(json.at("value").as_string()));
 	}
 
-	void StringGene::toJSON(nlohmann::json &json) const {
-		json["type"] = "string";
-		json["name"] = name;
-		json["value"] = value;
+	void StringGene::toJSON(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["type"] = "string";
+		object["name"] = name;
+		object["value"] = value;
 	}
 
 	void StringGene::mutate(float) {}
@@ -241,7 +248,7 @@ namespace Game3 {
 
 // All genes
 
-	void to_json(nlohmann::json &json, const Gene &gene) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Gene &gene) {
 		gene.toJSON(json);
 	}
 

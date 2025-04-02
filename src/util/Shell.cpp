@@ -1,7 +1,5 @@
-#ifdef _WIN32
-#warning "util/Shell is currently unimplemented for Windows."
-#else
-#include "Log.h"
+#include "threading/ThreadContext.h"
+#include "util/Log.h"
 #include "util/PipeWrapper.h"
 #include "util/Shell.h"
 
@@ -10,12 +8,18 @@
 #include <csignal>
 #include <cstring>
 #include <fcntl.h>
+#ifndef __MINGW32__
 #include <sys/wait.h>
+#endif
 #include <thread>
 #include <unistd.h>
+#include <vector>
 
 namespace Game3 {
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args) {
+#ifdef __MINGW32__
+		throw std::runtime_error("runCommand not implemented on Windows");
+#else
 		PipeWrapper stdout_pipe;
 		PipeWrapper stderr_pipe;
 
@@ -47,7 +51,7 @@ namespace Game3 {
 			close(stderr_pipe[1]);
 
 			if (execvp(path.c_str(), cstrings.data()) == -1) {
-				ERROR("Path: {}", path.c_str());
+				ERR("Path: {}", path.c_str());
 				throw std::runtime_error("execvp failed: " + std::to_string(errno));
 			}
 
@@ -69,9 +73,13 @@ namespace Game3 {
 			stderr_stream.write(buffer.data(), bytes_read);
 
 		return {stdout_stream.str(), stderr_stream.str()};
+#endif
 	}
 
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args, std::chrono::microseconds timeout, int signal_on_timeout) {
+#ifdef __MINGW32__
+		throw std::runtime_error("runCommand not implemented on Windows");
+#else
 		static thread_local PipeWrapper control_pipe;
 		PipeWrapper stdout_pipe;
 		PipeWrapper stderr_pipe;
@@ -83,6 +91,7 @@ namespace Game3 {
 		int child = -1;
 
 		std::thread thread([&] {
+			threadContext.rename("RunCommand");
 			auto until = std::chrono::system_clock::now() + timeout;
 			while (!child_quit) {
 				std::unique_lock lock(mutex);
@@ -141,7 +150,7 @@ namespace Game3 {
 			close(stderr_pipe[1]);
 
 			if (execvp(path.c_str(), cstrings.data()) == -1) {
-				ERROR("Path: {}", path.c_str());
+				ERR("Path: {}", path.c_str());
 				throw std::runtime_error("execvp failed: " + std::to_string(errno));
 			}
 
@@ -200,6 +209,6 @@ namespace Game3 {
 
 		thread.join();
 		return {stdout_stream.str(), stderr_stream.str()};
+#endif
 	}
 }
-#endif

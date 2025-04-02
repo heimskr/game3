@@ -1,11 +1,14 @@
-#include "types/Position.h"
 #include "entity/Player.h"
+#include "fluid/Fluid.h"
+#include "game/Game.h"
 #include "game/TileProvider.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
-#include "util/Util.h"
 #include "types/ChunkPosition.h"
+#include "types/Position.h"
+#include "util/Util.h"
 
 namespace Game3 {
 	Position::Position(std::string_view string) {
@@ -166,9 +169,14 @@ namespace Game3 {
 		return realm->tryTile(layer, position);
 	}
 
+	std::optional<FluidTile> Place::getFluid() const {
+		return realm->tryFluid(position);
+	}
+
 	std::optional<std::reference_wrapper<const Identifier>> Place::getName(Layer layer) const {
-		if (auto tile = realm->tryTile(layer, position))
+		if (auto tile = realm->tryTile(layer, position)) {
 			return realm->getTileset()[*tile];
+		}
 		return std::nullopt;
 	}
 
@@ -180,8 +188,20 @@ namespace Game3 {
 		realm->setTile(layer, position, tilename);
 	}
 
+	void Place::setFluid(FluidTile fluid_tile) const {
+		realm->setFluid(position, fluid_tile);
+	}
+
 	bool Place::isPathable() const {
 		return realm->isPathable(position);
+	}
+
+	std::shared_ptr<Tile> Place::getTile(Layer layer) const {
+		if (std::optional<TileID> tile_id = get(layer)) {
+			return realm->getGame()->getTile(realm->getTileset()[*tile_id]);
+		}
+
+		return {};
 	}
 
 	std::shared_ptr<TileEntity> Place::getTileEntity() const {
@@ -213,14 +233,16 @@ namespace Game3 {
 		return os << '(' << position.row << ", " << position.column << ')';
 	}
 
-	void to_json(nlohmann::json &json, const Position &position) {
-		json[0] = position.row;
-		json[1] = position.column;
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Position &position) {
+		auto &array = json.emplace_array();
+		array.emplace_back(position.row);
+		array.emplace_back(position.column);
 	}
 
-	void from_json(const nlohmann::json &json, Position &position) {
-		position.row = json.at(0);
-		position.column = json.at(1);
+	Position tag_invoke(boost::json::value_to_tag<Position>, const boost::json::value &json) {
+		auto row = getNumber<Position::IntType>(json.at(0));
+		auto column = getNumber<Position::IntType>(json.at(1));
+		return {row, column};
 	}
 
 	template <>
@@ -260,6 +282,10 @@ namespace Game3 {
 		return this == &other || (x == other.x && y == other.y && z == other.z);
 	}
 
+	Vector3::operator bool() const {
+		return x != 0 || y != 0 || z != 0;
+	}
+
 	Vector3 & Vector3::operator+=(const Vector3 &other) {
 		x += other.x;
 		y += other.y;
@@ -274,12 +300,23 @@ namespace Game3 {
 		return *this;
 	}
 
+	Vector3 & Vector3::operator*=(const Vector3 &other) {
+		x *= other.x;
+		y *= other.y;
+		z *= other.z;
+		return *this;
+	}
+
 	Vector3 Vector3::operator+(const Vector3 &other) const {
 		return {x + other.x, y + other.y, z + other.z};
 	}
 
 	Vector3 Vector3::operator-(const Vector3 &other) const {
 		return {x - other.x, y - other.y, z - other.z};
+	}
+
+	Vector3 Vector3::operator*(const Vector3 &other) const {
+		return {x * other.x, y * other.y, z * other.z};
 	}
 
 	template <>
@@ -307,8 +344,44 @@ namespace Game3 {
 		return buffer;
 	}
 
+	Vector2d::Vector2d() = default;
+
+	Vector2d::Vector2d(double x, double y):
+		x(x), y(y) {}
+
+	Vector2d::Vector2d(Position position):
+		x(position.column), y(position.row) {}
+
 	double Vector2d::magnitude() const {
 		return std::sqrt(x * x + y * y);
+	}
+
+	double Vector2d::distance(const Vector2d &other) const {
+		return std::sqrt(std::pow(other.x - x, 2) + std::pow(other.y - y, 2));
+	}
+
+	bool Vector2d::operator==(const Vector2d &other) const {
+		return this == &other || (x == other.x && y == other.y);
+	}
+
+	Vector2d & Vector2d::operator+=(const Vector2d &other) {
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	Vector2d & Vector2d::operator-=(const Vector2d &other) {
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
+	Vector2d Vector2d::operator+(const Vector2d &other) const {
+		return {x + other.x, y + other.y};
+	}
+
+	Vector2d Vector2d::operator-(const Vector2d &other) const {
+		return {x - other.x, y - other.y};
 	}
 
 	template <>

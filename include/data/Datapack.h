@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "data/Dependency.h"
 
@@ -11,7 +11,7 @@ namespace Game3 {
 	class Datapack {
 		public:
 			std::string id;
-			Version version;
+			SemanticVersion version;
 			std::vector<Dependency> dependencies;
 	};
 }

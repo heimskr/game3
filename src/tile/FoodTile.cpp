@@ -1,3 +1,4 @@
+#include "entity/Player.h"
 #include "game/Game.h"
 #include "item/Food.h"
 #include "tile/FoodTile.h"
@@ -11,7 +12,7 @@ namespace Game3 {
 		GamePtr game = place.getGame();
 		PlayerPtr player = place.player;
 
-		auto food = std::dynamic_pointer_cast<Food>(game->registry<ItemRegistry>()[foodItemName]);
+		auto food = std::dynamic_pointer_cast<Food>((*game->itemRegistry)[foodItemName]);
 		if (!food) {
 			throw std::logic_error(std::format("Can't find food item \"{}\"", foodItemName));
 		}

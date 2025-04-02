@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
@@ -11,7 +11,7 @@ namespace Game3 {
 	void OpenItemFiltersPacket::handle(const ClientGamePtr &game) {
 		RealmPtr realm = game->getRealm(realmID);
 		if (!realm) {
-			ERROR("Couldn't find realm {} in OpenItemFiltersPacket handler", realmID);
+			ERR("Couldn't find realm {} in OpenItemFiltersPacket handler", realmID);
 			return;
 		}
 

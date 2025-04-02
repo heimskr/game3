@@ -1,3 +1,4 @@
+#include "entity/Player.h"
 #include "game/EnergyContainer.h"
 #include "game/Game.h"
 #include "game/InventorySpan.h"
@@ -6,6 +7,7 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "item/Furniture.h"
+#include "lib/JSON.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/Autocrafter.h"
@@ -216,21 +218,22 @@ namespace Game3 {
 		});
 	}
 
-	void Autocrafter::toJSON(nlohmann::json &json) const {
+	void Autocrafter::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 		auto station_lock = stationInventory.sharedLock();
-		json["stationInventory"] = dynamic_cast<ServerInventory &>(*stationInventory);
+		ensureObject(json)["stationInventory"] = boost::json::value_from(dynamic_cast<ServerInventory &>(*stationInventory));
 	}
 
-	void Autocrafter::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Autocrafter::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
-		if (auto iter = json.find("stationInventory"); iter != json.end()) {
+
+		if (const auto *value = json.as_object().if_contains("stationInventory")) {
 			auto station_lock = stationInventory.sharedLock();
-			stationInventory = std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this()));
+			stationInventory = std::make_shared<ServerInventory>(boost::json::value_to<ServerInventory>(*value, std::pair{game, shared_from_this()}));
 		}
 	}
 

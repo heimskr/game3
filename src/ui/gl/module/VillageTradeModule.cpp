@@ -17,39 +17,39 @@
 #include <cassert>
 
 namespace Game3 {
-	VillageTradeModule::VillageTradeModule(UIContext &ui, const std::shared_ptr<ClientGame> &game, const std::any &argument):
-		Module(ui, game),
+	VillageTradeModule::VillageTradeModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &game, const std::any &argument):
+		Module(ui, selfScale, game),
 		village(std::any_cast<VillagePtr>(argument)) {}
 
 	void VillageTradeModule::init() {
 		assert(village);
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
+		vbox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 
-		villageName = std::make_shared<Label>(ui, scale);
+		villageName = make<Label>(ui, selfScale);
 		villageName->setText(village->getName());
 		villageName->setHorizontalAlignment(Alignment::Center);
 		villageName->setHorizontalExpand(true);
 		vbox->append(villageName);
 
-		laborLabel = std::make_shared<Label>(ui, scale);
+		laborLabel = make<Label>(ui, selfScale);
 		laborLabel->setHorizontalAlignment(Alignment::Center);
 		laborLabel->setHorizontalExpand(true);
 		vbox->append(laborLabel);
 
-		sellRow = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 2, 0, Color{});
+		sellRow = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
 		sellRow->setExpand(true, false);
 
-		totalPriceLabel = std::make_shared<Label>(ui, scale);
-		unitPriceLabel = std::make_shared<Label>(ui, scale);
+		totalPriceLabel = make<Label>(ui, selfScale);
+		unitPriceLabel = make<Label>(ui, selfScale);
 
-		sellLabelBox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
+		sellLabelBox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 		sellLabelBox->setExpand(true, false);
 		sellLabelBox->append(totalPriceLabel);
 		sellLabelBox->append(unitPriceLabel);
 
-		sellSlot = std::make_shared<ItemSlot>(ui);
+		sellSlot = make<ItemSlot>(ui);
 		sellSlot->onDrop.connect([this](ItemSlot &, const WidgetPtr &dropped_widget) {
 			auto dropped = std::dynamic_pointer_cast<ItemSlot>(dropped_widget);
 			if (!dropped)
@@ -62,15 +62,15 @@ namespace Game3 {
 			}
 		});
 
-		sellCount = std::make_shared<TextInput>(ui, scale);
+		sellCount = make<TextInput>(ui, selfScale);
 		sellCount->setText("0");
-		sellCount->setFixedWidth(16 * scale);
+		sellCount->setFixedWidth(16 * selfScale);
 		sellCount->setVerticalAlignment(Alignment::Center);
 
-		sellButton = std::make_shared<Button>(ui, scale);
+		sellButton = make<Button>(ui, selfScale);
 		sellButton->setText("Sell");
 		sellButton->setVerticalAlignment(Alignment::Center);
-		sellButton->setFixedHeight(10 * scale);
+		sellButton->setFixedHeight(10 * selfScale);
 		sellButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button == LEFT_BUTTON)
 				sell();
@@ -268,16 +268,15 @@ namespace Game3 {
 				iter->second->setAmount(amount);
 				iter->second->updateLabel();
 			} else if (1.0 <= amount) {
-				auto row = std::make_shared<VillageTradeRow>(ui, scale, game, village->getID(), *game->getItem(resource), amount);
-				row->init();
+				auto row = make<VillageTradeRow>(ui, selfScale, game, village->getID(), *game->getItem(resource), amount);
 				vbox->append(row);
 				rows[resource] = std::move(row);
 			}
 		}
 	}
 
-	VillageTradeRow::VillageTradeRow(UIContext &ui, float scale, const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
-		Box(ui, scale, Orientation::Horizontal, 2, 0, Color{}),
+	VillageTradeRow::VillageTradeRow(UIContext &ui, float selfScale, const ClientGamePtr &game, VillageID village_id, const Item &item, double amount_):
+		Box(ui, selfScale, Orientation::Horizontal, 2, 0, Color{}),
 		weakGame(game),
 		villageID(village_id),
 		resource(item.identifier),
@@ -288,13 +287,13 @@ namespace Game3 {
 		ClientGamePtr game = weakGame.lock();
 		assert(game);
 
-		itemSlot = std::make_shared<ItemSlot>(ui);
-		quantityLabel = std::make_shared<Label>(ui, scale);
-		transferAmount = std::make_shared<TextInput>(ui, scale);
-		buyButton = std::make_shared<Button>(ui, scale);
+		itemSlot = make<ItemSlot>(ui);
+		quantityLabel = make<Label>(ui, selfScale);
+		transferAmount = make<TextInput>(ui, selfScale);
+		buyButton = make<Button>(ui, selfScale);
 
 		buyButton->setText("Buy");
-		buyButton->setFixedHeight(10 * scale);
+		buyButton->setFixedHeight(10 * selfScale);
 		buyButton->setVerticalAlignment(Alignment::Center);
 		itemSlot->setStack(ItemStack::create(game, resource, ItemCount(-1)));
 		updateLabel();
@@ -302,7 +301,7 @@ namespace Game3 {
 		quantityLabel->setFixedWidth(64);
 		quantityLabel->setVerticalAlignment(Alignment::Center);
 		transferAmount->setText("0");
-		transferAmount->setFixedWidth(16 * scale);
+		transferAmount->setFixedWidth(16 * selfScale);
 		transferAmount->setVerticalAlignment(Alignment::Center);
 
 		transferAmount->onChange.connect([this](TextInput &, const UString &) {

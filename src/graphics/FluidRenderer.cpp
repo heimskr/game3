@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/Tileset.h"
 #include "container/Quadtree.h"
 #include "game/Game.h"

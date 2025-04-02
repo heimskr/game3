@@ -15,14 +15,16 @@ namespace Game3 {
 	class Slider: public Widget, public HasFixedSize {
 		public:
 			sigc::signal<void(Slider &, double)> onValueUpdate;
+			sigc::signal<void(Slider &, double)> onRelease;
 
-			Slider(UIContext &, float scale);
+			Slider(UIContext &, float selfScale);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			bool dragStart(int x, int y) final;
 			bool dragUpdate(int x, int y) final;
+			bool dragEnd(int x, int y) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	Aligner::Aligner(UIContext &ui, Orientation orientation, Alignment alignment):
-		Widget(ui, UI_SCALE),
+		Widget(ui, 1),
 		orientation(orientation),
 		alignment(alignment) {}
 
@@ -74,8 +74,10 @@ namespace Game3 {
 	}
 
 	bool Aligner::onChildrenUpdated() {
-		if (!Widget::onChildrenUpdated())
+		if (!Widget::onChildrenUpdated()) {
 			return false;
+		}
+
 		markDirty();
 		return true;
 	}

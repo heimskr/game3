@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
@@ -28,7 +28,7 @@ namespace Game3 {
 			player->setInventory(inventory, 0);
 			player->getInventory(0)->notifyOwner({});
 		} else {
-			ERROR("InventoryPacket::handle: player is missing");
+			ERR("InventoryPacket::handle: player is missing");
 			assert(player);
 		}
 	}

@@ -4,11 +4,11 @@
 #include "ui/gl/widget/Label.h"
 
 namespace Game3 {
-	GeneInfoModule::GeneInfoModule(UIContext &ui, GenePtr gene):
-		Module(ui), gene(std::move(gene)) {}
+	GeneInfoModule::GeneInfoModule(UIContext &ui, float selfScale, GenePtr gene):
+		Module(ui, selfScale), gene(std::move(gene)) {}
 
 	void GeneInfoModule::init() {
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0, Color{});
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0, Color{});
 		vbox->insertAtEnd(shared_from_this());
 	}
 
@@ -26,16 +26,18 @@ namespace Game3 {
 	}
 
 	void GeneInfoModule::reset() {
-		if (!vbox)
+		if (!vbox) {
 			return;
+		}
 
 		vbox->clearChildren();
 
-		if (!gene)
+		if (!gene) {
 			return;
+		}
 
 		for (const std::string &line: gene->describeLong()) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			label->setText(line);
 			label->insertAtEnd(vbox);
 		}

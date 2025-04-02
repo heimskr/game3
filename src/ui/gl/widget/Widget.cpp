@@ -10,10 +10,12 @@
 #include <cassert>
 
 namespace Game3 {
-	Widget::Widget(UIContext &ui, float scale):
-		ui(ui), scale(scale) {}
+	Widget::Widget(UIContext &ui, float selfScale):
+		ui(ui), selfScale(selfScale) {}
 
-	void Widget::init() {}
+	void Widget::init() {
+		rescale(ui.scale);
+	}
 
 	const Rectangle & Widget::getLastRectangle() const {
 		return lastRectangle;
@@ -35,13 +37,13 @@ namespace Game3 {
 		return nullptr;
 	}
 
-	bool Widget::click(int button, int x, int y) {
+	bool Widget::click(int button, int x, int y, Modifiers modifiers) {
 		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick) {
 			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
 		}
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->click(button, x, y)) {
+			if (child->contains(x, y) && child->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -49,9 +51,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::mouseDown(int button, int x, int y) {
+	bool Widget::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->mouseDown(button, x, y)) {
+			if (child->contains(x, y) && child->mouseDown(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -59,9 +61,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::mouseUp(int button, int x, int y) {
+	bool Widget::mouseUp(int button, int x, int y, Modifiers modifiers) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->mouseUp(button, x, y)) {
+			if (child->contains(x, y) && child->mouseUp(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -110,9 +112,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Widget::scroll(float x_delta, float y_delta, int x, int y) {
+	bool Widget::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y)) {
+			if (child->contains(x, y) && child->scroll(x_delta, y_delta, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -126,10 +128,6 @@ namespace Game3 {
 
 	bool Widget::charPressed(uint32_t, Modifiers) {
 		return false;
-	}
-
-	float Widget::getScale() const {
-		return scale;
 	}
 
 	bool Widget::isDragging() const {
@@ -351,8 +349,18 @@ namespace Game3 {
 		return ui;
 	}
 
+	float Widget::getScale() const {
+		return selfScale * ui.scale;
+	}
+
 	bool Widget::onChildrenUpdated() {
 		return !suppressChildUpdates;
+	}
+
+	void Widget::rescale(float new_scale) {
+		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
+			child->rescale(new_scale);
+		}
 	}
 
 	bool Widget::shouldCull() const {

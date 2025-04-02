@@ -1,6 +1,7 @@
 #include "entity/Miner.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Building.h"
 #include "tileentity/Chest.h"
@@ -15,7 +16,7 @@
 namespace Game3::WorldGen {
 	void generateHouse(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const std::shared_ptr<Realm> &parent_realm, Index width, Index height, Position entrance) {
 		auto guard = realm->guardGeneration();
-		realm->markGenerated(0, 0);
+		realm->markGenerated(ChunkPosition{0, 0});
 		Timer timer("GenerateHouse");
 
 		realm->tileProvider.ensureAllChunks(ChunkPosition{0, 0});
@@ -33,7 +34,7 @@ namespace Game3::WorldGen {
 		std::array<Index, 2> edges {1, width - 2};
 		const Position bed_position(2 + rng() % (height - 4), choose(edges, rng));
 		realm->setTile(Layer::Objects, bed_position, choose(beds, rng), false);
-		realm->extraData["bed"] = bed_position;
+		ensureObject(realm->extraData)["bed"] = boost::json::value_from(bed_position);
 
 		// const auto house_position = entrance - Position(1, 0);
 		// realm->spawn<Miner>({exit_position.row - 1, exit_position.column}, parent_realm->id, realm->id, house_position, parent_realm->closestTileEntity<Building>(house_position,
@@ -62,6 +63,11 @@ namespace Game3::WorldGen {
 					"Gangblanc is 1 cubic meter but a lot of it is hidden inside pocket dimensions so he appears to have a normal human volume.",
 					"I've heard whispers of a vending machine deep beneath the surface that takes quarters... but what kind?",
 					"4200200000001f16000000626173653a6d696e6967616d652f627265616b6f757404ffffffffffffffff",
+					"worlds grow old and suns grow cold, and death we never can doubt\ntime's cold wind wailing down the past reminds us that all flesh is grass\nand history's lamps blow out",
+					"cycles turn while the far stars burn\nand people and planets age\nlife's crown passes to younger lands\ntime sweeps dust of hope from her hands\nand turns another page",
+					"but we who feel the weight of the wheel, when winter falls over our world\ncan hope for tomorrow and raise our eyes\nto a silver moon in the open skies and a single flag unfurled",
+					"we know well what life can tell: if you will not perish, then grow\nand today our fragile flesh and steel have laid our hands on a vaster wheel\nwith all of the stars to know",
+					"from all who tried out of history's tide, a salute for the team that won\nand the old earth smiles at her children's reach\nthe wave that carried us up the beach\nto reach for the shining sun",
 				};
 
 				std::ranges::shuffle(texts, rng);

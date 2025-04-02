@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "Options.h"
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
@@ -7,6 +7,8 @@
 #include "game/ClientGame.h"
 #include "game/Inventory.h"
 #include "game/SimulationOptions.h"
+#include "graphics/Omniatlas.h"
+#include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "net/DisconnectedError.h"
 #include "net/LocalClient.h"
@@ -68,24 +70,30 @@ namespace Game3 {
 	}
 
 	void ClientGame::dragStart(double x, double y, Modifiers modifiers) {
-		Position position = translateCanvasCoordinates(x, y);
+		double x_offset{}, y_offset{};
+		Position position = translateCanvasCoordinates(x, y, &x_offset, &y_offset);
 		lastDragPosition = position;
-		getClient()->send(make<DragPacket>(DragPacket::Action::Start, position, modifiers));
+		std::pair<float, float> offsets{x_offset, y_offset};
+		getClient()->send(make<DragPacket>(DragPacket::Action::Start, position, modifiers, offsets));
 	}
 
 	void ClientGame::dragUpdate(double x, double y, Modifiers modifiers) {
-		Position position = translateCanvasCoordinates(x, y);
+		double x_offset{}, y_offset{};
+		Position position = translateCanvasCoordinates(x, y, &x_offset, &y_offset);
 		if (lastDragPosition && *lastDragPosition != position) {
 			lastDragPosition = position;
-			getClient()->send(make<DragPacket>(DragPacket::Action::Update, position, modifiers));
+			std::pair<float, float> offsets{x_offset, y_offset};
+			getClient()->send(make<DragPacket>(DragPacket::Action::Update, position, modifiers, offsets));
 		}
 	}
 
 	void ClientGame::dragEnd(double x, double y, Modifiers modifiers) {
 		if (lastDragPosition) {
-			Position position = translateCanvasCoordinates(x, y);
+			double x_offset{}, y_offset{};
+			Position position = translateCanvasCoordinates(x, y, &x_offset, &y_offset);
 			lastDragPosition.reset();
-			getClient()->send(make<DragPacket>(DragPacket::Action::End, position, modifiers));
+			std::pair<float, float> offsets{x_offset, y_offset};
+			getClient()->send(make<DragPacket>(DragPacket::Action::End, position, modifiers, offsets));
 		}
 	}
 
@@ -137,6 +145,31 @@ namespace Game3 {
 		return {static_cast<Index>(y - sub_y), static_cast<Index>(x - sub_x)};
 	}
 
+	std::pair<double, double> ClientGame::untranslateCanvasCoordinates(Position position) const {
+		RealmPtr realm = activeRealm;
+
+		if (!realm) {
+			return {};
+		}
+
+		std::shared_ptr<Window> window = getWindow();
+		const int width = window->getWidth();
+		const int height = window->getHeight();
+		const auto scale = window->scale;
+		const auto tile_size = realm->getTileset().getTileSize();
+		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
+
+		double x = position.column;
+		double y = position.row;
+
+		y *= tile_size * scale / 2.;
+		x *= tile_size * scale / 2.;
+		y += height / 2. - (map_length * tile_size / 4.) * scale + window->center.second * window->magic * scale;
+		x += width  / 2. - (map_length * tile_size / 4.) * scale + window->center.first  * window->magic * scale;
+
+		return {x, y};
+	}
+
 	void ClientGame::activateContext() {
 		getWindow()->activateContext();
 	}
@@ -182,10 +215,12 @@ namespace Game3 {
 			try {
 				packet->handle(getSelf());
 			} catch (const Warning &warning) {
-				getWindow()->error(warning.what());
+				getWindow()->delay([warning = UString(warning.what())](Window &window) {
+					window.error(warning);
+				});
 			} catch (const std::exception &err) {
 				Packet &packet_ref = *packet;
-				ERROR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
+				ERR("Couldn't handle packet of type {} ({}): {}", DEMANGLE(packet_ref), packet->getID(), err.what());
 				throw;
 			}
 		}
@@ -205,8 +240,9 @@ namespace Game3 {
 				missing_chunks_lock.unlock();
 				missingChunks = std::move(new_missing_chunks);
 				missing_chunks_lock.lock();
-				if (!missingChunks.empty())
+				if (!missingChunks.empty()) {
 					getClient()->send(make<ChunkRequestPacket>(*realm, missingChunks, true));
+				}
 			}
 		} else {
 			WARN("No realm");
@@ -312,6 +348,7 @@ namespace Game3 {
 		tickThreadLaunchWaiter.reset(1, true);
 
 		tickThread = std::thread([this] {
+			threadContext.rename("ClientTick");
 			while (active) {
 				try {
 					if (!tick()) {
@@ -362,6 +399,11 @@ namespace Game3 {
 		}
 
 		return *cachedIsConnectedLocally;
+	}
+
+	void ClientGame::initialSetup(const std::filesystem::path &dir) {
+		Game::initialSetup(dir);
+		// omniatlas.emplace("resources");
 	}
 
 	void ClientGame::garbageCollect() {

@@ -6,6 +6,7 @@
 #include "game/ClientInventory.h"
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
@@ -32,26 +33,30 @@ namespace Game3 {
 		return Entity::create<Miner>(overworld_realm, house_realm, house_position, keep_);
 	}
 
-	std::shared_ptr<Miner> Miner::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	std::shared_ptr<Miner> Miner::fromJSON(const GamePtr &game, const boost::json::value &json) {
 		auto out = Entity::create<Miner>();
 		out->absorbJSON(game, json);
 		return out;
 	}
 
-	void Miner::toJSON(nlohmann::json &json) const {
+	void Miner::toJSON(boost::json::value &json) const {
 		Entity::toJSON(json);
 		Worker::toJSON(json);
-		json["harvestingTime"] = harvestingTime;
-		if (chosenResource)
-			json["chosenResource"] = *chosenResource;
+		auto &object = json.as_object();
+		object["harvestingTime"] = harvestingTime;
+		if (chosenResource) {
+			object["chosenResource"] = boost::json::value_from(*chosenResource);
+		}
 	}
 
-	void Miner::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Miner::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		Entity::absorbJSON(game, json);
 		Worker::absorbJSON(game, json);
-		harvestingTime = json.at("harvestingTime");
-		if (json.contains("chosenResource"))
-			chosenResource = json.at("chosenResource");
+		const auto &object = json.as_object();
+		harvestingTime = getNumber<float>(object.at("harvestingTime"));
+		if (auto *value = object.if_contains("chosenResource")) {
+			chosenResource = boost::json::value_to<Position>(*value);
+		}
 	}
 
 	bool Miner::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
@@ -79,57 +84,56 @@ namespace Game3 {
 		const GamePtr &game = args.game;
 		const auto delta = args.delta;
 
-		if (getSide() == Side::Client || stillStuck(delta))
+		if (getSide() == Side::Client || stillStuck(delta)) {
 			return;
+		}
 
 		const auto hour = game->getHour();
 
-		if (phase == 0 && WORK_START_HOUR <= hour)
+		if (phase == 0 && WORK_START_HOUR <= hour) {
 			wakeUp();
 
-		else if (phase == 1 && realmID == overworldRealm)
+		} else if (phase == 1 && realmID == overworldRealm) {
 			goToResource();
 
-		else if (phase == 2 && position == destination)
+		} else if (phase == 2 && position == destination) {
 			startHarvesting();
 
-		else if (phase == 3) {
+		} else if (phase == 3) {
 			harvest(delta);
-			if (WORK_END_HOUR <= hour)
+			if (WORK_END_HOUR <= hour) {
 				setPhase(4);
-		}
+			}
 
-		else if (phase == 4)
+		} else if (phase == 4) {
 			goToKeep(5);
 
-		else if (phase == 5 && position == destination)
+		} else if (phase == 5 && position == destination) {
 			goToStockpile(6);
 
-		else if (phase == 6 && position == destination)
+		} else if (phase == 6 && position == destination) {
 			sellInventory();
 
-		else if (phase == 7) {
+		} else if (phase == 7) {
 			sellTime += delta;
 			if (SELLING_TIME <= sellTime) {
 				sellTime = 0;
 				leaveKeep(8);
 			}
-		}
 
-		else if (phase == 8 && realmID == overworldRealm)
+		} else if (phase == 8 && realmID == overworldRealm) {
 			goToHouse(9);
 
-		else if (phase == 9 && position == destination)
+		} else if (phase == 9 && position == destination) {
 			goToBed(10);
 
-		else if (phase == 10 && position == destination)
+		} else if (phase == 10 && position == destination) {
 			setPhase(11);
 
-		else if (phase == 11 && hour < WORK_END_HOUR)
+		} else if (phase == 11 && hour < WORK_END_HOUR) {
 			setPhase(0);
+		}
 	}
-
-
 
 	void Miner::encode(Buffer &buffer) {
 		Entity::encode(buffer);
@@ -154,9 +158,11 @@ namespace Game3 {
 		RealmPtr house     = game->getRealm(houseRealm);
 		// Detect all resources within a given radius of the house
 		std::vector<Position> resource_choices;
-		for (const auto &[te_position, tile_entity]: overworld->tileEntities)
-			if (dynamic_cast<OreDeposit *>(tile_entity.get()))
+		for (const auto &[te_position, tile_entity]: overworld->tileEntities) {
+			if (dynamic_cast<OreDeposit *>(tile_entity.get())) {
 				resource_choices.push_back(te_position);
+			}
+		}
 		// If there are no resources, get stuck forever. Seed -1998 has no resources.
 		if (resource_choices.empty()) {
 			setPhase(-1);
@@ -170,8 +176,9 @@ namespace Game3 {
 
 	void Miner::goToResource() {
 		auto realm = getRealm();
-		if (!chosenResource)
+		if (!chosenResource) {
 			return;
+		}
 
 		if (auto next = realm->getPathableAdjacent(*chosenResource)) {
 			if (!pathfind(destination = *next)) {
@@ -179,8 +186,9 @@ namespace Game3 {
 				return;
 			}
 			setPhase(2);
-		} else
+		} else {
 			stuck = true;
+		}
 	}
 
 	void Miner::startHarvesting() {
@@ -196,10 +204,12 @@ namespace Game3 {
 			GamePtr game = realm->getGame();
 			const ItemStackPtr &stack = deposit.getOre(*game).stack;
 			const auto leftover = getInventory(0)->add(stack);
-			if (leftover == stack)
+			if (leftover == stack) {
 				setPhase(4);
-		} else
+			}
+		} else {
 			harvestingTime += delta;
+		}
 	}
 
 	void Miner::sellInventory() {
@@ -241,7 +251,7 @@ namespace Game3 {
 		// setMoney(new_money);
 	}
 
-	void to_json(nlohmann::json &json, const Miner &miner) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Miner &miner) {
 		miner.toJSON(json);
 	}
 }

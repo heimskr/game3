@@ -1,7 +1,5 @@
 #pragma once
 
-#include "lib/Eigen.h"
-
 #include "graphics/HasBackbuffer.h"
 #include "graphics/Shader.h"
 

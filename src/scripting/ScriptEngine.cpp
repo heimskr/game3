@@ -1,8 +1,9 @@
 #include "config.h"
 
 #ifdef GAME3_ENABLE_SCRIPTING
-#include "Log.h"
+#include "util/Log.h"
 #include "game/Game.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "scripting/ObjectWrap.h"
 #include "scripting/ScriptEngine.h"
@@ -12,7 +13,6 @@
 #include "util/Util.h"
 
 #include <libplatform/libplatform.h>
-#include <nlohmann/json.hpp>
 
 #include <cassert>
 #include <sstream>
@@ -180,18 +180,18 @@ namespace Game3 {
 		return v8::External::New(isolate, item);
 	}
 
-	nlohmann::json ScriptEngine::getJSON(v8::Local<v8::Value> value) {
+	boost::json::value ScriptEngine::getJSON(v8::Local<v8::Value> value) {
 		if (value->IsString() || value->IsStringObject())
-			return nlohmann::json(string(value));
+			return boost::json::value(string(value));
 
 		if (value->IsNumber() || value->IsNumberObject())
-			return nlohmann::json(value->NumberValue(getContext()).ToChecked());
+			return boost::json::value(value->NumberValue(getContext()).ToChecked());
 
 		if (value->IsBigInt())
-			return nlohmann::json(value.As<v8::BigInt>()->Int64Value());
+			return boost::json::value(value.As<v8::BigInt>()->Int64Value());
 
 		if (value->IsObject()) {
-			nlohmann::json out;
+			boost::json::value out;
 			v8::Local<v8::Context> context = getContext();
 			v8::Local<v8::Object> obj = value.As<v8::Object>();
 			v8::MaybeLocal<v8::Array> maybe_array = obj->GetOwnPropertyNames(context);
@@ -208,7 +208,7 @@ namespace Game3 {
 		}
 
 		if (value->IsArray()) {
-			nlohmann::json out;
+			boost::json::value out;
 			v8::Local<v8::Context> context = getContext();
 			v8::Local<v8::Array> array = value.As<v8::Array>();
 			for (uint32_t i = 0, length = array->Length(); i < length; ++i)
@@ -330,7 +330,7 @@ namespace Game3 {
 	namespace {
 		void toObject(Buffer &buffer, const v8::FunctionCallbackInfo<v8::Value> &info) {
 			try {
-				nlohmann::json json;
+				boost::json::value json;
 
 				if (info.Length() >= 1 && info[0]->IsString() && 0 == strcmp("all", *v8::String::Utf8Value(info.GetIsolate(), info[0]))) {
 					json = buffer.popAllJSON();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/Game.h"
+#include "graphics/Omniatlas.h"
 #include "graphics/Rectangle.h"
 #include "threading/Atomic.h"
 #include "threading/Waiter.h"
@@ -28,9 +29,10 @@ namespace Game3 {
 	class ClientGame: public Game {
 		public:
 			bool stoppedByError = false;
+			bool suppressDisconnectionMessage = false;
 			std::function<void()> errorCallback;
 			SoundEngine sounds;
-			bool suppressDisconnectionMessage = false;
+			std::optional<Omniatlas> omniatlas;
 
 			sigc::signal<void(const PlayerPtr &)> signalPlayerInventoryUpdate;
 			sigc::signal<void(const PlayerPtr &)> signalPlayerMoneyUpdate;
@@ -53,6 +55,7 @@ namespace Game3 {
 			Rectangle getVisibleRealmBounds() const;
 			/** Translates coordinates relative to the top left corner of the canvas to realm coordinates. */
 			Position translateCanvasCoordinates(double x, double y, double *x_offset_out = nullptr, double *y_offset_out = nullptr) const;
+			std::pair<double, double> untranslateCanvasCoordinates(Position) const;
 			void activateContext();
 			void setText(const UString &text);
 			void runCommand(const std::string &);
@@ -96,6 +99,8 @@ namespace Game3 {
 			std::shared_ptr<Window> getWindow() const;
 
 			bool isConnectedLocally() const;
+
+			void initialSetup(const std::filesystem::path &dir) final;
 
 		private:
 			std::weak_ptr<Window> weakWindow;

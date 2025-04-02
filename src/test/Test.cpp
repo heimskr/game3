@@ -1,7 +1,8 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "container/Quadtree.h"
 #include "entity/ServerPlayer.h"
 #include "game/TileProvider.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "threading/LockableSharedPtr.h"
 #include "threading/LockableWeakPtr.h"
@@ -11,8 +12,6 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	void testQuadtree() {
@@ -174,7 +173,8 @@ namespace Game3 {
 
 	void testPlayerJSON() {
 		auto player = Entity::create<ServerPlayer>();
-		std::cout << nlohmann::json(*player).dump() << '\n';
+		serializeJSON(boost::json::value_from(*player), std::cout);
+		std::cout << '\n';
 	}
 
 	void testLockableWeakPtr() {
@@ -206,7 +206,7 @@ namespace Game3 {
 			if (facing == expected)
 				SUCCESS("({}, {}) → {}", row, column, facing);
 			else
-				ERROR("({}, {}) → {}, expected {}", row, column, facing, expected);
+				ERR("({}, {}) → {}, expected {}", row, column, facing, expected);
 		};
 
 		check( 0,  0, Direction::Invalid);

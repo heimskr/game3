@@ -1,20 +1,21 @@
+#include "lib/JSON.h"
 #include "types/VillageOptions.h"
-
-#include <nlohmann/json.hpp>
 
 namespace Game3 {
 	VillageOptions::VillageOptions(int width_, int height_, int padding_):
 		width(width_), height(height_), padding(padding_) {}
 
-	void to_json(nlohmann::json &json, const VillageOptions &village_options) {
-		json["width"]   = village_options.width;
-		json["height"]  = village_options.height;
-		json["padding"] = village_options.padding;
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const VillageOptions &village_options) {
+		auto &object = json.emplace_object();
+		object["width"]   = village_options.width;
+		object["height"]  = village_options.height;
+		object["padding"] = village_options.padding;
 	}
 
-	void from_json(const nlohmann::json &json, VillageOptions &village_options) {
-		village_options.width   = json.at("width");
-		village_options.height  = json.at("height");
-		village_options.padding = json.at("padding");
+	VillageOptions tag_invoke(boost::json::value_to_tag<VillageOptions>, const boost::json::value &json) {
+		int width   = getNumber<int>(json.at("width"));
+		int height  = getNumber<int>(json.at("height"));
+		int padding = getNumber<int>(json.at("padding"));
+		return {width, height, padding};
 	}
 }

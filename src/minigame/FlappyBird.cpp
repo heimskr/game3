@@ -1,9 +1,11 @@
+#include "minigame/FlappyBird.h"
+
+#ifdef ENABLE_ZIP8
 #include "game/ClientGame.h"
 #include "graphics/Color.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"
-#include "minigame/FlappyBird.h"
 #include "packet/SubmitScorePacket.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -15,12 +17,15 @@ namespace Game3 {
 	namespace {
 		constexpr Color FLAPPYBIRD_FOREGROUND{"#425229"};
 		constexpr Color FLAPPYBIRD_BACKGROUND{"#ffffce"};
-		constexpr std::size_t FLAPPYBIRD_SCORE_MULTIPLIER = 500;
+		constexpr double FLAPPYBIRD_SCORE_MULTIPLIER = 100;
+		constexpr double FLAPPYBIRD_SCORE_POWER = 1.1;
+
+		constexpr std::size_t getScore(uint64_t flags) {
+			return static_cast<std::size_t>(std::pow(flags, FLAPPYBIRD_SCORE_POWER) * FLAPPYBIRD_SCORE_MULTIPLIER);
+		}
 	}
 
-	FlappyBird::FlappyBird() = default;
-
-	void FlappyBird::tick(UIContext &ui, double) {
+	void FlappyBird::tick(double) {
 		if (!cpu) {
 			return;
 		}
@@ -32,8 +37,8 @@ namespace Game3 {
 
 		if (cpu->getFlagsDirty()) {
 			dirty = true;
-			score = cpu->getFlags() * FLAPPYBIRD_SCORE_MULTIPLIER;
-			ui.getGame()->send(make<SubmitScorePacket>(ID(), score));
+			const uint64_t flags = cpu->getFlags();
+			ui.getGame()->send(make<SubmitScorePacket>(ID(), getScore(flags)));
 			cpu->clearFlagsDirty();
 		}
 
@@ -43,25 +48,27 @@ namespace Game3 {
 		}
 	}
 
-	void FlappyBird::render(UIContext &, const RendererContext &renderers) {
+	void FlappyBird::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		width = gameWidth;
+		height = gameHeight;
+
+		Minigame::render(renderers, x, y, width, height);
+
 		if (!cpu || !display) {
 			return;
 		}
 
+		const double scale = getScale();
+
 		renderers.singleSprite.drawOnScreen(display, RenderOptions{
-			.x = 0,
-			.y = 0,
+			.x = x,
+			.y = y,
 			.sizeX = -1,
 			.sizeY = -1,
-			.scaleX = static_cast<double>(UI_SCALE),
-			.scaleY = static_cast<double>(UI_SCALE),
+			.scaleX = scale,
+			.scaleY = scale,
 			.invertY = false,
 		});
-	}
-
-	void FlappyBird::setSize(int width, int height) {
-		gameWidth = width;
-		gameHeight = height;
 	}
 
 	void FlappyBird::reset() {
@@ -102,3 +109,4 @@ namespace Game3 {
 		});
 	}
 }
+#endif

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/Directions.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "types/Position.h"
 #include "types/Quadrant.h"
 #include "graphics/Tileset.h"

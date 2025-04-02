@@ -1,4 +1,5 @@
-#include "Log.h"
+#include "util/Log.h"
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/InventorySpan.h"
@@ -34,11 +35,15 @@ namespace Game3 {
 		Disruptor("base:tile/disruptor"_id, position_) {}
 
 	bool Disruptor::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
-		if (slot >= INPUT_CAPACITY)
+		if (slot >= INPUT_CAPACITY) {
 			return false;
+		}
 
-		if (std::dynamic_pointer_cast<ChemicalItem>(stack->item))
-			return stack->data.contains("formula");
+		if (std::dynamic_pointer_cast<ChemicalItem>(stack->item)) {
+			if (const auto *object = stack->data.if_object()) {
+				return object->contains("formula");
+			}
+		}
 
 		return false;
 	}
@@ -60,8 +65,9 @@ namespace Game3 {
 
 	void Disruptor::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || realm->getSide() != Side::Server)
+		if (!realm || realm->getSide() != Side::Server) {
 			return;
+		}
 
 		Ticker ticker{*this, args};
 
@@ -75,7 +81,7 @@ namespace Game3 {
 		react();
 	}
 
-	void Disruptor::toJSON(nlohmann::json &json) const {
+	void Disruptor::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -108,7 +114,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Disruptor::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Disruptor::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
@@ -173,8 +179,9 @@ namespace Game3 {
 
 		{
 			auto energy_lock = energyContainer->sharedLock();
-			if (energyContainer->energy < ENERGY_PER_ATOM)
+			if (energyContainer->energy < ENERGY_PER_ATOM) {
 				return false;
+			}
 		}
 
 		if (inventory->empty())
@@ -188,30 +195,39 @@ namespace Game3 {
 		Slot slot = 0;
 		for (; slot < INPUT_CAPACITY; ++slot) {
 			stack = (*inventory)[slot];
-			if (stack)
+			if (stack) {
 				break;
+			}
 		}
 
-		if (!stack || stack->getID() != "base:item/chemical")
+		if (!stack || stack->getID() != "base:item/chemical") {
 			return false;
+		}
 
-		auto formula_iter = stack->data.find("formula");
-		if (formula_iter == stack->data.end())
+		const auto *object = stack->data.if_object();
+		if (!object) {
 			return false;
+		}
+
+		const auto *formula_value = object->if_contains("formula");
+		if (!formula_value) {
+			return false;
+		}
 
 		const std::map<std::string, size_t> *atom_counts = nullptr;
 		std::unique_lock<DefaultMutex> atom_lock;
 
 		try {
-			atom_counts = &getAtomCounts(atom_lock, *formula_iter);
+			atom_counts = &getAtomCounts(atom_lock, std::string(formula_value->as_string()));
 		} catch (const Chemskr::ParserError &) {
 			return false;
 		}
 
-		if (!atom_counts)
+		if (!atom_counts) {
 			return false;
+		}
 
-		std::shared_ptr<Item> chemical_item = game->registry<ItemRegistry>()["base:item/chemical"_id];
+		std::shared_ptr<Item> chemical_item = (*game->itemRegistry)["base:item/chemical"_id];
 		std::shared_ptr<Inventory> inventory_copy = inventory->copy();
 		inventory_copy->setOwner({});
 
@@ -219,16 +235,18 @@ namespace Game3 {
 		size_t total_atom_count = 0;
 
 		for (const auto &[atom, count]: *atom_counts) {
-			if (output_span.add(ItemStack::create(game, chemical_item, count, nlohmann::json{{"formula", atom}})))
+			if (output_span.add(ItemStack::create(game, chemical_item, count, boost::json::value{{"formula", atom}}))) {
 				return false;
+			}
 			total_atom_count += count;
 		}
 
 		{
 			auto energy_lock = energyContainer->uniqueLock();
 			EnergyAmount to_consume = total_atom_count * ENERGY_PER_ATOM;
-			if (!energyContainer->remove(to_consume))
+			if (!energyContainer->remove(to_consume)) {
 				return false;
+			}
 			EnergeticTileEntity::queueBroadcast();
 		}
 
@@ -245,8 +263,9 @@ namespace Game3 {
 	const std::map<std::string, size_t> & Disruptor::getAtomCounts(std::unique_lock<DefaultMutex> &lock, const std::string &formula) {
 		lock = atomCounts.uniqueLock();
 
-		if (auto iter = atomCounts.find(formula); iter != atomCounts.end())
+		if (auto iter = atomCounts.find(formula); iter != atomCounts.end()) {
 			return iter->second;
+		}
 
 		std::map<std::string, size_t> &counts = atomCounts[formula];
 		counts = Chemskr::count(formula);

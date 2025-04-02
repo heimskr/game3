@@ -24,14 +24,14 @@
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/milk",
 				"flask":    "base:item/milk_flask",
-				"color":    "#ffffff"
+				"color":    "#fffffe"
 			}],
 			["base:fluid/water", {
 				"name":     "Water",
 				"tileset":  "base:tileset/monomap",
 				"tilename": "base:tile/deeper_water",
 				"flask":    "base:item/water_flask",
-				"color":    "#0000ff"
+				"color":    "#44aaaa"
 			}],
 			["base:fluid/brine", {
 				"name":     "Brine",
@@ -60,6 +60,25 @@
 				"tilename": "base:tile/liquid_biomass",
 				"flask":    "base:item/liquid_biomass_flask",
 				"color":    "#45a600"
+			}],
+			["base:fluid/powdered_snow", {
+				"name":     "Powdered Snow",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/snow",
+				"flask":    "base:item/snowball",
+				"color":    "#eeeeff"
+			}],
+			["base:fluid/radon", {
+				"name":     "Radon",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/radon",
+				"color":    "#222222"
+			}],
+			["base:fluid/sulfuric_acid", {
+				"name":     "Sulfuric Acid",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/sulfuric_acid",
+				"color":    "#ccff33"
 			}]
 		]]
 	]

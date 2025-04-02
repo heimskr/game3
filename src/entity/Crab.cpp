@@ -13,11 +13,11 @@ namespace Game3 {
 		{8, "base:texture/crab_blue"},
 	};
 
-	bool Crab::canAbsorbGenes(const nlohmann::json &genes) const {
+	bool Crab::canAbsorbGenes(const boost::json::value &genes) const {
 		return checkGenes(genes, {"species", "breed"});
 	}
 
-	void Crab::absorbGenes(const nlohmann::json &genes) {
+	void Crab::absorbGenes(const boost::json::value &genes) {
 		absorbGene(breed, genes, "breed");
 		texture = nullptr;
 	}
@@ -61,8 +61,8 @@ namespace Game3 {
 					Position goal = start_position;
 
 					bool in_water = false;
-					if (std::optional<FluidTile> fluid = realm->tryFluid(start_position); fluid->level > 0) {
-						in_water = true;
+					if (std::optional<FluidTile> fluid = realm->tryFluid(start_position)) {
+						in_water = fluid->level > 0;
 					}
 
 					const TileID sand = realm->getTileset()["base:tile/sand"_id];

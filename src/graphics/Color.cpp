@@ -1,9 +1,8 @@
 #include "graphics/Color.h"
 #include "lib/ok_color.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "util/Util.h"
-
-#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -19,11 +18,13 @@ namespace Game3 {
 	template <>
 	OKHsv convertColor(const Color &rgb) {
 		// Horrible NaN nonsense abounds.
-		if (rgb.red < 0.001 && rgb.green < 0.001 && rgb.blue < 0.001)
+		if (rgb.red < 0.001 && rgb.green < 0.001 && rgb.blue < 0.001) {
 			return {0, 0, 0, rgb.alpha};
+		}
 
-		if (rgb.red > 0.999 && rgb.green > 0.999 && rgb.blue > 0.999)
+		if (rgb.red > 0.999 && rgb.green > 0.999 && rgb.blue > 0.999) {
 			return {1, 1, 1, rgb.alpha};
+		}
 
 		ok_color::HSV hsv = ok_color::srgb_to_okhsv({rgb.red, rgb.green, rgb.blue});
 		return {hsv.h, hsv.s, hsv.v, rgb.alpha};
@@ -44,7 +45,7 @@ namespace Game3 {
 
 		value /= value_divisor;
 
-		return OKHsv{hue, saturation, value, alpha};
+		return {hue, saturation, value, alpha};
 	}
 
 	Color Color::darken(float value_divisor) const {
@@ -74,7 +75,7 @@ namespace Game3 {
 	}
 
 	Color Color::fromBytes(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
-		return Color{red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f};
+		return {red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f};
 	}
 
 	template <>
@@ -103,7 +104,7 @@ namespace Game3 {
 		return buffer;
 	}
 
-	void from_json(const nlohmann::json &json, Color &color) {
-		color = Color(json.get<std::string>());
+	Color tag_invoke(boost::json::value_to_tag<Color>, const boost::json::value &json) {
+		return Color(json.as_string());
 	}
 }

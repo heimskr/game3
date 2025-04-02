@@ -1,7 +1,8 @@
 #pragma once
 
-#include "types/Types.h"
 #include "registry/Registry.h"
+#include "types/Types.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	class Crop;
@@ -17,12 +18,13 @@ namespace Game3 {
 	class RealmFactory;
 	class RegisterableIdentifier;
 	class Resource;
+	class StatusEffectFactory;
 	class Texture;
 	class Tile;
 	class Tileset;
 	class TileEntityFactory;
 	struct EntityTexture;
-	struct Fluid;
+	class Fluid;
 	struct Ore;
 	struct RealmDetails;
 	struct SoundPath;
@@ -141,5 +143,10 @@ namespace Game3 {
 	struct MinigameFactoryRegistry: NamedRegistry<MinigameFactory> {
 		static Identifier ID() { return {"base", "registry/minigame_factory"}; }
 		MinigameFactoryRegistry(): NamedRegistry(ID()) {}
+	};
+
+	struct StatusEffectFactoryRegistry: NamedRegistry<StatusEffectFactory> {
+		static Identifier ID() { return {"base", "registry/status_effect_factory"}; }
+		StatusEffectFactoryRegistry(): NamedRegistry(ID()) {}
 	};
 }

@@ -37,13 +37,10 @@ else
 endif
 
 TRIPLET      ?= x64-linux
-DEPS         := libzstd gtk4 gtkmm-4.0 glu libevent_openssl openssl libevent_pthreads freetype2 eigen3 vte-2.91-gtk4
 OUTPUT       := game3
 COMPILER     ?= g++
 DEBUGGER     ?= gdb
 CPPFLAGS     += -Wall -Wextra $(BUILDFLAGS) -std=c++23 -Iinclude -Isubprojects/chemskr/include -Ibuilddir -Ibuilddir/subprojects/chemskr -Idiscord $(LTO) $(PROFILING)
-INCLUDES     := $(shell pkg-config --cflags $(DEPS))
-LIBS         := $(shell pkg-config --libs   $(DEPS))
 GLIB_COMPILE_RESOURCES = $(shell pkg-config --variable=glib_compile_resources gio-2.0)
 LDFLAGS      := $(LDFLAGS) $(LIBS) -pthread $(LTO) $(PROFILING)
 SOURCES      := $(shell find -L src -name \*.cpp)
@@ -183,11 +180,42 @@ depend:
 
 sinclude $(DEPFILE)
 
-zip: $(OUTPUT)
+winzip: game3.exe
+	strip game3.exe
 	rm -f game3.zip
-	mkdir Game3
-	cp -r resources Game3/resources
-	cp -r data Game3/data
-	cp $(OUTPUT) Game3/$(OUTPUT)
-	zip -r game3.zip Game3
-	rm -r Game3
+	mkdir -p game3_zip/Game3
+	cd game3_zip && \
+	cp -r ../resources Game3/resources && \
+	cp -r ../gamedata Game3/gamedata && \
+	cp ../game3.exe Game3/ && \
+	cp ../*.dll Game3/ && \
+	zip -r ../game3.zip Game3
+
+winzip_debug: builddir/src/game3.exe
+	cv2pdb64 $< game3.exe game3.pdb
+	rm -f game3.zip
+	mkdir -p game3_zip/Game3
+	cd game3_zip && \
+	cp -r ../resources Game3/resources && \
+	cp -r ../gamedata Game3/gamedata && \
+	cp -r ../src Game3/src && \
+	cp -r ../include Game3/include && \
+	cp ../game3.exe Game3/ && \
+	cp ../game3.pdb Game3/ && \
+	cp ../*.dll Game3/ && \
+	zip -r ../game3.zip Game3
+
+winja:
+	ninja -C builddir
+	cp builddir/src/game3.exe .
+
+maczip:
+	cp builddir/src/game3 ./game3
+	strip game3
+	rm -f game3.zip
+	mkdir -p game3_zip/Game3
+	cd game3_zip && \
+	cp -r ../resources Game3/resources && \
+	cp -r ../gamedata Game3/gamedata && \
+	cp ../game3 Game3/ && \
+	zip -r ../game3.zip Game3

@@ -11,6 +11,7 @@
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/Hotbar.h"
+#include "ui/gl/widget/StatusEffectsDisplay.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -21,9 +22,13 @@
 
 namespace Game3 {
 	UIContext::UIContext(Window &window):
+		UIContext(window, UI_SCALE) {}
+
+	UIContext::UIContext(Window &window, float scale):
 		window(window),
-		hotbar(std::make_shared<Hotbar>(*this, HOTBAR_SCALE / window.xScale)),
-		tooltip(std::make_shared<Tooltip>(*this, UI_SCALE)) {
+		scale(scale),
+		hotbar(std::make_shared<Hotbar>(*this, 0.75)),
+		tooltip(std::make_shared<Tooltip>(*this, 1)) {
 			hotbar->setName("Hotbar");
 			hotbar->init();
 			tooltip->init();
@@ -38,9 +43,15 @@ namespace Game3 {
 		if (ClientGamePtr game = getGame(); game != nullptr && game->getActiveRealm() != nullptr) {
 			if (std::ranges::none_of(dialogs, +[](const DialogPtr &dialog) { return dialog->hidesHotbar(); })) {
 				scissorStack = internalScissorStack;
-				constexpr static float width = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * HOTBAR_SCALE + HOTBAR_BORDER * 2;
-				hotbar->render(context, (window.getWidth() - width) / 2, window.getHeight() - (OUTER_SLOT_SIZE * 2 - INNER_SLOT_SIZE / 2) * HOTBAR_SCALE, -1, -1);
+				float dummy{};
+				float natural_width{};
+				float natural_height{};
+				hotbar->measure(context, Orientation::Horizontal, window.getWidth(), window.getHeight(), dummy, natural_width);
+				hotbar->measure(context, Orientation::Vertical, window.getWidth(), window.getHeight(), dummy, natural_height);
+				hotbar->render(context, (window.getWidth() - natural_width) / 2, window.getHeight() - natural_height - hotbar->getScale(), -1, -1);
 			}
+
+			StatusEffectsDisplay(*this, 1).render(context, internalScissorStack.getTop().rectangle);
 		}
 
 		for (const DialogPtr &dialog: dialogs) {
@@ -94,14 +105,14 @@ namespace Game3 {
 		tooltip->hide();
 	}
 
-	bool UIContext::click(int button, int x, int y) {
+	bool UIContext::click(int button, int x, int y, Modifiers modifiers) {
 		refocusDialogs(x, y);
 
-		if (contextMenu && contextMenu->click(button, x, y)) {
+		if (contextMenu && contextMenu->click(button, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->click(button, x, y, modifiers)) {
 			return true;
 		}
 
@@ -109,52 +120,52 @@ namespace Game3 {
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
 			contained = contained || dialog->contains(x, y);
-			if (dialog->click(button, x, y)) {
+			if (dialog->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return (hotbar->contains(x, y) && hotbar->click(button, x, y)) || contained;
+		return (hotbar->contains(x, y) && hotbar->click(button, x, y, modifiers)) || contained;
 	}
 
-	bool UIContext::mouseDown(int button, int x, int y) {
-		if (contextMenu && contextMenu->mouseDown(button, x, y)) {
+	bool UIContext::mouseDown(int button, int x, int y, Modifiers modifiers) {
+		if (contextMenu && contextMenu->mouseDown(button, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->mouseDown(button, x, y, modifiers)) {
 			return true;
 		}
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->mouseDown(button, x, y)) {
+			if (dialog->mouseDown(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->mouseDown(button, x, y);
+		return hotbar->contains(x, y) && hotbar->mouseDown(button, x, y, modifiers);
 	}
 
-	bool UIContext::mouseUp(int button, int x, int y) {
-		if (contextMenu && contextMenu->mouseUp(button, x, y)) {
+	bool UIContext::mouseUp(int button, int x, int y, Modifiers modifiers) {
+		if (contextMenu && contextMenu->mouseUp(button, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->mouseUp(button, x, y, modifiers)) {
 			return true;
 		}
 
 		if (auto pressed = getPressedWidget()) {
-			return pressed->mouseUp(button, x, y);
+			return pressed->mouseUp(button, x, y, modifiers);
 		}
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->mouseUp(button, x, y)) {
+			if (dialog->mouseUp(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->mouseUp(button, x, y);
+		return hotbar->contains(x, y) && hotbar->mouseUp(button, x, y, modifiers);
 	}
 
 	bool UIContext::dragStart(int x, int y) {
@@ -288,22 +299,22 @@ namespace Game3 {
 		return true;
 	}
 
-	bool UIContext::scroll(float x_delta, float y_delta, int x, int y) {
-		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y)) {
+	bool UIContext::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
+		if (contextMenu && contextMenu->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->scroll(x_delta, y_delta, x, y)) {
+			if (dialog->scroll(x_delta, y_delta, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y);
+		return hotbar->contains(x, y) && hotbar->scroll(x_delta, y_delta, x, y, modifiers);
 	}
 
 	bool UIContext::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
@@ -504,8 +515,9 @@ namespace Game3 {
 		}
 	}
 
-	void UIContext::addDialog(DialogPtr dialog) {
-		dialogs.emplace_back(std::move(dialog));
+	void UIContext::addDialog(const DialogPtr &dialog) {
+		dialogs.emplace_back(dialog);
+		focusDialog(dialog);
 	}
 
 	const std::optional<std::pair<int, int>> & UIContext::getDragOrigin() const {
@@ -522,10 +534,35 @@ namespace Game3 {
 
 	std::shared_ptr<InventoryModule> UIContext::makePlayerInventoryModule() {
 		if (ClientPlayerPtr player = getPlayer()) {
-			return make<InventoryModule>(*this, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
+			return make<InventoryModule>(*this, 1, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
 		}
 
-		return make<InventoryModule>(*this, std::shared_ptr<ClientInventory>{});
+		return make<InventoryModule>(*this, 1, std::shared_ptr<ClientInventory>{});
+	}
+
+	void UIContext::setScale(float new_scale) {
+		scale = new_scale;
+		iterateChildren([new_scale](const WidgetPtr &widget) {
+			widget->rescale(new_scale);
+		});
+	}
+
+	void UIContext::iterateChildren(const std::function<void(const WidgetPtr &)> &iterator) const {
+		for (const DialogPtr &dialog: dialogs) {
+			iterator(dialog);
+		}
+
+		auto visit = [&](const WidgetPtr &widget) {
+			if (widget) {
+				iterator(widget);
+			}
+		};
+
+		visit(draggedWidget);
+		visit(hotbar);
+		visit(tooltip);
+		visit(autocompleteDropdown);
+		visit(contextMenu);
 	}
 
 	void UIContext::drawFrame(const RendererContext &renderers, double scale, bool alpha, const std::array<std::string_view, 8> &pieces, const Color &interior) {

@@ -1,5 +1,7 @@
+#include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
+#include "lib/JSON.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
@@ -63,13 +65,13 @@ namespace Game3 {
 		});
 	}
 
-	void EnergeticTileEntity::toJSON(nlohmann::json &json) const {
+	void EnergeticTileEntity::toJSON(boost::json::value &json) const {
 		auto lock = energyContainer->sharedLock();
-		json["energy"] = energyContainer->energy;
+		ensureObject(json)["energy"] = energyContainer->energy;
 	}
 
-	void EnergeticTileEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
-		const EnergyAmount amount = json.at("energy");
+	void EnergeticTileEntity::absorbJSON(const GamePtr &, const boost::json::value &json) {
+		EnergyAmount amount = boost::json::value_to<EnergyAmount>(json.at("energy"));
 		auto lock = energyContainer->uniqueLock();
 		energyContainer->energy = amount;
 	}

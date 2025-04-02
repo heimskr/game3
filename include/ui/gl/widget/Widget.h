@@ -23,7 +23,7 @@ namespace Game3 {
 
 	class Widget: public std::enable_shared_from_this<Widget>, public HasExpand {
 		public:
-			Widget(UIContext &, float scale);
+			Widget(UIContext &, float selfScale);
 
 			Widget(const Widget &) = delete;
 			Widget(Widget &&) noexcept = delete;
@@ -42,18 +42,17 @@ namespace Game3 {
 			/** Can return a pointer to nothing, itself or a new widget. */
 			virtual WidgetPtr getDragStartWidget();
 			/** `x` and `y` are absolute, not relative to the top left corner of the widget. */
-			virtual bool click(int button, int x, int y);
-			virtual bool mouseDown(int button, int x, int y);
-			virtual bool mouseUp(int button, int x, int y);
+			virtual bool click(int button, int x, int y, Modifiers);
+			virtual bool mouseDown(int button, int x, int y, Modifiers);
+			virtual bool mouseUp(int button, int x, int y, Modifiers);
 			virtual bool dragStart(int x, int y);
 			virtual bool dragUpdate(int x, int y);
 			virtual bool dragEnd(int x, int y);
-			virtual bool scroll(float x_delta, float y_delta, int x, int y);
+			virtual bool scroll(float x_delta, float y_delta, int x, int y, Modifiers);
 			virtual bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			virtual bool charPressed(uint32_t codepoint, Modifiers);
 			virtual SizeRequestMode getRequestMode() const = 0;
 			virtual void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) = 0;
-			virtual float getScale() const;
 			virtual bool isDragging() const;
 			virtual void onFocus();
 			virtual void onBlur();
@@ -81,9 +80,11 @@ namespace Game3 {
 
 			UIContext & getUI();
 
+			float getScale() const;
+
 		protected:
 			UIContext &ui;
-			float scale{};
+			float selfScale{};
 			std::optional<std::pair<int, int>> dragOrigin;
 			Rectangle lastRectangle{-1, -1, -1, -1};
 			WidgetPtr firstChild;
@@ -112,6 +113,9 @@ namespace Game3 {
 			/** Returns false if updates are suppressed. */
 			virtual bool onChildrenUpdated();
 
+			/** Informs the widget that the UI's scale has changed. */
+			virtual void rescale(float new_scale);
+
 			virtual void setOnClick(decltype(onClick));
 			virtual void setOnClick(std::function<bool(Widget &)>);
 			virtual void setOnClick(std::function<void(Widget &)>);
@@ -132,8 +136,8 @@ namespace Game3 {
 	template <typename T, typename... Args>
 	requires std::derived_from<T, Widget>
 	std::shared_ptr<T> make(Args &&...args) {
-		auto dialog = std::make_shared<T>(std::forward<Args>(args)...);
-		dialog->init();
-		return dialog;
+		auto widget = std::make_shared<T>(std::forward<Args>(args)...);
+		widget->init();
+		return widget;
 	}
 }

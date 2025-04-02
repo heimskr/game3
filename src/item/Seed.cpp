@@ -1,10 +1,10 @@
-#include "Log.h"
-#include "types/Position.h"
-#include "graphics/Tileset.h"
+#include "util/Log.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
+#include "graphics/Tileset.h"
 #include "item/Seed.h"
 #include "realm/Realm.h"
+#include "types/Position.h"
 
 namespace Game3 {
 	Seed::Seed(ItemID id_, std::string name_, Identifier crop_tilename, MoneyCount base_price, ItemCount max_count):
@@ -25,8 +25,8 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Seed::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	bool Seed::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		return use(slot, stack, place, modifiers, offsets);
 	}
 
 	bool Seed::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {

@@ -1,7 +1,9 @@
-#include "Log.h"
+#include "util/Log.h"
+#include "entity/Entity.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "packet/PacketError.h"
 #include "packet/TileEntityPacket.h"
@@ -59,23 +61,21 @@ namespace Game3 {
 			tileEntity->decode(*game, storedBuffer);
 
 			if (weak_agent) {
-				ERROR("Found TileEntity {} in allAgents, even though getAgent<TileEntity> returned null!", globalID);
+				ERR("Found TileEntity {} in allAgents, even though getAgent<TileEntity> returned null!", globalID);
 				if (auto entity = std::dynamic_pointer_cast<Entity>(weak_agent->lock())) {
-					nlohmann::json entity_json;
+					boost::json::value entity_json;
 					entity->toJSON(entity_json);
-					INFO("Entity found with same global ID:\n\e[32m{}\e[39m", entity_json.dump());
+					INFO("Entity found with same global ID:\n\e[32m{}\e[39m", entity_json);
+				} else if (auto agent_ptr = weak_agent->lock()) {
+					Agent &agent = *agent_ptr;
+					INFO("Agent typeid: {}", DEMANGLE(agent));
 				} else {
-					if (auto agent_ptr = weak_agent->lock()) {
-						Agent &agent = *agent_ptr;
-						INFO("Agent typeid: {}", DEMANGLE(agent));
-					} else {
-						INFO("Agent is expired.");
-					}
+					INFO("Agent is expired.");
 				}
 
-				nlohmann::json tile_entity_json;
+				boost::json::value tile_entity_json;
 				tileEntity->toJSON(tile_entity_json);
-				INFO("Tile entity data:\n\e[31m{}\e[39m", tile_entity_json.dump());
+				INFO("Tile entity data:\n\e[31m{}\e[39m", tile_entity_json);
 				assert(false);
 			}
 
@@ -83,12 +83,17 @@ namespace Game3 {
 		}
 
 		if (tileEntity) {
-			if (!wasFound)
+			if (!wasFound) {
 				game->getRealm(realmID)->add(tileEntity);
-			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity))
-				for (InventoryID i = 0, max = has_inventory->getInventoryCount(); i < max; ++i)
-					if (InventoryPtr inventory = has_inventory->getInventory(i))
+			}
+
+			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(tileEntity)) {
+				for (InventoryID i = 0, max = has_inventory->getInventoryCount(); i < max; ++i) {
+					if (InventoryPtr inventory = has_inventory->getInventory(i)) {
 						inventory->notifyOwner({});
+					}
+				}
+			}
 		}
 	}
 }

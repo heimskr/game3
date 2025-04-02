@@ -7,7 +7,10 @@
 
 namespace Game3 {
 	template <typename T>
-	using Chunk = Lockable<std::vector<T>>;
+	struct Chunk: Lockable<std::vector<T>> {
+		using Lockable<std::vector<T>>::Lockable;
+		uint64_t updateCounter = 0;
+	};
 
 	using TileChunk  = Chunk<TileID>;
 	using BiomeChunk = Chunk<BiomeType>;

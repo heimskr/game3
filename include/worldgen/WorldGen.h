@@ -4,11 +4,11 @@
 #include <memory>
 #include <random>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "types/Types.h"
 #include "types/ChunkPosition.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "threading/ThreadPool.h"
 
 namespace Game3 {
@@ -34,8 +34,8 @@ namespace Game3 {
 		}
 	};
 
-	void from_json(const nlohmann::json &, WorldGenParams &);
-	void to_json(nlohmann::json &, const WorldGenParams &);
+	WorldGenParams tag_invoke(boost::json::value_to_tag<WorldGenParams>, const boost::json::value &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const WorldGenParams &);
 
 	namespace WorldGen {
 		extern ThreadPool pool;

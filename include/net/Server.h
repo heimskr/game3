@@ -3,8 +3,7 @@
 #include "types/Types.h"
 #include "threading/Lockable.h"
 
-#include <asio.hpp>
-#include <asio/ssl.hpp>
+#include "lib/ASIO.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -13,7 +12,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <poll.h>
 #include <set>
 #include <shared_mutex>
 #include <string>

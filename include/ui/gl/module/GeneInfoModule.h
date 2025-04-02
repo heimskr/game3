@@ -15,7 +15,7 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "module/gene_info"}; }
 
-			GeneInfoModule(UIContext &, std::shared_ptr<Gene>);
+			GeneInfoModule(UIContext &, float selfScale, std::shared_ptr<Gene>);
 
 			Identifier getID() const final { return ID(); }
 			void init() final;

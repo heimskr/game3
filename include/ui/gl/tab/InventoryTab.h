@@ -11,15 +11,15 @@ namespace Game3 {
 
 	class InventoryTab: public Tab {
 		public:
-			InventoryTab(UIContext &, float scale);
+			InventoryTab(UIContext &, float selfScale);
 
 			void init() final;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void renderIcon(const RendererContext &) final;
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
-			bool scroll(float x_delta, float y_delta, int x, int y) final;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
 
 			void setModule(std::shared_ptr<Module>);
 			Module * getModule(std::shared_lock<DefaultMutex> &);

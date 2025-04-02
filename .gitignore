@@ -49,3 +49,10 @@ vgcore.*
 /game3.log
 /old
 /.codechecker
+/go.sh
+/.vscode
+*.dll
+*.exe
+/game3_zip
+/log*
+*.pdb

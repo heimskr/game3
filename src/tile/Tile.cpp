@@ -8,8 +8,8 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Tile::Tile(Identifier identifier_):
-		NamedRegisterable(std::move(identifier_)) {}
+	Tile::Tile(Identifier identifier):
+		NamedRegisterable(std::move(identifier)) {}
 
 	void Tile::randomTick(const Place &place) {
 		if (!canSpawnMonsters(place))
@@ -66,6 +66,20 @@ namespace Game3 {
 	}
 
 	void Tile::renderStaticLighting(const Place &, Layer, const RendererContext &) {}
+
+	bool Tile::hasStaticLighting() const {
+		return false;
+	}
+
+	bool Tile::update(const Place &, Layer) {
+		return false;
+	}
+
+	void Tile::jumpedFrom(const EntityPtr &, const Place &, Layer) {}
+
+	std::optional<FluidTile> Tile::yieldFluid(const Place &) {
+		return {};
+	}
 
 	void Tile::makeMonsterFactories(const GamePtr &game) {
 		{

@@ -3,6 +3,9 @@
 #include "item/Item.h"
 #include "tileentity/TileEntity.h"
 
+#include <memory>
+#include <vector>
+
 namespace Game3 {
 	class ItemSpawner: public TileEntity {
 		public:
@@ -11,8 +14,8 @@ namespace Game3 {
 			float maximumTime{};
 			std::vector<ItemStackPtr> spawnables;
 
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			void tick(const TickArgs &) override;
 			void render(SpriteRenderer &) override;
 

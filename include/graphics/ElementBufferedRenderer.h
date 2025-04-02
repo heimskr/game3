@@ -22,7 +22,7 @@ namespace Game3 {
 			int backbufferHeight = -1;
 			std::atomic_bool isMissing = false;
 
-			Eigen::Vector2f center{0.f, 0.f};
+			Vector2d center{0, 0};
 			std::shared_ptr<Tileset> tileset;
 
 			ElementBufferedRenderer();
@@ -39,6 +39,7 @@ namespace Game3 {
 			bool onBackbufferResized(int width, int height);
 			void setChunk(TileChunk &, bool can_reupload = true);
 			void setChunkPosition(const ChunkPosition &);
+			ChunkPosition getChunkPosition() const;
 			inline void setRealm(Realm &new_realm) { realm = &new_realm; }
 
 			void snooze();

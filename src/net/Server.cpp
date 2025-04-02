@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
@@ -15,6 +15,7 @@
 #include "realm/Overworld.h"
 #include "realm/ShadowRealm.h"
 #include "recipe/CraftingRecipe.h"
+#include "threading/ThreadContext.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Timer.h"
@@ -37,14 +38,14 @@ namespace Game3 {
 	threadCount(thread_count),
 	sslContext(asio::ssl::context::tls),
 	context(thread_count),
-	acceptor(context, asio::ip::tcp::endpoint(asio::ip::address::from_string(ip), port)),
+	acceptor(context, asio::ip::tcp::endpoint(asio::ip::make_address(ip), port)),
 	workGuard(asio::make_work_guard(context)) {
 		if (thread_count < 1) {
 			throw std::invalid_argument("Cannot instantiate a Server with a thread count of zero");
 		}
 
-		sslContext.use_certificate_chain_file(certificate_path);
-		sslContext.use_private_key_file(key_path, asio::ssl::context::pem);
+		sslContext.use_certificate_chain_file(certificate_path.string());
+		sslContext.use_private_key_file(key_path.string(), asio::ssl::context::pem);
 	}
 
 	Server::~Server() {
@@ -61,7 +62,7 @@ namespace Game3 {
 		INFO(3, "Accepting.");
 		acceptor.async_accept([this](const asio::error_code &errc, asio::ip::tcp::socket socket) {
 			if (errc) {
-				ERROR("Server accept: {}", errc.message());
+				ERR("Server accept: {}", errc.message());
 			} else {
 				std::string ip = socket.remote_endpoint().address().to_string();
 				auto client = std::make_shared<RemoteClient>(shared_from_this(), ip, ++lastID, std::move(socket));
@@ -179,7 +180,7 @@ namespace Game3 {
 		client.send(make<EntityMoneyChangedPacket>(*player));
 		client.send(make<SelfTeleportedPacket>(realm->id, player->getPosition()));
 		client.send(make<TimePacket>(game->time));
-		client.send(make<RecipeListPacket>(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>()));
+		client.send(make<RecipeListPacket>(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>(), game));
 		client.send(make<KnownItemsPacket>(*player));
 		auto lock = game->players.sharedLock();
 		const auto packet = make<EntityPacket>(player);
@@ -230,11 +231,14 @@ namespace Game3 {
 
 		global_server = Server::create("::0", port, "private.crt", "private.key", secret, 2);
 
+#ifndef __MINGW32__
 		if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 			throw std::runtime_error("Couldn't register SIGPIPE handler");
 		}
+#endif
 
 		std::thread stop_thread([] {
+			threadContext.rename("ServerStop");
 			std::unique_lock lock(stopMutex);
 			stopCV.wait(lock, [] { return !running.load(); });
 			global_server->stop();
@@ -292,6 +296,7 @@ namespace Game3 {
 		game->initInteractionSets();
 
 		std::thread tick_thread([&] {
+			threadContext.rename("ServerTick");
 			while (running) {
 				if (!game->tickingPaused)
 					game->tick();
@@ -303,6 +308,7 @@ namespace Game3 {
 		std::chrono::seconds save_period{120};
 
 		std::thread save_thread([&] {
+			threadContext.rename("ServerSave");
 			std::chrono::time_point last_save = std::chrono::system_clock::now();
 
 			while (running) {

@@ -2,7 +2,7 @@
 
 #include "net/Buffer.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include <atomic>
 #include <format>
@@ -30,20 +30,20 @@ namespace Game3 {
 			return *this;
 		}
 
-		Atomic & operator=(const nlohmann::json &json) {
-			std::atomic<T>::operator=(json.get<T>());
+		Atomic & operator=(const boost::json::value &json) {
+			std::atomic<T>::operator=(boost::json::value_to<T>(json));
 			return *this;
 		}
 	};
 
 	template <typename T>
-	void from_json(const nlohmann::json &json, Atomic<T> &atomic) {
-		atomic = json.get<T>();
+	Atomic<T> tag_invoke(boost::json::value_to_tag<Atomic<T>>, const boost::json::value &json) {
+		return {boost::json::value_to<T>(json)};
 	}
 
 	template <typename T>
-	void to_json(nlohmann::json &json, const Atomic<T> &atomic) {
-		json = atomic.load();
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Atomic<T> &atomic) {
+		json = boost::json::value_from(atomic.load());
 	}
 
 	template <typename T>

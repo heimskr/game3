@@ -1,4 +1,5 @@
-#include "Log.h"
+#include "util/Log.h"
+#include "lib/JSON.h"
 #include "util/Crypto.h"
 #include "util/Math.h"
 
@@ -89,13 +90,24 @@ namespace Game3 {
 	}
 
 	void Hasher::checkAlive() const {
-		if (!alive)
+		if (!alive) {
 			throw std::runtime_error("Hasher isn't alive");
+		}
 	}
 
 	Hasher & Hasher::operator+=(std::string_view input) {
 		checkAlive();
 		EVP_DigestUpdate(context, input.data(), input.size());
+		return *this;
+	}
+
+	Hasher & Hasher::operator+=(const boost::json::value &json) {
+		boost::json::serializer serializer;
+		serializer.reset(&json);
+		char buffer[512];
+		while (!serializer.done()) {
+			*this += static_cast<std::string_view>(serializer.read(buffer));
+		}
 		return *this;
 	}
 
@@ -138,9 +150,9 @@ namespace Game3 {
 		ss.imbue(std::locale("C"));
 		std::random_device rng;
 		std::mt19937_64 prng(rng());
-		for (size_t i = 0; i < count; ++i)
+		for (size_t i = 0; i < count; ++i) {
 			ss << std::hex << prng();
-		INFO("Secret: {}", ss.str());
+		}
 		return ss.str();
 	}
 }

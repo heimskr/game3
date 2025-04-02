@@ -5,13 +5,12 @@
 #include "packet/Packet.h"
 #include "threading/Lockable.h"
 
+#include "lib/ASIO.h"
+
 #include <condition_variable>
 #include <cstddef>
 #include <memory>
 #include <string>
-
-#include <asio.hpp>
-#include <asio/ssl.hpp>
 
 namespace Game3 {
 	class Realm;

@@ -1,4 +1,5 @@
 #include "ui/gl/widget/Grid.h"
+#include "ui/gl/UIContext.h"
 
 namespace Game3 {
 	void Grid::render(const RendererContext &renderers, float x, float y, float width, float height) {
@@ -17,6 +18,9 @@ namespace Game3 {
 
 		const float original_x = x;
 
+		const auto row_spacing = rowSpacing * getScale();
+		const auto column_spacing = columnSpacing * getScale();
+
 		for (std::size_t row = 0; row < widgetContainer.rows(); ++row) {
 			x = original_x;
 			float max_height = 0;
@@ -27,11 +31,11 @@ namespace Game3 {
 				if (Widget *widget = widgetContainer[row, column]) {
 					widget->render(renderers, x, y, child_width, child_height);
 				}
-				x += child_width + columnSpacing;
+				x += child_width + column_spacing;
 			}
 
 			if (max_height > 0) {
-				y += max_height + rowSpacing;
+				y += max_height + row_spacing;
 			}
 		}
 	}
@@ -96,26 +100,28 @@ namespace Game3 {
 			column = &outer;
 			row = &inner;
 			sizes = &columnWidths;
-			spacing = columnSpacing;
+			spacing = columnSpacing * getScale();
 		} else {
 			outer_size = widgetContainer.rows();
 			inner_size = widgetContainer.columns();
 			row = &outer;
 			column = &inner;
 			sizes = &rowHeights;
-			spacing = rowSpacing;
+			spacing = rowSpacing * getScale();
 		}
 
-		if (!*sizes)
+		if (!*sizes) {
 			sizes->emplace();
+		}
 
 		(*sizes)->resize(outer_size);
 
 		std::size_t expand_count = 0;
 
 		auto get_size_container = [&] -> float & {
-			if (orientation == Orientation::Horizontal)
+			if (orientation == Orientation::Horizontal) {
 				return sizeContainer[*row, *column].first;
+			}
 			return sizeContainer[*row, *column].second;
 		};
 
@@ -144,8 +150,9 @@ namespace Game3 {
 				accumulated_nonexpanding_natural += max_natural;
 			}
 
-			for (inner = 0; inner < inner_size; ++inner)
+			for (inner = 0; inner < inner_size; ++inner) {
 				get_size_container() = max_natural;
+			}
 
 			accumulated_minimum += max_minimum;
 			accumulated_natural += max_natural;
@@ -156,8 +163,9 @@ namespace Game3 {
 				float &size = (*sizes)->at(outer);
 				if (size == -1) {
 					size = (for_size - accumulated_nonexpanding_natural) / expand_count;
-					for (inner = 0; inner < inner_size; ++inner)
+					for (inner = 0; inner < inner_size; ++inner) {
 						get_size_container() = size;
+					}
 				}
 			}
 		}
@@ -168,8 +176,9 @@ namespace Game3 {
 	}
 
 	void Grid::remove(WidgetPtr child) {
-		if (child->getParent().get() != this)
+		if (child->getParent().get() != this) {
 			return;
+		}
 
 		Widget::remove(child);
 
@@ -201,8 +210,9 @@ namespace Game3 {
 			}
 		}
 
-		if (can_erase_row)
+		if (can_erase_row) {
 			widgetContainer.eraseRow(row_iter - widgetContainer.begin());
+		}
 
 		bool can_erase_column = true;
 		for (auto &row: widgetContainer) {
@@ -212,8 +222,9 @@ namespace Game3 {
 			}
 		}
 
-		if (can_erase_column)
+		if (can_erase_column) {
 			widgetContainer.eraseColumn(column);
+		}
 	}
 
 	void Grid::clearChildren() {
@@ -231,8 +242,9 @@ namespace Game3 {
 	}
 
 	void Grid::detach(std::size_t row, std::size_t column) {
-		if (widgetContainer.rows() <= row || widgetContainer.columns() <= column)
+		if (widgetContainer.rows() <= row || widgetContainer.columns() <= column) {
 			return;
+		}
 
 		Widget *&widget = widgetContainer.at(row, column);
 		if (widget) {
@@ -268,11 +280,13 @@ namespace Game3 {
 	}
 
 	WidgetPtr Grid::operator[](std::size_t row, std::size_t column) const {
-		if (widgetContainer.rows() <= row || widgetContainer.columns() < column)
+		if (widgetContainer.rows() <= row || widgetContainer.columns() < column) {
 			return {};
+		}
 
-		if (Widget *widget = widgetContainer.at(row, column))
+		if (Widget *widget = widgetContainer.at(row, column)) {
 			return widget->shared_from_this();
+		}
 
 		return {};
 	}

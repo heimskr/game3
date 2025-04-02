@@ -22,11 +22,13 @@ namespace Game3 {
 			const InventoryModule::Argument *argument = std::any_cast<InventoryModule::Argument>(&any);
 			if (!argument) {
 				const AgentPtr *agent = std::any_cast<AgentPtr>(&any);
-				if (!agent)
+				if (!agent) {
 					throw std::invalid_argument("Invalid std::any argument given to InventoryModule: " + demangle(any.type().name()));
+				}
 				auto has_inventory = std::dynamic_pointer_cast<HasInventory>(*agent);
-				if (!has_inventory)
+				if (!has_inventory) {
 					throw std::invalid_argument("Agent supplied to InventoryModule isn't castable to HasInventory");
+				}
 				return std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(0));
 			}
 			const auto [agent, index] = *argument;
@@ -34,11 +36,11 @@ namespace Game3 {
 		}
 	}
 
-	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientGame> &, const std::any &argument):
-		InventoryModule(ui, getInventoryArgument(argument)) {}
+	InventoryModule::InventoryModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &argument):
+		InventoryModule(ui, selfScale, getInventoryArgument(argument)) {}
 
-	InventoryModule::InventoryModule(UIContext &ui, const std::shared_ptr<ClientInventory> &inventory):
-		Module(ui, SLOT_SCALE), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
+	InventoryModule::InventoryModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientInventory> &inventory):
+		Module(ui, selfScale), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
 
 	void InventoryModule::init() {
 		assert(inventoryGetter);
@@ -50,7 +52,7 @@ namespace Game3 {
 		const Slot active_slot = inventory->activeSlot;
 		WidgetPtr self = shared_from_this();
 		for (Slot slot = 0; slot < slot_count; ++slot) {
-			auto &slot_widget = slotWidgets.emplace_back(std::make_shared<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, scale, is_player && slot == active_slot));
+			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, inventory, (*inventory)[slot], slot, INNER_SLOT_SIZE, selfScale, is_player && slot == active_slot));
 			slot_widget->insertAtEnd(self);
 		}
 	}
@@ -92,6 +94,8 @@ namespace Game3 {
 
 		previousActive = active_slot;
 
+		const auto scale = getScale();
+
 		const int column_count = getColumnCount(width, slotWidgets.size());
 		const float x_pad = (width - column_count * (OUTER_SLOT_SIZE * scale) + SLOT_PADDING * scale) / 2;
 
@@ -112,9 +116,7 @@ namespace Game3 {
 		}
 	}
 
-	bool InventoryModule::click(int button, int x, int y) {
-		const Modifiers modifiers = ui.window.getModifiers();
-
+	bool InventoryModule::click(int button, int x, int y, Modifiers modifiers) {
 		for (const std::shared_ptr<ItemSlot> &widget: slotWidgets) {
 			if (!widget->contains(x, y)) {
 				continue;
@@ -124,7 +126,7 @@ namespace Game3 {
 				return true;
 			}
 
-			if (widget->click(button, x, y)) {
+			if (widget->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}
@@ -162,9 +164,9 @@ namespace Game3 {
 		}
 
 		if (orientation == Orientation::Horizontal) {
-			minimum = natural = (getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * scale;
+			minimum = natural = (getColumnCount(for_width, slotWidgets.size()) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * getScale();
 		} else {
-			minimum = natural = (updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * scale;
+			minimum = natural = (updiv(slotWidgets.size(), getColumnCount(for_width, slotWidgets.size())) * OUTER_SLOT_SIZE - SLOT_PADDING + topPadding) * getScale();
 		}
 	}
 

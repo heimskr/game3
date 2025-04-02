@@ -23,7 +23,7 @@ namespace Game3 {
 				return Entity::create<Crab>();
 			}
 
-			static std::shared_ptr<Crab> fromJSON(const std::shared_ptr<Game> &game, const nlohmann::json &json) {
+			static std::shared_ptr<Crab> fromJSON(const std::shared_ptr<Game> &game, const boost::json::value &json) {
 				auto out = Entity::create<Crab>();
 				out->absorbJSON(game, json);
 				return out;
@@ -31,8 +31,8 @@ namespace Game3 {
 
 			std::string getName() const override { return "Crab"; }
 
-			bool canAbsorbGenes(const nlohmann::json &) const override;
-			void absorbGenes(const nlohmann::json &) override;
+			bool canAbsorbGenes(const boost::json::value &) const override;
+			void absorbGenes(const boost::json::value &) override;
 			void iterateGenes(const std::function<void(Gene &)> &) override;
 			void iterateGenes(const std::function<void(const Gene &)> &) const override;
 

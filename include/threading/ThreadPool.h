@@ -1,5 +1,7 @@
 #pragma once
 
+#include "threading/MTQueue.h"
+
 #include <atomic>
 #include <cassert>
 #include <condition_variable>
@@ -7,10 +9,6 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-
-#include "Log.h"
-#include "threading/ThreadContext.h"
-#include "threading/MTQueue.h"
 
 namespace Game3 {
 	class ThreadPool {

@@ -8,15 +8,16 @@
 namespace Game3 {
 	class CraftingTab;
 	class InventoryModule;
+	struct CraftingRecipe;
 
 	class RecipeRow: public Box {
 		public:
-			RecipeRow(UIContext &, float scale, CraftingRecipePtr);
+			RecipeRow(UIContext &, float selfScale, std::shared_ptr<CraftingRecipe>);
 
 			void init() final;
 
 		private:
-			CraftingRecipePtr recipe;
+			std::shared_ptr<CraftingRecipe> recipe;
 	};
 
 	class CraftingTab: public Tab {

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Log.h"
+#include "util/Log.h"
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
 #include "threading/HasMutex.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json.hpp>
 
 #include <map>
 #include <memory>
@@ -21,7 +21,7 @@ namespace Game3 {
 	struct NamedRegistryBase;
 	struct UnnamedRegistryBase;
 
-	class Registry: public NamedRegisterable, public HasMutex<>, public std::enable_shared_from_this<Registry> {
+	class Registry: public NamedRegisterable, public HasMutex<Registry>, public std::enable_shared_from_this<Registry> {
 		protected:
 			explicit Registry(Identifier identifier_): NamedRegisterable(std::move(identifier_)) {}
 
@@ -40,8 +40,6 @@ namespace Game3 {
 		protected:
 			size_t nextCounter = 0;
 	};
-
-	void from_json(const nlohmann::json &, Registry &);
 
 	class IdentifierRegistry: public Registry {
 		public:
@@ -168,36 +166,57 @@ namespace Game3 {
 
 			inline std::shared_ptr<T> maybe(const Identifier &id) const {
 				auto iter = items.find(id);
-				if (iter == items.end())
+				if (iter == items.end()) {
 					return {};
+				}
 				return iter->second;
 			}
 
 			inline std::shared_ptr<T> maybe(size_t counter) const {
-				if (counter < byCounter.size())
+				if (counter < byCounter.size()) {
 					return byCounter[counter];
+				}
 				return {};
 			}
 
-			inline std::shared_ptr<T> operator[](size_t counter) const {
+			inline const std::shared_ptr<T> & operator[](size_t counter) const {
 				return at(counter);
 			}
 
-			inline std::shared_ptr<T> at(size_t counter) const {
+			inline const std::shared_ptr<T> & at(size_t counter) const {
 				return byCounter.at(counter);
 			}
 
-			inline std::shared_ptr<T> operator[](const Identifier &id) const {
+			inline const std::shared_ptr<T> & operator[](const Identifier &id) const {
 				return at(id);
 			}
 
-			inline std::shared_ptr<T> at(const Identifier &id) const {
-				try {
-					return items.at(id);
-				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"{}\" in registry {}", id, identifier);
-					return {};
-				}
+			inline const std::shared_ptr<T> & at(const Identifier &id) const {
+				return items.at(id);
+			}
+
+			inline std::shared_ptr<T> & operator[](size_t counter) {
+				return at(counter);
+			}
+
+			inline std::shared_ptr<T> & at(size_t counter) {
+				return byCounter.at(counter);
+			}
+
+			inline std::shared_ptr<T> & operator[](const Identifier &id) {
+				return at(id);
+			}
+
+			inline std::shared_ptr<T> & at(const Identifier &id) {
+				return items.at(id);
+			}
+
+			inline auto find(const Identifier &id) const {
+				return items.find(id);
+			}
+
+			inline auto find(const Identifier &id) {
+				return items.find(id);
 			}
 
 			inline void clear() {
@@ -230,7 +249,7 @@ namespace Game3 {
 	struct UnnamedRegistryBase: Registry {
 		using Registry::Registry;
 
-		virtual void add(const std::shared_ptr<Game> &, const nlohmann::json &) = 0;
+		virtual void add(const std::shared_ptr<Game> &, const boost::json::value &) = 0;
 	};
 
 	template <typename T, template <typename...> typename Set = std::unordered_set>
@@ -278,7 +297,7 @@ namespace Game3 {
 				return false;
 			}
 
-			void add(const std::shared_ptr<Game> &, const nlohmann::json &) override {
+			void add(const std::shared_ptr<Game> &, const boost::json::value &) override {
 				throw std::runtime_error("Adding from JSON unimplemented");
 			}
 
@@ -332,8 +351,8 @@ namespace Game3 {
 		public:
 			using UnnamedRegistry<T, Set>::UnnamedRegistry;
 
-			void add(const std::shared_ptr<Game> &game, const nlohmann::json &json) override {
-				UnnamedRegistry<T, Set>::add(T::fromJSON(game, json));
+			void add(const std::shared_ptr<Game> &game, const boost::json::value &json) override {
+				UnnamedRegistry<T, Set>::add(boost::json::value_to<T>(json, game));
 			}
 	};
 
@@ -390,7 +409,7 @@ namespace Game3 {
 				try {
 					return items.at(number);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"{}\" in registry {}", number, identifier);
+					ERR("Couldn't find \"{}\" in registry {}", number, identifier);
 					return {};
 				}
 			}
@@ -464,7 +483,7 @@ namespace Game3 {
 				try {
 					return items.at(name);
 				} catch (const std::out_of_range &) {
-					ERROR("Couldn't find \"{}\" in registry {}", name, identifier);
+					ERR("Couldn't find \"{}\" in registry {}", name, identifier);
 					return {};
 				}
 			}
@@ -483,8 +502,8 @@ namespace Game3 {
 		public:
 			using StringRegistry<T>::StringRegistry;
 
-			void add(const std::shared_ptr<Game> &game, const std::string &name, const nlohmann::json &json) {
-				StringRegistry<T>::add(name, T::fromJSON(game, json));
+			void add(const std::shared_ptr<Game> &game, const std::string &name, const boost::json::value &json) {
+				StringRegistry<T>::add(name, boost::json::value_to<T>(json, game));
 			}
 	};
 }

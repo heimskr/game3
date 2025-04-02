@@ -216,14 +216,16 @@ namespace Game3 {
 		return std::nullopt;
 	}
 
-	void Tileset::getMeta(nlohmann::json &json) const {
-		json["hash"] = hexString(hash, false);
-		json["names"] = names;
-		json["categories"] = categories;
+	void Tileset::getMeta(boost::json::value &json) const {
+		auto &object = json.emplace_object();
+		object["hash"] = hexString(hash, false);
+		object["names"] = boost::json::value_from(names);
+		object["categories"] = boost::json::value_from(categories);
 		std::unordered_map<Identifier, Identifier> autotiles;
-		for (const auto &[id, autotile]: autotileSetMap)
+		for (const auto &[id, autotile]: autotileSetMap) {
 			autotiles[id] = autotile->identifier;
-		json["autotiles"] = std::move(autotiles);
+		}
+		object["autotiles"] = boost::json::value_from(autotiles);
 	}
 
 

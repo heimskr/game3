@@ -7,11 +7,11 @@ namespace Game3 {
 		"base:texture/hellhound",
 	};
 
-	bool Dog::canAbsorbGenes(const nlohmann::json &genes) const {
+	bool Dog::canAbsorbGenes(const boost::json::value &genes) const {
 		return checkGenes(genes, {"species", "breed"});
 	}
 
-	void Dog::absorbGenes(const nlohmann::json &genes) {
+	void Dog::absorbGenes(const boost::json::value &genes) {
 		absorbGene(breed, genes, "breed");
 		texture = nullptr;
 	}

@@ -4,6 +4,7 @@
 #include "types/Position.h"
 #include "realm/Realm.h"
 #include "util/Cast.h"
+#include "util/JSON.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -91,17 +92,19 @@ namespace Game3 {
 				anchor.column = parseNumber<Index>(position_string.substr(comma + 1));
 			}
 
-			tileEntityJSON.emplace(anchor, nlohmann::json::parse(line.substr(equals + 1)));
+			tileEntityJSON.emplace(anchor, boost::json::parse(line.substr(equals + 1)));
 		}
 	}
 
-	void Paster::patch(const nlohmann::json &patch) {
+	void Paster::patch(const boost::json::value &patch) {
+		const auto *array = patch.if_array();
+		if (!array) {
+			return;
+		}
+
 		for (auto &[position, json]: tileEntityJSON) {
-			try {
-				json.patch_inplace(patch);
-			} catch (const nlohmann::json::exception &) {
-				// Ignore unsuccessful patches.
-			}
+			// Ignore unsuccessful patches.
+			patchJSON(json, *array);
 		}
 	}
 

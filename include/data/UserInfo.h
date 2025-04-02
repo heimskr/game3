@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "types/Types.h"
 
@@ -16,6 +16,6 @@ namespace Game3 {
 			username(username_), displayName(display_name) {}
 	};
 
-	void to_json(nlohmann::json &, const UserInfo &);
-	void from_json(const nlohmann::json &, UserInfo &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const UserInfo &);
+	void from_json(const boost::json::value &, UserInfo &);
 }

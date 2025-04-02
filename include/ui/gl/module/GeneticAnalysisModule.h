@@ -15,7 +15,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "module/genetic_analysis"}; }
 
 			using Module::Module;
-			GeneticAnalysisModule(UIContext &, const ClientGamePtr &, const std::any &);
+			GeneticAnalysisModule(UIContext &, float selfScale, const ClientGamePtr &, const std::any &);
 
 			Identifier getID() const final { return ID(); }
 			void init() final;

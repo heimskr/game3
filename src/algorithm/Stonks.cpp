@@ -12,7 +12,7 @@ namespace Game3 {
 	}
 
 	bool isSellable(const ItemStackPtr &stack) {
-		return stack->data.empty();
+		return stack->data.is_null();
 	}
 
 	double buyPriceToSellPrice(double buy_price, double greed) {

@@ -20,8 +20,9 @@ namespace {
 	bool isStopChar(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
 
-		if (unicharacter > std::numeric_limits<char>::max())
+		if (unicharacter > std::numeric_limits<char>::max()) {
 			return false;
+		}
 
 		static const std::string_view stops = "_.,/-=+ \t\n";
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
@@ -30,8 +31,9 @@ namespace {
 	bool isWhitespace(Game3::UString::iterator cursor) {
 		const gunichar unicharacter = *--cursor;
 
-		if (unicharacter > std::numeric_limits<char>::max())
+		if (unicharacter > std::numeric_limits<char>::max()) {
 			return false;
+		}
 
 		static const std::string_view stops = " \t\n";
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
@@ -39,9 +41,9 @@ namespace {
 }
 
 namespace Game3 {
-	TextInput::TextInput(UIContext &ui, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
-		Widget(ui, scale),
-		HasFixedSize(-1, scale * TEXT_INPUT_HEIGHT_FACTOR),
+	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
+		Widget(ui, selfScale),
+		HasFixedSize(-1, selfScale * TEXT_INPUT_HEIGHT_FACTOR),
 		thickness(thickness),
 		borderColor(border_color),
 		interiorColor(interior_color),
@@ -49,14 +51,14 @@ namespace Game3 {
 		cursorColor(cursor_color),
 		focusedCursorColor(cursorColor.darken(3)) {}
 
-	TextInput::TextInput(UIContext &ui, float scale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
-		TextInput(ui, scale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
+		TextInput(ui, selfScale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
 
-	TextInput::TextInput(UIContext &ui, float scale, float thickness):
-		TextInput(ui, scale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
+	TextInput::TextInput(UIContext &ui, float selfScale, float thickness):
+		TextInput(ui, selfScale, DEFAULT_BORDER_COLOR, DEFAULT_TEXTINPUT_INTERIOR_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_CURSOR_COLOR, thickness) {}
 
-	TextInput::TextInput(UIContext &ui, float scale):
-		TextInput(ui, scale, DEFAULT_THICKNESS) {}
+	TextInput::TextInput(UIContext &ui, float selfScale):
+		TextInput(ui, selfScale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		if (width < -1 || height < -1) {
@@ -67,7 +69,7 @@ namespace Game3 {
 		const float original_height = height;
 
 		if (0 < fixedHeight) {
-			height = fixedHeight;
+			height = fixedHeight * ui.scale;
 		}
 
 		adjustCoordinate(Orientation::Horizontal, x, width, width);
@@ -86,12 +88,12 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		const float start = thickness * scale;
+		const float start = thickness * getScale();
 		// TODO: check for negative sizes
-		const Rectangle interior(x + start, y + start, width - 2 * start, height - 2 * start);
+		auto interior = Rectangle(x + start, y + start, width - 2 * start, height - 2 * start);
 
-		rectangler(borderColor, x, y, width, height * 0.6);
-		rectangler(borderColor.darken(), x, y + height * 0.6, width, height * 0.4);
+		rectangler(borderColor, Rectangle(x, y, width, height * 0.6));
+		rectangler(borderColor.darken(), Rectangle(x, y + height * 0.6, width, height * 0.4));
 		rectangler(interiorColor, interior);
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
@@ -99,8 +101,8 @@ namespace Game3 {
 		rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
 
 		texter(text, TextRenderOptions{
-			.x = start - xOffset * scale,
-			.y = scale * 2,
+			.x = start - xOffset * getScale(),
+			.y = getScale() * 2,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,
@@ -110,9 +112,10 @@ namespace Game3 {
 		});
 	}
 
-	bool TextInput::click(int button, int x, int y) {
-		if (Widget::click(button, x, y))
+	bool TextInput::click(int button, int x, int y, Modifiers modifiers) {
+		if (Widget::click(button, x, y, modifiers)) {
 			return true;
+		}
 
 		if (button == LEFT_BUTTON) {
 			ui.focusWidget(shared_from_this());
@@ -211,18 +214,18 @@ namespace Game3 {
 	}
 
 	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
-		const float border = 2 * thickness * scale;
+		const float border = 2 * thickness * selfScale;
 
 		if (orientation == Orientation::Horizontal) {
 			if (0 < fixedWidth) {
-				minimum = natural = fixedWidth;
+				minimum = natural = fixedWidth * ui.scale;
 			} else {
 				minimum = border;
 				natural = std::min(for_width, border + renderers.text.textWidth(text, getTextScale()));
 			}
 		} else {
 			if (0 < fixedHeight) {
-				minimum = natural = fixedHeight;
+				minimum = natural = fixedHeight * ui.scale;
 			} else {
 				minimum = border;
 				natural = std::min(for_height, border + renderers.text.textHeight(text, getTextScale(), for_width - border));
@@ -269,8 +272,9 @@ namespace Game3 {
 		if (suggestions) {
 			std::string_view raw = text.raw();
 			for (const UString &suggestion: *suggestions) {
-				if (suggestion.length() > text.length() && suggestion.raw().starts_with(raw))
+				if (suggestion.length() > text.length() && suggestion.raw().starts_with(raw)) {
 					relevant.push_back(suggestion);
+				}
 			}
 		}
 
@@ -311,8 +315,9 @@ namespace Game3 {
 	}
 
 	void TextInput::eraseWord() {
-		if (cursor == 0)
+		if (cursor == 0) {
 			return;
+		}
 
 		// TODO: instead of erasing multiple times, search the string for how much to erase and erase it all in one go.
 
@@ -402,11 +407,11 @@ namespace Game3 {
 	}
 
 	float TextInput::getTextScale() const {
-		return scale / 16;
+		return getScale() / 16;
 	}
 
 	float TextInput::getXPadding() const {
-		return thickness * scale;
+		return thickness * getScale();
 	}
 
 	float TextInput::getBoundary() const {
@@ -414,7 +419,7 @@ namespace Game3 {
 	}
 
 	float TextInput::getCursorPosition() const {
-		return getXPadding() - xOffset * scale + cursorXOffset * getTextScale();
+		return getXPadding() - xOffset * getScale() + cursorXOffset * getTextScale();
 	}
 
 	void TextInput::adjustCursorOffset(float offset) {
@@ -437,9 +442,9 @@ namespace Game3 {
 		const float boundary = getBoundary();
 
 		if (visual > boundary) {
-			xOffset += (visual - boundary + getXPadding() * 2) / scale;
+			xOffset += (visual - boundary + getXPadding() * 2) / selfScale;
 		} else if (visual < getXPadding()) {
-			xOffset -= (getXPadding() - visual) / scale;
+			xOffset -= (getXPadding() - visual) / selfScale;
 		}
 
 		cursorFixQueued = false;
@@ -466,12 +471,12 @@ namespace Game3 {
 		if (relevant.empty())
 			return;
 
-		auto dropdown = std::make_shared<AutocompleteDropdown>(ui, scale);
+		auto dropdown = std::make_shared<AutocompleteDropdown>(ui, selfScale);
 		dropdown->init();
 		dropdown->setParent(std::dynamic_pointer_cast<Autocompleter>(shared_from_this()));
 		dropdown->setOrigin({lastRectangle.x, lastRectangle.y + lastRectangle.height});
 		dropdown->setSuggestions(std::move(relevant));
-		dropdown->setFixedSize(lastRectangle.width, scale * 50);
+		dropdown->setFixedSize(lastRectangle.width, selfScale * 50);
 		// dropdown->queueConstrainSize();
 		ui.setAutocompleteDropdown(std::move(dropdown));
 	}

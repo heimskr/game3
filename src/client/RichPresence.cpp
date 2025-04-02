@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "client/RichPresence.h"
 
 namespace Game3 {
@@ -18,7 +18,7 @@ namespace Game3 {
 			*result_out = result;
 
 		if (result != discord::Result::Ok) {
-			ERROR("Couldn't initialize Discord: {}", int(result));
+			ERR("Couldn't initialize Discord: {}", int(result));
 			return false;
 		}
 
@@ -32,9 +32,9 @@ namespace Game3 {
 		return [callback = std::move(callback)](discord::Result result) {
 			if (result != discord::Result::Ok) {
 				if (result == discord::Result::TransactionAborted)
-					ERROR(3, "Couldn't set activity: transaction aborted");
+					ERR(3, "Couldn't set activity: transaction aborted");
 				else
-					ERROR("Couldn't set activity: {}", int(result));
+					ERR("Couldn't set activity: {}", int(result));
 			}
 			if (callback)
 				callback(result);

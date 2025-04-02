@@ -3,14 +3,14 @@
 #include <string>
 
 #include "data/Range.h"
-#include "data/Version.h"
+#include "data/SemanticVersion.h"
 
 namespace Game3 {
 	class Datapack;
 
 	struct Dependency {
 		std::string id;
-		Range<Version> range;
+		Range<SemanticVersion> range;
 
 		bool validate(const Datapack &) const;
 	};

@@ -73,14 +73,14 @@ namespace Game3 {
 		return '(' + std::to_string(x) + ", " + std::to_string(y) + ')';
 	}
 
-	void from_json(const nlohmann::json &json, ChunkPosition &position) {
-		position.x = json.at(0);
-		position.y = json.at(1);
+	ChunkPosition tag_invoke(boost::json::value_to_tag<ChunkPosition>, const boost::json::value &json) {
+		return {boost::json::value_to<ChunkPosition::IntType>(json.at(0)), boost::json::value_to<ChunkPosition::IntType>(json.at(1))};
 	}
 
-	void to_json(nlohmann::json &json, const ChunkPosition &position) {
-		json.push_back(position.x);
-		json.push_back(position.y);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ChunkPosition &position) {
+		auto &array = json.emplace_array();
+		array.push_back(position.x);
+		array.push_back(position.y);
 	}
 
 	ChunkRange::ChunkRange(ChunkPosition top_left, ChunkPosition bottom_right):
@@ -94,13 +94,13 @@ namespace Game3 {
 		return '[' + std::string(topLeft) + ", " + std::string(bottomRight) + ']';
 	}
 
-	void from_json(const nlohmann::json &json, ChunkRange &range) {
-		range.topLeft = json.at(0);
-		range.bottomRight = json.at(1);
+	ChunkRange tag_invoke(boost::json::value_to_tag<ChunkRange>, const boost::json::value &json) {
+		return {boost::json::value_to<ChunkPosition>(json.at(0)), boost::json::value_to<ChunkPosition>(json.at(1))};
 	}
 
-	void to_json(nlohmann::json &json, const ChunkRange &range) {
-		json.push_back(range.topLeft);
-		json.push_back(range.bottomRight);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ChunkRange &range) {
+		auto &array = json.emplace_array();
+		array.emplace_back(boost::json::value_from(range.topLeft));
+		array.emplace_back(boost::json::value_from(range.bottomRight));
 	}
 }

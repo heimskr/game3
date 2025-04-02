@@ -21,14 +21,17 @@ namespace {
 		"resources/gui/gui_topleft.png", "resources/gui/gui_top.png", "resources/gui/gui_topright.png", "resources/gui/gui_right.png",
 		"resources/gui/gui_bottomright_empty.png", "resources/gui/gui_bottom_empty.png", "resources/gui/gui_bottomleft_empty.png", "resources/gui/gui_left.png",
 	};
+
+	constexpr double X_FRACTION = 0.2;
+	constexpr double Y_FRACTION = 0.2;
 }
 
 namespace Game3 {
-	OmniDialog::OmniDialog(UIContext &ui, float scale):
-		Dialog(ui) {
-			inventoryTab = std::make_shared<InventoryTab>(ui, scale);
-			craftingTab = std::make_shared<CraftingTab>(ui, scale);
-			settingsTab = std::make_shared<SettingsTab>(ui, scale);
+	OmniDialog::OmniDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {
+			inventoryTab = std::make_shared<InventoryTab>(ui, selfScale);
+			craftingTab = std::make_shared<CraftingTab>(ui, selfScale);
+			settingsTab = std::make_shared<SettingsTab>(ui, selfScale);
 			tabs = {inventoryTab, craftingTab, settingsTab};
 			activeTab = inventoryTab;
 			tabRectangles.resize(tabs.size());
@@ -46,6 +49,8 @@ namespace Game3 {
 		Rectangle rectangle = getPosition();
 		const Rectangle original_rectangle = rectangle;
 		RectangleRenderer &rectangler = renderers.rectangle;
+
+		const float scale = getScale();
 
 		{
 			auto saver = stack.pushRelative(rectangle, renderers);
@@ -73,10 +78,12 @@ namespace Game3 {
 		auto saver = renderers.getSaver();
 
 		for (int i = 0; const std::shared_ptr<Tab> &tab: tabs) {
-			const int x_offset = (TOP_OFFSET + UNSCALED / 4) * i + 40;
-			const int y_offset = tab == activeTab? 2 * scale : 0;
+			constexpr int STRIDE = 22;
+			constexpr int WIDTH = 20;
+			const int x_offset = STRIDE * i * scale + 5 * scale;
+			const int y_offset = (tab == activeTab? 2 * scale : 0) - 16 * scale;
 
-			Rectangle tab_rectangle = original_rectangle + Rectangle(x_offset, UNSCALED * 5 / 4 - TOP_OFFSET + y_offset, TOP_OFFSET, TOP_OFFSET);
+			Rectangle tab_rectangle = original_rectangle + Rectangle(x_offset, y_offset, WIDTH * scale, WIDTH * scale);
 
 			{
 				auto saver = stack.pushRelative(tab_rectangle, renderers);
@@ -86,25 +93,30 @@ namespace Game3 {
 
 			if (tab == activeTab) {
 				auto saver = stack.pushRelative(original_rectangle, renderers);
-				rectangler.drawOnScreen(DEFAULT_BACKGROUND_COLOR, x_offset + UNSCALED, 0, TOP_OFFSET - UNSCALED * 2, 6 * scale);
 
-				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_left.png", true), RenderOptions{
+				TexturePtr merge_left = cacheTexture("resources/gui/gui_merge_left.png", true);
+				const auto merge_width = merge_left->width * scale / 8;
+				const auto inner_width = WIDTH * scale - merge_width * 2 - scale / UNSCALE; // hmm
+
+				rectangler.drawOnScreen(DEFAULT_BACKGROUND_COLOR, x_offset + scale / UNSCALE + merge_width, 0, inner_width, 6 * scale);
+
+				renderers.singleSprite.drawOnScreen(merge_left, RenderOptions{
 					.x = double(x_offset + scale / UNSCALE),
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,
-					.scaleX = 1,
-					.scaleY = 1,
+					.scaleX = scale / 8,
+					.scaleY = scale / 8,
 					.invertY = false,
 				});
 
 				renderers.singleSprite.drawOnScreen(cacheTexture("resources/gui/gui_merge_right.png", true), RenderOptions{
-					.x = double(x_offset - UNSCALED + TOP_OFFSET),
+					.x = double(x_offset + inner_width + merge_width),
 					.y = 0,
 					.sizeX = -1,
 					.sizeY = -1,
-					.scaleX = 1,
-					.scaleY = 1,
+					.scaleX = scale / 8,
+					.scaleY = scale / 8,
 					.invertY = false,
 				});
 			}
@@ -132,33 +144,37 @@ namespace Game3 {
 		activeTab->onBlur();
 	}
 
-	bool OmniDialog::click(int button, int x, int y) {
+	bool OmniDialog::click(int button, int x, int y, Modifiers modifiers) {
 		if (!getPosition().contains(x, y)) {
 			return false;
 		}
 
-		if (activeTab && activeTab->click(button, x, y)) {
+		if (activeTab && activeTab->click(button, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::click(button, x, y);
+		return Dialog::click(button, x, y, modifiers);
 	}
 
-	bool OmniDialog::mouseDown(int button, int x, int y) {
+	bool OmniDialog::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		mouseDownPosition.emplace(x, y);
 
-		if (!getPosition().contains(x, y)) {
-			return false;
+		if (getPosition().contains(x, y)) {
+			if (activeTab && activeTab->mouseDown(button, x, y, modifiers)) {
+				return true;
+			}
 		}
 
-		if (activeTab && activeTab->mouseDown(button, x, y)) {
-			return true;
+		for (size_t i = 0; i < tabRectangles.size(); ++i) {
+			if (tabRectangles[i].contains(x, y)) {
+				return true;
+			}
 		}
 
-		return Dialog::mouseDown(button, x, y);
+		return getPosition().contains(x, y) && Dialog::mouseDown(button, x, y, modifiers);
 	}
 
-	bool OmniDialog::mouseUp(int button, int x, int y) {
+	bool OmniDialog::mouseUp(int button, int x, int y, Modifiers modifiers) {
 		if (mouseDownPosition) {
 			const auto [mouse_down_x, mouse_down_y] = *mouseDownPosition;
 			mouseDownPosition.reset();
@@ -180,11 +196,11 @@ namespace Game3 {
 			return false;
 		}
 
-		if (activeTab && activeTab->mouseUp(button, x, y)) {
+		if (activeTab && activeTab->mouseUp(button, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::mouseUp(button, x, y);
+		return Dialog::mouseUp(button, x, y, modifiers);
 	}
 
 	bool OmniDialog::dragStart(int x, int y) {
@@ -223,16 +239,16 @@ namespace Game3 {
 		return Dialog::dragEnd(x, y);
 	}
 
-	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y) {
+	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (!getPosition().contains(x, y)) {
 			return false;
 		}
 
-		if (activeTab && activeTab->scroll(x_delta, y_delta, x, y)) {
+		if (activeTab && activeTab->scroll(x_delta, y_delta, x, y, modifiers)) {
 			return true;
 		}
 
-		return Dialog::scroll(x_delta, y_delta, x, y);
+		return Dialog::scroll(x_delta, y_delta, x, y, modifiers);
 	}
 
 	bool OmniDialog::hidesHotbar() const {

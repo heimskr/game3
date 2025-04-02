@@ -1,12 +1,14 @@
 #include "config.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "Options.h"
 #include "client/RichPresence.h"
 #include "client/ServerWrapper.h"
 #include "game/ClientGame.h"
 #include "graphics/Texture.h"
+#include "lib/JSON.h"
 #include "net/Server.h"
 #include "scripting/ScriptEngine.h"
+#include "threading/ThreadContext.h"
 #include "tools/Flasker.h"
 #include "tools/ItemStitcher.h"
 #include "tools/Mazer.h"
@@ -16,7 +18,9 @@
 #include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"
+#include "util/Demangle.h"
 #include "util/FS.h"
+#include "util/Log.h"
 #include "util/Shell.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -25,9 +29,15 @@
 #include "jc_voronoi.h"
 
 #include <GLFW/glfw3.h>
+#ifdef __MING32__
+#include <GL/glut.h>
+// #define CATCH_MAIN
+#endif
 
 #include <cstdlib>
 #include <ctime>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <vector>
@@ -47,6 +57,11 @@ namespace Game3 {
 
 int main(int argc, char **argv) {
 	using namespace Game3;
+
+#ifdef CATCH_MAIN
+	try {
+#endif
+	threadContext.rename("Main");
 
 #ifdef GAME3_ENABLE_SCRIPTING
 	ScriptEngine::init(argv[0]);
@@ -217,10 +232,12 @@ int main(int argc, char **argv) {
 			return 0;
 		}
 
+#ifdef ENABLE_ZIP8
 		if (arg1 == "--zip8-test") {
 			zip8Test();
 			return 0;
 		}
+#endif
 
 		if (arg1 == "--buffer-test-2") {
 			testBuffer2();
@@ -251,15 +268,61 @@ int main(int argc, char **argv) {
 			std::cout << generateFlask(dataRoot / "resources" / "flaskbase.png", dataRoot / "resources" / "flaskmask.png", argv[2], argv[3], argv[4]);
 			return 0;
 		}
+
+		if (arg1 == "--add-item" || arg1 == "--add-tile" || arg1 == "--add-sound") {
+			if (argc != 5) {
+				std::println("Usage: {} {} <identifier> <credit> <image path>", argv[0], arg1);
+				return 1;
+			}
+
+			std::string id = argv[2];
+			std::string_view credit = argv[3];
+			std::filesystem::path file_path = argv[4];
+
+			if (id.empty()) {
+				ERR("ID is empty.");
+				return 1;
+			}
+
+			std::string type(arg1.substr(6));
+
+			std::filesystem::path dir_path = std::format("resources/{}/{}", type == "tile"? "tileset" : (type + 's'), id);
+
+			if (std::filesystem::exists(dir_path)) {
+				ERR("{} already exists.", dir_path.string().c_str());
+				return 2;
+			}
+
+			std::filesystem::create_directory(dir_path);
+
+			boost::json::object object;
+			if (!credit.empty()) {
+				object["credit"] = credit;
+			}
+			object[type == "tile"? "tilename" : "id"] = "base:" + type + "/" + id;
+			std::ofstream json(dir_path / (type +".json"));
+			serializeJSON(object, json);
+
+			std::filesystem::copy_file(file_path, dir_path / (type == "sound"? "sound.opus" : (type + ".png")));
+			SUCCESS("Stored file {} in {} with ID base:{}/{}.", file_path.string().c_str(), dir_path.string().c_str(), type, id);
+			if (type == "item") {
+				INFO("Items.cpp: add(std::make_shared<Item>(\"base:item/{}\", \"{}{}\", 999, 64)); // TODO: cost", id, char(std::toupper(id[0])), id.substr(1));
+			}
+			return 0;
+		}
 	}
 
 	richPresence.init();
 	richPresence.initActivity();
 
+	const std::filesystem::path old_path = std::filesystem::current_path();
+
 	if (!glfwInit()) {
-		ERROR("Can't initialize GLFW");
+		ERR("Can't initialize GLFW");
 		return 1;
 	}
+
+	std::filesystem::current_path(old_path);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -271,7 +334,7 @@ int main(int argc, char **argv) {
 	if (!glfw_window) {
 		const char *message = "???";
 		int code = glfwGetError(&message);
-		ERROR("Can't create GLFW window: {} ({})", message, code);
+		ERR("Can't create GLFW window: {} ({})", message, code);
 		glfwTerminate();
 		return 2;
 	}
@@ -279,6 +342,13 @@ int main(int argc, char **argv) {
 	glfwMaximizeWindow(glfw_window);
 	glfwMakeContextCurrent(glfw_window);
 	glfwSwapInterval(1);
+
+#ifdef __MINGW32__
+	if (GLenum err = glewInit(); GLEW_OK != err) {
+		ERR("GLEW failed: {}", reinterpret_cast<const char *>(glewGetErrorString(err)));
+		return 1;
+	}
+#endif
 
 	auto window = std::make_shared<Window>(*glfw_window);
 
@@ -296,17 +366,17 @@ int main(int argc, char **argv) {
 		"resources/tileset/lava/tile.png",
 	};
 
-	TexturePtr stone = cacheTexture(choose(paths, std::random_device{}));
+	TexturePtr background = cacheTexture(choose(paths, std::random_device{}));
 
 	while (!glfwWindowShouldClose(glfw_window)) {
 		GL::clear(0, 0, 0);
 		if (!window->game) {
 			constexpr float strength = 0.3;
-			window->singleSpriteRenderer.drawOnScreen(stone, RenderOptions{
+			window->singleSpriteRenderer.drawOnScreen(background, RenderOptions{
 				.sizeX = static_cast<double>(window->getWidth()),
 				.sizeY = static_cast<double>(window->getHeight()),
-				.scaleX = 2 * UI_SCALE,
-				.scaleY = 2 * UI_SCALE,
+				.scaleX = 2 * window->uiContext.scale,
+				.scaleY = 2 * window->uiContext.scale,
 				.color{strength, strength, strength, 1},
 				.invertY = false,
 				.wrapMode = GL_REPEAT,
@@ -339,5 +409,16 @@ int main(int argc, char **argv) {
 
 	Timer::summary();
 	richPresence.reset();
+#ifdef CATCH_MAIN
+	} catch (const std::exception &err) {
+		ERR("UNCAUGHT EXCEPTION ({}): {}", DEMANGLE(err), err.what());
+		static_cast<std::ofstream &>(Logger::fileStream() << std::endl).close();
+		throw;
+	} catch (...) {
+		ERR("UNCAUGHT EXCEPTION (unknown type)");
+		static_cast<std::ofstream &>(Logger::fileStream() << std::endl).close();
+		throw;
+	}
+#endif
 	return 0;
 }

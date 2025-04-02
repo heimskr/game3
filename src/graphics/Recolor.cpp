@@ -121,6 +121,7 @@ namespace Game3 {
 
 		shader.set("model", model);
 		shader.set("spriteColor", options.color);
+		shader.set("spriteComposite", options.composite);
 		const double multiplier_x = 2. / texture->width;
 		const double multiplier_y = 2. / texture->height;
 		shader.set("texturePosition", options.offsetX * multiplier_x, options.offsetY * multiplier_y, size_x / texture->width, size_y / texture->width);
@@ -131,7 +132,10 @@ namespace Game3 {
 		shader.set("mask", 1);
 
 		texture->bind(0);
-		mask->bind(1);
+
+		if (mask) {
+			mask->bind(1);
+		}
 
 		glEnable(GL_BLEND); CHECKGL
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); CHECKGL

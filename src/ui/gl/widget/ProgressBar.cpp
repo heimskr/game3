@@ -30,7 +30,7 @@ namespace Game3 {
 		ProgressBar(ui, scale, DEFAULT_BAR_INTERIOR_COLOR, progress) {}
 
 	void ProgressBar::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		fixSizes(width, height);
+		fixSizes(width, height, ui.scale);
 		Widget::render(renderers, x, y, width, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
@@ -60,6 +60,8 @@ namespace Game3 {
 				shown_progress = lerp(oldProgress, progress, lerp_progress);
 			}
 		}
+
+		const auto scale = getScale();
 
 		const float bar_width = shown_progress * (width - 2 * scale);
 		const float top_height = .6f * (height - 2 * scale);
@@ -95,9 +97,9 @@ namespace Game3 {
 
 	void ProgressBar::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
-			minimum = natural = 0 < fixedWidth? fixedWidth : (horizontalExpand? for_width : getDefaultWidth());
+			minimum = natural = 0 < fixedWidth? fixedWidth * getScale() : (horizontalExpand? for_width : getDefaultWidth() * ui.scale);
 		} else {
-			minimum = natural = 0 < fixedHeight? fixedHeight : (verticalExpand? for_height : getDefaultHeight());
+			minimum = natural = 0 < fixedHeight? fixedHeight * getScale() : (verticalExpand? for_height : getDefaultHeight() * ui.scale);
 		}
 	}
 
@@ -111,10 +113,10 @@ namespace Game3 {
 	}
 
 	float ProgressBar::getDefaultWidth() const {
-		return 30 * scale;
+		return 30 * selfScale;
 	}
 
 	float ProgressBar::getDefaultHeight() const {
-		return 10 * scale;
+		return 10 * selfScale;
 	}
 }

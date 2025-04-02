@@ -24,15 +24,15 @@ namespace Game3 {
 		return content_height + 12 * scale;
 	}
 
-	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, int width, int height):
-		Dialog(ui),
+	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, float selfScale, int width, int height):
+		Dialog(ui, selfScale),
 		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height) {}
 
 	void BaseDraggableDialog::render(const RendererContext &renderers) {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		constexpr auto scale = UI_SCALE;
+		const auto scale = getScale();
 
 		titleRectangle = position + Rectangle(scale, scale, position.width - 9 * scale, 7 * scale);
 		bodyRectangle = position + Rectangle(scale, 9 * scale, position.width - 2 * scale, position.height - 10 * scale);
@@ -52,7 +52,7 @@ namespace Game3 {
 		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 
 		auto saver = ui.scissorStack.pushRelative(titleRectangle, renderers);
-		const auto text_scale = static_cast<double>(getTitleScale());
+		const auto text_scale = static_cast<double>(getTitleScale()) * ui.scale;
 
 		texter.drawOnScreen(getTitle(), TextRenderOptions{
 			.x = static_cast<double>(titleRectangle.width) / 2.0,
@@ -72,13 +72,15 @@ namespace Game3 {
 	}
 
 	Rectangle BaseDraggableDialog::getInnerRectangle() const {
+		const auto scale = getScale();
 		return getPosition() + Rectangle(2 * scale, 10 * scale, position.width - 4 * scale, position.height - 12 * scale);
 	}
 
 	void BaseDraggableDialog::init() {
-		closeButton = std::make_shared<Icon>(ui, UI_SCALE);
+		Dialog::init();
+		closeButton = std::make_shared<Icon>(ui, selfScale);
 		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
-		closeButton->setFixedSize(3.5 * UI_SCALE);
+		closeButton->setFixedSize(3.5 * selfScale);
 		closeButton->init();
 		closeButton->setOnClick([this](Widget &, int button, int, int) {
 			if (button != LEFT_BUTTON)
@@ -90,12 +92,12 @@ namespace Game3 {
 		});
 	}
 
-	bool BaseDraggableDialog::click(int button, int x, int y) {
+	bool BaseDraggableDialog::click(int button, int x, int y, Modifiers modifiers) {
 		if (closeButton->contains(x, y)) {
-			return closeButton->click(button, x, y);
+			return closeButton->click(button, x, y, modifiers);
 		}
 
-		return Dialog::click(button, x, y);
+		return Dialog::click(button, x, y, modifiers);
 	}
 
 	bool BaseDraggableDialog::dragStart(int x, int y) {
@@ -132,8 +134,13 @@ namespace Game3 {
 		return false;
 	}
 
+	void BaseDraggableDialog::recenter() {
+		const auto [width, height] = position.size();
+		position = {(ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height};
+	}
+
 	float DraggableDialog::getTitleScale() const {
-		return UI_SCALE / 16;
+		return selfScale / 16;
 	}
 
 	const UString & DraggableDialog::getTitle() const {

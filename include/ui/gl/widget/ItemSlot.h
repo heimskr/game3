@@ -15,15 +15,15 @@ namespace Game3 {
 		public:
 			sigc::signal<void(ItemSlot &self, const WidgetPtr &dragged)> onDrop;
 
-			ItemSlot(UIContext &, std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float scale, bool active = false);
-			ItemSlot(UIContext &, Slot, float size, float scale, bool active = false);
+			ItemSlot(UIContext &, std::shared_ptr<Inventory>, std::shared_ptr<ItemStack>, Slot, float size, float selfScale, bool active = false);
+			ItemSlot(UIContext &, Slot, float size, float selfScale, bool active = false);
 			ItemSlot(UIContext &, Slot = -1, bool active = false);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			std::shared_ptr<Widget> getDragStartWidget() final;
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 			bool dragStart(int x, int y) final;
 			bool dragEnd(int x, int y) final;
 

@@ -1,14 +1,13 @@
 // Credit: https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/3.2d_game/0.ull_source/sprite_renderer.cpp
 
-#include <iostream>
-
 #include "graphics/Shader.h"
 
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
-#include "graphics/GL.h"
 #include "graphics/BatchSpriteRenderer.h"
+#include "graphics/GL.h"
+#include "graphics/Util.h"
 #include "ui/Window.h"
 #include "util/FS.h"
 #include "util/Util.h"
@@ -42,7 +41,7 @@ namespace Game3 {
 		if (backbuffer_width != backbufferWidth || backbuffer_height != backbufferHeight) {
 			HasBackbuffer::update(backbuffer_width, backbuffer_height);
 			shader.bind();
-			shader.set("screenSize", Eigen::Vector2f(backbuffer_width, backbuffer_height));
+			shader.set("screenSize", Vector2d(backbuffer_width, backbuffer_height));
 		}
 
 		if (scale != canvasScale) {
@@ -55,7 +54,7 @@ namespace Game3 {
 			centerX = window.center.first;
 			centerY = window.center.second;
 			shader.bind();
-			shader.set("center", Eigen::Vector2f(float(centerX), float(centerY)));
+			shader.set("center", Vector2d(float(centerX), float(centerY)));
 		}
 	}
 
@@ -64,12 +63,12 @@ namespace Game3 {
 			backbufferWidth = width;
 			backbufferHeight = height;
 			shader.bind();
-			shader.set("screenSize", Eigen::Vector2f(width, height));
+			shader.set("screenSize", Vector2d(width, height));
 		}
 	}
 
 	void BatchSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, double x, double y, double scale, double angle, double alpha) {
-		drawOnMap(texture, RenderOptions {
+		drawOnMap(texture, RenderOptions{
 			.x = x,
 			.y = y,
 			.sizeX = double(texture->width),
@@ -77,7 +76,7 @@ namespace Game3 {
 			.scaleX = scale,
 			.scaleY = scale,
 			.angle = angle,
-			.color = {1.f, 1.f, 1.f, float(alpha)}
+			.color{1.f, 1.f, 1.f, static_cast<float>(alpha)}
 		});
 	}
 
@@ -135,6 +134,7 @@ namespace Game3 {
 	}
 
 	void BatchSpriteRenderer::flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) {
+		assert(texture != nullptr);
 		Atlas *atlas_ptr = nullptr;
 
 		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
@@ -155,7 +155,7 @@ namespace Game3 {
 
 		Atlas &atlas = *atlas_ptr;
 		shader.bind();
-		shader.set("atlasSize", Eigen::Vector2f(atlas.texture->width, atlas.texture->height));
+		shader.set("atlasSize", Vector2d(atlas.texture->width, atlas.texture->height));
 		shader.set("tileSize", float(tile_size));
 		shader.set("sprite", 0);
 		atlas.vao.bind();
@@ -173,7 +173,7 @@ namespace Game3 {
 		std::vector<float> data = generateData(texture, options);
 		atlas.vbo.init(data.data(), data.size(), GL_DYNAMIC_DRAW);
 		atlas.lastDataCount = data.size();
-		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4});
+		atlas.vao.init(atlas.vbo, {2, 2, 2, 2, 1, 1, 4, 2, 4, 4});
 		return atlas;
 	}
 
@@ -206,6 +206,10 @@ namespace Game3 {
 				data.push_back(item->offsetY * 2. / texture_height);
 				data.push_back(item->sizeX / texture_width);
 				data.push_back(item->sizeY / texture_height);
+				data.push_back(item->composite.red);
+				data.push_back(item->composite.green);
+				data.push_back(item->composite.blue);
+				data.push_back(item->composite.alpha);
 			}
 		}
 

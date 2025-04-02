@@ -16,29 +16,29 @@
 #include <cassert>
 
 namespace Game3 {
-	AutocrafterModule::AutocrafterModule(UIContext &ui, const ClientGamePtr &game, const std::any &argument):
-		AutocrafterModule(ui, game, safeDynamicCast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
+	AutocrafterModule::AutocrafterModule(UIContext &ui, float selfScale, const ClientGamePtr &game, const std::any &argument):
+		AutocrafterModule(ui, selfScale, game, safeDynamicCast<Autocrafter>(std::any_cast<AgentPtr>(argument))) {}
 
-	AutocrafterModule::AutocrafterModule(UIContext &ui, const ClientGamePtr &game, std::shared_ptr<Autocrafter> autocrafter):
-		Module(ui, game),
+	AutocrafterModule::AutocrafterModule(UIContext &ui, float selfScale, const ClientGamePtr &game, std::shared_ptr<Autocrafter> autocrafter):
+		Module(ui, selfScale, game),
 		autocrafter(std::move(autocrafter)),
-		inventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
-		stationInventoryModule(std::make_shared<InventoryModule>(ui, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
-		energyModule(std::make_shared<EnergyModule>(ui, game, std::static_pointer_cast<Agent>(this->autocrafter), false)) {}
+		inventoryModule(std::make_shared<InventoryModule>(ui, selfScale, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(0)))),
+		stationInventoryModule(std::make_shared<InventoryModule>(ui, selfScale, std::static_pointer_cast<ClientInventory>(this->autocrafter->getInventory(1)))),
+		energyModule(std::make_shared<EnergyModule>(ui, selfScale, game, std::static_pointer_cast<Agent>(this->autocrafter), false)) {}
 
 	void AutocrafterModule::init() {
 		assert(autocrafter);
 
 		ClientGamePtr game = getGame();
 
-		auto vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical);
+		auto vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical);
 		vbox->insertAtEnd(shared_from_this());
 
-		auto header = std::make_shared<Label>(ui, scale);
+		auto header = std::make_shared<Label>(ui, selfScale);
 		header->setText(autocrafter->getName());
 		header->insertAtEnd(vbox);
 
-		identifierInput = std::make_shared<TextInput>(ui, scale);
+		identifierInput = std::make_shared<TextInput>(ui, selfScale);
 		identifierInput->setText(autocrafter->getTarget().copyBase().str());
 		identifierInput->onSubmit.connect([this](TextInput &, const UString &text) {
 			setTarget(text.raw());

@@ -5,6 +5,7 @@
 #include "game/HasDimensions.h"
 #include "game/HasInventory.h"
 #include "game/Tickable.h"
+#include "graphics/ShadowParams.h"
 #include "graphics/Texture.h"
 #include "item/Item.h"
 #include "packet/EntityMoneyChangedPacket.h"
@@ -22,8 +23,8 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
-#include "lib/Eigen.h"
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
+#include <sigc++/sigc++.h>
 
 #include <atomic>
 #include <functional>
@@ -45,6 +46,7 @@ namespace Game3 {
 	class GenericClient;
 	class TileEntity;
 	class Window;
+	struct Color;
 	struct RendererContext;
 
 	enum class RideType {
@@ -57,11 +59,12 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
-	class Entity: public Agent, public HasDimensions, public HasInventory, public Tickable, public HasMutex<SharedRecursiveMutex> {
+	class Entity: public Agent, public HasDimensions, public HasInventory, public Tickable, public HasMutex<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			constexpr static float MAX_SPEED = 10.f;
+			sigc::signal<void(const EntityPtr &)> onTeleported;
 
 			EntityType type;
 			Lockable<Position> position{0, 0};
@@ -74,7 +77,7 @@ namespace Game3 {
 			Lockable<Vector3> offset;
 			/** Only the z component is handled in the default Entity tick method. */
 			Lockable<Vector3> velocity;
-			Lockable<std::list<Direction>> path;
+			Lockable<std::deque<Direction>> path;
 			Lockable<WeakSet<Entity>> visibleEntities;
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
@@ -87,6 +90,10 @@ namespace Game3 {
 			Identifier customTexture;
 			Lockable<std::optional<Position>> pathfindGoal;
 			Atomic<float> age;
+			Atomic<float> baseSpeed{MAX_SPEED};
+			Atomic<float> speedMultiplier{1.0};
+			/** Packets about this entity won't be sent to this player because they have a client-side instance already and don't need updates. */
+			PlayerPtr excludedPlayer;
 
 			virtual void destroy();
 
@@ -98,17 +105,18 @@ namespace Game3 {
 				return out;
 			}
 
-			static std::shared_ptr<Entity> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<Entity> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 			static std::shared_ptr<Entity> fromBuffer(const std::shared_ptr<Game> &, Buffer &);
 
 			static std::string getSQL();
 
-			virtual void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
-			virtual void toJSON(nlohmann::json &) const;
+			virtual void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &);
+			virtual void toJSON(boost::json::value &) const;
 			virtual void init(const std::shared_ptr<Game> &);
 			virtual void render(const RendererContext &);
 			virtual void renderUpper(const RendererContext &);
 			virtual void renderLighting(const RendererContext &);
+			virtual void renderShadow(const RendererContext &);
 			virtual void tick(const TickArgs &);
 			/** Whether the entity should be included in save data. */
 			virtual bool shouldPersist() const { return true; }
@@ -159,7 +167,7 @@ namespace Game3 {
 			 *  The function returns true if it should be removed from the move queue. */
 			void queueForMove(std::function<bool(const std::shared_ptr<Entity> &, bool)>);
 			void queueDestruction();
-			PathResult pathfind(const Position &start, const Position &goal, std::list<Direction> &, size_t loop_max = 1'000);
+			PathResult pathfind(const Position &start, const Position &goal, std::deque<Direction> &, size_t loop_max = 1'000);
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getMovementSpeed() const;
 			std::shared_ptr<Game> getGame() const override;
@@ -206,6 +214,9 @@ namespace Game3 {
 			/** Returns whether the entity is on the ground and not in the air. */
 			virtual bool isGrounded() const;
 			virtual bool isAffectedByKnockback() const;
+			/** Returns [multiplier, composite]. */
+			virtual std::pair<Color, Color> getColors() const;
+			virtual ShadowParams getShadowParams() const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -214,6 +225,7 @@ namespace Game3 {
 			inline MoneyCount getMoney() const { return money; }
 			virtual void setMoney(MoneyCount);
 			virtual void broadcastMoney();
+			virtual void broadcastPacket(const PacketPtr &);
 
 			void sendTo(GenericClient &, UpdateCounter threshold = 0);
 			void sendToVisible();
@@ -280,7 +292,7 @@ namespace Game3 {
 			bool setHeld(Slot, Held &);
 	};
 
-	void to_json(nlohmann::json &, const Entity &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Entity &);
 
 	using EntityPtr = std::shared_ptr<Entity>;
 	using WeakEntityPtr = std::weak_ptr<Entity>;

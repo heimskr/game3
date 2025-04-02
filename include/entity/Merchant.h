@@ -7,12 +7,12 @@ namespace Game3 {
 		public:
 			static Identifier ID() { return {"base", "entity/merchant"}; }
 			static std::shared_ptr<Merchant> create(const std::shared_ptr<Game> &, EntityType = ID());
-			static std::shared_ptr<Merchant> fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::shared_ptr<Merchant> fromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			double greed = .1;
 
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			std::string getName() const override { return "Blacksmith"; }
 			void encode(Buffer &) override;
@@ -30,5 +30,5 @@ namespace Game3 {
 			float accumulatedTime = 0.f;
 	};
 
-	void to_json(nlohmann::json &, const Merchant &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Merchant &);
 }

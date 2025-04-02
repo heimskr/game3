@@ -3,6 +3,7 @@
 #include "types/Direction.h"
 #include "types/Layer.h"
 #include "types/Types.h"
+#include "util/Concepts.h"
 
 #include <cmath>
 #include <functional>
@@ -11,14 +12,16 @@
 #include <ostream>
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Buffer;
 	class Game;
 	class Realm;
+	class Tile;
 	class TileEntity;
 	struct ChunkPosition;
+	struct FluidTile;
 
 	struct Position {
 		using IntType = Index;
@@ -63,8 +66,8 @@ namespace Game3 {
 
 	std::ostream & operator<<(std::ostream &, const Position &);
 
-	void to_json(nlohmann::json &, const Position &);
-	void from_json(const nlohmann::json &, Position &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Position &);
+	Position tag_invoke(boost::json::value_to_tag<Position>, const boost::json::value &);
 	Buffer & operator+=(Buffer &, const Position &);
 	Buffer & operator<<(Buffer &, const Position &);
 	Buffer & operator>>(Buffer &, Position &);
@@ -79,10 +82,13 @@ namespace Game3 {
 			position(std::move(position)), realm(std::move(realm)), player(std::move(player)) {}
 
 		std::optional<TileID> get(Layer) const;
+		std::optional<FluidTile> getFluid() const;
 		std::optional<std::reference_wrapper<const Identifier>> getName(Layer) const;
 		void set(Layer, TileID) const;
 		void set(Layer, const Identifier &) const;
+		void setFluid(FluidTile) const;
 		bool isPathable() const;
+		std::shared_ptr<Tile> getTile(Layer) const;
 		std::shared_ptr<TileEntity> getTileEntity() const;
 		Place withPosition(Position) const;
 
@@ -103,11 +109,14 @@ namespace Game3 {
 		inline bool isGrounded() const { return z < 0.01; }
 
 		bool operator==(const Vector3 &) const;
+		explicit operator bool() const;
 
 		Vector3 & operator+=(const Vector3 &);
 		Vector3 & operator-=(const Vector3 &);
+		Vector3 & operator*=(const Vector3 &);
 		Vector3 operator+(const Vector3 &) const;
 		Vector3 operator-(const Vector3 &) const;
+		Vector3 operator*(const Vector3 &) const;
 	};
 
 	Buffer & operator+=(Buffer &, const Vector3 &);
@@ -118,7 +127,34 @@ namespace Game3 {
 		double x = 0;
 		double y = 0;
 
+		Vector2d();
+		Vector2d(double x, double y);
+		Vector2d(Position);
+
 		double magnitude() const;
+		double distance(const Vector2d &) const;
+
+		bool operator==(const Vector2d &) const;
+
+		Vector2d & operator+=(const Vector2d &);
+		Vector2d & operator-=(const Vector2d &);
+		Vector2d operator+(const Vector2d &) const;
+		Vector2d operator-(const Vector2d &) const;
+
+		template <Numeric N>
+		Vector2d operator/(N divisor) const {
+			return {x / divisor, y / divisor};
+		}
+
+		template <Numeric N>
+		Vector2d operator*(N divisor) const {
+			return {x * divisor, y * divisor};
+		}
+
+		/** Returns an angle in radians. */
+		double atan2() const {
+			return std::atan2(y, x);
+		}
 	};
 
 	Buffer & operator+=(Buffer &, const Vector2d &);

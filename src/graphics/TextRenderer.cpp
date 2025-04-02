@@ -1,6 +1,6 @@
 // Credit: https://learnopengl.com/In-Practice/Text-Rendering
 
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/Tileset.h"
 #include "game/ClientGame.h"
 #include "graphics/TextRenderer.h"
@@ -90,6 +90,10 @@ namespace Game3 {
 		for (uint32_t ch = 32; ch < 0x400; ++ch) {
 			register_glyph(ch);
 		}
+
+		register_glyph(U'ǒ');
+		register_glyph(U'ī');
+		register_glyph(U'ó');
 
 		glGenVertexArrays(1, &vao); CHECKGL
 		glGenBuffers(1, &vbo); CHECKGL

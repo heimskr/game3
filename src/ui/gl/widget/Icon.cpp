@@ -6,11 +6,11 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Icon::Icon(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+	Icon::Icon(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	void Icon::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (fixedHeight > 0) {
+		if (fixedHeight >= 0) {
 			height = fixedHeight;
 		}
 
@@ -43,7 +43,7 @@ namespace Game3 {
 				tooltipTextChanged = false;
 				tooltip->setText(*tooltipText);
 			}
-			tooltip->setRegion(std::nullopt);
+			tooltip->setRegion(lastRectangle);
 			tooltip->show(*this);
 		} else {
 			tooltip->hide(*this);
@@ -58,20 +58,20 @@ namespace Game3 {
 		float size{};
 
 		if (orientation == Orientation::Horizontal) {
-			if (fixedWidth) {
-				size = fixedWidth;
+			if (fixedWidth >= 0) {
+				size = fixedWidth * ui.scale;
 			} else if (iconTexture) {
-				size = scale * iconTexture->width;
+				size = getScale() * iconTexture->width;
 			} else {
-				size = scale * 16;
+				size = getScale() * 16;
 			}
 		} else {
-			if (fixedHeight) {
-				size = fixedHeight;
+			if (fixedHeight >= 0) {
+				size = fixedHeight * ui.scale;
 			} else if (iconTexture) {
-				size = scale * iconTexture->height;
+				size = getScale() * iconTexture->height;
 			} else {
-				size = scale * 16;
+				size = getScale() * 16;
 			}
 		}
 

@@ -12,7 +12,7 @@
 namespace Game3 {
 	class Tooltip: public Widget {
 		public:
-			Tooltip(UIContext &, float scale);
+			Tooltip(UIContext &, float selfScale);
 
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 

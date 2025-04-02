@@ -4,6 +4,7 @@
 #include "command/local/LoginCommand.h"
 #include "command/local/PlayersCommand.h"
 #include "command/local/RegisterCommand.h"
+#include "command/local/ScaleCommand.h"
 #include "command/local/SegfaultCommand.h"
 #include "command/local/UsageCommand.h"
 
@@ -20,5 +21,6 @@ namespace Game3 {
 		add(LocalCommandFactory::create<ChemicalCommand>());
 		add(LocalCommandFactory::create<PlayersCommand>());
 		add(LocalCommandFactory::create<SegfaultCommand>());
+		add(LocalCommandFactory::create<ScaleCommand>());
 	}
 }

@@ -10,11 +10,13 @@
 namespace Game3 {
 	class Hotbar: public Widget {
 		public:
-			Hotbar(UIContext &, float scale);
+			Hotbar(UIContext &, float selfScale);
 
 			void init() final;
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
+
+			bool mouseDown(int button, int x, int y, Modifiers) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
@@ -28,5 +30,7 @@ namespace Game3 {
 			std::shared_ptr<ItemSlot> heldLeft;
 			std::shared_ptr<ItemSlot> heldRight;
 			std::optional<float> lastY;
+
+			float getRightSideWidth() const;
 	};
 }

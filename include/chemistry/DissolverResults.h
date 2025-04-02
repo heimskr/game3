@@ -2,29 +2,29 @@
 
 #include "types/Types.h"
 
+#include <boost/json/fwd.hpp>
+
 #include <memory>
 #include <vector>
-
-#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	class DissolverResult {
 		public:
 			virtual ~DissolverResult() = default;
 			virtual void add(const GamePtr &, std::vector<ItemStackPtr> &) = 0;
-			virtual void toJSON(nlohmann::json &) const = 0;
+			virtual void toJSON(boost::json::value &) const = 0;
 			std::vector<ItemStackPtr> getResult(const GamePtr &);
-			static std::vector<ItemStackPtr> getResult(const GamePtr &, const nlohmann::json &);
-			static std::unique_ptr<DissolverResult> fromJSON(const nlohmann::json &);
+			static std::vector<ItemStackPtr> getResult(const GamePtr &, const boost::json::value &);
+			static std::unique_ptr<DissolverResult> fromJSON(const boost::json::value &);
 	};
 
-	void to_json(nlohmann::json &, const DissolverResult &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const DissolverResult &);
 
 	class UnionDissolverResult: public DissolverResult {
 		public:
-			UnionDissolverResult(const nlohmann::json &);
+			UnionDissolverResult(const boost::json::value &);
 			void add(const GamePtr &, std::vector<ItemStackPtr> &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 
 		private:
 			std::vector<std::unique_ptr<DissolverResult>> members;
@@ -32,9 +32,9 @@ namespace Game3 {
 
 	class WeightedDissolverResult: public DissolverResult {
 		public:
-			WeightedDissolverResult(const nlohmann::json &);
+			WeightedDissolverResult(const boost::json::value &);
 			void add(const GamePtr &, std::vector<ItemStackPtr> &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 
 		private:
 			struct Member {
@@ -50,9 +50,9 @@ namespace Game3 {
 
 	class RandomDissolverResult: public DissolverResult {
 		public:
-			RandomDissolverResult(const nlohmann::json &);
+			RandomDissolverResult(const boost::json::value &);
 			void add(const GamePtr &, std::vector<ItemStackPtr> &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 
 		private:
 			std::vector<std::unique_ptr<DissolverResult>> members;
@@ -60,9 +60,9 @@ namespace Game3 {
 
 	class ChemicalResult: public DissolverResult {
 		public:
-			ChemicalResult(const nlohmann::json &);
+			ChemicalResult(const boost::json::value &);
 			void add(const GamePtr &, std::vector<ItemStackPtr> &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 
 		private:
 			std::string formula;
@@ -70,9 +70,9 @@ namespace Game3 {
 
 	class MultiChemicalResult: public DissolverResult {
 		public:
-			MultiChemicalResult(const nlohmann::json &);
+			MultiChemicalResult(const boost::json::value &);
 			void add(const GamePtr &, std::vector<ItemStackPtr> &) override;
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 
 		private:
 			std::unique_ptr<DissolverResult> result;

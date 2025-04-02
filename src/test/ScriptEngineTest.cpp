@@ -1,5 +1,5 @@
 #ifdef GAME3_ENABLE_SCRIPTING
-#include "Log.h"
+#include "util/Log.h"
 #include "scripting/ScriptEngine.h"
 
 #include <cassert>

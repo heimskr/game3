@@ -8,17 +8,18 @@
 #include "util/Defer.h"
 
 namespace Game3 {
-	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, const std::any &argument):
-		TextModule(ui, std::move(game), std::any_cast<std::string>(argument)) {}
+	TextModule::TextModule(UIContext &ui, float selfScale, std::shared_ptr<ClientGame> game, const std::any &argument):
+		TextModule(ui, selfScale, std::move(game), std::any_cast<std::string>(argument)) {}
 
-	TextModule::TextModule(UIContext &ui, std::shared_ptr<ClientGame> game, std::string text):
-		Module(ui, game) {
+	TextModule::TextModule(UIContext &ui, float selfScale, std::shared_ptr<ClientGame> game, std::string text):
+		Module(ui, selfScale, game) {
 			setText(game->getUIContext(), std::move(text));
 		}
 
 	void TextModule::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (lastRectangle.width != width)
+		if (lastRectangle.width != width) {
 			wrapped.reset();
+		}
 
 		Widget::render(renderers, x, y, width, height);
 		const float padding = getPadding();
@@ -53,7 +54,7 @@ namespace Game3 {
 		}
 
 		// Add a little bit to account for descenders.
-		const float addend = 2 * scale;
+		const float addend = 2 * selfScale;
 
 		if (lastTextHeight > 0 && for_width == lastRectangle.width) {
 			minimum = natural = lastTextHeight + addend;
@@ -80,15 +81,15 @@ namespace Game3 {
 	}
 
 	float TextModule::getTextScale() const {
-		return scale / 16;
+		return getScale() / 16;
 	}
 
 	float TextModule::getPadding() const {
-		return scale * 2;
+		return getScale() * 2;
 	}
 
 	float TextModule::getWrapWidth(float width) const {
-		return width - scale * 2;
+		return width - getScale() * 2;
 	}
 
 	void TextModule::tryWrap(const TextRenderer &texter) {

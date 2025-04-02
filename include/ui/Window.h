@@ -8,9 +8,11 @@
 #include "graphics/GL.h"
 #include "graphics/Multiplier.h"
 #include "graphics/Overlayer.h"
+#include "graphics/PathmapTextureCache.h"
 #include "graphics/Recolor.h"
 #include "graphics/Rectangle.h"
 #include "graphics/RectangleRenderer.h"
+#include "graphics/Reshader.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "threading/Lockable.h"
@@ -19,6 +21,7 @@
 #include "ui/gl/UIContext.h"
 #include "util/Concepts.h"
 
+#include <any>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -60,11 +63,20 @@ namespace Game3 {
 			RectangleRenderer rectangleRenderer{*this};
 			CircleRenderer circleRenderer{*this};
 			Recolor recolor{*this};
+			Reshader causticsShader;
+			Reshader waveShader;
+			Reshader colorDodgeShader;
+			Reshader blurShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
-			GL::Texture mainTexture;
+			PathmapTextureCache pathmapTextureCache;
+			GL::Texture mainGLTexture;
 			GL::Texture staticLightingTexture;
 			GL::Texture dynamicLightingTexture;
+			GL::Texture scratchGLTexture;
+			GL::Texture causticsGLTexture;
+			TexturePtr mainTexture;
+			TexturePtr scratchTexture;
 			GL::FBO fbo;
 			Rectangle realmBounds;
 			bool autofocus = true;
@@ -121,7 +133,7 @@ namespace Game3 {
 			RendererContext getRendererContext();
 
 			void tick();
-			void drawGL();
+			void render();
 			void closeGame();
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
@@ -142,18 +154,18 @@ namespace Game3 {
 
 			MTQueue<std::function<void(Window &)>> functionQueue;
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
-			GL::Texture scratchTexture;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
 			std::pair<int, int> lastWindowSize{-1, -1};
 			Modifiers lastModifiers;
 			std::optional<std::pair<int, int>> clickPosition;
 			std::optional<int> heldMouseButton;
-			bool dragStarted = false;
-			int fpsCountup = 0;
+			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
 			std::deque<double> fpses;
 			double runningSum = 0;
 			double runningFPS = 0;
+			int fpsCountup = 0;
+			bool dragStarted = false;
 			bool connectedLocally = false;
 			bool connected = false;
 

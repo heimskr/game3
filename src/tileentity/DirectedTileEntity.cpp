@@ -1,3 +1,4 @@
+#include "lib/JSON.h"
 #include "tileentity/DirectedTileEntity.h"
 
 namespace Game3 {
@@ -31,12 +32,12 @@ namespace Game3 {
 		queueBroadcast(true);
 	}
 
-	void DirectedTileEntity::toJSON(nlohmann::json &json) const {
-		json["direction"] = tileDirection;
+	void DirectedTileEntity::toJSON(boost::json::value &json) const {
+		ensureObject(json)["direction"] = boost::json::value_from(tileDirection);
 	}
 
-	void DirectedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &json) {
-		setDirection(json.at("direction"));
+	void DirectedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &json) {
+		setDirection(boost::json::value_to<Direction>(json.at("direction")));
 	}
 
 	void DirectedTileEntity::encode(Game &, Buffer &buffer) {

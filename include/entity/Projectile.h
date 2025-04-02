@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity/Entity.h"
-#include "graphics/TextRenderer.h"
+#include "graphics/Color.h"
 
 namespace Game3 {
 	class Projectile: public Entity {
@@ -51,7 +51,7 @@ namespace Game3 {
 
 			std::shared_ptr<Texture> getTexture() override;
 			void setTexture(const ClientGamePtr &);
-			void applyKnockback(const EntityPtr &, float factor);
+			virtual void applyKnockback(const EntityPtr &, float factor);
 
 		friend class Entity;
 	};

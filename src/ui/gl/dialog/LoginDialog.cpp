@@ -12,25 +12,25 @@
 
 namespace Game3 {
 	namespace {
-		constexpr int WIDTH = 600;
-		constexpr int HEIGHT = 350;
+		constexpr float WIDTH = 75;
+		constexpr float HEIGHT = 48;
 	}
 
-	LoginDialog::LoginDialog(UIContext &ui):
-		DraggableDialog(ui, WIDTH, HEIGHT) {
+	LoginDialog::LoginDialog(UIContext &ui, float selfScale):
+		DraggableDialog(ui, selfScale, WIDTH, HEIGHT) {
 			setTitle("Log In");
 		}
 
 	void LoginDialog::init() {
 		DraggableDialog::init();
 
-		auto vbox = std::make_shared<Box>(ui, UI_SCALE, Orientation::Vertical, 2, 0, Color{});
+		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 
-		auto grid = std::make_shared<Grid>(ui, UI_SCALE);
+		auto grid = make<Grid>(ui, selfScale);
 		grid->setRowSpacing(5);
 
 		auto make_label = [&](UString text) {
-			auto label = std::make_shared<Label>(ui, UI_SCALE, std::move(text));
+			auto label = make<Label>(ui, selfScale, std::move(text));
 			label->setVerticalAlignment(Alignment::Center);
 			return label;
 		};
@@ -38,12 +38,12 @@ namespace Game3 {
 		grid->attach(make_label("Username"), 0, 0);
 		grid->attach(make_label("Name"), 1, 0);
 
-		usernameInput = std::make_shared<TextInput>(ui, UI_SCALE);
+		usernameInput = make<TextInput>(ui, selfScale);
 		usernameInput->setHorizontalExpand(true);
 		usernameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(usernameInput, 0, 1);
 
-		displayNameInput = std::make_shared<TextInput>(ui, UI_SCALE);
+		displayNameInput = make<TextInput>(ui, selfScale);
 		displayNameInput->setHorizontalExpand(true);
 		displayNameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(displayNameInput, 1, 1);
@@ -54,11 +54,11 @@ namespace Game3 {
 
 		vbox->append(std::move(grid));
 
-		auto aligner = std::make_shared<Aligner>(ui, Orientation::Horizontal, Alignment::End);
+		auto aligner = make<Aligner>(ui, Orientation::Horizontal, Alignment::End);
 
-		auto yes_icon = std::make_shared<Icon>(ui, UI_SCALE);
+		auto yes_icon = make<Icon>(ui, selfScale);
 		yes_icon->setIconTexture(cacheTexture("resources/gui/yes.png"));
-		yes_icon->setFixedSize(8 * UI_SCALE, 8 * UI_SCALE);
+		yes_icon->setFixedSize(8 * selfScale, 8 * selfScale);
 		yes_icon->setOnClick(makeSubmit(true));
 
 		aligner->setChild(std::move(yes_icon));
@@ -66,11 +66,19 @@ namespace Game3 {
 		vbox->insertAtEnd(shared_from_this());
 
 		ui.focusWidget(usernameInput);
+
+		recenter();
 	}
 
 	void LoginDialog::render(const RendererContext &renderers) {
 		DraggableDialog::render(renderers);
 		firstChild->render(renderers, bodyRectangle);
+	}
+
+	void LoginDialog::rescale(float new_scale) {
+		position.width = WIDTH * new_scale;
+		position.height = HEIGHT * new_scale;
+		Dialog::rescale(new_scale);
 	}
 
 	void LoginDialog::submit(bool go) {
@@ -85,8 +93,9 @@ namespace Game3 {
 
 	std::function<bool(Widget &, int, int, int)> LoginDialog::makeSubmit(bool go) {
 		return [this, go](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			submit(go);
 			return true;
 		};

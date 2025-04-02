@@ -1,8 +1,9 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "algorithm/Voronoi.h"
 #include "graphics/Tileset.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "lib/JSON.h"
 #include "realm/Cave.h"
 #include "tileentity/Building.h"
 #include "util/Util.h"
@@ -97,21 +98,23 @@ namespace Game3 {
 		return vector;
 	}
 
-	void Cave::absorbJSON(const nlohmann::json &json, bool full_data) {
+	void Cave::absorbJSON(const boost::json::value &json, bool full_data) {
 		Realm::absorbJSON(json, full_data);
-		parentRealm = json.at("parentRealm");
-		if (auto iter = json.find("entranceCount"); iter != json.end()) {
-			entranceCount = iter->get<size_t>();
+		const auto &object = json.as_object();
+		parentRealm = boost::json::value_to<RealmID>(object.at("parentRealm"));
+		if (auto *value = object.if_contains("entranceCount")) {
+			entranceCount = boost::json::value_to<size_t>(*value);
 		} else {
 			entranceCount = 1;
 		}
 	}
 
-	void Cave::toJSON(nlohmann::json &json, bool full_data) const {
+	void Cave::toJSON(boost::json::value &json, bool full_data) const {
 		Realm::toJSON(json, full_data);
-		json["parentRealm"] = parentRealm;
+		auto &object = ensureObject(json);
+		object["parentRealm"] = parentRealm;
 		if (entranceCount != 1) {
-			json["entranceCount"] = entranceCount.load();
+			object["entranceCount"] = entranceCount.load();
 		}
 	}
 }

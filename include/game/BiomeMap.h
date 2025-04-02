@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "types/Position.h"
 #include "graphics/Texture.h"
@@ -48,8 +48,8 @@ namespace Game3 {
 		}
 	};
 
-	void to_json(nlohmann::json &, const BiomeMap &);
-	void from_json(const nlohmann::json &, BiomeMap &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const BiomeMap &);
+	void from_json(const boost::json::value &, BiomeMap &);
 
 	using BiomeMapPtr = std::shared_ptr<BiomeMap>;
 }

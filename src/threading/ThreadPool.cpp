@@ -1,3 +1,4 @@
+#include "threading/ThreadContext.h"
 #include "threading/ThreadPool.h"
 
 namespace Game3 {
@@ -10,12 +11,14 @@ namespace Game3 {
 	}
 
 	void ThreadPool::start() {
-		if (joining || active.exchange(true))
+		if (joining || active.exchange(true)) {
 			return;
+		}
 		assert(pool.empty());
-		for (size_t thread_index = 0; thread_index < size; ++thread_index)
+		for (size_t thread_index = 0; thread_index < size; ++thread_index) {
 			pool.emplace_back([this, thread_index] {
 				threadContext = {};
+				threadContext.rename(std::format("TP {}", thread_index));
 				size_t last_jobs_done = jobsDone.load();
 				while (active) {
 					{
@@ -24,8 +27,9 @@ namespace Game3 {
 							return joining.load() || newJobReady.load() || last_jobs_done < jobsDone;
 						});
 					}
-					if (joining)
+					if (joining) {
 						break;
+					}
 					if (auto job = workQueue.tryTake()) {
 						newJobReady = false;
 						assert(*job);
@@ -38,14 +42,16 @@ namespace Game3 {
 					}
 				}
 			});
+		}
 	}
 
 	void ThreadPool::join() {
 		if (active.exchange(false) && !joining.exchange(true)) {
 			workQueue.clear();
 			workCV.notify_all();
-			for (auto &thread: pool)
+			for (auto &thread: pool) {
 				thread.join();
+			}
 			pool.clear();
 			joining = false;
 		}

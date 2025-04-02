@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -15,6 +15,8 @@ namespace Game3 {
 
 		x = anchor_rectangle.x + xOffset;
 		y = anchor_rectangle.y + yOffset;
+
+		const auto scale = getScale();
 
 		{
 			const float frame_scale = scale / 2;

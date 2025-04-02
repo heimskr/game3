@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "entity/Player.h"
@@ -8,6 +6,7 @@
 #include "game/ExpandedServerInventory.h"
 #include "game/ServerInventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "tileentity/Crate.h"
 
@@ -22,12 +21,14 @@ namespace Game3 {
 		return name;
 	}
 
-	void Crate::toJSON(nlohmann::json &json) const {
+	void Crate::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["name"] = name;
-		json["itemName"] = itemName;
-		if (InventoryPtr inventory = getInventory(0))
-			json["inventory"] = dynamic_cast<ExpandedServerInventory &>(*inventory);
+		auto &object = ensureObject(json);
+		object["name"] = name;
+		object["itemName"] = boost::json::value_from(itemName);
+		if (InventoryPtr inventory = getInventory(0)) {
+			object["inventory"] = boost::json::value_from(dynamic_cast<ExpandedServerInventory &>(*inventory));
+		}
 	}
 
 	bool Crate::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
@@ -47,13 +48,15 @@ namespace Game3 {
 		return true;
 	}
 
-	void Crate::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Crate::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		assert(game->getSide() == Side::Server);
-		name = json.at("name");
-		itemName = json.at("itemName");
-		if (auto iter = json.find("inventory"); iter != json.end())
-			HasInventory::setInventory(std::make_shared<ExpandedServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
+		const auto &object = json.as_object();
+		itemName = boost::json::value_to<Identifier>(object.at("itemName"));
+		name = object.at("name").as_string();
+		if (const auto *value = object.if_contains("inventory")) {
+			HasInventory::setInventory(std::make_shared<ExpandedServerInventory>(boost::json::value_to<ServerInventory>(*value, std::pair{game, shared_from_this()})), 0);
+		}
 	}
 
 	void Crate::encode(Game &game, Buffer &buffer) {

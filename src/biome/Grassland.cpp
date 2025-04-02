@@ -46,10 +46,12 @@ namespace Game3 {
 			for (Index y_offset = 0; y_offset <= 1; ++y_offset) {
 				for (Index x_offset = 0; x_offset <= 1; ++x_offset) {
 					Position position = place.position + Position{y_offset, x_offset};
-					if (auto fluid = realm->tryFluid(position); !fluid || fluid->id != water)
+					if (auto fluid = realm->tryFluid(position); !fluid || fluid->id != water) {
 						return false;
-					if (auto tile = realm->tryTile(layer, position); !tile || tile != empty)
+					}
+					if (auto tile = realm->tryTile(layer, position); !tile || tile != empty) {
 						return false;
+					}
 				}
 			}
 
@@ -110,14 +112,17 @@ namespace Game3 {
 		const Tileset &tileset = realm->getTileset();
 		const Position position{row, column};
 
-		if (params.antiforestThreshold > noisegen(row / params.noiseZoom * factor, column / params.noiseZoom * factor, 0.))
-			if (auto tile = realm->tryTile(Layer::Submerged, position); tile && trees.contains(tileset[*tile]))
+		if (params.antiforestThreshold > noisegen(row / params.noiseZoom * factor, column / params.noiseZoom * factor, 0.)) {
+			if (auto tile = realm->tryTile(Layer::Submerged, position); tile && trees.contains(tileset[*tile])) {
 				realm->setTile(Layer::Submerged, position, 0, false);
+			}
+		}
 
 		const auto terrain_tile = tileset[realm->getTile(Layer::Terrain, position)];
 
-		if (water == FluidID(-1))
+		if (water == FluidID(-1)) {
 			water = safeCast<FluidID>(realm->getGame()->registry<FluidRegistry>().at("base:fluid/water")->registryID);
+		}
 
 		if (const auto fluid = realm->tryFluid(position); fluid && fluid->id == water) {
 			const double probability = 0.01 * std::pow(std::cos(std::min(1.6, 8.0 * (double(fluid->level) / FluidTile::FULL - 0.7))), 5.);

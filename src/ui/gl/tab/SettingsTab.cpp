@@ -40,23 +40,23 @@ namespace Game3 {
 		auto &settings = ui.getRenderers().settings;
 		auto settings_lock = settings.sharedLock();
 
-		scroller = std::make_shared<Scroller>(ui, scale);
+		scroller = std::make_shared<Scroller>(ui, selfScale);
 		scroller->insertAtEnd(tab);
 
-		grid = std::make_shared<Grid>(ui, scale);
-		grid->setSpacing(2 * scale);
+		grid = std::make_shared<Grid>(ui, selfScale);
+		grid->setSpacing(2 * selfScale);
 		grid->insertAtEnd(scroller);
 
 		std::size_t row = 0;
 
 		auto add_checkbox = [&](UString label_text, bool ClientSettings::*member, bool invert = false) {
-			auto label = std::make_shared<Label>(ui, scale, std::move(label_text));
+			auto label = std::make_shared<Label>(ui, selfScale, std::move(label_text));
 			label->setVerticalAlignment(Alignment::Center);
 			grid->attach(label, row, 0);
 
-			auto checkbox = std::make_shared<Checkbox>(ui, scale);
+			auto checkbox = std::make_shared<Checkbox>(ui, selfScale);
 			checkbox->setChecked(invert? !(settings.*member) : settings.*member);
-			checkbox->setFixedSize(scale * 8);
+			checkbox->setFixedSize(selfScale * 8);
 			checkbox->onCheck.connect([this, member, invert](bool checked) {
 				applySetting(member, invert? !checked : checked);
 			});
@@ -68,7 +68,7 @@ namespace Game3 {
 		};
 
 		auto add_slider = [&](UString label_text, UString tooltip = {}) {
-			auto label = std::make_shared<Label>(ui, scale);
+			auto label = std::make_shared<Label>(ui, selfScale);
 			label->setText(std::move(label_text));
 			label->setVerticalAlignment(Alignment::Center);
 			grid->attach(label, row, 0);
@@ -77,13 +77,13 @@ namespace Game3 {
 				label->setTooltipText(std::move(tooltip));
 			}
 
-			auto slider = std::make_shared<Slider>(ui, scale);
-			slider->setFixedSize(100 * scale, 8 * scale);
+			auto slider = std::make_shared<Slider>(ui, selfScale);
+			slider->setFixedSize(100 * selfScale, 8 * selfScale);
 
-			auto value_label = std::make_shared<Label>(ui, scale);
+			auto value_label = std::make_shared<Label>(ui, selfScale);
 			value_label->setVerticalAlignment(Alignment::Center);
 
-			auto hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 0, 0, Color{});
+			auto hbox = std::make_shared<Box>(ui, selfScale, Orientation::Horizontal, 0, 0, Color{});
 			hbox->append(slider);
 			hbox->append(value_label);
 			grid->attach(hbox, row, 1);
@@ -99,13 +99,13 @@ namespace Game3 {
 			return slider;
 		};
 
-		auto hostname_label = std::make_shared<Label>(ui, scale);
+		auto hostname_label = std::make_shared<Label>(ui, selfScale);
 		hostname_label->setText("Default Hostname");
 		hostname_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(hostname_label, row, 0);
 
-		auto hostname_input = std::make_shared<TextInput>(ui, scale);
-		hostname_input->setFixedHeight(scale * TEXT_INPUT_HEIGHT_FACTOR);
+		auto hostname_input = std::make_shared<TextInput>(ui, selfScale);
+		hostname_input->setFixedHeight(selfScale * TEXT_INPUT_HEIGHT_FACTOR);
 		hostname_input->setText(settings.hostname);
 		hostname_input->setHorizontalExpand(true);
 		hostname_input->onChange.connect([this](TextInput &input, const UString &text) {
@@ -121,13 +121,13 @@ namespace Game3 {
 
 		++row;
 
-		auto port_label = std::make_shared<Label>(ui, scale);
+		auto port_label = std::make_shared<Label>(ui, selfScale);
 		port_label->setText("Default Port");
 		port_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(port_label, row, 0);
 
-		auto port_input = std::make_shared<TextInput>(ui, scale);
-		port_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		auto port_input = std::make_shared<TextInput>(ui, selfScale);
+		port_input->setFixedSize(100 * selfScale, selfScale * TEXT_INPUT_HEIGHT_FACTOR);
 		port_input->setText(std::to_string(settings.port));
 		port_input->onChange.connect([this](TextInput &input, const UString &text) {
 			uint16_t port{};
@@ -150,13 +150,13 @@ namespace Game3 {
 
 		++row;
 
-		auto username_label = std::make_shared<Label>(ui, scale);
+		auto username_label = std::make_shared<Label>(ui, selfScale);
 		username_label->setText("Default Username");
 		username_label->setVerticalAlignment(Alignment::Center);
 		grid->attach(username_label, row, 0);
 
-		auto username_input = std::make_shared<TextInput>(ui, scale);
-		username_input->setFixedSize(100 * scale, scale * TEXT_INPUT_HEIGHT_FACTOR);
+		auto username_input = std::make_shared<TextInput>(ui, selfScale);
+		username_input->setFixedSize(100 * selfScale, selfScale * TEXT_INPUT_HEIGHT_FACTOR);
 		username_input->setText(settings.username);
 		username_input->onChange.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
@@ -176,6 +176,25 @@ namespace Game3 {
 		add_checkbox("Enable Timers", &ClientSettings::hideTimers, true);
 		add_checkbox("Display FPS", &ClientSettings::showFPS);
 		add_checkbox("Cap FPS", &ClientSettings::capFPS);
+		add_checkbox("Special Effects", &ClientSettings::specialEffects);
+
+		auto mystery_slider = add_slider("Mystery");
+		mystery_slider->setRange(0, 40);
+		mystery_slider->setStep(0.00000000001);
+		mystery_slider->setValue(settings.mystery);
+		mystery_slider->setDisplayDigits(5);
+		mystery_slider->onValueUpdate.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::mystery, value);
+		});
+
+		auto scale_slider = add_slider("UI Scale");
+		scale_slider->setRange(0.5, 16);
+		scale_slider->setStep(0.5);
+		scale_slider->setValue(settings.uiScale);
+		scale_slider->setDisplayDigits(1);
+		scale_slider->onRelease.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::uiScale, value);
+		});
 
 		auto level_slider = add_slider("Log Level");
 		level_slider->setRange(0, 3);
@@ -203,9 +222,9 @@ namespace Game3 {
 			applySetting(&ClientSettings::fpsSmoothing, value);
 		});
 
-		auto save_button = std::make_shared<Button>(ui, scale);
+		auto save_button = std::make_shared<Button>(ui, selfScale);
 		save_button->setText("Save");
-		save_button->setFixedHeight(10 * scale);
+		save_button->setFixedHeight(10 * selfScale);
 		save_button->setOnClick([this](Widget &, int, int, int) {
 			saveSettings();
 			return true;

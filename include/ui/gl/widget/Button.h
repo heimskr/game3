@@ -10,16 +10,16 @@
 namespace Game3 {
 	class Button: public Widget, public HasFixedSize, public HasAlignment {
 		public:
-			Button(UIContext &, float scale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			Button(UIContext &, float scale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
-			Button(UIContext &, float scale, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float selfScale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float selfScale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());
+			Button(UIContext &, float selfScale, TexturePtr texture = getDefaultTexture());
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool click(int button, int x, int y) final;
-			bool mouseDown(int button, int x, int y) final;
-			bool mouseUp(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
+			bool mouseDown(int button, int x, int y, Modifiers) final;
+			bool mouseUp(int button, int x, int y, Modifiers) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

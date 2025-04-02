@@ -21,18 +21,18 @@ namespace Game3 {
 			std::shared_ptr<Tab> settingsTab;
 			std::shared_ptr<Tab> activeTab;
 
-			OmniDialog(UIContext &, float scale);
+			OmniDialog(UIContext &, float selfScale);
 
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;
 			void onClose() final;
-			bool click(int button, int x, int y) final;
-			bool mouseDown(int button, int x, int y) final;
-			bool mouseUp(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
+			bool mouseDown(int button, int x, int y, Modifiers) final;
+			bool mouseUp(int button, int x, int y, Modifiers) final;
 			bool dragStart(int x, int y) final;
 			bool dragUpdate(int x, int y) final;
 			bool dragEnd(int x, int y) final;
-			bool scroll(float x_delta, float y_delta, int x, int y) final;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
 			bool hidesHotbar() const final;
 			void updateModule();
 

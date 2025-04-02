@@ -12,7 +12,7 @@ namespace Game3 {
 			~SoundEngine();
 
 			void play(const std::filesystem::path &, float pitch = 1.f);
-			size_t cleanup();
+			void cleanup();
 
 		private:
 			std::unique_ptr<SoundEngineImpl> impl;

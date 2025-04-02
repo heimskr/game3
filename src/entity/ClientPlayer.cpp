@@ -13,7 +13,10 @@
 #include "packet/MovePlayerPacket.h"
 #include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
+#include "tile/Tile.h"
 #include "ui/Window.h"
+
+#include <cmath>
 
 namespace Game3 {
 	namespace {
@@ -67,11 +70,26 @@ namespace Game3 {
 			move(Direction::Down, context);
 
 		direction = final_direction;
+
+		if (firing) {
+			if (InventoryPtr inventory = getInventory(0)) {
+				if (ItemStackPtr active = inventory->getActive()) {
+					Place place = getPlace();
+					ClientGamePtr game = getGame()->toClientPointer();
+					WindowPtr window = game->getWindow();
+					auto [x, y] = window->getMouseCoordinates<double>();
+					double x_offset{}, y_offset{};
+					place.position = game->translateCanvasCoordinates(x, y, &x_offset, &y_offset);
+					active->item->fire(inventory->activeSlot, active, place, window->getModifiers(), {x_offset, y_offset});
+				}
+			}
+		}
 	}
 
 	void ClientPlayer::render(const RendererContext &renderers) {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		TextRenderer &text = renderers.text;
 
@@ -87,13 +105,44 @@ namespace Game3 {
 
 		if (show_message) {
 			text.drawOnMap(lastMessage, {
-				.x = float(column) + x + .5,
-				.y = float(row) + y - z + health_offset - .25,
+				.x = static_cast<float>(column) + x + .5,
+				.y = static_cast<float>(row) + y - z + health_offset - .25,
 				.scaleX = .75,
 				.scaleY = .75,
 				.align = TextAlign::Center,
 			});
 		}
+
+#if 0
+		constexpr double thickness = 5 / 16.;
+		constexpr double shrink = 16 / 16.;
+		ClientGamePtr client_game = game->toClientPointer();
+		const auto [mouse_x, mouse_y] = client_game->getWindow()->getMouseCoordinates<double>();
+		double x_offset{}, y_offset{};
+		Position mouse_position = client_game->translateCanvasCoordinates(mouse_x, mouse_y, &x_offset, &y_offset);
+		Vector2d target(mouse_position.column - x_offset + 1, mouse_position.row - y_offset + 1);
+		Vector2d diff = Vector2d(getPosition()) + Vector2d(offset.x + 0.5, offset.y - offset.z + 0.5) - target;
+		Vector2d midpoint = target + diff / 2.0;
+		double degrees = diff.atan2() * 180 / M_PI;
+		double distance = diff.magnitude();
+
+		renderers.rectangle.drawOnMap(RenderOptions{
+			.x = midpoint.x - distance / 2 + shrink / 2,
+			.y = midpoint.y - thickness / 2,
+			.sizeX = distance - shrink,
+			.sizeY = thickness,
+			.angle = degrees,
+			.color = Color{"#fa4d10bd"},
+		});
+
+		renderers.singleSprite.drawOnMap(cacheTexture("resources/sticky_hand.png"), RenderOptions{
+			.x = target.x - 0.5,
+			.y = target.y - 0.5,
+			.sizeX = -1,
+			.sizeY = -1,
+			.angle = degrees,
+		});
+#endif
 
 		text.drawOnMap(displayName, {
 			.x = float(column) + x + .5,
@@ -104,7 +153,7 @@ namespace Game3 {
 		if (InventoryPtr inventory = getInventory(0)) {
 			if (ItemStackPtr active = inventory->getActive()) {
 				auto window = getGame()->toClient().getWindow();
-				active->renderEffects(renderers, window->getHoveredPosition(), window->getModifiers());
+				active->renderEffects(*window, renderers, window->getHoveredPosition(), window->getModifiers());
 			}
 		}
 	}
@@ -144,8 +193,9 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::jump() {
-		if (getRidden())
+		if (getRidden()) {
 			return;
+		}
 
 		double z{};
 		{
@@ -158,10 +208,22 @@ namespace Game3 {
 				velocity.z = getJumpSpeed();
 			}
 			GamePtr game = getGame();
-			constexpr static float variance = .9f;
-			game->toClient().playSound("base:sound/jump", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
-			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
-				tile_entity->onOverlapEnd(getSelf());
+			game->toClient().playSound("base:sound/jump", threadContext.getPitch(1.111f));
+
+			EntityPtr self = getSelf();
+
+			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
+				tile_entity->onOverlapEnd(self);
+			}
+
+			Place place = getPlace();
+
+			for (Layer layer: allLayers) {
+				if (TilePtr tile = place.getTile(layer)) {
+					tile->jumpedFrom(self, place, layer);
+				}
+			}
+
 			send(make<JumpPacket>());
 		}
 	}

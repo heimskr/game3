@@ -1,15 +1,14 @@
 #include "config.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "graphics/GL.h"
 #include "graphics/Texture.h"
+#include "lib/JSON.h"
 #include "tools/TileStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Util.h"
 
 #include <cmath>
-
-#include <nlohmann/json.hpp>
 
 #ifdef USING_VCPKG
 #include "lib/stb/stb_image.h"
@@ -23,10 +22,11 @@ namespace Game3 {
 	Tileset tileStitcher(const std::filesystem::path &base_dir, Identifier tileset_name, Side side, std::string *png_out) {
 		std::set<std::filesystem::path> dirs;
 
-		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
+		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir)) {
 			dirs.insert(entry);
+		}
 
-		std::unordered_map<std::string, nlohmann::json> json_map;
+		std::unordered_map<std::string, JSON::value> json_map;
 		std::set<std::string> short_autotiles;
 		std::set<std::string> non_autotiles;
 		std::set<std::string> tall_autotiles;
@@ -40,58 +40,72 @@ namespace Game3 {
 		Hasher hasher(Hasher::Algorithm::SHA3_512);
 
 		for (const std::filesystem::path &dir: dirs) {
-			if (!std::filesystem::is_directory(dir))
+			if (!std::filesystem::is_directory(dir)) {
 				continue;
+			}
 
-			nlohmann::json json = nlohmann::json::parse(readFile(dir / "tile.json"));
-			std::string name = dir.filename();
+			JSON::value json = JSON::parse(readFile(dir / "tile.json"));
+			std::string name = dir.filename().string();
 
-			const Identifier tilename = json.at("tilename");
+			Identifier tilename = JSON::value_to<Identifier>(json.at("tilename"));
 
 			out.inverseCategories[tilename] = {"base:category/all_tiles"};
 			out.categories["base:category/all_tiles"].insert(tilename);
 
-			if (auto categories = json.find("categories"); categories != json.end()) {
-				for (const nlohmann::json &category_json: *categories) {
-					Identifier category{category_json};
-					out.categories[category].insert(tilename);
-					out.inverseCategories[tilename].insert(std::move(category));
+			if (auto *object = json.if_object()) {
+				if (auto *categories = object->if_contains("categories")) {
+					if (auto *categories_array = categories->if_array()) {
+						for (const JSON::value &category_json: *categories_array) {
+							Identifier category = JSON::value_to<Identifier>(category_json);
+							out.categories[category].insert(tilename);
+							out.inverseCategories[tilename].insert(std::move(category));
+						}
+					}
+				}
+
+				if (auto *stack = object->if_contains("stack")) {
+					out.stackNames[tilename] = JSON::value_to<Identifier>(*stack);
 				}
 			}
-
-			if (auto stack = json.find("stack"); stack != json.end())
-				out.stackNames[tilename] = *stack;
 
 			json_map[name] = std::move(json);
 		}
 
 		if (std::filesystem::exists(base_dir / "tileset.json")) {
-			nlohmann::json tileset_meta = nlohmann::json::parse(readFile(base_dir / "tileset.json"));
+			JSON::value tileset_meta = JSON::parse(readFile(base_dir / "tileset.json"));
 
-			if (auto autotiles_iter = tileset_meta.find("autotiles"); autotiles_iter != tileset_meta.end()) {
-				for (const auto &[autotile, member]: autotiles_iter->items()) {
-					const Identifier autotile_id{autotile};
-					const Identifier member_id{member.get<std::string>()};
-					if (const std::string path_start = member_id.getPathStart(); path_start == "category") {
-						for (const Identifier &tilename: out.getTilesByCategory(member_id))
-							out.setAutotile(tilename, autotile_id);
-					} else if (path_start == "tile") {
-						out.setAutotile(member_id, autotile_id);
-					} else {
-						throw std::runtime_error("Invalid autotile member: " + member_id.str());
+			if (JSON::object *meta_object = tileset_meta.if_object()) {
+				if (auto *autotiles = meta_object->if_contains("autotiles")) {
+					for (const auto &[autotile, member]: autotiles->as_object()) {
+						Identifier autotile_id{autotile};
+						Identifier member_id = JSON::value_to<Identifier>(member);
+
+						if (const std::string path_start = member_id.getPathStart(); path_start == "category") {
+							for (const Identifier &tilename: out.getTilesByCategory(member_id)) {
+								out.setAutotile(tilename, autotile_id);
+							}
+						} else if (path_start == "tile") {
+							out.setAutotile(member_id, autotile_id);
+						} else {
+							throw std::runtime_error("Invalid autotile member: " + member_id.str());
+						}
+					}
+				}
+
+				// Some tiles, such as fences, want to autotile with most tiles.
+				// The "omnitiles" member is a set of such autotiles.
+				if (auto *omnitiles = meta_object->if_contains("omnitiles")) {
+					for (const auto &omnitile: omnitiles->as_array()) {
+						out.autotileSets.at(JSON::value_to<Identifier>(omnitile))->omni = true;
+					}
+				}
+
+				if (auto *stacks = meta_object->if_contains("stacks")) {
+					for (const auto &[category, stack]: stacks->as_object()) {
+						out.stackCategories[Identifier(category)] = JSON::value_to<Identifier>(stack);
 					}
 				}
 			}
-
-			// Some tiles, such as fences, want to autotile with most tiles.
-			// The "omnitiles" member is a set of such autotiles.
-			if (auto omnitiles_iter = tileset_meta.find("omnitiles"); omnitiles_iter != tileset_meta.end())
-				for (const auto &omnitile: *omnitiles_iter)
-					out.autotileSets.at(omnitile.get<Identifier>())->omni = true;
-
-			if (auto stacks = tileset_meta.find("stacks"); stacks != tileset_meta.end())
-				for (const auto &[category, stack]: stacks->items())
-					out.stackCategories[Identifier(category)] = stack;
 		}
 
 		std::unordered_set<std::string> is_tall;
@@ -99,9 +113,9 @@ namespace Game3 {
 		for (const auto &[name, json]: json_map) {
 			std::filesystem::path png_path = base_dir / name / "tile.png";
 			int width{}, height{}, channels{};
-			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
+			images.emplace(name, stbi_load(png_path.string().c_str(), &width, &height, &channels, 4));
 
-			Identifier tilename = json.at("tilename");
+			Identifier tilename = JSON::value_to<Identifier>(json.at("tilename"));
 
 			int desired_dimension = 16;
 
@@ -109,17 +123,21 @@ namespace Game3 {
 				short_autotiles.insert(name);
 				out.marchableMap[tilename] = MarchableInfo{tilename, autotile_iter->second, false};
 				desired_dimension = 64;
-			} else
+			} else {
 				non_autotiles.insert(name);
+			}
 
-			if (json.at("solid").get<bool>())
+			if (json.at("solid").as_bool()) {
 				out.solid.insert(tilename);
+			}
 
-			if (json.at("land").get<bool>())
+			if (json.at("land").as_bool()) {
 				out.land.insert(tilename);
+			}
 
-			if (channels != 3 && channels != 4)
+			if (channels != 3 && channels != 4) {
 				throw std::runtime_error("Invalid channel count for " + name + ": " + std::to_string(channels) + " (expected 3 or 4)");
+			}
 
 			if (desired_dimension == 16 && width == 16 && height == 32) {
 				is_tall.insert(name);
@@ -128,11 +146,13 @@ namespace Game3 {
 				tall_autotiles.insert(name);
 				out.marchableMap[tilename].tall = true;
 			} else {
-				if (width != desired_dimension)
+				if (width != desired_dimension) {
 					throw std::runtime_error("Invalid width for " + name + ": " + std::to_string(width) + " (expected " + std::to_string(desired_dimension) + ')');
+				}
 
-				if (height != desired_dimension)
+				if (height != desired_dimension) {
 					throw std::runtime_error("Invalid height for " + name + ": " + std::to_string(height) + " (expected " + std::to_string(desired_dimension) + ')');
+				}
 			}
 		}
 
@@ -152,8 +172,9 @@ namespace Game3 {
 		// Otherwise, we need to take the square root of the effective number of lines and round it
 		// up to the nearest power of two. This will get us the final side length of the omnisquare
 		// in tiles.
-		if (32 < effective_4x8_autotile_sets)
+		if (32 < effective_4x8_autotile_sets) {
 			dimension = size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(32 * effective_4x8_autotile_sets))))));
+		}
 		// Each tile is 16 pixels by 16 pixels.
 		dimension *= tilesize;
 
@@ -182,7 +203,7 @@ namespace Game3 {
 		};
 
 		for (const std::string &name: tall_autotiles) {
-			hasher += json_map.at(name).dump();
+			hasher += json_map.at(name);
 			const auto &source = images.at(name);
 
 			for (size_t row = 0; row < 4; ++row) {
@@ -202,11 +223,12 @@ namespace Game3 {
 				}
 			}
 
-			Identifier tilename = json_map.at(name).at("tilename");
+			Identifier tilename = JSON::value_to<Identifier>(json_map.at(name).at("tilename"));
 			out.ids[tilename] = tile_index;
 			for (size_t tile_offset = 0; tile_offset < 4 * 8; ++tile_offset) {
-				if (tile_offset % 2 == 0)
+				if (tile_offset % 2 == 0) {
 					out.uppers[tile_index + tile_offset] = tile_index + tile_offset + 1;
+				}
 				out.names[tile_index + tile_offset] = tilename;
 			}
 
@@ -214,7 +236,7 @@ namespace Game3 {
 		}
 
 		for (const std::string &name: short_autotiles) {
-			hasher += json_map.at(name).dump();
+			hasher += json_map.at(name);
 			const auto &source = images.at(name);
 
 			for (size_t row = 0; row < 4; ++row) {
@@ -231,25 +253,27 @@ namespace Game3 {
 				}
 			}
 
-			Identifier tilename = json_map.at(name).at("tilename");
+			Identifier tilename = JSON::value_to<Identifier>(json_map.at(name).at("tilename"));
 			out.ids[tilename] = tile_index;
-			for (size_t tile_offset = 0; tile_offset < 4 * 4; ++tile_offset)
+			for (size_t tile_offset = 0; tile_offset < 4 * 4; ++tile_offset) {
 				out.names[tile_index + tile_offset] = tilename;
+			}
 
 			next(4 * 4 * tilesize);
 		}
 
 		for (const std::string &name: non_autotiles) {
-			hasher += json_map.at(name).dump();
+			hasher += json_map.at(name);
 
 			const auto &source = images.at(name);
-			for (size_t y = 0; y < tilesize; ++y)
-				for (size_t x = 0; x < tilesize; ++x)
+			for (size_t y = 0; y < tilesize; ++y) {
+				for (size_t x = 0; x < tilesize; ++x) {
 					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (tilesize * y + x)], 4 * sizeof(uint8_t));
-
+				}
+			}
 
 			if (!is_tall.contains(name)) {
-				Identifier tilename = json_map.at(name).at("tilename");
+				Identifier tilename = JSON::value_to<Identifier>(json_map.at(name).at("tilename"));
 				out.ids[tilename] = tile_index;
 				out.names[tile_index] = std::move(tilename);
 
@@ -257,16 +281,18 @@ namespace Game3 {
 				continue;
 			}
 
-			Identifier tilename = json_map.at(name).at("tilename");
+			Identifier tilename = JSON::value_to<Identifier>(json_map.at(name).at("tilename"));
 			out.ids[tilename] = tile_index + 1;
 			out.names[tile_index + 1] = tilename;
 			out.uppers[tile_index + 1] = tile_index;
 			out.names[tile_index] = std::move(tilename);
 			next(tilesize);
 
-			for (size_t y = 0; y < tilesize; ++y)
-				for (size_t x = 0; x < tilesize; ++x)
+			for (size_t y = 0; y < tilesize; ++y) {
+				for (size_t x = 0; x < tilesize; ++x) {
 					std::memcpy(&raw[4 * (x_index + x + dimension * (y_index + y))], &source[4 * (tilesize * (y + 16) + x)], 4 * sizeof(uint8_t));
+				}
+			}
 
 			next(tilesize);
 		}
@@ -276,14 +302,17 @@ namespace Game3 {
 		out.names[0] = "base:tile/empty";
 
 		if (png_out != nullptr) {
-			for (const std::string &name: tall_autotiles)
-				INFO("{} → {}", name, out.ids[json_map.at(name)["tilename"]]);
+			for (const std::string &name: tall_autotiles) {
+				INFO("{} → {}", name, out.ids[JSON::value_to<Identifier>(json_map.at(name).at("tilename"))]);
+			}
 
-			for (const std::string &name: short_autotiles)
-				INFO("{} → {}", name, out.ids[json_map.at(name)["tilename"]]);
+			for (const std::string &name: short_autotiles) {
+				INFO("{} → {}", name, out.ids[JSON::value_to<Identifier>(json_map.at(name).at("tilename"))]);
+			}
 
-			for (const std::string &name: non_autotiles)
-				INFO("{} → {}", name, out.ids[json_map.at(name)["tilename"]]);
+			for (const std::string &name: non_autotiles) {
+				INFO("{} → {}", name, out.ids[JSON::value_to<Identifier>(json_map.at(name).at("tilename"))]);
+			}
 
 			std::stringstream ss;
 

@@ -4,43 +4,53 @@ if get_option('discord_rich_presence') == true
 	game3_sources += run_command('discord-grabber.sh', check: true).stdout().strip().split('\n')
 endif
 
+cmake = import('cmake')
+
 chemskr = subproject('chemskr')
 namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
+# fastnoise2 = cmake.subproject('FastNoise2')
 
 game3_deps = [
-	cxx.find_library('m'),
 	dependency('glibmm-2.68'),
 	dependency('threads'),
-	dependency('eigen3'),
 	dependency('openssl'),
 	dependency('freetype2'),
 	dependency('libzstd'),
-	dependency('sqlite3'),
 	dependency('gl'),
+#	dependency('glew'),
+#	dependency('freeglut'),
+	dependency('glfw3'),
 	dependency('asio'),
 	dependency('liblz4'),
-	dependency('nlohmann_json'),
-	dependency('glm'),
-	dependency('glfw3'),
-	dependency('boost'),
-	dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
+	dependency('boost', modules: ['json']),
+	# fastnoise2.dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
 	dependency('sigc++-3.0'),
+	dependency('libpng'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
+if build_machine.system() != 'windows'
+	# No clue why the libunwind package for MSYS2 doesn't include a .pc file. We just have to trust it's installed.
+	game3_deps += dependency('libunwind')
+endif
+
 inc_dirs = [
 	include_directories('..' / 'include'),
 	include_directories('..' / 'voronoi' / 'src'),
+	include_directories('..' / 'subprojects' / 'fixed_string' / 'include'),
+	include_directories('..' / 'subprojects' / 'backward-cpp'),
 ]
 
 link_with = [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')]
 
-link_args = []
+link_args = [
+	'-lbfd',
+]
 
 if get_option('enable_zip8')
 	zip8 = subproject('zip8')
@@ -65,8 +75,31 @@ if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
-else
+elif build_machine.system() == 'linux'
+	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 	link_args += '-lnoise'
+elif build_machine.system() == 'darwin'
+	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
+elif build_machine.system() == 'windows'
+	link_args += '../subprojects/FastNoise2/build2/lib/libFastNoise.a'
+	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
+	link_args += '-lws2_32'
+	link_args += '-lopengl32'
+	link_args += '-lwsock32'
+	link_args += '-lstdc++exp'
+	link_args += '-lcrypt32'
+	# link_args += '-lgcc'
+	link_args += '-lglew32'
+	link_args += '-lglu32'
+	link_args += '-lunwind'
+	link_args += '-ldbghelp'
+	inc_dirs += include_directories('..' / 'subprojects' / 'libnoise' / 'src')
+endif
+
+if build_machine.system() == 'darwin'
+	link_args += ['-L/opt/homebrew/Cellar/llvm/19.1.5/lib/c++']
+else
+	game3_deps += cxx.find_library('m')
 endif
 
 if get_option('discord_rich_presence') == true

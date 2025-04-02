@@ -23,8 +23,10 @@ namespace Game3 {
 		template <template <typename...> typename C = std::unordered_set>
 		C<Position> getPositions(const ItemStack &stack) {
 			auto lock = stack.data.sharedLock();
-			if (auto iter = stack.data.find("positions"); iter != stack.data.end())
-				return *iter;
+			const auto &object = stack.data.as_object();
+			if (const auto *value = object.if_contains("positions")) {
+				return boost::json::value_to<C<Position>>(*value);
+			}
 			return {};
 		}
 	}
@@ -58,8 +60,9 @@ namespace Game3 {
 		Position top_left{min_row, min_column};
 
 		for (auto iter = positions.begin(); iter != positions.end(); ++iter) {
-			if (!last_position || *last_position + Position(0, 1) != *iter)
+			if (!last_position || *last_position + Position(0, 1) != *iter) {
 				anchor = *iter;
+			}
 			last_position = *iter;
 			++spans[*anchor];
 		}
@@ -72,16 +75,16 @@ namespace Game3 {
 
 			for (size_t i = 0; i < span_length; ++i) {
 				for (const Layer layer: allLayers) {
-					std::optional<TileID> tile = realm->tryTile(layer, position);
-					if (!tile)
-						continue;
-					Identifier identifier = tileset[*tile];
-					if (!identifier_map.contains(identifier)) {
-						identifier_map[identifier] = identifier_map.size();
-						if (identifier.inSpace("base") && identifier.getPath() == "tile")
-							identifiers.push_back(identifier.getPostPath());
-						else
-							identifiers.push_back(identifier.str());
+					if (std::optional<TileID> tile = realm->tryTile(layer, position)) {
+						Identifier identifier = tileset[*tile];
+						if (!identifier_map.contains(identifier)) {
+							identifier_map[identifier] = identifier_map.size();
+							if (identifier.inSpace("base") && identifier.getPath() == "tile") {
+								identifiers.push_back(identifier.getPostPath());
+							} else {
+								identifiers.push_back(identifier.str());
+							}
+						}
 					}
 				}
 
@@ -103,18 +106,21 @@ namespace Game3 {
 
 				for (const Layer layer: allLayers) {
 					std::optional<TileID> tile = realm->tryTile(layer, position);
-					if (!tile)
+					if (!tile) {
 						break;
+					}
 					layers.push_back(identifier_map[tileset[*tile]]);
 				}
 
-				while (!layers.empty() && layers.back() == 0)
+				while (!layers.empty() && layers.back() == 0) {
 					layers.pop_back();
+				}
 
-				if (first)
+				if (first) {
 					first = false;
-				else
+				} else {
 					ss << ',';
+				}
 
 				std::string joined = join(layers, ":");
 
@@ -130,41 +136,46 @@ namespace Game3 {
 		}
 
 		std::string combined = ss.str();
-		if (!combined.empty() && combined.back() == '/')
+		if (!combined.empty() && combined.back() == '/') {
 			combined.pop_back();
+		}
 
-		if (auto iter = stack->data.find("includeTileEntities"); iter == stack->data.end() || !iter->get<bool>())
+		if (const auto *value = stack->data.as_object().if_contains("includeTileEntities"); !value || !value->as_bool()) {
 			return combined;
+		}
 
 		combined += '\n';
 		ss = {};
 
 		for (const Position &position: positions) {
 			TileEntityPtr tile_entity = realm->tileEntityAt(position);
-			if (!tile_entity)
+			if (!tile_entity) {
 				continue;
-			nlohmann::json json;
+			}
+			boost::json::value json;
 			tile_entity->toJSON(json);
-			json.erase("gid");
-			json.erase("position");
-			ss << (position.row - min_row) << ',' << (position.column - min_column) << '=' << json.dump() << '\n';
+			auto &object = json.as_object();
+			object.erase("gid");
+			object.erase("position");
+			ss << (position.row - min_row) << ',' << (position.column - min_column) << '=' << boost::json::serialize(object) << '\n';
 		}
 
 		combined += ss.str();
 
-		while (combined.back() == '\n')
+		while (combined.back() == '\n') {
 			combined.pop_back();
+		}
 
 		return combined;
 	}
 
-	bool Copier::drag(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
+	bool Copier::drag(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		if (modifiers == Modifiers(true, true, false, false)) {
 			std::string tiles = getString(stack, place.realm);
 			try {
 				Paster(std::string_view(tiles)).paste(place.realm, place.position);
 			} catch (const std::exception &err) {
-				ERROR("Couldn't paste: {}", err.what());
+				ERR("Couldn't paste: {}", err.what());
 			}
 			return true;
 		}
@@ -173,45 +184,46 @@ namespace Game3 {
 			auto lock = stack->data.uniqueLock();
 
 			if (modifiers.onlyCtrl()) {
-				if (!stack->data.is_null()) {
-					stack->data.erase("positions");
-					stack->data.erase("min");
+				if (auto *object = stack->data.if_object()) {
+					object->erase("positions");
+					object->erase("min");
 				}
-			} else {
+			} else if (auto *object = stack->data.if_object()) {
 				const Position &position = place.position;
 				std::unordered_set<Position> positions;
 
-				if (auto iter = stack->data.find("positions"); iter != stack->data.end())
-					positions = *iter;
+				if (auto *value = object->if_contains("positions")) {
+					positions = boost::json::value_to<decltype(positions)>(*value);
+				}
 
 				if (auto iter = positions.find(position); iter != positions.end()) {
 					positions.erase(iter);
 					if (positions.empty()) {
-						stack->data.erase("min");
-					} else if (auto iter = stack->data.find("min"); iter != stack->data.end()) {
-						auto &min = *iter;
+						object->erase("min");
+					} else if (auto *value = object->if_contains("min")) {
+						auto &min = value->as_array();
 						if (position.row == min[0] || position.column == min[1]) {
 							std::optional<Position> minimums = computeMinimums(positions);
 							assert(minimums);
-							stack->data["min"] = *minimums;
+							(*object)["min"] = boost::json::value_from(*minimums);
 						}
 					}
 				} else {
 					positions.insert(position);
-					if (auto iter = stack->data.find("min"); iter != stack->data.end()) {
-						auto &min = *iter;
-						min[0] = std::min(min[0].get<Index>(), position.row);
-						min[1] = std::min(min[1].get<Index>(), position.column);
+					if (auto *value = object->if_contains("min")) {
+						auto &min = value->as_array();
+						min[0] = std::min(boost::json::value_to<Index>(min[0]), position.row);
+						min[1] = std::min(boost::json::value_to<Index>(min[1]), position.column);
 					} else {
-						stack->data["min"] = position;
+						(*object)["min"] = boost::json::value_from(position);
 					}
 				}
 
 				if (positions.empty()) {
-					stack->data.erase("min");
-					stack->data.erase("positions");
+					object->erase("min");
+					object->erase("positions");
 				} else {
-					stack->data["positions"] = std::move(positions);
+					(*object)["positions"] = boost::json::value_from(positions);
 				}
 			}
 		}
@@ -220,7 +232,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Copier::renderEffects(const RendererContext &context, const Position &mouse_position, Modifiers modifiers, const ItemStackPtr &stack) const {
+	void Copier::renderEffects(Window &, const RendererContext &context, const Position &mouse_position, Modifiers modifiers, const ItemStackPtr &stack) const {
 		RectangleRenderer &rectangle = context.rectangle;
 
 		std::unordered_set<Position> positions = getPositions(*stack);
@@ -236,21 +248,19 @@ namespace Game3 {
 		}
 
 		if (modifiers == Modifiers(true, true, false, false)) {
-			auto iter = stack->data.find("min");
-			if (iter == stack->data.end())
-				return;
+			if (auto *value = stack->data.as_object().if_contains("min")) {
+				Position anchor = boost::json::value_to<Position>(*value);
 
-			Position anchor = *iter;
-
-			for (const Position &position: positions) {
-				Position adjusted = position - anchor + mouse_position;
-				rectangle.drawOnMap(RenderOptions{
-					.x = double(adjusted.column),
-					.y = double(adjusted.row),
-					.sizeX = 1.,
-					.sizeY = 1.,
-					.color = {.5f, .5f, .5f, .5f},
-				});
+				for (const Position &position: positions) {
+					Position adjusted = position - anchor + mouse_position;
+					rectangle.drawOnMap(RenderOptions{
+						.x = double(adjusted.column),
+						.y = double(adjusted.row),
+						.sizeX = 1.,
+						.sizeY = 1.,
+						.color = {.5f, .5f, .5f, .5f},
+					});
+				}
 			}
 		}
 	}

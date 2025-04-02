@@ -14,8 +14,9 @@
 
 namespace Game3 {
 	const std::filesystem::path * Game::getSound(const Identifier &identifier) {
-		if (auto sound_path = registry<SoundRegistry>().maybe(identifier))
+		if (auto sound_path = registry<SoundRegistry>().maybe(identifier)) {
 			return &sound_path->path;
+		}
 		return nullptr;
 	}
 
@@ -24,12 +25,14 @@ namespace Game3 {
 		size_t added = 0;
 
 		for (const auto &entry: std::filesystem::directory_iterator(dir)) {
-			if (!entry.is_directory())
+			if (!entry.is_directory()) {
 				continue;
+			}
 
-			nlohmann::json json = nlohmann::json::parse(readFile(entry.path() / "sound.json"));
-			const Identifier id = json.at("id");
-			reg.add(id, SoundPath(id, entry.path() / "sound.opus"));
+			boost::json::value json = boost::json::parse(readFile(entry.path() / "sound.json"));
+			Identifier id(json.at("id").as_string());
+			SoundPath sound_path(id, entry.path() / "sound.opus");
+			reg.add(std::move(id), std::move(sound_path));
 			++added;
 		}
 

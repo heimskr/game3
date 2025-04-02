@@ -19,27 +19,28 @@ namespace Game3 {
 		constexpr Color CHAT_FOCUSED_TEXT_COLOR{"#ffffff"};
 		constexpr Color CHAT_UNFOCUSED_TEXT_COLOR{"#000000a0"};
 		constexpr Color CHAT_SEPARATOR_COLOR{"#ffffffa0"};
-		constexpr int CHAT_TOGGLER_SIZE = 64;
+		constexpr int CHAT_TOGGLER_SIZE = 8;
 	}
 
-	ChatDialog::ChatDialog(UIContext &ui):
-		Dialog(ui) {}
+	ChatDialog::ChatDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {}
 
 	void ChatDialog::init() {
-		scroller = std::make_shared<Scroller>(ui, scale, CHAT_SCROLLBAR_COLOR);
-		messageBox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 2, 0, Color{});
-		toggler = std::make_shared<Label>(ui, scale, "<<", CHAT_FOCUSED_TEXT_COLOR);
+		scroller = std::make_shared<Scroller>(ui, selfScale, CHAT_SCROLLBAR_COLOR);
+		messageBox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
+		toggler = std::make_shared<Label>(ui, selfScale, "<<", CHAT_FOCUSED_TEXT_COLOR);
 
-		vbox = std::make_shared<Box>(ui, scale, Orientation::Vertical, 0, 0.5, CHAT_SEPARATOR_COLOR);
+		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0.5, CHAT_SEPARATOR_COLOR);
 
 		toggler->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			toggle(false);
 			return true;
 		});
 
-		messageInput = std::make_shared<TextInput>(ui, scale, Color{"#"}, Color{"#"}, CHAT_FOCUSED_TEXT_COLOR, CHAT_FOCUSED_TEXT_COLOR, 0);
+		messageInput = std::make_shared<TextInput>(ui, selfScale, Color{"#"}, Color{"#"}, CHAT_FOCUSED_TEXT_COLOR, CHAT_FOCUSED_TEXT_COLOR, 0);
 		messageInput->onSubmit.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
 				return;
@@ -64,7 +65,7 @@ namespace Game3 {
 
 		scroller->setChild(messageBox);
 		scroller->setExpand(true, true);
-		messageInput->setFixedHeight(8 * scale);
+		messageInput->setFixedHeight(8 * selfScale);
 		vbox->append(scroller);
 		vbox->append(messageInput);
 		vbox->insertAtEnd(shared_from_this());
@@ -75,12 +76,13 @@ namespace Game3 {
 
 	void ChatDialog::render(const RendererContext &renderers) {
 		Rectangle position = getPosition();
-		position.width -= CHAT_TOGGLER_SIZE;
+		const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
+		position.width -= toggler_size;
 
 		Rectangle toggler_position = position;
-		toggler_position.y = position.y + position.height - CHAT_TOGGLER_SIZE;
-		toggler_position.width = CHAT_TOGGLER_SIZE;
-		toggler_position.height = CHAT_TOGGLER_SIZE;
+		toggler_position.y = position.y + position.height - toggler_size;
+		toggler_position.width = toggler_size;
+		toggler_position.height = toggler_size;
 
 		if (!isHidden) {
 			if (isFocused()) {
@@ -106,10 +108,11 @@ namespace Game3 {
 	Rectangle ChatDialog::getPosition() const {
 		if (const std::optional<float> &last_y = ui.getHotbar()->getLastY()) {
 			constexpr int height = 400;
-			Rectangle out(0, *last_y - height - 64, isHidden? CHAT_TOGGLER_SIZE : ui.getWidth() / 2, height);
+			const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
+			Rectangle out(0, *last_y - height - 64, isHidden? toggler_size : ui.getWidth() / 2, height);
 			if (isHidden) {
-				out.y += out.height - CHAT_TOGGLER_SIZE;
-				out.height = CHAT_TOGGLER_SIZE;
+				out.y += out.height - toggler_size;
+				out.height = toggler_size;
 			}
 			return out;
 		}
@@ -117,16 +120,12 @@ namespace Game3 {
 		return Rectangle(0, 0, -1, -1);
 	}
 
-	bool ChatDialog::click(int button, int x, int y) {
-		return Dialog::click(button, x, y);
-	}
-
-	bool ChatDialog::scroll(float x_delta, float y_delta, int x, int y) {
+	bool ChatDialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (!isFocused()) {
 			return false;
 		}
 
-		return Dialog::scroll(x_delta, y_delta, x, y);
+		return Dialog::scroll(x_delta, y_delta, x, y, modifiers);
 	}
 
 	bool ChatDialog::keyPressed(uint32_t key, Modifiers, bool) {
@@ -156,7 +155,7 @@ namespace Game3 {
 
 	void ChatDialog::addMessage(UString message) {
 		assert(messageBox != nullptr);
-		auto label = std::make_shared<Label>(ui, scale, std::move(message), getTextColor());
+		auto label = std::make_shared<Label>(ui, selfScale, std::move(message), getTextColor());
 		messageBox->append(std::move(label));
 		// TODO: this is a temporary hack to fix the scrollbar. It's not otherwise informed that its child's height changed.
 		scroller->lastChildHeight = -1;

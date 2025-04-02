@@ -36,11 +36,20 @@ namespace Game3 {
 
 			GameDB(const std::shared_ptr<ServerGame> &);
 
+			static int64_t currentFormatVersion();
+
 			void open(std::filesystem::path);
 			void close();
 
+			/** <  0: this save is too old
+			 *  == 0: this save is compatible
+			 *  >  0: this save is too new    */
+			int64_t getCompatibility();
+
 			void writeAll();
 			void readAll();
+
+			void writeMisc();
 
 			void writeRules();
 			void readRules();
@@ -82,7 +91,7 @@ namespace Game3 {
 
 			void writeTilesetMeta(const Tileset &, bool use_transaction = true);
 			/** Returns whether anything was found. */
-			bool readTilesetMeta(const std::string &hash, nlohmann::json &, bool do_lock = true);
+			bool readTilesetMeta(const std::string &hash, boost::json::value &, bool do_lock = true);
 
 			inline bool isOpen() {
 				return database != nullptr;

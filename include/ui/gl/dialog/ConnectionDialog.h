@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/gl/dialog/Dialog.h"
+#include "ui/gl/dialog/SizeCachingDialog.h"
 
 #include <memory>
 
@@ -10,7 +10,7 @@ namespace Game3 {
 
 	class ConnectionDialog: public Dialog {
 		public:
-			ConnectionDialog(UIContext &);
+			ConnectionDialog(UIContext &, float selfScale);
 
 			void init() final;
 			void render(const RendererContext &) final;

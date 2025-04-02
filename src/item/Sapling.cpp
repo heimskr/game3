@@ -16,19 +16,21 @@ namespace Game3 {
 
 		Tileset &tileset = realm.getTileset();
 
-		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, getSoilCategory()))
+		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, getSoilCategory())) {
 			return false;
+		}
 
-		if (!place.isPathable() || place.get(Layer::Submerged) != 0)
+		if (!place.isPathable() || place.get(Layer::Submerged) != 0) {
 			return false;
+		}
 
 		const InventoryPtr inventory = player.getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
 		return plant(inventory, slot, stack, place);
 	}
 
-	bool Sapling::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers) {
-		return use(slot, stack, place, modifiers, {0.f, 0.f});
+	bool Sapling::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+		return use(slot, stack, place, modifiers, offsets);
 	}
 
 	bool Sapling::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {

@@ -4,14 +4,12 @@
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
 
-#include <nlohmann/json.hpp>
-
 namespace Game3 {
 	CombinerRecipe::CombinerRecipe(Identifier output_):
 		Recipe(output_), outputID(std::move(output_)) {}
 
-	CombinerRecipe::CombinerRecipe(Identifier output_, const std::shared_ptr<Game> &game, const nlohmann::json &json):
-		Recipe(output_), input(CombinerInput::fromJSON(json, &outputCount).getStacks(game)), outputID(std::move(output_)) {}
+	CombinerRecipe::CombinerRecipe(Identifier output_, const std::shared_ptr<Game> &game, const boost::json::value &json):
+		Recipe(output_), input(boost::json::value_to<CombinerInput>(json, &outputCount).getStacks(game)), outputID(std::move(output_)) {}
 
 	CombinerRecipe::Input CombinerRecipe::getInput(const std::shared_ptr<Game> &) {
 		return input;
@@ -87,13 +85,10 @@ namespace Game3 {
 		return true;
 	}
 
-	void CombinerRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = CombinerRecipeRegistry::ID();
-		json["input"] = input;
-		json["output"] = {outputID, outputCount};
-	}
-
-	void to_json(nlohmann::json &json, const CombinerRecipe &recipe) {
-		recipe.toJSON(json);
+	void CombinerRecipe::toJSON(boost::json::value &json, const GamePtr &) const {
+		auto &object = json.emplace_object();
+		object["type"] = boost::json::value_from(CombinerRecipeRegistry::ID());
+		object["input"] = boost::json::value_from(input);
+		object["output"] = boost::json::array{boost::json::value_from(outputID), outputCount};
 	}
 }

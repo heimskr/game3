@@ -14,6 +14,7 @@ namespace Game3 {
 			virtual void setFixedSize(float, float);
 			virtual void setFixedSize(float);
 			virtual void fixSizes(float &width, float &height);
+			virtual void fixSizes(float &width, float &height, float scale);
 
 		protected:
 			HasFixedSize(float fixed_width, float fixed_height);

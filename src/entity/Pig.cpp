@@ -26,11 +26,11 @@ namespace Game3 {
 		return out;
 	}
 
-	bool Pig::canAbsorbGenes(const nlohmann::json &genes) const {
+	bool Pig::canAbsorbGenes(const boost::json::value &genes) const {
 		return checkGenes(genes, {"variant", "species"});
 	}
 
-	void Pig::absorbGenes(const nlohmann::json &genes) {
+	void Pig::absorbGenes(const boost::json::value &genes) {
 		absorbGene(variant, genes, "variant");
 		texture = nullptr;
 	}

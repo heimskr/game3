@@ -5,7 +5,7 @@
 #include "registry/Registry.h"
 #include "types/Types.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <optional>
 #include <set>
@@ -18,7 +18,7 @@ namespace Game3 {
 	class ProductionRule: public Registerable {
 		public:
 			using Registerable::Registerable;
-			ProductionRule(const std::shared_ptr<Game> &, const nlohmann::json &);
+			ProductionRule(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			inline const auto & getInputs() const { return inputs; }
 			inline const auto & getOutput() const { return output; }
@@ -30,7 +30,6 @@ namespace Game3 {
 
 			bool doesBiomeMatch(BiomeType) const;
 
-			static ProductionRule fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
 
 		private:
 			std::vector<ItemStackPtr> inputs;
@@ -43,7 +42,8 @@ namespace Game3 {
 			std::optional<std::pair<double, double>> randomRange;
 	};
 
-	void to_json(nlohmann::json &, const ProductionRule &);
+	ProductionRule tag_invoke(boost::json::value_to_tag<ProductionRule>, const boost::json::value &, const std::shared_ptr<Game> &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ProductionRule &);
 
 	struct ProductionRuleRegistry: UnnamedJSONRegistry<ProductionRule, RandomSet> {
 		static Identifier ID() { return {"base", "registry/production_rule"}; }

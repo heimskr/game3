@@ -3,12 +3,12 @@
 #include "data/Identifier.h"
 #include "registry/Registerable.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Resource: public NamedRegisterable {
 		public:
-			Resource(Identifier, const nlohmann::json &);
+			Resource(Identifier, const boost::json::value &);
 
 			double sampleRichness(double factor = 10) const;
 			bool sampleLikelihood() const;
@@ -19,6 +19,6 @@ namespace Game3 {
 			double likelihood{};
 			double cap{};
 
-			static double findCap(const nlohmann::json &);
+			static double findCap(const boost::json::value &);
 	};
 }

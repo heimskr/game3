@@ -18,13 +18,13 @@ namespace Game3 {
 
 			sigc::signal<void()> signalDismiss;
 
-			BaseDraggableDialog(UIContext &, int width, int height);
+			BaseDraggableDialog(UIContext &, float selfScale, int width, int height);
 
 			void render(const RendererContext &) override;
 			Rectangle getPosition() const override;
 			Rectangle getInnerRectangle() const;
 			void init() override;
-			bool click(int button, int x, int y) override;
+			bool click(int button, int x, int y, Modifiers) override;
 			bool dragStart(int x, int y) override;
 			bool dragUpdate(int x, int y) override;
 			bool dragEnd(int x, int y) override;
@@ -32,6 +32,8 @@ namespace Game3 {
 
 			virtual float getTitleScale() const = 0;
 			virtual const UString & getTitle() const = 0;
+
+			void recenter();
 
 		protected:
 			Rectangle position;

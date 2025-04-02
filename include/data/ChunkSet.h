@@ -2,7 +2,7 @@
 
 #include "Constants.h"
 #include "types/Layer.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "threading/HasMutex.h"
 #include "types/Types.h"
 

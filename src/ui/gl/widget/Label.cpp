@@ -7,8 +7,8 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Label::Label(UIContext &ui, float scale, UString text, Color text_color):
-		Widget(ui, scale),
+	Label::Label(UIContext &ui, float selfScale, UString text, Color text_color):
+		Widget(ui, selfScale),
 		textColor(text_color) {
 			setText(std::move(text));
 		}
@@ -81,6 +81,8 @@ namespace Game3 {
 	}
 
 	void Label::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		const float scale = getScale();
+
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
 
@@ -120,8 +122,9 @@ namespace Game3 {
 	}
 
 	void Label::setText(UString new_text) {
-		if (text == new_text)
+		if (text == new_text) {
 			return;
+		}
 
 		text = std::move(new_text);
 		wrapped.reset();
@@ -141,11 +144,11 @@ namespace Game3 {
 	}
 
 	float Label::getTextScale() const {
-		return scale / 16;
+		return getScale() / 16;
 	}
 
 	float Label::getPadding() const {
-		return scale * 2;
+		return getScale() * 2;
 	}
 
 	float Label::getWrapWidth(float width) const {

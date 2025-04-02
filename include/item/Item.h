@@ -6,7 +6,7 @@
 #include "types/Types.h"
 #include "ui/Modifiers.h"
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include <format>
 #include <map>
@@ -21,6 +21,7 @@ namespace Game3 {
 	class Player;
 	class Realm;
 	class Texture;
+	class Window;
 	struct Place;
 	struct Position;
 	struct RendererContext;
@@ -67,14 +68,17 @@ namespace Game3 {
 			/** Called when the user uses the item via the context menu or via a keyboard shortcut. Returns true iff propagation should stop. */
 			virtual bool use(Slot, const ItemStackPtr &, const std::shared_ptr<Player> &, Modifiers);
 
-			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers);
+			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
+
+			/** Called on the client every tick while the user is holding the mouse button on the world with the item selected. */
+			virtual bool fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
 
 			/** Whether the item's use function (see Item::use) should be called when the user interacts with a floor tile and this item is selected in the inventory tab. */
 			virtual bool canUseOnWorld() const { return false; }
 
 			virtual void onDestroy(Game &, const ItemStackPtr &) const {}
 
-			virtual void renderEffects(const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
+			virtual void renderEffects(Window &, const RendererContext &, const Position &, Modifiers, const ItemStackPtr &) const {}
 
 			// virtual bool populateMenu(const InventoryPtr &, Slot, const ItemStackPtr &, Glib::RefPtr<Gio::Menu>, Glib::RefPtr<Gio::SimpleActionGroup>) const { return false; }
 
@@ -90,7 +94,7 @@ namespace Game3 {
 		public:
 			std::shared_ptr<Item> item;
 			ItemCount count = 1;
-			Lockable<nlohmann::json> data;
+			Lockable<boost::json::value> data;
 
 			template <typename... Args>
 			static std::shared_ptr<ItemStack> create(Args &&...args) {
@@ -144,14 +148,12 @@ namespace Game3 {
 
 			std::shared_ptr<ItemTexture> getItemTexture(Game &) const;
 
-			static void fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &, ItemStack &);
-			static ItemStackPtr fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
-			static std::vector<ItemStackPtr> manyFromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static std::vector<ItemStackPtr> manyFromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			void onDestroy();
 			void onDestroy(Game &);
 
-			void renderEffects(const RendererContext &, const Position &, Modifiers);
+			void renderEffects(Window &, const RendererContext &, const Position &, Modifiers);
 
 			void encode(Game &, Buffer &);
 			void decode(Game &, Buffer &);
@@ -168,9 +170,9 @@ namespace Game3 {
 			ItemStack() = default;
 			ItemStack(const std::shared_ptr<Game> &);
 			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_ = 1);
-			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &, std::shared_ptr<Item> item_, ItemCount count_, boost::json::value data_);
 			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount = 1);
-			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, nlohmann::json data_);
+			ItemStack(const std::shared_ptr<Game> &, const ItemID &, ItemCount, boost::json::value data_);
 
 			void absorbGame(Game &);
 
@@ -192,7 +194,9 @@ namespace Game3 {
 	template <>
 	ItemStackPtr makeForBuffer<ItemStackPtr>(Buffer &);
 
-	void to_json(nlohmann::json &, const ItemStack &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ItemStack &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ItemStackPtr &);
+	ItemStackPtr tag_invoke(boost::json::value_to_tag<ItemStackPtr>, const boost::json::value &, const GamePtr &);
 }
 
 template <>

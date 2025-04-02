@@ -1,6 +1,5 @@
-#include "Log.h"
-#include "types/Position.h"
-#include "graphics/Tileset.h"
+#include "util/Log.h"
+#include "algorithm/AStar.h"
 #include "data/Identifier.h"
 #include "entity/ClientPlayer.h"
 #include "entity/Entity.h"
@@ -11,9 +10,12 @@
 #include "game/Game.h"
 #include "game/ServerGame.h"
 #include "game/ServerInventory.h"
+#include "graphics/CircleRenderer.h"
 #include "graphics/ItemTexture.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/GenericClient.h"
 #include "packet/EntityPacket.h"
@@ -22,8 +24,9 @@
 #include "packet/HeldItemSetPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "tile/Tile.h"
+#include "types/Position.h"
 #include "ui/Window.h"
-#include "algorithm/AStar.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 
@@ -37,8 +40,8 @@ namespace Game3 {
 		textureID(std::move(texture_id)),
 		variety(variety_) {}
 
-	EntityPtr Entity::fromJSON(const GamePtr &game, const nlohmann::json &json) {
-		auto factory = game->registry<EntityFactoryRegistry>().at(json.at("type").get<EntityType>());
+	EntityPtr Entity::fromJSON(const GamePtr &game, const boost::json::value &json) {
+		auto factory = game->registry<EntityFactoryRegistry>().at(boost::json::value_to<EntityType>(json.at("type")));
 		assert(factory);
 		auto out = (*factory)(game, json);
 		out->absorbJSON(game, json);
@@ -103,88 +106,130 @@ namespace Game3 {
 		}
 	}
 
-	void Entity::toJSON(nlohmann::json &json) const {
+	void Entity::toJSON(boost::json::value &json) const {
+		auto &object = ensureObject(json);
 		auto this_lock = sharedLock();
-		json["type"]      = type;
-		json["position"]  = position;
-		json["realmID"]   = realmID;
-		json["direction"] = direction;
-		json["age"]       = age;
+		object["type"]      = boost::json::value_from(type);
+		object["position"]  = boost::json::value_from(position);
+		object["realmID"]   = realmID;
+		object["direction"] = boost::json::value_from(direction);
+		object["age"]       = age;
+
 		if (const InventoryPtr inventory = getInventory(0)) {
 			// TODO: move JSONification to StorageInventory
-			if (getSide() == Side::Client)
-				json["inventory"] = static_cast<ClientInventory &>(*inventory);
-			else
-				json["inventory"] = static_cast<ServerInventory &>(*inventory);
+			if (getSide() == Side::Client) {
+				object["inventory"] = boost::json::value_from(static_cast<ClientInventory &>(*inventory));
+			} else {
+				object["inventory"] = boost::json::value_from(static_cast<ServerInventory &>(*inventory));
+			}
 		}
 
 		{
 			auto path_lock = path.sharedLock();
-			if (!path.empty())
-				json["path"] = path;
+			if (!path.empty()) {
+				object["path"] = boost::json::value_from(path);
+			}
 		}
 
-		if (money != 0)
-			json["money"] = money;
-		if (0 <= heldLeft.slot)
-			json["heldLeft"] = heldLeft.slot;
-		if (0 <= heldRight.slot)
-			json["heldRight"] = heldRight.slot;
-		if (customTexture)
-			json["customTexture"] = customTexture;
+		if (money != 0) {
+			object["money"] = money;
+		}
+
+		if (0 <= heldLeft.slot) {
+			object["heldLeft"] = heldLeft.slot;
+		}
+
+		if (0 <= heldRight.slot) {
+			object["heldRight"] = heldRight.slot;
+		}
+
+		if (customTexture) {
+			object["customTexture"] = boost::json::value_from(customTexture);
+		}
 	}
 
-	void Entity::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
-		if (json.is_null())
+	void Entity::absorbJSON(const GamePtr &game, const boost::json::value &json) {
+		if (json.is_null()) {
 			return; // Hopefully this is because the Entity is being constructed in EntityPacket::decode.
+		}
+
+		const auto &object = json.as_object();
 
 		auto this_lock = uniqueLock();
 
-		if (auto iter = json.find("type"); iter != json.end())
-			type = *iter;
-		if (auto iter = json.find("position"); iter != json.end())
-			position = iter->get<Position>();
-		if (auto iter = json.find("realmID"); iter != json.end())
-			realmID = *iter;
-		if (auto iter = json.find("direction"); iter != json.end())
-			direction = *iter;
-		if (auto iter = json.find("inventory"); iter != json.end())
-			setInventory(std::make_shared<ServerInventory>(ServerInventory::fromJSON(game, *iter, shared_from_this())), 0);
-		if (auto iter = json.find("path"); iter != json.end()) {
-			auto path_lock = path.uniqueLock();
-			path = iter->get<std::list<Direction>>();
+		if (auto iter = object.find("type"); iter != object.end()) {
+			type = boost::json::value_to<EntityType>(iter->value());
 		}
-		if (auto iter = json.find("money"); iter != json.end())
-			money = *iter;
-		if (auto iter = json.find("heldLeft"); iter != json.end())
-			heldLeft.slot = *iter;
-		if (auto iter = json.find("heldRight"); iter != json.end())
-			heldRight.slot = *iter;
-		if (auto iter = json.find("customTexture"); iter != json.end())
-			customTexture = *iter;
-		if (auto iter = json.find("age"); iter != json.end())
-			age = *iter;
+
+		if (auto iter = object.find("position"); iter != object.end()) {
+			position = boost::json::value_to<Position>(iter->value());
+		}
+
+		if (auto iter = object.find("realmID"); iter != object.end()) {
+			realmID = boost::json::value_to<RealmID>(iter->value());
+		}
+
+		if (auto iter = object.find("direction"); iter != object.end()) {
+			direction = boost::json::value_to<Direction>(iter->value());
+		}
+
+		if (auto iter = object.find("inventory"); iter != object.end()) {
+			setInventory(std::make_shared<ServerInventory>(boost::json::value_to<ServerInventory>(iter->value(), std::pair{game, shared_from_this()})), 0);
+		}
+
+		if (auto iter = object.find("path"); iter != object.end()) {
+			auto path_lock = path.uniqueLock();
+			path = boost::json::value_to<std::deque<Direction>>(iter->value());
+		}
+
+		if (auto iter = object.find("money"); iter != object.end()) {
+			money = boost::json::value_to<MoneyCount>(iter->value());
+		}
+
+		if (auto iter = object.find("heldLeft"); iter != object.end()) {
+			heldLeft.slot = boost::json::value_to<Slot>(iter->value());
+		}
+
+		if (auto iter = object.find("heldRight"); iter != object.end()) {
+			heldRight.slot = boost::json::value_to<Slot>(iter->value());
+		}
+
+		if (auto iter = object.find("customTexture"); iter != object.end()) {
+			customTexture = boost::json::value_to<Identifier>(iter->value());
+		}
+
+		if (auto iter = object.find("age"); iter != object.end()) {
+			age = getDouble(iter->value());
+		}
 
 		increaseUpdateCounter();
 	}
 
 	void Entity::tick(const TickArgs &args) {
 		if (!weakRealm.lock()) {
-			if (args.game->getSide() == Side::Server)
+			if (args.game->getSide() == Side::Server) {
 				teleport(Position{32, 32}, args.game->getRealm(-1));
+			}
 			tryEnqueueTick();
 			return;
 		}
 
+		bool path_drained = false;
 		{
 			auto shared_lock = path.sharedLock();
 			if (!path.empty() && move(path.front())) {
 				// Please no data race kthx.
 				shared_lock.unlock();
 				auto unique_lock = path.uniqueLock();
-				if (!path.empty())
+				if (!path.empty()) {
 					path.pop_front();
+					path_drained = path.empty();
+				}
 			}
+		}
+
+		if (path_drained && args.game->getSide() == Side::Server) {
+			args.game->toServer().entityTeleported(*this, MovementContext{.clearOffset = false});
 		}
 
 		const auto delta = args.delta;
@@ -197,15 +242,17 @@ namespace Game3 {
 			auto &z = offset.z;
 			const auto speed = getMovementSpeed();
 
-			if (x < 0.)
+			if (x < 0.) {
 				x = std::min(x + delta * speed, 0.);
-			else if (0. < x)
+			} else if (0. < x) {
 				x = std::max(x - delta * speed, 0.);
+			}
 
-			if (y < 0.)
+			if (y < 0.) {
 				y = std::min(y + delta * speed, 0.);
-			else if (0. < y)
+			} else if (0. < y) {
 				y = std::max(y - delta * speed, 0.);
+			}
 
 			auto velocity_lock = velocity.uniqueLock();
 
@@ -222,14 +269,23 @@ namespace Game3 {
 			}
 
 			if (!old_grounded && offset.isGrounded()) {
-				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition()))
+				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
 					tile_entity->onOverlap(getSelf());
+				}
+
+				if (args.game->getSide() == Side::Server) {
+					args.game->toServer().entityTeleported(*this, MovementContext{
+						.excludePlayer = isPlayer()? getGID() : -1,
+						.clearOffset = false,
+					});
+				}
 			}
 
-			if (z == 0.)
+			if (z == 0.) {
 				velocity.z = 0;
-			else
+			} else {
 				velocity.z -= 32 * delta;
+			}
 
 			position.withUnique([&offset = offset](Position &position) {
 				using I = Position::IntType;
@@ -245,8 +301,9 @@ namespace Game3 {
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
 
-		if (EntityPtr rider = getRider())
+		if (EntityPtr rider = getRider()) {
 			updateRider(rider);
+		}
 
 		tryEnqueueTick();
 	}
@@ -280,18 +337,21 @@ namespace Game3 {
 	}
 
 	void Entity::setRider(const EntityPtr &rider) {
-		if (EntityPtr current_rider = getRider())
+		if (EntityPtr current_rider = getRider()) {
 			current_rider->setRidden(nullptr);
+		}
 
 		weakRider = rider;
 
-		if (rider)
+		if (rider) {
 			rider->setRidden(getSelf());
+		}
 
 		GamePtr game = getGame();
 
-		if (game->getSide() == Side::Server)
+		if (game->getSide() == Side::Server) {
 			game->toServer().broadcast(make<EntityRiddenPacket>(rider, *this));
+		}
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
@@ -303,16 +363,16 @@ namespace Game3 {
 		initialized = true;
 
 		weakGame = game;
-		auto shared = shared_from_this();
+		AgentPtr shared = shared_from_this();
 
 		{
 			auto lock = game->allAgents.uniqueLock();
 			if (game->allAgents.contains(globalID)) {
 				if (auto locked = game->allAgents.at(globalID).lock()) {
 					auto &locked_ref = *locked;
-					ERROR("globalID[{}], allAgents<{}>, type[this={}, other={}], this={}, other={}", globalID, game->allAgents.size(), DEMANGLE(*this), DEMANGLE(locked_ref), reinterpret_cast<void *>(this), reinterpret_cast<void *>(locked.get()));
+					ERR("globalID[{}], allAgents<{}>, type[this={}, other={}], this={}, other={}", globalID, game->allAgents.size(), DEMANGLE(*this), DEMANGLE(locked_ref), reinterpret_cast<void *>(this), reinterpret_cast<void *>(locked.get()));
 				} else {
-					ERROR("globalID[{}], allAgents<{}>, type[this={}, other=expired]", globalID, game->allAgents.size(), DEMANGLE(*this));
+					ERR("globalID[{}], allAgents<{}>, type[this={}, other=expired]", globalID, game->allAgents.size(), DEMANGLE(*this));
 				}
 				assert(!game->allAgents.contains(globalID));
 			}
@@ -320,10 +380,11 @@ namespace Game3 {
 		}
 
 		if (texture == nullptr && game->getSide() == Side::Client) {
-			if (customTexture)
+			if (customTexture) {
 				changeTexture(customTexture);
-			else
+			} else {
 				texture = getTexture();
+			}
 		}
 
 		InventoryPtr inventory = getInventory(0);
@@ -341,17 +402,20 @@ namespace Game3 {
 				assert(here == *this_inventory || there == *this_inventory);
 
 				return [this, &here, here_slot, &there, there_slot, this_inventory] {
-					for (Held &held: {std::ref(heldLeft), std::ref(heldRight)})
-						if (here_slot == held.slot)
+					for (Held &held: {std::ref(heldLeft), std::ref(heldRight)}) {
+						if (here_slot == held.slot) {
 							setHeld(here == there? there_slot : -1, held);
+						}
+					}
 				};
 			};
 
 			inventory->onMove = [this, weak_inventory = std::weak_ptr(inventory)](Inventory &source, Slot source_slot, Inventory &destination, Slot destination_slot, bool) -> std::function<void()> {
 				InventoryPtr inventory = weak_inventory.lock();
 
-				if (!inventory)
+				if (!inventory) {
 					return [] {};
+				}
 
 				return [this, &source, source_slot, &destination, destination_slot, inventory] {
 					if (source == *inventory && destination == *inventory) {
@@ -393,8 +457,9 @@ namespace Game3 {
 	}
 
 	void Entity::render(const RendererContext &renderers) {
-		if (texture == nullptr || !isVisible())
+		if (texture == nullptr || !isVisible()) {
 			return;
+		}
 
 		GamePtr game = getGame();
 		SpriteRenderer &sprite_renderer = renderers.batchSprite;
@@ -430,16 +495,17 @@ namespace Game3 {
 
 		double fluid_offset = 0.;
 
-		if (auto fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
+		if (std::optional<FluidTile> fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
 			fluid_offset = std::sin(game->time * 1.5) + .5;
 			renderHeight = 10. + fluid_offset;
 		} else {
 			renderHeight = 16.;
 		}
 
-
 		const double x = column + offset_x;
 		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
+
+		const auto [multiplier, composite] = getColors();
 
 		RenderOptions main_options{
 			.x = x,
@@ -448,6 +514,8 @@ namespace Game3 {
 			.offsetY = texture_y_offset,
 			.sizeX = 16.,
 			.sizeY = std::min(16., renderHeight + 8. * offset_z),
+			.color = multiplier,
+			.composite = composite,
 		};
 
 		if (!heldLeft && !heldRight) {
@@ -510,6 +578,24 @@ namespace Game3 {
 
 	void Entity::renderLighting(const RendererContext &) {}
 
+	void Entity::renderShadow(const RendererContext &renderers) {
+		const ShadowParams params = getShadowParams();
+		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
+
+		Vector2d shadow_position(getPosition());
+		shadow_position.x += offset_x + params.baseX;
+		shadow_position.y += offset_y + params.baseY;
+		const double shadow_size = params.sizeMinuend - std::clamp(offset_z / params.sizeDivisor, params.sizeClampMin, params.sizeClampMax);
+
+		renderers.circle.drawOnMap({
+			.x = shadow_position.x,
+			.y = shadow_position.y,
+			.sizeX = shadow_size / params.divisorX,
+			.sizeY = shadow_size / params.divisorY,
+			.color{"#00000044"},
+		});
+	}
+
 	bool Entity::move(Direction move_direction, MovementContext context) {
 		if (EntityPtr ridden = getRidden()) {
 			EntityPtr self = getSelf();
@@ -556,8 +642,9 @@ namespace Game3 {
 				throw std::invalid_argument(std::format("Invalid direction: {}", move_direction));
 		}
 
-		if (!context.facingDirection)
+		if (!context.facingDirection) {
 			context.facingDirection = move_direction;
+		}
 
 		if (context.forcedPosition) {
 			new_position = *context.forcedPosition;
@@ -577,10 +664,11 @@ namespace Game3 {
 				offset = *context.forcedOffset;
 			} else if (can_move) {
 				auto lock = offset.uniqueLock();
-				if (horizontal)
+				if (horizontal) {
 					offset.x = x_offset;
-				else
+				} else {
 					offset.y = y_offset;
+				}
 			}
 
 			{
@@ -608,9 +696,10 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Realm> Entity::getRealm() const {
-		auto out = weakRealm.lock();
-		if (!out)
+		RealmPtr out = weakRealm.lock();
+		if (!out) {
 			throw std::runtime_error("Couldn't lock entity's realm");
+		}
 		return out;
 	}
 
@@ -634,8 +723,9 @@ namespace Game3 {
 	bool Entity::canMoveTo(const Place &place) const {
 		RealmPtr realm = place.realm;
 
-		if (!realm)
+		if (!realm) {
 			return false;
+		}
 
 		const Tileset &tileset = realm->getTileset();
 
@@ -676,6 +766,14 @@ namespace Game3 {
 		return false;
 	}
 
+	std::pair<Color, Color> Entity::getColors() const {
+		return {Color{"#ffffff"}, Color{"#00000000"}};
+	}
+
+	ShadowParams Entity::getShadowParams() const {
+		return {};
+	}
+
 	void Entity::focus(Window &window, bool is_autofocus) {
 		if (EntityPtr ridden = getRidden()) {
 			ridden->focus(window, is_autofocus);
@@ -683,11 +781,13 @@ namespace Game3 {
 		}
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
 			return;
+		}
 
-		if (!is_autofocus)
+		if (!is_autofocus) {
 			window.scale = 8.;
+		}
 
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		{
@@ -703,36 +803,39 @@ namespace Game3 {
 		const bool in_different_chunk = firstTeleport || old_chunk_position != new_position.getChunk();
 		const bool is_server = getSide() == Side::Server;
 
-		if (2 < position.taxiDistance(new_position))
+		if (2 < position.taxiDistance(new_position)) {
 			context.isTeleport = true;
+		}
 
 		EntityPtr shared = getSelf();
 		RealmPtr realm = getRealm();
 
-		Position old_position = position;
-		position = new_position;
-
+		const Position old_position = std::exchange(position, new_position);
 		const Vector3 old_offset = getOffset();
 
 		if (context.forcedOffset) {
 			offset = *context.forcedOffset;
 		} else if (context.clearOffset) {
-			if (firstTeleport)
+			if (firstTeleport) {
 				offset = Vector3{0., 0., 0.};
-			else
+			} else {
 				offset = Vector3{0., 0., offset.z};
+			}
 		}
 
-		if (context.facingDirection)
+		if (context.facingDirection) {
 			direction = *context.facingDirection;
+		}
 
-		if (is_server)
+		if (is_server) {
 			increaseUpdateCounter();
+		}
 
 		realm->onMoved(shared, old_position, old_offset, new_position, getOffset());
 
-		if (in_different_chunk)
+		if (in_different_chunk) {
 			movedToNewChunk(old_chunk_position);
+		}
 
 		{
 			auto move_lock = moveQueue.uniqueLock();
@@ -750,20 +853,21 @@ namespace Game3 {
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
-		auto old_realm = weakRealm.lock();
+		RealmPtr old_realm = weakRealm.lock();
 		RealmID limbo_id = inLimboFor.load();
 
 		if ((old_realm != new_realm) || (limbo_id != 0 && limbo_id != new_realm->id)) {
 			nextRealm = new_realm->id;
-			auto shared = getSelf();
+			EntityPtr self = getSelf();
 
 			GamePtr game = getGame();
-			if (game->getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets)
+			if (game->getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets) {
 				game->toServer().entityChangingRealms(*this, new_realm, new_position);
+			}
 
 			if (old_realm && old_realm != new_realm) {
-				old_realm->detach(shared);
-				old_realm->queueRemoval(shared);
+				old_realm->detach(self);
+				old_realm->queueRemoval(self);
 			}
 
 			clearOffset();
@@ -799,34 +903,38 @@ namespace Game3 {
 			getRealm()->queueDestruction(getSelf());
 	}
 
-	PathResult Entity::pathfind(const Position &start, const Position &goal, std::list<Direction> &out, size_t loop_max) {
+	PathResult Entity::pathfind(const Position &start, const Position &goal, std::deque<Direction> &out, size_t loop_max) {
 		std::vector<Position> positions;
 
-		if (start == goal)
+		if (start == goal) {
 			return PathResult::Trivial;
+		}
 
-		if (!simpleAStar(getRealm(), start, goal, positions, loop_max))
+		if (!simpleAStar(getRealm(), start, goal, positions, loop_max)) {
 			return PathResult::Unpathable;
+		}
 
 		out.clear();
 		pathSeers.clear();
 
-		if (positions.size() < 2)
+		if (positions.size() < 2) {
 			return PathResult::Trivial;
+		}
 
 		for (auto iter = positions.cbegin() + 1, end = positions.cend(); iter != end; ++iter) {
 			const Position &prev = *(iter - 1);
 			const Position &next = *iter;
-			if (next.row == prev.row + 1)
+			if (next.row == prev.row + 1) {
 				out.push_back(Direction::Down);
-			else if (next.row == prev.row - 1)
+			} else if (next.row == prev.row - 1) {
 				out.push_back(Direction::Up);
-			else if (next.column == prev.column + 1)
+			} else if (next.column == prev.column + 1) {
 				out.push_back(Direction::Right);
-			else if (next.column == prev.column - 1)
+			} else if (next.column == prev.column - 1) {
 				out.push_back(Direction::Left);
-			else
+			} else {
 				throw std::runtime_error("Invalid path offset: " + std::string(next - prev));
+			}
 		}
 
 		pathfindGoal = goal;
@@ -858,23 +966,26 @@ namespace Game3 {
 	}
 
 	float Entity::getMovementSpeed() const {
-		return isInFluid()? MAX_SPEED * .5f : MAX_SPEED;
+		return speedMultiplier.load() * (isInFluid()? baseSpeed.load() * .5f : baseSpeed.load());
 	}
 
 	std::shared_ptr<Game> Entity::getGame() const {
-		if (auto locked = weakGame.lock())
+		if (auto locked = weakGame.lock()) {
 			return locked;
+		}
 
 		GamePtr game = getRealm()->getGame();
-		if (!game)
+		if (!game) {
 			throw std::runtime_error("Can't lock entity's game");
+		}
 		weakGame = game;
 		return game;
 	}
 
 	bool Entity::isVisible() const {
-		if (EntityPtr ridden = getRidden(); ridden && ridden->getRideType() == RideType::Hidden)
+		if (EntityPtr ridden = getRidden(); ridden && ridden->getRideType() == RideType::Hidden) {
 			return false;
+		}
 
 		const auto pos = getPosition();
 		auto realm = getRealm();
@@ -894,24 +1005,33 @@ namespace Game3 {
 	}
 
 	bool Entity::setHeldLeft(Slot new_value) {
-		if (0 <= new_value && heldRight.slot == new_value && !setHeld(-1, heldRight))
+		if (0 <= new_value && heldRight.slot == new_value && !setHeld(-1, heldRight)) {
 			return false;
+		}
+
 		return setHeld(new_value, heldLeft);
 	}
 
 	bool Entity::setHeldRight(Slot new_value) {
-		if (0 <= new_value && heldLeft.slot == new_value && !setHeld(-1, heldLeft))
+		if (0 <= new_value && heldLeft.slot == new_value && !setHeld(-1, heldLeft)) {
 			return false;
+		}
+
 		return setHeld(new_value, heldRight);
 	}
 
 	void Entity::unhold(Slot slot) {
-		if (slot < 0)
+		if (slot < 0) {
 			return;
-		if (heldLeft.slot == slot)
+		}
+
+		if (heldLeft.slot == slot) {
 			setHeldLeft(-1);
-		if (heldRight.slot == slot)
+		}
+
+		if (heldRight.slot == slot) {
 			setHeldRight(-1);
+		}
 	}
 
 	Side Entity::getSide() const {
@@ -930,15 +1050,18 @@ namespace Game3 {
 	bool Entity::canSee(RealmID realm_id, const Position &pos) const {
 		const auto realm = getRealm();
 
-		if (realm_id != (nextRealm == 0? realm->id : nextRealm.load()))
+		if (realm_id != (nextRealm == 0? realm->id : nextRealm.load())) {
 			return false;
+		}
 
 		const auto this_position = getChunk();
 		const auto other_position = pos.getChunk();
 
-		if (this_position.x - REALM_DIAMETER / 2 <= other_position.x && other_position.x <= this_position.x + REALM_DIAMETER / 2)
-			if (this_position.y - REALM_DIAMETER / 2 <= other_position.y && other_position.y <= this_position.y + REALM_DIAMETER / 2)
+		if (this_position.x - REALM_DIAMETER / 2 <= other_position.x && other_position.x <= this_position.x + REALM_DIAMETER / 2) {
+			if (this_position.y - REALM_DIAMETER / 2 <= other_position.y && other_position.y <= this_position.y + REALM_DIAMETER / 2) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -986,21 +1109,22 @@ namespace Game3 {
 						visible->visibleEntities.erase(shared);
 					}
 
-					if (visible->isPlayer())
+					if (visible->isPlayer()) {
 						players_to_erase.emplace_back(safeDynamicCast<Player>(visible));
+					}
 				}
 			}
 		}
 
-		for (const auto &entity: entities_to_erase)
+		for (const auto &entity: entities_to_erase) {
 			visibleEntities.erase(entity);
-
-		{
-			auto players_lock = visiblePlayers.uniqueLock();
-
-			for (const auto &player: players_to_erase)
-				visiblePlayers.erase(player);
 		}
+
+		visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
+			for (const auto &player: players_to_erase) {
+				visible.erase(player);
+			}
+		});
 
 		if (auto realm = weakRealm.lock()) {
 			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
@@ -1011,12 +1135,18 @@ namespace Game3 {
 					auto chunk_lock = visible_at_chunk->sharedLock();
 					for (const WeakEntityPtr &weak_visible: *visible_at_chunk) {
 						EntityPtr visible = weak_visible.lock();
-						if (!visible || visible.get() == this)
+
+						if (!visible || visible.get() == this) {
 							continue;
+						}
+
 						assert(visible->getGID() != getGID());
 						visibleEntities.insert(visible);
-						if (visible->isPlayer())
+
+						if (visible->isPlayer()) {
 							visiblePlayers.emplace(safeDynamicCast<Player>(visible));
+						}
+
 						if (visible->otherEntityToLock != globalID) {
 							otherEntityToLock = visible->globalID;
 							{
@@ -1068,10 +1198,11 @@ namespace Game3 {
 	void Entity::setSeenPath(const PlayerPtr &player, bool seen) {
 		auto lock = pathSeers.uniqueLock();
 
-		if (seen)
+		if (seen) {
 			pathSeers.insert(player);
-		else
+		} else {
 			pathSeers.erase(player);
+		}
 	}
 
 	size_t Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
@@ -1121,6 +1252,8 @@ namespace Game3 {
 		buffer << heldLeft.slot;
 		buffer << heldRight.slot;
 		buffer << customTexture;
+		buffer << baseSpeed;
+		buffer << speedMultiplier;
 	}
 
 	void Entity::decode(Buffer &buffer) {
@@ -1142,8 +1275,12 @@ namespace Game3 {
 		const auto right_slot = buffer.take<Slot>();
 
 		buffer >> customTexture;
-		if (customTexture)
+		buffer >> baseSpeed;
+		buffer >> speedMultiplier;
+
+		if (customTexture) {
 			changeTexture(customTexture);
+		}
 
 		setHeldLeft(left_slot);
 		setHeldRight(right_slot);
@@ -1158,30 +1295,56 @@ namespace Game3 {
 	}
 
 	void Entity::broadcastMoney() {
-		auto lock = visiblePlayers.sharedLock();
-		if (visiblePlayers.empty())
-			return;
+		broadcastPacket(make<EntityMoneyChangedPacket>(*this));
+	}
 
-		const auto packet = make<EntityMoneyChangedPacket>(*this);
-		for (const auto &weak_player: visiblePlayers)
-			if (PlayerPtr player = weak_player.lock())
+	void Entity::broadcastPacket(const PacketPtr &packet) {
+		if (getSide() != Side::Server) {
+			return;
+		}
+
+		if (isPlayer()) {
+			PlayerPtr player = std::dynamic_pointer_cast<Player>(shared_from_this());
+			assert(player != nullptr);
+			player->send(packet);
+		}
+
+		auto lock = visiblePlayers.sharedLock();
+		if (visiblePlayers.empty()) {
+			return;
+		}
+
+		for (const auto &weak_player: visiblePlayers) {
+			if (PlayerPtr player = weak_player.lock()) {
 				player->send(packet);
+			}
+		}
 	}
 
 	void Entity::sendTo(GenericClient &client, UpdateCounter threshold) {
-		if (threshold == 0 || getUpdateCounter() < threshold) {
-			RealmPtr realm = getRealm();
-			client.getPlayer()->notifyOfRealm(*realm);
-			client.send(make<EntityPacket>(getSelf()));
-			onSend(client.getPlayer());
+		if (threshold != 0 && threshold <= getUpdateCounter()) {
+			return;
 		}
+
+		PlayerPtr player = client.getPlayer();
+		if (player == excludedPlayer) {
+			return;
+		}
+
+		player->notifyOfRealm(*getRealm());
+		client.send(make<EntityPacket>(getSelf()));
+		onSend(player);
 	}
 
 	void Entity::sendToVisible() {
 		auto lock = visiblePlayers.sharedLock();
-		for (const auto &weak_player: visiblePlayers)
-			if (PlayerPtr player = weak_player.lock())
-				sendTo(*player->toServer()->getClient());
+		for (const auto &weak_player: visiblePlayers) {
+			if (PlayerPtr player = weak_player.lock()) {
+				if (player != excludedPlayer) {
+					sendTo(*player->toServer()->getClient());
+				}
+			}
+		}
 	}
 
 	bool Entity::setHeld(Slot new_value, Held &held) {
@@ -1196,8 +1359,9 @@ namespace Game3 {
 
 		if (new_value < 0) {
 			held.slot = -1;
-			if (is_client)
+			if (is_client) {
 				held.texture.reset();
+			}
 			return true;
 		}
 
@@ -1206,8 +1370,9 @@ namespace Game3 {
 		if (!inventory->contains(new_value)) {
 			WARN("Can't equip slot {}: no item in inventory", new_value);
 			held.slot = -1;
-			if (is_client)
+			if (is_client) {
 				held.texture.reset();
+			}
 			return false;
 		}
 
@@ -1232,8 +1397,9 @@ namespace Game3 {
 
 	std::function<void(const TickArgs &)> Entity::getTickFunction() {
 		return [weak = getWeakSelf()](const TickArgs &args) {
-			if (EntityPtr entity = weak.lock())
+			if (EntityPtr entity = weak.lock()) {
 				entity->tick(args);
+			}
 		};
 	}
 
@@ -1247,6 +1413,7 @@ namespace Game3 {
 		return tickEnqueued(game->enqueue(getTickFunction()));
 	}
 
+#ifndef __MINGW32__
 	template <>
 	std::vector<Direction> Entity::copyPath<std::vector>() {
 		std::vector<Direction> out;
@@ -1255,14 +1422,17 @@ namespace Game3 {
 		out = {path.begin(), path.end()};
 		return out;
 	}
+#endif
 
 	void Entity::calculateVisibleEntities() {
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return;
+		}
 
-		auto realm = weakRealm.lock();
-		if (!realm)
+		RealmPtr realm = weakRealm.lock();
+		if (!realm) {
 			return;
+		}
 
 		{
 			auto entities_lock = realm->entities.sharedLock();
@@ -1291,13 +1461,16 @@ namespace Game3 {
 	void Entity::jump() {
 		RealmPtr realm = getRealm();
 		GamePtr game = realm->getGame();
-		if (game->getSide() != Side::Server || getRidden())
+
+		if (game->getSide() != Side::Server || getRidden()) {
 			return;
+		}
 
 		{
 			auto velocity_lock = velocity.uniqueLock();
-			if (velocity.z != 0.)
+			if (velocity.z != 0.) {
 				return;
+			}
 
 			{
 				auto offset_lock = offset.sharedLock();
@@ -1307,10 +1480,22 @@ namespace Game3 {
 
 			velocity.z = getJumpSpeed();
 		}
+
 		increaseUpdateCounter();
 
-		if (TileEntityPtr tile_entity = realm->tileEntityAt(getPosition()))
-			tile_entity->onOverlapEnd(getSelf());
+		EntityPtr self = getSelf();
+
+		if (TileEntityPtr tile_entity = realm->tileEntityAt(getPosition())) {
+			tile_entity->onOverlapEnd(self);
+		}
+
+		Place place = getPlace();
+
+		for (Layer layer: allLayers) {
+			if (TilePtr tile = place.getTile(layer)) {
+				tile->jumpedFrom(self, place, layer);
+			}
+		}
 
 		game->toServer().entityTeleported(*this, MovementContext{.excludePlayer = getGID()});
 	}
@@ -1394,7 +1579,7 @@ namespace Game3 {
 		customTexture = identifier;
 	}
 
-	void to_json(nlohmann::json &json, const Entity &entity) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Entity &entity) {
 		entity.toJSON(json);
 	}
 }

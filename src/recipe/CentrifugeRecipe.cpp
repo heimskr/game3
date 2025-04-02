@@ -6,7 +6,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	CentrifugeRecipe::CentrifugeRecipe(Input input, std::map<nlohmann::json, double> weight_map):
+	CentrifugeRecipe::CentrifugeRecipe(Input input, std::unordered_map<boost::json::value, double> weight_map):
 		input(input), weightMap(std::move(weight_map)) {}
 
 	CentrifugeRecipe::Input CentrifugeRecipe::getInput(const GamePtr &) {
@@ -14,7 +14,7 @@ namespace Game3 {
 	}
 
 	CentrifugeRecipe::Output CentrifugeRecipe::getOutput(const Input &, const GamePtr &game) {
-		return ItemStack::fromJSON(game, weightedChoice(weightMap, threadContext.rng));
+		return boost::json::value_to<ItemStackPtr>(weightedChoice(weightMap, threadContext.rng), game);
 	}
 
 	bool CentrifugeRecipe::canCraft(const std::shared_ptr<Container> &container) {
@@ -57,22 +57,23 @@ namespace Game3 {
 		return result;
 	}
 
-	void CentrifugeRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = CentrifugeRecipeRegistry::ID();
-		json["input"] = input;
-		nlohmann::json &output = json["output"];
+	void CentrifugeRecipe::toJSON(boost::json::value &json, const GamePtr &game) const {
+		auto &object = json.emplace_object();
+		object["type"] = boost::json::value_from(CentrifugeRecipeRegistry::ID());
+		object["input"] = boost::json::value_from(input, game);
+		auto &output = object["output"].emplace_array();
 		for (const auto &[item, weight]: weightMap) {
-			output.push_back(nlohmann::json{weight, item});
+			output.emplace_back(boost::json::value{weight, item});
 		}
 	}
 
-	CentrifugeRecipe CentrifugeRecipe::fromJSON(const GamePtr &game, const nlohmann::json &json) {
+	CentrifugeRecipe tag_invoke(boost::json::value_to_tag<CentrifugeRecipe>, const boost::json::value &json, const GamePtr &game) {
 		CentrifugeRecipe recipe;
 
-		recipe.input = FluidStack::fromJSON(*game, json.at("input"));
+		recipe.input = boost::json::value_to<FluidStack>(json.at("input"), game);
 
-		for (const auto &item: json.at("output")) {
-			recipe.weightMap[item.at(1)] = item.at(0);
+		for (const auto &item: json.at("output").as_array()) {
+			recipe.weightMap[item.at(1)] = boost::json::value_to<double>(item.at(0));
 		}
 
 		return recipe;

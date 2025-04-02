@@ -15,7 +15,8 @@ namespace Game3 {
 		Identifier identifier;
 
 		NamedRegisterable() = delete;
-		NamedRegisterable(Identifier identifier_): identifier(std::move(identifier_)) {}
+		NamedRegisterable(Identifier identifier):
+			identifier(std::move(identifier)) {}
 	};
 
 	struct NumericRegisterable: Registerable {
@@ -24,7 +25,8 @@ namespace Game3 {
 		Type number;
 
 		NumericRegisterable() = delete;
-		NumericRegisterable(Type number_): number(number_) {}
+		NumericRegisterable(Type number):
+			number(number) {}
 	};
 
 	struct StringRegisterable: Registerable {
@@ -33,6 +35,7 @@ namespace Game3 {
 		Type name;
 
 		StringRegisterable() = delete;
-		StringRegisterable(Type name_): name(std::move(name_)) {}
+		StringRegisterable(Type name):
+			name(std::move(name)) {}
 	};
 }

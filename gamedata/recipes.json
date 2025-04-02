@@ -136,7 +136,7 @@
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/iron_bar", 1]],
-				"output": [["base:item/item_pipe", 8]],
+				"output": [["base:item/item_pipe", 4]],
 				"station": "base:station/anvil"
 			}],
 			["base:registry/crafting_recipe", {
@@ -237,6 +237,10 @@
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/plank", 2]],
 				"output": [["base:item/fence", 1]]
+			}],
+			["base:registry/crafting_recipe", {
+				"input": [["base:item/fence", 1]],
+				"output": [["base:item/fence_gate", 1]]
 			}],
 			["base:registry/crafting_recipe", {
 				"input": [["base:item/plank", 1], ["base:item/knife", 1]],
@@ -457,6 +461,10 @@
 				"input":  [["base:item/fire_opal", 4], ["base:item/diamond", 4]],
 				"output": [["base:item/teleportation_focus", 1]]
 			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/bean", 42], ["base:item/chili", 64]],
+				"output": [["base:item/bing", 1]]
+			}],
 			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
@@ -494,6 +502,10 @@
 			["base:registry/liquefier_recipe", {
 				"input":  ["base:item/chemical", 1, {"formula": "C3H7N3O2"}],
 				"output": ["base:fluid/mutagen", 250]
+			}],
+			["base:registry/liquefier_recipe", {
+				"input":  ["base:item/chemical", 1, {"formula": "H2SO4"}],
+				"output": ["base:fluid/sulfuric_acid", 250]
 			}]
 		]]
 	]

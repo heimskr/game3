@@ -456,6 +456,24 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Viewport width
 	- `i32` Viewport height
 
+68. **Set Firing**: tells the server that the client is or isn't holding down the mouse on the world.
+
+	- `bool` Firing
+
+69. **Use Fluid Gun**: tells the server to activate the client's held fluid gun.
+
+	- `i64` Position Y
+	- `i64` Position X
+	- `f32` Offset X
+	- `f32` Offset Y
+	- `u8` Modifiers: bitfield (1 = shift, 2 = ctrl, 4 = alt, 8 = super)
+	- `u16` Tick frequency
+
+70. **Status Effects**: tells a client what status effects a living entity currently has.
+
+	- `u64` Global ID
+	- `StatusEffectMap`
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.
@@ -492,6 +510,7 @@ All values are little endian. Strings are not null-terminated.
 | `0xe7`                           | CircularGene                 |
 | `0xe8`                           | StringGene                   |
 | `0xe9`                           | Position                     |
+| `0xea`                           | StatusEffectMap              |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 
@@ -563,6 +582,14 @@ To send a map, send `0x21`, followed by the type encoding of the key type, follo
 ### StringGene (`0xe8`)
 
 - `string` Current value
+
+### Position (`0xe9`)
+
+TODO
+
+### StatusEffectMap (`0xea`)
+
+TODO
 
 # Examples
 

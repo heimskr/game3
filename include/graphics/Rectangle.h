@@ -13,10 +13,10 @@ namespace Game3 {
 
 		Rectangle() = default;
 
-		Rectangle(int x, int y, int width, int height):
+		constexpr Rectangle(int x, int y, int width, int height):
 			x(x), y(y), width(width), height(height) {}
 
-		Rectangle(int x, int y):
+		constexpr Rectangle(int x, int y):
 			Rectangle(x, y, 0, 0) {}
 
 		Rectangle(Vector2d pos, int size):
@@ -41,8 +41,17 @@ namespace Game3 {
 		/** Ignores the width/height of the RHS and uses the width/height of the LHS. */
 		Rectangle operator-(const Rectangle &) const;
 
+		template <typename T>
+		Rectangle operator*(T scale) const {
+			return Rectangle(x, y, width * scale, height * scale);
+		}
+
 		/** Returns whether both the height and width of the rectangle are positive. */
 		operator bool() const;
+
+		std::pair<int, int> size() const {
+			return {width, height};
+		}
 	};
 }
 

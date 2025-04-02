@@ -13,14 +13,14 @@ namespace Game3 {
 		public:
 			sigc::signal<void(bool)> onCheck;
 
-			Checkbox(UIContext &, float scale, Color top_color, Color bottom_color, Color check_color, Color interior_color);
-			Checkbox(UIContext &, float scale, Color primary_color, Color interior_color);
-			Checkbox(UIContext &, float scale);
+			Checkbox(UIContext &, float selfScale, Color top_color, Color bottom_color, Color check_color, Color interior_color);
+			Checkbox(UIContext &, float selfScale, Color primary_color, Color interior_color);
+			Checkbox(UIContext &, float selfScale);
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool click(int button, int x, int y) final;
+			bool click(int button, int x, int y, Modifiers) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

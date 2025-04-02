@@ -18,15 +18,15 @@
 
 namespace Game3 {
 	namespace {
-		const std::string & rectangleFrag() { static auto out = readFile("resources/circle.frag"); return out; }
-		const std::string & rectangleVert() { static auto out = readFile("resources/circle.vert"); return out; }
-		constexpr GLenum BLEND_MODE = GL_ONE;
+		const std::string & circleFrag() { static auto out = readFile("resources/circle.frag"); return out; }
+		const std::string & circleVert() { static auto out = readFile("resources/circle.vert"); return out; }
+		constexpr GLenum BLEND_MODE = GL_ONE_MINUS_SRC_ALPHA;
 	}
 
 	CircleRenderer::CircleRenderer(Window &window):
 		shader("CircleRenderer"),
 		window(window) {
-			shader.init(rectangleVert(), rectangleFrag()); CHECKGL
+			shader.init(circleVert(), circleFrag()); CHECKGL
 			initRenderData(32); CHECKGL
 		}
 
@@ -52,8 +52,9 @@ namespace Game3 {
 	}
 
 	void CircleRenderer::drawOnMap(const RenderOptions &options, float cutoff) {
-		if (!isInitialized())
+		if (!isInitialized()) {
 			return;
+		}
 
 		auto width  = options.sizeX * 16;
 		auto height = options.sizeY * 16;
@@ -72,12 +73,12 @@ namespace Game3 {
 		y *= tile_size * window.scale / 2.;
 
 		x += backbufferWidth / 2.;
-		x -= map_length * tile_size * window.scale / 4.; // TODO: the math here is a little sus... things might cancel out
+		x -= map_length * tile_size * window.scale / window.magic * 2.; // TODO: the math here is a little sus... things might cancel out
 		x += center_x * window.scale * tile_size / 2.;
 
 		y += backbufferHeight / 2.;
-		y -= map_length * tile_size * window.scale;
-		y += center_y * tile_size * window.scale / 4.;
+		y -= map_length * tile_size * window.scale / window.magic * 2.;
+		y += center_y * window.scale * tile_size / 2.;
 
 		shader.bind(); CHECKGL
 
@@ -85,9 +86,10 @@ namespace Game3 {
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(x, y, 0.f));
 		if (angle != 0) {
-			model = glm::translate(model, glm::vec3(0.5f * width, 0.5f * height, 0.f)); // move origin of rotation to center of quad
-			model = glm::rotate(model, float(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
-			model = glm::translate(model, glm::vec3(-0.5f * width, -0.5f * height, 0.f)); // move origin back
+			const float ws = window.scale / 4.;
+			model = glm::translate(model, glm::vec3(width * ws, height * ws, 0.f)); // move origin of rotation to center of quad
+			model = glm::rotate(model, static_cast<float>(glm::radians(angle)), glm::vec3(0.f, 0.f, 1.f)); // then rotate
+			model = glm::translate(model, glm::vec3(-width * ws, -height * ws, 0.f)); // move origin back
 		}
 		model = glm::scale(model, glm::vec3(width * window.scale / 2., height * window.scale / 2., 1.f)); // last scale
 

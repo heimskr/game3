@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "game/ServerInventory.h"
@@ -167,7 +167,7 @@ namespace Game3 {
 		});
 	}
 
-	void InventoriedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const nlohmann::json &) {}
+	void InventoriedTileEntity::absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) {}
 
 	void InventoriedTileEntity::encode(Game &, Buffer &buffer) {
 		HasInventory::encode(buffer, 0);

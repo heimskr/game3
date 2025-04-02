@@ -1,19 +1,16 @@
 #include "config.h"
-#include "Log.h"
+#include "util/Log.h"
 #include "game/Resource.h"
 #include "graphics/GL.h"
 #include "graphics/ItemSet.h"
 #include "graphics/Texture.h"
 #include "registry/Registries.h"
+#include "lib/JSON.h"
 #include "threading/ThreadContext.h"
 #include "tools/ItemStitcher.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Util.h"
-
-#include <cmath>
-
-#include <nlohmann/json.hpp>
 
 #ifdef USING_VCPKG
 #include "lib/stb/stb_image.h"
@@ -23,15 +20,19 @@
 #include "lib/stb/stb_image_write.h"
 #endif
 
+#include <cmath>
+
 namespace Game3 {
 	ItemSet itemStitcher(ItemTextureRegistry *texture_registry, ResourceRegistry *resource_registry, const std::filesystem::path &base_dir, Identifier itemset_name, std::string *png_out) {
 		std::set<std::filesystem::path> dirs;
 
-		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir))
-			if (std::filesystem::is_directory(entry))
+		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(base_dir)) {
+			if (std::filesystem::is_directory(entry)) {
 				dirs.insert(entry);
+			}
+		}
 
-		std::unordered_map<std::string, nlohmann::json> jsons;
+		std::unordered_map<std::string, boost::json::value> jsons;
 		std::unordered_map<std::string, std::unique_ptr<uint8_t[], FreeDeleter>> images;
 
 		TexturePtr texture = std::make_shared<Texture>(itemset_name);
@@ -42,7 +43,7 @@ namespace Game3 {
 		ItemSet out(itemset_name);
 		Hasher hasher(Hasher::Algorithm::SHA3_512);
 
-		constexpr static size_t base_size = 16;
+		constexpr size_t base_size = 16;
 
 		size_t count_1x1 = 0;
 		size_t count_2x2 = 0;
@@ -51,22 +52,23 @@ namespace Game3 {
 		std::set<std::string> names_2x2;
 
 		if (std::filesystem::exists(base_dir / "itemset.json")) {
-			const nlohmann::json itemset_meta = nlohmann::json::parse(readFile(base_dir / "itemset.json"));
+			boost::json::value itemset_meta = boost::json::parse(readFile(base_dir / "itemset.json"));
 
-			if (auto iter = itemset_meta.find("name"); iter != itemset_meta.end())
-				out.name = *iter;
+			if (auto *value = ensureObject(itemset_meta).if_contains("name")) {
+				out.name = value->as_string();
+			}
 		}
 
 		for (const std::filesystem::path &dir: dirs) {
-			std::string name = dir.filename();
+			std::string name = dir.filename().string();
 			std::filesystem::path png_path = base_dir / name / "item.png";
-			jsons[name] = nlohmann::json::parse(readFile(dir / "item.json"));
+			jsons[name] = boost::json::parse(readFile(dir / "item.json"));
 
 			int width{}, height{}, channels{};
-			images.emplace(name, stbi_load(png_path.c_str(), &width, &height, &channels, 4));
+			images.emplace(name, stbi_load(png_path.string().c_str(), &width, &height, &channels, 4));
 
 			if (channels != 3 && channels != 4)
-				throw std::runtime_error(std::format("Invalid channel count for {} at {}: {} (expected 3 or 4)", name, png_path.c_str(), channels));
+				throw std::runtime_error(std::format("Invalid channel count for {} at {}: {} (expected 3 or 4)", name, png_path.string().c_str(), channels));
 
 			if (width == 16 && height == 16) {
 				++count_1x1;
@@ -108,16 +110,25 @@ namespace Game3 {
 
 		auto handle_json = [&](const std::string &name, int scale) {
 			if (auto iter = jsons.find(name); iter != jsons.end()) {
-				const nlohmann::json &json = iter->second;
-				hasher += json.dump();
-				Identifier id = json.at("id");
+				hasher += boost::json::serialize(iter->second);
 
-				if (texture_registry)
-					texture_registry->add(id, ItemTexture{id, texture, int(x_index), int(y_index), int(scale * base_size), int(scale * base_size)});
+				const auto *object = iter->second.if_object();
+				if (!object) {
+					return;
+				}
 
-				if (resource_registry)
-					if (auto iter = json.find("resource"); iter != json.end())
-						resource_registry->add(id, Resource{id, *iter});
+				Identifier id = boost::json::value_to<Identifier>(object->at("id"));
+
+				if (texture_registry) {
+					texture_registry->add(id, ItemTexture{id, texture, static_cast<int>(x_index), static_cast<int>(y_index), static_cast<int>(scale * base_size), static_cast<int>(scale * base_size)});
+				}
+
+				if (resource_registry) {
+					if (const auto *value = object->if_contains("resource")) {
+						Resource resource{id, *value};
+						resource_registry->add(std::move(id), std::move(resource));
+					}
+				}
 			}
 		};
 

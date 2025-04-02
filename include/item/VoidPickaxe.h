@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			using Tool::Tool;
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool canUseOnWorld() const override { return false; }
 	};
 }

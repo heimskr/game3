@@ -1,20 +1,22 @@
 #pragma once
 
 #include "data/Identifier.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "item/Item.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <memory>
+#include <optional>
+#include <unordered_map>
 
 namespace Game3 {
 	struct CentrifugeRecipe: Recipe<FluidStack, ItemStackPtr> {
 		Input input;
-		std::map<nlohmann::json, double> weightMap;
+		std::unordered_map<boost::json::value, double> weightMap;
 
 		CentrifugeRecipe() = default;
-		CentrifugeRecipe(Input, std::map<nlohmann::json, double>);
+		CentrifugeRecipe(Input, std::unordered_map<boost::json::value, double>);
 
 		Input getInput(const GamePtr &) override;
 		Output getOutput(const Input &, const GamePtr &) override;
@@ -24,10 +26,10 @@ namespace Game3 {
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(nlohmann::json &) const override;
-
-		static CentrifugeRecipe fromJSON(const GamePtr &, const nlohmann::json &);
+		void toJSON(boost::json::value &, const GamePtr &) const override;
 	};
+
+	CentrifugeRecipe tag_invoke(boost::json::value_to_tag<CentrifugeRecipe>, const boost::json::value &, const GamePtr &);
 
 	struct CentrifugeRecipeRegistry: UnnamedJSONRegistry<CentrifugeRecipe> {
 		static Identifier ID() { return {"base", "registry/centrifuge_recipe"}; }

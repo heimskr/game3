@@ -1,7 +1,4 @@
-#include <cassert>
-#include <csignal>
-
-#include "Log.h"
+#include "util/Log.h"
 #include "game/ServerGame.h"
 #include "net/Buffer.h"
 #include "net/Server.h"
@@ -13,6 +10,9 @@
 #include "util/Demangle.h"
 #include "util/Math.h"
 #include "util/Util.h"
+
+#include <cassert>
+#include <csignal>
 
 namespace Game3 {
 	RemoteClient::RemoteClient(const ServerPtr &server, std::string_view ip, int id, asio::ip::tcp::socket &&socket):
@@ -104,11 +104,11 @@ namespace Game3 {
 				try {
 					packet->decode(*server->game, receiveBuffer);
 				} catch (const std::exception &err) {
-					ERROR("Couldn't decode packet of type {}, size {}: {}", packetType, payloadSize, err.what());
+					ERR("Couldn't decode packet of type {}, size {}: {}", packetType, payloadSize, err.what());
 					mock();
 					return;
 				} catch (...) {
-					ERROR("Couldn't decode packet of type {}, size {}", packetType, payloadSize);
+					ERR("Couldn't decode packet of type {}, size {}", packetType, payloadSize);
 					mock();
 					return;
 				}
@@ -123,7 +123,7 @@ namespace Game3 {
 
 	bool RemoteClient::send(const PacketPtr &packet) {
 		if (packet == nullptr) {
-			ERROR("Dropping null packet");
+			ERR("Dropping null packet");
 			return false;
 		}
 
@@ -175,7 +175,7 @@ namespace Game3 {
 
 		strand.post([this, message = std::move(message)]() mutable {
 			queue(std::move(message));
-		});
+		}, asio::get_associated_allocator(strand));
 	}
 
 	void RemoteClient::startBuffering() {
@@ -213,7 +213,7 @@ namespace Game3 {
 					// 1 corresponds to stream truncated, a very common error that I don't really consider an error
 					SUCCESS("Mostly managed to shut down client {}.", id);
 				} else {
-					ERROR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
+					ERR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
 				}
 			} else {
 				socket.lowest_layer().close();
@@ -222,7 +222,7 @@ namespace Game3 {
 		} catch (const asio::system_error &err) {
 			// Who really cares if SSL doesn't shut down properly?
 			// Who decided that the client is worthy of a proper shutdown?
-			ERROR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
+			ERR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
 		}
 	}
 
@@ -280,7 +280,7 @@ namespace Game3 {
 		}
 
 		if (errc) {
-			ERROR("Client write ({}): {} ({})", ip, errc.message(), errc.value());
+			ERR("Client write ({}): {} ({})", ip, errc.message(), errc.value());
 			return;
 		}
 
@@ -291,7 +291,7 @@ namespace Game3 {
 	void RemoteClient::doHandshake() {
 		socket.async_handshake(asio::ssl::stream_base::server, [this, shared = shared_from_this()](const asio::error_code &errc) {
 			if (errc) {
-				ERROR("Client handshake ({}): {}", ip, errc.message());
+				ERR("Client handshake ({}): {}", ip, errc.message());
 				return;
 			}
 
@@ -305,7 +305,7 @@ namespace Game3 {
 			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, size_t length) {
 				if (errc) {
 					if (errc.value() != 1) // "stream truncated"
-						ERROR("Client read ({}): {} ({})", ip, errc.message(), errc.value());
+						ERR("Client read ({}): {} ({})", ip, errc.message(), errc.value());
 					removeSelf();
 					return;
 				}

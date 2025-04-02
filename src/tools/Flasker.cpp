@@ -1,40 +1,10 @@
 #include "config.h"
 #include "graphics/HSL.h"
+#include "lib/PNG.h"
 #include "tools/Flasker.h"
 #include "util/Util.h"
 
 #include <sstream>
-
-#ifdef USING_VCPKG
-#include "lib/stb/stb_image.h"
-#else
-#include "lib/stb/stb_image.h"
-#endif
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#endif
-
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#ifdef USING_VCPKG
-#include "lib/stb/stb_image_write.h"
-#else
-#include "lib/stb/stb_image_write.h"
-#endif
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 namespace Game3 {
 	// Credit for RGB to HSL: https://www.programmingalgorithms.com/algorithm/rgb-to-hsl/cpp/
@@ -139,11 +109,11 @@ namespace Game3 {
 		int base_channels = 0;
 		int mask_channels = 0;
 
-		auto base = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(base_filename.c_str(), &base_width, &base_height, &base_channels, 0));
+		auto base = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(base_filename.string().c_str(), &base_width, &base_height, &base_channels, 0));
 		if (!base)
 			throw std::runtime_error("Couldn't load " + base_filename.string());
 
-		auto mask = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(mask_filename.c_str(), &mask_width, &mask_height, &mask_channels, 0));
+		auto mask = std::unique_ptr<uint8_t[], FreeDeleter>(stbi_load(mask_filename.string().c_str(), &mask_width, &mask_height, &mask_channels, 0));
 		if (!mask)
 			throw std::runtime_error("Couldn't load " + mask_filename.string());
 

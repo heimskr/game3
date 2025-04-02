@@ -4,7 +4,7 @@
 #include "registry/Registry.h"
 #include "types/Types.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include <limits>
 #include <optional>
@@ -18,7 +18,7 @@ namespace Game3 {
 	class ConsumptionRule: public Registerable {
 		public:
 			using Registerable::Registerable;
-			ConsumptionRule(const std::shared_ptr<Game> &, const nlohmann::json &);
+			ConsumptionRule(const std::shared_ptr<Game> &, const boost::json::value &);
 
 			inline const auto & getInput() const { return input; }
 			inline const auto & getLaborRange() const { return laborRange; }
@@ -27,7 +27,7 @@ namespace Game3 {
 			inline auto getRate() const { return rate; }
 			inline auto getIgnoreLabor() const { return ignoreLabor; }
 
-			static ConsumptionRule fromJSON(const std::shared_ptr<Game> &, const nlohmann::json &);
+			static ConsumptionRule fromJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
 		private:
 			Identifier input;
@@ -38,7 +38,8 @@ namespace Game3 {
 			bool ignoreLabor = false;
 	};
 
-	void to_json(nlohmann::json &, const ConsumptionRule &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ConsumptionRule &);
+	ConsumptionRule tag_invoke(boost::json::value_to_tag<ConsumptionRule>, const boost::json::value &, const GamePtr &);
 
 	struct ConsumptionRuleRegistry: UnnamedJSONRegistry<ConsumptionRule> {
 		static Identifier ID() { return {"base", "registry/consumption_rule"}; }

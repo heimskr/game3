@@ -1,10 +1,11 @@
 #pragma once
 
-#include <span>
-#include <string>
-
+#include <boost/json/fwd.hpp>
 #include <openssl/evp.h>
 #include <openssl/sha.h>
+
+#include <span>
+#include <string>
 
 namespace Game3 {
 	template <typename T>
@@ -20,6 +21,8 @@ namespace Game3 {
 			~Hasher();
 
 			Hasher & operator+=(std::string_view);
+
+			Hasher & operator+=(const boost::json::value &);
 
 			template <typename T>
 			Hasher & operator+=(std::span<T> span) {

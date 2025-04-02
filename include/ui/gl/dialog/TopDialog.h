@@ -8,7 +8,7 @@ namespace Game3 {
 
 	class TopDialog: public Dialog {
 		public:
-			TopDialog(UIContext &);
+			TopDialog(UIContext &, float selfScale);
 
 			void init() final;
 			void render(const RendererContext &) final;

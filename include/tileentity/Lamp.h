@@ -9,8 +9,8 @@ namespace Game3 {
 
 			std::string getName() const override { return "Lamp"; }
 
-			void toJSON(nlohmann::json &) const override;
-			void absorbJSON(const GamePtr &, const nlohmann::json &) override;
+			void toJSON(boost::json::value &) const override;
+			void absorbJSON(const GamePtr &, const boost::json::value &) override;
 
 			void setOn(bool);
 

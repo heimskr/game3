@@ -1,20 +1,21 @@
 #include "game/Game.h"
 #include "game/Inventory.h"
+#include "lib/JSON.h"
 #include "recipe/DissolverRecipe.h"
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
 
-#include <nlohmann/json.hpp>
 
 #include "chemskr/Chemskr.h"
 
 namespace Game3 {
 	namespace {
 		size_t countAtoms(const ItemStackPtr &chemical) {
-			if (chemical->item->identifier != "base:item/chemical")
+			if (chemical->item->identifier != "base:item/chemical") {
 				return 4; // Count non-chemicals as four atoms.
+			}
 
-			const auto counts = Chemskr::count(chemical->data.at("formula"));
+			const auto counts = Chemskr::count(std::string(chemical->data.at("formula").as_string()));
 
 			return std::accumulate(counts.begin(), counts.end(), 0, [](size_t total, const auto &pair) {
 				return total + pair.second;
@@ -25,7 +26,7 @@ namespace Game3 {
 	DissolverRecipe::DissolverRecipe(Identifier identifier_):
 		Recipe(std::move(identifier_)) {}
 
-	DissolverRecipe::DissolverRecipe(Identifier identifier_, Input input_, const nlohmann::json &json):
+	DissolverRecipe::DissolverRecipe(Identifier identifier_, Input input_, const boost::json::value &json):
 		Recipe(std::move(identifier_)), input(std::move(input_)), dissolverResult(DissolverResult::fromJSON(json)) {}
 
 	DissolverRecipe::Input DissolverRecipe::getInput(const GamePtr &) {
@@ -101,18 +102,19 @@ namespace Game3 {
 		return true;
 	}
 
-	DissolverRecipe DissolverRecipe::fromJSON(const GamePtr &game, const Identifier &identifier, const nlohmann::json &json) {
+	DissolverRecipe DissolverRecipe::fromJSON(const GamePtr &game, const Identifier &identifier, const boost::json::value &json) {
 		return DissolverRecipe(identifier, ItemStack::create(game, identifier, 1), json);
 	}
 
-	void DissolverRecipe::toJSON(nlohmann::json &json) const {
-		json["type"] = DissolverRecipeRegistry::ID();
-		json["input"] = *input;
+	void DissolverRecipe::toJSON(boost::json::value &json, const GamePtr &) const {
 		assert(dissolverResult);
-		json["output"] = *dissolverResult;
+		auto &object = json.emplace_object();
+		object["type"] = boost::json::value_from(DissolverRecipeRegistry::ID());
+		object["input"] = boost::json::value_from(*input);
+		object["output"] = boost::json::value_from(*dissolverResult);
 	}
 
-	void to_json(nlohmann::json &json, const DissolverRecipe &recipe) {
-		recipe.toJSON(json);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const DissolverRecipe &recipe, const GamePtr &game) {
+		recipe.toJSON(json, game);
 	}
 }

@@ -9,6 +9,6 @@ namespace Game3 {
 		std::string count = "1";
 		if (pieces.size() == 3)
 			count = pieces[2];
-		client.getGame()->runCommand("give chemical " + count + " " + nlohmann::json{{"formula", std::move(pieces.at(1))}}.dump());
+		client.getGame()->runCommand("give chemical " + count + " " + boost::json::serialize(boost::json::value{{"formula", std::move(pieces.at(1))}}));
 	}
 }

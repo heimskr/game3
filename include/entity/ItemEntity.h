@@ -5,7 +5,7 @@
 #include "item/Item.h"
 #include "threading/Atomic.h"
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 namespace Game3 {
 	class Game;
@@ -18,9 +18,9 @@ namespace Game3 {
 
 			static std::shared_ptr<ItemEntity> create(const GamePtr &);
 			static std::shared_ptr<ItemEntity> create(const GamePtr &, ItemStackPtr);
-			static std::shared_ptr<ItemEntity> fromJSON(const GamePtr &, const nlohmann::json &);
+			static std::shared_ptr<ItemEntity> fromJSON(const GamePtr &, const boost::json::value &);
 
-			void toJSON(nlohmann::json &) const override;
+			void toJSON(boost::json::value &) const override;
 			void init(const GamePtr &) override;
 			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;
@@ -51,5 +51,5 @@ namespace Game3 {
 		friend class Entity;
 	};
 
-	void to_json(nlohmann::json &, const ItemEntity &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ItemEntity &);
 }

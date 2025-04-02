@@ -36,13 +36,22 @@ namespace Game3 {
 
 			if (!hasHit) {
 				Position position = getPosition();
+				Vector2d self_vector(position);
 				position.row += offset.y;
 				position.column += offset.x;
-				std::vector<EntityPtr> targets = getRealm()->findEntities(position, getSelf());
-				for (const EntityPtr &target: targets) {
-					if (target->getGID() != thrower && target->isAffectedByKnockback()) {
-						onHit(target);
-						break;
+				self_vector.x += offset.x;
+				self_vector.y += offset.y;
+				auto self = getSelf();
+
+				for (const EntityPtr &target: getRealm()->findEntitiesSquare(position, 2)) {
+					if (target != self && target->getGID() != thrower && target->isAffectedByKnockback()) {
+						Vector2d target_vector(target->getPosition());
+						target_vector.x += target->offset.x;
+						target_vector.y += target->offset.y;
+						if (self_vector.distance(target_vector) < 1) { // TODO: get actual size and use that for the threshold
+							onHit(target);
+							break;
+						}
 					}
 				}
 			}
@@ -54,8 +63,9 @@ namespace Game3 {
 	void Projectile::render(const RendererContext &renderers) {
 		SpriteRenderer &sprite_renderer = renderers.batchSprite;
 
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		if (texture == nullptr || needsTexture) {
 			if (needsTexture) {
@@ -143,6 +153,8 @@ namespace Game3 {
 	}
 
 	void Projectile::applyKnockback(const EntityPtr &target, float factor) {
+		assert(target.get() != this);
+
 		target->velocity.withUnique([this, factor](Vector3 &target_velocity) {
 			auto lock = velocity.uniqueLock();
 			target_velocity.x += velocity.x;

@@ -1,10 +1,11 @@
-#include "Log.h"
-#include "graphics/Tileset.h"
+#include "util/Log.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
+#include "lib/JSON.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tileentity/ItemSpawner.h"
@@ -18,20 +19,23 @@ namespace Game3 {
 		maximumTime(maximum_time),
 		spawnables(std::move(spawnables_)) {}
 
-	void ItemSpawner::toJSON(nlohmann::json &json) const {
+	void ItemSpawner::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
-		json["minimumTime"] = minimumTime;
-		json["maximumTime"] = maximumTime;
-		for (const ItemStackPtr &spawnable: spawnables)
-			json["spawnables"].push_back(*spawnable);
+		auto &object = json.as_object();
+		object["minimumTime"] = minimumTime;
+		object["maximumTime"] = maximumTime;
+		auto &array = object["spawnables"].emplace_array();
+		for (const ItemStackPtr &spawnable: spawnables) {
+			array.emplace_back(boost::json::value_from(*spawnable));
+		}
 	}
 
-	void ItemSpawner::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void ItemSpawner::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		minimumTime = json.at("minimumTime");
-		maximumTime = json.at("maximumTime");
-		for (const auto &spawnable: json.at("spawnables"))
-			spawnables.emplace_back(ItemStack::fromJSON(game, spawnable));
+		minimumTime = getDouble(json.at("minimumTime"));
+		maximumTime = getDouble(json.at("maximumTime"));
+		for (const auto &spawnable: json.at("spawnables").as_array())
+			spawnables.emplace_back(boost::json::value_to<ItemStackPtr>(spawnable, game));
 	}
 
 	void ItemSpawner::tick(const TickArgs &args) {

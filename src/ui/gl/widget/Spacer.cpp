@@ -1,9 +1,11 @@
 #include "ui/gl/widget/Spacer.h"
 #include "ui/gl/UIContext.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	Spacer::Spacer(UIContext &ui, Orientation orientation):
-		Widget(ui, -1), orientation(orientation) {}
+		Widget(ui, 1),
+		orientation(orientation) {}
 
 	void Spacer::init() {
 		if (orientation == Orientation::Vertical) {

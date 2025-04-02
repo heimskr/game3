@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "types/Types.h"
 #include "realm/Realm.h"

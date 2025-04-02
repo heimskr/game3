@@ -6,6 +6,7 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "item/ContainmentOrb.h"
+#include "lib/JSON.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
@@ -75,17 +76,17 @@ namespace Game3 {
 			return false;
 
 		struct CombinedGene {
-			nlohmann::json data;
+			boost::json::value data;
 			bool fromFirst;
 
-			CombinedGene(nlohmann::json data = {}, bool from_first = {}):
+			CombinedGene(boost::json::value data = {}, bool from_first = {}):
 				data(std::move(data)), fromFirst(from_first) {}
 		};
 
 		bool was_empty = !output;
 
 		if (was_empty) {
-			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, nlohmann::json{{"genes", std::map<std::string, nlohmann::json>()}});
+			output = ItemStack::create(getGame(), "base:item/genetic_template", 1, boost::json::value{{"genes", boost::json::object{}}});
 		} else if (output->getID() != "base:item/genetic_template") {
 			return false;
 		}
@@ -94,15 +95,15 @@ namespace Game3 {
 
 		for (const ItemStackPtr &stack: {first, second}) {
 			if (stack->getID() == "base:item/gene") {
-				nlohmann::json &gene = stack->data.at("gene");
-				combined_genes.try_emplace(gene.at("name"), gene, stack == first);
+				boost::json::value &gene = stack->data.at("gene");
+				combined_genes.try_emplace(std::string(gene.at("name").as_string()), gene, stack == first);
 			} else {
-				for (const auto &[name, gene]: stack->data.at("genes").items())
+				for (const auto &[name, gene]: stack->data.at("genes").as_object())
 					combined_genes.try_emplace(name, gene, stack == first);
 			}
 		}
 
-		nlohmann::json &genes = output->data.at("genes");
+		boost::json::object &genes = ensureObject(output->data.at("genes"));
 
 		bool any_from_first  = false;
 		bool any_from_second = false;
@@ -129,7 +130,7 @@ namespace Game3 {
 		return any_from_first || any_from_second;
 	}
 
-	void Recombinator::toJSON(nlohmann::json &json) const {
+	void Recombinator::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
@@ -155,7 +156,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Recombinator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Recombinator::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);

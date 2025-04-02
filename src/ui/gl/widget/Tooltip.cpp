@@ -14,15 +14,16 @@ namespace {
 }
 
 namespace Game3 {
-	Tooltip::Tooltip(UIContext &ui, float scale):
-		Widget(ui, scale),
+	Tooltip::Tooltip(UIContext &ui, float selfScale):
+		Widget(ui, selfScale),
 		maxWidth(DEFAULT_MAX_WIDTH),
 		backgroundColor(DEFAULT_TOOLTIP_BACKGROUND_COLOR),
 		textColor(DEFAULT_TOOLTIP_TEXT_COLOR) {}
 
 	void Tooltip::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (!visible)
+		if (!visible) {
 			return;
+		}
 
 		if (positionOverride) {
 			x = positionOverride->first;
@@ -42,6 +43,8 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
+		const auto scale = getScale();
+
 		const float padding = getPadding();
 		const float text_scale = getTextScale();
 
@@ -53,6 +56,11 @@ namespace Game3 {
 
 		lastRectangle.width  = effective_width;
 		lastRectangle.height = effective_height;
+
+		if (x + effective_width > ui.getWidth() && x - effective_width >= 0) {
+			lastRectangle.x -= effective_width;
+			x -= effective_width;
+		}
 
 		rectangler(backgroundColor, Rectangle(x, y, effective_width, effective_height));
 
@@ -155,10 +163,10 @@ namespace Game3 {
 	}
 
 	float Tooltip::getTextScale() const {
-		return scale / 16;
+		return getScale() / 16;
 	}
 
 	float Tooltip::getPadding() const {
-		return scale * 2;
+		return getScale() * 2;
 	}
 }

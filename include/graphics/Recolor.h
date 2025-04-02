@@ -34,6 +34,7 @@ namespace Game3 {
 			void update(int width, int height);
 
 			void drawOnMap(const std::shared_ptr<Texture> &, const std::shared_ptr<Texture> &mask, const RenderOptions &, float hue, float saturation, float value_multiplier);
+			void drawOnMap(const GL::Texture &, const std::shared_ptr<Texture> &mask, const RenderOptions &, float hue, float saturation, float value_multiplier);
 
 			void reset();
 

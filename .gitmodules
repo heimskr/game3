@@ -19,3 +19,21 @@
 [submodule "subprojects/zip8"]
 	path = subprojects/zip8
 	url = https://github.com/heimskr/zip8.git
+[submodule "subprojects/pngpp"]
+	path = subprojects/pngpp
+	url = https://github.com/heimskr/pngpp.git
+[submodule "subprojects/fixed_string"]
+	path = subprojects/fixed_string
+	url = https://github.com/unterumarmung/fixed_string.git
+[submodule "subprojects/FastNoise2"]
+	path = subprojects/FastNoise2
+	url = https://github.com/Auburn/FastNoise2.git
+[submodule "subprojects/glm"]
+	path = subprojects/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "subprojects/libnoise"]
+	path = subprojects/libnoise
+	url = https://github.com/qknight/libnoise.git
+[submodule "subprojects/backward-cpp"]
+	path = subprojects/backward-cpp
+	url = https://github.com/bombela/backward-cpp.git

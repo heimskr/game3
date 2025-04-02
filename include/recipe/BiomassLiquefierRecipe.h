@@ -1,12 +1,10 @@
 #pragma once
 
 #include "data/Identifier.h"
-#include "game/Fluids.h"
+#include "fluid/Fluid.h"
 #include "item/Item.h"
 #include "recipe/Recipe.h"
 #include "registry/Registries.h"
-
-#include <nlohmann/json_fwd.hpp>
 
 namespace Game3 {
 	struct BiomassLiquefierRecipe: Recipe<ItemStackPtr, FluidAmount, NamedRegisterable> {
@@ -24,7 +22,7 @@ namespace Game3 {
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container, std::optional<Output> &leftovers) override;
 		/** Doesn't lock either container. */
 		bool craft(const GamePtr &, const std::shared_ptr<Container> &input_container, const std::shared_ptr<Container> &output_container) override;
-		void toJSON(nlohmann::json &) const override;
+		void toJSON(boost::json::value &, const GamePtr &) const override;
 	};
 
 	struct BiomassLiquefierRecipeRegistry: NamedRegistry<BiomassLiquefierRecipe> {

@@ -14,8 +14,8 @@ namespace Game3 {
 
 	class EnergyModule: public Module {
 		public:
-			EnergyModule(UIContext &, const std::shared_ptr<ClientGame> &, const std::any &, bool show_header = true);
-			EnergyModule(UIContext &, const AgentPtr &, bool show_header = true);
+			EnergyModule(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &, bool show_header = true);
+			EnergyModule(UIContext &, float selfScale, const AgentPtr &, bool show_header = true);
 
 			static Identifier ID() { return {"base", "module/energy_level"}; }
 

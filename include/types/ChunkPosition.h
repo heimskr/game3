@@ -5,7 +5,7 @@
 #include <random>
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
+#include <boost/json/fwd.hpp>
 
 #include "Constants.h"
 #include "types/Position.h"
@@ -71,8 +71,8 @@ namespace Game3 {
 		auto operator<=>(const ChunkRequest &) const = default;
 	};
 
-	void from_json(const nlohmann::json &, ChunkPosition &);
-	void to_json(nlohmann::json &, const ChunkPosition &);
+	ChunkPosition tag_invoke(boost::json::value_to_tag<ChunkPosition>, const boost::json::value &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ChunkPosition &);
 
 	struct ChunkRange {
 		public:
@@ -110,7 +110,7 @@ namespace Game3 {
 			/** Stops iterating if the function returns true. */
 			template <typename Fn>
 			requires(Returns<Fn, bool, ChunkPosition>)
-			void iterate(const Fn &fn) const {
+			void iterate(Fn &&fn) const {
 				for (auto y = topLeft.y; y <= bottomRight.y; ++y)
 					for (auto x = topLeft.x; x <= bottomRight.x; ++x)
 						if (fn(ChunkPosition{x, y}))
@@ -118,8 +118,8 @@ namespace Game3 {
 			}
 	};
 
-	void from_json(const nlohmann::json &, ChunkRange &);
-	void to_json(nlohmann::json &, const ChunkRange &);
+	ChunkRange tag_invoke(boost::json::value_to_tag<ChunkRange>, const boost::json::value &);
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ChunkRange &);
 }
 
 template <>

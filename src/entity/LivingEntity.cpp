@@ -6,7 +6,10 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/RenderOptions.h"
+#include "lib/JSON.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
+#include "packet/StatusEffectsPacket.h"
+#include "statuseffect/StatusEffect.h"
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
@@ -18,30 +21,65 @@ namespace Game3 {
 		health = getMaxHealth();
 	}
 
-	void LivingEntity::toJSON(nlohmann::json &json) const {
-		auto this_lock = sharedLock();
-		json["health"] = health;
-		json["luck"] = luckStat;
+	void LivingEntity::tick(const TickArgs &args) {
+		Entity::tick(args);
+
+		LivingEntityPtr self = getSelf();
+
+		if (getSide() == Side::Server) {
+			if (std::optional<FluidTile> fluid_tile = getRealm()->tileProvider.copyFluidTile(getPosition()); fluid_tile && 0 < fluid_tile->level) {
+				FluidPtr fluid = getGame()->getFluid(fluid_tile->id);
+				assert(fluid != nullptr);
+				fluid->onCollision(self);
+			}
+		}
+
+		auto lock = statusEffects.uniqueLock();
+
+		if (statusEffects.empty()) {
+			return;
+		}
+
+		std::erase_if(statusEffects, [&](const auto &item) {
+			const bool remove = item.second->apply(self, args.delta);
+			if (remove) {
+				item.second->onRemove(self);
+			}
+			return remove;
+		});
 	}
 
-	void LivingEntity::absorbJSON(const GamePtr &, const nlohmann::json &json) {
-		if (json.is_null())
+	void LivingEntity::toJSON(boost::json::value &json) const {
+		boost::json::object &object = json.emplace_object();
+		auto lock = sharedLock();
+		object["health"] = health;
+		object["luck"] = luckStat;
+	}
+
+	void LivingEntity::absorbJSON(const GamePtr &, const boost::json::value &json) {
+		if (json.is_null()) {
 			return;
+		}
 
-		auto this_lock = uniqueLock();
+		const boost::json::object &object = json.as_object();
 
-		if (auto iter = json.find("health"); iter != json.end())
-			health = *iter;
+		auto lock = uniqueLock();
 
-		if (auto iter = json.find("luck"); iter != json.end())
-			luckStat = *iter;
+		if (auto *value = object.if_contains("health")) {
+			health = boost::json::value_to<HitPoints>(*value);
+		}
+
+		if (auto *value = object.if_contains("luck")) {
+			luckStat = getDouble(*value);
+		}
 	}
 
 	void LivingEntity::renderUpper(const RendererContext &renderers) {
 		Entity::renderUpper(renderers);
 
-		if (!canShowHealthBar())
+		if (!canShowHealthBar()) {
 			return;
+		}
 
 		RectangleRenderer &rectangle = renderers.rectangle;
 
@@ -87,6 +125,7 @@ namespace Game3 {
 		buffer << health;
 		buffer << defenseStat;
 		buffer << luckStat;
+		buffer << statusEffects;
 	}
 
 	void LivingEntity::decode(Buffer &buffer) {
@@ -94,10 +133,23 @@ namespace Game3 {
 		buffer >> health;
 		buffer >> defenseStat;
 		buffer >> luckStat;
+		buffer >> statusEffects;
 	}
 
 	bool LivingEntity::isAffectedByKnockback() const {
 		return true;
+	}
+
+	std::pair<Color, Color> LivingEntity::getColors() const {
+		auto [multiplier, composite] = Entity::getColors();
+
+		statusEffects.withUnique([&](const auto &map) {
+			for (const auto &[identifier, effect]: map) {
+				effect->modifyColors(multiplier, composite);
+			}
+		});
+
+		return {multiplier, composite};
 	}
 
 	bool LivingEntity::canShowHealthBar() const {
@@ -141,28 +193,38 @@ namespace Game3 {
 	bool LivingEntity::takeDamage(HitPoints damage) {
 		assert(getSide() == Side::Server);
 
+		if (isInvincible()) {
+			return false;
+		}
+
 		std::uniform_int_distribution<int> defense_distribution(0, 99);
 
 		const int defense = getDefense();
 		const double luck = getLuck();
 
 		for (int roll = 0; roll < defense; ++roll) {
-			if (damage == 0)
+			if (damage == 0) {
 				break;
+			}
 
-			if (defense_distribution(threadContext.rng) < 10 * luck)
+			if (defense_distribution(threadContext.rng) < 10 * luck) {
 				--damage;
+			}
 		}
 
-		Color color{1, 0, 0, 1};
-		if (damage == 0)
-			color = {0, 0, 1, 1};
+		Color color{"#ff0000"};
+		if (damage == 0) {
+			color = Color{"#0000ff"};
+		} else if (damage < 0) {
+			color = Color{"#00ff00"};
+		}
 
 		RealmPtr realm = getRealm();
 		realm->spawn<TextParticle>(getPosition(), std::to_string(damage), color, .666f);
 
-		if (damage == 0)
+		if (damage == 0) {
 			return false;
+		}
 
 		spawnBlood(3);
 
@@ -177,13 +239,24 @@ namespace Game3 {
 		return false;
 	}
 
+	void LivingEntity::enqueueDamage(HitPoints damage) {
+		getGame()->enqueue([weak = getWeakSelf(), old_kills = kills, damage](const TickArgs &) {
+			if (LivingEntityPtr self = weak.lock()) {
+				if (self->kills == old_kills) {
+					self->takeDamage(damage);
+				}
+			}
+		});
+	}
+
 	void LivingEntity::kill() {
 		assert(getSide() == Side::Server);
 
-		RealmPtr realm = getRealm();
+		++kills;
 
-		for (const ItemStackPtr &stack: getDrops())
-			stack->spawn(Place{getPosition(), realm});
+		for (Place place = getPlace(); const ItemStackPtr &stack: getDrops()) {
+			stack->spawn(place);
+		}
 
 		queueDestruction();
 	}
@@ -193,12 +266,12 @@ namespace Game3 {
 		Position position = getPosition();
 
 		std::uniform_real_distribution y_distribution(-0.15, 0.15);
-		std::uniform_real_distribution z_distribution(16., 32.);
+		std::uniform_real_distribution z_distribution(6., 10.);
 		std::uniform_real_distribution depth_distribution(-0.5, 0.0);
 		std::uniform_real_distribution red_distribution(0.333, 1.0);
 
 		for (double x: {-1, +1}) {
-			std::uniform_real_distribution x_distribution(x - 0.2, x + 0.2);
+			std::uniform_real_distribution x_distribution(x - 1.0, x + 1.0);
 			for (size_t i = 0; i < count; ++i) {
 				Vector3 velocity{
 					x_distribution(threadContext.rng),
@@ -220,11 +293,11 @@ namespace Game3 {
 		return {};
 	}
 
-	bool LivingEntity::canAbsorbGenes(const nlohmann::json &) const {
+	bool LivingEntity::canAbsorbGenes(const boost::json::value &) const {
 		return false;
 	}
 
-	void LivingEntity::absorbGenes(const nlohmann::json &) {}
+	void LivingEntity::absorbGenes(const boost::json::value &) {}
 
 	float LivingEntity::getBaseSpeed() {
 		return 1.5;
@@ -234,12 +307,107 @@ namespace Game3 {
 
 	void LivingEntity::iterateGenes(const std::function<void(const Gene &)> &) const {}
 
-	bool LivingEntity::checkGenes(const nlohmann::json &genes, std::unordered_set<std::string> &&names) {
-		if (genes.size() != names.size())
-			return false;
+	void LivingEntity::inflictStatusEffect(std::unique_ptr<StatusEffect> &&effect, bool can_overwrite) {
+		assert(effect != nullptr);
 
-		for (const auto &[key, value]: genes.items())
+		if (!susceptibleToStatusEffect(effect->identifier)) {
+			return;
+		}
+
+		auto lock = statusEffects.uniqueLock();
+
+		if (auto iter = statusEffects.find(effect->identifier); iter == statusEffects.end()) {
+			Identifier identifier = effect->identifier;
+			effect->onAdd(getSelf());
+			statusEffects.emplace(std::move(identifier), std::move(effect));
+		} else if (can_overwrite) {
+			iter->second = std::move(effect);
+		} else {
+			iter->second->replenish(getSelf());
+		}
+
+		broadcastPacket(make<StatusEffectsPacket>(*this));
+	}
+
+	void LivingEntity::removeStatusEffect(const Identifier &identifier) {
+		auto lock = statusEffects.uniqueLock();
+		if (auto iter = statusEffects.find(identifier); iter != statusEffects.end()) {
+			iter->second->onRemove(getSelf());
+			statusEffects.erase(iter);
+			broadcastPacket(make<StatusEffectsPacket>(*this));
+		}
+	}
+
+	void LivingEntity::setStatusEffects(StatusEffectMap value) {
+		auto lock = statusEffects.uniqueLock();
+		StatusEffectMap &base = statusEffects.getBase();
+		LivingEntityPtr self = getSelf();
+
+		for (const auto &[identifier, effect]: value) {
+			if (!statusEffects.contains(identifier)) {
+				effect->onAdd(self);
+			}
+		}
+
+		for (const auto &[identifier, effect]: base) {
+			if (!value.contains(identifier)) {
+				effect->onRemove(self);
+			}
+		}
+
+		base = std::move(value);
+
+		if (getSide() == Side::Server) {
+			lock.unlock();
+			broadcastPacket(make<StatusEffectsPacket>(*this));
+		}
+	}
+
+	StatusEffectMap LivingEntity::copyStatusEffects() const {
+		StatusEffectMap out;
+		statusEffects.withShared([&](const StatusEffectMap &map) {
+			out.reserve(map.size());
+			for (const auto &[identifier, effect]: map) {
+				out[identifier] = effect->copy();
+			}
+		});
+		return out;
+	}
+
+	bool LivingEntity::iterateStatusEffects(const std::function<bool(const Identifier &, const std::unique_ptr<StatusEffect> &)> &function) const {
+		return statusEffects.withShared([&](const StatusEffectMap &map) {
+			for (const auto &[identifier, effect]: map) {
+				if (function(identifier, effect)) {
+					return true;
+				}
+			}
+
+			return false;
+		});
+	}
+
+	bool LivingEntity::susceptibleToStatusEffect(const Identifier &) const {
+		return true;
+	}
+
+	std::shared_ptr<LivingEntity> LivingEntity::getSelf() {
+		return std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+	}
+
+	std::weak_ptr<LivingEntity> LivingEntity::getWeakSelf() {
+		return std::weak_ptr(getSelf());
+	}
+
+	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {
+		const boost::json::object &object = genes.as_object();
+
+		if (object.size() != names.size()) {
+			return false;
+		}
+
+		for (const auto &[key, value]: object) {
 			names.erase(key);
+		}
 
 		return names.size() == 0;
 	}

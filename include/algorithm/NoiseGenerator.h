@@ -13,7 +13,7 @@ namespace Game3 {
 			int seed = 0;
 
 		public:
-			NoiseGenerator() = default;
+			NoiseGenerator();
 
 			NoiseGenerator(int seed_):
 				seed(seed_) {}

@@ -6,8 +6,6 @@
 
 #include <string_view>
 
-#include "lib/Eigen.h"
-
 namespace Game3 {
 	class Texture;
 

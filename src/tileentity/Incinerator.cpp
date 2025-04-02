@@ -53,7 +53,7 @@ namespace Game3 {
 		}
 	}
 
-	void Incinerator::toJSON(nlohmann::json &json) const {
+	void Incinerator::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		InventoriedTileEntity::toJSON(json);
@@ -70,7 +70,7 @@ namespace Game3 {
 		return false;
 	}
 
-	void Incinerator::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Incinerator::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		InventoriedTileEntity::absorbJSON(game, json);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity/Entity.h"
-#include "graphics/TextRenderer.h"
+#include "graphics/Color.h"
 
 namespace Game3 {
 	class SquareParticle: public Entity {
@@ -16,6 +16,7 @@ namespace Game3 {
 				return Entity::create<SquareParticle>(std::forward<Args>(args)...);
 			}
 
+			void renderShadow(const RendererContext &) override;
 			void render(const RendererContext &) override;
 			void tick(const TickArgs &) override;
 			bool shouldPersist() const override { return false; }

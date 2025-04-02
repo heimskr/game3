@@ -15,7 +15,7 @@ namespace Game3 {
 		public:
 			sigc::signal<void(bool response)> onSubmit;
 
-			MessageDialog(UIContext &, int width, int height, ButtonsType = ButtonsType::Okay);
+			MessageDialog(UIContext &, float selfScale, int width, int height, ButtonsType = ButtonsType::Okay);
 
 			void render(const RendererContext &) override;
 
@@ -24,7 +24,7 @@ namespace Game3 {
 
 			void setChild(WidgetPtr);
 
-			static std::shared_ptr<MessageDialog> create(UIContext &, UString text, ButtonsType = ButtonsType::Okay);
+			static std::shared_ptr<MessageDialog> create(UIContext &, float selfScale, UString text, ButtonsType = ButtonsType::Okay);
 
 		private:
 			ButtonsType buttonsType = ButtonsType::Okay;

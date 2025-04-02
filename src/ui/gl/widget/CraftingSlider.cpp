@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "graphics/Texture.h"
 #include "packet/CraftPacket.h"
@@ -16,7 +16,8 @@
 
 namespace Game3 {
 	CraftingSlider::CraftingSlider(UIContext &ui, float scale, CraftingRecipePtr recipe):
-		Grid(ui, scale), recipe(std::move(recipe)) {}
+		Grid(ui, scale),
+		recipe(std::move(recipe)) {}
 
 	void CraftingSlider::init() {
 		clearChildren();
@@ -27,13 +28,13 @@ namespace Game3 {
 			};
 		};
 
-		auto minus = make<Icon>(ui, scale);
+		auto minus = make<Icon>(ui, selfScale);
 		minus->setIconTexture(cacheTexture("resources/gui/minus.png"));
-		minus->setFixedSize(8 * scale);
+		minus->setFixedSize(8 * selfScale);
 		minus->setOnClick(make_increment(-1));
 		attach(std::move(minus), 0, 0);
 
-		valueSlider = make<Slider>(ui, scale);
+		valueSlider = make<Slider>(ui, selfScale);
 		valueSlider->setRange(1.0, static_cast<double>(getMaximum()));
 		valueSlider->setStep(1.0);
 		valueSlider->setDisplayDigits(0);
@@ -43,23 +44,23 @@ namespace Game3 {
 		});
 		attach(valueSlider, 0, 1);
 
-		auto plus = make<Icon>(ui, scale);
+		auto plus = make<Icon>(ui, selfScale);
 		plus->setIconTexture(cacheTexture("resources/gui/plus.png"));
-		plus->setFixedSize(8 * scale);
+		plus->setFixedSize(8 * selfScale);
 		plus->setOnClick(make_increment(1));
 		attach(std::move(plus), 0, 2);
 
-		auto hbox = make<Box>(ui, scale, Orientation::Horizontal, scale / 2, 0, Color{});
+		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, selfScale / 2, 0, Color{});
 
-		auto one_button = make<Button>(ui, scale);
+		auto one_button = make<Button>(ui, selfScale);
 		one_button->setText("1");
 		one_button->setOnClick([this](Widget &) {
 			setValue(1);
 		});
 		hbox->append(std::move(one_button));
 
-		valueInput = make<IntegerInput>(ui, scale);
-		valueInput->setFixedWidth(16 * scale);
+		valueInput = make<IntegerInput>(ui, selfScale);
+		valueInput->setFixedWidth(16 * selfScale);
 		valueInput->setText(std::format("{}", value));
 		valueInput->onChange.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
@@ -75,14 +76,14 @@ namespace Game3 {
 		});
 		hbox->append(valueInput);
 
-		auto craft_button = make<IconButton>(ui, scale);
+		auto craft_button = make<IconButton>(ui, selfScale);
 		craft_button->setIconTexture(cacheTexture("resources/gui/crafting.png"));
 		craft_button->setOnClick([this](Widget &) {
 			craft();
 		});
 		hbox->append(std::move(craft_button));
 
-		auto max_button = make<Button>(ui, scale);
+		auto max_button = make<Button>(ui, selfScale);
 		max_button->setText(std::format("{}", getMaximum()));
 		max_button->setOnClick([this](Widget &) {
 			setValue(getMaximum());

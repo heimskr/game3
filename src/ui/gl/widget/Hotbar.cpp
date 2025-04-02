@@ -13,14 +13,14 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
-	Hotbar::Hotbar(UIContext &ui, float scale):
-		Widget(ui, scale) {}
+	Hotbar::Hotbar(UIContext &ui, float selfScale):
+		Widget(ui, selfScale) {}
 
 	void Hotbar::init() {
 		WidgetPtr self = shared_from_this();
 
 		for (Slot slot = 0; slot < HOTBAR_SIZE; ++slot) {
-			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, scale, false));
+			auto &slot_widget = slotWidgets.emplace_back(make<ItemSlot>(ui, slot, INNER_SLOT_SIZE, selfScale, false));
 			slot_widget->onDrop.connect([this](ItemSlot &self, const WidgetPtr &widget) {
 				if (auto dragged = std::dynamic_pointer_cast<ItemSlot>(widget); dragged && dragged.get() != &self) {
 					ClientPlayerPtr player = ui.getPlayer();
@@ -30,8 +30,8 @@ namespace Game3 {
 			slot_widget->insertAtEnd(self);
 		}
 
-		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
-		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, scale / 2, false);
+		heldLeft  = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, selfScale / 2, false);
+		heldRight = make<ItemSlot>(ui, -1, INNER_SLOT_SIZE, selfScale / 2, false);
 
 		heldLeft->insertAtEnd(self);
 		heldRight->insertAtEnd(self);
@@ -70,9 +70,11 @@ namespace Game3 {
 
 		measure(renderers, Orientation::Horizontal, original_width, original_height, dummy, width);
 		measure(renderers, Orientation::Vertical,   original_width, original_height, dummy, height);
+		Widget::render(renderers, x, y, width, height);
+		width -= getRightSideWidth();
+		const auto scale = getScale();
 		const float offset = SLOT_PADDING * scale / 3;
 		const float held_scale = heldLeft->getScale();
-		Widget::render(renderers, x, y, width + 2 * offset + INNER_SLOT_SIZE * held_scale + 2 * SLOT_PADDING * held_scale, height);
 
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
@@ -121,9 +123,9 @@ namespace Game3 {
 				heldRight->setStack(nullptr);
 			}
 
-			const float held_size = INNER_SLOT_SIZE * heldLeft->getScale();
-			const float held_padding = SLOT_PADDING * heldLeft->getScale();
-			const float text_scale = heldLeft->getScale() / 8;
+			const float held_size = INNER_SLOT_SIZE * held_scale;
+			const float held_padding = SLOT_PADDING * held_scale;
+			const float text_scale = held_scale / 8;
 			const float rectangle_size = held_size + 2 * held_padding;
 
 			x += width + 2 * offset;
@@ -158,15 +160,20 @@ namespace Game3 {
 		}
 	}
 
+	bool Hotbar::mouseDown(int, int, int, Modifiers) {
+		return true;
+	}
+
 	SizeRequestMode Hotbar::getRequestMode() const {
 		return SizeRequestMode::ConstantSize;
 	}
 
 	void Hotbar::measure(const RendererContext &, Orientation orientation, float, float, float &minimum, float &natural) {
+		const auto scale = getScale();
 		if (orientation == Orientation::Horizontal) {
-			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
+			minimum = natural = (OUTER_SLOT_SIZE * HOTBAR_SIZE + SLOT_PADDING + HOTBAR_BORDER * 2) * scale + getRightSideWidth();
 		} else {
-			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING) * scale + HOTBAR_BORDER * 2;
+			minimum = natural = (OUTER_SLOT_SIZE + SLOT_PADDING + HOTBAR_BORDER * 2) * scale;
 		}
 	}
 
@@ -178,5 +185,15 @@ namespace Game3 {
 
 	const std::optional<float> & Hotbar::getLastY() const {
 		return lastY;
+	}
+
+	float Hotbar::getRightSideWidth() const {
+		const auto scale = getScale();
+		const auto offset = SLOT_PADDING * scale / 3;
+		const auto held_scale = heldLeft->getScale();
+		const auto held_size = INNER_SLOT_SIZE * held_scale;
+		const auto held_padding = SLOT_PADDING * held_scale;
+		const auto rectangle_size = held_size + 2 * held_padding + 2 * offset;
+		return 2 * offset + rectangle_size;
 	}
 }

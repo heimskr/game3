@@ -1,14 +1,22 @@
-#include "Log.h"
+#include "util/Log.h"
 #include "client/ClientSettings.h"
 #include "game/ClientGame.h"
+#include "lib/JSON.h"
+#include "ui/gl/Constants.h"
 #include "ui/Window.h"
 #include "util/Timer.h"
 
-#include <nlohmann/json.hpp>
-
 namespace Game3 {
-	void ClientSettings::apply(ClientGame &) const {
+	ClientSettings::ClientSettings():
+		uiScale(UI_SCALE) {}
+
+	void ClientSettings::apply(ClientGame &game) const {
 		glfwSwapInterval(capFPS? 1 : 0);
+		apply(game.getWindow()->uiContext);
+	}
+
+	void ClientSettings::apply(UIContext &ui) const {
+		ui.setScale(uiScale);
 		apply();
 	}
 
@@ -17,10 +25,14 @@ namespace Game3 {
 		Logger::level = logLevel;
 	}
 
-	void from_json(const nlohmann::json &json, ClientSettings &settings) {
+	ClientSettings tag_invoke(boost::json::value_to_tag<ClientSettings>, const boost::json::value &json) {
+		const auto &object = json.as_object();
+
+		ClientSettings out;
+
 		auto get = [&](const char *key, auto member) {
-			if (auto iter = json.find(key); iter != json.end()) {
-				settings.*member = *iter;
+			if (auto iter = object.find(key); iter != object.end()) {
+				out.*member = boost::json::value_to<std::decay_t<decltype(out.*member)>>(iter->value());
 			}
 		};
 
@@ -35,20 +47,28 @@ namespace Game3 {
 		get("fpsSmoothing", &ClientSettings::fpsSmoothing);
 		get("showFPS", &ClientSettings::showFPS);
 		get("capFPS", &ClientSettings::capFPS);
+		get("specialEffects", &ClientSettings::specialEffects);
+		get("uiScale", &ClientSettings::uiScale);
+
+		return out;
 	}
 
-	void to_json(nlohmann::json &json, const ClientSettings &settings) {
-		json["hostname"] = settings.hostname;
-		json["port"] = settings.port;
-		if (!settings.username.empty())
-			json["username"] = settings.username;
-		json["alertOnConnection"] = settings.alertOnConnection;
-		json["tickFrequency"] = settings.tickFrequency;
-		json["renderLighting"] = settings.renderLighting;
-		json["hideTimers"] = settings.hideTimers;
-		json["logLevel"] = settings.logLevel;
-		json["fpsSmoothing"] = settings.fpsSmoothing;
-		json["showFPS"] = settings.showFPS;
-		json["capFPS"] = settings.capFPS;
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ClientSettings &settings) {
+		auto &object = json.emplace_object();
+		object["hostname"] = settings.hostname;
+		object["port"] = settings.port;
+		if (!settings.username.empty()) {
+			object["username"] = settings.username;
+		}
+		object["alertOnConnection"] = settings.alertOnConnection;
+		object["tickFrequency"] = settings.tickFrequency;
+		object["renderLighting"] = settings.renderLighting;
+		object["hideTimers"] = settings.hideTimers;
+		object["logLevel"] = settings.logLevel;
+		object["fpsSmoothing"] = settings.fpsSmoothing;
+		object["showFPS"] = settings.showFPS;
+		object["capFPS"] = settings.capFPS;
+		object["specialEffects"] = settings.specialEffects;
+		object["uiScale"] = settings.uiScale;
 	}
 }

@@ -9,15 +9,15 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	TopDialog::TopDialog(UIContext &ui):
-		Dialog(ui) {}
+	TopDialog::TopDialog(UIContext &ui, float selfScale):
+		Dialog(ui, selfScale) {}
 
 	void TopDialog::init() {
-		hbox = std::make_shared<Box>(ui, scale, Orientation::Horizontal, 0);
+		hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
 
-		abscond = make<Icon>(ui, scale);
+		abscond = make<Icon>(ui, selfScale);
 		abscond->setIconTexture(cacheTexture("resources/gui/abscond.png"));
-		abscond->setFixedSize(10 * scale);
+		abscond->setFixedSize(10 * selfScale);
 		abscond->setTooltipText("Abscond");
 		abscond->setOnClick([this](Widget &) {
 			ui.window.disconnect();
@@ -37,8 +37,7 @@ namespace Game3 {
 	}
 
 	Rectangle TopDialog::getPosition() const {
-		float offset = scale;
-		return Rectangle(offset, offset, ui.getWidth() - 2 * offset, 16 * scale);
+		return Rectangle(0, 0, ui.getWidth(), 10 * getScale());
 	}
 
 	void TopDialog::onBlur() {

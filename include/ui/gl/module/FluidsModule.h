@@ -14,13 +14,13 @@ namespace Game3 {
 	class HasFluids;
 	class Label;
 	class ProgressBar;
-	struct Fluid;
+	class Fluid;
 
 	class FluidsModule: public Module {
 		public:
-			FluidsModule(UIContext &, const std::shared_ptr<ClientGame> &, const std::any &, bool show_header = true);
-			FluidsModule(UIContext &, const AgentPtr &, bool show_header = true);
-			FluidsModule(UIContext &, std::shared_ptr<HasFluids>, bool show_header = true);
+			FluidsModule(UIContext &, float selfScale, const std::shared_ptr<ClientGame> &, const std::any &, bool show_header = true);
+			FluidsModule(UIContext &, float selfScale, const AgentPtr &, bool show_header = true);
+			FluidsModule(UIContext &, float selfScale, std::shared_ptr<HasFluids>, bool show_header = true);
 
 			static Identifier ID() { return {"base", "module/fluid_levels"}; }
 

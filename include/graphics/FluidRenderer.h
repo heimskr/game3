@@ -22,7 +22,7 @@ namespace Game3 {
 			std::atomic_int backbufferHeight = -1;
 			std::atomic_bool isMissing = false;
 
-			Eigen::Vector2f center {0.f, 0.f};
+			Vector2d center{0, 0};
 
 			FluidRenderer();
 			FluidRenderer(Realm &);

@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include "Log.h"
+#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -10,6 +8,7 @@
 #include "game/ServerGame.h"
 #include "game/Inventory.h"
 #include "item/Tool.h"
+#include "lib/JSON.h"
 #include "net/Buffer.h"
 #include "net/LocalClient.h"
 #include "net/RemoteClient.h"
@@ -25,8 +24,9 @@ namespace Game3 {
 		Entity(ID()), LivingEntity() {}
 
 	Player::~Player() {
-		if (spawning)
+		if (spawning) {
 			return;
+		}
 
 		INFO(3, "\e[31m~Player\e[39m({}, {}, {})", reinterpret_cast<void *>(this), username.empty()? "[unknown username]" : username, globalID);
 	}
@@ -39,9 +39,11 @@ namespace Game3 {
 			auto lock = visibleEntities.sharedLock();
 			if (!visibleEntities.empty()) {
 				auto shared = getShared();
-				for (const auto &weak_visible: visibleEntities)
-					if (auto visible = weak_visible.lock())
+				for (const auto &weak_visible: visibleEntities) {
+					if (auto visible = weak_visible.lock()) {
 						times += visible->removeVisible(weak);
+					}
+				}
 			}
 		}
 
@@ -61,8 +63,9 @@ namespace Game3 {
 			}
 		}
 
-		if (remaining != 0)
-			ERROR("Player was still present in {} visible set{}!", remaining, remaining == 1? "" : "s");
+		if (remaining != 0) {
+			ERR("Player was still present in {} visible set{}!", remaining, remaining == 1? "" : "s");
+		}
 
 		Entity::destroy();
 	}
@@ -71,33 +74,37 @@ namespace Game3 {
 		return MAX_HEALTH;
 	}
 
-	void Player::toJSON(nlohmann::json &json) const {
+	void Player::toJSON(boost::json::value &json) const {
 		Entity::toJSON(json);
 		LivingEntity::toJSON(json);
-		json["isPlayer"] = true;
-		json["displayName"] = displayName;
-		json["spawnPosition"] = spawnPosition.copyBase();
-		json["spawnRealmID"] = spawnRealmID;
-		json["timeSinceAttack"] = timeSinceAttack;
-		if (0.f < tooldown)
-			json["tooldown"] = tooldown;
+		auto &object = json.as_object();
+		object["isPlayer"] = true;
+		object["displayName"] = displayName;
+		object["spawnPosition"] = boost::json::value_from(spawnPosition.copyBase());
+		object["spawnRealmID"] = spawnRealmID;
+		object["timeSinceAttack"] = timeSinceAttack;
+		if (0.f < tooldown) {
+			object["tooldown"] = tooldown;
+		}
 	}
 
-	void Player::absorbJSON(const GamePtr &game, const nlohmann::json &json) {
+	void Player::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		Entity::absorbJSON(game, json);
 		LivingEntity::absorbJSON(game, json);
-		displayName = json.at("displayName");
-		spawnPosition = json.at("spawnPosition");
-		spawnRealmID = json.at("spawnRealmID");
-		timeSinceAttack = json.at("timeSinceAttack");
-		if (auto iter = json.find("tooldown"); iter != json.end())
-			tooldown = *iter;
-		else
+		const auto &object = json.as_object();
+		displayName = object.at("displayName").as_string();
+		spawnPosition = boost::json::value_to<Position>(object.at("spawnPosition"));
+		spawnRealmID = object.at("spawnRealmID");
+		timeSinceAttack = getDouble(object.at("timeSinceAttack"));
+		if (auto *value = object.if_contains("tooldown")) {
+			tooldown = getDouble(*value);;
+		} else {
 			tooldown = 0.f;
+		}
 	}
 
 	void Player::tick(const TickArgs &args) {
-		Entity::tick(args);
+		LivingEntity::tick(args);
 
 		const auto delta = args.delta;
 
@@ -109,16 +116,18 @@ namespace Game3 {
 			}
 		}
 
-		if (timeSinceAttack < 1'000'000.f)
+		if (timeSinceAttack < 1'000'000.f) {
 			timeSinceAttack += delta;
+		}
 	}
 
 	bool Player::interactOn(Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
 		auto realm = getRealm();
 		auto player = getShared();
 		auto entity = realm->findEntity(position, player);
-		if (!entity)
+		if (!entity) {
 			return false;
+		}
 		return entity->onInteractOn(player, modifiers, used_item, hand);
 	}
 
@@ -129,18 +138,23 @@ namespace Game3 {
 		EntityPtr entity = realm->findEntity(next_to, player);
 		bool interesting = false;
 
-		if (hand != Hand::None && used_item && used_item->item->use(getHeldSlot(hand), used_item, getPlace(), modifiers, hand))
+		if (hand != Hand::None && used_item && used_item->item->use(getHeldSlot(hand), used_item, getPlace(), modifiers, hand)) {
 			return;
+		}
 
-		if (entity)
+		if (entity) {
 			interesting = entity->onInteractNextTo(player, modifiers, used_item, hand);
+		}
 
-		if (!interesting)
-			if (auto tileEntity = realm->tileEntityAt(next_to))
+		if (!interesting) {
+			if (auto tileEntity = realm->tileEntityAt(next_to)) {
 				interesting = tileEntity->onInteractNextTo(player, modifiers, used_item, hand);
+			}
+		}
 
-		if (!interesting)
+		if (!interesting) {
 			realm->interactGround(player, next_to, modifiers, used_item, hand);
+		}
 	}
 
 	void Player::teleport(const Position &position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
@@ -154,8 +168,9 @@ namespace Game3 {
 
 		RealmID old_realm_id = 0;
 		auto locked_realm = weakRealm.lock();
-		if (locked_realm)
+		if (locked_realm) {
 			old_realm_id = locked_realm->id;
+		}
 
 		Entity::teleport(position, new_realm, context);
 
@@ -175,8 +190,9 @@ namespace Game3 {
 					client_game.requestFromLimbo(new_realm->id);
 				}
 			} else {
-				if (locked_realm)
+				if (locked_realm) {
 					locked_realm->queuePlayerRemoval(getShared());
+				}
 				auto locked_client = toServer()->weakClient.lock();
 				assert(locked_client);
 				if (!locked_client->getPlayer()->knowsRealm(new_realm->id)) {
@@ -188,8 +204,9 @@ namespace Game3 {
 	}
 
 	bool Player::setTooldown(float multiplier) {
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return false;
+		}
 
 		if (ItemStackPtr active = getInventory(0)->getActive()) {
 			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
@@ -200,10 +217,6 @@ namespace Game3 {
 		}
 
 		return false;
-	}
-
-	float Player::getMovementSpeed() const {
-		return isInFluid()? movementSpeed * .5f : movementSpeed;
 	}
 
 	void Player::give(const ItemStackPtr &stack, Slot start) {
@@ -245,7 +258,6 @@ namespace Game3 {
 		buffer << displayName;
 		buffer << tooldown;
 		buffer << stationTypes;
-		buffer << movementSpeed;
 		buffer << spawnRealmID;
 		buffer << spawnPosition;
 		buffer << timeSinceAttack;
@@ -261,7 +273,6 @@ namespace Game3 {
 		buffer >> displayName;
 		buffer >> tooldown;
 		buffer >> stationTypes;
-		buffer >> movementSpeed;
 		buffer >> spawnRealmID;
 		buffer >> spawnPosition;
 		buffer >> timeSinceAttack;
@@ -327,10 +338,11 @@ namespace Game3 {
 	void Player::removeStationType(const Identifier &station_type) {
 		{
 			auto lock = stationTypes.uniqueLock();
-			if (auto iter = stationTypes.find(station_type); iter != stationTypes.end())
+			if (auto iter = stationTypes.find(station_type); iter != stationTypes.end()) {
 				stationTypes.erase(station_type);
-			else
+			} else {
 				return;
+			}
 		}
 		send(make<SetPlayerStationTypesPacket>(stationTypes, false));
 	}
@@ -345,11 +357,11 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ClientPlayer> Player::toClient() {
-		return std::dynamic_pointer_cast<ClientPlayer>(shared_from_this());
+		return safeDynamicCast<ClientPlayer>(shared_from_this());
 	}
 
 	std::shared_ptr<ServerPlayer> Player::toServer() {
-		return std::dynamic_pointer_cast<ServerPlayer>(shared_from_this());
+		return safeDynamicCast<ServerPlayer>(shared_from_this());
 	}
 
 	void Player::addKnownRealm(RealmID realm_id) {
@@ -363,15 +375,17 @@ namespace Game3 {
 	}
 
 	void Player::notifyOfRealm(Realm &realm) {
-		if (knowsRealm(realm.id))
+		if (knowsRealm(realm.id)) {
 			return;
+		}
 		send(make<RealmNoticePacket>(realm));
 		addKnownRealm(realm.id);
 	}
 
 	float Player::getAttackPeriod() const {
-		if (speedStat == 0)
+		if (speedStat == 0) {
 			return std::numeric_limits<float>::infinity();
+		}
 		return 1 / speedStat;
 	}
 
@@ -406,6 +420,10 @@ namespace Game3 {
 		return knownItems.contains(item_id);
 	}
 
+	void Player::setFiring(bool value) {
+		firing = value;
+	}
+
 	void Player::resetEphemeral() {
 		stopMoving();
 		continuousInteraction = false;
@@ -414,7 +432,7 @@ namespace Game3 {
 		continuousInteractionModifiers = {};
 	}
 
-	void to_json(nlohmann::json &json, const Player &player) {
+	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Player &player) {
 		player.toJSON(json);
 	}
 }
