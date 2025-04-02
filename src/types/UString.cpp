@@ -305,6 +305,8 @@ namespace Game3 {
 
 			iter = iterator(next.base() + delimiter.bytes());
 		}
+
+		found({iter, end()});
 	}
 
 	bool UStringSpan::starts_with(const UStringSpan &other) const {
@@ -346,14 +348,16 @@ namespace Game3 {
 		while (iter != end()) {
 			auto start = iter;
 			auto that = other.begin();
+			bool found = true;
 
 			while (iter != end() && that != other.end()) {
 				if (*iter++ != *that++) {
+					found = false;
 					break;
 				}
 			}
 
-			if (that == other.end()) {
+			if (found && that == other.end()) {
 				return start;
 			}
 		}
