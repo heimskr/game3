@@ -4,11 +4,14 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <miniaudio/extras/miniaudio_libopus.h>
 #include <miniaudio/extras/miniaudio_libvorbis.h>
 #pragma GCC diagnostic pop
 
+#include <cstring>
 #include <format>
+#include <utility>
 
 static ma_result ma_decoding_backend_init__libvorbis(void *, ma_read_proc on_read, ma_seek_proc on_seek, ma_tell_proc on_tell, void *read_seek_tell_user_data, const ma_decoding_backend_config *config,
                                                      const ma_allocation_callbacks *allocation_callbacks, ma_data_source **backend) {
@@ -99,13 +102,64 @@ static ma_decoding_backend_vtable g_ma_decoding_backend_vtable_libopus = {
 };
 
 namespace MiniAudio {
-	AudioError::AudioError(const std::string &message, ma_result result_):
-		std::runtime_error(std::format("{} ({})", message, static_cast<int>(result_))),
-		result(result_) {}
+	AudioError::AudioError(const std::string &message, ma_result result):
+		std::runtime_error(std::format("{} ({})", message, static_cast<int>(result))),
+		result(result) {}
 
-	AudioError::AudioError(ma_result result_):
-		std::runtime_error(std::format("MiniAudio error {}", static_cast<int>(result_))),
-		result(result_) {}
+	AudioError::AudioError(ma_result result):
+		std::runtime_error(std::format("MiniAudio error {}", static_cast<int>(result))),
+		result(result) {}
+
+	Decoder::Decoder():
+		decoder(),
+		valid(false) {}
+
+	Decoder::Decoder(std::string data):
+		data(std::move(data)),
+		decoder(),
+		valid(true) {}
+
+	Decoder::Decoder(Decoder &&other):
+		data(std::move(other.data)),
+		decoder(other.decoder),
+		valid(std::exchange(other.valid, false)) {}
+
+	Decoder::~Decoder() {
+		if (valid) {
+			ma_decoder_uninit(&decoder);
+		}
+	}
+
+	Decoder::operator ma_decoder *() {
+		return &decoder;
+	}
+
+	Decoder::operator const ma_decoder *() const {
+		return &decoder;
+	}
+
+	bool Decoder::isBusy() const {
+		ma_uint64 cursor{}, total{};
+
+		// There's no reason for the ma_decoder_get_*_in_pcm_frames functions to take a non-const pointer.
+		ma_decoder *unconst = const_cast<ma_decoder *>(&decoder);
+
+		if (ma_result result = ma_decoder_get_cursor_in_pcm_frames(unconst, &cursor); result != MA_SUCCESS) {
+			throw AudioError("Couldn't get decoder cursor", result);
+		}
+
+		if (ma_result result = ma_decoder_get_length_in_pcm_frames(unconst, &total); result != MA_SUCCESS) {
+			throw AudioError("Couldn't get decoder length", result);
+		}
+
+		return cursor != total;
+	}
+
+	void Decoder::init(const ma_decoder_config &config) {
+		if (ma_result result = ma_decoder_init_memory(data.data(), data.size(), &config, &decoder); result != MA_SUCCESS) {
+			throw AudioError("Couldn't load memory into decoder", result);
+		}
+	}
 
 	ma_result makeEngine(ma_engine &engine, ma_resource_manager &resource_manager, ma_decoding_backend_vtable * (*vtables)[2]) {
 		ma_engine_config engine_config{};
@@ -126,8 +180,9 @@ namespace MiniAudio {
 		config.customDecodingBackendCount     = sizeof(custom_backend_vtables) / sizeof(custom_backend_vtables[0]);
 		config.pCustomDecodingBackendUserData = nullptr; // This will be passed in to the pUserData parameter of each function in the decoding backend vtables.
 
-		if (ma_result result = ma_resource_manager_init(&config, &resource_manager); result != MA_SUCCESS)
+		if (ma_result result = ma_resource_manager_init(&config, &resource_manager); result != MA_SUCCESS) {
 			return result;
+		}
 
 		// Once we have a resource manager we can create the engine.
 		engine_config = ma_engine_config_init();

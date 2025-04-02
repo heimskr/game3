@@ -240,8 +240,9 @@ namespace Game3 {
 				missing_chunks_lock.unlock();
 				missingChunks = std::move(new_missing_chunks);
 				missing_chunks_lock.lock();
-				if (!missingChunks.empty())
+				if (!missingChunks.empty()) {
 					getClient()->send(make<ChunkRequestPacket>(*realm, missingChunks, true));
+				}
 			}
 		} else {
 			WARN("No realm");
