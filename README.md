@@ -26,6 +26,7 @@ Sprites credited to [Franuka](https://twitter.com/franuka_art) are not governed 
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
 
+- Don't use AI. At all. It's not that hard. Slop PRs will be reported as spam.
 - Improve the shading of the flower sprites `flower1_*` and `flower5_*` in `/resources/tileset`.
 - Make animals useful.
 	- For example, add a shears tool that can be used to get wool from sheep.
