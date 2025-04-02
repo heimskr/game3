@@ -54,6 +54,7 @@ namespace Game3 {
 			virtual StatusEffectMap copyStatusEffects() const;
 			/** Returns whether iteration was stopped by the supplied function returning true. */
 			virtual bool iterateStatusEffects(const std::function<bool(const Identifier &, const std::unique_ptr<StatusEffect> &)> &) const;
+			virtual bool susceptibleToStatusEffect(const Identifier &) const;
 
 			std::shared_ptr<LivingEntity> getSelf();
 			std::weak_ptr<LivingEntity> getWeakSelf();

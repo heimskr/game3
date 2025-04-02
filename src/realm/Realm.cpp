@@ -397,7 +397,7 @@ namespace Game3 {
 		if (auto found = getEntity(entity->getGID())) {
 			return found;
 		}
-		auto shared = shared_from_this();
+		RealmPtr shared = shared_from_this();
 		{
 			auto lock = entities.uniqueLock();
 			entities.insert(entity);
@@ -407,13 +407,15 @@ namespace Game3 {
 			entitiesByGID[entity->globalID] = entity;
 		}
 		entity->firstTeleport = true;
-		if (entity->isPlayer() && entity->weakRealm.lock()) {
+		if (entity->isPlayer() && !entity->weakRealm.expired()) {
 			safeDynamicCast<Player>(entity)->stopMoving();
 		}
 		entity->setRealm(shared);
 		entity->teleport(position, MovementContext{.excludePlayer = entity->getGID(), .clearOffset = false, .isTeleport = true});
 		entity->firstTeleport = false;
 		attach(entity);
+		entity->onTeleported(entity);
+		entity->onTeleported.clear();
 		if (entity->isPlayer()) {
 			{
 				auto lock = players.uniqueLock();
@@ -1602,7 +1604,7 @@ namespace Game3 {
 
 	void Realm::attach(const EntityPtr &entity) {
 		auto lock = entitiesByChunk.uniqueLock();
-		const auto chunk_position = entity->getChunk();
+		ChunkPosition chunk_position = entity->getChunk();
 
 		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end()) {
 			assert(iter->second);
@@ -1618,8 +1620,9 @@ namespace Game3 {
 
 	Realm::WeakEntitySet Realm::getEntities(ChunkPosition chunk_position) const {
 		auto lock = entitiesByChunk.sharedLock();
-		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end())
+		if (auto iter = entitiesByChunk.find(chunk_position); iter != entitiesByChunk.end()) {
 			return iter->second;
+		}
 		return {};
 	}
 
@@ -1627,8 +1630,9 @@ namespace Game3 {
 		auto lock = tileEntitiesByChunk.uniqueLock();
 		if (auto iter = tileEntitiesByChunk.find(tile_entity->getChunk()); iter != tileEntitiesByChunk.end()) {
 			iter->second->erase(tile_entity);
-			if (iter->second->empty())
+			if (iter->second->empty()) {
 				tileEntitiesByChunk.erase(iter);
+			}
 		}
 	}
 

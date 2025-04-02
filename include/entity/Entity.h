@@ -24,6 +24,7 @@
 #include "ui/Modifiers.h"
 
 #include <boost/json/fwd.hpp>
+#include <sigc++/sigc++.h>
 
 #include <atomic>
 #include <functional>
@@ -63,6 +64,7 @@ namespace Game3 {
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;
 			/** The reciprocal of this is how many seconds it takes to move one square. */
 			constexpr static float MAX_SPEED = 10.f;
+			sigc::signal<void(const EntityPtr &)> onTeleported;
 
 			EntityType type;
 			Lockable<Position> position{0, 0};

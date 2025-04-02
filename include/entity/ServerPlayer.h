@@ -33,14 +33,20 @@ namespace Game3 {
 			void broadcastMoney() final;
 
 			void kill() override;
+			void setStatusEffects(StatusEffectMap) final;
+			bool susceptibleToStatusEffect(const Identifier &) const final;
 
 			void unsubscribeVillages();
 			void subscribeVillage(const std::shared_ptr<Village> &);
 
 			void showText(const UString &text, const UString &name) final;
 
+			std::shared_ptr<ServerPlayer> getSelf();
+			std::weak_ptr<ServerPlayer> getWeakSelf();
+
 		private:
 			std::weak_ptr<Village> subscribedVillage;
+			std::atomic_bool dying = false;
 
 			ServerPlayer();
 

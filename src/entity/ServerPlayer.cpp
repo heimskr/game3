@@ -27,7 +27,7 @@ namespace Game3 {
 		GamePtr game = weakGame.lock();
 
 		if (!game) {
-			if (auto realm = weakRealm.lock()) {
+			if (RealmPtr realm = weakRealm.lock()) {
 				game = realm->getGame();
 			}
 		}
@@ -60,8 +60,9 @@ namespace Game3 {
 					return;
 				}
 
-				for (const ServerPlayerPtr &player: players)
+				for (const ServerPlayerPtr &player: players) {
 					usernames.push_back(player->username);
+				}
 			}
 
 			INFO("Remaining player{}: {}", usernames.size() == 1? "" : "s", join(usernames));
@@ -86,14 +87,15 @@ namespace Game3 {
 	}
 
 	bool ServerPlayer::ensureEntity(const std::shared_ptr<Entity> &entity) {
-		auto client = weakClient.lock();
+		GenericClientPtr client = weakClient.lock();
 		if (!client)
 			return false;
 
 		{
 			auto lock = knownEntities.sharedLock();
-			if (knownEntities.contains(std::weak_ptr(entity)))
+			if (knownEntities.contains(std::weak_ptr(entity))) {
 				return false;
+			}
 		}
 
 		RealmPtr realm = entity->getRealm();
@@ -109,9 +111,9 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<GenericClient> ServerPlayer::getClient() const {
-		auto locked = weakClient.lock();
-		assert(locked);
-		return locked;
+		GenericClientPtr client = weakClient.lock();
+		assert(client);
+		return client;
 	}
 
 	void ServerPlayer::tick(const TickArgs &args) {
@@ -131,19 +133,20 @@ namespace Game3 {
 
 	void ServerPlayer::handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data) {
 		assert(source);
-		if (auto *buffer = std::any_cast<Buffer>(&data))
+		if (Buffer *buffer = std::any_cast<Buffer>(&data)) {
 			send(make<AgentMessagePacket>(source->getGID(), name, std::move(*buffer)));
-		else
+		} else {
 			throw std::runtime_error("Expected data to be a Buffer in ServerPlayer::handleMessage");
+		}
 	}
 
 	void ServerPlayer::movedToNewChunk(const std::optional<ChunkPosition> &old_position) {
-		auto shared = getShared();
+		PlayerPtr shared = getShared();
 
 		{
 			auto lock = visibleEntities.sharedLock();
 			for (const auto &weak_visible: visibleEntities) {
-				if (auto visible = weak_visible.lock()) {
+				if (EntityPtr visible = weak_visible.lock()) {
 					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
 						// INFO("Late sending EntitySetPathPacket (Player)");
 						toServer()->ensureEntity(visible);
@@ -161,9 +164,9 @@ namespace Game3 {
 		}
 
 		if (auto realm = weakRealm.lock()) {
-			if (const auto client_ptr = toServer()->weakClient.lock()) {
-				const auto chunk = getChunk();
-				auto &client = *client_ptr;
+			if (const GenericClientPtr client_ptr = toServer()->weakClient.lock()) {
+				const ChunkPosition chunk = getChunk();
+				GenericClient &client = *client_ptr;
 
 				if (auto tile_entities = realm->getTileEntities(chunk)) {
 					auto lock = tile_entities->sharedLock();
@@ -174,7 +177,7 @@ namespace Game3 {
 					}
 				}
 
-				if (auto entities = realm->getEntities(chunk)) {
+				if (Realm::WeakEntitySet entities = realm->getEntities(chunk)) {
 					auto lock = entities->sharedLock();
 					for (const WeakEntityPtr &weak_entity: *entities) {
 						if (EntityPtr entity = weak_entity.lock(); entity && !entity->hasBeenSentTo(shared)) {
@@ -197,8 +200,9 @@ namespace Game3 {
 	}
 
 	bool ServerPlayer::removeMoney(MoneyCount to_remove) {
-		if (money < to_remove)
+		if (money < to_remove) {
 			return false;
+		}
 
 		setMoney(money - to_remove);
 		return true;
@@ -210,6 +214,11 @@ namespace Game3 {
 	}
 
 	void ServerPlayer::kill() {
+		if (dying.exchange(true)) {
+			WARN("Can't kill server player {}: already dying", username);
+			return;
+		}
+
 		WARN("Killing server player \e[1m{}\e[22m.", username);
 		ServerGame &game = getGame()->toServer();
 
@@ -234,31 +243,56 @@ namespace Game3 {
 		setHealth(getMaxHealth());
 
 		// Can't do this immediately due to visibleChunks locking shenanigans.
-		getRealm()->queue([&game, weak_player = std::weak_ptr(safeDynamicCast<ServerPlayer>(getSelf()))] {
-			if (auto player = weak_player.lock()) {
+		getRealm()->queue([&game, weak = getWeakSelf()] {
+			if (ServerPlayerPtr player = weak.lock()) {
 				RealmPtr realm = game.getRealm(player->spawnRealmID);
 				if (!realm) {
 					WARN("Couldn't find spawn realm {} for player {}", player->spawnRealmID, player->username);
+					player->dying = false;
 					return;
 				}
 				player->teleport(player->spawnPosition.copyBase(), realm, MovementContext{.facingDirection = Direction::Down, .isTeleport = true});
+				player->onTeleported.connect([](const EntityPtr &entity) {
+					safeDynamicCast<ServerPlayer>(entity)->dying = false;
+				});
 			}
 		});
 	}
 
+	void ServerPlayer::setStatusEffects(StatusEffectMap effects) {
+		if (dying && !effects.empty()) {
+			return;
+		}
+
+		Player::setStatusEffects(std::move(effects));
+	}
+
+	bool ServerPlayer::susceptibleToStatusEffect(const Identifier &) const {
+		return !dying;
+	}
+
 	void ServerPlayer::unsubscribeVillages() {
-		if (auto village = subscribedVillage.lock())
-			village->removeSubscriber(safeDynamicCast<ServerPlayer>(shared_from_this()));
+		if (VillagePtr village = subscribedVillage.lock()) {
+			village->removeSubscriber(getSelf());
+		}
 		subscribedVillage.reset();
 	}
 
 	void ServerPlayer::subscribeVillage(const std::shared_ptr<Village> &village) {
-		assert(village);
-		village->addSubscriber(safeDynamicCast<ServerPlayer>(shared_from_this()));
+		assert(village != nullptr);
+		village->addSubscriber(getSelf());
 		subscribedVillage = village;
 	}
 
 	void ServerPlayer::showText(const UString &text, const UString &name) {
 		send(make<DisplayTextPacket>(name.raw(), text.raw(), true));
+	}
+
+	std::shared_ptr<ServerPlayer> ServerPlayer::getSelf() {
+		return std::dynamic_pointer_cast<ServerPlayer>(shared_from_this());
+	}
+
+	std::weak_ptr<ServerPlayer> ServerPlayer::getWeakSelf() {
+		return std::weak_ptr(getSelf());
 	}
 }

@@ -803,15 +803,14 @@ namespace Game3 {
 		const bool in_different_chunk = firstTeleport || old_chunk_position != new_position.getChunk();
 		const bool is_server = getSide() == Side::Server;
 
-		if (2 < position.taxiDistance(new_position))
+		if (2 < position.taxiDistance(new_position)) {
 			context.isTeleport = true;
+		}
 
 		EntityPtr shared = getSelf();
 		RealmPtr realm = getRealm();
 
-		Position old_position = position;
-		position = new_position;
-
+		const Position old_position = std::exchange(position, new_position);
 		const Vector3 old_offset = getOffset();
 
 		if (context.forcedOffset) {
@@ -834,8 +833,9 @@ namespace Game3 {
 
 		realm->onMoved(shared, old_position, old_offset, new_position, getOffset());
 
-		if (in_different_chunk)
+		if (in_different_chunk) {
 			movedToNewChunk(old_chunk_position);
+		}
 
 		{
 			auto move_lock = moveQueue.uniqueLock();
@@ -853,12 +853,12 @@ namespace Game3 {
 	}
 
 	void Entity::teleport(const Position &new_position, const std::shared_ptr<Realm> &new_realm, MovementContext context) {
-		auto old_realm = weakRealm.lock();
+		RealmPtr old_realm = weakRealm.lock();
 		RealmID limbo_id = inLimboFor.load();
 
 		if ((old_realm != new_realm) || (limbo_id != 0 && limbo_id != new_realm->id)) {
 			nextRealm = new_realm->id;
-			auto shared = getSelf();
+			EntityPtr self = getSelf();
 
 			GamePtr game = getGame();
 			if (game->getSide() == Side::Server && old_realm != new_realm && !context.suppressPackets) {
@@ -866,8 +866,8 @@ namespace Game3 {
 			}
 
 			if (old_realm && old_realm != new_realm) {
-				old_realm->detach(shared);
-				old_realm->queueRemoval(shared);
+				old_realm->detach(self);
+				old_realm->queueRemoval(self);
 			}
 
 			clearOffset();

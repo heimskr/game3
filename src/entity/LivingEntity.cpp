@@ -24,7 +24,7 @@ namespace Game3 {
 	void LivingEntity::tick(const TickArgs &args) {
 		Entity::tick(args);
 
-		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+		LivingEntityPtr self = getSelf();
 
 		if (getSide() == Side::Server) {
 			if (std::optional<FluidTile> fluid_tile = getRealm()->tileProvider.copyFluidTile(getPosition()); fluid_tile && 0 < fluid_tile->level) {
@@ -50,8 +50,8 @@ namespace Game3 {
 	}
 
 	void LivingEntity::toJSON(boost::json::value &json) const {
-		auto &object = json.emplace_object();
-		auto this_lock = sharedLock();
+		boost::json::object &object = json.emplace_object();
+		auto lock = sharedLock();
 		object["health"] = health;
 		object["luck"] = luckStat;
 	}
@@ -61,9 +61,9 @@ namespace Game3 {
 			return;
 		}
 
-		const auto &object = json.as_object();
+		const boost::json::object &object = json.as_object();
 
-		auto this_lock = uniqueLock();
+		auto lock = uniqueLock();
 
 		if (auto *value = object.if_contains("health")) {
 			health = boost::json::value_to<HitPoints>(*value);
@@ -212,9 +212,11 @@ namespace Game3 {
 			}
 		}
 
-		Color color{1, 0, 0, 1};
+		Color color{"#ff0000"};
 		if (damage == 0) {
-			color = {0, 0, 1, 1};
+			color = Color{"#0000ff"};
+		} else if (damage < 0) {
+			color = Color{"#00ff00"};
 		}
 
 		RealmPtr realm = getRealm();
@@ -252,10 +254,8 @@ namespace Game3 {
 
 		++kills;
 
-		RealmPtr realm = getRealm();
-
-		for (const ItemStackPtr &stack: getDrops()) {
-			stack->spawn(Place{getPosition(), realm});
+		for (Place place = getPlace(); const ItemStackPtr &stack: getDrops()) {
+			stack->spawn(place);
 		}
 
 		queueDestruction();
@@ -309,24 +309,30 @@ namespace Game3 {
 
 	void LivingEntity::inflictStatusEffect(std::unique_ptr<StatusEffect> &&effect, bool can_overwrite) {
 		assert(effect != nullptr);
+
+		if (!susceptibleToStatusEffect(effect->identifier)) {
+			return;
+		}
+
 		auto lock = statusEffects.uniqueLock();
-		auto iter = statusEffects.find(effect->identifier);
-		if (iter == statusEffects.end()) {
+
+		if (auto iter = statusEffects.find(effect->identifier); iter == statusEffects.end()) {
 			Identifier identifier = effect->identifier;
-			effect->onAdd(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
+			effect->onAdd(getSelf());
 			statusEffects.emplace(std::move(identifier), std::move(effect));
 		} else if (can_overwrite) {
 			iter->second = std::move(effect);
 		} else {
-			iter->second->replenish(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
+			iter->second->replenish(getSelf());
 		}
+
 		broadcastPacket(make<StatusEffectsPacket>(*this));
 	}
 
 	void LivingEntity::removeStatusEffect(const Identifier &identifier) {
 		auto lock = statusEffects.uniqueLock();
 		if (auto iter = statusEffects.find(identifier); iter != statusEffects.end()) {
-			iter->second->onRemove(std::dynamic_pointer_cast<LivingEntity>(shared_from_this()));
+			iter->second->onRemove(getSelf());
 			statusEffects.erase(iter);
 			broadcastPacket(make<StatusEffectsPacket>(*this));
 		}
@@ -335,7 +341,7 @@ namespace Game3 {
 	void LivingEntity::setStatusEffects(StatusEffectMap value) {
 		auto lock = statusEffects.uniqueLock();
 		StatusEffectMap &base = statusEffects.getBase();
-		auto self = std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
+		LivingEntityPtr self = getSelf();
 
 		for (const auto &[identifier, effect]: value) {
 			if (!statusEffects.contains(identifier)) {
@@ -380,6 +386,10 @@ namespace Game3 {
 		});
 	}
 
+	bool LivingEntity::susceptibleToStatusEffect(const Identifier &) const {
+		return true;
+	}
+
 	std::shared_ptr<LivingEntity> LivingEntity::getSelf() {
 		return std::dynamic_pointer_cast<LivingEntity>(shared_from_this());
 	}
@@ -389,7 +399,7 @@ namespace Game3 {
 	}
 
 	bool LivingEntity::checkGenes(const boost::json::value &genes, std::unordered_set<std::string> &&names) {
-		const auto &object = genes.as_object();
+		const boost::json::object &object = genes.as_object();
 
 		if (object.size() != names.size()) {
 			return false;
