@@ -8,6 +8,7 @@
 #include "lib/JSON.h"
 #include "net/Server.h"
 #include "scripting/ScriptEngine.h"
+#include "test/Testing.h"
 #include "threading/ThreadContext.h"
 #include "tools/Flasker.h"
 #include "tools/ItemStitcher.h"
@@ -92,6 +93,10 @@ int main(int argc, char **argv) {
 			return 0;
 
 		const std::string_view arg1{argv[1]};
+
+		if (arg1 == "--test") {
+			return Tests::get().runAll()? 0 : 1;
+		}
 
 		if (arg1 == "--token" && argc == 3) {
 			if (!std::filesystem::exists(".secret")) {

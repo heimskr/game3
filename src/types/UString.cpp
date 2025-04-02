@@ -1,5 +1,8 @@
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+
 #include "util/Log.h"
 #include "graphics/TextRenderer.h"
+#include "test/Testing.h"
 #include "types/UString.h"
 
 namespace Game3 {
@@ -13,12 +16,14 @@ namespace Game3 {
 	}
 
 	std::vector<UString> UString::split(const UString &delimiter, Glib::ustring::size_type(UString::*finder)(const Glib::ustring &, Glib::ustring::size_type) const) const {
-		if (empty())
+		if (empty()) {
 			return {};
+		}
 
 		size_t next = (this->*finder)(delimiter, 0);
-		if (next == UString::npos)
+		if (next == UString::npos) {
 			return {*this};
+		}
 
 		std::vector<UString> out;
 		const size_t delimiter_length = finder == static_cast<decltype(finder)>(&Glib::ustring::find_first_of)? 1 : delimiter.length();
@@ -41,8 +46,9 @@ namespace Game3 {
 		std::map<UString, float> width_map;
 
 		auto text_width = [&, text_scale](const UString &text) {
-			if (auto iter = width_map.find(text); iter != width_map.end())
+			if (auto iter = width_map.find(text); iter != width_map.end()) {
 				return iter->second;
+			}
 			return width_map[text] = texter.textWidth(text, text_scale);
 		};
 
@@ -57,29 +63,33 @@ namespace Game3 {
 		UString output;
 		std::vector<UString> pieces = split(" ");
 
-		if (pieces.empty())
+		if (pieces.empty()) {
 			return {};
+		}
 
 		std::optional<float> line_width = 0;
 
 		auto get_line_width = [&] {
-			if (line_width)
+			if (line_width) {
 				return *line_width;
+			}
 			return *(line_width = text_width(line));
 		};
 
 		std::optional<UString> word = pieces.front();
 
 		for (auto iter = pieces.begin(); iter != pieces.end();) {
-			if (!word)
+			if (!word) {
 				word = *iter;
+			}
 
 			const bool at_end = iter + 1 == pieces.end();
 
 			if (get_line_width() + text_width(*word) + (at_end? 0 : space_width) <= max_width) {
 				line += *word;
-				if (!at_end)
+				if (!at_end) {
 					line += ' ';
+				}
 				line_width.reset();
 				word.reset();
 				++iter;
@@ -103,20 +113,23 @@ namespace Game3 {
 						}
 
 						line += character;
-						if (line_width)
+						if (line_width) {
 							*line_width += width;
+						}
 					}
 				} else {
-					if (line.empty())
+					if (line.empty()) {
 						return *this;
+					}
 					output += line;
 					output += '\n';
 					line.clear();
 					line_width = 0;
 				}
 			} else {
-				if (line.empty())
+				if (line.empty()) {
 					return *this;
+				}
 				output += line;
 				output += '\n';
 				line.clear();
@@ -126,5 +139,27 @@ namespace Game3 {
 
 		output += line;
 		return output;
+	}
+
+	std::vector<std::pair<Glib::ustring::const_iterator, Glib::ustring::const_iterator>> UString::getLines() const {
+		std::vector<std::pair<Glib::ustring::const_iterator, Glib::ustring::const_iterator>> out;
+
+		if (empty()) {
+			return out;
+		}
+
+		auto left = begin();
+		auto right = begin();
+
+		while (right != end()) {
+			if (*right == '\n') {
+				out.emplace_back(left, right++);
+				left = right;
+			} else {
+				++right;
+			}
+		}
+
+		return out;
 	}
 }

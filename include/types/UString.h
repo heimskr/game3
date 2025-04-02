@@ -17,6 +17,11 @@ namespace Game3 {
 
 			std::vector<UString> split(const UString &delimiter, Glib::ustring::size_type(UString::*finder)(const Glib::ustring &, Glib::ustring::size_type) const = &Glib::ustring::find) const;
 			UString wrap(const TextRenderer &, float max_width, float text_scale) const;
+
+		private:
+			std::vector<std::pair<Glib::ustring::const_iterator, Glib::ustring::const_iterator>> getLines() const;
+
+		friend class UStringTest;
 	};
 }
 
