@@ -81,15 +81,15 @@ namespace Game3 {
 	}
 
 	float TextModule::getTextScale() const {
-		return selfScale / 16;
+		return getScale() / 16;
 	}
 
 	float TextModule::getPadding() const {
-		return selfScale * 2;
+		return getScale() * 2;
 	}
 
 	float TextModule::getWrapWidth(float width) const {
-		return width - selfScale * 2;
+		return width - getScale() * 2;
 	}
 
 	void TextModule::tryWrap(const TextRenderer &texter) {
