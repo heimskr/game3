@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	void JumpPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
-		if (auto player = client.getPlayer()) {
+		if (ServerPlayerPtr player = client.getPlayer()) {
 			player->jump();
 		} else {
 			client.send(make<ErrorPacket>("No player."));

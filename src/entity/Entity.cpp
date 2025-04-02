@@ -1468,14 +1468,8 @@ namespace Game3 {
 
 		{
 			auto velocity_lock = velocity.uniqueLock();
-			if (velocity.z != 0.) {
+			if (velocity.z > 0.0) {
 				return;
-			}
-
-			{
-				auto offset_lock = offset.sharedLock();
-				if (offset.z != 0.)
-					return;
 			}
 
 			velocity.z = getJumpSpeed();
