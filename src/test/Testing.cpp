@@ -55,9 +55,17 @@ namespace Game3 {
 		if (good == 0 && bad == 0) {
 			WARN("No tests were run.");
 		} else if (good > 0 && bad == 0) {
-			SUCCESS("Summary: passed {} {}.", good, plural(good));
+			if (good == 1) {
+				SUCCESS("Summary: passed 1 test.");
+			} else {
+				SUCCESS("Summary: passed all {} tests.", good);
+			}
 		} else if (bad > 0 && good == 0) {
-			ERR("Summary: failed \e[31m{}\e[39m {}.", bad, plural(bad));
+			if (bad == 1) {
+				ERR("Summary: failed \e[31m1\e[39m test.");
+			} else {
+				ERR("Summary: failed all \e[31m{}\e[39m tests.", bad);
+			}
 		} else {
 			WARN("Summary: passed \e[32m{}\e[39m {} and failed \e[31m{}\e[39m {}.", good, plural(good), bad, plural(bad));
 		}

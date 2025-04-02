@@ -23,8 +23,18 @@ namespace Game3 {
 			bool report(std::string_view, bool passed);
 
 			template <typename T, typename U>
-			bool expectEqual(T &&actual, U &&expected) {
-				std::string name = std::format("actual \"{}\" == expected \"{}\"", actual, expected);
+			bool expectEqual(const T &actual, const U &expected) {
+				if (actual == expected) {
+					pass(std::format("expect \"{}\"", expected));
+					return true;
+				} else {
+					fail(std::format("expect actual \"{}\" == expected \"{}\"", actual, expected));
+					return false;
+				}
+			}
+
+			template <typename T, typename U>
+			bool expectEqual(std::string_view name, T &&actual, U &&expected) {
 				return report(name, std::forward<T>(actual) == std::forward<U>(expected));
 			}
 
