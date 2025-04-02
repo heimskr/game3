@@ -1,3 +1,4 @@
+#include "graphics/TextRenderer.h"
 #include "test/Testing.h"
 #include "types/UString.h"
 #include "util/Format.h"
@@ -44,6 +45,21 @@ namespace Game3 {
 						context.expectEqual(split[0], "");
 						context.expectEqual(split[1], "");
 					}
+				}
+
+				TextRenderer renderer = TextRenderer::forTesting();
+				renderer.initRenderData();
+
+				{
+					UString string = "Gangblanc, Gangblanc, give me your answer, do\nI'm half forswonk all for the code of you\nIt won't be a stylish shader\nI can't code up a trader\nBut you'll look cool without the tools\nOf a game engine built for three";
+					UString wrapped = string.wrap(renderer, 538, 0.5);
+					context.expectEqual(wrapped, "Gangblanc, Gangblanc, \ngive me your answer, \ndo\nI'm half forswonk all \nfor the code of you\nIt won't be a stylish \nshader\nI can't code up a tra-\nder\nBut you'll look cool \nwithout the tools\nOf a game engine bu-\nilt for three");
+				}
+
+				{
+					UString string = "\n\nGangblanc, Gangblanc, give me your answer, do\nI'm half forswonk all for the code of you\nIt won't be a stylish shader\nI can't code up a trader\nBut you'll look cool without the tools\nOf a game engine built for three\n \n";
+					UString wrapped = string.wrap(renderer, 538, 0.5);
+					context.expectEqual(wrapped, "\n\nGangblanc, Gangblanc, \ngive me your answer, \ndo\nI'm half forswonk all \nfor the code of you\nIt won't be a stylish \nshader\nI can't code up a tra-\nder\nBut you'll look cool \nwithout the tools\nOf a game engine bu-\nilt for three\n \n");
 				}
 			}
 	};

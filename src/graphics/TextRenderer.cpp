@@ -25,10 +25,16 @@ namespace Game3 {
 		const std::string & textVert() { static auto out = readFile("resources/text.vert"); return out; }
 	}
 
-	TextRenderer::TextRenderer(Window &window, uint32_t font_scale):
+	TextRenderer::TextRenderer(uint32_t fontScale):
+		window(nullptr),
+		shader("FakeTextRenderer"),
+		fontScale(fontScale),
+		fake(true) {}
+
+	TextRenderer::TextRenderer(Window &window, uint32_t fontScale):
 		window(&window),
 		shader("TextRenderer"),
-		fontScale(font_scale) {
+		fontScale(fontScale) {
 			shader.init(textVert(), textFrag());
 		}
 
@@ -36,8 +42,12 @@ namespace Game3 {
 		remove();
 	}
 
+	TextRenderer TextRenderer::forTesting() {
+		return TextRenderer(96);
+	}
+
 	void TextRenderer::remove() {
-		if (initialized) {
+		if (initialized && !fake) {
 			glDeleteVertexArrays(1, &vao); CHECKGL
 			glDeleteBuffers(1, &vbo); CHECKGL
 			vao = 0;
@@ -47,37 +57,49 @@ namespace Game3 {
 	}
 
 	void TextRenderer::initRenderData() {
-		if (initialized)
+		if (initialized) {
 			return;
+		}
 
 		auto freetypeLibrary = std::unique_ptr<FT_Library, FreeLibrary>(new FT_Library);
-		if (FT_Init_FreeType(freetypeLibrary.get()))
+		if (FT_Init_FreeType(freetypeLibrary.get())) {
 			throw std::runtime_error("Couldn't initialize FreeType");
+		}
 
 		auto freetypeFace = std::unique_ptr<FT_Face, FreeFace>(new FT_Face);
-		if (FT_New_Face(*freetypeLibrary, "resources/CozetteVector.ttf", 0, freetypeFace.get()))
+		if (FT_New_Face(*freetypeLibrary, "resources/CozetteVector.ttf", 0, freetypeFace.get())) {
 			throw std::runtime_error("Couldn't initialize font");
+		}
 
 		auto &face = *freetypeFace;
 		FT_Set_Pixel_Sizes(face, 0, fontScale);
 		characters.clear();
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1); CHECKGL
+
+		if (!fake) {
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1); CHECKGL
+		}
+
+		GLuint texture = 0;
 
 		auto register_glyph = [&](uint32_t ch) {
 			// Load character glyph
-			if (FT_Load_Char(face, ch, FT_LOAD_RENDER))
+			if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
 				throw std::runtime_error("Failed to load glyph " + std::to_string(static_cast<uint32_t>(ch)));
+			}
 
-			GLuint texture = 0;
-			glGenTextures(1, &texture); CHECKGL
-			glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer); CHECKGL
+			if (!fake) {
+				glGenTextures(1, &texture); CHECKGL
+				glBindTexture(GL_TEXTURE_2D, texture); CHECKGL
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer); CHECKGL
 
-			// Set texture options
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
+				// Set texture options
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); CHECKGL
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); CHECKGL
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); CHECKGL
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); CHECKGL
+			} else {
+				++texture;
+			}
 
 			// Store character for later use
 			characters.try_emplace(ch,
@@ -95,15 +117,17 @@ namespace Game3 {
 		register_glyph(U'ī');
 		register_glyph(U'ó');
 
-		glGenVertexArrays(1, &vao); CHECKGL
-		glGenBuffers(1, &vbo); CHECKGL
-		glBindVertexArray(vao); CHECKGL
-		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
-		glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(float), nullptr, GL_DYNAMIC_DRAW); CHECKGL
-		glEnableVertexAttribArray(0); CHECKGL
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0); CHECKGL
-		glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
-		glBindVertexArray(0); CHECKGL
+		if (!fake) {
+			glGenVertexArrays(1, &vao); CHECKGL
+			glGenBuffers(1, &vbo); CHECKGL
+			glBindVertexArray(vao); CHECKGL
+			glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL
+			glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(float), nullptr, GL_DYNAMIC_DRAW); CHECKGL
+			glEnableVertexAttribArray(0); CHECKGL
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0); CHECKGL
+			glBindBuffer(GL_ARRAY_BUFFER, 0); CHECKGL
+			glBindVertexArray(0); CHECKGL
+		}
 
 		initialized = true;
 	}
@@ -136,8 +160,9 @@ namespace Game3 {
 	}
 
 	void TextRenderer::drawOnMap(const UString &text, TextRenderOptions options) {
-		if (!initialized)
+		if (!initialized) {
 			initRenderData();
+		}
 
 		if (0 < options.shadow.alpha) {
 			Color color = options.shadow;
@@ -184,10 +209,11 @@ namespace Game3 {
 		x *= window->scale;
 		y *= window->scale;
 
-		if (options.align == TextAlign::Center)
+		if (options.align == TextAlign::Center) {
 			x -= textWidth(text, scale_x) / 2;
-		else if (options.align == TextAlign::Right)
+		} else if (options.align == TextAlign::Right) {
 			x -= textWidth(text, scale_x);
+		}
 
 		shader.bind();
 		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha); CHECKGL
@@ -263,10 +289,11 @@ namespace Game3 {
 
 		y = backbufferHeight - y;
 
-		if (options.align == TextAlign::Center)
+		if (options.align == TextAlign::Center) {
 			x -= textWidth(text, scale_x) / 2;
-		else if (options.align == TextAlign::Right)
+		} else if (options.align == TextAlign::Right) {
 			x -= textWidth(text, scale_x);
+		}
 
 		shader.bind();
 		shader.set("textColor", options.color.red, options.color.green, options.color.blue, options.color.alpha); CHECKGL
@@ -349,15 +376,20 @@ namespace Game3 {
 
 	float TextRenderer::textWidth(const UString &text, float scale) const {
 		float out = 0;
-		for (const auto ch: text)
+
+		for (const auto ch: text) {
 			out += scale * (getCharacter(ch).advance >> 6);
+		}
+
 		return out;
 	}
 
 	float TextRenderer::textHeight(const UString &text, float scale) const {
 		float out = 0;
-		for (const auto ch: text)
+		for (const auto ch: text) {
 			out = std::max(out, getCharacter(ch).size.y * scale);
+		}
+
 		return out;
 	}
 
@@ -384,11 +416,13 @@ namespace Game3 {
 			const float w = character.size.x * scale;
 			const float h = character.size.y * scale;
 
-			if (y == 0 && h > highest_on_first_line)
+			if (y == 0 && h > highest_on_first_line) {
 				highest_on_first_line = h;
+			}
 
-			if (wrap_width > 0 && wrap_width < x + character.bearing.x * scale + w)
+			if (wrap_width > 0 && wrap_width < x + character.bearing.x * scale + w) {
 				next_line();
+			}
 
 			x += (character.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 		}
@@ -405,17 +439,23 @@ namespace Game3 {
 	}
 
 	const TextRenderer::Character & TextRenderer::getCharacter(uint32_t ch) const {
-		if (auto iter = characters.find(ch); iter != characters.end())
+		if (auto iter = characters.find(ch); iter != characters.end()) {
 			return iter->second;
+		}
+
 		assert(initialized);
 		return characters.at('?');
 	}
 
 	const TextRenderer::Character & TextRenderer::getCharacter(uint32_t ch) {
-		if (!initialized)
+		if (!initialized) {
 			initRenderData();
-		if (auto iter = characters.find(ch); iter != characters.end())
+		}
+
+		if (auto iter = characters.find(ch); iter != characters.end()) {
 			return iter->second;
+		}
+
 		return characters.at('?');
 	}
 }

@@ -55,7 +55,7 @@ namespace Game3 {
 
 			std::unordered_map<uint32_t, Character> characters;
 
-			TextRenderer(Window &, uint32_t font_scale = 96);
+			TextRenderer(Window &, uint32_t fontScale = 96);
 			~TextRenderer();
 
 			void remove();
@@ -75,7 +75,11 @@ namespace Game3 {
 			void reset();
 			void initRenderData();
 
+			static TextRenderer forTesting();
+
 		private:
+			explicit TextRenderer(uint32_t fontScale);
+
 			struct FreeLibrary {
 				void operator()(FT_Library *library) const {
 					FT_Done_FreeType(*library);
@@ -93,6 +97,7 @@ namespace Game3 {
 			GLuint vao = 0;
 			GLuint vbo = 0;
 			bool initialized = false;
+			bool fake = false;
 			mutable std::optional<float> cachedIHeight;
 
 			glm::mat4 projection;

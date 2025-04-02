@@ -112,7 +112,6 @@ namespace Game3 {
 			std::vector<UStringSpan> pieces = span.split(" ");
 
 			if (pieces.empty()) {
-				output += '\n';
 				continue;
 			}
 
