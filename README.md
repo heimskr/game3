@@ -7,7 +7,7 @@ A 2D game made with OpenGL. No engine because I'd prefer to do things my own way
 
 ## Screenshots
 
-See [the game3 website](https://ucsc.io/game3/) for screenshots and more information.
+See [the game3 website](https://game3.gay/) for screenshots and more information.
 
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
@@ -26,6 +26,7 @@ Sprites credited to [Franuka](https://twitter.com/franuka_art) are not governed 
 ## Contribution Ideas
 If you'd like to contribute, here are some ideas, ordered roughly from easiest to hardest.
 
+- Don't use AI. At all. It's not that hard. Slop PRs will be reported as spam.
 - Improve the shading of the flower sprites `flower1_*` and `flower5_*` in `/resources/tileset`.
 - Make animals useful.
 	- For example, add a shears tool that can be used to get wool from sheep.
