@@ -7,7 +7,7 @@ A 2D game made with OpenGL. No engine because I'd prefer to do things my own way
 
 ## Screenshots
 
-See [the game3 website](https://ucsc.io/game3/) for screenshots and more information.
+See [the game3 website](https://game3.gay/) for screenshots and more information.
 
 ## Credits
 Huge thanks to [Shade](https://merchant-shade.itch.io/) for creating [Mini World Sprites](https://merchant-shade.itch.io/16x16-mini-world-sprites),
