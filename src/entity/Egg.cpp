@@ -55,8 +55,7 @@ namespace Game3 {
 			new_pos.row += intpart;
 			quarter->setRealm(realm);
 			realm->queueEntityInit(std::move(quarter), new_pos);
-			constexpr static float variance = .8;
-			realm->playSound(new_pos, "base:sound/flesh", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+			realm->playSound(new_pos, "base:sound/flesh", threadContext.getPitch(1.25f));
 			return;
 		}
 

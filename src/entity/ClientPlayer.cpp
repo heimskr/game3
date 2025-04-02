@@ -208,8 +208,7 @@ namespace Game3 {
 				velocity.z = getJumpSpeed();
 			}
 			GamePtr game = getGame();
-			constexpr static float variance = .9f;
-			game->toClient().playSound("base:sound/jump", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+			game->toClient().playSound("base:sound/jump", threadContext.getPitch(1.111f));
 
 			EntityPtr self = getSelf();
 

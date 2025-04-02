@@ -212,8 +212,7 @@ namespace Game3 {
 		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_play).count();
 		if (diff > 90) {
 			last_play = now;
-			constexpr static float variance = .8;
-			place.realm->playSound(place.position, "base:sound/hit", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+			place.realm->playSound(place.position, "base:sound/hit", threadContext.getPitch(1.25f));
 		}
 
 		return true;

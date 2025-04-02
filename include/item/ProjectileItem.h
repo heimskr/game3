@@ -42,8 +42,7 @@ namespace Game3 {
 				entity->setRealm(realm);
 				entity->offset.z = player->getOffset().z;
 				realm->queueEntityInit(std::move(entity), player->getPosition());
-				constexpr static float variance = .9;
-				realm->playSound(place.position, "base:sound/throw", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+				realm->playSound(place.position, "base:sound/throw", threadContext.getPitch(1.111f));
 
 				return true;
 			}

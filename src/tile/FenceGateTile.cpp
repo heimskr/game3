@@ -12,8 +12,9 @@
 namespace Game3 {
 	bool FenceGateTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {
 		auto id = place.getName(layer);
-		if (!id)
+		if (!id) {
 			return false;
+		}
 
 		const std::string &tile_name = id->get().name;
 		const bool is_closed = place.realm->getTileset().isInCategory(*id, "base:category/fence_gates_closed");
@@ -23,37 +24,40 @@ namespace Game3 {
 		const char *new_id = nullptr;
 
 		if (tile_name.starts_with("tile/gate_horizontal")) {
-			if (is_closed)
+			if (is_closed) {
 				new_id = direction == Direction::Down? "base:tile/gate_horizontal_s" : "base:tile/gate_horizontal_n";
-			else
+			} else {
 				new_id = "base:tile/gate_horizontal";
+			}
 		} else if (tile_name.starts_with("tile/gate_vertical")) {
-			if (is_closed)
+			if (is_closed) {
 				new_id = direction == Direction::Right? "base:tile/gate_vertical_e" : "base:tile/gate_vertical_w";
-			else
+			} else {
 				new_id = "base:tile/gate_vertical";
+			}
 		}
 
-		assert(new_id);
+		assert(new_id != nullptr);
 
 		place.set(layer, Identifier(new_id));
-		constexpr static float variance = .9;
-		place.realm->playSound(place.position, "base:sound/gate", std::uniform_real_distribution(variance, 1.f / variance)(threadContext.rng));
+		place.realm->playSound(place.position, "base:sound/gate", threadContext.getPitch(1.111f));
 
 		return true;
 	}
 
 	bool FenceGateTile::update(const Place &place, Layer layer) {
 		auto id = place.getName(layer);
-		if (!id)
+		if (!id) {
 			return false;
+		}
 
 		Tileset &tileset = place.realm->getTileset();
 
 		auto is_match = [&](Direction direction) {
 			auto opt = (place + direction).getName(layer);
-			if (!opt)
+			if (!opt) {
 				return false;
+			}
 			const Identifier &id = opt->get();
 			return id == "base:tile/fence" || tileset.isInCategory(id, "base:category/fence_gates");
 		};
@@ -71,11 +75,13 @@ namespace Game3 {
 		const std::string &tile_name = id->get().name;
 
 		if (tile_name.starts_with("tile/gate_horizontal")) {
-			if (is_vertical)
+			if (is_vertical) {
 				place.set(layer, is_closed? "base:tile/gate_vertical" : "base:tile/gate_vertical_e");
+			}
 		} else if (tile_name.starts_with("tile/gate_vertical")) {
-			if (!is_vertical)
+			if (!is_vertical) {
 				place.set(layer, is_closed? "base:tile/gate_horizontal" : "base:tile/gate_horizontal_s");
+			}
 		}
 
 		return true;
