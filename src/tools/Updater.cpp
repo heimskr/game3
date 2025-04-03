@@ -17,10 +17,10 @@ namespace {
 	std::string DEFAULT_DOMAIN = "game3.zip";
 #ifdef __MINGW32__
 	std::string EXECUTABLE = "game3.exe";
-	std::string TEMP_EXECUTABLE = "game3_.exe";
+	std::string TEMP_EXECUTABLE = "./update/_game3.exe";
 #else
 	std::string EXECUTABLE = "game3";
-	std::string TEMP_EXECUTABLE = "game3_";
+	std::string TEMP_EXECUTABLE = "./update/_game3";
 #endif
 
 	static void maybeInitializeCurl() {
@@ -81,7 +81,9 @@ namespace Game3 {
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(directory / "Game3")) {
 			const std::filesystem::path &path = entry.path();
 			if (path.extension() == ".dll") {
-				std::filesystem::rename(entry.path(), cwd / path.filename());
+				std::filesystem::path old_path = cwd / path.filename();
+				std::filesystem::rename(old_path, cwd / ("_" + path.filename()));
+				std::filesystem::rename(entry.path(), old_path);
 			}
 		}
 #endif
