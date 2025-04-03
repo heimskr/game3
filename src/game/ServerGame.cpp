@@ -311,7 +311,7 @@ namespace Game3 {
 	void ServerGame::openDatabase(std::filesystem::path path) {
 		assert(database);
 		database->open(std::move(path));
-		if (int64_t compatibility = database->getCompatibility()) {
+		if (int64_t compatibility = database->getCompatibility(); compatibility != 0 && compatibility != INT64_MIN) {
 			ERR("Incompatible by {}", compatibility);
 			throw IncompatibleError(compatibility);
 		} else {
