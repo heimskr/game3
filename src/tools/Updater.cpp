@@ -52,6 +52,9 @@ namespace Game3 {
 		request.setOpt(curlpp::options::Url(url));
 		request.setOpt(curlpp::options::WriteStream(&string_stream));
 		request.setOpt(curlpp::options::FailOnError(true));
+#ifdef __MINGW32__
+		request.setOpt(curlpp::options::SslOptions(CURLSSLOPT_NATIVE_CA));
+#endif
 		request.perform();
 
 		updateLocal(std::move(string_stream).str());
