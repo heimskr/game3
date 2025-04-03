@@ -41,6 +41,12 @@ namespace Game3 {
 		/** Ignores the width/height of the RHS and uses the width/height of the LHS. */
 		Rectangle operator-(const Rectangle &) const;
 
+		Rectangle shrinkTop(int) const;
+		Rectangle shrinkRight(int) const;
+		Rectangle shrinkBottom(int) const;
+		Rectangle shrinkLeft(int) const;
+		Rectangle shrinkAll(int) const;
+
 		template <typename T>
 		Rectangle operator*(T scale) const {
 			return Rectangle(x, y, width * scale, height * scale);

@@ -53,6 +53,26 @@ namespace Game3 {
 		return {x - other.x, y - other.y, width, height};
 	}
 
+	Rectangle Rectangle::shrinkTop(int amount) const {
+		return {x, y + amount, width, height - amount};
+	}
+
+	Rectangle Rectangle::shrinkRight(int amount) const {
+		return {x, y, width - amount, height};
+	}
+
+	Rectangle Rectangle::shrinkBottom(int amount) const {
+		return {x, y, width, height - amount};
+	}
+
+	Rectangle Rectangle::shrinkLeft(int amount) const {
+		return {x + amount, y, width - amount, height};
+	}
+
+	Rectangle Rectangle::shrinkAll(int amount) const {
+		return {x + amount, y + amount, width - 2 * amount, height - 2 * amount};
+	}
+
 	Rectangle::operator bool() const {
 		return width > 0 && height > 0;
 	}

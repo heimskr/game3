@@ -37,6 +37,7 @@ namespace Game3 {
 	class HasFluids;
 	class LocalClient;
 	class OmniDialog;
+	class TitleDialog;
 	class TopDialog;
 	class Window;
 	struct Modifiers;
@@ -56,6 +57,7 @@ namespace Game3 {
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
 			std::shared_ptr<TopDialog> topDialog;
+			std::shared_ptr<TitleDialog> titleDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
 			SingleSpriteRenderer singleSpriteRenderer{*this};
@@ -96,6 +98,7 @@ namespace Game3 {
 			float getYFactor() const;
 			int getMouseX() const;
 			int getMouseY() const;
+			Rectangle inset(int distance = 0) const;
 
 			template <Numeric T>
 			std::pair<T, T> getMouseCoordinates() const;
@@ -103,6 +106,7 @@ namespace Game3 {
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();
 			const std::shared_ptr<TopDialog> & getTopDialog();
+			const std::shared_ptr<TitleDialog> & getTitleDialog();
 			void showOmniDialog();
 			void hideOmniDialog();
 			void toggleOmniDialog();
@@ -145,6 +149,8 @@ namespace Game3 {
 			void disconnect();
 			bool isKeyHeld(int key) const;
 
+			void setGame(std::shared_ptr<ClientGame>);
+
 		private:
 			struct KeyInfo {
 				int code;
@@ -181,6 +187,7 @@ namespace Game3 {
 			void handleKeys();
 			void renderGame();
 			void renderTitle();
+			void renderFPSCounter();
 	};
 
 	using WindowPtr = std::shared_ptr<Window>;

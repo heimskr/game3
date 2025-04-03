@@ -6,9 +6,10 @@
 #include "ui/gl/widget/Widget.h"
 #include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasFixedSize.h"
+#include "ui/gl/HasTooltipText.h"
 
 namespace Game3 {
-	class Button: public Widget, public HasFixedSize, public HasAlignment {
+	class Button: public Widget, public HasFixedSize, public HasAlignment, public HasTooltipText {
 		public:
 			Button(UIContext &, float selfScale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture = getDefaultTexture());
 			Button(UIContext &, float selfScale, Color border_color, Color text_color, TexturePtr texture = getDefaultTexture());

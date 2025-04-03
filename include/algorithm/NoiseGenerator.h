@@ -1,6 +1,9 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <noise/noise.h>
+#pragma GCC diagnostic pop
 #include <FastNoise/FastNoise.h>
 #include <FastNoise/Generators/Simplex.h>
 

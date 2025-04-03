@@ -6,6 +6,7 @@
 #include "graphics/TextRenderer.h"
 #include "threading/ThreadContext.h"
 #include "ui/gl/widget/Button.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 
@@ -108,6 +109,19 @@ namespace Game3 {
 
 		// Bottom
 		rectangler(bottom_color, x + 2 * scale, adjusted_y + height - 2 * scale, width - 4 * scale, bottom_height);
+
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
+
+		if (tooltipText && !ui.anyDragUpdaters() && ui.checkMouse(lastRectangle)) {
+			if (!tooltip->wasUpdatedBy(*this) || tooltipTextChanged) {
+				tooltipTextChanged = false;
+				tooltip->setText(*tooltipText);
+			}
+			tooltip->setRegion(lastRectangle);
+			tooltip->show(*this);
+		} else {
+			tooltip->hide(*this);
+		}
 	}
 
 	bool Button::click(int, int, int, Modifiers) {

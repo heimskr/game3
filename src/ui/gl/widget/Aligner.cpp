@@ -1,5 +1,6 @@
 #include "ui/gl/widget/Aligner.h"
 #include "ui/gl/Constants.h"
+#include "ui/gl/UIContext.h"
 
 #include <cassert>
 
@@ -58,17 +59,17 @@ namespace Game3 {
 	void Aligner::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
 			if (getHorizontalExpand()) {
-				minimum = fixedWidth < 0? for_width : std::min(for_width, fixedWidth);
+				minimum = fixedWidth < 0? for_width : std::min(for_width, fixedWidth * ui.scale);
 				natural = for_width;
 			} else {
-				minimum = natural = fixedWidth < 0? for_width : fixedWidth;
+				minimum = natural = fixedWidth < 0? for_width : fixedWidth * ui.scale;
 			}
 		} else {
 			if (getVerticalExpand()) {
-				minimum = fixedHeight < 0? for_height : std::min(for_height, fixedHeight);
+				minimum = fixedHeight < 0? for_height : std::min(for_height, fixedHeight * ui.scale);
 				natural = for_height;
 			} else {
-				minimum = natural = fixedHeight < 0? for_height : fixedHeight;
+				minimum = natural = fixedHeight < 0? for_height : fixedHeight * ui.scale;
 			}
 		}
 	}

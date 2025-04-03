@@ -21,6 +21,7 @@
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
+#include "ui/gl/dialog/TitleDialog.h"
 #include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
@@ -188,6 +189,10 @@ namespace Game3 {
 		return static_cast<int>(std::floor(y * yScale));
 	}
 
+	Rectangle Window::inset(int distance) const {
+		return uiContext.scissorStack.getTop().rectangle.shrinkAll(distance);
+	}
+
 	template <>
 	std::pair<int, int> Window::getMouseCoordinates() const {
 		double x{}, y{};
@@ -228,6 +233,13 @@ namespace Game3 {
 			topDialog = make<TopDialog>(uiContext, 1);
 		}
 		return topDialog;
+	}
+
+	const std::shared_ptr<TitleDialog> & Window::getTitleDialog() {
+		if (!titleDialog) {
+			titleDialog = make<TitleDialog>(uiContext, 1);
+		}
+		return titleDialog;
 	}
 
 	void Window::showOmniDialog() {
@@ -434,17 +446,7 @@ namespace Game3 {
 		uiContext.render(getMouseX(), getMouseY());
 
 		if (settings.showFPS && runningFPS > 0) {
-			textRenderer.drawOnScreen(std::format("{:.1f} FPS", runningFPS), TextRenderOptions{
-				.x = static_cast<double>(width - 10),
-				.y = static_cast<double>(height - 10),
-				.scaleX = 0.5,
-				.scaleY = 0.5,
-				.color = Color{"#ffffff"},
-				.align = TextAlign::Right,
-				.alignTop = false,
-				.shadow = Color{"#000000"},
-				.shadowOffset{6, 6},
-			});
+			renderFPSCounter();
 		}
 	}
 
@@ -785,7 +787,7 @@ namespace Game3 {
 		connected = false;
 		removeModule();
 		game->stopThread();
-		game.reset();
+		setGame({});
 		serverWrapper.stop();
 		goToTitle();
 	}
@@ -795,6 +797,7 @@ namespace Game3 {
 			window.omniDialog.reset();
 			window.uiContext.reset();
 			window.uiContext.emplaceDialog<ConnectionDialog>(1);
+			window.uiContext.addDialog(window.getTitleDialog());
 		});
 	}
 
@@ -898,7 +901,7 @@ namespace Game3 {
 	bool Window::connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> client) {
 		closeGame();
 
-		game = std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this()));
+		setGame(std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this())));
 
 		if (client == nullptr) {
 			client = std::make_shared<LocalClient>();
@@ -1139,6 +1142,14 @@ namespace Game3 {
 		return heldKeys.contains(key);
 	}
 
+	void Window::setGame(std::shared_ptr<ClientGame> new_game) {
+		if (game && !new_game) {
+			uiContext.removeDialog(getTitleDialog());
+		}
+
+		game = std::move(new_game);
+	}
+
 	void Window::handleKeys() {
 		std::erase_if(keyTimes, [this](const std::pair<int, KeyInfo> &pair) {
 			return glfwGetKey(glfwWindow, pair.first) == GLFW_RELEASE;
@@ -1286,5 +1297,20 @@ namespace Game3 {
 
 			hsv.hue += 0.5 / i_max;
 		}
+	}
+
+	void Window::renderFPSCounter() {
+		auto [width, height] = getDimensions();
+		textRenderer.drawOnScreen(std::format("{:.1f} FPS", runningFPS), TextRenderOptions{
+			.x = static_cast<double>(width - 10),
+			.y = static_cast<double>(height - 10),
+			.scaleX = 0.5,
+			.scaleY = 0.5,
+			.color = Color{"#ffffff"},
+			.align = TextAlign::Right,
+			.alignTop = false,
+			.shadow = Color{"#000000"},
+			.shadowOffset{6, 6},
+		});
 	}
 }
