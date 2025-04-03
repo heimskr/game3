@@ -1,12 +1,7 @@
 #include "threading/SharedRecursiveMutex.h"
 
 namespace Game3 {
-#ifdef __MINGW32__
-	// shared_mutex is exploding for seemingly no reason
-	constexpr static bool uniqueOnly = true;
-#else
 	constexpr static bool uniqueOnly = false;
-#endif
 
 	void SharedRecursiveMutex::lock() {
 		if constexpr (uniqueOnly) {
