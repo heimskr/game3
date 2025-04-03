@@ -72,6 +72,15 @@ namespace Game3 {
 		if (std::filesystem::exists(pdb)) {
 			std::filesystem::rename(pdb, "./game3.pdb");
 		}
+
+		std::filesystem::path cwd = std::filesystem::current_path();
+
+		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(directory / "Game3")) {
+			const std::filesystem::path &path = entry.path();
+			if (path.extension() == ".dll") {
+				std::filesystem::rename(entry.path(), cwd / path.filename());
+			}
+		}
 #endif
 
 		std::filesystem::remove_all("./resources");
