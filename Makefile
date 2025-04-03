@@ -189,7 +189,9 @@ winzip: game3.exe
 	cp -r ../gamedata Game3/gamedata && \
 	cp ../game3.exe Game3/ && \
 	cp ../*.dll Game3/ && \
-	zip -r ../game3.zip Game3
+	zip -r ../game3.zip Game3 && \
+	cd .. && \
+	rm -r game3_zip
 
 winzip_debug: builddir/src/game3.exe
 	cv2pdb64 $< game3.exe game3.pdb
@@ -203,7 +205,9 @@ winzip_debug: builddir/src/game3.exe
 	cp ../game3.exe Game3/ && \
 	cp ../game3.pdb Game3/ && \
 	cp ../*.dll Game3/ && \
-	zip -r ../game3.zip Game3
+	zip -r ../game3.zip Game3 && \
+	cd .. && \
+	rm -r game3_zip
 
 winja:
 	ninja -C builddir
@@ -218,4 +222,6 @@ maczip:
 	cp -r ../resources Game3/resources && \
 	cp -r ../gamedata Game3/gamedata && \
 	cp ../game3 Game3/ && \
-	zip -r ../game3.zip Game3
+	zip -r ../game3.zip Game3 && \
+	cd .. && \
+	rm -r game3_zip
