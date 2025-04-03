@@ -5,7 +5,10 @@
 #define BACKWARD_SYSTEM_WINDOWS
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunqualified-std-cast-call"
 #include "backward.hpp"
+#pragma GCC diagnostic pop
 
 namespace backward {
 	backward::SignalHandling sh;

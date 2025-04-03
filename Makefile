@@ -213,8 +213,8 @@ winja:
 	ninja -C builddir
 	cp builddir/src/game3.exe .
 
-maczip:
-	cp builddir/src/game3 ./game3
+zip:
+	- cp builddir/src/game3 ./game3
 	strip game3
 	rm -f game3.zip
 	mkdir -p game3_zip/Game3

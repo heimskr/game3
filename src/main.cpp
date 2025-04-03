@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
 		const std::string_view arg1{argv[1]};
 
 		if (arg1 == "--test") {
-			return Tests::get().runAll()? 0 : 1;
+			return Tests::get().runAll(argc > 2? argv[2] : "")? 0 : 1;
 		}
 
 		if (arg1 == "--gen-cert") {

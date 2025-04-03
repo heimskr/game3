@@ -6,6 +6,9 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 namespace Game3 {
 	class Game;
@@ -16,11 +19,12 @@ namespace Game3 {
 			GamePtr game;
 
 			using Reporter = std::function<void(std::string_view)>;
-			TestContext(Reporter pass, Reporter fail, GamePtr game);
+			TestContext(Reporter pass, Reporter fail, std::string_view option_string, GamePtr game);
 
 			void pass(std::string_view);
 			void fail(std::string_view);
 			bool report(std::string_view, bool passed);
+			bool hasOption(const std::string &option) const;
 
 			template <typename T, typename U>
 			bool expectEqual(const T &actual, const U &expected) {
@@ -41,6 +45,7 @@ namespace Game3 {
 		private:
 			Reporter passReporter;
 			Reporter failReporter;
+			std::unordered_set<std::string> options;
 	};
 
 	class Test {
@@ -56,7 +61,7 @@ namespace Game3 {
 			using Base = std::map<Identifier, TestPtr>;
 			using Base::Base;
 
-			bool runAll(const GamePtr & = {});
+			bool runAll(std::string_view options = {}, const GamePtr & = {});
 
 			static Tests & get();
 	};

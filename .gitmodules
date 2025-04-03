@@ -37,3 +37,6 @@
 [submodule "subprojects/backward-cpp"]
 	path = subprojects/backward-cpp
 	url = https://github.com/bombela/backward-cpp.git
+[submodule "subprojects/curlpp"]
+	path = subprojects/curlpp
+	url = https://github.com/jpbarrette/curlpp.git

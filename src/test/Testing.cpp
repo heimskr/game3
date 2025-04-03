@@ -1,5 +1,6 @@
 #include "test/Testing.h"
 #include "util/Log.h"
+#include "util/Util.h"
 
 namespace {
 	constexpr const char * plural(std::size_t count) {
@@ -8,10 +9,13 @@ namespace {
 }
 
 namespace Game3 {
-	TestContext::TestContext(Reporter pass, Reporter fail, GamePtr game):
+	TestContext::TestContext(Reporter pass, Reporter fail, std::string_view option_string, GamePtr game):
 		game(std::move(game)),
 		passReporter(std::move(pass)),
-		failReporter(std::move(fail)) {}
+		failReporter(std::move(fail)) {
+			std::vector<std::string> vector = split<std::string>(option_string, ",");
+			options = {std::move_iterator(vector.begin()), std::move_iterator(vector.end())};
+		}
 
 	void TestContext::pass(std::string_view test_name) {
 		passReporter(test_name);
@@ -31,12 +35,16 @@ namespace Game3 {
 		return passed;
 	}
 
+	bool TestContext::hasOption(const std::string &option) const {
+		return options.contains(option);
+	}
+
 	Tests & Tests::get() {
 		static Tests tests;
 		return tests;
 	}
 
-	bool Tests::runAll(const GamePtr &game) {
+	bool Tests::runAll(std::string_view options, const GamePtr &game) {
 		std::size_t good = 0;
 		std::size_t bad = 0;
 
@@ -46,7 +54,7 @@ namespace Game3 {
 		}, [&](std::string_view test_name) {
 			ERR("Failed \e[1m{}\e[22m", test_name);
 			++bad;
-		}, game);
+		}, options, game);
 
 		for (const auto &[id, test]: *this) {
 			(*test)(context);

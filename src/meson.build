@@ -10,7 +10,7 @@ chemskr = subproject('chemskr')
 namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
-# fastnoise2 = cmake.subproject('FastNoise2')
+curlpp = cmake.subproject('curlpp')
 
 game3_deps = [
 	dependency('glibmm-2.68'),
@@ -25,9 +25,10 @@ game3_deps = [
 	dependency('asio'),
 	dependency('liblz4'),
 	dependency('boost', modules: ['json']),
-	# fastnoise2.dependency('FastNoise2', modules: ['FastNoise2::FastNoise']),
+	curlpp.dependency('curlpp_static'),
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
+	dependency('libcurl'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
