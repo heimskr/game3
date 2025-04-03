@@ -1,5 +1,6 @@
 #include "test/Testing.h"
 #include "tools/Updater.h"
+#include "util/FS.h"
 #include "util/Log.h"
 
 namespace Game3 {
@@ -10,13 +11,14 @@ namespace Game3 {
 			UpdaterTest() = default;
 
 			void operator()(TestContext &context) {
-				if (!context.hasOption("updater")) {
+				if (!context.hasOption("updater") && !context.hasOption("all")) {
 					return;
 				}
 
 				Updater updater;
+
 				try {
-					updater.update();
+					updater.updateLocal(readFile("./game3-linux-x86_64.zip"));
 					context.pass("updater");
 				} catch (const std::exception &err) {
 					ERR("Updater failed: {}", err.what());

@@ -40,3 +40,6 @@
 [submodule "subprojects/curlpp"]
 	path = subprojects/curlpp
 	url = https://github.com/jpbarrette/curlpp.git
+[submodule "subprojects/Zipios"]
+	path = subprojects/Zipios
+	url = https://github.com/heimskr/zipios.git

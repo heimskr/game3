@@ -1,5 +1,7 @@
 #include "tools/Updater.h"
+#include "util/FS.h"
 #include "util/Log.h"
+#include "util/Zip.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -13,12 +15,19 @@
 
 namespace {
 	std::string DEFAULT_DOMAIN = "game3.zip";
+#ifdef __MINGW32__
+	std::string EXECUTABLE = "game3.exe";
+	std::string TEMP_EXECUTABLE = "game3_.exe";
+#else
+	std::string EXECUTABLE = "game3";
+	std::string TEMP_EXECUTABLE = "game3_";
+#endif
 }
 
 namespace Game3 {
 	Updater::Updater() = default;
 
-	void Updater::update(const std::string &domain) {
+	void Updater::updateFetch(const std::string &domain) {
 		std::string url;
 #ifdef __MINGW32__
 		url = std::format("https://{}/game3-windows-x86_64.zip", domain);
@@ -35,10 +44,27 @@ namespace Game3 {
 		request.setOpt(write_stream);
 		request.perform();
 
-		std::string zip = std::move(string_stream).str();
+		updateLocal(std::move(string_stream).str());
+	}
+
+	void Updater::updateLocal(std::string raw_zip) {
+		std::filesystem::path directory = "./update";
+		Zip(std::move(raw_zip)).unzipTo(directory);
+
+		if (!std::filesystem::is_symlink(EXECUTABLE)) {
+			std::filesystem::rename(EXECUTABLE, TEMP_EXECUTABLE);
+			std::filesystem::rename(directory / "Game3" / EXECUTABLE, EXECUTABLE);
+			markExecutable(EXECUTABLE);
+		}
+
+		std::filesystem::remove_all("./resources");
+		std::filesystem::rename(directory / "Game3" / "resources", "./resources");
+
+		std::filesystem::remove_all("./gamedata");
+		std::filesystem::rename(directory / "Game3" / "gamedata", "./gamedata");
 	}
 
 	void Updater::update() {
-		update(DEFAULT_DOMAIN);
+		updateFetch(DEFAULT_DOMAIN);
 	}
 }

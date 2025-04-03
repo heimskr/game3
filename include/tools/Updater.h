@@ -7,7 +7,8 @@ namespace Game3 {
 		public:
 			Updater();
 
-			void update(const std::string &domain);
+			void updateFetch(const std::string &domain);
+			void updateLocal(std::string raw_zip);
 			void update();
 	};
 }

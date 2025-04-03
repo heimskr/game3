@@ -12,6 +12,11 @@ sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
 curlpp = cmake.subproject('curlpp')
 
+zipios_options = cmake.subproject_options()
+zipios_options.add_cmake_defines({'BUILD_SHARED_LIBS': false, 'BUILD_DOCUMENTATION': false, 'BUILD_ZIPIOS_TESTS': false})
+zipios_options.set_override_option('cpp_std', 'c++23')
+zipios = cmake.subproject('Zipios', options: zipios_options)
+
 game3_deps = [
 	dependency('glibmm-2.68'),
 	dependency('threads'),
@@ -29,6 +34,7 @@ game3_deps = [
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
 	dependency('libcurl'),
+	zipios.dependency('zipios'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),

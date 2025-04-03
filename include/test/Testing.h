@@ -52,6 +52,7 @@ namespace Game3 {
 		public:
 			virtual ~Test() = default;
 			virtual void operator()(TestContext &) = 0;
+			virtual void cleanup();
 	};
 
 	using TestPtr = std::shared_ptr<Test>;

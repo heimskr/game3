@@ -56,3 +56,5 @@ vgcore.*
 /game3_zip
 /log*
 *.pdb
+/*_test
+/update

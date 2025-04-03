@@ -44,6 +44,8 @@ namespace Game3 {
 		return tests;
 	}
 
+	void Test::cleanup() {}
+
 	bool Tests::runAll(std::string_view options, const GamePtr &game) {
 		std::size_t good = 0;
 		std::size_t bad = 0;
@@ -57,7 +59,24 @@ namespace Game3 {
 		}, options, game);
 
 		for (const auto &[id, test]: *this) {
-			(*test)(context);
+			const std::size_t old_good = good;
+			const std::size_t old_bad = bad;
+
+			try {
+				(*test)(context);
+			} catch (const std::exception &err) {
+				good = old_good;
+				bad = old_bad;
+				context.fail(id.str());
+				ERR("Test {} caught exception: {}", id, err.what());
+			} catch (...) {
+				good = old_good;
+				bad = old_bad;
+				context.fail(id.str());
+				ERR("Test {} caught exception", id);
+			}
+
+			test->cleanup();
 		}
 
 		if (good == 0 && bad == 0) {

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <filesystem>
 #include <format>
-#include <sstream>
 #include <vector>
 
 template <typename T>
@@ -39,5 +39,21 @@ struct std::formatter<std::vector<T>> {
 		}
 
 		return ctx.out();
+	}
+};
+
+template <>
+struct std::formatter<std::filesystem::path> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(const auto &path, auto &ctx) const {
+#ifdef __MINGW32__
+		// Windows users are punished with an extra allocation.
+		return std::format_to(ctx.out(), "{}", path.string().c_str());
+#else
+		return std::format_to(ctx.out(), "{}", path.c_str());
+#endif
 	}
 };

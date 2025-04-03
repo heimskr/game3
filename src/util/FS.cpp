@@ -63,4 +63,10 @@ namespace Game3 {
 
 		return false;
 	}
+
+	void markExecutable(const std::filesystem::path &path) {
+		std::filesystem::perms perms = std::filesystem::status(path).permissions();
+		perms |= std::filesystem::perms::owner_exec;
+		std::filesystem::permissions(path, perms);
+	}
 }
