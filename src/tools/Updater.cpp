@@ -82,7 +82,7 @@ namespace Game3 {
 			const std::filesystem::path &path = entry.path();
 			if (path.extension() == ".dll") {
 				std::filesystem::path old_path = cwd / path.filename();
-				std::filesystem::rename(old_path, cwd / ("_" + path.filename()));
+				std::filesystem::rename(old_path, cwd / ("_" + path.filename().string()));
 				std::filesystem::rename(entry.path(), old_path);
 			}
 		}
