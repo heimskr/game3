@@ -17,10 +17,10 @@ namespace {
 	std::string DEFAULT_DOMAIN = "game3.zip";
 #ifdef __MINGW32__
 	std::string EXECUTABLE = "game3.exe";
-	std::string TEMP_EXECUTABLE = "./update/_game3.exe";
+	std::string TEMP_EXECUTABLE = "./_game3.exe";
 #else
 	std::string EXECUTABLE = "game3";
-	std::string TEMP_EXECUTABLE = "./update/_game3";
+	std::string TEMP_EXECUTABLE = "./_game3";
 #endif
 
 	static void maybeInitializeCurl() {
