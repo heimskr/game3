@@ -67,6 +67,13 @@ namespace Game3 {
 			markExecutable(EXECUTABLE);
 		}
 
+#ifdef __MINGW32__
+		std::filesystem::path pdb = directory / "Game3" / "game3.pdb";
+		if (std::filesystem::exists(pdb)) {
+			std::filesystem::rename(pdb, "./game3.pdb");
+		}
+#endif
+
 		std::filesystem::remove_all("./resources");
 		std::filesystem::rename(directory / "Game3" / "resources", "./resources");
 
