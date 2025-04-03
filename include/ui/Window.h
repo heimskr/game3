@@ -179,6 +179,8 @@ namespace Game3 {
 			void autoConnect();
 			void continueLocalConnection();
 			void handleKeys();
+			void renderGame();
+			void renderTitle();
 	};
 
 	using WindowPtr = std::shared_ptr<Window>;

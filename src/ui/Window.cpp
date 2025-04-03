@@ -412,8 +412,6 @@ namespace Game3 {
 	}
 
 	void Window::render() {
-		const float x_factor = getXFactor();
-		const float y_factor = getYFactor();
 		auto [width, height] = getDimensions();
 
 		activateContext();
@@ -428,124 +426,9 @@ namespace Game3 {
 		overlayer.update(width, height);
 
 		if (game != nullptr && game->getPlayer() != nullptr) {
-			game->iterateRealms([](const RealmPtr &realm) {
-				if (!realm->renderersReady) {
-					return;
-				}
-
-				if (realm->wakeupPending.exchange(false)) {
-					for (auto &row: *realm->baseRenderers) {
-						for (auto &renderer: row) {
-							renderer.wakeUp();
-						}
-					}
-
-					for (auto &row: *realm->upperRenderers) {
-						for (auto &renderer: row) {
-							renderer.wakeUp();
-						}
-					}
-
-					realm->reupload();
-				} else if (realm->snoozePending.exchange(false)) {
-					for (auto &row: *realm->baseRenderers) {
-						for (auto &renderer: row) {
-							renderer.snooze();
-						}
-					}
-
-					for (auto &row: *realm->upperRenderers) {
-						for (auto &renderer: row) {
-							renderer.snooze();
-						}
-					}
-				}
-			});
-
-			GLsizei tile_size = 16;
-			RealmPtr realm = game->getActiveRealm();
-
-			if (realm) {
-				tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
-			}
-
-			const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
-			const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
-
-			if (mainGLTexture.getWidth() != width || mainGLTexture.getHeight() != height) {
-				mainGLTexture.initRGBA(width, height, GL_NEAREST);
-				staticLightingTexture.initRGBA(x_static_size, y_static_size, GL_NEAREST);
-				dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
-				scratchGLTexture.initRGBA(width, height, GL_NEAREST);
-				causticsGLTexture.initRGBA(width, height, GL_NEAREST);
-
-				GL::FBOBinder binder = fbo.getBinder();
-				dynamicLightingTexture.useInFB();
-				GL::clear(1, 1, 1);
-
-				if (realm) {
-					realm->queueStaticLightingTexture();
-				}
-
-				mainTexture = std::make_shared<Texture>();
-				mainTexture->init(mainGLTexture);
-
-				scratchTexture = std::make_shared<Texture>();
-				scratchTexture->init(scratchGLTexture);
-			}
-
-			if (realm) {
-				realm->getRenderer()->render(getRendererContext(), realm, *this);
-				realmBounds = game->getVisibleRealmBounds();
-			}
+			renderGame();
 		} else {
-			static float hue = 0;
-			static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
-			static bool has_been_nonzero = false;
-
-			const auto [mouse_x, mouse_y] = getMouseCoordinates<double>();
-
-			if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
-				singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
-					.x = mouse_x,
-					.y = mouse_y,
-					.scaleX = 16,
-					.scaleY = 16,
-					.invertY = false,
-				});
-			}
-
-			if (!has_been_nonzero && (mouse_x != 0 || mouse_y != 0)) {
-				has_been_nonzero = true;
-			}
-
-			auto now = getTime();
-
-			if (lastRenderTime) {
-				hue += std::chrono::duration_cast<std::chrono::nanoseconds>(now - *lastRenderTime).count() / 1e9 * 144 * 0.001;
-			}
-
-			lastRenderTime = now;
-
-			OKHsv hsv{hue, 1, 1, 1};
-			constexpr int i_max = 32;
-			constexpr double offset_factor = 2;
-			constexpr double x_offset = offset_factor * i_max;
-
-			for (int i = 0; i < i_max; ++i) {
-				const double offset = offset_factor * (i_max - i);
-				textRenderer.drawOnScreen("game3", TextRenderOptions{
-					.x = getWidth() / 2.0 + (offset - x_offset) / 2,
-					.y = 64.0 + offset / 2,
-					.scaleX = 2.5,
-					.scaleY = 2.5,
-					.color = hsv.convert<Color>(),
-					.align = TextAlign::Center,
-					.alignTop = true,
-				});
-
-				hsv.hue += 0.5 / i_max;
-			}
+			renderTitle();
 		}
 
 		uiContext.render(getMouseX(), getMouseY());
@@ -1275,6 +1158,133 @@ namespace Game3 {
 
 			time = getTime();
 			keyCallback(key, keycode, CUSTOM_REPEAT, static_cast<uint8_t>(modifiers));
+		}
+	}
+
+	void Window::renderGame() {
+		const float x_factor = getXFactor();
+		const float y_factor = getYFactor();
+		auto [width, height] = getDimensions();
+
+		game->iterateRealms([](const RealmPtr &realm) {
+			if (!realm->renderersReady) {
+				return;
+			}
+
+			if (realm->wakeupPending.exchange(false)) {
+				for (auto &row: *realm->baseRenderers) {
+					for (auto &renderer: row) {
+						renderer.wakeUp();
+					}
+				}
+
+				for (auto &row: *realm->upperRenderers) {
+					for (auto &renderer: row) {
+						renderer.wakeUp();
+					}
+				}
+
+				realm->reupload();
+			} else if (realm->snoozePending.exchange(false)) {
+				for (auto &row: *realm->baseRenderers) {
+					for (auto &renderer: row) {
+						renderer.snooze();
+					}
+				}
+
+				for (auto &row: *realm->upperRenderers) {
+					for (auto &renderer: row) {
+						renderer.snooze();
+					}
+				}
+			}
+		});
+
+		GLsizei tile_size = 16;
+		RealmPtr realm = game->getActiveRealm();
+
+		if (realm) {
+			tile_size = static_cast<GLsizei>(realm->getTileset().getTileSize());
+		}
+
+		const auto x_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * x_factor);
+		const auto y_static_size = static_cast<GLsizei>(REALM_DIAMETER * CHUNK_SIZE * tile_size * y_factor);
+
+		if (mainGLTexture.getWidth() != width || mainGLTexture.getHeight() != height) {
+			mainGLTexture.initRGBA(width, height, GL_NEAREST);
+			staticLightingTexture.initRGBA(x_static_size, y_static_size, GL_NEAREST);
+			dynamicLightingTexture.initRGBA(width, height, GL_NEAREST);
+			scratchGLTexture.initRGBA(width, height, GL_NEAREST);
+			causticsGLTexture.initRGBA(width, height, GL_NEAREST);
+
+			GL::FBOBinder binder = fbo.getBinder();
+			dynamicLightingTexture.useInFB();
+			GL::clear(1, 1, 1);
+
+			if (realm) {
+				realm->queueStaticLightingTexture();
+			}
+
+			mainTexture = std::make_shared<Texture>();
+			mainTexture->init(mainGLTexture);
+
+			scratchTexture = std::make_shared<Texture>();
+			scratchTexture->init(scratchGLTexture);
+		}
+
+		if (realm) {
+			realm->getRenderer()->render(getRendererContext(), realm, *this);
+			realmBounds = game->getVisibleRealmBounds();
+		}
+	}
+
+	void Window::renderTitle() {
+		static float hue = 0;
+		static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
+		static bool has_been_nonzero = false;
+
+		const auto [mouse_x, mouse_y] = getMouseCoordinates<double>();
+
+		if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
+			singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
+				.x = mouse_x,
+				.y = mouse_y,
+				.scaleX = 16,
+				.scaleY = 16,
+				.invertY = false,
+			});
+		}
+
+		if (!has_been_nonzero && (mouse_x != 0 || mouse_y != 0)) {
+			has_been_nonzero = true;
+		}
+
+		auto now = getTime();
+
+		if (lastRenderTime) {
+			hue += std::chrono::duration_cast<std::chrono::nanoseconds>(now - *lastRenderTime).count() / 1e9 * 144 * 0.001;
+		}
+
+		lastRenderTime = now;
+
+		OKHsv hsv{hue, 1, 1, 1};
+		constexpr int i_max = 32;
+		constexpr double offset_factor = 2.05;
+		constexpr double x_offset = offset_factor * i_max;
+
+		for (int i = 0; i < i_max; ++i) {
+			const double offset = offset_factor * (i_max - i);
+			textRenderer.drawOnScreen("game3", TextRenderOptions{
+				.x = getWidth() / 2.0 + (offset - x_offset) / 2,
+				.y = 64.0 + offset / 2,
+				.scaleX = 2.5,
+				.scaleY = 2.5,
+				.color = hsv.convert<Color>(),
+				.align = TextAlign::Center,
+				.alignTop = true,
+			});
+
+			hsv.hue += 0.5 / i_max;
 		}
 	}
 }
