@@ -53,12 +53,6 @@ namespace Game3 {
 				std::shared_ptr<std::istream> input_stream = zip_file.getInputStream(entry->getName());
 				std::ofstream output_stream(full, std::ios::binary | std::ios::trunc | std::ios::out);
 				output_stream << input_stream->rdbuf();
-
-				auto extra = entry->getExtra();
-
-				INFO("Extra for {}: {}", full, extra);
-
-				// std::filesystem::permissions(entry->
 			}
 		}
 	}

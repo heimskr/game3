@@ -18,8 +18,14 @@ namespace Game3 {
 				Updater updater;
 
 				try {
-					updater.updateLocal(readFile("./game3-linux-x86_64.zip"));
-					context.pass("updater");
+					std::filesystem::path local = "./game3-linux-x86_64.zip";
+					if (std::filesystem::exists(local)) {
+						updater.updateLocal(readFile(local));
+						context.pass("updater local");
+					} else {
+						updater.update();
+						context.pass("updater remote");
+					}
 				} catch (const std::exception &err) {
 					ERR("Updater failed: {}", err.what());
 					context.fail("updater");

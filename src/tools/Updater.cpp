@@ -22,12 +22,22 @@ namespace {
 	std::string EXECUTABLE = "game3";
 	std::string TEMP_EXECUTABLE = "game3_";
 #endif
+
+	static void maybeInitializeCurl() {
+		static bool initialized = false;
+		if (!initialized) {
+			curlpp::initialize();
+			initialized = true;
+		}
+	}
 }
 
 namespace Game3 {
 	Updater::Updater() = default;
 
 	void Updater::updateFetch(const std::string &domain) {
+		maybeInitializeCurl();
+
 		std::string url;
 #ifdef __MINGW32__
 		url = std::format("https://{}/game3-windows-x86_64.zip", domain);
@@ -38,10 +48,10 @@ namespace Game3 {
 #endif
 
 		curlpp::Easy request;
-		request.setOpt(curlpp::options::Url(url));
 		std::ostringstream string_stream;
-		curlpp::options::WriteStream write_stream(&string_stream);
-		request.setOpt(write_stream);
+		request.setOpt(curlpp::options::Url(url));
+		request.setOpt(curlpp::options::WriteStream(&string_stream));
+		request.setOpt(curlpp::options::FailOnError(true));
 		request.perform();
 
 		updateLocal(std::move(string_stream).str());
@@ -62,6 +72,8 @@ namespace Game3 {
 
 		std::filesystem::remove_all("./gamedata");
 		std::filesystem::rename(directory / "Game3" / "gamedata", "./gamedata");
+
+		std::filesystem::remove_all(directory);
 	}
 
 	void Updater::update() {
