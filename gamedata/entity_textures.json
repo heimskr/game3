@@ -30,6 +30,7 @@
 		"base:entity/mushroom":        ["base:texture/mushroom",    1],
 		"base:entity/ship":            ["base:texture/ship",        0],
 		"base:entity/duck":            ["base:texture/duck",        3],
-		"base:entity/quarter":         ["base:texture/quarter",     0]
+		"base:entity/quarter":         ["base:texture/quarter",     0],
+		"base:entity/voidbug":         ["base:texture/voidbug",     3]
 	}]]
 }
