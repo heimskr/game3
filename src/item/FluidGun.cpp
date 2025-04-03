@@ -41,18 +41,20 @@ namespace Game3 {
 		PackedTime last_slurp{0};
 
 		stack->data.withShared([&](const boost::json::value &data) {
-			if (auto lookup_result = data.try_at("fluid")) {
-				if (auto string_result = lookup_result->try_as_string()) {
-					fluid = game->getFluid(Identifier(*string_result));
+			if (auto *object = data.if_object()) {
+				if (auto *lookup_result = object->if_contains("fluid")) {
+					if (auto *string_result = lookup_result->if_string()) {
+						fluid = game->getFluid(Identifier(*string_result));
+					}
 				}
-			}
 
-			if (auto lookup_result = data.try_at("level")) {
-				amount = getNumber<FluidAmount>(*lookup_result);
-			}
+				if (auto *lookup_result = object->if_contains("level")) {
+					amount = getNumber<FluidAmount>(*lookup_result);
+				}
 
-			if (auto lookup_result = data.try_at("lastSlurp")) {
-				last_slurp = getUint64(*lookup_result);
+				if (auto *lookup_result = object->if_contains("lastSlurp")) {
+					last_slurp = getUint64(*lookup_result);
+				}
 			}
 		});
 
