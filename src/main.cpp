@@ -7,6 +7,7 @@
 #include "graphics/Texture.h"
 #include "lib/JSON.h"
 #include "net/Server.h"
+#include "net/CertGen.h"
 #include "scripting/ScriptEngine.h"
 #include "test/Testing.h"
 #include "threading/ThreadContext.h"
@@ -96,6 +97,11 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--test") {
 			return Tests::get().runAll()? 0 : 1;
+		}
+
+		if (arg1 == "--gen-cert") {
+			generateCertPair("private.crt", "private.key");
+			return 0;
 		}
 
 		if (arg1 == "--token" && argc == 3) {
