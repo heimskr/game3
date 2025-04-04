@@ -5,6 +5,7 @@
 #include "packet/AddKnownItemPacket.h"
 #include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/tab/CraftingTab.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Util.h"
 
@@ -15,7 +16,9 @@ namespace Game3 {
 	void AddKnownItemPacket::handle(const ClientGamePtr &game) {
 		if (game->getPlayer()->addKnownItem(itemID)) {
 			game->getWindow()->queue([](Window &window) {
-				window.getOmniDialog()->craftingTab->reset();
+				if (auto game_ui = window.getUI<GameUI>()) {
+					game_ui->getOmniDialog()->craftingTab->reset();
+				}
 			});
 		}
 	}

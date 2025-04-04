@@ -21,7 +21,6 @@
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
-#include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
@@ -216,68 +215,6 @@ namespace Game3 {
 		return {x * xScale, y * yScale};
 	}
 
-	const std::shared_ptr<OmniDialog> & Window::getOmniDialog() {
-		if (!omniDialog) {
-			omniDialog = make<OmniDialog>(uiContext, 1);
-		}
-		return omniDialog;
-	}
-
-	const std::shared_ptr<ChatDialog> & Window::getChatDialog() {
-		if (!chatDialog) {
-			chatDialog = make<ChatDialog>(uiContext, 1);
-		}
-		return chatDialog;
-	}
-
-	const std::shared_ptr<TopDialog> & Window::getTopDialog() {
-		if (!topDialog) {
-			topDialog = make<TopDialog>(uiContext, 1);
-		}
-		return topDialog;
-	}
-
-	void Window::showOmniDialog() {
-		if (!uiContext.hasDialog<OmniDialog>()) {
-			uiContext.addDialog(getOmniDialog());
-			uiContext.addDialog(getTopDialog());
-		}
-	}
-
-	void Window::hideOmniDialog() {
-		uiContext.removeDialogs<OmniDialog, TopDialog>();
-	}
-
-	void Window::toggleOmniDialog() {
-		if (uiContext.hasDialog<OmniDialog>()) {
-			hideOmniDialog();
-		} else {
-			showOmniDialog();
-		}
-	}
-
-	void Window::openModule(const Identifier &module_id, const std::any &argument) {
-		assert(game != nullptr);
-
-		auto &registry = game->registry<ModuleFactoryRegistry>();
-
-		if (auto factory = registry[module_id]) {
-			getOmniDialog();
-			omniDialog->inventoryTab->setModule((*factory)(game, argument));
-			omniDialog->activeTab = omniDialog->inventoryTab;
-			showOmniDialog();
-			return;
-		}
-
-		WARN("Couldn't find module {}", module_id);
-	}
-
-	void Window::removeModule() {
-		if (omniDialog) {
-			omniDialog->inventoryTab->removeModule();
-		}
-	}
-
 	void Window::alert(const UString &message, bool do_queue, bool use_markup) {
 		(void) use_markup;
 
@@ -325,15 +262,6 @@ namespace Game3 {
 		return {};
 	}
 
-	void Window::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
-		std::unique_lock<DefaultMutex> module_lock;
-
-		if (Module *module_ = getOmniDialog()->inventoryTab->getModule(module_lock); module_ != nullptr && (module_id.empty() || module_->getID() == module_id)) {
-			std::any data{std::move(buffer)};
-			module_->handleMessage(source, name, data);
-		}
-	}
-
 	void Window::activateContext() {
 		glfwMakeContextCurrent(glfwWindow);
 	}
@@ -352,30 +280,6 @@ namespace Game3 {
 		while (!serializer.done()) {
 			ofs << serializer.read(buffer);
 		}
-	}
-
-	void Window::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
-		assert(inventory);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(uiContext, 1, inventory));
-	}
-
-	void Window::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
-		assert(has_fluids);
-		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(uiContext, 1, has_fluids));
-	}
-
-	GlobalID Window::getExternalGID() const {
-		if (omniDialog) {
-			std::unique_lock<DefaultMutex> lock;
-			if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
-				std::any empty;
-				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty)) {
-					return response->take<GlobalID>();
-				}
-			}
-		}
-
-		return -1;
 	}
 
 	bool Window::inBounds(const Position &pos) const {
@@ -535,7 +439,7 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_E) {
 					if (uiContext.hasDialog<OmniDialog>()) {
-						hideOmniDialog();
+						getUI<GameUI>()->hideOmniDialog();
 					} else {
 						game->interactNextTo(modifiers, Hand::Right);
 					}
@@ -586,7 +490,9 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_ESCAPE) {
-					toggleOmniDialog();
+					if (auto game_ui = getUI<GameUI>()) {
+						game_ui->toggleOmniDialog();
+					}
 					return;
 				}
 
@@ -617,17 +523,21 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_SLASH) {
 					queue([](Window &window) {
-						window.getChatDialog()->toggle(false);
+						if (auto game_ui = window.getUI<GameUI>()) {
+							game_ui->getChatDialog()->toggle(false);
+						}
 					});
 					return;
 				}
 
 				if (key == GLFW_KEY_BACKSLASH) {
 					queue([slash = modifiers.onlyShift()](Window &window) {
-						std::shared_ptr<ChatDialog> chat = window.getChatDialog();
-						chat->focusInput();
-						if (slash) {
-							chat->setSlash();
+						if (auto game_ui = window.getUI<GameUI>()) {
+							std::shared_ptr<ChatDialog> chat = game_ui->getChatDialog();
+							chat->focusInput();
+							if (slash) {
+								chat->setSlash();
+							}
 						}
 					});
 					return;
@@ -774,10 +684,13 @@ namespace Game3 {
 			return;
 		}
 
+		auto game_ui = getUI<GameUI>();
+		assert(game_ui != nullptr);
+
 		// richPresence.setActivityDetails("Idling");
 
 		connected = false;
-		removeModule();
+		game_ui->removeModule();
 		game->stopThread();
 		setGame({});
 		serverWrapper.stop();
@@ -786,7 +699,9 @@ namespace Game3 {
 
 	void Window::goToTitle() {
 		queue([](Window &window) {
-			window.omniDialog.reset();
+			if (auto game_ui = window.getUI<GameUI>()) {
+				game_ui->omniDialog.reset();
+			}
 			window.uiContext.reset();
 			window.uiContext.emplaceDialog<ConnectionDialog>(1);
 			window.setUI<TitleUI>();
@@ -799,7 +714,7 @@ namespace Game3 {
 
 		connected = true;
 		uiContext.reset();
-		uiContext.addDialog(getChatDialog());
+		/// uiContext.addDialog(getChatDialog());
 
 		game->initInteractionSets();
 		settings.apply(*game);
@@ -808,10 +723,12 @@ namespace Game3 {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
 				queue([owner, client_inventory](Window &window) {
-					if (owner->getGID() == window.getExternalGID()) {
-						std::unique_lock<DefaultMutex> lock;
-						if (Module *module_ = window.getOmniDialog()->inventoryTab->getModule(lock)) {
-							module_->setInventory(client_inventory);
+					if (auto game_ui = window.getUI<GameUI>()) {
+						if (owner->getGID() == game_ui->getExternalGID()) {
+							std::unique_lock<DefaultMutex> lock;
+							if (Module *module_ = game_ui->getOmniDialog()->inventoryTab->getModule(lock)) {
+								module_->setInventory(client_inventory);
+							}
 						}
 					}
 				});
@@ -824,55 +741,63 @@ namespace Game3 {
 
 		game->signalFluidUpdate.connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([has_fluids](Window &window) mutable {
-				if (!window.omniDialog) {
-					return;
-				}
+				if (auto game_ui = window.getUI<GameUI>()) {
+					if (!game_ui->omniDialog) {
+						return;
+					}
 
-				std::unique_lock<DefaultMutex> lock;
+					std::unique_lock<DefaultMutex> lock;
 
-				if (Module *module_ = window.omniDialog->inventoryTab->getModule(lock)) {
-					std::any data(std::move(has_fluids));
-					module_->handleMessage({}, "UpdateFluids", data);
+					if (Module *module_ = game_ui->omniDialog->inventoryTab->getModule(lock)) {
+						std::any data(std::move(has_fluids));
+						module_->handleMessage({}, "UpdateFluids", data);
+					}
 				}
 			});
 		});
 
 		game->signalEnergyUpdate.connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([has_energy](Window &window) mutable {
-				if (!window.omniDialog) {
-					return;
-				}
+				if (auto game_ui = window.getUI<GameUI>()) {
+					if (!game_ui->omniDialog) {
+						return;
+					}
 
-				std::unique_lock<DefaultMutex> lock;
+					std::unique_lock<DefaultMutex> lock;
 
-				if (Module *module_ = window.omniDialog->inventoryTab->getModule(lock)) {
-					std::any data(std::move(has_energy));
-					module_->handleMessage({}, "UpdateEnergy", data);
+					if (Module *module_ = game_ui->omniDialog->inventoryTab->getModule(lock)) {
+						std::any data(std::move(has_energy));
+						module_->handleMessage({}, "UpdateEnergy", data);
+					}
 				}
 			});
 		});
 
 		game->signalVillageUpdate.connect([this](const VillagePtr &village) {
 			queue([village](Window &window) mutable {
-				if (!window.omniDialog) {
-					return;
-				}
+				if (auto game_ui = window.getUI<GameUI>()) {
+					if (!game_ui->omniDialog) {
+						return;
+					}
 
-				std::unique_lock<DefaultMutex> lock;
+					std::unique_lock<DefaultMutex> lock;
 
-				if (Module *module_ = window.omniDialog->inventoryTab->getModule(lock)) {
-					std::any data(std::move(village));
-					module_->handleMessage({}, "VillageUpdate", data);
+					if (Module *module_ = game_ui->omniDialog->inventoryTab->getModule(lock)) {
+						std::any data(std::move(village));
+						module_->handleMessage({}, "VillageUpdate", data);
+					}
 				}
 			});
 		});
 
 		game->signalChatReceived.connect([this](const PlayerPtr &player, const UString &message) {
-			auto dialog = getChatDialog();
-			if (player == nullptr) {
-				dialog->addMessage(message);
-			} else {
-				dialog->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
+			if (auto game_ui = getUI<GameUI>()) {
+				auto dialog = game_ui->getChatDialog();
+				if (player == nullptr) {
+					dialog->addMessage(message);
+				} else {
+					dialog->addMessage(std::format("<{}> {}", player->displayName, message.raw()));
+				}
 			}
 		});
 

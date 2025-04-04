@@ -9,6 +9,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/UIContext.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
 
@@ -86,7 +87,9 @@ namespace Game3 {
 				inventoryModule->handleMessage(source, name, data);
 				energyModule->handleMessage(source, name, data);
 				getGame()->getWindow()->queue([](Window &window) {
-					window.removeModule();
+					if (auto game_ui = window.getUI<GameUI>()) {
+						game_ui->removeModule();
+					}
 				});
 			}
 

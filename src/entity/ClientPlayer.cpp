@@ -14,6 +14,7 @@
 #include "packet/TileEntityRequestPacket.h"
 #include "threading/ThreadContext.h"
 #include "tile/Tile.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 #include <cmath>
@@ -340,7 +341,9 @@ namespace Game3 {
 			const auto module_name = buffer->take<Identifier>();
 			const auto message_name = buffer->take<std::string>();
 			GamePtr game = getGame();
-			game->toClient().getWindow()->moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
+			if (auto game_ui = game->toClient().getWindow()->getUI<GameUI>()) {
+				game_ui->moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
+			}
 		}
 	}
 
@@ -368,6 +371,8 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::showText(const UString &text, const UString &) {
-		getGame()->toClient().getWindow()->openModule("base:module/text", std::any(text.raw()));
+		if (auto game_ui = getGame()->toClient().getWindow()->getUI<GameUI>()) {
+			game_ui->openModule("base:module/text", std::any(text.raw()));
+		}
 	}
 }

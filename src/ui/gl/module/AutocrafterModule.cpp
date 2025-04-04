@@ -10,6 +10,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/widget/TextInput.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
 
@@ -48,9 +49,11 @@ namespace Game3 {
 			input.hideDropdown();
 		});
 		std::set<UString> item_names;
-		for (const auto &recipe: game->registry<CraftingRecipeRegistry>())
-			for (const ItemStackPtr &stack: recipe->output)
+		for (const auto &recipe: game->registry<CraftingRecipeRegistry>()) {
+			for (const ItemStackPtr &stack: recipe->output) {
 				item_names.insert(UString(stack->item->identifier.str()));
+			}
+		}
 		identifierInput->setSuggestions(std::vector(std::move_iterator(item_names.begin()), std::move_iterator(item_names.end())));
 		identifierInput->insertAtEnd(vbox);
 
@@ -99,7 +102,9 @@ namespace Game3 {
 				stationInventoryModule->handleMessage(source, name, data);
 				inventoryModule->handleMessage(source, name, data);
 				game->getWindow()->queue([](Window &window) {
-					window.removeModule();
+					if (auto game_ui = window.getUI<GameUI>()) {
+						game_ui->removeModule();
+					}
 				});
 			}
 

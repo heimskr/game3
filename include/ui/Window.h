@@ -36,7 +36,6 @@ namespace Game3 {
 	class ClientInventory;
 	class HasFluids;
 	class LocalClient;
-	class OmniDialog;
 	class TopDialog;
 	class UI;
 	class Window;
@@ -55,9 +54,6 @@ namespace Game3 {
 			float xScale = 1.0;
 			float yScale = 1.0;
 			bool autofocus = true;
-			std::shared_ptr<OmniDialog> omniDialog;
-			std::shared_ptr<ChatDialog> chatDialog;
-			std::shared_ptr<TopDialog> topDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
 			SingleSpriteRenderer singleSpriteRenderer{*this};
@@ -94,16 +90,6 @@ namespace Game3 {
 			template <Numeric T>
 			std::pair<T, T> getMouseCoordinates() const;
 
-			const std::shared_ptr<OmniDialog> & getOmniDialog();
-			const std::shared_ptr<ChatDialog> & getChatDialog();
-			const std::shared_ptr<TopDialog> & getTopDialog();
-			void showOmniDialog();
-			void hideOmniDialog();
-			void toggleOmniDialog();
-
-			void openModule(const Identifier &, const std::any &);
-			void removeModule();
-
 			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay or queue. */
 			void alert(const UString &message, bool do_queue = true, bool use_markup = false);
 
@@ -113,15 +99,9 @@ namespace Game3 {
 			Modifiers getModifiers() const;
 			Position getHoveredPosition() const;
 
-			void moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data);
-
 			void activateContext();
 
 			void saveSettings();
-
-			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
-			void showFluids(const std::shared_ptr<HasFluids> &);
-			GlobalID getExternalGID() const;
 
 			bool inBounds(const Position &) const;
 			RendererContext getRendererContext();
@@ -145,6 +125,11 @@ namespace Game3 {
 			void setUI() {
 				currentUI = std::make_shared<T>(uiContext, 1);
 				initUI();
+			}
+
+			template <typename T>
+			std::shared_ptr<T> getUI() {
+				return std::dynamic_pointer_cast<T>(currentUI);
 			}
 
 		private:

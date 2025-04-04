@@ -22,6 +22,7 @@
 #include "packet/TeleportSelfPacket.h"
 #include "threading/ThreadContext.h"
 #include "ui/gl/Constants.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Util.h"
 
@@ -176,8 +177,10 @@ namespace Game3 {
 
 	void ClientGame::setText(const UString &text) {
 		auto window = getWindow();
-		window->showOmniDialog();
-		window->openModule("base:module/text", std::any(text.raw()));
+		if (auto game_ui = window->getUI<GameUI>()) {
+			game_ui->showOmniDialog();
+			game_ui->openModule("base:module/text", std::any(text.raw()));
+		}
 	}
 
 	void ClientGame::runCommand(const std::string &command) {
@@ -323,7 +326,9 @@ namespace Game3 {
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
-		getWindow()->moduleMessageBuffer(module_id, source, name, std::move(data));
+		if (auto game_ui = getWindow()->getUI<GameUI>()) {
+			game_ui->moduleMessageBuffer(module_id, source, name, std::move(data));
+		}
 	}
 
 	void ClientGame::setPlayer(ClientPlayerPtr new_player) {

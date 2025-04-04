@@ -6,6 +6,7 @@
 #include "ui/gl/tab/Tab.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -37,6 +38,10 @@ namespace Game3 {
 	}
 
 	bool Tab::isActive() const {
-		return ui.window.getOmniDialog()->activeTab.get() == this;
+		if (auto game_ui = ui.window.getUI<GameUI>()) {
+			return game_ui->getOmniDialog()->activeTab.get() == this;
+		}
+
+		return false;
 	}
 }

@@ -7,6 +7,7 @@
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/TextInput.h"
 #include "util/Cast.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -88,7 +89,9 @@ namespace Game3 {
 				ClientGamePtr game = getGame();
 				multiModule->handleMessage(source, name, data);
 				game->getWindow()->queue([](Window &window) {
-					window.removeModule();
+					if (auto game_ui = window.getUI<GameUI>()) {
+						game_ui->removeModule();
+					}
 				});
 			}
 

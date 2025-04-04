@@ -15,6 +15,7 @@
 #include "tileentity/Chest.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Teleporter.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Util.h"
 
@@ -73,7 +74,9 @@ namespace Game3 {
 			// 	tab->removeModule();
 			// 	return true;
 			// });
-			window->showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
+			if (auto game_ui = window->getUI<GameUI>()) {
+				game_ui->showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
+			}
 		}
 		return true;
 	}

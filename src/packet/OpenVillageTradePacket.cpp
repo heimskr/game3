@@ -4,6 +4,7 @@
 #include "game/ClientInventory.h"
 #include "packet/OpenVillageTradePacket.h"
 #include "types/DirectedPlace.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "ui/gl/module/VillageTradeModule.h"
 
@@ -23,18 +24,24 @@ namespace Game3 {
 		if (removeOnMove) {
 			game->getPlayer()->queueForMove([window](const auto &, bool) {
 				window->queue([](Window &window) {
-					window.removeModule();
-					window.hideOmniDialog();
+					if (auto game_ui = window.getUI<GameUI>()) {
+						game_ui->removeModule();
+						game_ui->hideOmniDialog();
+					}
 				});
 				return true;
 			});
 		}
 
-		// Force a fresh module construction instead of an update
-		window->removeModule();
+		if (auto game_ui = window->getUI<GameUI>()) {
+			// Force a fresh module construction instead of an update
+			game_ui->removeModule();
 
-		window->queue([village = std::move(village)](Window &window) {
-			window.openModule(VillageTradeModule::ID(), std::any(village));
-		});
+			window->queue([village = std::move(village)](Window &window) {
+				if (auto game_ui = window.getUI<GameUI>()) {
+					game_ui->openModule(VillageTradeModule::ID(), std::any(village));
+				}
+			});
+		}
 	}
 }

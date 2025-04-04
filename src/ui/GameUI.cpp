@@ -4,6 +4,13 @@
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
+#include "ui/gl/dialog/ChatDialog.h"
+#include "ui/gl/dialog/OmniDialog.h"
+#include "ui/gl/dialog/TopDialog.h"
+#include "ui/gl/module/FluidsModule.h"
+#include "ui/gl/module/InventoryModule.h"
+#include "ui/gl/module/ModuleFactory.h"
+#include "ui/gl/tab/InventoryTab.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Util.h"
@@ -12,9 +19,14 @@ namespace Game3 {
 	void GameUI::init(Window &) {
 		Dialog::init();
 		fbo.init();
+		chatDialog = ui.emplaceDialog<ChatDialog>(selfScale);
 	}
 
-	void GameUI::render(const RendererContext &renderers) {
+	GameUI::~GameUI() {
+		ui.removeDialog(topDialog);
+	}
+
+	void GameUI::render(const RendererContext &) {
 		Window &window = ui.window;
 
 		const float x_factor = window.getXFactor();
@@ -102,5 +114,98 @@ namespace Game3 {
 
 	Rectangle GameUI::getPosition() const {
 		return ui.window.inset(0);
+	}
+
+	const std::shared_ptr<OmniDialog> & GameUI::getOmniDialog() {
+		if (!omniDialog) {
+			omniDialog = make<OmniDialog>(ui, selfScale);
+		}
+		return omniDialog;
+	}
+
+	const std::shared_ptr<ChatDialog> & GameUI::getChatDialog() {
+		return chatDialog;
+	}
+
+	const std::shared_ptr<TopDialog> & GameUI::getTopDialog() {
+		if (!topDialog) {
+			topDialog = make<TopDialog>(ui, selfScale);
+		}
+		return topDialog;
+	}
+
+	void GameUI::showOmniDialog() {
+		if (!ui.hasDialog<OmniDialog>()) {
+			ui.addDialog(getOmniDialog());
+			ui.addDialog(getTopDialog());
+		}
+	}
+
+	void GameUI::hideOmniDialog() {
+		ui.removeDialogs<OmniDialog, TopDialog>();
+	}
+
+	void GameUI::toggleOmniDialog() {
+		if (ui.hasDialog<OmniDialog>()) {
+			hideOmniDialog();
+		} else {
+			showOmniDialog();
+		}
+	}
+
+	void GameUI::openModule(const Identifier &module_id, const std::any &argument) {
+		ClientGamePtr game = ui.window.game;
+		assert(game != nullptr);
+
+		auto &registry = game->registry<ModuleFactoryRegistry>();
+
+		if (auto factory = registry[module_id]) {
+			auto omni = getOmniDialog();
+			omni->inventoryTab->setModule((*factory)(game, argument));
+			omni->activeTab = omni->inventoryTab;
+			showOmniDialog();
+			return;
+		}
+
+		WARN("Couldn't find module {}", module_id);
+	}
+
+	void GameUI::removeModule() {
+		if (omniDialog) {
+			omniDialog->inventoryTab->removeModule();
+		}
+	}
+
+	void GameUI::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&buffer) {
+		std::unique_lock<DefaultMutex> module_lock;
+
+		if (Module *module_ = getOmniDialog()->inventoryTab->getModule(module_lock); module_ != nullptr && (module_id.empty() || module_->getID() == module_id)) {
+			std::any data{std::move(buffer)};
+			module_->handleMessage(source, name, data);
+		}
+	}
+
+	void GameUI::showExternalInventory(const std::shared_ptr<ClientInventory> &inventory) {
+		assert(inventory);
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<InventoryModule>(ui, 1, inventory));
+	}
+
+	void GameUI::showFluids(const std::shared_ptr<HasFluids> &has_fluids) {
+		assert(has_fluids);
+		getOmniDialog()->inventoryTab->setModule(std::make_shared<FluidsModule>(ui, 1, has_fluids));
+	}
+
+	GlobalID GameUI::getExternalGID() const {
+		if (omniDialog) {
+			std::unique_lock<DefaultMutex> lock;
+			if (Module *module_ = omniDialog->inventoryTab->getModule(lock)) {
+				std::any empty;
+				if (std::optional<Buffer> response = module_->handleMessage({}, "GetAgentGID", empty)) {
+					return response->take<GlobalID>();
+				}
+			}
+		}
+
+		return -1;
 	}
 }

@@ -11,6 +11,7 @@
 #include "ui/gl/widget/Button.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/Constants.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -47,8 +48,9 @@ namespace Game3 {
 		mutateButton->setFixedHeight(10 * selfScale);
 		mutateButton->setVerticalAlignment(Alignment::Center);
 		mutateButton->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
+			if (button != LEFT_BUTTON) {
 				return false;
+			}
 			mutate();
 			return true;
 		});
@@ -103,7 +105,9 @@ namespace Game3 {
 
 			if (source && source->getGID() == mutator->getGID()) {
 				getGame()->getWindow()->queue([](Window &window) {
-					window.removeModule();
+					if (auto game_ui = window.getUI<GameUI>()) {
+						game_ui->removeModule();
+					}
 				});
 			}
 
