@@ -8,6 +8,7 @@
 namespace {
 	constexpr float SCROLL_SPEED = 64;
 	constexpr bool ALLOW_VERTICAL_OVERSCROLL = false;
+	constexpr bool ALLOW_HORIZONTAL_OVERSCROLL = false;
 	constexpr Game3::Color DEFAULT_SCROLLBAR_COLOR{"#49120080"};
 }
 
@@ -21,13 +22,13 @@ namespace Game3 {
 	void Scroller::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		float dummy{};
 
+		if (firstChild && static_cast<int>(width) != lastRectangle.width) {
+			firstChild->measure(renderers, Orientation::Horizontal, width, height, dummy, lastChildWidth.emplace(-1));
+		}
+
 		if (firstChild && static_cast<int>(height) != lastRectangle.height) {
 			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight.emplace(-1));
 		}
-
-		// if (firstChild && static_cast<int>(width) != lastRectangle.width) {
-		// 	firstChild->measure(renderers, Orientation::Horizontal, width, height, dummy, dummy);
-		// }
 
 		maybeRemeasure(renderers, width, height);
 
@@ -39,11 +40,23 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
+		if (!lastChildWidth) {
+			firstChild->measure(renderers, Orientation::Horizontal, width, height, dummy, lastChildWidth.emplace(-1));
+		}
+
 		if (!lastChildHeight) {
 			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight.emplace(-1));
 		}
 
 		firstChild->render(renderers, xOffset, yOffset, width, *lastChildHeight);
+
+		if (lastChildWidth > 0) {
+			updateHorizontalRectangle();
+			const float horizontal_fraction = width / (ALLOW_HORIZONTAL_OVERSCROLL? width + lastChildWidth.value() : lastChildWidth.value());
+			if (horizontal_fraction < 1) {
+				renderers.rectangle.drawOnScreen(scrollbarColor, *lastHorizontalScrollbarRectangle - saver.rectangle);
+			}
+		}
 
 		if (lastChildHeight > 0) {
 			updateVerticalRectangle();
@@ -55,7 +68,7 @@ namespace Game3 {
 	}
 
 	bool Scroller::click(int button, int x, int y, Modifiers modifiers) {
-		if (lastVerticalScrollMouse || lastHorizontalScrollMouse) {
+		if (lastHorizontalScrollMouse || lastVerticalScrollMouse) {
 			return false;
 		}
 
@@ -64,23 +77,47 @@ namespace Game3 {
 
 	bool Scroller::dragStart(int x, int y) {
 		const auto [last_x, last_y, width, height] = lastRectangle;
+		const float bar_thickness = getBarThickness() * ui.scale;
+		bool updated = false;
+
+		if (lastHorizontalScrollbarRectangle) {
+			if (lastHorizontalScrollbarRectangle->contains(x, y)) {
+				// Grab bar
+				lastHorizontalScrollMouse = x - last_x;
+				ui.addDragUpdater(shared_from_this());
+				updated = true;
+			} else if (Rectangle(last_x, last_y + height - bar_thickness, width, bar_thickness).contains(x, y)) {
+				// Jump to clicked position
+				const float new_horizontal_offset = x - last_x - lastHorizontalScrollbarRectangle->width / 2;
+				xOffset = fixYOffset(recalculateYOffset(new_horizontal_offset));
+				lastHorizontalScrollMouse = x - last_x;
+				updateHorizontalRectangle();
+				ui.addDragUpdater(shared_from_this());
+				updated = true;
+			}
+
+			if (updated) {
+				return true;
+			}
+		}
 
 		if (lastVerticalScrollbarRectangle) {
 			if (lastVerticalScrollbarRectangle->contains(x, y)) {
 				// Grab bar
 				lastVerticalScrollMouse = y - last_y;
 				ui.addDragUpdater(shared_from_this());
-				return true;
-			}
-
-			const float bar_thickness = getBarThickness();
-			if (Rectangle(last_x + width - bar_thickness, last_y, bar_thickness, height).contains(x, y)) {
+				updated = true;
+			} else if (Rectangle(last_x + width - bar_thickness, last_y, bar_thickness, height).contains(x, y)) {
 				// Jump to clicked position
 				const float new_vertical_offset = y - last_y - lastVerticalScrollbarRectangle->height / 2;
 				yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
 				lastVerticalScrollMouse = y - last_y;
 				updateVerticalRectangle();
 				ui.addDragUpdater(shared_from_this());
+				updated = true;
+			}
+
+			if (updated) {
 				return true;
 			}
 		}
@@ -89,6 +126,7 @@ namespace Game3 {
 			return true;
 		}
 
+		lastHorizontalScrollMouse = x - last_x;
 		lastVerticalScrollMouse = y - last_y;
 		ui.addDragUpdater(shared_from_this());
 		reverseScroll = true;
@@ -96,6 +134,24 @@ namespace Game3 {
 	}
 
 	bool Scroller::dragUpdate(int x, int y) {
+		if (lastHorizontalScrollMouse) {
+			maybeRemeasureChildWidth();
+
+			if (ALLOW_HORIZONTAL_OVERSCROLL || lastChildWidth > lastRectangle.width) {
+				const auto start_x = *lastHorizontalScrollMouse;
+				const float last_x = lastRectangle.x;
+				const float new_horizontal_offset = getHorizontalOffset() + (x - last_x - start_x) * (reverseScroll? -0.5 : 1.0);
+				xOffset = fixXOffset(recalculateXOffset(new_horizontal_offset));
+				lastHorizontalScrollMouse = x - last_x;
+			} else {
+				xOffset = 0;
+				lastHorizontalScrollMouse = 0;
+			}
+
+			updateVerticalRectangle();
+			return true;
+		}
+
 		if (lastVerticalScrollMouse) {
 			maybeRemeasureChildHeight();
 
@@ -109,6 +165,7 @@ namespace Game3 {
 				yOffset = 0;
 				lastVerticalScrollMouse = 0;
 			}
+
 			updateVerticalRectangle();
 			return true;
 		}
@@ -119,13 +176,13 @@ namespace Game3 {
 	bool Scroller::dragEnd(int x, int y) {
 		reverseScroll = false;
 
-		if (lastVerticalScrollMouse) {
-			lastVerticalScrollMouse.reset();
+		if (lastHorizontalScrollMouse) {
+			lastHorizontalScrollMouse.reset();
 			return true;
 		}
 
-		if (lastHorizontalScrollMouse) {
-			lastHorizontalScrollMouse.reset();
+		if (lastVerticalScrollMouse) {
+			lastVerticalScrollMouse.reset();
 			return true;
 		}
 
@@ -133,8 +190,16 @@ namespace Game3 {
 	}
 
 	bool Scroller::scroll(float x_delta, float y_delta, int, int, Modifiers) {
-		xOffset += (getNatural()? -x_delta : x_delta) * SCROLL_SPEED;
-		xOffset = std::min(0.f, xOffset);
+		maybeRemeasureChildWidth();
+
+		if (ALLOW_HORIZONTAL_OVERSCROLL || lastChildWidth > lastRectangle.width) {
+			xOffset += (getNatural()? -x_delta : x_delta) * SCROLL_SPEED;
+			xOffset = fixXOffset(xOffset);
+		} else {
+			xOffset = 0;
+		}
+
+		updateHorizontalRectangle();
 
 		maybeRemeasureChildHeight();
 
@@ -146,7 +211,6 @@ namespace Game3 {
 		}
 
 		updateVerticalRectangle();
-		// static_assert(ALLOW_VERTICAL_OVERSCROLL); // TODO
 		return true;
 	}
 
@@ -172,6 +236,7 @@ namespace Game3 {
 	void Scroller::clearChildren() {
 		xOffset = 0;
 		yOffset = 0;
+		lastChildWidth.reset();
 		lastChildHeight.reset();
 		lastVerticalScrollMouse.reset();
 		lastHorizontalScrollMouse.reset();
@@ -185,11 +250,13 @@ namespace Game3 {
 			return false;
 		}
 
+		lastChildWidth.reset();
 		lastChildHeight.reset();
 		return true;
 	}
 
-	void Scroller::childResized(const WidgetPtr &, int, int new_height) {
+	void Scroller::childResized(const WidgetPtr &, int new_width, int new_height) {
+		lastChildWidth = new_width;
 		lastChildHeight = new_height;
 	}
 
@@ -206,6 +273,7 @@ namespace Game3 {
 
 		xOffset = 0;
 		yOffset = 0;
+		lastChildWidth.reset();
 		lastChildHeight.reset();
 	}
 
@@ -217,6 +285,13 @@ namespace Game3 {
 		return 2 * selfScale;
 	}
 
+	float Scroller::getHorizontalOffset() const {
+		const float width = lastRectangle.width;
+		const float horizontal_fraction = replaceNaN(width / (ALLOW_HORIZONTAL_OVERSCROLL? width + lastChildWidth.value() : lastChildWidth.value()), 0);
+		const float horizontal_width = horizontal_fraction * width;
+		return replaceNaN(xOffset / lastChildWidth.value() * ((ALLOW_HORIZONTAL_OVERSCROLL? horizontal_width : 0) - width), 0);
+	}
+
 	float Scroller::getVerticalOffset() const {
 		const float height = lastRectangle.height;
 		const float vertical_fraction = replaceNaN(height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight.value() : lastChildHeight.value()), 0);
@@ -224,9 +299,11 @@ namespace Game3 {
 		return replaceNaN(yOffset / lastChildHeight.value() * ((ALLOW_VERTICAL_OVERSCROLL? vertical_height : 0) - height), 0);
 	}
 
-	float Scroller::getHorizontalOffset() const {
-		assert(false);
-		return -1;
+	float Scroller::recalculateXOffset(float horizontal_offset) const {
+		const float width = lastRectangle.width;
+		const float horizontal_fraction = replaceNaN(width / (ALLOW_HORIZONTAL_OVERSCROLL? width + lastChildWidth.value() : lastChildWidth.value()), 0);
+		const float horizontal_width = horizontal_fraction * width;
+		return replaceNaN(horizontal_offset * lastChildWidth.value() / ((ALLOW_HORIZONTAL_OVERSCROLL? horizontal_width : 0) - width), 0);
 	}
 
 	float Scroller::recalculateYOffset(float vertical_offset) const {
@@ -236,9 +313,18 @@ namespace Game3 {
 		return replaceNaN(vertical_offset * lastChildHeight.value() / ((ALLOW_VERTICAL_OVERSCROLL? vertical_height : 0) - height), 0);
 	}
 
-	float Scroller::recalculateXOffset(float) const {
-		assert(false);
-		return -1;
+	float Scroller::fixXOffset(float x_offset) const {
+		x_offset = std::min(0.f, x_offset);
+		if constexpr (ALLOW_HORIZONTAL_OVERSCROLL) {
+			if (lastChildWidth.value() > 0) {
+				x_offset = std::max(x_offset, -lastChildWidth.value());
+			}
+		} else {
+			if (lastChildWidth.value() - lastRectangle.width > 0) {
+				x_offset = std::max(x_offset, lastRectangle.width - lastChildWidth.value());
+			}
+		}
+		return x_offset;
 	}
 
 	float Scroller::fixYOffset(float y_offset) const {
@@ -255,12 +341,28 @@ namespace Game3 {
 		return y_offset;
 	}
 
+	void Scroller::updateHorizontalRectangle() {
+		const auto [x, y, width, height] = lastRectangle;
+		const float horizontal_width = replaceNaN(width * width / (ALLOW_VERTICAL_OVERSCROLL? width + lastChildWidth.value() : lastChildWidth.value()), 0);
+		if (!std::isinf(horizontal_width)) {
+			const float bar_thickness = getBarThickness() * ui.scale;
+			lastHorizontalScrollbarRectangle.emplace(x + getHorizontalOffset(), y + height - bar_thickness, horizontal_width, bar_thickness);
+		}
+	}
+
 	void Scroller::updateVerticalRectangle() {
 		const auto [x, y, width, height] = lastRectangle;
 		const float vertical_height = replaceNaN(height * height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight.value() : lastChildHeight.value()), 0);
 		if (!std::isinf(vertical_height)) {
 			const float bar_thickness = getBarThickness() * ui.scale;
 			lastVerticalScrollbarRectangle.emplace(x + width - bar_thickness, y + getVerticalOffset(), bar_thickness, vertical_height);
+		}
+	}
+
+	void Scroller::maybeRemeasureChildWidth() {
+		if (!ALLOW_HORIZONTAL_OVERSCROLL && firstChild != nullptr && lastChildWidth.value() <= 0) {
+			float dummy{};
+			firstChild->measure(ui.getRenderers(), Orientation::Horizontal, lastRectangle.width, lastRectangle.height, dummy, lastChildWidth.value());
 		}
 	}
 

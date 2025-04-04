@@ -31,6 +31,7 @@ namespace Game3 {
 
 		private:
 			Color scrollbarColor;
+			std::optional<float> lastChildWidth;
 			std::optional<float> lastChildHeight;
 			float xOffset = 0;
 			float yOffset = 0;
@@ -46,8 +47,11 @@ namespace Game3 {
 			float getHorizontalOffset() const;
 			float recalculateYOffset(float vertical_offset) const;
 			float recalculateXOffset(float horizontal_offset) const;
+			float fixXOffset(float) const;
 			float fixYOffset(float) const;
+			void updateHorizontalRectangle();
 			void updateVerticalRectangle();
+			void maybeRemeasureChildWidth();
 			void maybeRemeasureChildHeight();
 
 		friend class ChatDialog;
