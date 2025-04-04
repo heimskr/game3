@@ -22,7 +22,7 @@ namespace Game3 {
 		float dummy{};
 
 		if (firstChild && static_cast<int>(height) != lastRectangle.height) {
-			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight.emplace());
+			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight.emplace(-1));
 		}
 
 		// if (firstChild && static_cast<int>(width) != lastRectangle.width) {
@@ -40,7 +40,7 @@ namespace Game3 {
 		auto saver = ui.scissorStack.pushRelative(Rectangle(x, y, width, height), renderers);
 
 		if (!lastChildHeight) {
-			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight.emplace());
+			firstChild->measure(renderers, Orientation::Vertical, width, height, dummy, lastChildHeight.emplace(-1));
 		}
 
 		firstChild->render(renderers, xOffset, yOffset, width, *lastChildHeight);
@@ -187,6 +187,10 @@ namespace Game3 {
 
 		lastChildHeight.reset();
 		return true;
+	}
+
+	void Scroller::childResized(const WidgetPtr &, int, int new_height) {
+		lastChildHeight = new_height;
 	}
 
 	void Scroller::setChild(WidgetPtr new_child) {

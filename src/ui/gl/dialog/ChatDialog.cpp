@@ -29,7 +29,6 @@ namespace Game3 {
 		scroller = std::make_shared<Scroller>(ui, selfScale, CHAT_SCROLLBAR_COLOR);
 		messageBox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 		toggler = std::make_shared<Label>(ui, selfScale, "<<", CHAT_FOCUSED_TEXT_COLOR);
-
 		vbox = std::make_shared<Box>(ui, selfScale, Orientation::Vertical, 0, 0.5, CHAT_SEPARATOR_COLOR);
 
 		toggler->setOnClick([this](Widget &, int button, int, int) {
@@ -106,7 +105,7 @@ namespace Game3 {
 	}
 
 	Rectangle ChatDialog::getPosition() const {
-		if (const std::optional<float> &last_y = ui.getHotbar()->getLastY()) {
+		if (std::optional<float> last_y = ui.getHotbar()->getLastY()) {
 			constexpr int height = 400;
 			const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
 			Rectangle out(0, *last_y - height - 64, isHidden? toggler_size : ui.getWidth() / 2, height);
@@ -117,7 +116,7 @@ namespace Game3 {
 			return out;
 		}
 
-		return Rectangle(0, 0, -1, -1);
+		return {0, 0, -1, -1};
 	}
 
 	bool ChatDialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
@@ -157,8 +156,6 @@ namespace Game3 {
 		assert(messageBox != nullptr);
 		auto label = std::make_shared<Label>(ui, selfScale, std::move(message), getTextColor());
 		messageBox->append(std::move(label));
-		// TODO: this is a temporary hack to fix the scrollbar. It's not otherwise informed that its child's height changed.
-		scroller->lastChildHeight = -1;
 		messageBox->maybeRemeasure(ui.getRenderers(), -1, -1);
 	}
 

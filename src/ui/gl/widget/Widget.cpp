@@ -158,6 +158,8 @@ namespace Game3 {
 		return lastRectangle.contains(x, y);
 	}
 
+	void Widget::childResized(const WidgetPtr &, int, int) {}
+
 	WidgetPtr Widget::getParent() const {
 		return weakParent.lock();
 	}
@@ -365,6 +367,25 @@ namespace Game3 {
 
 	bool Widget::shouldCull() const {
 		return !ui.scissorStack.getTop().rectangle.intersection(lastRectangle);
+	}
+
+	void Widget::setLastWidth(int new_width) {
+		if (lastRectangle.width != new_width) {
+			lastRectangle.width = new_width;
+			if (WidgetPtr parent = getParent()) {
+				parent->childResized(shared_from_this(), new_width, lastRectangle.height);
+			}
+		}
+	}
+
+	void Widget::setLastHeight(int new_height) {
+		if (lastRectangle.height != new_height) {
+			lastRectangle.height = new_height;
+			if (WidgetPtr parent = getParent()) {
+				parent->childResized(shared_from_this(), lastRectangle.width, new_height);
+			}
+		}
+
 	}
 
 	bool Widget::findAttributeUp(const std::string &attribute, int depth_limit) const {

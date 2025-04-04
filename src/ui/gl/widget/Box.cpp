@@ -217,6 +217,12 @@ namespace Game3 {
 				natural = std::max(natural, measure_orientation == Orientation::Vertical? for_height : for_width);
 			}
 		}
+
+		if (measure_orientation == Orientation::Horizontal) {
+			setLastWidth(natural);
+		} else {
+			setLastHeight(natural);
+		}
 	}
 
 	bool Box::onChildrenUpdated() {
