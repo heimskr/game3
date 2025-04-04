@@ -150,17 +150,22 @@ namespace Game3 {
 			.align = TextAlign::Center,
 		});
 
-		if (InventoryPtr inventory = getInventory(0)) {
-			if (ItemStackPtr active = inventory->getActive()) {
-				auto window = getGame()->toClient().getWindow();
-				active->renderEffects(*window, renderers, window->getHoveredPosition(), window->getModifiers());
+		ClientGamePtr client_game = getGame()->toClientPointer();
+
+		if (client_game->getPlayer().get() == this) {
+			if (InventoryPtr inventory = getInventory(0)) {
+				if (ItemStackPtr active = inventory->getActive()) {
+					auto window = client_game->getWindow();
+					active->renderEffects(*window, renderers, window->getHoveredPosition(), window->getModifiers());
+				}
 			}
 		}
 	}
 
 	void ClientPlayer::renderLighting(const RendererContext &renderers) {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
