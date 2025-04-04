@@ -1,12 +1,15 @@
 #pragma once
 
+#include "ui/gl/dialog/Dialog.h"
+
 namespace Game3 {
 	class Window;
 
-	class UI {
+	class UI: public Dialog {
 		public:
-			virtual ~UI() = default;
+			using Dialog::Dialog;
 
-			virtual void render(Window &) = 0;
+			using Dialog::init;
+			virtual void init(Window &) = 0;
 	};
 }

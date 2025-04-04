@@ -20,8 +20,10 @@ namespace Game3 {
 			GL::FBO fbo;
 			Rectangle realmBounds;
 
-			GameUI();
+			using UI::UI;
 
-			void render(Window &) final;
+			void init(Window &) final;
+			void render(const RendererContext &) final;
+			Rectangle getPosition() const final;
 	};
 }

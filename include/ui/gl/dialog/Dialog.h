@@ -24,11 +24,10 @@ namespace Game3 {
 	using WeakDialogPtr = std::weak_ptr<Dialog>;
 
 	class Dialog: public Widget {
-		protected:
-			Dialog(UIContext &, float selfScale);
-
 		public:
 			sigc::signal<void()> signalClose;
+
+			Dialog(UIContext &, float selfScale);
 
 			virtual ~Dialog() = default;
 

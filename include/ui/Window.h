@@ -37,7 +37,6 @@ namespace Game3 {
 	class HasFluids;
 	class LocalClient;
 	class OmniDialog;
-	class TitleDialog;
 	class TopDialog;
 	class UI;
 	class Window;
@@ -59,7 +58,6 @@ namespace Game3 {
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
 			std::shared_ptr<TopDialog> topDialog;
-			std::shared_ptr<TitleDialog> titleDialog;
 			UIContext uiContext{*this};
 			BatchSpriteRenderer  batchSpriteRenderer{*this};
 			SingleSpriteRenderer singleSpriteRenderer{*this};
@@ -75,7 +73,7 @@ namespace Game3 {
 			Overlayer overlayer;
 			std::set<int> heldKeys;
 			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
-			std::unique_ptr<UI> currentUI;
+			std::shared_ptr<UI> currentUI;
 
 			Window(GLFWwindow &);
 
@@ -99,7 +97,6 @@ namespace Game3 {
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();
 			const std::shared_ptr<TopDialog> & getTopDialog();
-			const std::shared_ptr<TitleDialog> & getTitleDialog();
 			void showOmniDialog();
 			void hideOmniDialog();
 			void toggleOmniDialog();
@@ -146,7 +143,8 @@ namespace Game3 {
 
 			template <typename T>
 			void setUI() {
-				currentUI = std::make_unique<T>();
+				currentUI = std::make_shared<T>(uiContext, 1);
+				initUI();
 			}
 
 		private:
@@ -183,6 +181,7 @@ namespace Game3 {
 			void continueLocalConnection();
 			void handleKeys();
 			void renderFPSCounter();
+			void initUI();
 	};
 
 	using WindowPtr = std::shared_ptr<Window>;

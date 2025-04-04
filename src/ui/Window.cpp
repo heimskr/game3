@@ -21,7 +21,6 @@
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
-#include "ui/gl/dialog/TitleDialog.h"
 #include "ui/gl/dialog/TopDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
@@ -238,13 +237,6 @@ namespace Game3 {
 		return topDialog;
 	}
 
-	const std::shared_ptr<TitleDialog> & Window::getTitleDialog() {
-		if (!titleDialog) {
-			titleDialog = make<TitleDialog>(uiContext, 1);
-		}
-		return titleDialog;
-	}
-
 	void Window::showOmniDialog() {
 		if (!uiContext.hasDialog<OmniDialog>()) {
 			uiContext.addDialog(getOmniDialog());
@@ -441,7 +433,7 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		currentUI->render(*this);
+		currentUI->render(getRendererContext());
 
 		uiContext.render(getMouseX(), getMouseY());
 
@@ -794,11 +786,10 @@ namespace Game3 {
 
 	void Window::goToTitle() {
 		queue([](Window &window) {
-			window.setUI<TitleUI>();
 			window.omniDialog.reset();
 			window.uiContext.reset();
 			window.uiContext.emplaceDialog<ConnectionDialog>(1);
-			window.uiContext.addDialog(window.getTitleDialog());
+			window.setUI<TitleUI>();
 		});
 	}
 
@@ -1144,10 +1135,6 @@ namespace Game3 {
 	}
 
 	void Window::setGame(std::shared_ptr<ClientGame> new_game) {
-		if (game && !new_game) {
-			uiContext.removeDialog(getTitleDialog());
-		}
-
 		game = std::move(new_game);
 	}
 
@@ -1186,5 +1173,9 @@ namespace Game3 {
 			.shadow = Color{"#000000"},
 			.shadowOffset{6, 6},
 		});
+	}
+
+	void Window::initUI() {
+		currentUI->init(*this);
 	}
 }

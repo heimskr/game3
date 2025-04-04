@@ -1,10 +1,39 @@
 #include "graphics/Texture.h"
+#include "ui/gl/widget/Aligner.h"
+#include "ui/gl/widget/Box.h"
+#include "ui/gl/widget/IconButton.h"
 #include "ui/TitleUI.h"
 #include "ui/Window.h"
 #include "util/Util.h"
 
 namespace Game3 {
-	void TitleUI::render(Window &window) {
+	void TitleUI::init(Window &window) {
+		Dialog::init();
+		UIContext &ui = window.uiContext;
+		aligner = make<Aligner>(ui, Orientation::Horizontal, Alignment::End);
+
+		hbox = make<Box>(ui, 1, Orientation::Horizontal);
+
+		updateButton = make<IconButton>(ui, 1);
+		updateButton->setIconTexture(cacheTexture("resources/gui/up.png"));
+		updateButton->setTooltipText("Download update");
+		updateButton->setOnClick([this, &window](Widget &widget) {
+			try {
+				updater.update();
+				window.alert("Updated successfully.");
+			} catch (const std::exception &error) {
+				window.error(std::format("Failed to update:\n{}", error.what()));
+			}
+		});
+
+		updateButton->insertAtEnd(hbox);
+		hbox->insertAtEnd(aligner);
+		aligner->insertAtEnd(shared_from_this());
+	}
+
+	void TitleUI::render(const RendererContext &renderers) {
+		Window &window = ui.window;
+
 		static float hue = 0;
 		static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
 		static bool has_been_nonzero = false;
@@ -52,5 +81,11 @@ namespace Game3 {
 
 			hsv.hue += 0.5 / i_max;
 		}
+	}
+
+	Rectangle TitleUI::getPosition() const {
+		Rectangle position = ui.window.inset(10);
+		position.height = getScale() * 32;
+		return position;
 	}
 }

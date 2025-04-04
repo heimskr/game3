@@ -9,11 +9,14 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	GameUI::GameUI() {
+	void GameUI::init(Window &) {
+		Dialog::init();
 		fbo.init();
 	}
 
-	void GameUI::render(Window &window) {
+	void GameUI::render(const RendererContext &renderers) {
+		Window &window = ui.window;
+
 		const float x_factor = window.getXFactor();
 		const float y_factor = window.getYFactor();
 		auto [width, height] = window.getDimensions();
@@ -95,5 +98,9 @@ namespace Game3 {
 			realm->getRenderer()->render(window.getRendererContext(), realm, window, *this);
 			realmBounds = game->getVisibleRealmBounds();
 		}
+	}
+
+	Rectangle GameUI::getPosition() const {
+		return ui.window.inset(0);
 	}
 }
