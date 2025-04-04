@@ -259,7 +259,7 @@ namespace Game3 {
 		const auto [x, y, width, height] = lastRectangle;
 		const float vertical_height = replaceNaN(height * height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight.value() : lastChildHeight.value()), 0);
 		if (!std::isinf(vertical_height)) {
-			const float bar_thickness = getBarThickness();
+			const float bar_thickness = getBarThickness() * ui.scale;
 			lastVerticalScrollbarRectangle.emplace(x + width - bar_thickness, y + getVerticalOffset(), bar_thickness, vertical_height);
 		}
 	}
