@@ -17,6 +17,7 @@
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
 #include "ui/gl/Constants.h"
+#include "ui/UI.h"
 #include "ui/Window.h"
 #include "util/Crypto.h"
 #include "util/Defer.h"

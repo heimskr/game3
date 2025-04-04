@@ -1,0 +1,56 @@
+#include "graphics/Texture.h"
+#include "ui/TitleUI.h"
+#include "ui/Window.h"
+#include "util/Util.h"
+
+namespace Game3 {
+	void TitleUI::render(Window &window) {
+		static float hue = 0;
+		static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
+		static bool has_been_nonzero = false;
+
+		const auto [mouse_x, mouse_y] = window.getMouseCoordinates<double>();
+
+		if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
+			window.singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
+				.x = mouse_x,
+				.y = mouse_y,
+				.scaleX = 16,
+				.scaleY = 16,
+				.invertY = false,
+			});
+		}
+
+		if (!has_been_nonzero && (mouse_x != 0 || mouse_y != 0)) {
+			has_been_nonzero = true;
+		}
+
+		auto now = getTime();
+
+		if (window.lastRenderTime) {
+			hue += std::chrono::duration_cast<std::chrono::nanoseconds>(now - *window.lastRenderTime).count() / 1e9 * 144 * 0.001;
+		}
+
+		window.lastRenderTime = now;
+
+		OKHsv hsv{hue, 1, 1, 1};
+		constexpr int i_max = 32;
+		constexpr double offset_factor = 2.05;
+		constexpr double x_offset = offset_factor * i_max;
+
+		for (int i = 0; i < i_max; ++i) {
+			const double offset = offset_factor * (i_max - i);
+			window.textRenderer.drawOnScreen("game3", TextRenderOptions{
+				.x = window.getWidth() / 2.0 + (offset - x_offset) / 2,
+				.y = 64.0 + offset / 2,
+				.scaleX = 2.5,
+				.scaleY = 2.5,
+				.color = hsv.convert<Color>(),
+				.align = TextAlign::Center,
+				.alignTop = true,
+			});
+
+			hsv.hue += 0.5 / i_max;
+		}
+	}
+}

@@ -22,6 +22,7 @@
 #include "realm/RealmFactory.h"
 #include "threading/ThreadContext.h"
 #include "tile/Tile.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
 #include "util/Timer.h"
@@ -211,7 +212,7 @@ namespace Game3 {
 		const ChunkPosition current_chunk = player->getChunk();
 		if (staticLightingQueued.exchange(false) || lastPlayerChunk != current_chunk) {
 			lastPlayerChunk = current_chunk;
-			remakeStaticLightingTexture();
+			remakeStaticLightingTexture(dynamic_cast<GameUI &>(*game.getWindow()->currentUI));
 			return true;
 		}
 
@@ -1766,7 +1767,7 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::remakeStaticLightingTexture() {
+	void Realm::remakeStaticLightingTexture(GameUI &ui) {
 		assert(isClient());
 		ClientGame &game = getGame()->toClient();
 		PlayerPtr player = game.getPlayer();
@@ -1775,9 +1776,8 @@ namespace Game3 {
 			return;
 
 		Timer timer("RemakeStaticLightingTexture");
-		auto window = game.getWindow();
-		GL::Texture &texture = window->staticLightingTexture;
-		GL::FBOBinder binder = window->fbo.getBinder();
+		GL::Texture &texture = ui.staticLightingTexture;
+		GL::FBOBinder binder = ui.fbo.getBinder();
 		GL::TextureFBOBinder texture_binder = texture.getBinder();
 		GL::clear(0, 0, 0, 0);
 		const ChunkPosition chunk = player->getChunk();
@@ -1787,7 +1787,7 @@ namespace Game3 {
 
 		Tileset &tileset = getTileset();
 		RealmPtr shared = shared_from_this();
-		RendererContext context = window->getRendererContext();
+		RendererContext context = game.getWindow()->getRendererContext();
 		auto saver = context.getSaver();
 		context.updateSize(texture.getWidth(), texture.getHeight());
 		GL::Viewport viewport(0, 0, texture.getWidth(), texture.getHeight());

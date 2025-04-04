@@ -3,6 +3,7 @@
 #include <memory>
 
 namespace Game3 {
+	class GameUI;
 	class Realm;
 	class Window;
 	struct RendererContext;
@@ -10,6 +11,6 @@ namespace Game3 {
 	struct RealmRenderer {
 		RealmRenderer() = default;
 		virtual ~RealmRenderer() = default;
-		virtual void render(const RendererContext &, const std::shared_ptr<Realm> &, Window &);
+		virtual void render(const RendererContext &, const std::shared_ptr<Realm> &, Window &, GameUI &);
 	};
 }

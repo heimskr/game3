@@ -6,6 +6,7 @@
 #include "packet/LoginStatusPacket.h"
 #include "packet/PacketError.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -60,5 +61,8 @@ namespace Game3 {
 		realm->add(player, player->getPosition());
 		realm->addPlayer(player);
 		player->getInventory(0)->notifyOwner({});
+		window->queue([](Window &window) {
+			window.setUI<GameUI>();
+		});
 	}
 }

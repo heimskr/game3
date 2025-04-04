@@ -39,6 +39,7 @@ namespace Game3 {
 	class OmniDialog;
 	class TitleDialog;
 	class TopDialog;
+	class UI;
 	class Window;
 	struct Modifiers;
 	struct Position;
@@ -54,6 +55,7 @@ namespace Game3 {
 			float magic = 8;
 			float xScale = 1.0;
 			float yScale = 1.0;
+			bool autofocus = true;
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
 			std::shared_ptr<TopDialog> topDialog;
@@ -71,18 +73,9 @@ namespace Game3 {
 			Reshader blurShader;
 			Multiplier multiplier;
 			Overlayer overlayer;
-			PathmapTextureCache pathmapTextureCache;
-			GL::Texture mainGLTexture;
-			GL::Texture staticLightingTexture;
-			GL::Texture dynamicLightingTexture;
-			GL::Texture scratchGLTexture;
-			GL::Texture causticsGLTexture;
-			TexturePtr mainTexture;
-			TexturePtr scratchTexture;
-			GL::FBO fbo;
-			Rectangle realmBounds;
-			bool autofocus = true;
 			std::set<int> heldKeys;
+			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
+			std::unique_ptr<UI> currentUI;
 
 			Window(GLFWwindow &);
 
@@ -151,6 +144,11 @@ namespace Game3 {
 
 			void setGame(std::shared_ptr<ClientGame>);
 
+			template <typename T>
+			void setUI() {
+				currentUI = std::make_unique<T>();
+			}
+
 		private:
 			struct KeyInfo {
 				int code;
@@ -166,7 +164,6 @@ namespace Game3 {
 			Modifiers lastModifiers;
 			std::optional<std::pair<int, int>> clickPosition;
 			std::optional<int> heldMouseButton;
-			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
 			std::deque<double> fpses;
 			double runningSum = 0;
 			double runningFPS = 0;
@@ -185,8 +182,6 @@ namespace Game3 {
 			void autoConnect();
 			void continueLocalConnection();
 			void handleKeys();
-			void renderGame();
-			void renderTitle();
 			void renderFPSCounter();
 	};
 

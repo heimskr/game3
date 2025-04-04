@@ -4,19 +4,20 @@
 #include "graphics/RealmRenderer.h"
 #include "graphics/RendererContext.h"
 #include "realm/Realm.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 namespace Game3 {
-	static void renderWithLighting(const RendererContext &renderers, const std::shared_ptr<Realm> &realm, Window &window) {
-		GL::FBOBinder binder = window.fbo.getBinder();
-		window.mainGLTexture.useInFB();
+	static void renderWithLighting(const RendererContext &renderers, const std::shared_ptr<Realm> &realm, Window &window, GameUI &ui) {
+		GL::FBOBinder binder = ui.fbo.getBinder();
+		ui.mainGLTexture.useInFB();
 		const auto [width, height] = window.getDimensions();
 		glViewport(0, 0, width, height); CHECKGL
 		GL::clear(.2, .2, .2);
 		renderers.updateSize(width, height);
 
 		if (realm->prerender()) {
-			window.mainGLTexture.useInFB();
+			ui.mainGLTexture.useInFB();
 			window.batchSpriteRenderer.update(window);
 			window.singleSpriteRenderer.update(window);
 			window.recolor.update(window);
@@ -31,14 +32,14 @@ namespace Game3 {
 
 		realm->render(width, height, window.center, window.scale, renderers, game->getDivisor()); CHECKGL
 
-		window.dynamicLightingTexture.useInFB();
+		ui.dynamicLightingTexture.useInFB();
 
 		realm->renderLighting(width, height, window.center, window.scale, renderers, game->getDivisor()); CHECKGL
 
-		window.scratchGLTexture.useInFB();
+		ui.scratchGLTexture.useInFB();
 		GL::clear(1, 1, 1);
 
-		window.singleSpriteRenderer.drawOnScreen(window.dynamicLightingTexture, RenderOptions{
+		window.singleSpriteRenderer.drawOnScreen(ui.dynamicLightingTexture, RenderOptions{
 			.x = 0,
 			.y = 0,
 			.sizeX = -1,
@@ -51,7 +52,7 @@ namespace Game3 {
 		const auto [static_y, static_x] = chunk.topLeft();
 		const auto x_factor = window.getXFactor();
 		const auto y_factor = window.getYFactor();
-		window.singleSpriteRenderer.drawOnMap(window.staticLightingTexture, RenderOptions{
+		window.singleSpriteRenderer.drawOnMap(ui.staticLightingTexture, RenderOptions{
 			.x = static_cast<double>(static_x),
 			.y = static_cast<double>(static_y),
 			.sizeX = -1,
@@ -66,7 +67,7 @@ namespace Game3 {
 
 		renderers.updateSize(width, height);
 		glViewport(0, 0, width, height); CHECKGL
-		window.multiplier(window.mainGLTexture, window.scratchGLTexture);
+		window.multiplier(ui.mainGLTexture, ui.scratchGLTexture);
 	}
 
 	static void renderWithoutLighting(const RendererContext &renderers, const std::shared_ptr<Realm> &realm, Window &window) {
@@ -86,9 +87,9 @@ namespace Game3 {
 		realm->render(width, height, window.center, window.scale, renderers, 1.f);
 	}
 
-	void RealmRenderer::render(const RendererContext &renderers, const std::shared_ptr<Realm> &realm, Window &window) {
+	void RealmRenderer::render(const RendererContext &renderers, const std::shared_ptr<Realm> &realm, Window &window, GameUI &ui) {
 		if (window.settings.renderLighting) { // don't care about data races on a boolean tbh
-			renderWithLighting(renderers, realm, window);
+			renderWithLighting(renderers, realm, window, ui);
 		} else {
 			renderWithoutLighting(renderers, realm, window);
 		}

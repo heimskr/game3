@@ -40,6 +40,7 @@ namespace Game3 {
 
 	class Entity;
 	class Game;
+	class GameUI;
 	class GenericClient;
 	struct RealmRenderer;
 	struct RendererContext;
@@ -215,7 +216,7 @@ namespace Game3 {
 			void queueReupload();
 			void autotile(const Position &, Layer, TileUpdateContext = {});
 			/** Should be called in the UI thread. */
-			void remakeStaticLightingTexture();
+			void remakeStaticLightingTexture(GameUI &);
 			void queueStaticLightingTexture();
 			/** Server-side only. */
 			void playSound(const Position &, const Identifier &, float pitch = 1) const;
