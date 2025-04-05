@@ -64,13 +64,18 @@ namespace Game3 {
 		std::filesystem::path directory = "./update";
 		Zip(std::move(raw_zip)).unzipTo(directory);
 
+		if (std::filesystem::exists("meson.build")) {
+			WARN("Refusing to install update because meson.build exists.");
+			return;
+		}
+
+		std::filesystem::path cwd = std::filesystem::current_path();
+
 #ifdef __MINGW32__
 		std::filesystem::path pdb = directory / "Game3" / "game3.pdb";
 		if (std::filesystem::exists(pdb)) {
 			std::filesystem::rename(pdb, "./game3.pdb");
 		}
-
-		std::filesystem::path cwd = std::filesystem::current_path();
 
 		std::filesystem::path graveyard = cwd / "graveyard";
 		if (!std::filesystem::exists(graveyard)) {
@@ -103,6 +108,17 @@ namespace Game3 {
 
 		std::filesystem::remove_all("./gamedata");
 		std::filesystem::rename(directory / "Game3" / "gamedata", "./gamedata");
+
+		for (std::string_view subdir: {"src", "include"}) {
+			std::filesystem::path in_update = directory / "Game3" / subdir;
+			if (std::filesystem::exists(in_update)) {
+				std::filesystem::path in_root = cwd / subdir;
+				if (std::filesystem::exists(in_root)) {
+					std::filesystem::remove_all(in_root);
+				}
+				std::filesystem::rename(in_update, in_root);
+			}
+		}
 
 		std::filesystem::remove_all(directory);
 	}

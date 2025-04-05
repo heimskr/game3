@@ -684,7 +684,6 @@ namespace Game3 {
 			return;
 		}
 
-
 		// richPresence.setActivityDetails("Idling");
 
 		connected = false;
