@@ -161,7 +161,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
-		std::string canonical = std::filesystem::canonical(path).string();
+		std::string canonical = std::filesystem::weakly_canonical(path).string();
 		TextureCache &cache = getTextureCache();
 		if (auto iter = cache.find(canonical); iter != cache.end()) {
 			return iter->second;
