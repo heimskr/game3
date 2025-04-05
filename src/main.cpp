@@ -16,6 +16,7 @@
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
 #include "tools/TileStitcher.h"
+#include "tools/Updater.h"
 #include "ui/gl/Constants.h"
 #include "ui/UI.h"
 #include "ui/Window.h"
@@ -95,6 +96,11 @@ int main(int argc, char **argv) {
 			return 0;
 
 		const std::string_view arg1{argv[1]};
+
+		if (arg1 == "--hash") {
+			std::print("{}", Updater{}.getLocalHash());
+			return 0;
+		}
 
 		if (arg1 == "--test") {
 			return Tests::get().runAll(argc > 2? argv[2] : "")? 0 : 1;
