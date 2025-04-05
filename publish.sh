@@ -29,8 +29,9 @@ if [ "$TARGET" = "windows" ]; then
 	./game3.exe --hash > "$HASH"
 else
 	./game3 --hash > "$HASH"
-	echo "Hash: $(cat "$HASH")"
 fi
+
+echo "Hash: $(cat "$HASH")"
 
 printf "%s" "$(date -u +%s)" > "$STAMP"
 echo "Timestamp: $(cat "$STAMP")"
