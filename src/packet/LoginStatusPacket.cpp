@@ -48,7 +48,6 @@ namespace Game3 {
 			window->settings.username = username;
 		}
 		window->saveSettings();
-		window->uiContext.removeDialogs<ConnectionDialog>();
 		auto player = Entity::create<ClientPlayer>();
 		game->setPlayer(player);
 		player->setGID(globalID);

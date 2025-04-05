@@ -1,4 +1,6 @@
+#include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
+#include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/IconButton.h"
@@ -21,9 +23,8 @@ namespace Game3 {
 
 	void TitleUI::init(Window &window) {
 		Dialog::init();
-		UIContext &ui = window.uiContext;
-		aligner = make<Aligner>(ui, Orientation::Horizontal, Alignment::End);
 
+		aligner = make<Aligner>(ui, Orientation::Horizontal, Alignment::End);
 		hbox = make<Box>(ui, 1, Orientation::Horizontal);
 
 		updateButton = make<IconButton>(ui, 1);
@@ -44,13 +45,14 @@ namespace Game3 {
 		updateButton->insertAtEnd(hbox);
 		hbox->insertAtEnd(aligner);
 		aligner->insertAtEnd(shared_from_this());
+		ui.emplaceDialog<ConnectionDialog>(1);
 	}
 
-	void TitleUI::render(const RendererContext &) {
+	void TitleUI::render(const RendererContext &renderers) {
 		Window &window = ui.window;
 
 		constexpr float strength = 0.3;
-		window.singleSpriteRenderer.drawOnScreen(background, RenderOptions{
+		renderers.singleSprite.drawOnScreen(background, RenderOptions{
 			.sizeX = static_cast<double>(window.getWidth()),
 			.sizeY = static_cast<double>(window.getHeight()),
 			.scaleX = 2 * window.uiContext.scale,
@@ -67,7 +69,7 @@ namespace Game3 {
 		const auto [mouse_x, mouse_y] = window.getMouseCoordinates<double>();
 
 		if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
-			window.singleSpriteRenderer.drawOnScreen(gangblanc, RenderOptions{
+			renderers.singleSprite.drawOnScreen(gangblanc, RenderOptions{
 				.x = mouse_x,
 				.y = mouse_y,
 				.scaleX = 16,
@@ -95,7 +97,7 @@ namespace Game3 {
 
 		for (int i = 0; i < i_max; ++i) {
 			const double offset = offset_factor * (i_max - i);
-			window.textRenderer.drawOnScreen("game3", TextRenderOptions{
+			renderers.text.drawOnScreen("game3", TextRenderOptions{
 				.x = window.getWidth() / 2.0 + (offset - x_offset) / 2,
 				.y = 64.0 + offset / 2,
 				.scaleX = 2.5,
@@ -107,6 +109,8 @@ namespace Game3 {
 
 			hsv.hue += 0.5 / i_max;
 		}
+
+		firstChild->render(renderers, getPosition());
 	}
 
 	Rectangle TitleUI::getPosition() const {

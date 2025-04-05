@@ -29,8 +29,7 @@ namespace Game3 {
 
 	bool Dialog::click(int button, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::click(button, x, y, modifiers);
-			return true;
+			return Widget::click(button, x, y, modifiers);
 		}
 
 		return false;
@@ -38,8 +37,7 @@ namespace Game3 {
 
 	bool Dialog::mouseDown(int button, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::mouseDown(button, x, y, modifiers);
-			return true;
+			return Widget::mouseDown(button, x, y, modifiers);
 		}
 
 		return false;
@@ -47,8 +45,7 @@ namespace Game3 {
 
 	bool Dialog::mouseUp(int button, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::mouseUp(button, x, y, modifiers);
-			return true;
+			return Widget::mouseUp(button, x, y, modifiers);
 		}
 
 		return false;
@@ -56,8 +53,7 @@ namespace Game3 {
 
 	bool Dialog::dragStart(int x, int y) {
 		if (contains(x, y)) {
-			Widget::dragStart(x, y);
-			return true;
+			return Widget::dragStart(x, y);
 		}
 
 		return false;
@@ -65,8 +61,7 @@ namespace Game3 {
 
 	bool Dialog::dragUpdate(int x, int y) {
 		if (contains(x, y)) {
-			Widget::dragUpdate(x, y);
-			return true;
+			return Widget::dragUpdate(x, y);
 		}
 
 		return false;
@@ -74,8 +69,7 @@ namespace Game3 {
 
 	bool Dialog::dragEnd(int x, int y) {
 		if (contains(x, y)) {
-			Widget::dragEnd(x, y);
-			return true;
+			return Widget::dragEnd(x, y);
 		}
 
 		return false;
@@ -83,8 +77,7 @@ namespace Game3 {
 
 	bool Dialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (contains(x, y)) {
-			Widget::scroll(x_delta, y_delta, x, y, modifiers);
-			return true;
+			return Widget::scroll(x_delta, y_delta, x, y, modifiers);
 		}
 
 		return false;

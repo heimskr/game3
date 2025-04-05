@@ -338,7 +338,6 @@ namespace Game3 {
 		overlayer.update(width, height);
 
 		currentUI->render(getRendererContext());
-
 		uiContext.render(getMouseX(), getMouseY());
 
 		if (settings.showFPS && runningFPS > 0) {
@@ -702,7 +701,6 @@ namespace Game3 {
 				game_ui->omniDialog.reset();
 			}
 			window.uiContext.reset();
-			window.uiContext.emplaceDialog<ConnectionDialog>(1);
 			window.setUI<TitleUI>();
 		});
 	}
@@ -1100,6 +1098,8 @@ namespace Game3 {
 	}
 
 	void Window::initUI() {
+		uiContext.reset();
 		currentUI->init(*this);
+		uiContext.addDialog(currentUI);
 	}
 }

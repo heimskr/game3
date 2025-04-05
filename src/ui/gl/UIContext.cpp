@@ -16,6 +16,7 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Modifiers.h"
+#include "ui/UI.h"
 #include "ui/Window.h"
 #include "util/Defer.h"
 #include "util/Util.h"
@@ -48,15 +49,17 @@ namespace Game3 {
 				float natural_height{};
 				hotbar->measure(context, Orientation::Horizontal, window.getWidth(), window.getHeight(), dummy, natural_width);
 				hotbar->measure(context, Orientation::Vertical, window.getWidth(), window.getHeight(), dummy, natural_height);
-				hotbar->render(context, (window.getWidth() - natural_width) / 2, window.getHeight() - natural_height - hotbar->getScale(), -1, -1);
+				hotbar->render(context, (window.getWidth() - natural_width) / 2, window.getHeight() - natural_height - hotbar->getScale(), natural_width, natural_height);
 			}
 
 			StatusEffectsDisplay(*this, 1).render(context, internalScissorStack.getTop().rectangle);
 		}
 
 		for (const DialogPtr &dialog: dialogs) {
-			scissorStack = internalScissorStack;
-			dialog->render(context);
+			if (dialog != window.currentUI) {
+				scissorStack = internalScissorStack;
+				dialog->render(context);
+			}
 		}
 
 		if (autocompleteDropdown) {
