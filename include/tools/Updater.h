@@ -15,5 +15,7 @@ namespace Game3 {
 
 			/** Returns false if it was determined that the update shouldn't be installed. */
 			bool update();
+
+			bool mayUpdate();
 	};
 }

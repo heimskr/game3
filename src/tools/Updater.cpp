@@ -64,7 +64,7 @@ namespace Game3 {
 		std::filesystem::path directory = "./update";
 		Zip(std::move(raw_zip)).unzipTo(directory);
 
-		if (std::filesystem::exists("meson.build")) {
+		if (!mayUpdate()) {
 			WARN("Refusing to install update because meson.build exists.");
 			return false;
 		}
@@ -126,5 +126,9 @@ namespace Game3 {
 
 	bool Updater::update() {
 		return updateFetch(DEFAULT_DOMAIN);
+	}
+
+	bool Updater::mayUpdate() {
+		return !std::filesystem::exists("meson.build");
 	}
 }

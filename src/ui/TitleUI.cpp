@@ -32,7 +32,7 @@ namespace Game3 {
 		updateButton->setTooltipText("Download update");
 		updateButton->setOnClick([this, &window](Widget &) {
 			try {
-				if (updater.update()) {
+				if (updater.mayUpdate() && updater.update()) {
 					window.alert("Updated successfully.");
 				} else {
 					window.alert("The game chose not to update.");
