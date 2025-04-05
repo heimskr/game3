@@ -12,6 +12,16 @@
 #include <vector>
 
 namespace Game3 {
+	template <typename U>
+	struct VoidFunction {
+		using Type = std::move_only_function<void(U)>;
+	};
+
+	template <>
+	struct VoidFunction<void> {
+		using Type = std::move_only_function<void()>;
+	};
+
 	template <typename T>
 	class Promise: public RefCounted<Promise<T>> {
 		public:
@@ -146,17 +156,7 @@ namespace Game3 {
 			std::atomic_bool rejected = false;
 
 			template <typename U>
-			struct FunctionStruct {
-				using Type = std::move_only_function<void(U)>;
-			};
-
-			template <>
-			struct FunctionStruct<void> {
-				using Type = std::move_only_function<void()>;
-			};
-
-			template <typename U>
-			using Function = FunctionStruct<U>::Type;
+			using Function = VoidFunction<U>::Type;
 
 			Function<T> thenFunction;
 			std::function<void(std::exception_ptr)> oopsFunction;
