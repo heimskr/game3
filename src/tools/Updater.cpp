@@ -129,7 +129,7 @@ namespace Game3 {
 			}
 			std::filesystem::path relative = std::filesystem::relative(path, cwd);
 			std::size_t hash = std::hash<std::string>{}(readFile(relative));
-			hash_map[std::move(relative)] = hash;
+			hash_map[relative.string()] = hash;
 		};
 
 		absorb(cwd / EXECUTABLE);
