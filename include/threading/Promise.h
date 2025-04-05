@@ -1,9 +1,11 @@
 #include "mixin/RefCounted.h"
 
 #include <atomic>
+#include <condition_variable>
 #include <expected>
 #include <functional>
 #include <future>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -33,22 +35,22 @@ namespace Game3 {
 
 				thread = std::jthread([this](std::promise<Result> promise, auto &&lambda) -> void {
 					lambda([this, &promise, future = future](T &&resolution) {
-						const bool was_consumed = thenFunction && consumed.exchange(true);
-
 						promise.set_value(std::forward<T>(resolution));
 
-						if (thenFunction && !was_consumed) {
+						if (thenFunction) {
 							thenFunction(future.get().value());
+							consumed = true;
+							conditionVariable.notify_all();
 						}
 
 						done();
 					}, [this, &promise, future = future](E &&rejection) {
-						const bool was_consumed = oopsFunction && consumed.exchange(true);
-
 						promise.set_value(std::unexpected(std::forward<E>(rejection)));
 
-						if (oopsFunction && !was_consumed) {
+						if (oopsFunction) {
 							oopsFunction(future.get().error());
+							consumed = true;
+							conditionVariable.notify_all();
 						}
 
 						done();
@@ -66,8 +68,8 @@ namespace Game3 {
 					go();
 				}
 
-				if (consumed.exchange(true)) {
-					throw std::runtime_error("Cannot get from a consumed Promise");
+				if (thenFunction || oopsFunction) {
+					throw std::runtime_error("Cannot get from a Promise with a then or catch function");
 				}
 
 				future.wait();
@@ -83,6 +85,11 @@ namespace Game3 {
 
 				if (!launched) {
 					go();
+				}
+
+				if (thenFunction || oopsFunction) {
+					std::unique_lock lock(mutex);
+					conditionVariable.wait(lock, [this] { return consumed.load(); });
 				}
 
 				future.wait();
@@ -110,13 +117,15 @@ namespace Game3 {
 			std::shared_future<Result> future;
 			std::jthread thread;
 			std::atomic_bool launched = false;
-			std::atomic_bool undeleted = false;
 			std::atomic_bool consumed = false;
 
 			std::function<void(T)> thenFunction;
 			std::function<void(E)> oopsFunction;
 			std::function<void()> finallyFunction;
 			std::function<void(std::function<void(T &&)> &&resolve, std::function<void(E &&)> &&reject)> deferred;
+
+			std::condition_variable conditionVariable;
+			std::mutex mutex;
 
 			Promise() = default;
 
