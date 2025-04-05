@@ -153,14 +153,20 @@ namespace Game3 {
 		valid = false;
 	}
 
-	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureCache;
+	using TextureCache = std::unordered_map<std::string, std::shared_ptr<Texture>>;
+
+	static TextureCache & getTextureCache() {
+		static TextureCache cache;
+		return cache;
+	}
 
 	std::shared_ptr<Texture> cacheTexture(const std::filesystem::path &path, bool alpha, int filter) {
-		auto canonical = std::filesystem::canonical(path).string();
-		if (textureCache.contains(canonical)) {
-			return textureCache.at(canonical);
+		std::string canonical = std::filesystem::canonical(path).string();
+		TextureCache &cache = getTextureCache();
+		if (auto iter = cache.find(canonical); iter != cache.end()) {
+			return iter->second;
 		}
-		return textureCache.try_emplace(canonical, std::make_shared<Texture>(Identifier(), path, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
+		return cache.try_emplace(std::move(canonical), std::make_shared<Texture>(Identifier(), path, alpha, filter == -1? DEFAULT_FILTER : filter)).first->second;
 	}
 
 	std::shared_ptr<Texture> cacheTexture(const char *path, bool alpha, int filter) {
@@ -169,10 +175,11 @@ namespace Game3 {
 
 	std::shared_ptr<Texture> cacheTexture(const boost::json::value &json) {
 		std::string path(json.at(0).as_string());
-		if (auto iter = textureCache.find(path); iter != textureCache.end()) {
+		TextureCache &cache = getTextureCache();
+		if (auto iter = cache.find(path); iter != cache.end()) {
 			return iter->second;
 		}
-		return textureCache.try_emplace(std::move(path), boost::json::value_to<TexturePtr>(json)).first->second;
+		return cache.try_emplace(std::move(path), boost::json::value_to<TexturePtr>(json)).first->second;
 	}
 
 	std::string Texture::filterToString(int filter) {
