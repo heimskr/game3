@@ -30,13 +30,17 @@ namespace Game3 {
 			Ref<Promise<T>> go() {
 				auto reference = this->getRef();
 
+				if (launched) {
+					return reference;
+				}
+
 				std::promise<T> promise;
 				future = promise.get_future();
 
-				thread = std::jthread([this](std::promise<T> promise, auto &&lambda) -> void {
+				thread = std::jthread([this](std::promise<T> promise, auto &&lambda) {
 					try {
 						if constexpr (typeid(T) == typeid(void)) {
-							lambda([this, &promise, future = future]() {
+							lambda([this, promise = std::move(promise), future = future] mutable {
 								promise.set_value();
 
 								if (thenFunction) {
@@ -48,7 +52,7 @@ namespace Game3 {
 								done();
 							});
 						} else {
-							lambda([this, &promise, future = future](T &&resolution) {
+							lambda([this, promise = std::move(promise), future = future](T &&resolution) mutable {
 								promise.set_value(std::forward<T>(resolution));
 
 								if (thenFunction) {
@@ -73,6 +77,8 @@ namespace Game3 {
 						}
 					}
 				}, std::move(promise), std::move(deferred));
+
+				thread.detach();
 
 				launched = true;
 				return reference;
@@ -141,12 +147,12 @@ namespace Game3 {
 
 			template <typename U>
 			struct FunctionStruct {
-				using Type = std::function<void(U)>;
+				using Type = std::move_only_function<void(U)>;
 			};
 
 			template <>
 			struct FunctionStruct<void> {
-				using Type = std::function<void()>;
+				using Type = std::move_only_function<void()>;
 			};
 
 			template <typename U>
@@ -155,7 +161,7 @@ namespace Game3 {
 			Function<T> thenFunction;
 			std::function<void(std::exception_ptr)> oopsFunction;
 			std::function<void()> finallyFunction;
-			std::function<void(Function<T> &&resolve)> deferred;
+			std::move_only_function<void(Function<T> &&resolve)> deferred;
 
 			std::condition_variable conditionVariable;
 			std::mutex mutex;
@@ -165,10 +171,6 @@ namespace Game3 {
 			void done() {
 				if (finallyFunction) {
 					finallyFunction();
-				}
-
-				if (launched) {
-					thread.detach();
 				}
 
 				this->deref();
