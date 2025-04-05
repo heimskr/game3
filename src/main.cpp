@@ -370,30 +370,8 @@ int main(int argc, char **argv) {
 
 	SystemTimePoint time = getTime();
 
-	constexpr std::array paths{
-		"resources/gui/stone.png",
-		"resources/gui/dirt.png",
-		"resources/gui/grass.png",
-		"resources/gui/grimrubble.png",
-		"resources/tileset/lava/tile.png",
-	};
-
-	TexturePtr background = cacheTexture(choose(paths, std::random_device{}));
-
 	while (!glfwWindowShouldClose(glfw_window)) {
 		GL::clear(0, 0, 0);
-		if (!window->game) {
-			constexpr float strength = 0.3;
-			window->singleSpriteRenderer.drawOnScreen(background, RenderOptions{
-				.sizeX = static_cast<double>(window->getWidth()),
-				.sizeY = static_cast<double>(window->getHeight()),
-				.scaleX = 2 * window->uiContext.scale,
-				.scaleY = 2 * window->uiContext.scale,
-				.color{strength, strength, strength, 1},
-				.invertY = false,
-				.wrapMode = GL_REPEAT,
-			});
-		}
 		window->tick();
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();

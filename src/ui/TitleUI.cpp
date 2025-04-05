@@ -7,6 +7,18 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	namespace {
+		constexpr std::array paths{
+			"resources/gui/stone.png",
+			"resources/gui/dirt.png",
+			"resources/gui/grass.png",
+			"resources/gui/grimrubble.png",
+			"resources/tileset/lava/tile.png",
+		};
+
+		TexturePtr background = cacheTexture(choose(paths, std::random_device{}));
+	}
+
 	void TitleUI::init(Window &window) {
 		Dialog::init();
 		UIContext &ui = window.uiContext;
@@ -36,6 +48,17 @@ namespace Game3 {
 
 	void TitleUI::render(const RendererContext &) {
 		Window &window = ui.window;
+
+		constexpr float strength = 0.3;
+		window.singleSpriteRenderer.drawOnScreen(background, RenderOptions{
+			.sizeX = static_cast<double>(window.getWidth()),
+			.sizeY = static_cast<double>(window.getHeight()),
+			.scaleX = 2 * window.uiContext.scale,
+			.scaleY = 2 * window.uiContext.scale,
+			.color{strength, strength, strength, 1},
+			.invertY = false,
+			.wrapMode = GL_REPEAT,
+		});
 
 		static float hue = 0;
 		static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
