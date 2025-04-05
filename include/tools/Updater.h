@@ -17,5 +17,7 @@ namespace Game3 {
 			bool update();
 
 			bool mayUpdate();
+
+			std::size_t getLocalHash();
 	};
 }

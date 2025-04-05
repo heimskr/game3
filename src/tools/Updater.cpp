@@ -1,6 +1,8 @@
 #include "tools/Updater.h"
 #include "util/FS.h"
 #include "util/Log.h"
+#include "util/PairHash.h"
+#include "util/VectorHash.h"
 #include "util/Zip.h"
 
 #pragma GCC diagnostic push
@@ -130,5 +132,34 @@ namespace Game3 {
 
 	bool Updater::mayUpdate() {
 		return !std::filesystem::exists("meson.build");
+	}
+
+	std::size_t Updater::getLocalHash() {
+		std::map<std::string, std::size_t> hash_map; // haha. funny
+		const std::filesystem::path cwd = std::filesystem::current_path();
+
+		auto absorb = [&](this const auto &absorb, const std::filesystem::path &path) -> void {
+			if (std::filesystem::is_directory(path)) {
+				for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(path)) {
+					absorb(entry.path());
+				}
+				return;
+			}
+			std::filesystem::path relative = std::filesystem::relative(path, cwd);
+			std::size_t hash = std::hash<std::string>{}(readFile(relative));
+			hash_map[std::move(relative)] = hash;
+		};
+
+		absorb(cwd / EXECUTABLE);
+		absorb(cwd / "resources");
+
+		std::vector<std::size_t> hash_vector;
+		hash_vector.reserve(hash_map.size());
+
+		for (const auto &[path, hash]: hash_map) {
+			hash_vector.emplace_back(hash);
+		}
+
+		return std::hash<decltype(hash_vector)>{}(hash_vector);
 	}
 }
