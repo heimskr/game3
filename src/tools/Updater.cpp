@@ -40,12 +40,22 @@ namespace Game3 {
 	Updater::Updater(std::string domain):
 		domain(std::move(domain)) {}
 
-	bool Updater::updateFetch() {
-		if (!checkHash()) {
-			return false;
-		}
+	UpdaterPtr Updater::make() {
+		return std::shared_ptr<Updater>(new Updater());
+	}
 
-		return updateLocal(HTTP::get(getURL("zip")));
+	UpdaterPtr Updater::make(std::string domain) {
+		return std::shared_ptr<Updater>(new Updater(std::move(domain)));
+	}
+
+	Ref<Promise<bool, std::string>> Updater::updateFetch() {
+		return Promise<bool, std::string>::now([self = shared_from_this()](auto resolve, auto reject) {
+			if (!checkHash()) {
+				resolve(false);
+			}
+
+			return updateLocal(HTTP::get(getURL("zip")));
+		});
 	}
 
 	bool Updater::updateLocal(std::string raw_zip) {

@@ -17,7 +17,7 @@ namespace Game3 {
 			Rectangle getPosition() const final;
 
 		private:
-			Updater updater;
+			UpdaterPtr updater;
 			std::shared_ptr<Aligner> aligner;
 			std::shared_ptr<Box> hbox;
 			std::shared_ptr<IconButton> updateButton;

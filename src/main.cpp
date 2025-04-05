@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
 		const std::string_view arg1{argv[1]};
 
 		if (arg1 == "--hash") {
-			std::print("{}", Updater{}.getLocalHash());
+			std::print("{}", Updater::getLocalHash());
 			return 0;
 		}
 

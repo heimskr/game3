@@ -24,6 +24,8 @@ namespace Game3 {
 	void TitleUI::init(Window &window) {
 		Dialog::init();
 
+		updater = Updater::make();
+
 		aligner = make<Aligner>(ui, Orientation::Horizontal, Alignment::End);
 		hbox = make<Box>(ui, 1, Orientation::Horizontal);
 
@@ -32,7 +34,7 @@ namespace Game3 {
 		updateButton->setTooltipText("Download update");
 		updateButton->setOnClick([this, &window](Widget &) {
 			try {
-				if (updater.mayUpdate() && updater.updateFetch()) {
+				if (updater->mayUpdate() && updater->updateFetch()->get().value()) {
 					window.alert("Updated successfully.");
 				} else {
 					window.alert("The game chose not to update.");

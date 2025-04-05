@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cassert>
-
-#include "util/Log.h"
+#include <utility>
 
 namespace Game3 {
 	template <typename Sub>

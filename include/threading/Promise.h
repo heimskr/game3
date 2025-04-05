@@ -12,6 +12,20 @@
 namespace Game3 {
 	template <typename T, typename E>
 	class Promise: public RefCounted<Promise<T, E>> {
+		private:
+			template <typename U>
+			struct RRefStruct {
+				using Type = U &&;
+			};
+
+			template <>
+			struct RRefStruct<void> {
+				using Type = std::monostate &&;
+			};
+
+			template <typename U>
+			using RRef = RRefStruct<U>::Type;
+
 		public:
 			using Result = std::expected<T, E>;
 
@@ -34,7 +48,7 @@ namespace Game3 {
 				future = promise.get_future();
 
 				thread = std::jthread([this](std::promise<Result> promise, auto &&lambda) -> void {
-					lambda([this, &promise, future = future](T &&resolution) {
+					lambda([this, &promise, future = future](RRef<T> resolution) {
 						promise.set_value(std::forward<T>(resolution));
 
 						if (thenFunction) {
@@ -119,10 +133,36 @@ namespace Game3 {
 			std::atomic_bool launched = false;
 			std::atomic_bool consumed = false;
 
-			std::function<void(T)> thenFunction;
-			std::function<void(E)> oopsFunction;
+			template <typename U>
+			struct FunctionStruct {
+				using Type = std::function<void(U)>;
+			};
+
+			template <>
+			struct FunctionStruct<void> {
+				using Type = std::function<void()>;
+			};
+
+			template <typename U>
+			using Function = FunctionStruct<U>::Type;
+
+			template <typename U>
+			struct ForwarderStruct {
+				using Type = std::function<void(U)>;
+			};
+
+			template <>
+			struct ForwarderStruct<void> {
+				using Type = std::function<void()>;
+			};
+
+			template <typename U>
+			using Forwarder = ForwarderStruct<U>::Type;
+
+			Function<T> thenFunction;
+			Function<E> oopsFunction;
 			std::function<void()> finallyFunction;
-			std::function<void(std::function<void(T &&)> &&resolve, std::function<void(E &&)> &&reject)> deferred;
+			std::function<void(Forwarder<T> &&resolve, Forwarder<E> &&reject)> deferred;
 
 			std::condition_variable conditionVariable;
 			std::mutex mutex;

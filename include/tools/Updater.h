@@ -1,22 +1,28 @@
 #pragma once
 
+#include "threading/Promise.h"
+
+#include <memory>
 #include <string>
 
 namespace Game3 {
-	class Updater {
+	class Updater;
+	using UpdaterPtr = std::shared_ptr<Updater>;
+
+	class Updater: public std::enable_shared_from_this<Updater> {
 		public:
-			Updater();
-			Updater(std::string domain);
+			static UpdaterPtr make();
+			static UpdaterPtr make(std::string domain);
 
 			/** Returns false if it was determined that the update shouldn't be installed. */
-			bool updateFetch();
+			Ref<Promise<bool, std::string>> updateFetch();
 
 			/** Returns false if it was determined that the update shouldn't be installed. */
 			bool updateLocal(std::string raw_zip);
 
 			bool mayUpdate();
 
-			std::size_t getLocalHash();
+			static std::size_t getLocalHash();
 
 			std::string fetchHash();
 
@@ -31,6 +37,9 @@ namespace Game3 {
 				FetchingHash,
 				FetchingZip,
 			};
+
+			Updater();
+			Updater(std::string domain);
 
 			std::string domain;
 			State state = State::Idle;
