@@ -2,6 +2,7 @@
 
 #include "data/Identifier.h"
 
+#include <expected>
 #include <format>
 #include <functional>
 #include <map>
@@ -40,6 +41,26 @@ namespace Game3 {
 			template <typename T, typename U>
 			bool expectEqual(std::string_view name, T &&actual, U &&expected) {
 				return report(name, std::forward<T>(actual) == std::forward<U>(expected));
+			}
+
+			template <typename E, typename U>
+			bool expect(std::string_view name, const std::expected<E, U> &expectation, E &&value) {
+				if (expectation) {
+					return expectEqual(name, *expectation, std::forward<E>(value));
+				} else {
+					fail(name);
+					return false;
+				}
+			}
+
+			template <typename E, typename U>
+			bool unexpect(std::string_view name, const std::expected<E, U> &expectation, U &&value) {
+				if (expectation) {
+					fail(name);
+					return false;
+				} else {
+					return expectEqual(name, expectation.error(), std::forward<U>(value));
+				}
 			}
 
 		private:

@@ -164,8 +164,9 @@ int main(int argc, char **argv) {
 			if (argc == 3) {
 				const auto count = parseNumber<size_t>(argv[2]);
 				size_t dimension = 16;
-				if (16 < count)
-					dimension = 4 * size_t(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(count))))));
+				if (16 < count) {
+					dimension = 4 * static_cast<size_t>(std::pow(2, std::ceil(std::log2(std::ceil(std::sqrt(count))))));
+				}
 				std::cout << count << " → " << dimension << 'x' << dimension << '\n';
 				return 0;
 			}
@@ -185,15 +186,17 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--migrate") {
 			std::vector<std::string> args;
-			for (int i = 2; i < argc; ++i)
+			for (int i = 2; i < argc; ++i) {
 				args.emplace_back(argv[i]);
+			}
 			return migrate(args);
 		}
 
 		if (arg1 == "--maze") {
 			for (const auto &row: Mazer({32, 32}, 666, {2, 0}).getRows(false)) {
-				for (const auto column: row)
+				for (const auto column: row) {
 					std::cout << (column? "\u2588" : " ");
+				}
 				std::cout << std::endl;
 			}
 

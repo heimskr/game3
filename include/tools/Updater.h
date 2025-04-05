@@ -5,8 +5,6 @@
 namespace Game3 {
 	class Updater {
 		public:
-			std::string domain;
-
 			Updater();
 			Updater(std::string domain);
 
@@ -26,5 +24,15 @@ namespace Game3 {
 
 			/** Returns true iff the local hash and remote hash are different. */
 			bool checkHash();
+
+		private:
+			enum class State: uint8_t {
+				Idle,
+				FetchingHash,
+				FetchingZip,
+			};
+
+			std::string domain;
+			State state = State::Idle;
 	};
 }
