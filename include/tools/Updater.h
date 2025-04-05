@@ -7,8 +7,13 @@ namespace Game3 {
 		public:
 			Updater();
 
-			void updateFetch(const std::string &domain);
-			void updateLocal(std::string raw_zip);
-			void update();
+			/** Returns false if it was determined that the update shouldn't be installed. */
+			bool updateFetch(const std::string &domain);
+
+			/** Returns false if it was determined that the update shouldn't be installed. */
+			bool updateLocal(std::string raw_zip);
+
+			/** Returns false if it was determined that the update shouldn't be installed. */
+			bool update();
 	};
 }

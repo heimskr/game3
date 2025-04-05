@@ -35,7 +35,7 @@ namespace {
 namespace Game3 {
 	Updater::Updater() = default;
 
-	void Updater::updateFetch(const std::string &domain) {
+	bool Updater::updateFetch(const std::string &domain) {
 		maybeInitializeCurl();
 
 		std::string url;
@@ -57,16 +57,16 @@ namespace Game3 {
 #endif
 		request.perform();
 
-		updateLocal(std::move(string_stream).str());
+		return updateLocal(std::move(string_stream).str());
 	}
 
-	void Updater::updateLocal(std::string raw_zip) {
+	bool Updater::updateLocal(std::string raw_zip) {
 		std::filesystem::path directory = "./update";
 		Zip(std::move(raw_zip)).unzipTo(directory);
 
 		if (std::filesystem::exists("meson.build")) {
 			WARN("Refusing to install update because meson.build exists.");
-			return;
+			return false;
 		}
 
 		std::filesystem::path cwd = std::filesystem::current_path();
@@ -121,9 +121,10 @@ namespace Game3 {
 		}
 
 		std::filesystem::remove_all(directory);
+		return true;
 	}
 
-	void Updater::update() {
-		updateFetch(DEFAULT_DOMAIN);
+	bool Updater::update() {
+		return updateFetch(DEFAULT_DOMAIN);
 	}
 }

@@ -17,10 +17,13 @@ namespace Game3 {
 		updateButton = make<IconButton>(ui, 1);
 		updateButton->setIconTexture(cacheTexture("resources/gui/up.png"));
 		updateButton->setTooltipText("Download update");
-		updateButton->setOnClick([this, &window](Widget &widget) {
+		updateButton->setOnClick([this, &window](Widget &) {
 			try {
-				updater.update();
-				window.alert("Updated successfully.");
+				if (updater.update()) {
+					window.alert("Updated successfully.");
+				} else {
+					window.alert("The game chose not to update.");
+				}
 			} catch (const std::exception &error) {
 				window.error(std::format("Failed to update:\n{}", error.what()));
 			}
@@ -31,7 +34,7 @@ namespace Game3 {
 		aligner->insertAtEnd(shared_from_this());
 	}
 
-	void TitleUI::render(const RendererContext &renderers) {
+	void TitleUI::render(const RendererContext &) {
 		Window &window = ui.window;
 
 		static float hue = 0;
