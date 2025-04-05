@@ -213,7 +213,7 @@ winja:
 	ninja -C builddir
 	cp builddir/src/game3.exe .
 
-zip:
+linzip:
 	- cp builddir/src/game3 ./game3
 	strip game3
 	rm -f game3.zip
@@ -222,6 +222,6 @@ zip:
 	cp -r ../resources Game3/resources && \
 	cp -r ../gamedata Game3/gamedata && \
 	cp ../game3 Game3/ && \
-	zip -r ../game3.zip Game3 && \
+	zip -r ../game3-linux-x86_64.zip Game3 && \
 	cd .. && \
 	rm -r game3_zip
