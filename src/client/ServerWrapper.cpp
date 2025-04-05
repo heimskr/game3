@@ -269,11 +269,11 @@ namespace Game3 {
 		}
 
 		write(logControlPipe.writeEnd(), "r", 1);
-		logThread.join();
 #ifdef REDIRECT_LOGS
 		logFDWrapper.close();
 #endif
 #ifndef __MINGW32__
+		logThread.join();
 		logDataPipe.reset();
 #endif
 
