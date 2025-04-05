@@ -23,7 +23,7 @@ namespace Game3 {
 						updater.updateLocal(readFile(local));
 						context.pass("updater local");
 					} else {
-						updater.update();
+						updater.updateFetch();
 						context.pass("updater remote");
 					}
 				} catch (const std::exception &err) {

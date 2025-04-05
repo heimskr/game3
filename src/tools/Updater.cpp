@@ -1,3 +1,4 @@
+#include "net/HTTP.h"
 #include "tools/Updater.h"
 #include "util/FS.h"
 #include "util/Log.h"
@@ -5,14 +6,8 @@
 #include "util/VectorHash.h"
 #include "util/Zip.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#include <curlpp/cURLpp.hpp>
-#include <curlpp/Easy.hpp>
-#include <curlpp/Options.hpp>
-#pragma GCC diagnostic pop
-
 #include <format>
+#include <map>
 #include <sstream>
 
 namespace {
@@ -20,46 +15,37 @@ namespace {
 #ifdef __MINGW32__
 	std::string EXECUTABLE = "game3.exe";
 	std::string TEMP_EXECUTABLE = "./graveyard/game3.exe";
+	std::string PLATFORM = "windows";
+	std::string ARCHITECTURE = "x86_64";
 #else
 	std::string EXECUTABLE = "game3";
 	std::string TEMP_EXECUTABLE = "./_game3";
+#ifdef __APPLE__
+	std::string PLATFORM = "darwin";
+	std::string ARCHITECTURE = "arm64";
+#elif defined(__linux__)
+	std::string PLATFORM = "linux";
+	std::string ARCHITECTURE = "x86_64";
+#else
+	std::string PLATFORM = "unknown";
+	std::string ARCHITECTURE = "unknown";
 #endif
-
-	static void maybeInitializeCurl() {
-		static bool initialized = false;
-		if (!initialized) {
-			curlpp::initialize();
-			initialized = true;
-		}
-	}
+#endif
 }
 
 namespace Game3 {
-	Updater::Updater() = default;
+	Updater::Updater():
+		domain(DEFAULT_DOMAIN) {}
 
-	bool Updater::updateFetch(const std::string &domain) {
-		maybeInitializeCurl();
+	Updater::Updater(std::string domain):
+		domain(std::move(domain)) {}
 
-		std::string url;
-#ifdef __MINGW32__
-		url = std::format("https://{}/game3-windows-x86_64.zip", domain);
-#elif defined(__linux__)
-		url = std::format("https://{}/game3-linux-x86_64.zip", domain);
-#else
-		throw std::runtime_error("Can't update: unknown platform");
-#endif
+	bool Updater::updateFetch() {
+		if (!checkHash()) {
+			return false;
+		}
 
-		curlpp::Easy request;
-		std::ostringstream string_stream;
-		request.setOpt(curlpp::options::Url(url));
-		request.setOpt(curlpp::options::WriteStream(&string_stream));
-		request.setOpt(curlpp::options::FailOnError(true));
-#ifdef __MINGW32__
-		request.setOpt(curlpp::options::SslOptions(CURLSSLOPT_NATIVE_CA));
-#endif
-		request.perform();
-
-		return updateLocal(std::move(string_stream).str());
+		return updateLocal(HTTP::get(getURL("zip")));
 	}
 
 	bool Updater::updateLocal(std::string raw_zip) {
@@ -126,10 +112,6 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Updater::update() {
-		return updateFetch(DEFAULT_DOMAIN);
-	}
-
 	bool Updater::mayUpdate() {
 		return !std::filesystem::exists("meson.build");
 	}
@@ -161,5 +143,29 @@ namespace Game3 {
 		}
 
 		return std::hash<decltype(hash_vector)>{}(hash_vector);
+	}
+
+	std::string Updater::getURL(std::string_view extension) const {
+		if (PLATFORM == "unknown") {
+			throw std::runtime_error("Can't update: unknown platform");
+		}
+
+		if (ARCHITECTURE == "unknown") {
+			throw std::runtime_error("Can't update: unknown architecture");
+		}
+
+		return std::format("https://{}/game3-{}-{}.{}", domain, PLATFORM, ARCHITECTURE, extension);
+	}
+
+	bool Updater::checkHash() {
+		std::string local_hash = std::to_string(getLocalHash());
+		std::string remote_hash = HTTP::get(getURL("hash"));
+
+		if (local_hash == remote_hash) {
+			WARN("Hashes already match: {}", local_hash);
+			return false;
+		}
+
+		return true;
 	}
 }

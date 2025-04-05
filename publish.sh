@@ -17,10 +17,24 @@ if [ -z "$GAME3_REMOTE" ]; then
 fi
 
 ZIP="game3-$TARGET-x86_64.zip"
+HASH="game3-$TARGET-x86_64.hash"
+STAMP="game3-$TARGET-x86_64.stamp"
 
 if [ ! -f "$ZIP" ]; then
 	echo "\"$ZIP\" doesn't exist."
 	exit 3
 fi
 
+if [ "$TARGET" = "windows" ]; then
+	./game3.exe --hash > "$HASH"
+else
+	./game3 --hash > "$HASH"
+	echo "Hash: $(cat "$HASH")"
+fi
+
+printf "%s" "$(date -u +%s)" > "$STAMP"
+echo "Timestamp: $(cat "$STAMP")"
+
 scp "$ZIP" "$GAME3_REMOTE/$ZIP"
+scp "$HASH" "$GAME3_REMOTE/$HASH"
+scp "$STAMP" "$GAME3_REMOTE/$STAMP"

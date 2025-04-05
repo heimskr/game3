@@ -58,3 +58,5 @@ vgcore.*
 *.pdb
 /*_test
 /update
+/*.hash
+/*.stamp
