@@ -17,7 +17,7 @@ namespace {
 	std::string DEFAULT_DOMAIN = "game3.zip";
 #ifdef __MINGW32__
 	std::string EXECUTABLE = "game3.exe";
-	std::string TEMP_EXECUTABLE = "./_game3.exe";
+	std::string TEMP_EXECUTABLE = "./graveyard/game3.exe";
 #else
 	std::string EXECUTABLE = "game3";
 	std::string TEMP_EXECUTABLE = "./_game3";
@@ -64,12 +64,6 @@ namespace Game3 {
 		std::filesystem::path directory = "./update";
 		Zip(std::move(raw_zip)).unzipTo(directory);
 
-		if (!std::filesystem::is_symlink(EXECUTABLE)) {
-			std::filesystem::rename(EXECUTABLE, TEMP_EXECUTABLE);
-			std::filesystem::rename(directory / "Game3" / EXECUTABLE, EXECUTABLE);
-			markExecutable(EXECUTABLE);
-		}
-
 #ifdef __MINGW32__
 		std::filesystem::path pdb = directory / "Game3" / "game3.pdb";
 		if (std::filesystem::exists(pdb)) {
@@ -78,13 +72,29 @@ namespace Game3 {
 
 		std::filesystem::path cwd = std::filesystem::current_path();
 
+		std::filesystem::path graveyard = cwd / "graveyard";
+		if (!std::filesystem::exists(graveyard)) {
+			std::filesystem::create_directory(graveyard);
+		}
+
+		if (!std::filesystem::is_symlink(EXECUTABLE)) {
+			std::filesystem::rename("game3.exe", graveyard / "game3.exe");
+			std::filesystem::rename(directory / "Game3" / "game3.exe", "game3.exe");
+		}
+
 		for (const std::filesystem::directory_entry &entry: std::filesystem::directory_iterator(directory / "Game3")) {
 			const std::filesystem::path &path = entry.path();
 			if (path.extension() == ".dll") {
 				std::filesystem::path old_path = cwd / path.filename();
-				std::filesystem::rename(old_path, cwd / ("_" + path.filename().string()));
+				std::filesystem::rename(old_path, graveyard / path.filename().string());
 				std::filesystem::rename(entry.path(), old_path);
 			}
+		}
+#else
+		if (!std::filesystem::is_symlink(EXECUTABLE)) {
+			std::filesystem::rename(EXECUTABLE, TEMP_EXECUTABLE);
+			std::filesystem::rename(directory / "Game3" / EXECUTABLE, EXECUTABLE);
+			markExecutable(EXECUTABLE);
 		}
 #endif
 
