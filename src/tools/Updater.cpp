@@ -52,9 +52,9 @@ namespace Game3 {
 		return Promise<bool>::now([self = shared_from_this()](auto resolve) {
 			if (!self->checkHash()->get()) {
 				resolve(false);
+			} else {
+				resolve(self->updateLocal(HTTP::get(self->getURL("zip"))->get()));
 			}
-
-			resolve(self->updateLocal(HTTP::get(self->getURL("zip"))->get()));
 		});
 	}
 
