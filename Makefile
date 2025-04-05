@@ -182,20 +182,20 @@ sinclude $(DEPFILE)
 
 winzip: game3.exe
 	strip game3.exe
-	rm -f game3.zip
+	rm -f game3-windows-x86_64.zip
 	mkdir -p game3_zip/Game3
 	cd game3_zip && \
 	cp -r ../resources Game3/resources && \
 	cp -r ../gamedata Game3/gamedata && \
 	cp ../game3.exe Game3/ && \
 	cp ../*.dll Game3/ && \
-	zip -r ../game3.zip Game3 && \
+	zip -r ../game3-windows-x86_64.zip Game3 && \
 	cd .. && \
 	rm -r game3_zip
 
 winzip_debug: builddir/src/game3.exe
 	cv2pdb64 $< game3.exe game3.pdb
-	rm -f game3.zip
+	rm -f game3-windows-x86_64.zip
 	mkdir -p game3_zip/Game3
 	cd game3_zip && \
 	cp -r ../resources Game3/resources && \
@@ -205,7 +205,7 @@ winzip_debug: builddir/src/game3.exe
 	cp ../game3.exe Game3/ && \
 	cp ../game3.pdb Game3/ && \
 	cp ../*.dll Game3/ && \
-	zip -r ../game3.zip Game3 && \
+	zip -r ../game3-windows-x86_64.zip Game3 && \
 	cd .. && \
 	rm -r game3_zip
 
@@ -216,7 +216,7 @@ winja:
 linzip:
 	- cp builddir/src/game3 ./game3
 	strip game3
-	rm -f game3.zip
+	rm -f game3-linux-x86_64.zip
 	mkdir -p game3_zip/Game3
 	cd game3_zip && \
 	cp -r ../resources Game3/resources && \
