@@ -48,13 +48,13 @@ namespace Game3 {
 		return std::shared_ptr<Updater>(new Updater(std::move(domain)));
 	}
 
-	Ref<Promise<bool, std::string>> Updater::updateFetch() {
-		return Promise<bool, std::string>::now([self = shared_from_this()](auto resolve, auto reject) {
-			if (!checkHash()) {
+	PromiseRef<bool> Updater::updateFetch() {
+		return Promise<bool>::now([self = shared_from_this()](auto resolve) {
+			if (!self->checkHash()->get()) {
 				resolve(false);
 			}
 
-			return updateLocal(HTTP::get(getURL("zip")));
+			resolve(self->updateLocal(HTTP::get(self->getURL("zip"))->get()));
 		});
 	}
 
@@ -167,15 +167,17 @@ namespace Game3 {
 		return std::format("https://{}/game3-{}-{}.{}", domain, PLATFORM, ARCHITECTURE, extension);
 	}
 
-	bool Updater::checkHash() {
-		std::string local_hash = std::to_string(getLocalHash());
-		std::string remote_hash = HTTP::get(getURL("hash"));
+	PromiseRef<bool> Updater::checkHash() {
+		return Promise<bool>::now([self = shared_from_this()](auto resolve) {
+			std::string local_hash = std::to_string(getLocalHash());
+			std::string remote_hash = HTTP::get(self->getURL("hash"))->get();
 
-		if (local_hash == remote_hash) {
-			WARN("Hashes already match: {}", local_hash);
-			return false;
-		}
-
-		return true;
+			if (local_hash == remote_hash) {
+				WARN("Hashes already match: {}", local_hash);
+				resolve(false);
+			} else {
+				resolve(true);
+			}
+		});
 	}
 }

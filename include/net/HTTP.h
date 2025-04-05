@@ -7,8 +7,8 @@
 
 namespace Game3 {
 	struct HTTP {
-		static Ref<Promise<std::string, std::string>> get(std::string url);
+		static Ref<Promise<std::string>> get(std::string url);
 		/** The stream must remain valid until the promise resolves! */
-		static Ref<Promise<void, std::string>> get(std::string url, std::ostream &);
+		static Ref<Promise<void>> get(std::string url, std::ostream &);
 	};
 }

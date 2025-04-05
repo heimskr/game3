@@ -18,33 +18,26 @@ namespace Game3 {
 		}
 	}
 
-	Ref<Promise<std::string, std::string>> HTTP::get(std::string url) {
-		return Promise<std::string, std::string>::now([url = std::move(url)](auto resolve, auto reject) {
+	Ref<Promise<std::string>> HTTP::get(std::string url) {
+		return Promise<std::string>::now([url = std::move(url)](auto resolve) {
 			std::ostringstream stream;
-			get(url, stream)->then([resolve, &stream] {
-				resolve(std::move(stream).str());
-			})->oops([reject](std::string rejection) {
-				reject(std::move(rejection));
-			})->wait();
+			get(url, stream)->wait();
+			resolve(std::move(stream).str());
 		});
 	}
 
-	Ref<Promise<void, std::string>> HTTP::get(std::string url, std::ostream &stream) {
-		return Promise<void, std::string>::now([url = std::move(url), &stream](auto resolve, auto reject) {
+	Ref<Promise<void>> HTTP::get(std::string url, std::ostream &stream) {
+		return Promise<void>::now([url = std::move(url), &stream](auto resolve) {
 			maybeInitializeCurl();
-			try {
-				curlpp::Easy request;
-				request.setOpt(curlpp::options::Url(url));
-				request.setOpt(curlpp::options::WriteStream(&stream));
-				request.setOpt(curlpp::options::FailOnError(true));
+			curlpp::Easy request;
+			request.setOpt(curlpp::options::Url(url));
+			request.setOpt(curlpp::options::WriteStream(&stream));
+			request.setOpt(curlpp::options::FailOnError(true));
 #ifdef __MINGW32__
-				request.setOpt(curlpp::options::SslOptions(CURLSSLOPT_NATIVE_CA));
+			request.setOpt(curlpp::options::SslOptions(CURLSSLOPT_NATIVE_CA));
 #endif
-				request.perform();
-				resolve();
-			} catch (const std::exception &err) {
-				reject(err.what());
-			}
+			request.perform();
+			resolve();
 		});
 	}
 }

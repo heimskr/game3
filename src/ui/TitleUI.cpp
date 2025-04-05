@@ -34,8 +34,16 @@ namespace Game3 {
 		updateButton->setTooltipText("Download update");
 		updateButton->setOnClick([this, &window](Widget &) {
 			try {
-				if (updater->mayUpdate() && updater->updateFetch()->get().value()) {
-					window.alert("Updated successfully.");
+				if (updater->mayUpdate()) {
+					updater->updateFetch()->then([&window](bool result) {
+						window.queue([result](Window &window) {
+							if (result) {
+								window.alert("Updated successfully.");
+							} else {
+								window.alert("Nothing to update.");
+							}
+						});
+					});
 				} else {
 					window.alert("The game chose not to update.");
 				}

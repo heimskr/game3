@@ -1,8 +1,10 @@
+#pragma once
+
 #include "mixin/RefCounted.h"
 
 #include <atomic>
 #include <condition_variable>
-#include <expected>
+#include <exception>
 #include <functional>
 #include <future>
 #include <mutex>
@@ -10,72 +12,73 @@
 #include <vector>
 
 namespace Game3 {
-	template <typename T, typename E>
-	class Promise: public RefCounted<Promise<T, E>> {
-		private:
-			template <typename U>
-			struct RRefStruct {
-				using Type = U &&;
-			};
-
-			template <>
-			struct RRefStruct<void> {
-				using Type = std::monostate &&;
-			};
-
-			template <typename U>
-			using RRef = RRefStruct<U>::Type;
-
+	template <typename T>
+	class Promise: public RefCounted<Promise<T>> {
 		public:
-			using Result = std::expected<T, E>;
-
 			template <typename F>
-			static Ref<Promise<T, E>> now(F &&lambda) {
+			static Ref<Promise<T>> now(F &&lambda) {
 				return make(std::forward<F>(lambda))->go();
 			}
 
 			template <typename F>
-			static Ref<Promise<T, E>> make(F &&lambda) {
-				auto *pointer = new Promise<T, E>;
+			static Ref<Promise<T>> make(F &&lambda) {
+				auto *pointer = new Promise<T>;
 				pointer->deferred = std::forward<F>(lambda);
 				return pointer->getRef();
 			}
 
-			Ref<Promise<T, E>> go() {
+			Ref<Promise<T>> go() {
 				auto reference = this->getRef();
 
-				std::promise<Result> promise;
+				std::promise<T> promise;
 				future = promise.get_future();
 
-				thread = std::jthread([this](std::promise<Result> promise, auto &&lambda) -> void {
-					lambda([this, &promise, future = future](RRef<T> resolution) {
-						promise.set_value(std::forward<T>(resolution));
+				thread = std::jthread([this](std::promise<T> promise, auto &&lambda) -> void {
+					try {
+						if constexpr (typeid(T) == typeid(void)) {
+							lambda([this, &promise, future = future]() {
+								promise.set_value();
 
-						if (thenFunction) {
-							thenFunction(future.get().value());
-							consumed = true;
-							conditionVariable.notify_all();
+								if (thenFunction) {
+									thenFunction();
+									consumed = true;
+									conditionVariable.notify_all();
+								}
+
+								done();
+							});
+						} else {
+							lambda([this, &promise, future = future](T &&resolution) {
+								promise.set_value(std::forward<T>(resolution));
+
+								if (thenFunction) {
+									thenFunction(future.get());
+									consumed = true;
+									conditionVariable.notify_all();
+								}
+
+								done();
+							});
 						}
-
-						done();
-					}, [this, &promise, future = future](E &&rejection) {
-						promise.set_value(std::unexpected(std::forward<E>(rejection)));
-
+					} catch (...) {
 						if (oopsFunction) {
-							oopsFunction(future.get().error());
+							oopsFunction(std::current_exception());
 							consumed = true;
+							rejected = true;
 							conditionVariable.notify_all();
+							done();
+						} else {
+							done();
+							throw;
 						}
-
-						done();
-					});
+					}
 				}, std::move(promise), std::move(deferred));
 
 				launched = true;
 				return reference;
 			}
 
-			Result get() {
+			T get() {
 				auto reference = this->getRef();
 
 				if (!launched) {
@@ -103,35 +106,38 @@ namespace Game3 {
 
 				if (thenFunction || oopsFunction) {
 					std::unique_lock lock(mutex);
-					conditionVariable.wait(lock, [this] { return consumed.load(); });
+					conditionVariable.wait(lock, [this] { return consumed.load() || rejected.load(); });
 				}
 
-				future.wait();
+				if (!rejected) {
+					future.wait();
+				}
 			}
 
 			template <typename F>
-			Promise<T, E> * then(F &&function) {
+			Ref<Promise<T>> then(F &&function) {
 				thenFunction = std::forward<F>(function);
-				return this;
+				return this->getRef();
 			}
 
 			template <typename F>
-			Promise<T, E> * oops(F &&function) {
+			Ref<Promise<T>> oops(F &&function) {
 				oopsFunction = std::forward<F>(function);
-				return this;
+				return this->getRef();
 			}
 
 			template <typename F>
-			Promise<T, E> * finally(F &&function) {
+			Ref<Promise<T>> finally(F &&function) {
 				finallyFunction = std::forward<F>(function);
-				return this;
+				return this->getRef();
 			}
 
 		private:
-			std::shared_future<Result> future;
+			std::shared_future<T> future;
 			std::jthread thread;
 			std::atomic_bool launched = false;
 			std::atomic_bool consumed = false;
+			std::atomic_bool rejected = false;
 
 			template <typename U>
 			struct FunctionStruct {
@@ -146,23 +152,10 @@ namespace Game3 {
 			template <typename U>
 			using Function = FunctionStruct<U>::Type;
 
-			template <typename U>
-			struct ForwarderStruct {
-				using Type = std::function<void(U)>;
-			};
-
-			template <>
-			struct ForwarderStruct<void> {
-				using Type = std::function<void()>;
-			};
-
-			template <typename U>
-			using Forwarder = ForwarderStruct<U>::Type;
-
 			Function<T> thenFunction;
-			Function<E> oopsFunction;
+			std::function<void(std::exception_ptr)> oopsFunction;
 			std::function<void()> finallyFunction;
-			std::function<void(Forwarder<T> &&resolve, Forwarder<E> &&reject)> deferred;
+			std::function<void(Function<T> &&resolve)> deferred;
 
 			std::condition_variable conditionVariable;
 			std::mutex mutex;
@@ -181,4 +174,7 @@ namespace Game3 {
 				this->deref();
 			}
 	};
+
+	template <typename T>
+	using PromiseRef = Ref<Promise<T>>;
 }

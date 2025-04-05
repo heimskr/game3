@@ -15,7 +15,7 @@ namespace Game3 {
 			static UpdaterPtr make(std::string domain);
 
 			/** Returns false if it was determined that the update shouldn't be installed. */
-			Ref<Promise<bool, std::string>> updateFetch();
+			PromiseRef<bool> updateFetch();
 
 			/** Returns false if it was determined that the update shouldn't be installed. */
 			bool updateLocal(std::string raw_zip);
@@ -29,7 +29,7 @@ namespace Game3 {
 			std::string getURL(std::string_view extension) const;
 
 			/** Returns true iff the local hash and remote hash are different. */
-			bool checkHash();
+			PromiseRef<bool> checkHash();
 
 		private:
 			enum class State: uint8_t {

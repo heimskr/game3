@@ -9,35 +9,25 @@ namespace Game3 {
 			PromiseTest() = default;
 
 			void operator()(TestContext &context) {
-				Promise<int, int>::make([](auto resolve, auto) {
+				Promise<int>::make([](auto resolve) {
 					resolve(42);
 				})->then([&](int result) {
 					context.expectEqual("resolve(42)", result, 42);
-				})->oops([&](int) {
+				})->oops([&](std::exception_ptr) {
 					context.fail("resolve(42)");
 				})->wait();
 
-				Promise<int, int>::make([](auto, auto reject) {
-					reject(64);
+				Promise<int>::make([](auto) {
+					throw 42;
 				})->then([&](int) {
-					context.fail("reject(64)");
-				})->oops([&](int result) {
-					context.expectEqual("reject(64)", result, 64);
+					context.fail("reject(42)");
+				})->oops([&](std::exception_ptr result) {
+					try {
+						std::rethrow_exception(std::move(result));
+					} catch (int value) {
+						context.expectEqual("reject(42)", value, 42);
+					}
 				})->wait();
-
-				context.expect("resolve(100)", Promise<int, std::string>::make([](auto resolve, auto) {
-					resolve(100);
-				})->get(), 100);
-
-				context.unexpect("reject(\"oof\")", Promise<int, std::string>::make([](auto, auto reject) {
-					reject("oof");
-				})->get(), std::string("oof"));
-
-				Promise<int, int>::make([](auto resolve, auto) {
-					resolve(-1);
-				})->then([&](int result) {
-					context.expectEqual("resolve(-1)", result, -1);
-				});
 			}
 	};
 
