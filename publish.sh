@@ -3,8 +3,12 @@
 TARGET="$1"
 
 if [ -z "$TARGET" ]; then
-	echo "Please specify a target."
-	exit 1
+	if [ -z "$GAME3_PLATFORM" ]; then
+		echo "Please specify a target."
+		exit 1
+	else
+		TARGET="$GAME3_PLATFORM"
+	fi
 fi
 
 if [ -z "$GAME3_REMOTE" ]; then
