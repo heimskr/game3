@@ -684,13 +684,13 @@ namespace Game3 {
 			return;
 		}
 
-		auto game_ui = getUI<GameUI>();
-		assert(game_ui != nullptr);
 
 		// richPresence.setActivityDetails("Idling");
 
 		connected = false;
-		game_ui->removeModule();
+		if (auto game_ui = getUI<GameUI>()) {
+			game_ui->removeModule();
+		}
 		game->stopThread();
 		setGame({});
 		serverWrapper.stop();
