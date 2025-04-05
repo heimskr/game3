@@ -33,19 +33,26 @@ namespace Game3 {
 		updateButton->setIconTexture(cacheTexture("resources/gui/up.png"));
 		updateButton->setTooltipText("Download update");
 		updateButton->setOnClick([this, &window](Widget &) {
+			if (updating.exchange(true)) {
+				window.error("Already updating.");
+				return;
+			}
+
 			try {
 				if (updater->mayUpdate()) {
-					updater->updateFetch()->then([&window](bool result) {
-						window.queue([result](Window &window) {
+					updater->updateFetch()->then([&window, weak = getWeakSelf()](bool result) {
+						if (auto self = weak.lock()) {
 							if (result) {
 								window.alert("Updated successfully.");
 							} else {
 								window.alert("Nothing to update.");
 							}
-						});
+							self->updating = false;
+						}
 					});
 				} else {
 					window.alert("The game chose not to update.");
+					updating = false;
 				}
 			} catch (const std::exception &error) {
 				window.error(std::format("Failed to update:\n{}", error.what()));
@@ -127,5 +134,13 @@ namespace Game3 {
 		Rectangle position = ui.window.inset(10);
 		position.height = getScale() * 32;
 		return position;
+	}
+
+	std::shared_ptr<TitleUI> TitleUI::getSelf() {
+		return std::static_pointer_cast<TitleUI>(shared_from_this());
+	}
+
+	std::weak_ptr<TitleUI> TitleUI::getWeakSelf() {
+		return std::weak_ptr(getSelf());
 	}
 }

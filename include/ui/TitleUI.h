@@ -3,6 +3,8 @@
 #include "tools/Updater.h"
 #include "ui/UI.h"
 
+#include <atomic>
+
 namespace Game3 {
 	class Aligner;
 	class Box;
@@ -21,5 +23,9 @@ namespace Game3 {
 			std::shared_ptr<Aligner> aligner;
 			std::shared_ptr<Box> hbox;
 			std::shared_ptr<IconButton> updateButton;
+			std::atomic_bool updating = false;
+
+			std::shared_ptr<TitleUI> getSelf();
+			std::weak_ptr<TitleUI> getWeakSelf();
 	};
 }

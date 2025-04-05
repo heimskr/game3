@@ -32,16 +32,9 @@ namespace Game3 {
 			PromiseRef<bool> checkHash();
 
 		private:
-			enum class State: uint8_t {
-				Idle,
-				FetchingHash,
-				FetchingZip,
-			};
-
 			Updater();
 			Updater(std::string domain);
 
 			std::string domain;
-			State state = State::Idle;
 	};
 }
