@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <format>
+#include <source_location>
 #include <vector>
 
 template <typename T>
@@ -55,5 +56,16 @@ struct std::formatter<std::filesystem::path> {
 #else
 		return std::format_to(ctx.out(), "{}", path.c_str());
 #endif
+	}
+};
+
+template <>
+struct std::formatter<std::source_location> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(std::source_location location, auto &ctx) const {
+		return std::format_to(ctx.out(), "[{}:{} {}]", location.file_name(), location.line(), location.function_name());
 	}
 };

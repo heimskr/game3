@@ -119,16 +119,13 @@ namespace Game3 {
 			return true;
 		}
 
-		bool contained = false;
-
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			contained = contained || dialog->contains(x, y);
 			if (dialog->click(button, x, y, modifiers)) {
 				return true;
 			}
 		}
 
-		return (hotbar->contains(x, y) && hotbar->click(button, x, y, modifiers)) || contained;
+		return hotbar->contains(x, y) && hotbar->click(button, x, y, modifiers);
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y, Modifiers modifiers) {
@@ -185,17 +182,10 @@ namespace Game3 {
 		unfocusWidget();
 		dragOrigin.emplace(x, y);
 
-		bool contained = false;
-
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			contained = contained || dialog->contains(x, y);
 			if (dialog->dragStart(x, y)) {
 				return true;
 			}
-		}
-
-		if (contained) {
-			return true;
 		}
 
 		if (hotbar->contains(x, y)) {
@@ -229,17 +219,10 @@ namespace Game3 {
 			}
 		}
 
-		bool contained = false;
-
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			contained = contained || dialog->contains(x, y);
 			if (dialog->dragUpdate(x, y)) {
 				return true;
 			}
-		}
-
-		if (contained) {
-			return true;
 		}
 
 		if (hotbar->contains(x, y)) {
@@ -277,11 +260,7 @@ namespace Game3 {
 		bool out = false;
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->contains(x, y)) {
-				out = true;
-			}
-
-			if (dialog->dragEnd(x, y)) {
+			if (dialog->contains(x, y) && dialog->dragEnd(x, y)) {
 				out = true;
 				break;
 			}
