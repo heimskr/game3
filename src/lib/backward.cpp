@@ -1,3 +1,4 @@
+#ifndef __APPLE__
 #ifndef __MINGW32__
 #define BACKWARD_HAS_BFD 1
 #define BACKWARD_HAS_LIBUNWIND 1
@@ -13,3 +14,4 @@
 namespace backward {
 	backward::SignalHandling sh;
 }
+#endif
