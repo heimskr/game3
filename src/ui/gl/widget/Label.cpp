@@ -128,7 +128,7 @@ namespace Game3 {
 
 		text = std::move(new_text);
 		wrapped.reset();
-		lastUnwrappedTextWidth = ui.getRenderers().text.textWidth(text, getTextScale());
+		lastUnwrappedTextWidth = ui.getRenderers(0).text.textWidth(text, getTextScale());
 	}
 
 	const UString & Label::getText() const {

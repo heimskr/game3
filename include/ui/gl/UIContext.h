@@ -34,7 +34,7 @@ namespace Game3 {
 			UIContext(Window &);
 			UIContext(Window &, float scale);
 
-			void render(float mouse_x, float mouse_y);
+			void render(float mouse_x, float mouse_y, float delta);
 			std::shared_ptr<ClientGame> getGame() const;
 			void onResize(int x, int y);
 			void reset();
@@ -51,7 +51,7 @@ namespace Game3 {
 			void setDraggedWidget(WidgetPtr);
 			WidgetPtr getDraggedWidget() const;
 			std::shared_ptr<ClientPlayer> getPlayer() const;
-			RendererContext getRenderers() const;
+			RendererContext getRenderers(float delta) const;
 			void focusWidget(const WidgetPtr &);
 			WidgetPtr getFocusedWidget() const;
 			/** Unfocuses if the currently focused widget is the given widget. */

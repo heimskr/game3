@@ -37,7 +37,7 @@ namespace Game3 {
 	void SettingsTab::init() {
 		auto tab = shared_from_this();
 
-		auto &settings = ui.getRenderers().settings;
+		auto &settings = ui.getRenderers(0).settings;
 		auto settings_lock = settings.sharedLock();
 
 		scroller = std::make_shared<Scroller>(ui, selfScale);

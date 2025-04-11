@@ -290,11 +290,11 @@ namespace Game3 {
 		    && y <= pos.row    && pos.row    < y + realmBounds.height;
 	}
 
-	RendererContext Window::getRendererContext() {
-		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, recolor, settings, getXFactor(), getYFactor()};
+	RendererContext Window::getRendererContext(float delta) {
+		return {rectangleRenderer, singleSpriteRenderer, batchSpriteRenderer, textRenderer, circleRenderer, recolor, settings, getXFactor(), getYFactor(), delta};
 	}
 
-	void Window::tick() {
+	void Window::tick(float delta) {
 		const auto [width, height] = getDimensions();
 
 		if (width != lastWindowSize.first || height != lastWindowSize.second) {
@@ -320,10 +320,10 @@ namespace Game3 {
 			});
 		});
 
-		render();
+		render(delta);
 	}
 
-	void Window::render() {
+	void Window::render(float delta) {
 		auto [width, height] = getDimensions();
 
 		activateContext();
@@ -337,8 +337,8 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		currentUI->render(getRendererContext());
-		uiContext.render(getMouseX(), getMouseY());
+		currentUI->render(getRendererContext(delta));
+		uiContext.render(getMouseX(), getMouseY(), delta);
 
 		if (settings.showFPS && runningFPS > 0) {
 			renderFPSCounter();

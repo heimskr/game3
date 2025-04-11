@@ -362,14 +362,14 @@ namespace Game3 {
 	void Scroller::maybeRemeasureChildWidth() {
 		if (!ALLOW_HORIZONTAL_OVERSCROLL && firstChild != nullptr && lastChildWidth.value() <= 0) {
 			float dummy{};
-			firstChild->measure(ui.getRenderers(), Orientation::Horizontal, lastRectangle.width, lastRectangle.height, dummy, lastChildWidth.value());
+			firstChild->measure(ui.getRenderers(0), Orientation::Horizontal, lastRectangle.width, lastRectangle.height, dummy, lastChildWidth.value());
 		}
 	}
 
 	void Scroller::maybeRemeasureChildHeight() {
 		if (!ALLOW_VERTICAL_OVERSCROLL && firstChild != nullptr && lastChildHeight.value() <= 0) {
 			float dummy{};
-			firstChild->measure(ui.getRenderers(), Orientation::Vertical, lastRectangle.width, lastRectangle.height, dummy, lastChildHeight.value());
+			firstChild->measure(ui.getRenderers(0), Orientation::Vertical, lastRectangle.width, lastRectangle.height, dummy, lastChildHeight.value());
 		}
 	}
 }

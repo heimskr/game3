@@ -104,10 +104,10 @@ namespace Game3 {
 			void saveSettings();
 
 			bool inBounds(const Position &) const;
-			RendererContext getRendererContext();
+			RendererContext getRendererContext(float delta);
 
-			void tick();
-			void render();
+			void tick(float delta);
+			void render(float delta);
 			void closeGame();
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);

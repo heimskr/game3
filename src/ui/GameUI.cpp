@@ -26,11 +26,11 @@ namespace Game3 {
 		ui.removeDialog(topDialog);
 	}
 
-	void GameUI::render(const RendererContext &) {
+	void GameUI::render(const RendererContext &renderers) {
 		Window &window = ui.window;
 
-		const float x_factor = window.getXFactor();
-		const float y_factor = window.getYFactor();
+		const float x_factor = renderers.xFactor;
+		const float y_factor = renderers.yFactor;
 		auto [width, height] = window.getDimensions();
 
 		ClientGamePtr game = window.game;
@@ -107,7 +107,7 @@ namespace Game3 {
 		}
 
 		if (realm) {
-			realm->getRenderer()->render(window.getRendererContext(), realm, window, *this);
+			realm->getRenderer()->render(renderers, realm, window, *this);
 			realmBounds = game->getVisibleRealmBounds();
 		}
 	}

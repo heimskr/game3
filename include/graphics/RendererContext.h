@@ -23,9 +23,19 @@ namespace Game3 {
 		Lockable<ClientSettings> &settings;
 		float xFactor;
 		float yFactor;
+		float delta;
 
-		RendererContext(RectangleRenderer &rectangle, SingleSpriteRenderer &single_sprite, BatchSpriteRenderer &batch_sprite, TextRenderer &text, CircleRenderer &circle, Recolor &recolor, Lockable<ClientSettings> &settings, float x_factor, float y_factor):
-			rectangle(rectangle), singleSprite(single_sprite), batchSprite(batch_sprite), text(text), circle(circle), recolor(recolor), settings(settings), xFactor(x_factor), yFactor(y_factor) {}
+		RendererContext(RectangleRenderer &rectangle, SingleSpriteRenderer &singleSprite, BatchSpriteRenderer &batchSprite, TextRenderer &text, CircleRenderer &circle, Recolor &recolor, Lockable<ClientSettings> &settings, float xFactor, float yFactor, float delta):
+			rectangle(rectangle),
+			singleSprite(singleSprite),
+			batchSprite(batchSprite),
+			text(text),
+			circle(circle),
+			recolor(recolor),
+			settings(settings),
+			xFactor(xFactor),
+			yFactor(yFactor),
+			delta(delta) {}
 
 		void pushSize() const;
 		void popSize() const;

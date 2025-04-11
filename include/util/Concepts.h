@@ -72,4 +72,10 @@ namespace Game3 {
 
 	template <typename T>
 	concept EnumClass = !std::is_convertible_v<T, int> && std::is_enum_v<T>;
+
+	template <typename T, template <typename...> typename U>
+	concept IsSpecializationOf = requires(std::remove_cvref_t<T> t) {
+		// https://www.reddit.com/r/cpp/comments/1hw6a29/a_concept_for_is_specialization_of/m61d6wv/
+		[]<typename... Args>(U<Args...> &){}(t);
+	};
 }

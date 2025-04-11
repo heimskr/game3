@@ -156,7 +156,7 @@ namespace Game3 {
 		assert(messageBox != nullptr);
 		auto label = std::make_shared<Label>(ui, selfScale, std::move(message), getTextColor());
 		messageBox->append(std::move(label));
-		messageBox->maybeRemeasure(ui.getRenderers(), -1, -1);
+		messageBox->maybeRemeasure(ui.getRenderers(0), -1, -1);
 	}
 
 	void ChatDialog::toggle(bool affect_focus) {

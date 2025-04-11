@@ -380,14 +380,14 @@ int main(int argc, char **argv) {
 	SystemTimePoint time = getTime();
 
 	while (!glfwWindowShouldClose(glfw_window)) {
+		SystemTimePoint old_time = std::exchange(time, getTime());
+		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
+
 		GL::clear(0, 0, 0);
-		window->tick();
+		window->tick(diff / 1e6);
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
 
-		SystemTimePoint old_time = time;
-		time = getTime();
-		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
 		if (diff != 0) {
 			window->feedFPS(1e6 / diff);
 		}

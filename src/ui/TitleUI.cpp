@@ -4,8 +4,10 @@
 #include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/IconButton.h"
+#include "ui/gl/widget/Spinner.h"
 #include "ui/TitleUI.h"
 #include "ui/Window.h"
+#include "util/Promises.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -39,9 +41,11 @@ namespace Game3 {
 			}
 
 			try {
-				if (updater->mayUpdate()) {
+				if (updater->mayUpdate() || 1) {
+					setSpinning(true);
 					updater->updateFetch()->then([&window, weak = getWeakSelf()](bool result) {
 						if (auto self = weak.lock()) {
+							self->setSpinning(false);
 							if (result) {
 								window.alert("Updated successfully.");
 							} else {
@@ -55,11 +59,16 @@ namespace Game3 {
 					updating = false;
 				}
 			} catch (const std::exception &error) {
+				setSpinning(false);
 				window.error(std::format("Failed to update:\n{}", error.what()));
 			}
 		});
 
+		spinner = make<Spinner>(ui, 1);
+		spinner->setFixedSize(8, 8);
+
 		updateButton->insertAtEnd(hbox);
+		updateButton->setFixedHeight(10.f);
 		hbox->insertAtEnd(aligner);
 		aligner->insertAtEnd(shared_from_this());
 		ui.emplaceDialog<ConnectionDialog>(1);
@@ -142,5 +151,20 @@ namespace Game3 {
 
 	std::weak_ptr<TitleUI> TitleUI::getWeakSelf() {
 		return std::weak_ptr(getSelf());
+	}
+
+	void TitleUI::setSpinning(bool spinning) {
+		if (spinning == (spinner->getParent() != nullptr)) {
+			// No change
+			return;
+		}
+
+		if (spinning) {
+			hbox->remove(updateButton);
+			spinner->insertAtEnd(hbox);
+		} else {
+			hbox->remove(spinner);
+			updateButton->insertAtEnd(hbox);
+		}
 	}
 }

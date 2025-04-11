@@ -311,7 +311,7 @@ namespace Game3 {
 		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
 		++cursor;
-		adjustCursorOffset(ui.getRenderers().text.textWidth(UString(1, character)));
+		adjustCursorOffset(ui.getRenderers(0).text.textWidth(UString(1, character)));
 	}
 
 	void TextInput::eraseWord() {
@@ -355,7 +355,7 @@ namespace Game3 {
 			return;
 		}
 
-		adjustCursorOffset(-ui.getRenderers().text.textWidth(text.substr(--cursor, 1)));
+		adjustCursorOffset(-ui.getRenderers(0).text.textWidth(text.substr(--cursor, 1)));
 		cursorIterator = text.erase(--cursorIterator);
 	}
 
@@ -366,7 +366,7 @@ namespace Game3 {
 	}
 
 	void TextInput::goLeft(size_t count) {
-		RendererContext renderers = ui.getRenderers();
+		RendererContext renderers = ui.getRenderers(0);
 		UString piece;
 
 		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
@@ -377,7 +377,7 @@ namespace Game3 {
 	}
 
 	void TextInput::goRight(size_t count) {
-		RendererContext renderers = ui.getRenderers();
+		RendererContext renderers = ui.getRenderers(0);
 		UString piece;
 
 		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
@@ -398,7 +398,7 @@ namespace Game3 {
 		cursor = text.length();
 		cursorIterator = text.end();
 		xOffset = 0;
-		setCursorOffset(ui.getRenderers().text.textWidth(text));
+		setCursorOffset(ui.getRenderers(0).text.textWidth(text));
 	}
 
 	void TextInput::autocomplete(const UString &completion) {

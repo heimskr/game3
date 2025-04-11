@@ -35,8 +35,8 @@ namespace Game3 {
 			tooltip->init();
 		}
 
-	void UIContext::render(float mouse_x, float mouse_y) {
-		RendererContext context = window.getRendererContext();
+	void UIContext::render(float mouse_x, float mouse_y, float delta) {
+		RendererContext context = window.getRendererContext(delta);
 
 		const int x_factor = window.getXFactor();
 		const int y_factor = window.getYFactor();
@@ -359,8 +359,8 @@ namespace Game3 {
 		return window.game->getPlayer();
 	}
 
-	RendererContext UIContext::getRenderers() const {
-		return window.getRendererContext();
+	RendererContext UIContext::getRenderers(float delta) const {
+		return window.getRendererContext(delta);
 	}
 
 	void UIContext::focusWidget(const WidgetPtr &to_focus) {

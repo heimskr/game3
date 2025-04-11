@@ -22,7 +22,7 @@ namespace Game3 {
 			std::shared_ptr<Grid> grid;
 
 			inline void applySetting(auto member_ptr, const auto &value) {
-				ui.getRenderers().settings.withUnique([this, member_ptr, &value](ClientSettings &settings) {
+				ui.getRenderers(0).settings.withUnique([this, member_ptr, &value](ClientSettings &settings) {
 					(settings.*member_ptr) = value;
 					settings.apply(*ui.getGame());
 				});

@@ -112,7 +112,7 @@ namespace Game3 {
 		}
 
 		float minimum{}, natural{};
-		child->measure(ui.getRenderers(), Orientation::Vertical, fixedWidth, fixedHeight, minimum, natural);
+		child->measure(ui.getRenderers(0), Orientation::Vertical, fixedWidth, fixedHeight, minimum, natural);
 		if (0 < natural) {
 			setFixedHeight(natural);
 		}

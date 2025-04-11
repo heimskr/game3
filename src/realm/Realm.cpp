@@ -230,7 +230,7 @@ namespace Game3 {
 		PlayerPtr player = game.getPlayer();
 		assert(player);
 
-		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, recolor, settings, x_factor, y_factor] = renderers;
+		auto &[rectangle_renderer, single_sprite, batch_sprite, text_renderer, circle_renderer, recolor, settings, x_factor, y_factor, delta] = renderers;
 
 		float effective_time = outdoors? game_time : 1;
 
@@ -1787,7 +1787,7 @@ namespace Game3 {
 
 		Tileset &tileset = getTileset();
 		RealmPtr shared = shared_from_this();
-		RendererContext context = game.getWindow()->getRendererContext();
+		RendererContext context = game.getWindow()->getRendererContext(0);
 		auto saver = context.getSaver();
 		context.updateSize(texture.getWidth(), texture.getHeight());
 		GL::Viewport viewport(0, 0, texture.getWidth(), texture.getHeight());
