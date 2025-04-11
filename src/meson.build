@@ -86,7 +86,7 @@ elif build_machine.system() == 'linux'
 	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 	link_args += '-lnoise'
 elif build_machine.system() == 'darwin'
-	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
+	link_args += '../subprojects/FastNoise2/build/src/libFastNoise.a'
 elif build_machine.system() == 'windows'
 	link_args += '../subprojects/FastNoise2/build2/lib/libFastNoise.a'
 	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
