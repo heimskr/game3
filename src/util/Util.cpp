@@ -4,6 +4,13 @@
 
 #include "util/Util.h"
 
+#ifdef __MINGW32__
+#include <windows.h>
+#include <shellapi.h>
+#else
+#include "util/Shell.h"
+#endif
+
 namespace Game3 {
 	std::default_random_engine utilRNG;
 
@@ -131,5 +138,16 @@ namespace Game3 {
 			}
 		}
 		return out;
+	}
+
+	void openInBrowser(const std::string &url) {
+		assert(url.starts_with("http://") || url.starts_with("https://"));
+#ifdef __MINGW32__
+		ShellExecuteA(nullptr, nullptr, url.c_str(), nullptr, nullptr, SW_SHOW);
+#elifdef __APPLE__
+		runCommand("open", {url});
+#else
+		runCommand("xdg-open", {url});
+#endif
 	}
 }

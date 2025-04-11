@@ -10,8 +10,9 @@ namespace Game3 {
 		std::string err;
 
 		CommandOutput() = default;
-		CommandOutput(std::string out_, std::string err_):
-			out(std::move(out_)), err(std::move(err_)) {}
+		CommandOutput(std::string out, std::string err):
+			out(std::move(out)),
+			err(std::move(err)) {}
 	};
 
 	CommandOutput runCommand(const std::string &path, std::span<const std::string> args);

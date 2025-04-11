@@ -30,15 +30,17 @@ namespace Game3 {
 
 		const int child = fork();
 
-		if (child == -1)
+		if (child == -1) {
 			throw std::runtime_error("Couldn't fork");
+		}
 
 		if (child == 0) {
 			std::vector<char *> cstrings{const_cast<char *>(path.c_str())};
 			cstrings.reserve(args.size() + 2);
 
-			for (const std::string &arg: args)
+			for (const std::string &arg: args) {
 				cstrings.push_back(const_cast<char *>(arg.data()));
+			}
 
 			cstrings.push_back(nullptr);
 

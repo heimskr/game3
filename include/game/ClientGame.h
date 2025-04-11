@@ -102,6 +102,11 @@ namespace Game3 {
 
 			void initialSetup(const std::filesystem::path &dir) final;
 
+			template <typename... Args>
+			void runCommand(std::format_string<Args...> format, Args &&...args) {
+				runCommand(std::format(format, std::forward<Args>(args)...));
+			}
+
 		private:
 			std::weak_ptr<Window> weakWindow;
 			ClientPlayerPtr player;

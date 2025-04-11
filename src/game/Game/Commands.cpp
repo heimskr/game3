@@ -7,6 +7,7 @@
 #include "command/local/ScaleCommand.h"
 #include "command/local/SegfaultCommand.h"
 #include "command/local/UsageCommand.h"
+#include "command/local/WikiCommand.h"
 
 namespace Game3 {
 	void Game::add(LocalCommandFactory &&factory) {
@@ -22,5 +23,6 @@ namespace Game3 {
 		add(LocalCommandFactory::create<PlayersCommand>());
 		add(LocalCommandFactory::create<SegfaultCommand>());
 		add(LocalCommandFactory::create<ScaleCommand>());
+		add(LocalCommandFactory::create<WikiCommand>());
 	}
 }

@@ -136,6 +136,8 @@ namespace Game3 {
 
 	std::string escape(std::string_view);
 
+	void openInBrowser(const std::string &url);
+
 	template <std::integral I>
 	I parseNumber(std::string_view view, int base = 10) {
 		I out{};
