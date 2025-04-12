@@ -38,7 +38,7 @@ namespace Game3 {
 		rotation += renderers.delta * speed;
 
 		for (int i = 0; i < count; ++i) {
-			float radians = (static_cast<float>(i) / count + rotation) * 2.f * M_PIf;
+			float radians = (static_cast<float>(i) / count + rotation) * 2.f * static_cast<float>(M_PI);
 			float x_offset = width * (0.5f + std::cos(radians) / 2.f) + scaled_radius;
 			float y_offset = height * (0.5f + std::sin(radians) / 2.f) + scaled_radius;
 			renderers.circle.drawOnScreen(color, x + x_offset, y + y_offset, scaled_radius, scaled_radius);
