@@ -102,7 +102,7 @@ namespace Game3 {
 				stationInventoryModule->handleMessage(source, name, data);
 				inventoryModule->handleMessage(source, name, data);
 				game->getWindow()->queue([](Window &window) {
-					if (auto game_ui = window.getUI<GameUI>()) {
+					if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 						game_ui->removeModule();
 					}
 				});

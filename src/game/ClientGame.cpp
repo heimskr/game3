@@ -177,7 +177,7 @@ namespace Game3 {
 
 	void ClientGame::setText(const UString &text) {
 		auto window = getWindow();
-		if (auto game_ui = window->getUI<GameUI>()) {
+		if (auto game_ui = window->uiContext.getUI<GameUI>()) {
 			game_ui->showOmniDialog();
 			game_ui->openModule("base:module/text", std::any(text.raw()));
 		}
@@ -326,7 +326,7 @@ namespace Game3 {
 	}
 
 	void ClientGame::moduleMessageBuffer(const Identifier &module_id, const std::shared_ptr<Agent> &source, const std::string &name, Buffer &&data) {
-		if (auto game_ui = getWindow()->getUI<GameUI>()) {
+		if (auto game_ui = getWindow()->uiContext.getUI<GameUI>()) {
 			game_ui->moduleMessageBuffer(module_id, source, name, std::move(data));
 		}
 	}

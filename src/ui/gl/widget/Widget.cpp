@@ -38,6 +38,10 @@ namespace Game3 {
 	}
 
 	bool Widget::click(int button, int x, int y, Modifiers modifiers) {
+		if (!contains(x, y)) {
+			return false;
+		}
+
 		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick) {
 			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
 		}
@@ -52,6 +56,10 @@ namespace Game3 {
 	}
 
 	bool Widget::mouseDown(int button, int x, int y, Modifiers modifiers) {
+		if (!contains(x, y)) {
+			return false;
+		}
+
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
 			if (child->contains(x, y) && child->mouseDown(button, x, y, modifiers)) {
 				return true;
@@ -72,6 +80,10 @@ namespace Game3 {
 	}
 
 	bool Widget::dragStart(int x, int y) {
+		if (!contains(x, y)) {
+			return false;
+		}
+
 		dragOrigin.emplace(x, y);
 
 		if (onDragStart && onDragStart(*this, x - lastRectangle.x, y - lastRectangle.y)) {
@@ -88,6 +100,10 @@ namespace Game3 {
 	}
 
 	bool Widget::dragUpdate(int x, int y) {
+		if (!contains(x, y)) {
+			return false;
+		}
+
 		if (onDragUpdate && onDragUpdate(*this, x - lastRectangle.x, y - lastRectangle.y))
 			return true;
 

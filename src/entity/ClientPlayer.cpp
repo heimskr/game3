@@ -341,7 +341,7 @@ namespace Game3 {
 			const auto module_name = buffer->take<Identifier>();
 			const auto message_name = buffer->take<std::string>();
 			GamePtr game = getGame();
-			if (auto game_ui = game->toClient().getWindow()->getUI<GameUI>()) {
+			if (auto game_ui = game->toClient().getWindow()->uiContext.getUI<GameUI>()) {
 				game_ui->moduleMessageBuffer(module_name, source, message_name, std::move(*buffer));
 			}
 		}
@@ -371,7 +371,7 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::showText(const UString &text, const UString &) {
-		if (auto game_ui = getGame()->toClient().getWindow()->getUI<GameUI>()) {
+		if (auto game_ui = getGame()->toClient().getWindow()->uiContext.getUI<GameUI>()) {
 			game_ui->openModule("base:module/text", std::any(text.raw()));
 		}
 	}

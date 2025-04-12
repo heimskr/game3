@@ -160,8 +160,8 @@ namespace Game3 {
 		}
 	}
 
-	bool Hotbar::mouseDown(int, int, int, Modifiers) {
-		return true;
+	bool Hotbar::mouseDown(int, int x, int y, Modifiers) {
+		return contains(x, y);
 	}
 
 	SizeRequestMode Hotbar::getRequestMode() const {

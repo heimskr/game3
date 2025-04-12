@@ -160,7 +160,8 @@ namespace Game3 {
 		mouseDownPosition.emplace(x, y);
 
 		if (getPosition().contains(x, y)) {
-			if (activeTab && activeTab->mouseDown(button, x, y, modifiers)) {
+			if (activeTab && activeTab->contains(x, y)) {
+				activeTab->mouseDown(button, x, y, modifiers);
 				return true;
 			}
 		}

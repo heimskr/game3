@@ -38,6 +38,8 @@ namespace Game3 {
 	}
 
 	void InventoryTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Widget::render(renderers, x, y, width, height);
+
 		Rectangle rectangle(x, y, width, height);
 
 		std::unique_lock<DefaultMutex> module_lock;

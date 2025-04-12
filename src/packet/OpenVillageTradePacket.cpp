@@ -24,7 +24,7 @@ namespace Game3 {
 		if (removeOnMove) {
 			game->getPlayer()->queueForMove([window](const auto &, bool) {
 				window->queue([](Window &window) {
-					if (auto game_ui = window.getUI<GameUI>()) {
+					if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 						game_ui->removeModule();
 						game_ui->hideOmniDialog();
 					}
@@ -33,12 +33,12 @@ namespace Game3 {
 			});
 		}
 
-		if (auto game_ui = window->getUI<GameUI>()) {
+		if (auto game_ui = window->uiContext.getUI<GameUI>()) {
 			// Force a fresh module construction instead of an update
 			game_ui->removeModule();
 
 			window->queue([village = std::move(village)](Window &window) {
-				if (auto game_ui = window.getUI<GameUI>()) {
+				if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 					game_ui->openModule(VillageTradeModule::ID(), std::any(village));
 				}
 			});

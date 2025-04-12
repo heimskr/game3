@@ -37,7 +37,6 @@ namespace Game3 {
 	class HasFluids;
 	class LocalClient;
 	class TopDialog;
-	class UI;
 	class Window;
 	struct Modifiers;
 	struct Position;
@@ -69,7 +68,6 @@ namespace Game3 {
 			Overlayer overlayer;
 			std::set<int> heldKeys;
 			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
-			std::shared_ptr<UI> currentUI;
 
 			Window(GLFWwindow &);
 
@@ -121,17 +119,6 @@ namespace Game3 {
 
 			void setGame(std::shared_ptr<ClientGame>);
 
-			template <typename T>
-			void setUI() {
-				currentUI = std::make_shared<T>(uiContext, 1);
-				initUI();
-			}
-
-			template <typename T>
-			std::shared_ptr<T> getUI() {
-				return std::dynamic_pointer_cast<T>(currentUI);
-			}
-
 		private:
 			struct KeyInfo {
 				int code;
@@ -166,7 +153,6 @@ namespace Game3 {
 			void continueLocalConnection();
 			void handleKeys();
 			void renderFPSCounter();
-			void initUI();
 	};
 
 	using WindowPtr = std::shared_ptr<Window>;

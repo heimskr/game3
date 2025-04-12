@@ -61,7 +61,7 @@ namespace Game3 {
 		realm->addPlayer(player);
 		player->getInventory(0)->notifyOwner({});
 		window->queue([](Window &window) {
-			window.setUI<GameUI>();
+			window.uiContext.setUI<GameUI>();
 		});
 	}
 }

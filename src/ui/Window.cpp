@@ -130,7 +130,7 @@ namespace Game3 {
 			settings.apply(uiContext);
 
 			textRenderer.initRenderData();
-			setUI<TitleUI>();
+			uiContext.setUI<TitleUI>();
 		}
 
 	void Window::queue(std::function<void(Window &)> function) {
@@ -283,7 +283,7 @@ namespace Game3 {
 	}
 
 	bool Window::inBounds(const Position &pos) const {
-		Rectangle realmBounds = dynamic_cast<GameUI &>(*currentUI).realmBounds;
+		Rectangle realmBounds = uiContext.getUI<GameUI>()->realmBounds;
 		const auto x = realmBounds.x;
 		const auto y = realmBounds.y;
 		return x <= pos.column && pos.column < x + realmBounds.width
@@ -337,7 +337,6 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		currentUI->render(getRendererContext(delta));
 		uiContext.render(getMouseX(), getMouseY(), delta);
 
 		if (settings.showFPS && runningFPS > 0) {
@@ -438,7 +437,7 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_E) {
 					if (uiContext.hasDialog<OmniDialog>()) {
-						getUI<GameUI>()->hideOmniDialog();
+						uiContext.getUI<GameUI>()->hideOmniDialog();
 					} else {
 						game->interactNextTo(modifiers, Hand::Right);
 					}
@@ -489,7 +488,7 @@ namespace Game3 {
 				}
 
 				if (key == GLFW_KEY_ESCAPE) {
-					if (auto game_ui = getUI<GameUI>()) {
+					if (auto game_ui = uiContext.getUI<GameUI>()) {
 						game_ui->toggleOmniDialog();
 					}
 					return;
@@ -522,7 +521,7 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_SLASH) {
 					queue([](Window &window) {
-						if (auto game_ui = window.getUI<GameUI>()) {
+						if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 							game_ui->getChatDialog()->toggle(false);
 						}
 					});
@@ -531,7 +530,7 @@ namespace Game3 {
 
 				if (key == GLFW_KEY_BACKSLASH) {
 					queue([slash = modifiers.onlyShift()](Window &window) {
-						if (auto game_ui = window.getUI<GameUI>()) {
+						if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 							std::shared_ptr<ChatDialog> chat = game_ui->getChatDialog();
 							chat->focusInput();
 							if (slash) {
@@ -686,7 +685,7 @@ namespace Game3 {
 		// richPresence.setActivityDetails("Idling");
 
 		connected = false;
-		if (auto game_ui = getUI<GameUI>()) {
+		if (auto game_ui = uiContext.getUI<GameUI>()) {
 			game_ui->removeModule();
 		}
 		game->stopThread();
@@ -697,11 +696,11 @@ namespace Game3 {
 
 	void Window::goToTitle() {
 		queue([](Window &window) {
-			if (auto game_ui = window.getUI<GameUI>()) {
+			if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 				game_ui->omniDialog.reset();
 			}
 			window.uiContext.reset();
-			window.setUI<TitleUI>();
+			window.uiContext.setUI<TitleUI>();
 		});
 	}
 
@@ -720,7 +719,7 @@ namespace Game3 {
 			if (auto has_inventory = std::dynamic_pointer_cast<HasInventory>(owner); has_inventory && has_inventory->getInventory(inventory_id)) {
 				auto client_inventory = std::dynamic_pointer_cast<ClientInventory>(has_inventory->getInventory(inventory_id));
 				queue([owner, client_inventory](Window &window) {
-					if (auto game_ui = window.getUI<GameUI>()) {
+					if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 						if (owner->getGID() == game_ui->getExternalGID()) {
 							std::unique_lock<DefaultMutex> lock;
 							if (Module *module_ = game_ui->getOmniDialog()->inventoryTab->getModule(lock)) {
@@ -738,7 +737,7 @@ namespace Game3 {
 
 		game->signalFluidUpdate.connect([this](const std::shared_ptr<HasFluids> &has_fluids) {
 			queue([has_fluids](Window &window) mutable {
-				if (auto game_ui = window.getUI<GameUI>()) {
+				if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 					if (!game_ui->omniDialog) {
 						return;
 					}
@@ -755,7 +754,7 @@ namespace Game3 {
 
 		game->signalEnergyUpdate.connect([this](const std::shared_ptr<HasEnergy> &has_energy) {
 			queue([has_energy](Window &window) mutable {
-				if (auto game_ui = window.getUI<GameUI>()) {
+				if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 					if (!game_ui->omniDialog) {
 						return;
 					}
@@ -772,7 +771,7 @@ namespace Game3 {
 
 		game->signalVillageUpdate.connect([this](const VillagePtr &village) {
 			queue([village](Window &window) mutable {
-				if (auto game_ui = window.getUI<GameUI>()) {
+				if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 					if (!game_ui->omniDialog) {
 						return;
 					}
@@ -788,7 +787,7 @@ namespace Game3 {
 		});
 
 		game->signalChatReceived.connect([this](const PlayerPtr &player, const UString &message) {
-			if (auto game_ui = getUI<GameUI>()) {
+			if (auto game_ui = uiContext.getUI<GameUI>()) {
 				auto dialog = game_ui->getChatDialog();
 				if (player == nullptr) {
 					dialog->addMessage(message);
@@ -1095,11 +1094,5 @@ namespace Game3 {
 			.shadow = Color{"#000000"},
 			.shadowOffset{6, 6},
 		});
-	}
-
-	void Window::initUI() {
-		uiContext.reset();
-		currentUI->init(*this);
-		uiContext.addDialog(currentUI);
 	}
 }

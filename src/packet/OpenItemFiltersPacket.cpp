@@ -21,7 +21,7 @@ namespace Game3 {
 		if (removeOnMove) {
 			game->getPlayer()->queueForMove([window](const auto &, bool) {
 				window->queue([](Window &window) {
-					if (auto game_ui = window.getUI<GameUI>()) {
+					if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 						game_ui->removeModule();
 						game_ui->hideOmniDialog();
 					}
@@ -31,14 +31,14 @@ namespace Game3 {
 		}
 
 		// Force a fresh module construction instead of an update
-		if (auto game_ui = window->getUI<GameUI>()) {
+		if (auto game_ui = window->uiContext.getUI<GameUI>()) {
 			game_ui->removeModule();
 		}
 
 		DirectedPlace place{direction, Place(position, realm, {})};
 
 		window->queue([place = std::move(place)](Window &window) {
-			if (auto game_ui = window.getUI<GameUI>()) {
+			if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 				game_ui->openModule(ItemFiltersModule::ID(), std::any(place));
 			}
 		});

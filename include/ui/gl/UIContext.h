@@ -4,6 +4,7 @@
 #include "ui/gl/dialog/Dialog.h"
 #include "ui/gl/widget/Widget.h"
 #include "ui/Modifiers.h"
+#include "util/Reverse.h"
 
 #include <algorithm>
 #include <memory>
@@ -21,12 +22,14 @@ namespace Game3 {
 	class InventoryModule;
 	class Texture;
 	class Tooltip;
+	class UI;
 	class Window;
 	struct RendererContext;
 
 	class UIContext {
 		public:
 			Window &window;
+			std::shared_ptr<UI> currentUI;
 			ScissorStack scissorStack;
 			float scale = 1;
 			bool renderingDraggedWidget = false;
@@ -106,6 +109,17 @@ namespace Game3 {
 				return dialog;
 			}
 
+			template <typename T>
+			void setUI() {
+				currentUI = std::make_shared<T>(*this, 1);
+				initUI();
+			}
+
+			template <typename T>
+			std::shared_ptr<T> getUI() const {
+				return std::dynamic_pointer_cast<T>(currentUI);
+			}
+
 		private:
 			std::vector<std::shared_ptr<Dialog>> dialogs;
 			ScissorStack internalScissorStack; // TODO: remove this
@@ -122,6 +136,7 @@ namespace Game3 {
 			std::set<WidgetPtr> extraDragUpdaters;
 
 			void refocusDialogs(int x, int y);
+			void initUI();
 
 			template <typename T>
 			static bool dialogMatcher(const std::shared_ptr<Dialog> &dialog) {
@@ -131,6 +146,29 @@ namespace Game3 {
 				}
 
 				return false;
+			}
+
+			template <typename... Args>
+			bool dispatch(bool (Widget::*function)(Args...), Args ...args) {
+				if (contextMenu && ((*contextMenu).*function)(args...)) {
+					return true;
+				}
+
+				if (autocompleteDropdown && ((*autocompleteDropdown).*function)(args...)) {
+					return true;
+				}
+
+				for (const DialogPtr &dialog: reverse(dialogs)) {
+					if (((*dialog).*function)(args...)) {
+						return true;
+					}
+				}
+
+				if (((*hotbar).*function)(args...)) {
+					return true;
+				}
+
+				return currentUI && ((*currentUI).*function)(args...);
 			}
 	};
 }

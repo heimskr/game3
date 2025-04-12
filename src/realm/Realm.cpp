@@ -25,6 +25,7 @@
 #include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
+#include "util/Reverse.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -212,7 +213,7 @@ namespace Game3 {
 		const ChunkPosition current_chunk = player->getChunk();
 		if (staticLightingQueued.exchange(false) || lastPlayerChunk != current_chunk) {
 			lastPlayerChunk = current_chunk;
-			remakeStaticLightingTexture(dynamic_cast<GameUI &>(*game.getWindow()->currentUI));
+			remakeStaticLightingTexture(dynamic_cast<GameUI &>(*game.getWindow()->uiContext.currentUI));
 			return true;
 		}
 

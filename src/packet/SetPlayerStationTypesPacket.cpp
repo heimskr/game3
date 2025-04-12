@@ -13,7 +13,7 @@ namespace Game3 {
 		game->getPlayer()->stationTypes = std::move(stationTypes);
 		auto window = game->getWindow();
 		window->queue([game, focus = focus](Window &window) {
-			if (auto game_ui = window.getUI<GameUI>()) {
+			if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 				auto omni = game_ui->getOmniDialog();
 				auto tab = omni->craftingTab;
 				tab->reset();

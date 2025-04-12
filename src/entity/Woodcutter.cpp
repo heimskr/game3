@@ -74,7 +74,7 @@ namespace Game3 {
 			// 	tab->removeModule();
 			// 	return true;
 			// });
-			if (auto game_ui = window->getUI<GameUI>()) {
+			if (auto game_ui = window->uiContext.getUI<GameUI>()) {
 				game_ui->showExternalInventory(std::dynamic_pointer_cast<ClientInventory>(getInventory(0)));
 			}
 		}

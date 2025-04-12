@@ -13,7 +13,7 @@ namespace Game3 {
 		if (removeOnMove) {
 			game->getPlayer()->queueForMove([window](const auto &, bool) {
 				window->queue([](Window &window) {
-					if (auto game_ui = window.getUI<GameUI>()) {
+					if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 						game_ui->removeModule();
 						game_ui->hideOmniDialog();
 					}
@@ -23,7 +23,7 @@ namespace Game3 {
 		}
 
 		window->queue([message = std::move(message)](Window &window) mutable {
-			if (auto game_ui = window.getUI<GameUI>()) {
+			if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 				game_ui->openModule("base:module/text", std::any(std::move(message)));
 			}
 		});

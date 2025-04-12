@@ -105,7 +105,7 @@ namespace Game3 {
 
 			if (source && source->getGID() == mutator->getGID()) {
 				getGame()->getWindow()->queue([](Window &window) {
-					if (auto game_ui = window.getUI<GameUI>()) {
+					if (auto game_ui = window.uiContext.getUI<GameUI>()) {
 						game_ui->removeModule();
 					}
 				});

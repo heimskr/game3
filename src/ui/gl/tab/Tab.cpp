@@ -38,7 +38,7 @@ namespace Game3 {
 	}
 
 	bool Tab::isActive() const {
-		if (auto game_ui = ui.window.getUI<GameUI>()) {
+		if (auto game_ui = ui.window.uiContext.getUI<GameUI>()) {
 			return game_ui->getOmniDialog()->activeTab.get() == this;
 		}
 
