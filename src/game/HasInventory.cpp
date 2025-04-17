@@ -1,19 +1,21 @@
-#include "game/Game.h"
 #include "game/ClientInventory.h"
+#include "game/Game.h"
 #include "game/HasInventory.h"
 #include "game/ServerInventory.h"
 #include "net/Buffer.h"
 
 namespace Game3 {
-	const std::shared_ptr<Inventory> & HasInventory::getInventory(InventoryID inventory_id) const {
-		if (inventory_id != 0)
+	const std::shared_ptr<Inventory> &HasInventory::getInventory(InventoryID inventory_id) const {
+		if (inventory_id != 0) {
 			throw std::invalid_argument(std::format("Couldn't retrieve inventory with index {}", inventory_id));
+		}
 		return inventory;
 	}
 
 	void HasInventory::setInventory(std::shared_ptr<Inventory> new_inventory, InventoryID inventory_id) {
-		if (inventory_id != 0)
+		if (inventory_id != 0) {
 			throw std::invalid_argument(std::format("Couldn't set inventory with index {}", inventory_id));
+		}
 		inventory = std::move(new_inventory);
 	}
 

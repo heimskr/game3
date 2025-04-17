@@ -40,9 +40,9 @@
 #include "item/LiquefierItem.h"
 #include "item/MeleeWeapon.h"
 #include "item/MicroscopeItem.h"
+#include "item/Mushroom.h"
 #include "item/Mutagen.h"
 #include "item/MutatorItem.h"
-#include "item/Mushroom.h"
 #include "item/Pickaxe.h"
 #include "item/PipeItem.h"
 #include "item/PressurePlateItem.h"
@@ -50,8 +50,8 @@
 #include "item/PumpItem.h"
 #include "item/RecombinatorItem.h"
 #include "item/Sapling.h"
-#include "item/SequencerItem.h"
 #include "item/Seed.h"
+#include "item/SequencerItem.h"
 #include "item/SulfuricAcidItem.h"
 #include "item/TankItem.h"
 #include "item/TerrainSeed.h"
@@ -365,40 +365,45 @@ namespace Game3 {
 
 		add(Furniture::createTileEntity("base:item/chest", "Chest", 100, [](const Place &place) -> bool {
 			auto out = TileEntity::spawn<Chest>(place, "base:tile/chest", place.position, "Chest", "base:item/chest");
-			if (!out)
+			if (!out) {
 				return false;
+			}
 			out->setInventory(30);
 			return true;
 		}));
 
 		add(Furniture::createTileEntity("base:item/crate", "Crate", 999, [](const Place &place) -> bool { // TODO: cost
 			auto out = TileEntity::spawn<Crate>(place, "base:tile/crate", place.position, "base:item/crate", "Crate");
-			if (!out)
+			if (!out) {
 				return false;
+			}
 			out->setInventory(1);
 			return true;
 		}));
 
 		add(Furniture::createTileEntity("base:item/barrel", "Barrel", 999, [](const Place &place) -> bool { // TODO: cost
 			auto out = TileEntity::spawn<Crate>(place, "base:tile/barrel", place.position, "base:item/barrel", "Barrel");
-			if (!out)
+			if (!out) {
 				return false;
+			}
 			out->setInventory(1);
 			return true;
 		}));
 
 		add(Furniture::createTileEntity("base:item/fridge", "Fridge", 150, [](const Place &place) -> bool {
 			auto out = TileEntity::spawn<Chest>(place, "base:tile/fridge", place.position, "Fridge", "base:item/fridge");
-			if (!out)
+			if (!out) {
 				return false;
+			}
 			out->setInventory(30);
 			return true;
 		}));
 
 		add(Furniture::createTileEntity("base:item/cabinet", "Cabinet", 36, [](const Place &place) -> bool {
 			auto out = TileEntity::spawn<Chest>(place, "base:tile/cabinet", place.position, "Fridge", "base:item/cabinet");
-			if (!out)
+			if (!out) {
 				return false;
+			}
 			out->setInventory(15);
 			return true;
 		}));

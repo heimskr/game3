@@ -1,4 +1,3 @@
-#include "util/Log.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
@@ -11,6 +10,7 @@
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "ui/Window.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	ItemEntity::ItemEntity(const GamePtr &game):

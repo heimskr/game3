@@ -12,10 +12,11 @@ namespace Game3 {
 		// TODO: avoid overflow or whatever, in case someone tries to store more than 19+ quintillion of something
 
 		if (0 <= start) {
-			if (slotCount <= start)
+			if (slotCount <= start) {
 				throw std::out_of_range(std::format("Can't start at slot {}: out of range", start));
+			}
 
-			if (predicate(start)){
+			if (predicate(start)) {
 				if (auto iter = storage.find(start); iter != storage.end()) {
 					const ItemStackPtr &stored = iter->second;
 					stored->count += stack->count;
@@ -26,8 +27,9 @@ namespace Game3 {
 
 		if (!done) {
 			for (auto &[slot, stored]: storage) {
-				if (slot == start || !stored->canMerge(*stack) || !predicate(slot))
+				if (slot == start || !stored->canMerge(*stack) || !predicate(slot)) {
 					continue;
+				}
 
 				stored->count += stack->count;
 				done = true;
@@ -37,8 +39,9 @@ namespace Game3 {
 
 		if (!done) {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
-				if (storage.contains(slot) || !predicate(slot))
+				if (storage.contains(slot) || !predicate(slot)) {
 					continue;
+				}
 
 				storage.emplace(slot, stack);
 				done = true;
@@ -56,12 +59,14 @@ namespace Game3 {
 
 	bool ExpandedServerInventory::canInsert(const ItemStackPtr &stack, const std::function<bool(Slot)> &predicate) const {
 		for (Slot slot = 0; slot < slotCount; ++slot) {
-			if (!predicate(slot))
+			if (!predicate(slot)) {
 				continue;
+			}
 
 			if (auto iter = storage.find(slot); iter != storage.end()) {
-				if (iter->second->canMerge(*stack))
+				if (iter->second->canMerge(*stack)) {
 					return true;
+				}
 			} else {
 				return true;
 			}
@@ -72,8 +77,9 @@ namespace Game3 {
 
 	bool ExpandedServerInventory::canInsert(const ItemStackPtr &stack, Slot slot) const {
 		auto iter = storage.find(slot);
-		if (iter == storage.end())
+		if (iter == storage.end()) {
 			return true;
+		}
 		return iter->second->canMerge(*stack);
 	}
 

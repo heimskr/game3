@@ -1,4 +1,3 @@
-#include "util/Log.h"
 #include "algorithm/AStar.h"
 #include "data/Identifier.h"
 #include "entity/ClientPlayer.h"
@@ -28,6 +27,7 @@
 #include "types/Position.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
+#include "util/Log.h"
 #include "util/Util.h"
 
 #include <cassert>
@@ -94,9 +94,11 @@ namespace Game3 {
 			{
 				auto lock = visibleEntities.sharedLock();
 				if (!visibleEntities.empty()) {
-					for (const auto &weak_visible: visibleEntities)
-						if (auto visible = weak_visible.lock())
+					for (const auto &weak_visible: visibleEntities) {
+						if (auto visible = weak_visible.lock()) {
 							visible->removeVisible(shared);
+						}
+					}
 				}
 			}
 
@@ -109,11 +111,11 @@ namespace Game3 {
 	void Entity::toJSON(boost::json::value &json) const {
 		auto &object = ensureObject(json);
 		auto this_lock = sharedLock();
-		object["type"]      = boost::json::value_from(type);
-		object["position"]  = boost::json::value_from(position);
-		object["realmID"]   = realmID;
+		object["type"] = boost::json::value_from(type);
+		object["position"] = boost::json::value_from(position);
+		object["realmID"] = realmID;
 		object["direction"] = boost::json::value_from(direction);
-		object["age"]       = age;
+		object["age"] = age;
 
 		if (const InventoryPtr inventory = getInventory(0)) {
 			// TODO: move JSONification to StorageInventory
@@ -289,8 +291,8 @@ namespace Game3 {
 
 			position.withUnique([&offset = offset](Position &position) {
 				using I = Position::IntType;
-				position.column += offset.x < 0? -I(-offset.x) : I(offset.x);
-				position.row    += offset.y < 0? -I(-offset.y) : I(offset.y);
+				position.column += offset.x < 0? -static_cast<I>(-offset.x) : static_cast<I>(offset.x);
+				position.row    += offset.y < 0? -static_cast<I>(-offset.y) : static_cast<I>(offset.y);
 			});
 
 			double dummy;
@@ -899,8 +901,9 @@ namespace Game3 {
 	}
 
 	void Entity::queueDestruction() {
-		if (!awaitingDestruction.exchange(true))
+		if (!awaitingDestruction.exchange(true)) {
 			getRealm()->queueDestruction(getSelf());
+		}
 	}
 
 	PathResult Entity::pathfind(const Position &start, const Position &goal, std::deque<Direction> &out, size_t loop_max) {
@@ -1166,8 +1169,9 @@ namespace Game3 {
 			});
 		}
 
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return;
+		}
 
 		auto path_lock = path.sharedLock();
 
@@ -1271,7 +1275,7 @@ namespace Game3 {
 		buffer >> age;
 		// TODO: support multiple entity inventories
 		HasInventory::decode(buffer, 0);
-		const auto left_slot  = buffer.take<Slot>();
+		const auto left_slot = buffer.take<Slot>();
 		const auto right_slot = buffer.take<Slot>();
 
 		buffer >> customTexture;
@@ -1438,9 +1442,11 @@ namespace Game3 {
 			auto entities_lock = realm->entities.sharedLock();
 			auto visible_lock = visibleEntities.uniqueLock();
 			visibleEntities.clear();
-			for (const EntityPtr &entity: realm->entities)
-				if (entity.get() != this && entity->canSee(*this))
+			for (const EntityPtr &entity: realm->entities) {
+				if (entity.get() != this && entity->canSee(*this)) {
 					visibleEntities.insert(entity);
+				}
+			}
 		}
 
 		{

@@ -31,8 +31,9 @@ namespace Game3 {
 	}
 
 	StorageInventory & StorageInventory::operator=(const StorageInventory &other) {
-		if (this == &other)
+		if (this == &other) {
 			return *this;
+		}
 
 		auto this_lock = uniqueLock();
 		auto other_lock = other.sharedLock();
@@ -42,8 +43,9 @@ namespace Game3 {
 	}
 
 	StorageInventory & StorageInventory::operator=(StorageInventory &&other) noexcept {
-		if (this == &other)
+		if (this == &other) {
 			return *this;
+		}
 
 		auto this_lock = uniqueLock();
 		auto other_lock = other.uniqueLock();
@@ -53,14 +55,16 @@ namespace Game3 {
 	}
 
 	ItemStackPtr StorageInventory::operator[](Slot slot) const {
-		if (auto iter = storage.find(slot); iter != storage.end())
+		if (auto iter = storage.find(slot); iter != storage.end()) {
 			return iter->second;
+		}
 		return nullptr;
 	}
 
 	void StorageInventory::set(Slot slot, ItemStackPtr stack) {
-		if (!hasSlot(slot))
+		if (!hasSlot(slot)) {
 			throw std::out_of_range("Slot out of range: " + std::to_string(slot));
+		}
 		storage[slot] = std::move(stack);
 	}
 
@@ -73,23 +77,28 @@ namespace Game3 {
 	}
 
 	void StorageInventory::iterate(const std::function<bool(const ItemStackPtr &, Slot)> &function) const {
-		for (Slot slot = 0; slot < slotCount; ++slot)
-			if (auto iter = storage.find(slot); iter != storage.end())
-				if (function(iter->second, slot))
+		for (Slot slot = 0; slot < slotCount; ++slot) {
+			if (auto iter = storage.find(slot); iter != storage.end()) {
+				if (function(iter->second, slot)) {
 					return;
+				}
+			}
+		}
 	}
 
 	ItemStackPtr StorageInventory::firstItem(Slot *slot_out) {
 		if (storage.empty()) {
-			if (slot_out != nullptr)
+			if (slot_out != nullptr) {
 				*slot_out = -1;
+			}
 			return nullptr;
 		}
 
 		auto &[slot, stack] = *storage.begin();
 
-		if (slot_out)
+		if (slot_out) {
 			*slot_out = slot;
+		}
 
 		return stack;
 	}
@@ -97,14 +106,16 @@ namespace Game3 {
 	ItemStackPtr StorageInventory::firstItem(Slot *slot_out, const std::function<bool(const ItemStackPtr &, Slot)> &predicate) {
 		for (auto &[slot, stack]: storage) {
 			if (predicate(stack, slot)) {
-				if (slot_out)
+				if (slot_out) {
 					*slot_out = slot;
+				}
 				return stack;
 			}
 		}
 
-		if (slot_out)
+		if (slot_out) {
 			*slot_out = -1;
+		}
 
 		return nullptr;
 	}
@@ -113,29 +124,34 @@ namespace Game3 {
 		ssize_t remaining = stack->count;
 
 		for (const auto &[slot, stored]: storage) {
-			if (!predicate(slot) || !stored->canMerge(*stack))
+			if (!predicate(slot) || !stored->canMerge(*stack)) {
 				continue;
+			}
 			const ssize_t storable = ssize_t(stored->item->maxCount) - ssize_t(stored->count);
 			if (0 < storable) {
 				const ItemCount to_store = std::min(ItemCount(remaining), ItemCount(storable));
 				remaining -= to_store;
-				if (remaining <= 0)
+				if (remaining <= 0) {
 					break;
+				}
 			}
 		}
 
 		if (0 < remaining) {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
-				if (!predicate(slot) || storage.contains(slot))
+				if (!predicate(slot) || storage.contains(slot)) {
 					continue;
+				}
 				remaining -= std::min(ItemCount(remaining), stack->item->maxCount);
-				if (remaining <= 0)
+				if (remaining <= 0) {
 					break;
+				}
 			}
 		}
 
-		if (remaining < 0)
+		if (remaining < 0) {
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
+		}
 
 		return remaining == 0;
 	}
@@ -143,13 +159,15 @@ namespace Game3 {
 	bool StorageInventory::canInsert(const ItemStackPtr &stack, Slot slot) const {
 		auto iter = storage.find(slot);
 
-		if (iter == storage.end())
+		if (iter == storage.end()) {
 			return stack->count <= stack->item->maxCount;
+		}
 
 		const ItemStackPtr &stored = iter->second;
 
-		if (!stored->canMerge(*stack))
+		if (!stored->canMerge(*stack)) {
 			return false;
+		}
 
 		ssize_t remaining = stack->count;
 		const ssize_t storable = ssize_t(stored->item->maxCount) - ssize_t(stored->count);
@@ -171,26 +189,31 @@ namespace Game3 {
 	ItemCount StorageInventory::insertable(const ItemStackPtr &stack, Slot slot) const {
 		auto iter = storage.find(slot);
 
-		if (iter == storage.end())
+		if (iter == storage.end()) {
 			return stack->count;
+		}
 
 		const ItemStackPtr &stored = iter->second;
 
-		if (!stored->canMerge(*stack))
+		if (!stored->canMerge(*stack)) {
 			return 0;
+		}
 
 		return stored->item->maxCount - stack->count;
 	}
 
 	ItemCount StorageInventory::count(const ItemID &id) const {
-		if (id.getPath() == "attribute")
+		if (id.getPath() == "attribute") {
 			return countAttribute(id);
+		}
 
 		ItemCount out = 0;
 
-		for (const auto &[slot, stack]: storage)
-			if (stack->item->identifier == id)
+		for (const auto &[slot, stack]: storage) {
+			if (stack->item->identifier == id) {
 				out += stack->count;
+			}
+		}
 
 		return out;
 	}
@@ -198,9 +221,11 @@ namespace Game3 {
 	ItemCount StorageInventory::count(const Item &item) const {
 		ItemCount out = 0;
 
-		for (const auto &[slot, stack]: storage)
-			if (stack->item->identifier == item.identifier)
+		for (const auto &[slot, stack]: storage) {
+			if (stack->item->identifier == item.identifier) {
 				out += stack->count;
+			}
+		}
 
 		return out;
 	}
@@ -208,9 +233,11 @@ namespace Game3 {
 	ItemCount StorageInventory::count(const ItemStackPtr &stack) const {
 		ItemCount out = 0;
 
-		for (const auto &[slot, stored_stack]: storage)
-			if (stack->canMerge(*stored_stack))
+		for (const auto &[slot, stored_stack]: storage) {
+			if (stack->canMerge(*stored_stack)) {
 				out += stored_stack->count;
+			}
+		}
 
 		return out;
 	}
@@ -218,9 +245,11 @@ namespace Game3 {
 	ItemCount StorageInventory::count(const ItemStackPtr &stack, const std::function<bool(Slot)> &predicate) const {
 		ItemCount out = 0;
 
-		for (const auto &[slot, stored_stack]: storage)
-			if (predicate(slot) && stack->canMerge(*stored_stack))
+		for (const auto &[slot, stored_stack]: storage) {
+			if (predicate(slot) && stack->canMerge(*stored_stack)) {
 				out += stored_stack->count;
+			}
+		}
 
 		return out;
 	}
@@ -228,9 +257,11 @@ namespace Game3 {
 	ItemCount StorageInventory::countAttribute(const Identifier &attribute) const {
 		ItemCount out = 0;
 
-		for (const auto &[slot, stack]: storage)
-			if (stack->hasAttribute(attribute))
+		for (const auto &[slot, stack]: storage) {
+			if (stack->hasAttribute(attribute)) {
 				out += stack->count;
+			}
+		}
 
 		return out;
 	}
@@ -244,8 +275,9 @@ namespace Game3 {
 	}
 
 	ItemStackPtr StorageInventory::front() const {
-		if (storage.empty())
+		if (storage.empty()) {
 			throw std::out_of_range("Inventory empty");
+		}
 		return storage.begin()->second;
 	}
 
@@ -254,32 +286,39 @@ namespace Game3 {
 	}
 
 	std::optional<Slot> StorageInventory::find(const ItemID &id, const Predicate &predicate) const {
-		for (const auto &[slot, stack]: storage)
-			if (predicate(stack, slot) && stack->item->identifier == id)
+		for (const auto &[slot, stack]: storage) {
+			if (predicate(stack, slot) && stack->item->identifier == id) {
 				return slot;
+			}
+		}
 		return std::nullopt;
 	}
 
 	std::optional<Slot> StorageInventory::findAttribute(const Identifier &attribute, const Predicate &predicate) const {
-		for (const auto &[slot, stack]: storage)
-			if (predicate(stack, slot) && stack->item->attributes.contains(attribute))
+		for (const auto &[slot, stack]: storage) {
+			if (predicate(stack, slot) && stack->item->attributes.contains(attribute)) {
 				return slot;
+			}
+		}
 		return std::nullopt;
 	}
 
 	ItemStackPtr StorageInventory::getActive() const {
-		if (auto iter = storage.find(activeSlot); iter != storage.end())
+		if (auto iter = storage.find(activeSlot); iter != storage.end()) {
 			return iter->second;
+		}
 		return nullptr;
 	}
 
 	bool StorageInventory::contains(const ItemStackPtr &needle, const Predicate &predicate) const {
 		ItemCount remaining = needle->count;
 		for (const auto &[slot, stack]: storage) {
-			if (!predicate(stack, slot) || !needle->canMerge(*stack))
+			if (!predicate(stack, slot) || !needle->canMerge(*stack)) {
 				continue;
-			if (remaining <= stack->count)
+			}
+			if (remaining <= stack->count) {
 				return true;
+			}
 			remaining -= stack->count;
 		}
 
@@ -287,13 +326,15 @@ namespace Game3 {
 	}
 
 	void StorageInventory::prevSlot() {
-		if (0 < activeSlot)
+		if (0 < activeSlot) {
 			setActive(activeSlot - 1, false);
+		}
 	}
 
 	void StorageInventory::nextSlot() {
-		if (activeSlot < slotCount - 1)
+		if (activeSlot < slotCount - 1) {
 			setActive(activeSlot + 1, false);
+		}
 	}
 
 	Slot StorageInventory::slotsOccupied() const {
@@ -301,8 +342,9 @@ namespace Game3 {
 	}
 
 	void StorageInventory::replace(const Inventory &other) {
-		if (this == &other)
+		if (this == &other) {
 			return;
+		}
 
 		if (const auto *other_storage = dynamic_cast<const StorageInventory *>(&other)) {
 			*this = *other_storage;
@@ -312,8 +354,9 @@ namespace Game3 {
 	}
 
 	void StorageInventory::replace(Inventory &&other) {
-		if (this == &other)
+		if (this == &other) {
 			return;
+		}
 
 		if (auto *other_storage = dynamic_cast<StorageInventory *>(&other)) {
 			*this = std::move(*other_storage);
@@ -326,10 +369,11 @@ namespace Game3 {
 		auto lock = storage.uniqueLock();
 
 		for (auto iter = storage.begin(); iter != storage.end();) {
-			if (iter->second->count == 0)
+			if (iter->second->count == 0) {
 				storage.erase(iter++);
-			else
+			} else {
 				++iter;
+			}
 		}
 	}
 }

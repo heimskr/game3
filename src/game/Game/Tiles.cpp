@@ -19,8 +19,9 @@
 namespace Game3 {
 	std::shared_ptr<Tile> Game::getTile(const Identifier &identifier) {
 		TileRegistry &reg = *tileRegistry;
-		if (auto found = reg.maybe(identifier))
+		if (auto found = reg.maybe(identifier)) {
 			return found;
+		}
 		static auto default_tile = std::make_shared<Tile>("base:tile/?");
 		return default_tile;
 	}
@@ -58,7 +59,7 @@ namespace Game3 {
 
 		reg.add("base:tile/cake", std::make_shared<FoodTile>("base:tile/cake", "base:item/cake"));
 
-		static const std::array rares {
+		static const std::array rares{
 			"apatite",
 			"asbestos",
 			"bauxite",
@@ -91,19 +92,22 @@ namespace Game3 {
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
 		auto grass = std::make_shared<GrassTile>();
-		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners"))
+		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners")) {
 			reg.add(tilename, grass);
+		}
 
 		for (const auto &[crop_name, crop]: registry<CropRegistry>()) {
 			if (crop->customType.empty()) {
 				auto tile = std::make_shared<CropTile>(crop);
-				for (const auto &stage: crop->stages)
+				for (const auto &stage: crop->stages) {
 					reg.add(stage, tile);
+				}
 			} else if (crop->customType == "base:tile/tree") {
 				// TODO: We need the factory thing.
 				auto tile = std::make_shared<TreeTile>(crop);
-				for (const auto &stage: crop->stages)
+				for (const auto &stage: crop->stages) {
 					reg.add(stage, tile);
+				}
 			}
 		}
 	}

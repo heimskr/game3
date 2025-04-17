@@ -13,8 +13,9 @@ namespace Game3 {
 	bool HasDimensions::occupies(const Position &check) const {
 		const auto [dimensions_x, dimensions_y] = getDimensions();
 
-		if (dimensions_x == 1 && dimensions_y == 1)
+		if (dimensions_x == 1 && dimensions_y == 1) {
 			return getPosition() == check;
+		}
 
 		const auto [row, column] = getPosition();
 		const auto [anchor_x, anchor_y] = getAnchor();

@@ -20,8 +20,9 @@ namespace Game3 {
 	}
 
 	double applyMoney(double base_price, MoneyCount merchant_money) {
-		if (merchant_money == MoneyCount(-1))
+		if (merchant_money == MoneyCount(-1)) {
 			return base_price;
+		}
 		return base_price / pow(E, merchant_money / 50.);
 	}
 
@@ -45,8 +46,9 @@ namespace Game3 {
 		auto amount = stack->count;
 		while (1 <= amount) {
 			const double unit_price = sellPrice(base, held_amount++, money, greed);
-			if (money < unit_price)
+			if (money < unit_price) {
 				result = false;
+			}
 			money -= unit_price;
 			price += unit_price;
 			--amount;
@@ -73,16 +75,18 @@ namespace Game3 {
 		double price = 0.;
 		double money(merchant_money);
 
-		if (merchant_money == static_cast<MoneyCount>(-1))
+		if (merchant_money == static_cast<MoneyCount>(-1)) {
 			money = -1;
+		}
 
 		while (1 <= count) {
 			const double unit_price = sellPrice(base_price, merchant_count++, money < 0? MoneyCount(-1) : MoneyCount(money), greed);
 
 			if (0 <= money) {
 				money -= unit_price;
-				if (money < 0)
+				if (money < 0) {
 					return std::nullopt;
+				}
 			}
 
 			price += unit_price;
@@ -97,13 +101,15 @@ namespace Game3 {
 		double money(merchant_money);
 
 		while (1 <= count) {
-			if (merchant_count == 0)
+			if (merchant_count == 0) {
 				return std::nullopt;
+			}
 
 			const double unit_price = buyPrice(base_price, merchant_count--, money < 0? MoneyCount(-1) : MoneyCount(money));
 
-			if (0 <= money)
+			if (0 <= money) {
 				money += unit_price;
+			}
 
 			price += unit_price;
 			--count;

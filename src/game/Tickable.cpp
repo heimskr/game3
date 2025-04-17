@@ -12,8 +12,9 @@ namespace Game3 {
 		GamePtr game = getGame();
 		const Tick next_tick = game->getCurrentTick() + 1;
 
-		if (tickSet.contains(next_tick))
+		if (tickSet.contains(next_tick)) {
 			return;
+		}
 
 		enqueueTick();
 	}

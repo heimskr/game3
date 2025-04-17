@@ -4,8 +4,8 @@
 #include "entity/TextParticle.h"
 #include "game/ServerGame.h"
 #include "graphics/RectangleRenderer.h"
-#include "graphics/RendererContext.h"
 #include "graphics/RenderOptions.h"
+#include "graphics/RendererContext.h"
 #include "lib/JSON.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
 #include "packet/StatusEffectsPacket.h"
@@ -84,9 +84,9 @@ namespace Game3 {
 		RectangleRenderer &rectangle = renderers.rectangle;
 
 		constexpr static float bar_offset = .15f;
-		constexpr static float bar_width  = .8f;
+		constexpr static float bar_width = .8f;
 		constexpr static float bar_height = .18f;
-		constexpr static float thickness  = .05f;
+		constexpr static float thickness = .05f;
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
@@ -95,7 +95,7 @@ namespace Game3 {
 		const float bar_y = float(row) + y - z - bar_offset - bar_height;
 		const float fraction = double(health) / getMaxHealth();
 
-		rectangle.drawOnMap(RenderOptions {
+		rectangle.drawOnMap(RenderOptions{
 			.x = bar_x - thickness,
 			.y = bar_y - thickness,
 			.sizeX = bar_width  + thickness * 2,
@@ -103,7 +103,7 @@ namespace Game3 {
 			.color = {.1, .1, .1, .9},
 		});
 
-		rectangle.drawOnMap(RenderOptions {
+		rectangle.drawOnMap(RenderOptions{
 			.x = bar_x,
 			.y = bar_y,
 			.sizeX = bar_width * fraction,
@@ -111,7 +111,7 @@ namespace Game3 {
 			.color = {0, 1, 0, 1},
 		});
 
-		rectangle.drawOnMap(RenderOptions {
+		rectangle.drawOnMap(RenderOptions{
 			.x = bar_x + fraction * bar_width,
 			.y = bar_y,
 			.sizeX = bar_width * (1 - fraction),

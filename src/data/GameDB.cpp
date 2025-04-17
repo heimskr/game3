@@ -181,8 +181,9 @@ namespace Game3 {
 		{
 			Timer timer{"WriteTilesetMeta"};
 			const Tileset &tileset = realm->getTileset();
-			if (!hasTileset(tileset.getHash(), false))
+			if (!hasTileset(tileset.getHash(), false)) {
 				writeTilesetMeta(tileset, false);
+			}
 		}
 		{
 			Timer timer{"WriteVillages"};
@@ -199,8 +200,9 @@ namespace Game3 {
 
 		{
 			auto lock = realm->tileEntities.sharedLock();
-			for (const auto &[position, tile_entity]: realm->tileEntities)
+			for (const auto &[position, tile_entity]: realm->tileEntities) {
 				deleteTileEntity(tile_entity);
+			}
 		}
 
 		{
@@ -228,8 +230,9 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		std::optional<SQLite::Transaction> transaction;
-		if (use_transaction)
+		if (use_transaction) {
 			transaction.emplace(*database);
+		}
 
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO chunks VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
@@ -355,14 +358,16 @@ namespace Game3 {
 		}
 
 		const bool force_migrate = std::filesystem::exists(".force-migrate");
-		if (force_migrate)
+		if (force_migrate) {
 			std::filesystem::remove(".force-migrate");
+		}
 
 		std::unordered_map<std::string, boost::json::value> meta_cache;
 
 		auto get_meta = [&](const std::string &hash) -> const boost::json::value & {
-			if (auto iter = meta_cache.find(hash); iter != meta_cache.end())
+			if (auto iter = meta_cache.find(hash); iter != meta_cache.end()) {
 				return iter->second;
+			}
 			boost::json::value json;
 			readTilesetMeta(hash, json, false);
 			return meta_cache[hash] = std::move(json);
@@ -372,8 +377,9 @@ namespace Game3 {
 			Tileset &tileset = realm->getTileset();
 
 			const std::string realm_tileset_hash = readRealmTilesetHash(realm->id, false);
-			if (tileset.getHash() == realm_tileset_hash)
+			if (tileset.getHash() == realm_tileset_hash) {
 				return;
+			}
 
 			const boost::json::value &meta = get_meta(realm_tileset_hash);
 
@@ -398,9 +404,11 @@ namespace Game3 {
 
 			const std::unordered_map<Identifier, TileID> new_map = tileset.getIDs();
 
-			for (const auto &[numeric, identifier]: old_map)
-				if (auto new_tile_iter = new_map.find(identifier); new_tile_iter != new_map.end())
+			for (const auto &[numeric, identifier]: old_map) {
+				if (auto new_tile_iter = new_map.find(identifier); new_tile_iter != new_map.end()) {
 					migration_map[numeric] = new_tile_iter->second;
+				}
+			}
 
 			TileProvider &provider = realm->tileProvider;
 			std::unordered_set<TileID> covered;
@@ -418,15 +426,18 @@ namespace Game3 {
 
 							// We don't want to automigrate old autotiles to the base of the new autotile.
 							// Take the autotile offset of the old autotile and add it to the new autotile.
-							if (autotiles.contains(old_map.at(old_tile)))
+							if (autotiles.contains(old_map.at(old_tile))) {
 								new_tile += old_tile % 16;
+							}
 
 							tile_id = new_tile;
-							if (new_tile != old_tile && covered.insert(old_tile).second)
+							if (new_tile != old_tile && covered.insert(old_tile).second) {
 								INFO("{} ({}) → {} ({})", old_map.at(old_tile), old_tile, tileset.getNames().at(new_tile), new_tile);
+							}
 						} else if (force_migrate) {
-							if (warned.insert(old_tile).second)
+							if (warned.insert(old_tile).second) {
 								WARN("Replacing tile {} ({}) with nothing.", old_map.at(old_tile), old_tile);
+							}
 							tile_id = 0;
 						} else {
 							Identifier tilename = old_map.at(old_tile);
@@ -446,8 +457,9 @@ namespace Game3 {
 		ServerGamePtr game = getGame();
 
 		std::unique_lock<std::recursive_mutex> db_lock;
-		if (do_lock)
+		if (do_lock) {
 			db_lock = database.uniqueLock();
+		}
 
 		std::string raw_json;
 
@@ -456,8 +468,9 @@ namespace Game3 {
 
 			query.bind(1, realm_id);
 
-			if (!query.executeStep())
+			if (!query.executeStep()) {
 				throw std::out_of_range("Couldn't find realm " + std::to_string(realm_id) + " in database");
+			}
 
 			raw_json = query.getColumn(0).getString();
 		}
@@ -538,8 +551,9 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		std::optional<SQLite::Transaction> transaction;
-		if (use_transaction)
+		if (use_transaction) {
 			transaction.emplace(*database);
+		}
 
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO realms VALUES (?, ?, ?)"};
 
@@ -549,8 +563,9 @@ namespace Game3 {
 
 		statement.exec();
 
-		if (transaction)
+		if (transaction) {
 			transaction->commit();
+		}
 	}
 
 	std::optional<ChunkSet> GameDB::getChunk(RealmID realm_id, ChunkPosition chunk_position) {
@@ -589,8 +604,9 @@ namespace Game3 {
 		query.bind(1, username);
 
 		if (query.executeStep()) {
-			if (display_name_out != nullptr)
+			if (display_name_out != nullptr) {
 				*display_name_out = std::string(query.getColumn(0));
+			}
 
 			if (buffer_out != nullptr) {
 				SQLite::Column column = query.getColumn(1);
@@ -684,11 +700,13 @@ namespace Game3 {
 		query.bind(1, username);
 
 		if (query.executeStep()) {
-			if (query.isColumnNull(0) || query.isColumnNull(1))
+			if (query.isColumnNull(0) || query.isColumnNull(1)) {
 				return std::nullopt;
+			}
 			const std::string concatenated = query.getColumn(0).getString();
-			if (concatenated.empty())
+			if (concatenated.empty()) {
 				return std::nullopt;
+			}
 			ServerGamePtr game = getGame();
 			return Place{Position{concatenated}, game->getRealm(query.getColumn(1).getInt())};
 		}
@@ -702,8 +720,9 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		std::optional<SQLite::Transaction> transaction;
-		if (use_transaction)
+		if (use_transaction) {
 			transaction.emplace(*database);
+		}
 
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO tileEntities VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
@@ -721,8 +740,9 @@ namespace Game3 {
 			statement.reset();
 		}
 
-		if (transaction)
+		if (transaction) {
 			transaction->commit();
+		}
 	}
 
 	void GameDB::writeTileEntities(const RealmPtr &realm, bool use_transaction) {
@@ -733,8 +753,9 @@ namespace Game3 {
 		}
 		auto iter = copy.begin();
 		writeTileEntities([&](TileEntityPtr &out) {
-			if (iter == copy.end())
+			if (iter == copy.end()) {
 				return false;
+			}
 			out = iter++->second;
 			return true;
 		}, use_transaction);
@@ -756,14 +777,16 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		std::optional<SQLite::Transaction> transaction;
-		if (use_transaction)
+		if (use_transaction) {
 			transaction.emplace(*database);
+		}
 
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO entities VALUES (?, ?, ?, ?, ?, ?, ?)"};
 
 		while (getter(entity)) {
-			if (!entity->shouldPersist() || entity->isPlayer())
+			if (!entity->shouldPersist() || entity->isPlayer()) {
 				continue;
+			}
 			statement.bind(1, std::make_signed_t<GlobalID>(entity->getGID()));
 			statement.bind(2, entity->realmID);
 			statement.bind(3, entity->position.row);
@@ -777,8 +800,9 @@ namespace Game3 {
 			statement.reset();
 		}
 
-		if (transaction)
+		if (transaction) {
 			transaction->commit();
+		}
 	}
 
 	void GameDB::writeEntities(const RealmPtr &realm, bool use_transaction) {
@@ -789,8 +813,9 @@ namespace Game3 {
 		}
 		auto iter = copy.begin();
 		writeEntities([&](EntityPtr &out) {
-			if (iter == copy.end())
+			if (iter == copy.end()) {
 				return false;
+			}
 			out = *iter++;
 			return true;
 		}, use_transaction);
@@ -810,15 +835,17 @@ namespace Game3 {
 		assert(database);
 
 		std::unique_lock<std::recursive_mutex> db_lock;
-		if (do_lock)
+		if (do_lock) {
 			db_lock = database.uniqueLock();
+		}
 
 		SQLite::Statement query{*database, "SELECT tilesetHash FROM realms WHERE realmID = ? LIMIT 1"};
 
 		query.bind(1, realm_id);
 
-		if (query.executeStep())
+		if (query.executeStep()) {
 			return query.getColumn(0).getString();
+		}
 
 		throw std::out_of_range("Can't find tileset hash for realm " + std::to_string(realm_id));
 	}
@@ -827,8 +854,9 @@ namespace Game3 {
 		assert(database);
 
 		std::unique_lock<std::recursive_mutex> db_lock;
-		if (do_lock)
+		if (do_lock) {
 			db_lock = database.uniqueLock();
+		}
 
 		SQLite::Statement query{*database, "SELECT NULL FROM tilesets WHERE hash = ? LIMIT 1"};
 
@@ -842,8 +870,9 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 
 		std::optional<SQLite::Transaction> transaction;
-		if (use_transaction)
+		if (use_transaction) {
 			transaction.emplace(*database);
+		}
 
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO tilesets VALUES (?, ?)"};
 
@@ -855,16 +884,18 @@ namespace Game3 {
 
 		statement.exec();
 
-		if (transaction)
+		if (transaction) {
 			transaction->commit();
+		}
 	}
 
 	bool GameDB::readTilesetMeta(const std::string &hash, boost::json::value &json, bool do_lock) {
 		assert(database);
 
 		std::unique_lock<std::recursive_mutex> db_lock;
-		if (do_lock)
+		if (do_lock) {
 			db_lock = database.uniqueLock();
+		}
 
 		SQLite::Statement query{*database, "SELECT json FROM tilesets WHERE hash = ? LIMIT 1"};
 

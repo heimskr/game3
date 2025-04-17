@@ -1,5 +1,5 @@
-#include "util/Log.h"
 #include "client/RichPresence.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	Discord::~Discord() {
@@ -14,8 +14,9 @@ namespace Game3 {
 		discord::Core *core_raw{};
 		const discord::Result result = discord::Core::Create(1155446965744709672, DiscordCreateFlags_NoRequireDiscord, &core_raw);
 
-		if (result_out != nullptr)
+		if (result_out != nullptr) {
 			*result_out = result;
+		}
 
 		if (result != discord::Result::Ok) {
 			ERR("Couldn't initialize Discord: {}", int(result));
@@ -31,13 +32,15 @@ namespace Game3 {
 #ifdef DISCORD_RICH_PRESENCE
 		return [callback = std::move(callback)](discord::Result result) {
 			if (result != discord::Result::Ok) {
-				if (result == discord::Result::TransactionAborted)
+				if (result == discord::Result::TransactionAborted) {
 					ERR(3, "Couldn't set activity: transaction aborted");
-				else
+				} else {
 					ERR("Couldn't set activity: {}", int(result));
+				}
 			}
-			if (callback)
+			if (callback) {
 				callback(result);
+			}
 		};
 #else
 		(void) callback;
@@ -47,8 +50,9 @@ namespace Game3 {
 
 	bool Discord::updateActivity(std::function<void(discord::Result)> callback) {
 #ifdef DISCORD_RICH_PRESENCE
-		if (!core)
+		if (!core) {
 			return false;
+		}
 
 		core->ActivityManager().UpdateActivity(activity, makeActivityCallback(std::move(callback)));
 		return true;
@@ -58,10 +62,10 @@ namespace Game3 {
 #endif
 	}
 
-
 	bool Discord::initActivity(std::function<void(discord::Result)> callback) {
-		if (!core)
+		if (!core) {
 			return false;
+		}
 
 		details = defaultDetails();
 #ifdef DISCORD_RICH_PRESENCE
@@ -77,8 +81,9 @@ namespace Game3 {
 	}
 
 	bool Discord::tick() {
-		if (!core)
+		if (!core) {
 			return false;
+		}
 #ifdef DISCORD_RICH_PRESENCE
 		core->RunCallbacks();
 #endif
@@ -118,8 +123,9 @@ namespace Game3 {
 	}
 
 	void Discord::reset() {
-		if (!core)
+		if (!core) {
 			return;
+		}
 		details = defaultDetails();
 		core.reset();
 	}

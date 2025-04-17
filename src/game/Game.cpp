@@ -1,6 +1,6 @@
 #include "algorithm/AStar.h"
-#include "game/ClientGame.h"
 #include "fluid/Fluid.h"
+#include "game/ClientGame.h"
 #include "game/Game.h"
 #include "game/InteractionSet.h"
 #include "game/Inventory.h"
@@ -84,21 +84,24 @@ namespace Game3 {
 	}
 
 	void Game::initEntities() {
-		for (const auto &[realm_id, realm]: realms)
+		for (const auto &[realm_id, realm]: realms) {
 			realm->initEntities();
+		}
 	}
 
 	void Game::initInteractionSets() {
 		interactionSets.clear();
 		auto standard = std::make_shared<StandardInteractions>();
-		for (const auto &type: registry<RealmTypeRegistry>().items)
+		for (const auto &type: registry<RealmTypeRegistry>().items) {
 			interactionSets.emplace(type, standard);
+		}
 	}
 
 	void Game::add(std::shared_ptr<Item> item) {
 		itemRegistry->add(item->identifier, item);
-		for (const auto &attribute: item->attributes)
+		for (const auto &attribute: item->attributes) {
 			itemsByAttribute[attribute].insert(item);
+		}
 	}
 
 	void Game::add(ModuleFactory &&factory) {
@@ -116,8 +119,9 @@ namespace Game3 {
 	RealmID Game::newRealmID() const {
 		// TODO: a less stupid way of doing this.
 		RealmID max = 1;
-		for (const auto &[id, realm]: realms)
+		for (const auto &[id, realm]: realms) {
 			max = std::max(max, id);
+		}
 		return max + 1;
 	}
 
@@ -139,8 +143,9 @@ namespace Game3 {
 	}
 
 	std::optional<TileID> Game::getFluidTileID(FluidID fluid_id) {
-		if (auto iter = fluidCache.find(fluid_id); iter != fluidCache.end())
+		if (auto iter = fluidCache.find(fluid_id); iter != fluidCache.end()) {
 			return iter->second;
+		}
 
 		if (auto fluid = registry<FluidRegistry>().maybe(static_cast<size_t>(fluid_id))) {
 			if (auto tileset = registry<TilesetRegistry>().maybe(fluid->tilesetName)) {

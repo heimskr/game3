@@ -1,6 +1,6 @@
-#include "util/Log.h"
-#include "realm/Realm.h"
 #include "algorithm/AStar.h"
+#include "realm/Realm.h"
+#include "util/Log.h"
 
 #include <algorithm>
 #include <queue>
@@ -36,8 +36,9 @@ namespace Game3 {
 			next.clear();
 
 			auto check = [&](const Position &pos) {
-				if (auto state = realm->tileProvider.copyPathState(pos); state && *state != 0 && !realm->hasFluid(pos))
+				if (auto state = realm->tileProvider.copyPathState(pos); state && *state != 0 && !realm->hasFluid(pos)) {
 					next.emplace_back(pos);
+				}
 			};
 
 			check({position.row - 1, position.column});
@@ -68,8 +69,9 @@ namespace Game3 {
 				auto iter = moves.find(goal);
 				while (iter != moves.end()) {
 					path.push_back(iter->second);
-					if (iter->second == start)
+					if (iter->second == start) {
 						break;
+					}
 					iter = moves.find(iter->second);
 				}
 				std::reverse(path.begin(), path.end());

@@ -1,12 +1,11 @@
-#include "util/Log.h"
 #include "entity/ClientPlayer.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "entity/ServerPlayer.h"
 #include "error/InsufficientFundsError.h"
 #include "game/ClientGame.h"
-#include "game/ServerGame.h"
 #include "game/Inventory.h"
+#include "game/ServerGame.h"
 #include "item/Tool.h"
 #include "lib/JSON.h"
 #include "net/Buffer.h"
@@ -18,6 +17,7 @@
 #include "realm/Realm.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	Player::Player():
@@ -47,8 +47,9 @@ namespace Game3 {
 			}
 		}
 
-		if (times != 0)
+		if (times != 0) {
 			INFO("Removed {} from visible sets {} time{}", username, times, times == 1? "" : "s");
+		}
 
 		size_t remaining = 0;
 
@@ -97,7 +98,7 @@ namespace Game3 {
 		spawnRealmID = object.at("spawnRealmID");
 		timeSinceAttack = getDouble(object.at("timeSinceAttack"));
 		if (auto *value = object.if_contains("tooldown")) {
-			tooldown = getDouble(*value);;
+			tooldown = getDouble(*value);
 		} else {
 			tooldown = 0.f;
 		}
@@ -328,8 +329,9 @@ namespace Game3 {
 	void Player::addStationType(Identifier station_type) {
 		{
 			auto lock = stationTypes.uniqueLock();
-			if (stationTypes.contains(station_type))
+			if (stationTypes.contains(station_type)) {
 				return;
+			}
 			stationTypes.insert(std::move(station_type));
 		}
 		send(make<SetPlayerStationTypesPacket>(stationTypes, true));

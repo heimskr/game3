@@ -1,9 +1,9 @@
-#include "util/Log.h"
 #include "client/ClientSettings.h"
 #include "game/ClientGame.h"
 #include "lib/JSON.h"
-#include "ui/gl/Constants.h"
 #include "ui/Window.h"
+#include "ui/gl/Constants.h"
+#include "util/Log.h"
 #include "util/Timer.h"
 
 namespace Game3 {

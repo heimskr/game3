@@ -9,8 +9,9 @@ namespace Game3 {
 		index(inventory.index) {}
 
 	std::shared_ptr<Inventory> InventoryGetter::get() const {
-		if (auto haver = std::dynamic_pointer_cast<HasInventory>(owner))
+		if (auto haver = std::dynamic_pointer_cast<HasInventory>(owner)) {
 			return haver->getInventory(index);
+		}
 
 		throw std::runtime_error("Couldn't cast inventory owner to HasInventory");
 	}

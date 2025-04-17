@@ -1,7 +1,7 @@
 #pragma once
 
-#include "graphics/Texture.h"
 #include "entity/Entity.h"
+#include "graphics/Texture.h"
 #include "item/Item.h"
 #include "threading/Atomic.h"
 

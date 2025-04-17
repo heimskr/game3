@@ -38,8 +38,9 @@ namespace Game3 {
 
 	void OwnsVillages::saveVillages(SQLite::Database &database, bool use_transaction) {
 		std::optional<SQLite::Transaction> transaction;
-		if (use_transaction)
+		if (use_transaction) {
 			transaction.emplace(database);
+		}
 
 		SQLite::Statement statement{database, "INSERT OR REPLACE INTO villages VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"};
 
@@ -61,8 +62,9 @@ namespace Game3 {
 		}
 		lock.unlock();
 
-		if (transaction)
+		if (transaction) {
 			transaction->commit();
+		}
 	}
 
 	void OwnsVillages::loadVillages(const std::shared_ptr<Game> &game, SQLite::Database &database) {

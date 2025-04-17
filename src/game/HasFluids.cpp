@@ -7,8 +7,9 @@ namespace Game3 {
 		fluidContainer(std::move(fluid_container)) {}
 
 	void HasFluids::init(const std::shared_ptr<HasFluids> &self) {
-		if (fluidContainer)
+		if (fluidContainer) {
 			fluidContainer->weakOwner = self;
+		}
 	}
 
 	FluidAmount HasFluids::getMaxLevel(FluidID) {
@@ -21,8 +22,9 @@ namespace Game3 {
 		auto [id, to_add] = stack;
 		auto &levels = fluidContainer->levels;
 
-		if (getMaxFluidTypes() <= levels.size() && !levels.contains(id))
+		if (getMaxFluidTypes() <= levels.size() && !levels.contains(id)) {
 			return to_add;
+		}
 
 		FluidAmount &level = levels[id];
 		const FluidAmount max = getMaxLevel(id);
@@ -54,14 +56,16 @@ namespace Game3 {
 
 		auto iter = levels.find(stack.id);
 
-		if (iter == levels.end())
+		if (iter == levels.end()) {
 			return levels.size() < getMaxFluidTypes() && stack.amount <= getMaxLevel(stack.id);
+		}
 
 		const FluidAmount current_amount = iter->second;
 
 		// Integer overflow definitely isn't allowed.
-		if (current_amount + stack.amount < current_amount)
+		if (current_amount + stack.amount < current_amount) {
 			return false;
+		}
 
 		return current_amount + stack.amount <= getMaxLevel(stack.id);
 	}
@@ -71,8 +75,9 @@ namespace Game3 {
 		auto &levels = fluidContainer->levels;
 
 		auto iter = levels.find(id);
-		if (iter == levels.end())
+		if (iter == levels.end()) {
 			return levels.size() < getMaxFluidTypes()? getMaxLevel(id) : 0;
+		}
 
 		return getMaxLevel(id) - iter->second;
 	}

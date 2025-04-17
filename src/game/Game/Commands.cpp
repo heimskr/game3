@@ -1,4 +1,3 @@
-#include "game/Game.h"
 #include "command/local/ChemicalCommand.h"
 #include "command/local/LocalCommandFactory.h"
 #include "command/local/LoginCommand.h"
@@ -8,6 +7,7 @@
 #include "command/local/SegfaultCommand.h"
 #include "command/local/UsageCommand.h"
 #include "command/local/WikiCommand.h"
+#include "game/Game.h"
 
 namespace Game3 {
 	void Game::add(LocalCommandFactory &&factory) {

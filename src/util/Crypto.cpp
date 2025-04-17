@@ -56,7 +56,7 @@ namespace Game3 {
 		const auto bytes = computeSHA3_512<std::vector<uint8_t>>(input);
 		assert(sizeof(uint64_t) <= bytes.size());
 		uint64_t out{};
-		std::memcpy(&out, bytes.data(), sizeof(uint64_t));;
+		std::memcpy(&out, bytes.data(), sizeof(uint64_t));
 		return toLittle(out);
 	}
 

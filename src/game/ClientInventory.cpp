@@ -1,6 +1,3 @@
-#include <cassert>
-
-#include "util/Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -16,7 +13,10 @@
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "ui/Window.h"
+#include "util/Log.h"
 #include "util/Util.h"
+
+#include <cassert>
 
 namespace Game3 {
 	ClientInventory::ClientInventory(std::shared_ptr<Agent> owner, Slot slot_count, Slot active_slot, InventoryID index_, Storage storage_):
@@ -185,7 +185,7 @@ namespace Game3 {
 		for (const auto &[slot, stack]: inventory.getStorage()) {
 			storage[std::to_string(slot)] = boost::json::value_from(*stack);
 		}
-		object["slotCount"]  = inventory.getSlotCount();
+		object["slotCount"] = inventory.getSlotCount();
 		object["activeSlot"] = inventory.activeSlot.load();
 	}
 }

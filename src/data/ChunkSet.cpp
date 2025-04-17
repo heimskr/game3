@@ -1,7 +1,6 @@
-// #include "Constants.h"
-#include "util/Log.h"
 #include "data/ChunkSet.h"
 #include "fluid/Fluid.h"
+#include "util/Log.h"
 
 #include <bit>
 #include <cstddef>
@@ -16,10 +15,11 @@ namespace Game3 {
 	}
 
 	ChunkSet::ChunkSet(std::vector<TileChunk> terrain_, BiomeChunk biomes_, FluidChunk fluids_, PathChunk pathmap_):
-	terrain(std::move(terrain_)), biomes(std::move(biomes_)), fluids(std::move(fluids_)), pathmap(std::move(pathmap_)) {
-		if (terrain.size() != LAYER_COUNT)
-			throw std::invalid_argument("Invalid layer count in ChunkSet::ChunkSet: " + std::to_string(terrain.size()));
-	}
+		terrain(std::move(terrain_)), biomes(std::move(biomes_)), fluids(std::move(fluids_)), pathmap(std::move(pathmap_)) {
+			if (terrain.size() != LAYER_COUNT) {
+				throw std::invalid_argument("Invalid layer count in ChunkSet::ChunkSet: " + std::to_string(terrain.size()));
+			}
+		}
 
 	ChunkSet::ChunkSet(std::span<const uint8_t> raw):
 		ChunkSet(std::span<const char>(reinterpret_cast<const char *>(raw.data()), raw.size())) {}
@@ -33,7 +33,7 @@ namespace Game3 {
 		ChunkSet(raw.subspan(0, LAYER_COUNT * LAYER_BYTE_COUNT),
 		         raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT, BIOMES_BYTE_COUNT),
 		         raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT + BIOMES_BYTE_COUNT, FLUIDS_BYTE_COUNT),
-				 raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT + BIOMES_BYTE_COUNT + FLUIDS_BYTE_COUNT, PATHMAP_BYTE_COUNT)) {}
+		         raw.subspan(LAYER_COUNT * LAYER_BYTE_COUNT + BIOMES_BYTE_COUNT + FLUIDS_BYTE_COUNT, PATHMAP_BYTE_COUNT)) {}
 
 	ChunkSet::ChunkSet(std::span<const char> terrain_, std::span<const char> biomes_, std::span<const char> fluids_, std::span<const char> pathmap_) {
 		terrain.resize(LAYER_COUNT);
@@ -46,8 +46,9 @@ namespace Game3 {
 			} else {
 				layer.reserve(CHUNK_SIZE * CHUNK_SIZE);
 				static_assert(sizeof(TileID) == 2);
-				for (size_t i = 0; i < LAYER_BYTE_COUNT; i += sizeof(TileID))
+				for (size_t i = 0; i < LAYER_BYTE_COUNT; i += sizeof(TileID)) {
 					layer.emplace_back(terrain_[i] | (TileID(terrain_[i + 1]) << 8));
+				}
 			}
 
 			terrain_ = terrain_.subspan(LAYER_BYTE_COUNT);
@@ -67,8 +68,9 @@ namespace Game3 {
 		} else {
 			biomes.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(BiomeType) == 2);
-			for (size_t i = 0; i < BIOMES_BYTE_COUNT; i += sizeof(BiomeType))
+			for (size_t i = 0; i < BIOMES_BYTE_COUNT; i += sizeof(BiomeType)) {
 				biomes.emplace_back(biomes_[i] | (BiomeType(biomes_[i + 1]) << 8));
+			}
 
 			fluids.reserve(CHUNK_SIZE * CHUNK_SIZE);
 			static_assert(sizeof(FluidInt) == 8);

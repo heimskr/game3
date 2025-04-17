@@ -1,4 +1,3 @@
-#include "util/Log.h"
 #include "Options.h"
 #include "command/local/LocalCommandFactory.h"
 #include "entity/ClientPlayer.h"
@@ -12,18 +11,19 @@
 #include "graphics/Tileset.h"
 #include "net/DisconnectedError.h"
 #include "net/LocalClient.h"
-#include "packet/CommandPacket.h"
 #include "packet/ChunkRequestPacket.h"
 #include "packet/ClickPacket.h"
+#include "packet/CommandPacket.h"
 #include "packet/DragPacket.h"
 #include "packet/EntityRequestPacket.h"
 #include "packet/InteractPacket.h"
 #include "packet/RegisterPlayerPacket.h"
 #include "packet/TeleportSelfPacket.h"
 #include "threading/ThreadContext.h"
-#include "ui/gl/Constants.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
+#include "ui/gl/Constants.h"
+#include "util/Log.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -34,7 +34,8 @@ namespace Game3 {
 	ClientGame::ClientGame(const std::shared_ptr<Window> &window):
 		Game(),
 		weakWindow(window),
-		tickThreadLaunchWaiter(1) {}
+		tickThreadLaunchWaiter(1) {
+	}
 
 	ClientGame::~ClientGame() {
 		INFO(3, "\e[31m~ClientGame\e[39m({})", reinterpret_cast<void *>(this));
@@ -100,7 +101,7 @@ namespace Game3 {
 
 	Rectangle ClientGame::getVisibleRealmBounds() const {
 		auto window = getWindow();
-		const auto [top,     left] = translateCanvasCoordinates(0, 0);
+		const auto [top, left] = translateCanvasCoordinates(0, 0);
 		const auto [bottom, right] = translateCanvasCoordinates(window->getWidth(), window->getHeight());
 		return {
 			static_cast<int>(left),
@@ -127,8 +128,8 @@ namespace Game3 {
 		constexpr auto map_length = CHUNK_SIZE * REALM_DIAMETER;
 		x -= width  / 2. - (map_length * tile_size / 4.) * scale + window->center.first  * window->magic * scale;
 		y -= height / 2. - (map_length * tile_size / 4.) * scale + window->center.second * window->magic * scale;
-		const double sub_x = x < 0.? 1. : 0.;
-		const double sub_y = y < 0.? 1. : 0.;
+		const double sub_x = x < 0? 1 : 0;
+		const double sub_y = y < 0? 1 : 0;
 		x /= tile_size * scale / 2.;
 		y /= tile_size * scale / 2.;
 

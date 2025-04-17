@@ -12,8 +12,9 @@ namespace Game3 {
 	EnergyAmount HasEnergy::addEnergy(EnergyAmount to_add) {
 		assert(energyContainer);
 		const EnergyAmount remainder = energyContainer->add(to_add);
-		if (remainder != to_add)
+		if (remainder != to_add) {
 			energyUpdated();
+		}
 		return remainder;
 	}
 

@@ -1,4 +1,3 @@
-#include "util/Log.h"
 #include "client/ServerWrapper.h"
 #include "error/IncompatibleError.h"
 #include "game/ServerGame.h"
@@ -12,6 +11,7 @@
 #include "threading/ThreadContext.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
+#include "util/Log.h"
 #include "util/Timer.h"
 #include "worldgen/Overworld.h"
 #include "worldgen/ShadowRealm.h"
@@ -40,7 +40,7 @@ namespace Game3 {
 	void ServerWrapper::runInThread(size_t overworld_seed) {
 		stop();
 
-		runThread =	std::thread([this, overworld_seed] {
+		runThread = std::thread([this, overworld_seed] {
 			threadContext.rename("ServerRun");
 			threadActive = true;
 			run(overworld_seed);

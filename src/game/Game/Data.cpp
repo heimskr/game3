@@ -109,7 +109,6 @@ namespace Game3 {
 					name_node.link(*out);
 				}
 			}
-
 		}
 
 		for (const auto &[category, names]: categories) {

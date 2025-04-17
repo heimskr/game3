@@ -43,7 +43,7 @@ namespace Game3 {
 			void notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>>) override;
 
 		private:
-			void send(const PacketPtr &);
+			void send(const std::shared_ptr<Packet> &);
 
 			static ClientInventory fromJSON(const std::shared_ptr<Game> &, const boost::json::value &, const std::shared_ptr<Agent> &);
 

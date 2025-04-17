@@ -1,18 +1,19 @@
+#include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
-#include "entity/ServerPlayer.h"
 #include "net/RemoteClient.h"
 #include "packet/AgentMessagePacket.h"
+#include "packet/DisplayTextPacket.h"
 #include "packet/EntityMoneyChangedPacket.h"
 #include "packet/EntityPacket.h"
 #include "packet/EntitySetPathPacket.h"
-#include "packet/DisplayTextPacket.h"
 #include "util/Cast.h"
 #include "util/Util.h"
 
 namespace Game3 {
 	ServerPlayer::ServerPlayer():
-		Entity(ID()), Player() {}
+		Entity(ID()), Player() {
+	}
 
 	ServerPlayer::~ServerPlayer() {
 		// In Tile::makeMonsterFactories, temporary entities are created so their virtual methods can be called.
@@ -88,8 +89,9 @@ namespace Game3 {
 
 	bool ServerPlayer::ensureEntity(const std::shared_ptr<Entity> &entity) {
 		GenericClientPtr client = weakClient.lock();
-		if (!client)
+		if (!client) {
 			return false;
+		}
 
 		{
 			auto lock = knownEntities.sharedLock();

@@ -38,18 +38,21 @@ namespace Game3 {
 		const double t = 2 * k;
 		double m = (t + 1) * (t + 1);
 
-		if (index + 1 >= m - t)
+		if (index + 1 >= m - t) {
 			return {IntType(m - index - k - 1), IntType(-k)};
+		}
 
 		m -= t;
 
-		if (index + 1 >= m - t)
+		if (index + 1 >= m - t) {
 			return {IntType(k), IntType(m - index - k - 1)};
+		}
 
 		m -= t;
 
-		if (index + 1 >= m - t)
+		if (index + 1 >= m - t) {
 			return {IntType(k - m + index + 1), IntType(k)};
+		}
 
 		return {IntType(-k), IntType(k - m + index + 1 + t)};
 	}

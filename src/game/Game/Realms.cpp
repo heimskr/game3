@@ -35,8 +35,9 @@ namespace Game3 {
 
 	RealmPtr Game::tryRealm(RealmID realm_id) const {
 		auto lock = realms.sharedLock();
-		if (auto iter = realms.find(realm_id); iter != realms.end())
+		if (auto iter = realms.find(realm_id); iter != realms.end()) {
 			return iter->second;
+		}
 		return {};
 	}
 
@@ -47,8 +48,9 @@ namespace Game3 {
 
 	RealmPtr Game::getRealm(RealmID realm_id, const std::function<RealmPtr()> &creator) {
 		auto lock = realms.uniqueLock();
-		if (auto iter = realms.find(realm_id); iter != realms.end())
+		if (auto iter = realms.find(realm_id); iter != realms.end()) {
 			return iter->second;
+		}
 		RealmPtr new_realm = creator();
 		realms.emplace(realm_id, new_realm);
 		return new_realm;
@@ -56,8 +58,9 @@ namespace Game3 {
 
 	void Game::addRealm(RealmID realm_id, RealmPtr realm) {
 		auto lock = realms.uniqueLock();
-		if (!realms.emplace(realm_id, realm).second)
+		if (!realms.emplace(realm_id, realm).second) {
 			throw std::runtime_error("Couldn't add realm " + std::to_string(realm_id) + ": a realm with that ID already exists");
+		}
 	}
 
 	void Game::addRealm(RealmPtr realm) {

@@ -1,14 +1,15 @@
 // There's an obscene amount of code duplication here. I'm sorry.
 
-#include "graphics/Tileset.h"
 #include "game/Game.h"
 #include "game/TileProvider.h"
+#include "graphics/Tileset.h"
 #include "util/Util.h"
 #include "util/Zstd.h"
 
 namespace Game3 {
 	TileProvider::TileProvider(Identifier tileset_id):
-		tilesetID(std::move(tileset_id)) {}
+		tilesetID(std::move(tileset_id)) {
+	}
 
 	void TileProvider::clear() {
 		for (auto &map: chunkMaps) {
@@ -326,7 +327,7 @@ namespace Game3 {
 		created = false;
 		validateLayer(layer);
 
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_mutex &mutex = chunkMutexes[getIndex(layer)];
 		std::shared_lock shared_lock(mutex);
@@ -363,7 +364,7 @@ namespace Game3 {
 		created = false;
 		validateLayer(layer);
 
-		const ChunkPosition chunk_position {divide(position.column), divide(position.row)};
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_mutex &mutex = chunkMutexes[getIndex(layer)];
 		std::shared_lock shared_lock(mutex);

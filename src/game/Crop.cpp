@@ -28,14 +28,16 @@ namespace Game3 {
 		) {}
 
 	const Identifier & Crop::getFirstStage() const {
-		if (stages.empty())
+		if (stages.empty()) {
 			throw std::runtime_error("No crop stages found");
+		}
 		return stages.front();
 	}
 
 	const Identifier & Crop::getLastStage() const {
-		if (stages.empty())
+		if (stages.empty()) {
 			throw std::runtime_error("No crop stages found");
+		}
 		return stages.back();
 	}
 

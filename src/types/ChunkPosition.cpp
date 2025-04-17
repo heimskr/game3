@@ -13,8 +13,9 @@ namespace Game3 {
 		y(TileProvider::divide<IntType>(position.row)) {}
 
 	ChunkPosition::ChunkPosition(std::string_view string) {
-		if (string.size() < 6 || string.front() != '(' || string.back() != ')')
+		if (string.size() < 6 || string.front() != '(' || string.back() != ')') {
 			throw std::invalid_argument("Invalid ChunkPosition string");
+		}
 
 		string.remove_prefix(1);
 		string.remove_suffix(1);
@@ -25,8 +26,9 @@ namespace Game3 {
 		if (comma == std::string_view::npos) {
 			comma = string.find(',');
 			comma_size = 1;
-			if (comma == std::string_view::npos)
+			if (comma == std::string_view::npos) {
 				throw std::invalid_argument("Invalid ChunkPosition string");
+			}
 		}
 
 		x = parseNumber<IntType>(string.substr(0, comma));

@@ -13,7 +13,7 @@ namespace Game3 {
 	ThreadPool Animal::threadPool{2};
 
 	namespace {
-		constexpr HitPoints MAX_HEALTH   = 40;
+		constexpr HitPoints MAX_HEALTH = 40;
 	}
 
 	std::uniform_real_distribution<float> Animal::getWanderDistribution() {
@@ -68,10 +68,11 @@ namespace Game3 {
 			auto lock = player->visibleEntities.sharedLock();
 			INFO("  Visible to player? {:s}", player->visibleEntities.contains(getSelf()));
 		}
-		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf()))
+		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf())) {
 			SUCCESS("  In chunk.");
-		else
+		} else {
 			ERR("  Not in chunk.");
+		}
 		INFO("  First wander: {}", firstWander);
 		INFO("  Attempting wander: {:s}", attemptingWander.load());
 		return true;

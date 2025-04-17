@@ -1,4 +1,3 @@
-#include "util/Log.h"
 #include "entity/Animal.h"
 #include "entity/EntityFactory.h"
 #include "entity/ItemEntity.h"
@@ -6,8 +5,8 @@
 #include "error/IncompatibleError.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
-#include "net/Server.h"
 #include "net/RemoteClient.h"
+#include "net/Server.h"
 #include "packet/ChatMessageSentPacket.h"
 #include "packet/CommandResultPacket.h"
 #include "packet/DestroyEntityPacket.h"
@@ -23,6 +22,7 @@
 #include "threading/ThreadContext.h"
 #include "util/Cast.h"
 #include "util/Demangle.h"
+#include "util/Log.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -33,8 +33,8 @@ namespace Game3 {
 	ServerGame::ServerGame(const std::shared_ptr<Server> &server, std::size_t pool_size):
 		weakServer(server),
 		pool(pool_size) {
-			pool.start();
-		}
+		pool.start();
+	}
 
 	ServerGame::~ServerGame() {
 		INFO(3, "\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));
@@ -74,10 +74,11 @@ namespace Game3 {
 		std::unordered_map<Player *, std::unique_ptr<BufferGuard>> guards;
 		guards.reserve(players.size());
 
-		for (const auto &player: players)
+		for (const auto &player: players) {
 			if (auto client = player->toServer()->weakClient.lock()) {
 				guards.emplace(player.get(), client->bufferGuard());
 			}
+		}
 
 		for (const auto &[weak_client, packet]: packetQueue.steal()) {
 			if (auto client = weak_client.lock()) {
@@ -405,8 +406,9 @@ namespace Game3 {
 		auto player = client.getPlayer();
 
 		// Change this check if there are any miscellaneous commands implemented later that don't require a player.
-		if (!player)
+		if (!player) {
 			return {false, "No player."};
+		}
 
 		try {
 			if (command[0] == ':') {
@@ -448,8 +450,9 @@ namespace Game3 {
 			}
 
 			if (first == "give") {
-				if (words.size() < 2)
+				if (words.size() < 2) {
 					return {false, "Not enough arguments."};
+				}
 
 				ItemCount count = 1;
 				if (3 <= words.size()) {
@@ -649,9 +652,7 @@ namespace Game3 {
 					}
 				}
 
-				player->teleport(other_player->getPosition(), other_player->getRealm(), {
-					.isTeleport = true
-				});
+				player->teleport(other_player->getPosition(), other_player->getRealm(), {.isTeleport = true});
 
 				return {true, "Teleported."};
 			}
@@ -677,9 +678,7 @@ namespace Game3 {
 					return {false, "Realm not found."};
 				}
 
-				player->teleport(player->getPosition(), realm, {
-					.isTeleport = true
-				});
+				player->teleport(player->getPosition(), realm, {.isTeleport = true});
 
 				return {true, "Teleported."};
 			}
@@ -741,9 +740,9 @@ namespace Game3 {
 					return false;
 				};
 
-				const bool exclude_both    = has_arg("-ai");
+				const bool exclude_both = has_arg("-ai");
 				const bool exclude_animals = exclude_both || has_arg("-a");
-				const bool exclude_items   = exclude_both || has_arg("-i");
+				const bool exclude_items = exclude_both || has_arg("-i");
 
 				for (const auto &[gid, weak_agent]: allAgents) {
 					if (AgentPtr agent = weak_agent.lock()) {
@@ -764,7 +763,7 @@ namespace Game3 {
 				std::sort(entities.begin(), entities.end(), [](const EntityPtr &left, const EntityPtr &right) {
 					Entity &left_ref = *left;
 					Entity &right_ref = *right;
-					const std::string left_demangled  = DEMANGLE(left_ref);
+					const std::string left_demangled = DEMANGLE(left_ref);
 					const std::string right_demangled = DEMANGLE(right_ref);
 
 					if (left_demangled < right_demangled) {
@@ -775,7 +774,7 @@ namespace Game3 {
 						return false;
 					}
 
-					const std::string left_name  = left->getName();
+					const std::string left_name = left->getName();
 					const std::string right_name = right->getName();
 
 					if (left_name < right_name) {
@@ -882,8 +881,9 @@ namespace Game3 {
 				}
 
 				auto factory = registry<EntityFactoryRegistry>().maybe(entity_id);
-				if (!factory)
+				if (!factory) {
 					return {false, "Unknown entity type."};
+				}
 
 				RealmPtr realm = player->getRealm();
 				EntityPtr entity = (*factory)(shared_from_this());

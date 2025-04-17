@@ -17,8 +17,9 @@ namespace Game3 {
 	void TextParticle::renderShadow(const RendererContext &) {}
 
 	void TextParticle::render(const RendererContext &renderers) {
-		if (!isVisible() || text.empty())
+		if (!isVisible() || text.empty()) {
 			return;
+		}
 
 		const auto [row, column] = getPosition();
 		const auto [x, y, z] = offset.copyBase();
@@ -40,10 +41,11 @@ namespace Game3 {
 		if (offset.z <= DEPTH) {
 			velocity = {};
 			age += args.delta;
-			if (lingerTime <= age)
+			if (lingerTime <= age) {
 				queueDestruction();
-			else
+			} else {
 				enqueueTick();
+			}
 			return;
 		}
 

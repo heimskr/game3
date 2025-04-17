@@ -2,11 +2,10 @@
 
 namespace Game3 {
 	InventoryWrapper::InventoryWrapper(std::shared_ptr<Inventory> inventory_):
-	inventory(std::move(inventory_)) {
-		weakOwner = inventory->weakOwner;
-		// TODO!: getter method for active slot
-		activeSlot = inventory->activeSlot.load();
-	}
+		inventory(std::move(inventory_)) {
+			weakOwner = inventory->weakOwner;
+			activeSlot = inventory->activeSlot.load();
+		}
 
 	Slot InventoryWrapper::getSlotCount() const {
 		return inventory->getSlotCount();
@@ -77,41 +76,48 @@ namespace Game3 {
 	}
 
 	void InventoryWrapper::drop(Slot slot) {
-		if (validateSlot(slot))
+		if (validateSlot(slot)) {
 			inventory->drop(slot);
+		}
 	}
 
 	void InventoryWrapper::discard(Slot slot) {
-		if (validateSlot(slot))
+		if (validateSlot(slot)) {
 			inventory->discard(slot);
+		}
 	}
 
 	void InventoryWrapper::swap(Slot source, Slot destination) {
-		if (validateSlot(source) && validateSlot(destination))
+		if (validateSlot(source) && validateSlot(destination)) {
 			inventory->swap(source, destination);
+		}
 	}
 
 	void InventoryWrapper::erase(Slot slot) {
-		if (validateSlot(slot))
+		if (validateSlot(slot)) {
 			inventory->erase(slot);
+		}
 	}
 
 	void InventoryWrapper::clear() {
 		for (Slot slot = 0, slot_max = inventory->getSlotCount(); slot < slot_max; ++slot) {
-			if (validateSlot(slot))
+			if (validateSlot(slot)) {
 				inventory->erase(slot);
+			}
 		}
 	}
 
 	ItemCount InventoryWrapper::count(const ItemID &id) const {
-		if (id.getPathStart() == "attribute")
+		if (id.getPathStart() == "attribute") {
 			return countAttribute(id);
+		}
 
 		ItemCount out = 0;
 
 		iterate([&](const ItemStackPtr &stack, Slot) {
-			if (stack->item->identifier == id)
+			if (stack->item->identifier == id) {
 				out += stack->count;
+			}
 			return false;
 		});
 
@@ -122,8 +128,9 @@ namespace Game3 {
 		ItemCount out = 0;
 
 		iterate([&](const ItemStackPtr &stack, Slot) {
-			if (stack->item->identifier == item.identifier)
+			if (stack->item->identifier == item.identifier) {
 				out += stack->count;
+			}
 			return false;
 		});
 
@@ -134,8 +141,9 @@ namespace Game3 {
 		ItemCount out = 0;
 
 		iterate([&](const ItemStackPtr &stored_stack, Slot) {
-			if (stack->canMerge(*stored_stack))
+			if (stack->canMerge(*stored_stack)) {
 				out += stored_stack->count;
+			}
 			return false;
 		});
 
@@ -152,8 +160,9 @@ namespace Game3 {
 		ItemCount out = 0;
 
 		iterate([&](const ItemStackPtr &stack, Slot) {
-			if (stack->hasAttribute(attribute))
+			if (stack->hasAttribute(attribute)) {
 				out += stack->count;
+			}
 			return false;
 		});
 
@@ -172,8 +181,9 @@ namespace Game3 {
 			return true;
 		});
 
-		if (!out)
+		if (!out) {
 			throw std::out_of_range("InventoryWrapper empty");
+		}
 
 		return out;
 	}
@@ -251,8 +261,9 @@ namespace Game3 {
 	}
 
 	void InventoryWrapper::setActive(Slot slot, bool force) {
-		if (validateSlot(slot))
+		if (validateSlot(slot)) {
 			inventory->setActive(slot, force);
+		}
 	}
 
 	void InventoryWrapper::notifyOwner(std::optional<std::variant<ItemStackPtr, Slot>> variant) {
@@ -267,8 +278,9 @@ namespace Game3 {
 		Slot out = 0;
 
 		iterate([this, &out](const ItemStackPtr &stack, Slot slot) {
-			if (stack && validateSlot(slot))
+			if (stack && validateSlot(slot)) {
 				++out;
+			}
 			return false;
 		});
 

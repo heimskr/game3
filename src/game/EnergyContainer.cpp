@@ -1,5 +1,5 @@
-#include "util/Log.h"
 #include "game/EnergyContainer.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	bool EnergyContainer::canInsert(EnergyAmount to_add) {

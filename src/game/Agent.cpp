@@ -1,12 +1,12 @@
-#include <mutex>
-#include <random>
-
-#include "util/Log.h"
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
 #include "net/LocalClient.h"
 #include "realm/Realm.h"
+#include "util/Log.h"
+
+#include <mutex>
+#include <random>
 
 namespace Game3 {
 	static std::mt19937_64 agent_rng;
@@ -18,9 +18,11 @@ namespace Game3 {
 		std::vector<ChunkPosition> out;
 		out.reserve(REALM_DIAMETER * REALM_DIAMETER);
 		constexpr int32_t half = REALM_DIAMETER / 2;
-		for (int32_t y = -half; y <= half; ++y)
-			for (int32_t x = -half; x <= half; ++x)
+		for (int32_t y = -half; y <= half; ++y) {
+			for (int32_t x = -half; x <= half; ++x) {
 				out.emplace_back(ChunkPosition{x + original_position.x, y + original_position.y});
+			}
+		}
 		return out;
 	}
 

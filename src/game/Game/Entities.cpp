@@ -1,4 +1,3 @@
-#include "game/Game.h"
 #include "entity/Blacksmith.h"
 #include "entity/Bomb.h"
 #include "entity/Chicken.h"
@@ -15,13 +14,14 @@
 #include "entity/Pig.h"
 #include "entity/Player.h"
 #include "entity/Quarter.h"
-#include "entity/Snowball.h"
 #include "entity/Sheep.h"
 #include "entity/Ship.h"
+#include "entity/Snowball.h"
 #include "entity/SquareParticle.h"
 #include "entity/TextParticle.h"
 #include "entity/Woodcutter.h"
 #include "entity/Worker.h"
+#include "game/Game.h"
 
 namespace Game3 {
 	void Game::add(EntityFactory &&factory) {

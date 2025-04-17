@@ -5,22 +5,25 @@
 namespace Game3 {
 	std::string Identifier::getPath() const {
 		const size_t slash = name.find_last_of('/');
-		if (slash == std::string::npos)
+		if (slash == std::string::npos) {
 			return "";
+		}
 		return name.substr(0, slash);
 	}
 
 	std::string Identifier::getPathStart() const {
 		const size_t slash = name.find('/');
-		if (slash == std::string::npos)
+		if (slash == std::string::npos) {
 			return "";
+		}
 		return name.substr(0, slash);
 	}
 
 	std::string Identifier::getPostPath() const {
 		const size_t slash = name.find_last_of('/');
-		if (slash == std::string::npos)
+		if (slash == std::string::npos) {
 			return name;
+		}
 		return name.substr(slash + 1);
 	}
 
@@ -47,8 +50,9 @@ namespace Game3 {
 
 	template <>
 	std::string Buffer::getType<Identifier>(const Identifier &identifier, bool in_container) {
-		if (in_container)
+		if (in_container) {
 			return getType(std::string{}, true);
+		}
 		return getType(identifier.str(), false);
 	}
 

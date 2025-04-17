@@ -1,6 +1,5 @@
 #include <cassert>
 
-#include "util/Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -11,11 +10,12 @@
 #include "game/Inventory.h"
 #include "game/InventoryGetter.h"
 #include "game/ServerInventory.h"
+#include "packet/DropItemPacket.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
-#include "packet/DropItemPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
+#include "util/Log.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -76,8 +76,9 @@ namespace Game3 {
 		{
 			auto lock = do_lock? uniqueLock() : std::unique_lock<DefaultMutex>{};
 
-			if (stack->count < amount)
+			if (stack->count < amount) {
 				throw std::runtime_error("Can't decrease stack count " + std::to_string(stack->count) + " by " + std::to_string(amount));
+			}
 
 			stack->count -= amount;
 

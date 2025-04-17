@@ -2,8 +2,8 @@
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
 #include "entity/Player.h"
-#include "game/Resource.h"
 #include "game/Game.h"
+#include "game/Resource.h"
 #include "game/Village.h"
 #include "packet/VillageUpdatePacket.h"
 #include "threading/ThreadContext.h"
@@ -60,18 +60,20 @@ namespace Game3 {
 
 	std::optional<double> Village::getResourceAmount(const Identifier &resource) const {
 		auto lock = resources.sharedLock();
-		if (auto iter = resources.find(resource); iter != resources.end())
+		if (auto iter = resources.find(resource); iter != resources.end()) {
 			return iter->second;
+		}
 		return std::nullopt;
 	}
 
 	void Village::setResourceAmount(const Identifier &resource, double amount) {
 		{
 			auto lock = resources.uniqueLock();
-			if (std::abs(amount) < 0.00001)
+			if (std::abs(amount) < 0.00001) {
 				resources.erase(resource);
-			else
+			} else {
 				resources[resource] = amount;
+			}
 		}
 		sendUpdates();
 	}
@@ -82,8 +84,9 @@ namespace Game3 {
 	}
 
 	void Village::produce(BiomeType biome, const ProductionRule &rule) {
-		if (const auto &biomes = rule.getBiomes(); biomes && !biomes->contains(biome))
+		if (const auto &biomes = rule.getBiomes(); biomes && !biomes->contains(biome)) {
 			return;
+		}
 
 		auto lock = resources.uniqueLock();
 
@@ -92,8 +95,9 @@ namespace Game3 {
 		if (auto effect = rule.getRichnessEffect()) {
 			if (auto richness = getRichness(rule.getOutput()->getID())) {
 				multiplier = *effect * *richness;
-				if (multiplier <= 0)
+				if (multiplier <= 0) {
 					return;
+				}
 			} else {
 				return;
 			}
@@ -101,8 +105,9 @@ namespace Game3 {
 
 		for (const ItemStackPtr &stack: rule.getInputs()) {
 			auto iter = resources.find(stack->getID());
-			if (iter == resources.end() || iter->second < multiplier * stack->count)
+			if (iter == resources.end() || iter->second < multiplier * stack->count) {
 				return;
+			}
 		}
 
 		double &output_count = resources[rule.getOutput()->getID()];
@@ -119,24 +124,27 @@ namespace Game3 {
 		// Don't use too much labor.
 		double labor_needed = rule.getLabor() * multiplier;
 		if (labor < labor_needed) {
-			add_count  *= labor / labor_needed;
+			add_count *= labor / labor_needed;
 			multiplier *= labor / labor_needed;
 			labor_needed = labor;
 		}
 
-		if (multiplier == 0)
+		if (multiplier == 0) {
 			return;
+		}
 
-		for (const ItemStackPtr &stack: rule.getInputs())
+		for (const ItemStackPtr &stack: rule.getInputs()) {
 			resources.at(stack->getID()) -= multiplier * stack->count;
+		}
 
 		output_count += add_count;
 		labor = labor - labor_needed;
 	}
 
 	void Village::produce(BiomeType biome, const ProductionRuleRegistry &rules) {
-		for (const std::shared_ptr<ProductionRule> &rule: rules)
+		for (const std::shared_ptr<ProductionRule> &rule: rules) {
 			produce(biome, *rule);
+		}
 	}
 
 	bool Village::consume(const ConsumptionRule &rule) {
@@ -144,30 +152,35 @@ namespace Game3 {
 		auto resources_lock = resources.uniqueLock();
 		auto iter = resources.find(rule.getInput());
 
-		if (iter == resources.end())
+		if (iter == resources.end()) {
 			return false;
+		}
 
 		double &amount = iter->second;
 
-		if (amount < rate)
+		if (amount < rate) {
 			return false;
+		}
 
 		const auto [min, max] = rule.getLaborRange();
 
 		const bool in_range = min <= labor && labor <= max;
 
 		if (rule.getIgnoreLabor()) {
-			if (in_range)
+			if (in_range) {
 				labor = labor + rule.getLaborOut() * rate;
+			}
 		} else {
-			if (!in_range)
+			if (!in_range) {
 				return false;
+			}
 			labor = labor + rule.getLaborOut() * rate;
 		}
 
 		amount -= rate;
-		if (amount < 0.0001)
+		if (amount < 0.0001) {
 			resources.erase(iter);
+		}
 
 		return true;
 	}
@@ -176,21 +189,24 @@ namespace Game3 {
 		std::vector<std::shared_ptr<ConsumptionRule>> candidates;
 
 		for (const auto &rule: rules) {
-			if (rule->getAlways())
+			if (rule->getAlways()) {
 				consume(*rule);
-			else
+			} else {
 				candidates.push_back(rule);
+			}
 		}
 
-		if (!candidates.empty())
+		if (!candidates.empty()) {
 			consume(*choose(candidates, threadContext.rng));
+		}
 	}
 
 	void Village::tick(const TickArgs &args) {
 		const GamePtr &game = args.game;
 		BiomeType biome = Biome::VOID_REALM;
-		if (std::optional<BiomeType> found_biome = game->getRealm(realmID)->tileProvider.copyBiomeType(position))
+		if (std::optional<BiomeType> found_biome = game->getRealm(realmID)->tileProvider.copyBiomeType(position)) {
 			biome = *found_biome;
+		}
 
 		consume(game->registry<ConsumptionRuleRegistry>());
 		produce(biome, game->registry<ProductionRuleRegistry>());
@@ -201,13 +217,15 @@ namespace Game3 {
 	void Village::sendUpdates() {
 		auto lock = subscribedPlayers.sharedLock();
 
-		if (subscribedPlayers.empty())
+		if (subscribedPlayers.empty()) {
 			return;
+		}
 
 		const auto packet = make<VillageUpdatePacket>(*this);
 
-		for (const PlayerPtr &player: subscribedPlayers)
+		for (const PlayerPtr &player: subscribedPlayers) {
 			player->send(packet);
+		}
 	}
 
 	GamePtr Village::getGame() const {
@@ -239,7 +257,7 @@ namespace Game3 {
 
 	Resources Village::getDefaultResources() {
 		return {
-			{"base:item/meat", 10}
+			{"base:item/meat", 10},
 		};
 	}
 

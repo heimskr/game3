@@ -1,4 +1,3 @@
-#include "util/Log.h"
 #include "entity/Entity.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
@@ -8,13 +7,14 @@
 #include "game/ServerInventory.h"
 #include "item/Item.h"
 #include "net/Buffer.h"
+#include "packet/DropItemPacket.h"
 #include "packet/InventoryPacket.h"
 #include "packet/SetActiveSlotPacket.h"
-#include "packet/DropItemPacket.h"
 #include "realm/Realm.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/InventoriedTileEntity.h"
 #include "util/Cast.h"
+#include "util/Log.h"
 #include "util/Util.h"
 
 #include <cassert>
@@ -25,9 +25,11 @@ namespace Game3 {
 
 	std::unique_ptr<Inventory> ServerInventory::copy() const {
 		auto out = std::make_unique<ServerInventory>(*this);
-		for (auto &[slot, stack]: out->storage)
-			if (stack)
+		for (auto &[slot, stack]: out->storage) {
+			if (stack) {
 				stack = stack->copy();
+			}
+		}
 		return out;
 	}
 
@@ -35,8 +37,9 @@ namespace Game3 {
 		ssize_t remaining = stack->count;
 
 		if (0 <= start) {
-			if (slotCount <= start)
+			if (slotCount <= start) {
 				throw std::out_of_range(std::format("Can't start at slot {}: out of range", start));
+			}
 
 			if (auto iter = storage.find(start); iter != storage.end() && predicate(start)) {
 				ItemStackPtr stored = iter->second;
@@ -58,50 +61,59 @@ namespace Game3 {
 
 		if (0 < remaining) {
 			for (auto &[slot, stored]: storage) {
-				if (slot == start || !stored->canMerge(*stack) || !predicate(slot))
+				if (slot == start || !stored->canMerge(*stack) || !predicate(slot)) {
 					continue;
+				}
 				const ssize_t storable = ssize_t(stored->item->maxCount) - ssize_t(stored->count);
 				if (0 < storable) {
 					const ItemCount to_store = std::min<ItemCount>(remaining, storable);
 					stored->count += to_store;
 					remaining -= to_store;
-					if (remaining <= 0)
+					if (remaining <= 0) {
 						break;
+					}
 				}
 			}
 		}
 
 		if (0 < remaining) {
 			for (Slot slot = 0; slot < slotCount; ++slot) {
-				if (storage.contains(slot) || !predicate(slot))
+				if (storage.contains(slot) || !predicate(slot)) {
 					continue;
+				}
 				const ItemCount to_store = std::min(static_cast<ItemCount>(remaining), stack->item->maxCount);
 				storage.emplace(slot, ItemStack::create(stack->getGame(), stack->item, to_store, stack->data));
 				remaining -= to_store;
-				if (remaining <= 0)
+				if (remaining <= 0) {
 					break;
+				}
 			}
 		}
 
-		if (remaining != static_cast<ssize_t>(stack->count))
+		if (remaining != static_cast<ssize_t>(stack->count)) {
 			notifyOwner(stack);
+		}
 
-		if (remaining < 0 || static_cast<ssize_t>(stack->count) < remaining)
+		if (remaining < 0 || static_cast<ssize_t>(stack->count) < remaining) {
 			throw std::logic_error("How'd we end up with " + std::to_string(remaining) + " items remaining?");
+		}
 
-		if (remaining == 0)
+		if (remaining == 0) {
 			return nullptr;
+		}
 
-		return ItemStack::create(stack->hasGame()? stack->getGame() : getOwner()->getRealm()->getGame(), stack->item, remaining, stack->data);
+		return ItemStack::create(stack->hasGame() ? stack->getGame() : getOwner()->getRealm()->getGame(), stack->item, remaining, stack->data);
 	}
 
 	void ServerInventory::drop(Slot slot) {
-		if (!storage.contains(slot))
+		if (!storage.contains(slot)) {
 			return;
+		}
 
 		auto owner = weakOwner.lock();
-		if (!owner)
+		if (!owner) {
 			throw std::logic_error("ServerInventory is missing an owner");
+		}
 
 		auto realm = owner->getRealm();
 		realm->spawn<ItemEntity>(owner->getPosition(), storage.at(slot));
@@ -115,46 +127,54 @@ namespace Game3 {
 	}
 
 	void ServerInventory::swap(Slot source, Slot destination) {
-		if (slotCount <= source || slotCount <= destination || !storage.contains(source))
+		if (slotCount <= source || slotCount <= destination || !storage.contains(source)) {
 			return;
+		}
 
 		ItemStackPtr source_stack = storage.at(source);
 
 		std::function<void()> action;
 
-		if (onSwap)
+		if (onSwap) {
 			action = onSwap(*this, source, *this, destination);
+		}
 
 		if (storage.contains(destination)) {
 			ItemStackPtr destination_stack = storage.at(destination);
 			if (destination_stack->canMerge(*source_stack)) {
 				ItemCount to_move = std::min(source_stack->count, destination_stack->item->maxCount - destination_stack->count);
 				destination_stack->count += to_move;
-				if ((source_stack->count -= to_move) == 0)
+				if ((source_stack->count -= to_move) == 0) {
 					storage.erase(source);
-			} else
+				}
+			} else {
 				std::swap(storage.at(source), storage.at(destination));
+			}
 		} else {
 			storage.emplace(destination, std::move(source_stack));
 			storage.erase(source);
 		}
 
-		if (action)
+		if (action) {
 			action();
+		}
 
 		notifyOwner({});
 	}
 
 	void ServerInventory::erase(Slot slot) {
-		if (slot < 0)
+		if (slot < 0) {
 			throw std::invalid_argument("Can't erase invalid slot " + std::to_string(slot));
+		}
 
 		std::function<void()> after;
-		if (onRemove)
+		if (onRemove) {
 			after = onRemove(slot);
+		}
 		storage.erase(slot);
-		if (after)
+		if (after) {
 			after();
+		}
 	}
 
 	void ServerInventory::clear() {
@@ -170,8 +190,9 @@ namespace Game3 {
 		ItemCount removed = 0;
 
 		std::erase_if(storage, [&](auto &item) {
-			if (count_to_remove == 0)
+			if (count_to_remove == 0) {
 				return false;
+			}
 
 			auto &[slot, stack] = item;
 
@@ -181,15 +202,17 @@ namespace Game3 {
 				count_to_remove -= to_remove;
 				removed += to_remove;
 
-				if (stack->count == 0)
+				if (stack->count == 0) {
 					return true;
+				}
 			}
 
 			return false;
 		});
 
-		if (0 < removed)
+		if (0 < removed) {
 			notifyOwner({});
+		}
 
 		return removed;
 	}
@@ -199,8 +222,9 @@ namespace Game3 {
 		ItemCount removed = 0;
 
 		std::erase_if(storage, [&](auto &item) {
-			if (count_to_remove == 0)
+			if (count_to_remove == 0) {
 				return false;
+			}
 
 			auto &[slot, stack] = item;
 
@@ -210,15 +234,17 @@ namespace Game3 {
 				count_to_remove -= to_remove;
 				removed += to_remove;
 
-				if (stack->count == 0)
+				if (stack->count == 0) {
 					return true;
+				}
 			}
 
 			return false;
 		});
 
-		if (0 < removed)
+		if (0 < removed) {
 			notifyOwner({});
+		}
 
 		return removed;
 	}
@@ -226,28 +252,32 @@ namespace Game3 {
 	ItemCount ServerInventory::remove(const ItemStackPtr &stack_to_remove, Slot slot) {
 		auto iter = storage.find(slot);
 		if (iter == storage.end()) {
-			if (auto owner = weakOwner.lock())
+			if (auto owner = weakOwner.lock()) {
 				WARN("Trying to remove from empty slot {} in {} {}'s inventory", slot, owner->getName(), owner->getGID());
-			else
+			} else {
 				WARN("Trying to remove from empty slot {} in an unowned inventory", slot);
+			}
 			return 0;
 		}
 
 		ItemStackPtr &stack = iter->second;
-		if (!stack_to_remove->canMerge(*stack))
+		if (!stack_to_remove->canMerge(*stack)) {
 			return 0;
+		}
 
 		const ItemCount to_remove = std::min(stack->count, stack_to_remove->count);
-		if ((stack->count -= to_remove) == 0)
+		if ((stack->count -= to_remove) == 0) {
 			storage.erase(slot);
+		}
 
 		notifyOwner({});
 		return to_remove;
 	}
 
 	ItemCount ServerInventory::remove(const CraftingRequirement &requirement, const Predicate &predicate) {
-		if (requirement.is<ItemStackPtr>())
+		if (requirement.is<ItemStackPtr>()) {
 			return remove(requirement.get<ItemStackPtr>(), predicate);
+		}
 		return remove(requirement.get<AttributeRequirement>(), predicate);
 	}
 
@@ -259,10 +289,11 @@ namespace Game3 {
 		for (Slot slot = 0; slot < slotCount && 0 < count_remaining; ++slot) {
 			if (ItemStackPtr stack = (*this)[slot]; stack && predicate(stack, slot) && stack->hasAttribute(attribute)) {
 				const ItemCount to_remove = std::min(stack->count, count_remaining);
-				stack->count  -= to_remove;
+				stack->count -= to_remove;
 				count_removed += to_remove;
-				if (0 == (count_remaining -= to_remove))
+				if (0 == (count_remaining -= to_remove)) {
 					break;
+				}
 			}
 		}
 
@@ -289,8 +320,9 @@ namespace Game3 {
 		if (owner) {
 			owner->inventoryUpdated(index);
 
-			if (suppressInventoryNotifications)
+			if (suppressInventoryNotifications) {
 				return;
+			}
 
 			owner->increaseUpdateCounter();
 			if (auto tile_entity = std::dynamic_pointer_cast<InventoriedTileEntity>(owner)) {
@@ -323,7 +355,7 @@ namespace Game3 {
 			}
 		}
 
-		out.slotCount  = boost::json::value_to<Slot>(object.at("slotCount"));
+		out.slotCount = boost::json::value_to<Slot>(object.at("slotCount"));
 		out.activeSlot = boost::json::value_to<Slot>(object.at("activeSlot"));
 
 		return out;
@@ -363,8 +395,9 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected inventory)");
 		}
 		const auto gid = buffer.take<GlobalID>();
-		if (inventory.hasOwner())
+		if (inventory.hasOwner()) {
 			inventory.getOwner()->setGID(gid);
+		}
 		inventory.setSlotCount(buffer.take<Slot>());
 		inventory.activeSlot = buffer.take<Slot>();
 		inventory.index = buffer.take<InventoryID>();
@@ -380,7 +413,7 @@ namespace Game3 {
 			storage[std::to_string(key)] = boost::json::value_from(*val);
 		}
 
-		object["slotCount"]  = inventory.getSlotCount();
+		object["slotCount"] = inventory.getSlotCount();
 		object["activeSlot"] = inventory.activeSlot.load();
 	}
 }

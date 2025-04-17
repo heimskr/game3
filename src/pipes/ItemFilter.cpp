@@ -22,7 +22,7 @@ namespace Game3 {
 		auto lock = configsByItem.sharedLock();
 
 		if (auto iter = configsByItem.find(stack->item->identifier); iter != configsByItem.end()) {
-			if (std::ranges::any_of(iter->second, std::bind(&isMatch, std::cref(stack), std::cref(inventory), strict, std::placeholders::_1))) {
+			if (std::ranges::any_of(iter->second, std::bind_front(&isMatch, std::cref(stack), std::cref(inventory), strict))) {
 				return allowMode;
 			}
 		}

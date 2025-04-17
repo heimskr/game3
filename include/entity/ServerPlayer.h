@@ -1,8 +1,8 @@
 #pragma once
 
+#include "container/WeakSet.h"
 #include "entity/Player.h"
 #include "threading/Lockable.h"
-#include "container/WeakSet.h"
 
 namespace Game3 {
 	class GenericClient;
