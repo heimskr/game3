@@ -1,8 +1,8 @@
-#include "util/Log.h"
 #include "game/EnergyContainer.h"
 #include "pipes/EnergyNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/EnergeticTileEntity.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	EnergyNetwork::EnergyNetwork(size_t id_, const std::shared_ptr<Realm> &realm):
@@ -19,8 +19,9 @@ namespace Game3 {
 		auto this_lock = uniqueLock();
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || insertions.empty())
+		if (!realm || insertions.empty()) {
 			return;
+		}
 
 		EnergyAmount &energy = energyContainer->energy;
 		auto energy_lock = energyContainer->uniqueLock();
@@ -47,12 +48,14 @@ namespace Game3 {
 				}
 
 				energy += energetic->extractEnergy(direction, true, capacity - energy);
-				if (capacity <= energy)
+				if (capacity <= energy) {
 					energy = distribute(energy);
+				}
 			}
 
-			for (const auto &iter: to_erase)
+			for (const auto &iter: to_erase) {
 				extractions.erase(iter);
+			}
 		}
 
 		energy = distribute(energy);
@@ -63,12 +66,14 @@ namespace Game3 {
 	}
 
 	EnergyAmount EnergyNetwork::distribute(EnergyAmount amount) {
-		if (amount == 0)
+		if (amount == 0) {
 			return 0;
+		}
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
 			return amount;
+		}
 
 		std::vector<std::pair<std::shared_ptr<EnergeticTileEntity>, Direction>> accepting_insertions;
 
@@ -79,18 +84,21 @@ namespace Game3 {
 			std::erase_if(insertions, [&](const std::pair<Position, Direction> &pair) {
 				const auto [position, direction] = pair;
 				auto energetic = std::dynamic_pointer_cast<EnergeticTileEntity>(realm->tileEntityAt(position));
-				if (!energetic)
+				if (!energetic) {
 					return true;
+				}
 
-				if (energetic->canInsertEnergy(1, direction))
+				if (energetic->canInsertEnergy(1, direction)) {
 					accepting_insertions.emplace_back(energetic, direction);
+				}
 
 				return false;
 			});
 		}
 
-		if (accepting_insertions.empty())
+		if (accepting_insertions.empty()) {
 			return amount;
+		}
 
 		size_t insertions_remaining = accepting_insertions.size();
 

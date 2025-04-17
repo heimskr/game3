@@ -1,7 +1,7 @@
 #pragma once
 
-#include "types/ChunkPosition.h"
 #include "threading/Lockable.h"
+#include "types/ChunkPosition.h"
 
 #include <atomic>
 #include <memory>

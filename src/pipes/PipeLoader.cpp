@@ -1,9 +1,9 @@
-#include "types/Directions.h"
-#include "pipes/ItemNetwork.h"
 #include "pipes/PipeLoader.h"
+#include "pipes/ItemNetwork.h"
 #include "pipes/PipeNetwork.h"
 #include "realm/Realm.h"
 #include "tileentity/Pipe.h"
+#include "types/Directions.h"
 
 #include <atomic>
 
@@ -11,24 +11,30 @@ namespace Game3 {
 	void PipeLoader::load(Realm &realm, ChunkPosition chunk_position) {
 		{
 			auto shared_lock = busyChunks.sharedLock();
-			if (busyChunks.contains(chunk_position))
+			if (busyChunks.contains(chunk_position)) {
 				return;
+			}
 		}
 
 		{
 			auto unique_lock = busyChunks.uniqueLock();
-			if (busyChunks.contains(chunk_position))
+			if (busyChunks.contains(chunk_position)) {
 				return;
+			}
 			busyChunks.insert(chunk_position);
 		}
 
 		if (auto by_chunk = realm.getTileEntities(chunk_position)) {
 			auto lock = by_chunk->sharedLock();
-			for (const TileEntityPtr &tile_entity: *by_chunk)
-				if (auto pipe = std::dynamic_pointer_cast<Pipe>(tile_entity))
-					for (const Substance pipe_type: PIPE_TYPES)
-						if (!pipe->loaded[pipe_type])
+			for (const TileEntityPtr &tile_entity: *by_chunk) {
+				if (auto pipe = std::dynamic_pointer_cast<Pipe>(tile_entity)) {
+					for (const Substance pipe_type: PIPE_TYPES) {
+						if (!pipe->loaded[pipe_type]) {
 							floodFill(pipe_type, pipe);
+						}
+					}
+				}
+			}
 		}
 
 		{
@@ -57,10 +63,12 @@ namespace Game3 {
 			Directions &directions = pipe->getDirections()[pipe_type];
 
 			if (auto other_network = pipe->getNetwork(pipe_type)) {
-				if (network != other_network)
+				if (network != other_network) {
 					network->absorb(other_network);
-			} else
+				}
+			} else {
 				network->add(pipe);
+			}
 
 			directions.iterate([&](Direction direction) {
 				const Position neighbor_position = pipe->getPosition() + direction;

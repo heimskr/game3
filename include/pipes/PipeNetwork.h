@@ -1,11 +1,11 @@
 #pragma once
 
-#include "types/Position.h"
-#include "types/Types.h"
+#include "container/WeakSet.h"
 #include "threading/HasMutex.h"
 #include "threading/Lockable.h"
+#include "types/Position.h"
+#include "types/Types.h"
 #include "util/PairHash.h"
-#include "container/WeakSet.h"
 
 #include <memory>
 #include <unordered_set>
@@ -56,7 +56,7 @@ namespace Game3 {
 			virtual bool canWorkWith(const std::shared_ptr<TileEntity> &) const { return false; }
 
 			inline const auto & getExtractions() const { return extractions; }
-			inline const auto & getInsertions()  const { return insertions; }
+			inline const auto & getInsertions() const { return insertions; }
 
 			inline auto getID() const { return id; }
 
