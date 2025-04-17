@@ -1,5 +1,5 @@
-#include "util/Log.h"
 #include "net/Buffer.h"
+#include "util/Log.h"
 
 #include "game/HasInventory.h"
 #include "game/StorageInventory.h"
@@ -22,9 +22,8 @@ namespace Game3 {
 
 		auto insertions_lock = insertions.uniqueLock();
 		RealmPtr realm = weakRealm.lock();
-		{
-			if (!realm || insertions.empty())
-				return;
+		if (!realm || insertions.empty()) {
+			return;
 		}
 
 		auto overflow_lock = overflowQueue.uniqueLock();
@@ -35,8 +34,9 @@ namespace Game3 {
 			ItemStackPtr stack = std::move(overflowQueue.front());
 			overflowQueue.pop_front();
 
-			if (!roundRobinIterator)
+			if (!roundRobinIterator) {
 				advanceRoundRobin();
+			}
 
 			iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &inventoried, Direction direction) {
 				inventoried->insertItem(stack, direction, &stack);
@@ -45,8 +45,9 @@ namespace Game3 {
 
 			// If the stack couldn't be fully inserted, put the remainder at the end of the overflow queue.
 			// TODO!: copy here?
-			if (stack)
+			if (stack) {
 				overflowQueue.push_back(std::move(stack));
+			}
 
 			return;
 		}
@@ -73,23 +74,27 @@ namespace Game3 {
 
 			{
 				auto inventory_lock = inventory->sharedLock();
-				if (inventoried->empty())
+				if (inventoried->empty()) {
 					continue;
+				}
 			}
 
-			if (!roundRobinIterator)
+			if (!roundRobinIterator) {
 				advanceRoundRobin();
+			}
 
 			bool failed = false;
 			auto inventory_lock = inventory->uniqueLock();
 
 			std::shared_ptr<ItemFilter> extraction_filter;
-			if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + direction)))
+			if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(position + direction))) {
 				extraction_filter = pipe->itemFilters[flipDirection(direction)];
+			}
 
 			inventoried->iterateExtractableItems(direction, [&, direction = direction](const ItemStackPtr &stack, Slot slot) {
-				if (extraction_filter && !extraction_filter->isAllowed(stack, *inventory))
+				if (extraction_filter && !extraction_filter->isAllowed(stack, *inventory)) {
 					return false;
+				}
 
 				// It's possible we'll extract an item and put it right back.
 				// If that happens, we don't want to notify the owner and potentially queue a broadcast.
@@ -106,12 +111,13 @@ namespace Game3 {
 				const ItemCount original_count = extracted->count;
 
 				// Try to insert the extracted item into insertion points until we either finish inserting all of it
-				// or we run out of insertion points.
+				// or run out of insertion points.
 				iterateRoundRobin([&](const std::shared_ptr<InventoriedTileEntity> &round_robin, Direction round_robin_direction) -> bool {
 					InventoryPtr round_robin_inventory = round_robin->getInventory(0);
 
-					if (!round_robin_inventory)
+					if (!round_robin_inventory) {
 						return false;
+					}
 
 					if (const auto pipe = std::dynamic_pointer_cast<Pipe>(realm->tileEntityAt(round_robin->getPosition() + round_robin_direction))) {
 						auto round_robin_inventory_lock = round_robin_inventory->sharedLock();
@@ -155,17 +161,20 @@ namespace Game3 {
 				return false;
 			});
 
-			if (failed)
+			if (failed) {
 				return;
+			}
 		}
 
-		for (const auto &iter: to_erase)
+		for (const auto &iter: to_erase) {
 			extractions.erase(iter);
+		}
 	}
 
 	void ItemNetwork::lastPipeRemoved(Position where) {
-		if (overflowQueue.empty())
+		if (overflowQueue.empty()) {
 			return;
+		}
 
 		RealmPtr realm = weakRealm.lock();
 		if (!realm) {
@@ -173,8 +182,9 @@ namespace Game3 {
 			return;
 		}
 
-		for (const ItemStackPtr &stack: overflowQueue)
+		for (const ItemStackPtr &stack: overflowQueue) {
 			stack->spawn(Place{where, realm});
+		}
 
 		// Just in case.
 		overflowQueue.clear();
@@ -200,24 +210,27 @@ namespace Game3 {
 		if (insertions.size() == 1) {
 			TileEntityPtr tile_entity = realm->tileEntityAt(insertions.begin()->first);
 
-			if (std::dynamic_pointer_cast<HasInventory>(tile_entity))
+			if (std::dynamic_pointer_cast<HasInventory>(tile_entity)) {
 				roundRobinIterator.getBase() = insertions.begin();
-			else
+			} else {
 				roundRobinIterator.getBase() = insertions.end();
+			}
 
 			return;
 		}
 
-		if (!roundRobinIterator || *roundRobinIterator == insertions.end())
+		if (!roundRobinIterator || *roundRobinIterator == insertions.end()) {
 			roundRobinIterator.getBase() = insertions.begin();
+		}
 
 		auto old_iter = *roundRobinIterator;
 		bool has_inventory = false;
 
 		// Keep searching for the next insertion that has an inventory until we reach the initial iterator.
 		do {
-			if (++*roundRobinIterator == insertions.end())
+			if (++*roundRobinIterator == insertions.end()) {
 				roundRobinIterator.getBase() = insertions.begin();
+			}
 
 			assert(!insertions.empty());
 			assert(roundRobinIterator);
@@ -232,29 +245,34 @@ namespace Game3 {
 
 		// If we haven't found an inventoried tile entity by this point, it means none exists among the insertion set;
 		// therefore, we need to invalidate the iterator.
-		if (!has_inventory)
+		if (!has_inventory) {
 			roundRobinIterator.getBase() = insertions.end();
+		}
 	}
 
 	std::pair<std::shared_ptr<InventoriedTileEntity>, Direction> ItemNetwork::getRoundRobin() {
-		if (!roundRobinIterator)
+		if (!roundRobinIterator) {
 			advanceRoundRobin();
+		}
 
 		{
 			auto lock = insertions.sharedLock();
-			if (*roundRobinIterator == insertions.end())
+			if (*roundRobinIterator == insertions.end()) {
 				return {nullptr, Direction::Invalid};
+			}
 		}
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
 			return {nullptr, Direction::Invalid};
+		}
 
 		const auto [position, direction] = **roundRobinIterator;
 
 		TileEntityPtr tile_entity = realm->tileEntityAt(position);
-		if (!tile_entity)
+		if (!tile_entity) {
 			return {nullptr, Direction::Invalid};
+		}
 
 		return {std::dynamic_pointer_cast<InventoriedTileEntity>(tile_entity), direction};
 	}
@@ -272,8 +290,9 @@ namespace Game3 {
 		do {
 			advanceRoundRobin();
 			if (const auto [tile_entity, direction] = getRoundRobin(); tile_entity) {
-				if (tile_entity != avoid && function(tile_entity, direction))
+				if (tile_entity != avoid && function(tile_entity, direction)) {
 					return;
+				}
 			}
 		} while (old_iter != roundRobinIterator.getBase() && ++counter < max);
 	}
