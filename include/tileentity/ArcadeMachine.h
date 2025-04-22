@@ -13,6 +13,8 @@ namespace Game3 {
 			std::string getName() const override { return "Arcade Machine"; }
 
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
+			bool mouseOver() final;
+			void mouseOut() final;
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;

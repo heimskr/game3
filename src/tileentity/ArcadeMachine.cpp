@@ -9,6 +9,8 @@
 #include "realm/Realm.h"
 #include "tileentity/ArcadeMachine.h"
 #include "ui/gl/dialog/MinigameDialog.h"
+#include "ui/gl/widget/Tooltip.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 
 namespace Game3 {
@@ -21,6 +23,30 @@ namespace Game3 {
 	bool ArcadeMachine::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
 		player->send(make<OpenMinigamePacket>(minigameName, gameWidth, gameHeight));
 		return true;
+	}
+
+	bool ArcadeMachine::mouseOver() {
+		WindowPtr window = getGame()->toClient().getWindow();
+		auto tooltip = window->uiContext.getTooltip();
+		if (!tooltip->wasUpdatedBy(*this)) {
+			if (auto minigame = getGame()->registry<MinigameFactoryRegistry>().maybe(minigameName)) {
+				tooltip->setText(minigame->gameName, *this);
+				tooltip->show(*this);
+			} else {
+				tooltip->hide();
+			}
+		} else {
+			tooltip->show(*this);
+		}
+		return true;
+	}
+
+	void ArcadeMachine::mouseOut() {
+		WindowPtr window = getGame()->toClient().getWindow();
+		auto tooltip = window->uiContext.getTooltip();
+		if (tooltip->wasUpdatedBy(*this)) {
+			tooltip->hide();
+		}
 	}
 
 	void ArcadeMachine::encode(Game &game, Buffer &buffer) {

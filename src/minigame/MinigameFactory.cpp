@@ -3,8 +3,10 @@
 #include "ui/Window.h"
 
 namespace Game3 {
-	MinigameFactory::MinigameFactory(Identifier identifier, decltype(function) function):
-		NamedRegisterable(std::move(identifier)), function(std::move(function)) {}
+	MinigameFactory::MinigameFactory(Identifier identifier, std::string gameName, decltype(function) function):
+		NamedRegisterable(std::move(identifier)),
+		function(std::move(function)),
+		gameName(std::move(gameName)) {}
 
 	std::shared_ptr<Minigame> MinigameFactory::operator()(const std::shared_ptr<ClientGame> &game, const std::any &argument) const {
 		if (!function) {

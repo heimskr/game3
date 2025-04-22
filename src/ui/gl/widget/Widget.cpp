@@ -371,6 +371,22 @@ namespace Game3 {
 		return selfScale * ui.scale;
 	}
 
+	WidgetPtr Widget::getSelf() {
+		return shared_from_this();
+	}
+
+	std::shared_ptr<const Widget> Widget::getSelf() const {
+		return shared_from_this();
+	}
+
+	std::weak_ptr<Widget> Widget::getWeakSelf() {
+		return weak_from_this();
+	}
+
+	std::weak_ptr<const Widget> Widget::getWeakSelf() const {
+		return weak_from_this();
+	}
+
 	bool Widget::onChildrenUpdated() {
 		return !suppressChildUpdates;
 	}

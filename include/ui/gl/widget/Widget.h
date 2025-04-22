@@ -5,6 +5,7 @@
 #include "ui/gl/HasExpand.h"
 #include "ui/gl/Types.h"
 #include "ui/Modifiers.h"
+#include "ui/TooltipUpdater.h"
 
 #include <functional>
 #include <memory>
@@ -21,7 +22,7 @@ namespace Game3 {
 	using WidgetPtr = std::shared_ptr<Widget>;
 	using WeakWidgetPtr = std::weak_ptr<Widget>;
 
-	class Widget: public std::enable_shared_from_this<Widget>, public HasExpand {
+	class Widget: public std::enable_shared_from_this<Widget>, public HasExpand, public TooltipUpdater {
 		public:
 			Widget(UIContext &, float selfScale);
 
@@ -82,6 +83,11 @@ namespace Game3 {
 			UIContext & getUI();
 
 			float getScale() const;
+
+			WidgetPtr getSelf();
+			std::shared_ptr<const Widget> getSelf() const;
+			std::weak_ptr<Widget> getWeakSelf();
+			std::weak_ptr<const Widget> getWeakSelf() const;
 
 		protected:
 			UIContext &ui;

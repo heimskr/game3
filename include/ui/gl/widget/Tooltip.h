@@ -22,31 +22,56 @@ namespace Game3 {
 			/** Unconditionally disables the widget's visibility. */
 			void hide();
 			/** Hides the widget if the updater is the stored updater. */
-			void hide(const Widget &updater);
+			void hide(TooltipUpdater &);
 
 			/** Unconditionally enables the widget's visibility. */
 			void show();
-			/** Unconditionally enables the widget's visibility and sets the last updater. */
-			void show(const Widget &updater);
 
-			bool wasUpdatedBy(const Widget &) const;
+			/** Unconditionally enables the widget's visibility and sets the last updater. */
+			template <typename U>
+			void show(U &updater) {
+				show();
+				lastUpdater = updater.weak_from_this();
+			}
+
+			bool wasUpdatedBy(const TooltipUpdater &) const;
 
 			void setText(UString);
-			bool setText(UString, const Widget &updater);
 
 			void setMaxWidth(float);
-			bool setMaxWidth(float, const Widget &updater);
 
 			void setBackgroundColor(const Color &);
-			bool setBackgroundColor(const Color &, const Widget &updater);
 
 			void setTextColor(const Color &);
-			bool setTextColor(const Color &, const Widget &updater);
 
 			void setRegion(std::optional<Rectangle>);
-			bool setRegion(std::optional<Rectangle>, const Widget &updater);
 
 			void setPositionOverride(std::optional<std::pair<float, float>>);
+
+			template <typename U>
+			bool setText(UString new_text, U &updater) {
+				return updateField(std::move(new_text), &Tooltip::text, updater);
+			}
+
+			template <typename U>
+			bool setMaxWidth(float new_max_width, U &updater) {
+				return updateField(new_max_width, &Tooltip::maxWidth, updater);
+			}
+
+			template <typename U>
+			bool setBackgroundColor(const Color &new_color, U &updater) {
+				return updateField(new_color, &Tooltip::backgroundColor, updater);
+			}
+
+			template <typename U>
+			bool setTextColor(const Color &new_color, U &updater) {
+				return updateField(new_color, &Tooltip::textColor, updater);
+			}
+
+			template <typename U>
+			bool setRegion(std::optional<Rectangle> new_region, U &updater) {
+				return updateField(std::move(new_region), &Tooltip::region, updater);
+			}
 
 		private:
 			UString text;
@@ -54,7 +79,7 @@ namespace Game3 {
 			bool visible = false;
 			Color backgroundColor;
 			Color textColor;
-			std::weak_ptr<const Widget> lastUpdater;
+			std::weak_ptr<TooltipUpdater> lastUpdater;
 			std::optional<Rectangle> region;
 			/** Absolute (x, y) coordinates. */
 			std::optional<std::pair<float, float>> positionOverride;
@@ -63,8 +88,8 @@ namespace Game3 {
 			float getPadding() const;
 
 			/** Returns whether the update took place. */
-			template <typename T>
-			bool updateField(T &&new_value, std::decay_t<T> Tooltip::*field, const Widget &updater) {
+			template <typename T, typename U>
+			bool updateField(T &&new_value, std::decay_t<T> Tooltip::*field, U &updater) {
 				auto weak = updater.weak_from_this();
 				if (lastUpdater.lock() == weak.lock())
 					return false;

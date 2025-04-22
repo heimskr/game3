@@ -35,27 +35,6 @@ namespace Game3 {
 			bool solid = false;
 			boost::json::value extraData;
 
-			template <typename T, typename... Args>
-			static std::shared_ptr<T> create(Args &&...args) {
-				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-			}
-
-			template <typename T, typename... Args>
-			static std::shared_ptr<T> spawn(const Place &place, Args &&...args) {
-				auto out = create<T>(std::forward<Args>(args)...);
-				if (out->spawnIn(place))
-					return out;
-				return {};
-			}
-
-			template <typename T, typename... Args>
-			static std::shared_ptr<T> spawn(const std::shared_ptr<Realm> &realm, Args &&...args) {
-				auto out = create<T>(std::forward<Args>(args)...);
-				if (out->spawnIn(Place(out->getPosition(), realm)))
-					return out;
-				return {};
-			}
-
 			~TileEntity() override = default;
 			virtual void destroy();
 
@@ -97,6 +76,8 @@ namespace Game3 {
 			std::shared_ptr<TileEntity> getSelf();
 			std::weak_ptr<TileEntity> getWeakSelf();
 			void queueDestruction();
+			virtual bool mouseOver();
+			virtual void mouseOut();
 
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) override;
 
@@ -111,6 +92,29 @@ namespace Game3 {
 			virtual void broadcast(bool force);
 
 			virtual void toJSON(boost::json::value &) const;
+
+			template <typename T, typename... Args>
+			static std::shared_ptr<T> create(Args &&...args) {
+				return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
+			}
+
+			template <typename T, typename... Args>
+			static std::shared_ptr<T> spawn(const Place &place, Args &&...args) {
+				auto out = create<T>(std::forward<Args>(args)...);
+				if (out->spawnIn(place)) {
+					return out;
+				}
+				return {};
+			}
+
+			template <typename T, typename... Args>
+			static std::shared_ptr<T> spawn(const std::shared_ptr<Realm> &realm, Args &&...args) {
+				auto out = create<T>(std::forward<Args>(args)...);
+				if (out->spawnIn(Place(out->getPosition(), realm))) {
+					return out;
+				}
+				return {};
+			}
 
 		protected:
 			TileID cachedTile = -1;

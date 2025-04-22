@@ -45,10 +45,10 @@ namespace Game3 {
 				invalidInput();
 			}
 		});
-		input->insertAtEnd(shared_from_this());
+		input->insertAtEnd(getSelf());
 
 		bar = make<ProgressBar>(ui, selfScale, MATH_GAME_FOREGROUND, MATH_GAME_BACKGROUND.darken(), MATH_GAME_BACKGROUND.darken(3));
-		bar->insertAtEnd(shared_from_this());
+		bar->insertAtEnd(getSelf());
 
 		setSize(gameWidth, gameHeight);
 	}

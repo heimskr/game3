@@ -10,7 +10,8 @@ namespace Game3 {
 	class Breakout: public Minigame {
 		public:
 			static Identifier ID() { return {"base", "minigame/breakout"}; }
-			std::string getGameName() const final { return "Breakout"; }
+			static std::string GameName() { return "Breakout"; }
+			std::string getGameName() const final { return GameName(); }
 
 			Breakout(UIContext &, float scale);
 

@@ -14,7 +14,8 @@ namespace Game3 {
 	class FlappyBird: public Minigame {
 		public:
 			static Identifier ID() { return {"base", "minigame/flappy_bird"}; }
-			std::string getGameName() const final { return "Flappy Bird"; }
+			static std::string GameName() { return "Flappy Bird"; }
+			std::string getGameName() const final { return GameName(); }
 
 			using Minigame::Minigame;
 

@@ -8,6 +8,7 @@
 #include "ui/UI.h"
 
 #include <any>
+#include <memory>
 #include <string>
 
 namespace Game3 {
@@ -15,6 +16,7 @@ namespace Game3 {
 	class ClientInventory;
 	class HasFluids;
 	class OmniDialog;
+	class TileEntity;
 	class TopDialog;
 
 	class GameUI final: public UI {
@@ -57,5 +59,8 @@ namespace Game3 {
 			void showExternalInventory(const std::shared_ptr<ClientInventory> &);
 			void showFluids(const std::shared_ptr<HasFluids> &);
 			GlobalID getExternalGID() const;
+
+		private:
+			std::weak_ptr<TileEntity> hoveredTileEntity;
 	};
 }

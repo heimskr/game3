@@ -18,13 +18,15 @@ namespace Game3 {
 			static UIContext & getUIContext(ClientGame &);
 
 		public:
-			MinigameFactory(Identifier, decltype(function));
+			std::string gameName;
+
+			MinigameFactory(Identifier, std::string gameName, decltype(function));
 
 			std::shared_ptr<Minigame> operator()(const std::shared_ptr<ClientGame> &, const std::any &) const;
 
 			template <typename T>
 			static MinigameFactory create(const Identifier &id = T::ID()) {
-				return {id, [](const std::shared_ptr<ClientGame> &game, const std::any &) {
+				return {id, T::GameName(), [](const std::shared_ptr<ClientGame> &game, const std::any &) {
 					auto out = std::make_shared<T>(getUIContext(*game), 1);
 					out->init();
 					return out;

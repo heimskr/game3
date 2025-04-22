@@ -6,6 +6,7 @@
 #include "threading/Lockable.h"
 #include "types/ChunkPosition.h"
 #include "ui/Modifiers.h"
+#include "ui/TooltipUpdater.h"
 
 #include <any>
 
@@ -20,7 +21,7 @@ namespace Game3 {
 		AgentMeta(UpdateCounter counter): updateCounter(counter) {}
 	};
 
-	class Agent: public HasPlace, public std::enable_shared_from_this<Agent> {
+	class Agent: public HasPlace, public std::enable_shared_from_this<Agent>, public TooltipUpdater {
 		public:
 			enum class Type {Entity, TileEntity};
 

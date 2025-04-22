@@ -62,8 +62,9 @@ namespace Game3 {
 	}
 
 	void TileEntity::render(SpriteRenderer &sprite_renderer) {
-		if (!isVisible())
+		if (!isVisible()) {
 			return;
+		}
 
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
@@ -77,13 +78,15 @@ namespace Game3 {
 				tileLookupFailed = false;
 				cachedTile = tileset[tileID];
 				cachedUpperTile = tileset.getUpper(cachedTile);
-				if (cachedUpperTile == 0)
+				if (cachedUpperTile == 0) {
 					cachedUpperTile = -1;
+				}
 			}
 		}
 
-		if (cachedTile == 0)
+		if (cachedTile == 0) {
 			return;
+		}
 
 		GamePtr game = realm->getGame();
 		const auto tilesize = tileset.getTileSize();
@@ -102,14 +105,16 @@ namespace Game3 {
 	}
 
 	void TileEntity::renderUpper(SpriteRenderer &sprite_renderer) {
-		if (!isVisible({-1, 0}))
+		if (!isVisible({-1, 0})) {
 			return;
+		}
 
 		RealmPtr realm = getRealm();
 		Tileset &tileset = realm->getTileset();
 
-		if (cachedUpperTile == TileID(-1) || cachedUpperTile == 0)
+		if (cachedUpperTile == TileID(-1) || cachedUpperTile == 0) {
 			return;
+		}
 
 		GamePtr game = realm->getGame();
 		const auto tilesize = tileset.getTileSize();
@@ -135,14 +140,16 @@ namespace Game3 {
 
 	void TileEntity::onSpawn() {
 		GamePtr game = getRealm()->getGame();
-		if (game->getSide() == Side::Server)
+		if (game->getSide() == Side::Server) {
 			game->toServer().tileEntitySpawned(getSelf());
+		}
 	}
 
 	void TileEntity::onRemove() {
 		GamePtr game = getRealm()->getGame();
-		if (game->getSide() == Side::Client)
+		if (game->getSide() == Side::Client) {
 			game->toClient().moduleMessage({}, shared_from_this(), "TileEntityRemoved", Side::Client);
+		}
 	}
 
 	void TileEntity::setRealm(const RealmPtr &realm) {
@@ -152,8 +159,9 @@ namespace Game3 {
 
 	RealmPtr TileEntity::getRealm() const {
 		RealmPtr out = weakRealm.lock();
-		if (!out)
+		if (!out) {
 			throw std::runtime_error("Couldn't lock tile entity's realm");
+		}
 		return out;
 	}
 
@@ -197,8 +205,9 @@ namespace Game3 {
 	}
 
 	GamePtr TileEntity::getGame() const {
-		if (RealmPtr realm = weakRealm.lock())
+		if (RealmPtr realm = weakRealm.lock()) {
 			return realm->getGame();
+		}
 		throw std::runtime_error("Couldn't get Game from TileEntity: couldn't lock Realm");
 	}
 
@@ -213,6 +222,12 @@ namespace Game3 {
 	void TileEntity::queueDestruction() {
 		getRealm()->queueDestruction(getSelf());
 	}
+
+	bool TileEntity::mouseOver() {
+		return false;
+	}
+
+	void TileEntity::mouseOut() {}
 
 	void TileEntity::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
 		if (name == "GetName") {
@@ -257,14 +272,16 @@ namespace Game3 {
 		Broadcastable::queueBroadcast(force);
 
 		getGame()->enqueue([weak = getWeakSelf()](const TickArgs &) {
-			if (auto tile_entity = weak.lock())
+			if (auto tile_entity = weak.lock()) {
 				tile_entity->tryBroadcast();
+			}
 		});
 	}
 
 	void TileEntity::tryBroadcast() {
-		if (needsBroadcast.exchange(false))
+		if (needsBroadcast.exchange(false)) {
 			broadcast(forceBroadcast.exchange(false));
+		}
 	}
 
 	void TileEntity::broadcast(bool) {
@@ -278,8 +295,9 @@ namespace Game3 {
 				auto lock = entities->sharedLock();
 				for (const WeakEntityPtr &weak_entity: *entities) {
 					EntityPtr entity = weak_entity.lock();
-					if (entity && entity->isPlayer())
+					if (entity && entity->isPlayer()) {
 						safeDynamicCast<Player>(entity)->send(packet);
+					}
 				}
 			}
 		});
@@ -293,8 +311,9 @@ namespace Game3 {
 
 	std::function<void(const TickArgs &)> TileEntity::getTickFunction() {
 		return [weak = getWeakSelf()](const TickArgs &args) {
-			if (TileEntityPtr tile_entity = weak.lock())
+			if (TileEntityPtr tile_entity = weak.lock()) {
 				tile_entity->tick(args);
+			}
 		};
 	}
 
@@ -309,8 +328,8 @@ namespace Game3 {
 	void TileEntity::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		assert(game->getSide() == Side::Server);
 		tileEntityID = boost::json::value_to<Identifier>(json.at("id"));
-		tileID       = boost::json::value_to<Identifier>(json.at("tileID"));
-		solid        = boost::json::value_to<bool>(json.at("solid"));
+		tileID = boost::json::value_to<Identifier>(json.at("tileID"));
+		solid = boost::json::value_to<bool>(json.at("solid"));
 		const auto &object = json.as_object();
 		if (auto iter = object.find("extra"); iter != object.end()) {
 			extraData = iter->value();
@@ -326,12 +345,12 @@ namespace Game3 {
 
 	void TileEntity::toJSON(boost::json::value &json) const {
 		auto &object = json.emplace_object();
-		object["id"]       = boost::json::value_from(getID());
-		object["gid"]      = globalID;
-		object["tileID"]   = boost::json::value_from(tileID);
+		object["id"] = boost::json::value_from(getID());
+		object["gid"] = globalID;
+		object["tileID"] = boost::json::value_from(tileID);
 		object["position"] = boost::json::value_from(position);
-		object["solid"]    = solid;
-		object["extra"]    = extraData;
+		object["solid"] = solid;
+		object["extra"] = extraData;
 	}
 
 	bool TileEntity::spawnIn(const Place &place) {

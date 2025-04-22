@@ -99,7 +99,7 @@ namespace Game3 {
 		positionOverride.reset();
 	}
 
-	void Tooltip::hide(const Widget &updater) {
+	void Tooltip::hide(TooltipUpdater &updater) {
 		if (lastUpdater.lock().get() == &updater) {
 			hide();
 		}
@@ -109,53 +109,28 @@ namespace Game3 {
 		visible = true;
 	}
 
-	void Tooltip::show(const Widget &updater) {
-		show();
-		lastUpdater = updater.weak_from_this();
-	}
-
-	bool Tooltip::wasUpdatedBy(const Widget &widget) const {
-		return lastUpdater.lock().get() == &widget;
+	bool Tooltip::wasUpdatedBy(const TooltipUpdater &updater) const {
+		return lastUpdater.lock().get() == &updater;
 	}
 
 	void Tooltip::setText(UString new_text) {
 		text = std::move(new_text);
 	}
 
-	bool Tooltip::setText(UString new_text, const Widget &updater) {
-		return updateField(std::move(new_text), &Tooltip::text, updater);
-	}
-
 	void Tooltip::setMaxWidth(float new_max_width) {
 		maxWidth = new_max_width;
-	}
-
-	bool Tooltip::setMaxWidth(float new_max_width, const Widget &updater) {
-		return updateField(new_max_width, &Tooltip::maxWidth, updater);
 	}
 
 	void Tooltip::setBackgroundColor(const Color &new_color) {
 		backgroundColor = new_color;
 	}
 
-	bool Tooltip::setBackgroundColor(const Color &new_color, const Widget &updater) {
-		return updateField(new_color, &Tooltip::backgroundColor, updater);
-	}
-
 	void Tooltip::setTextColor(const Color &new_color) {
 		textColor = new_color;
 	}
 
-	bool Tooltip::setTextColor(const Color &new_color, const Widget &updater) {
-		return updateField(new_color, &Tooltip::textColor, updater);
-	}
-
 	void Tooltip::setRegion(std::optional<Rectangle> new_region) {
 		region = std::move(new_region);
-	}
-
-	bool Tooltip::setRegion(std::optional<Rectangle> new_region, const Widget &updater) {
-		return updateField(std::move(new_region), &Tooltip::region, updater);
 	}
 
 	void Tooltip::setPositionOverride(std::optional<std::pair<float, float>> new_position_override) {
