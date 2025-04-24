@@ -168,7 +168,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i64` Position Y
 	- `i64` Position X
 
-21. **Interact**: tells the server to perform an interaction.
+21. **Interact**: tells the server or a client to perform an interaction.
 
 	- `bool` Direct: whether to interact with the tile the player is on, rather than one tile in front of the player
 	- `u8` Use item: which hand's held item to use (e.g., for attacking) (0 = neither, 1 = left, 2 = right)

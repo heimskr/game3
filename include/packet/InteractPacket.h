@@ -15,8 +15,8 @@ namespace Game3 {
 		std::optional<Direction> direction;
 
 		InteractPacket() = default;
-		InteractPacket(bool direct_, Hand hand_, Modifiers modifiers_, std::optional<GlobalID> global_id = {}, std::optional<Direction> direction_ = {}):
-			direct(direct_), hand(hand_), modifiers(modifiers_), globalID(global_id), direction(direction_) {}
+		InteractPacket(bool direct, Hand hand, Modifiers modifiers, std::optional<GlobalID> globalID = {}, std::optional<Direction> direction = {}):
+			direct(direct), hand(hand), modifiers(modifiers), globalID(globalID), direction(direction) {}
 
 		PacketID getID() const override { return ID(); }
 
@@ -24,5 +24,6 @@ namespace Game3 {
 		void decode(Game &, Buffer &buffer)       override { buffer >> direct >> hand >> modifiers >> globalID >> direction; }
 
 		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
+		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
 }
