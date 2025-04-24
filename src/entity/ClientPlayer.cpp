@@ -371,8 +371,10 @@ namespace Game3 {
 	}
 
 	void ClientPlayer::showText(const UString &text, const UString &) {
-		if (auto game_ui = getGame()->toClient().getWindow()->uiContext.getUI<GameUI>()) {
-			game_ui->openModule("base:module/text", std::any(text.raw()));
-		}
+		getGame()->toClient().getWindow()->queue([text = std::any(text.raw())](Window &window) {
+			if (auto game_ui = window.uiContext.getUI<GameUI>()) {
+				game_ui->openModule("base:module/text", text);
+			}
+		});
 	}
 }
