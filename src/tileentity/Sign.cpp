@@ -3,10 +3,11 @@
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "lib/JSON.h"
-#include "packet/DisplayTextPacket.h"
+#include "packet/InteractPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
 #include "ui/Window.h"
+#include "ui/gl/dialog/EditSignDialog.h"
 
 namespace Game3 {
 	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):
@@ -19,8 +20,17 @@ namespace Game3 {
 		object["name"] = name;
 	}
 
-	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers, const ItemStackPtr &, Hand) {
-		player->showText(text, name);
+	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand hand) {
+		INFO("Sign side: {}", player->getSide());
+		if (player->getSide() == Side::Server) {
+			player->send(make<InteractPacket>(false, hand, modifiers, getGID()));
+		} else {
+			// player->showText(text, name);
+			WindowPtr window = player->getGame()->toClient().getWindow();
+			window->queue([this](Window &window) {
+				window.uiContext.emplaceDialog<EditSignDialog>(1.f, 800, 400, tileID.str(), text);
+			});
+		}
 		return true;
 	}
 
