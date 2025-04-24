@@ -291,7 +291,12 @@ int main(int argc, char **argv) {
 		}
 
 		if (arg1 == "--add-item" || arg1 == "--add-tile" || arg1 == "--add-sound") {
-			if (argc != 5) {
+			if (arg1 == "--add-tile") {
+				if (argc != 7) {
+					std::println("Usage: {} --add-tile <identifier> <credit> <image path> <land> <solid>", argv[0]);
+					return 1;
+				}
+			} else if (argc != 5) {
 				std::println("Usage: {} {} <identifier> <credit> <image path>", argv[0], arg1);
 				return 1;
 			}
@@ -319,6 +324,20 @@ int main(int argc, char **argv) {
 			boost::json::object object;
 			if (!credit.empty()) {
 				object["credit"] = credit;
+			}
+			if (arg1 == "--add-tile") {
+				auto get_bool = [](std::string_view str) {
+					if (str == "true" || str == "1" || str == "t") {
+						return true;
+					} else if (str == "false" || str == "0" || str == "f") {
+						return false;
+					} else {
+						throw std::invalid_argument(std::format("Unrecognized boolean: \"{}\"", str));
+					}
+				};
+
+				object["land"] = get_bool(argv[5]);
+				object["solid"] = get_bool(argv[6]);
 			}
 			object[type == "tile"? "tilename" : "id"] = "base:" + type + "/" + id;
 			std::ofstream json(dir_path / (type +".json"));
