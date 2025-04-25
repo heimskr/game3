@@ -16,13 +16,17 @@ namespace Game3 {
 		return true;
 	}
 
+	Identifier Furniture::getSoundSet() const {
+		return "base:sound_set/wood_place";
+	}
+
 	bool Furniture::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		if (!preCheck(place))
 			return false;
 
 		if (apply(place)) {
 			InventoryPtr inventory = place.player->getInventory(0);
-			if (SoundSetPtr sound_set = place.getGame()->registry<SoundSetRegistry>().maybe("base:sound_set/wood_place")) {
+			if (SoundSetPtr sound_set = place.getGame()->registry<SoundSetRegistry>().maybe(getSoundSet())) {
 				place.realm->playSound(place.position, sound_set->choose(), sound_set->choosePitch(), 32);
 			}
 			assert(inventory);
@@ -37,8 +41,8 @@ namespace Game3 {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 
-	std::shared_ptr<Furniture> Furniture::createSimple(ItemID id, std::string name, MoneyCount base_price, Layer layer, Identifier tilename) {
-		return std::make_shared<SimpleFurniture>(std::move(id), std::move(name), base_price, layer, std::move(tilename));
+	std::shared_ptr<Furniture> Furniture::createSimple(ItemID id, std::string name, MoneyCount base_price, Layer layer, Identifier tilename, Identifier sound_set_id) {
+		return std::make_shared<SimpleFurniture>(std::move(id), std::move(name), base_price, layer, std::move(tilename), std::move(sound_set_id));
 	}
 
 	std::shared_ptr<Furniture> Furniture::createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer layer, Identifier start, Identifier autotile) {
@@ -57,21 +61,30 @@ namespace Game3 {
 		return std::make_shared<StationFurniture>(std::move(id), std::move(name), base_price, std::move(tilename), std::move(station_name));
 	}
 
-	SimpleFurniture::SimpleFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier tilename_):
-		Furniture(std::move(id_), std::move(name_), base_price, 64),
-		tilename(std::move(tilename_)),
-		layer(layer_) {}
+	SimpleFurniture::SimpleFurniture(ItemID id, std::string name, MoneyCount basePrice, Layer layer, Identifier tilename, Identifier soundSetID):
+		Furniture(std::move(id), std::move(name), basePrice, 64),
+		tilename(std::move(tilename)),
+		soundSetID(std::move(soundSetID)),
+		layer(layer) {}
 
 	bool SimpleFurniture::apply(const Place &place) {
 		place.set(layer, tilename);
 		return true;
 	}
 
-	MarchableFurniture::MarchableFurniture(ItemID id_, std::string name_, MoneyCount base_price, Layer layer_, Identifier start_, Identifier autotile_):
-		Furniture(std::move(id_), std::move(name_), base_price, 64),
-		start(std::move(start_)),
-		autotile(std::move(autotile_)),
-		layer(layer_) {}
+	Identifier SimpleFurniture::getSoundSet() const {
+		if (soundSetID) {
+			return soundSetID;
+		}
+
+		return Furniture::getSoundSet();
+	}
+
+	MarchableFurniture::MarchableFurniture(ItemID id, std::string name, MoneyCount basePrice, Layer layer, Identifier start, Identifier autotile):
+		Furniture(std::move(id), std::move(name), basePrice, 64),
+		start(std::move(start)),
+		autotile(std::move(autotile)),
+		layer(layer) {}
 
 	bool MarchableFurniture::apply(const Place &place) {
 		place.set(layer, march(place));
@@ -92,17 +105,17 @@ namespace Game3 {
 		return tileset[start] + march_result;
 	}
 
-	CustomFurniture::CustomFurniture(ItemID id_, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_, Layer layer_):
-		Furniture(std::move(id_), std::move(name_), base_price, 64),
-		placer(std::move(placer_)),
-		layer(layer_) {}
+	CustomFurniture::CustomFurniture(ItemID id, std::string name, MoneyCount basePrice, std::function<bool(const Place &)> placer, Layer layer):
+		Furniture(std::move(id), std::move(name), basePrice, 64),
+		placer(std::move(placer)),
+		layer(layer) {}
 
 	bool CustomFurniture::apply(const Place &place) {
 		return placer(place);
 	}
 
-	TileEntityFurniture::TileEntityFurniture(ItemID id_, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_):
-		CustomFurniture(std::move(id_), std::move(name_), base_price, std::move(placer_), Layer::Invalid) {}
+	TileEntityFurniture::TileEntityFurniture(ItemID id, std::string name, MoneyCount basePrice, std::function<bool(const Place &)> placer):
+		CustomFurniture(std::move(id), std::move(name), basePrice, std::move(placer), Layer::Invalid) {}
 
 	bool TileEntityFurniture::preCheck(const Place &place) const {
 		return !place.realm->tileEntityAt(place.position);
@@ -112,10 +125,10 @@ namespace Game3 {
 		return !place.realm->tileEntityAt(place.position);
 	}
 
-	StationFurniture::StationFurniture(ItemID item_id, std::string name_, MoneyCount base_price, Identifier tilename_, Identifier station_type):
-		Furniture(std::move(item_id), std::move(name_), base_price, 64),
-		tilename(std::move(tilename_)),
-		stationType(std::move(station_type)) {}
+	StationFurniture::StationFurniture(ItemID item_id, std::string name, MoneyCount basePrice, Identifier tilename, Identifier stationType):
+		Furniture(std::move(item_id), std::move(name), basePrice, 64),
+		tilename(std::move(tilename)),
+		stationType(std::move(stationType)) {}
 
 	bool StationFurniture::apply(const Place &place) {
 		return TileEntity::spawn<CraftingStation>(place, tilename, place.position, stationType, identifier) != nullptr;

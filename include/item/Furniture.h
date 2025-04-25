@@ -25,8 +25,9 @@ namespace Game3 {
 			virtual bool preCheck(const Place &) const;
 			virtual Layer getLayer() const = 0;
 			virtual bool apply(const Place &) = 0;
+			virtual Identifier getSoundSet() const;
 
-			static std::shared_ptr<Furniture> createSimple(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier tilename);
+			static std::shared_ptr<Furniture> createSimple(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier tilename, Identifier sound_set_id = {});
 			static std::shared_ptr<Furniture> createMarchable(ItemID id, std::string name, MoneyCount base_price, Layer, Identifier start, Identifier autotile);
 			static std::shared_ptr<Furniture> createCustom(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
 			static std::shared_ptr<Furniture> createTileEntity(ItemID id, std::string name, MoneyCount base_price, std::function<bool(const Place &)> placer);
@@ -35,17 +36,19 @@ namespace Game3 {
 
 	struct SimpleFurniture: Furniture {
 		Identifier tilename;
+		Identifier soundSetID;
 		Layer layer;
 
-		SimpleFurniture(ItemID, std::string name_, MoneyCount base_price, Layer, Identifier tilename_);
+		SimpleFurniture(ItemID, std::string name, MoneyCount basePrice, Layer, Identifier tilename, Identifier soundSetID);
 
 		Layer getLayer() const override { return layer; }
 		bool apply(const Place &) override;
+		Identifier getSoundSet() const override;
 	};
 
 	class MarchableFurniture: public Furniture {
 		public:
-			MarchableFurniture(ItemID, std::string name_, MoneyCount base_price, Layer, Identifier start_, Identifier autotile_);
+			MarchableFurniture(ItemID, std::string name, MoneyCount basePrice, Layer, Identifier start, Identifier autotile);
 
 			Layer getLayer() const override { return layer; }
 			bool apply(const Place &) override;
@@ -60,7 +63,7 @@ namespace Game3 {
 
 	class CustomFurniture: public Furniture {
 		public:
-			CustomFurniture(ItemID, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_, Layer = Layer::Objects);
+			CustomFurniture(ItemID, std::string name, MoneyCount basePrice, std::function<bool(const Place &)> placer, Layer = Layer::Objects);
 			bool apply(const Place &) override;
 			Layer getLayer() const override { return layer; }
 
@@ -71,7 +74,7 @@ namespace Game3 {
 
 	class TileEntityFurniture: public CustomFurniture {
 		public:
-			TileEntityFurniture(ItemID, std::string name_, MoneyCount base_price, std::function<bool(const Place &)> placer_);
+			TileEntityFurniture(ItemID, std::string name, MoneyCount basePrice, std::function<bool(const Place &)> placer);
 			bool preCheck(const Place &) const override;
 	};
 
@@ -80,7 +83,7 @@ namespace Game3 {
 			Identifier tilename;
 			Identifier stationType;
 
-			StationFurniture(ItemID, std::string name_, MoneyCount base_price, Identifier tilename_, Identifier station_type);
+			StationFurniture(ItemID, std::string name, MoneyCount basePrice, Identifier tilename, Identifier stationType);
 			bool preCheck(const Place &) const override;
 			Layer getLayer() const override { return Layer::Invalid; }
 			bool apply(const Place &) override;

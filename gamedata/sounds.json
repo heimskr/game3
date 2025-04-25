@@ -16,6 +16,15 @@
 				1.25,
 				"base:sound/wood_place1",
 				"base:sound/wood_place2"
+			],
+			"base:sound_set/cloth_place": [
+				1.25,
+				"base:sound/cloth_place1",
+				"base:sound/cloth_place2",
+				"base:sound/cloth_place3",
+				"base:sound/cloth_place4",
+				"base:sound/cloth_place5",
+				"base:sound/cloth_place6"
 			]
 		}]
 	]

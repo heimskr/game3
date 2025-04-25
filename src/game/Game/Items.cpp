@@ -337,9 +337,9 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/electric_guitar",  "Electric Guitar",  100, Layer::Objects,   "base:tile/electric_guitar"));
 		add(Furniture::createSimple("base:item/red_planter",      "Red Planter",        8, Layer::Highest,   "base:tile/red_planter"));
 		add(Furniture::createSimple("base:item/blue_planter",     "Blue Planter",       8, Layer::Highest,   "base:tile/blue_planter"));
-		add(Furniture::createSimple("base:item/red_carpet",       "Red Carpet",        24, Layer::Submerged, "base:tile/red_carpet"));
-		add(Furniture::createSimple("base:item/blue_carpet",      "Blue Carpet",       24, Layer::Submerged, "base:tile/blue_carpet"));
-		add(Furniture::createSimple("base:item/purple_carpet",    "Purple Carpet",     24, Layer::Submerged, "base:tile/purple_carpet"));
+		add(Furniture::createSimple("base:item/red_carpet",       "Red Carpet",        24, Layer::Submerged, "base:tile/red_carpet",    "base:sound_set/cloth_place"));
+		add(Furniture::createSimple("base:item/blue_carpet",      "Blue Carpet",       24, Layer::Submerged, "base:tile/blue_carpet",   "base:sound_set/cloth_place"));
+		add(Furniture::createSimple("base:item/purple_carpet",    "Purple Carpet",     24, Layer::Submerged, "base:tile/purple_carpet", "base:sound_set/cloth_place"));
 		add(Furniture::createSimple("base:item/torch",            "Torch",              2, Layer::Objects,   "base:tile/torch"));
 		add(Furniture::createSimple("base:item/blue_bed",         "Blue Bed",          90, Layer::Objects,   "base:tile/bed1"));
 		add(Furniture::createSimple("base:item/red_bed",          "Red Bed",           90, Layer::Objects,   "base:tile/bed2"));
