@@ -11,6 +11,7 @@ namespace Game3 {
 		float pitchVariance;
 		SoundSet(Identifier identifier, Set sounds, float pitchVariance = 1);
 		const Identifier & choose() const;
+		float choosePitch() const;
 	};
 
 	using SoundSetPtr = std::shared_ptr<SoundSet>;

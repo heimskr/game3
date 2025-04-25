@@ -1,5 +1,7 @@
 #include "algorithm/MarchingSquares.h"
+#include "data/SoundSet.h"
 #include "entity/Player.h"
+#include "game/Game.h"
 #include "game/Inventory.h"
 #include "graphics/Tileset.h"
 #include "item/Furniture.h"
@@ -20,6 +22,9 @@ namespace Game3 {
 
 		if (apply(place)) {
 			InventoryPtr inventory = place.player->getInventory(0);
+			if (SoundSetPtr sound_set = place.getGame()->registry<SoundSetRegistry>().maybe("base:sound_set/wood_place")) {
+				place.realm->playSound(place.position, sound_set->choose(), sound_set->choosePitch(), 32);
+			}
 			assert(inventory);
 			inventory->decrease(stack, slot, 1, true);
 			return true;

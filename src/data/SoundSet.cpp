@@ -11,4 +11,8 @@ namespace Game3 {
 	const Identifier & SoundSet::choose() const {
 		return Game3::choose(sounds, threadContext.rng);
 	}
+
+	float SoundSet::choosePitch() const {
+		return threadContext.getPitch(pitchVariance);
+	}
 }

@@ -11,6 +11,11 @@
 				"base:sound/door3",
 				"base:sound/door4",
 				"base:sound/door5"
+			],
+			"base:sound_set/wood_place": [
+				1.25,
+				"base:sound/wood_place1",
+				"base:sound/wood_place2"
 			]
 		}]
 	]
