@@ -1922,19 +1922,17 @@ namespace Game3 {
 		}
 	}
 
-	void Realm::playSound(const Position &position, const Identifier &id, float pitch) const {
-		if (getSide() == Side::Server) {
-			const auto packet = make<PlaySoundPacket>(id, position, pitch);
-			getPlayers().withShared([&](const WeakSet<Player> &set) {
-				for (const auto &weak_player: set) {
-					if (auto player = weak_player.lock()) {
-						player->send(packet);
-					}
+	void Realm::playSound(const Position &position, const Identifier &id, float pitch, uint16_t maximum_distance) const {
+		assert(getSide() == Side::Server);
+		const auto packet = make<PlaySoundPacket>(id, position, pitch, maximum_distance);
+
+		getPlayers().withShared([&](const WeakSet<Player> &set) {
+			for (const auto &weak_player: set) {
+				if (auto player = weak_player.lock()) {
+					player->send(packet);
 				}
-			});
-		} else {
-			getGame()->toClient().playSound(id, pitch);
-		}
+			}
+		});
 	}
 
 	bool Realm::isChunkGenerated(ChunkPosition chunk_position) const {

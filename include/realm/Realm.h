@@ -219,7 +219,7 @@ namespace Game3 {
 			void remakeStaticLightingTexture(GameUI &);
 			void queueStaticLightingTexture();
 			/** Server-side only. */
-			void playSound(const Position &, const Identifier &, float pitch = 1) const;
+			void playSound(const Position &, const Identifier &, float pitch = 1, uint16_t maximum_distance = 65535) const;
 			bool isChunkGenerated(ChunkPosition) const;
 
 			inline const auto & getPlayers() const { return players; }

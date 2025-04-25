@@ -8,7 +8,7 @@ namespace Game3 {
 		float volume = 1;
 
 		if (maximumDistance != std::numeric_limits<decltype(maximumDistance)>::max()) {
-			volume = game->getPlayer()->getPosition().distance(soundOrigin) / maximumDistance;
+			volume = 1 - game->getPlayer()->getPosition().distance(soundOrigin) / maximumDistance;
 		}
 
 		bool played = game->playSound(soundID, pitch, volume);

@@ -36,7 +36,7 @@ namespace Game3 {
 				pitch = threadContext.getPitch(variance);
 			}
 
-			player->getRealm()->playSound(player->getPosition(), sound_set->choose(), pitch);
+			player->getRealm()->playSound(player->getPosition(), sound_set->choose(), pitch, 64);
 		}
 
 		teleport(player);
