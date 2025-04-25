@@ -13,15 +13,16 @@ namespace Game3 {
 		Identifier soundID;
 		Position soundOrigin;
 		float pitch = 1;
+		uint16_t maximumDistance = 65535;
 
 		PlaySoundPacket() = default;
-		PlaySoundPacket(Identifier sound_id, const Position &sound_origin, float pitch = 1):
-			soundID(std::move(sound_id)), soundOrigin(sound_origin), pitch(pitch) {}
+		PlaySoundPacket(Identifier soundID, Position soundOrigin, float pitch = 1, uint16_t maximumDistance = 65535):
+			soundID(std::move(soundID)), soundOrigin(soundOrigin), pitch(pitch), maximumDistance(maximumDistance) {}
 
 		PacketID getID() const override { return ID(); }
 
-		void encode(Game &, Buffer &buffer) const override { buffer << soundID << soundOrigin << pitch; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> soundID >> soundOrigin >> pitch; }
+		void encode(Game &, Buffer &buffer) const override { buffer << soundID << soundOrigin << pitch << maximumDistance; }
+		void decode(Game &, Buffer &buffer)       override { buffer >> soundID >> soundOrigin >> pitch >> maximumDistance; }
 
 		void handle(const std::shared_ptr<ClientGame> &) override;
 	};

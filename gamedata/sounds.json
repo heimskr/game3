@@ -2,6 +2,16 @@
 	"name": "base_sounds",
 	"dependencies": [],
 	"data": [
-		["base:soundset", "resources/sounds"]
+		["base:sound_source", "resources/sounds"],
+		["base:sound_set_map", {
+			"base:sound_set/doors": [
+				1.2,
+				"base:sound/door1",
+				"base:sound/door2",
+				"base:sound/door3",
+				"base:sound/door4",
+				"base:sound/door5"
+			]
+		}]
 	]
 }

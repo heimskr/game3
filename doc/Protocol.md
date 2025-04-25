@@ -433,6 +433,7 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `string` Sound ID
 	- `Position` Origin
 	- `f32` Pitch
+	- `u16` Maximum distance (65535 = audible everywhere)
 
 64. **Known Items**: tells a client which items it has ever seen.
 

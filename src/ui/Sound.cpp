@@ -10,8 +10,8 @@ namespace Game3 {
 
 	SoundEngine::~SoundEngine() = default;
 
-	void SoundEngine::play(const std::filesystem::path &path, float pitch) {
-		impl->play(path, pitch);
+	void SoundEngine::play(const std::filesystem::path &path, float pitch, float volume) {
+		impl->play(path, pitch, volume);
 	}
 
 	void SoundEngine::cleanup() {
@@ -33,9 +33,10 @@ namespace Game3 {
 		ma_resource_manager_uninit(&resourceManager);
 	}
 
-	void SoundEngineImpl::play(const std::filesystem::path &path, float pitch) {
+	void SoundEngineImpl::play(const std::filesystem::path &path, float pitch, float volume) {
 		auto lock = uniqueLock();
 		ma_sound &sound = getSound(path, pitch);
+		ma_sound_set_volume(&sound, volume);
 		ma_sound_start(&sound);
 	}
 

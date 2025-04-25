@@ -1,15 +1,20 @@
 #include "util/Log.h"
-#include "entity/Entity.h"
+#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "packet/PlaySoundPacket.h"
 
 namespace Game3 {
 	void PlaySoundPacket::handle(const ClientGamePtr &game) {
-		// TODO: origin
+		float volume = 1;
 
-		bool played = game->playSound(soundID, pitch);
+		if (maximumDistance != std::numeric_limits<decltype(maximumDistance)>::max()) {
+			volume = game->getPlayer()->getPosition().distance(soundOrigin) / maximumDistance;
+		}
 
-		if (!played)
+		bool played = game->playSound(soundID, pitch, volume);
+
+		if (!played) {
 			WARN("Can't play unknown sound: {}", soundID);
+		}
 	}
 }

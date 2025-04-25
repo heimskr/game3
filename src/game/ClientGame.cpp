@@ -309,9 +309,9 @@ namespace Game3 {
 		}
 	}
 
-	bool ClientGame::playSound(const Identifier &identifier, float pitch) {
+	bool ClientGame::playSound(const Identifier &identifier, float pitch, float volume) {
 		if (const std::filesystem::path *path = getSound(identifier)) {
-			sounds.play(*path, pitch);
+			sounds.play(*path, pitch, volume);
 			return true;
 		}
 

@@ -11,7 +11,7 @@ namespace Game3 {
 			SoundEngine();
 			~SoundEngine();
 
-			void play(const std::filesystem::path &, float pitch = 1.f);
+			void play(const std::filesystem::path &, float pitch = 1, float volume = 1);
 			void cleanup();
 
 		private:

@@ -1,5 +1,6 @@
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
+#include "data/SoundSet.h"
 #include "game/Game.h"
 #include "recipe/BiomassLiquefierRecipe.h"
 #include "recipe/CentrifugeRecipe.h"
@@ -45,5 +46,6 @@ namespace Game3 {
 		registries.add<AttributeExemplarRegistry>();
 		registries.add<MinigameFactoryRegistry>();
 		registries.add<StatusEffectFactoryRegistry>();
+		registries.add<SoundSetRegistry>();
 	}
 }

@@ -68,7 +68,7 @@ namespace Game3 {
 			void putInLimbo(EntityPtr, RealmID, const Position &);
 			void requestFromLimbo(RealmID);
 			/** Returns whether a sound was found with the given ID. */
-			bool playSound(const Identifier &, float pitch = 1.f);
+			bool playSound(const Identifier &, float pitch = 1, float volume = 1);
 			UIContext & getUIContext() const;
 			void handleChat(const PlayerPtr &, const UString &message);
 

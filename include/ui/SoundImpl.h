@@ -13,7 +13,7 @@ namespace Game3 {
 			SoundEngineImpl();
 			~SoundEngineImpl();
 
-			void play(const std::filesystem::path &, float pitch);
+			void play(const std::filesystem::path &, float pitch, float volume);
 			void cleanup();
 
 		private:
@@ -25,7 +25,7 @@ namespace Game3 {
 			ma_decoder_config decoderConfig{};
 
 			/** Doesn't lock. */
-			ma_sound & getSound(const std::filesystem::path &, float pitch = 1.f);
+			ma_sound & getSound(const std::filesystem::path &, float pitch = 1);
 
 			/** Doesn't lock. */
 			MiniAudio::Decoder & getDecoder(const std::filesystem::path &);

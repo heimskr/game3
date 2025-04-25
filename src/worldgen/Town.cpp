@@ -7,12 +7,14 @@
 #include "util/Util.h"
 #include "worldgen/Arcade.h"
 #include "worldgen/BlacksmithGen.h"
-#include "worldgen/Keep.h"
 #include "worldgen/House.h"
+#include "worldgen/Keep.h"
 #include "worldgen/Tavern.h"
 #include "worldgen/WorldGen.h"
 
 namespace Game3::WorldGen {
+	const static Identifier soundSetID = "base:sound_set/doors";
+
 	void generateTown(const std::shared_ptr<Realm> &realm, std::default_random_engine &rng, const Position &position, Index width, Index height, Index pad, int seed, const VillagePtr &village) {
 		Index row = 0;
 		Index column = 0;
@@ -21,8 +23,9 @@ namespace Game3::WorldGen {
 		auto guard = realm->guardGeneration();
 
 		const auto cleanup = [&](Index row, Index column) {
-			if (auto tile_entity = realm->tileEntityAt({row, column}))
+			if (auto tile_entity = realm->tileEntityAt({row, column})) {
 				realm->remove(tile_entity);
+			}
 		};
 
 		const auto set_terrain = [&](const Identifier &tilename, bool helper = false) {
@@ -46,11 +49,12 @@ namespace Game3::WorldGen {
 		};
 
 		Timer town_timer("TownLayout");
-		for (row = position.row - pad; row < position.row + height + pad; ++row)
+		for (row = position.row - pad; row < position.row + height + pad; ++row) {
 			for (column = position.column - pad; column < position.column + width + pad; ++column) {
 				set_submerged({row, column}, "base:tile/empty");
 				set_objects_pos({row, column}, "base:tile/empty");
 			}
+		}
 
 		for (row = position.row; row < position.row + height; ++row) {
 			set_objects_pos({row, position.column}, "base:tile/tower");
@@ -79,7 +83,7 @@ namespace Game3::WorldGen {
 		row = position.row + height / 2 - 1;
 		for (column = position.column - pad; column < position.column + width + pad; ++column) {
 			buildable_set.erase({row, column});
-			buildable_set.erase({position.row + height - 2,  column}); // Make sure no houses spawn on the bottom row of the town
+			buildable_set.erase({position.row + height - 2, column}); // Make sure no houses spawn on the bottom row of the town
 			set_terrain("base:tile/road");
 			++row;
 			buildable_set.erase({row, column});
@@ -119,9 +123,11 @@ namespace Game3::WorldGen {
 		GamePtr game = realm->getGame();
 		auto &crop_registry = game->registry<CropRegistry>();
 		std::vector<std::shared_ptr<Crop>> crops;
-		for (const auto &[key, crop]: crop_registry)
-			if (crop->canSpawnInTown)
+		for (const auto &[key, crop]: crop_registry) {
+			if (crop->canSpawnInTown) {
 				crops.push_back(crop);
+			}
+		}
 
 		for (row = position.row + 1; row < position.row + height / 2 - 1; ++row) {
 			for (column = position.column + 1; column < position.column + width / 2 - 1; ++column) {
@@ -166,7 +172,7 @@ namespace Game3::WorldGen {
 
 		auto create_keep = [&](const Identifier &tilename) {
 			realm->setTile(Layer::Objects, keep_position, tilename, false);
-			TileEntity::spawn<Building>(realm, tilename, keep_position, keep_realm_id, keep_entrance);
+			TileEntity::spawn<Building>(realm, tilename, keep_position, keep_realm_id, keep_entrance, soundSetID);
 		};
 
 		create_keep("base:tile/keep_nw");
@@ -197,7 +203,7 @@ namespace Game3::WorldGen {
 			auto gen_building = [&](const Identifier &tilename, Index realm_width, Index realm_height, RealmType realm_type, const BuildingGenerator &gen_fn, std::optional<Position> entrance = std::nullopt) {
 				realm->setTile(Layer::Objects, building_position, tilename, false);
 				const RealmID realm_id = game->newRealmID();
-				auto building = TileEntity::spawn<Building>(realm, tilename, building_position, realm_id, entrance? *entrance : Position(realm_height - 2, realm_width - 3));
+				auto building = TileEntity::spawn<Building>(realm, tilename, building_position, realm_id, entrance ? *entrance : Position(realm_height - 2, realm_width - 3), soundSetID);
 				assert(building);
 				auto details = game->registry<RealmDetailsRegistry>()[realm_type];
 				auto new_realm = Realm::create(game, realm_id, realm_type, details->tilesetName, -seed);
@@ -212,13 +218,13 @@ namespace Game3::WorldGen {
 				building_position = *buildable_set.begin();
 				switch (rng() % 8) {
 					case 0: {
-						static const std::array blacksmiths {"base:tile/blacksmith1"_id, "base:tile/blacksmith2"_id, "base:tile/blacksmith3"_id};
+						static const std::array blacksmiths{"base:tile/blacksmith1"_id, "base:tile/blacksmith2"_id, "base:tile/blacksmith3"_id};
 						gen_building(choose(blacksmiths), 9, 9, "base:realm/blacksmith", WorldGen::generateBlacksmith);
 						break;
 					}
 
 					case 1: {
-						static const std::array taverns {"base:tile/tavern1"_id};
+						static const std::array taverns{"base:tile/tavern1"_id};
 						constexpr size_t tavern_width  = 25;
 						constexpr size_t tavern_height = 15;
 						gen_building(choose(taverns), tavern_width, tavern_height, "base:realm/tavern", WorldGen::generateTavern, Position(tavern_height - 2, tavern_width / 2));

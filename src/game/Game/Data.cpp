@@ -1,6 +1,7 @@
 #include "data/ConsumptionRule.h"
 #include "data/ProductionRule.h"
 #include "data/RegisterableIdentifier.h"
+#include "data/SoundSet.h"
 #include "entity/Entity.h"
 #include "game/Crop.h"
 #include "game/Game.h"
@@ -208,7 +209,7 @@ namespace Game3 {
 				itemsets.add(identifier, itemStitcher(&registry<ItemTextureRegistry>(), &registry<ResourceRegistry>(), base_dir, identifier));
 			}
 
-		} else if (type == "base:soundset") {
+		} else if (type == "base:sound_source") {
 
 			addSounds(std::string_view(json.at(1).as_string()));
 
@@ -294,6 +295,22 @@ namespace Game3 {
 			auto &exemplars = registry<AttributeExemplarRegistry>();
 			for (const auto &[key, value]: json.at(1).as_object()) {
 				exemplars.add(Identifier(key), RegisterableIdentifier(Identifier(key), boost::json::value_to<Identifier>(value)));
+			}
+
+		} else if (type == "base:sound_set_map") {
+
+			auto &sound_sets = registry<SoundSetRegistry>();
+			for (const auto &[key, value]: json.at(1).as_object()) {
+				SoundSet::Set set;
+				float pitch_variance = 1;
+				for (const boost::json::value &subvalue: value.as_array()) {
+					if (subvalue.is_string()) {
+						set.emplace(boost::json::value_to<Identifier>(subvalue));
+					} else {
+						pitch_variance = getNumber<float>(subvalue);
+					}
+				}
+				sound_sets.add(Identifier(key), std::make_shared<SoundSet>(Identifier(key), std::move(set), pitch_variance));
 			}
 
 		} else if (type.getPathStart() == "ignore") {

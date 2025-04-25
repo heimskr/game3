@@ -32,7 +32,7 @@ namespace Game3 {
 		weakGame(game) {}
 
 	int64_t GameDB::currentFormatVersion() {
-		return 1;
+		return 2;
 	}
 
 	void GameDB::open(std::filesystem::path path_) {

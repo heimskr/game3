@@ -1,5 +1,6 @@
 #pragma once
 
+#include "data/SoundSet.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
@@ -8,6 +9,7 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "te/building"}; }
 			RealmID innerRealmID = 0;
 			Position entrance;
+			SoundSetPtr soundSet;
 
 			std::string getName() const override { return "Building"; }
 
@@ -23,7 +25,12 @@ namespace Game3 {
 
 		protected:
 			Building() = default;
-			Building(Identifier, Position, RealmID inner_realm_id, Position entrance_);
+			Building(Identifier, Position, RealmID innerRealmID, Position entrance, Identifier soundSetID = {});
+
+		private:
+			Identifier soundSetID;
+
+			const SoundSetPtr & getSoundSet();
 
 		friend class TileEntity;
 	};
