@@ -99,7 +99,7 @@ namespace Game3 {
 			void makeDropdown();
 			bool ownsDropdown() const;
 			bool atBeginning() const;
-			size_t getLineCount() const;
+			size_t & getLineCount() const;
 			size_t getLastLineNumber() const;
 			size_t getColumnCount(size_t line) const;
 			void setCachedColumnCounts() const;

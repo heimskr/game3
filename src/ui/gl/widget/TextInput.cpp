@@ -328,7 +328,13 @@ namespace Game3 {
 			++lineNumber;
 			columnNumber = 0;
 			cursorXOffset = 0;
+			xOffset = 0;
+			++getLineCount();
+			cachedColumnCounts.reset();
 		} else {
+			if (cachedColumnCounts) {
+				++cachedColumnCounts->at(lineNumber);
+			}
 			++columnNumber;
 			adjustCursorOffset(ui.getRenderers(0).text.textWidth(character));
 		}
@@ -377,11 +383,18 @@ namespace Game3 {
 
 		if (*--cursorIterator == '\n') {
 			columnNumber = getColumnCount(--lineNumber);
+			--getLineCount();
+			cachedColumnCounts.reset();
+			cursorXOffset = ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber));
 		} else {
+			if (cachedColumnCounts) {
+				--cachedColumnCounts->at(lineNumber);
+			}
 			--columnNumber;
+			adjustCursorOffset(-ui.getRenderers(0).text.textWidth(*cursorIterator));
 		}
 
-		adjustCursorOffset(-ui.getRenderers(0).text.textWidth(text.substr(--textPosition, 1)));
+		--textPosition;
 		cursorIterator = text.erase(cursorIterator);
 	}
 
@@ -538,7 +551,7 @@ namespace Game3 {
 		return lineNumber == 0 && columnNumber == 0;
 	}
 
-	size_t TextInput::getLineCount() const {
+	size_t & TextInput::getLineCount() const {
 		if (!cachedLineCount) {
 			cachedLineCount = 1 + std::count(text.begin(), text.end(), '\n');
 		}
