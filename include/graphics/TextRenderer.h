@@ -71,13 +71,16 @@ namespace Game3 {
 			float textWidth(const UString &text, float scale = 1.f) const;
 			float textWidth(UStringSpan text, float scale = 1.f) const;
 			float textHeight(const UString &text, float scale = 1.f) const;
+			float textHeight(UStringSpan text, float scale = 1.f) const;
 			float textHeight(const UString &text, float scale, float wrap_width) const;
+			float textHeight(UStringSpan text, float scale, float wrap_width) const;
 			float getIHeight() const;
 
 			void reset();
 			void initRenderData();
 
 			static TextRenderer forTesting();
+			static float getLineHeight();
 
 		private:
 			explicit TextRenderer(uint32_t fontScale);

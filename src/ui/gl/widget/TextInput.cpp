@@ -2,12 +2,12 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
-#include "ui/gl/widget/AutocompleteDropdown.h"
-#include "ui/gl/widget/TextInput.h"
-#include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/gl/Util.h"
+#include "ui/gl/widget/AutocompleteDropdown.h"
+#include "ui/gl/widget/TextInput.h"
+#include "ui/gl/widget/Tooltip.h"
 #include "util/Util.h"
 
 namespace {
@@ -231,17 +231,8 @@ namespace Game3 {
 			if (0 < fixedHeight) {
 				minimum = natural = fixedHeight * ui.scale;
 			} else {
-				int line_count = 1;
-				if (multiline) {
-					for (gunichar character: text) {
-						if (character == '\n') {
-							++line_count;
-						}
-					}
-				}
-
 				minimum = border;
-				natural = border + renderers.text.textHeight(text, getTextScale(), for_width - border) * line_count;
+				natural = border + renderers.text.textHeight(text, getTextScale(), multiline? -1 : for_width - border);
 			}
 		}
 	}
@@ -255,8 +246,9 @@ namespace Game3 {
 		focused = false;
 
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
-		if (dropdown && dropdown->checkParent(*this))
+		if (dropdown && dropdown->checkParent(*this)) {
 			ui.setAutocompleteDropdown(nullptr);
+		}
 	}
 
 	void TextInput::setInteriorColor(Color color) {
@@ -430,6 +422,7 @@ namespace Game3 {
 				++lineNumber;
 				columnNumber = 0;
 				cursorXOffset = 0;
+				xOffset = 0;
 			} else {
 				++columnNumber;
 				adjustCursorOffset(renderers.text.textWidth(UStringSpan(old_iterator, cursorIterator)));
@@ -522,8 +515,9 @@ namespace Game3 {
 
 	void TextInput::makeDropdown() {
 		std::vector<UString> relevant = getRelevantSuggestions();
-		if (relevant.empty())
+		if (relevant.empty()) {
 			return;
+		}
 
 		auto dropdown = std::make_shared<AutocompleteDropdown>(ui, selfScale);
 		dropdown->init();

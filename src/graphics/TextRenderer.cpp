@@ -46,6 +46,10 @@ namespace Game3 {
 		return TextRenderer(96);
 	}
 
+	float TextRenderer::getLineHeight() {
+		return LINE_HEIGHT;
+	}
+
 	void TextRenderer::remove() {
 		if (initialized && !fake) {
 			glDeleteVertexArrays(1, &vao); CHECKGL
@@ -389,25 +393,34 @@ namespace Game3 {
 	}
 
 	float TextRenderer::textHeight(const UString &text, float scale) const {
+		return textHeight(UStringSpan(text), scale);
+	}
+
+	float TextRenderer::textHeight(UStringSpan text, float scale) const {
 		float out = 0;
 		for (const auto ch: text) {
-			out = std::max(out, getCharacter(ch).size.y * scale);
+			if (ch != '\n') {
+				out = std::max(out, getCharacter(ch).size.y * scale);
+			}
 		}
 
 		return out;
 	}
 
 	float TextRenderer::textHeight(const UString &text, float scale, float wrap_width) const {
+		return textHeight(UStringSpan(text), scale, wrap_width);
+	}
+
+	float TextRenderer::textHeight(UStringSpan text, float scale, float wrap_width) const {
 		const auto i_height = getIHeight() * scale;
 		float x = 0;
 		float y = 0;
+		float first_line_height = 0;
 
 		auto next_line = [&] {
 			x = 0;
-			y -= i_height * LINE_HEIGHT;
+			y += i_height * LINE_HEIGHT;
 		};
-
-		float highest_on_first_line = 0;
 
 		for (const uint32_t ch: text) {
 			if (ch == '\n') {
@@ -420,8 +433,8 @@ namespace Game3 {
 			const float w = character.size.x * scale;
 			const float h = character.size.y * scale;
 
-			if (y == 0 && h > highest_on_first_line) {
-				highest_on_first_line = h;
+			if (y == 0) {
+				first_line_height = std::max(first_line_height, h);
 			}
 
 			if (wrap_width > 0 && wrap_width < x + character.bearing.x * scale + w) {
@@ -431,7 +444,8 @@ namespace Game3 {
 			x += (character.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 		}
 
-		return -y + highest_on_first_line;
+		next_line();
+		return y + first_line_height;
 	}
 
 	float TextRenderer::getIHeight() const {
