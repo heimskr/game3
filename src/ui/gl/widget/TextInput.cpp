@@ -404,6 +404,12 @@ namespace Game3 {
 
 	void TextInput::eraseForward() {
 		if (!text.empty() && cursorIterator != text.end()) {
+			if (*cursorIterator == '\n') {
+				--getLineCount();
+				cachedColumnCounts.reset();
+			} else if (cachedColumnCounts) {
+				--cachedColumnCounts->at(lineNumber);
+			}
 			cursorIterator = text.erase(cursorIterator);
 		}
 	}
