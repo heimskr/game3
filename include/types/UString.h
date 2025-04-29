@@ -33,6 +33,8 @@ namespace Game3 {
 			std::vector<UStringSpan> split(const UString &delimiter, Glib::ustring::size_type(UString::*finder)(const Glib::ustring &, Glib::ustring::size_type) const = &Glib::ustring::find) const;
 			UString wrap(const TextRenderer &, float max_width, float text_scale) const;
 
+			UStringSpan span(size_t pos, size_t n = npos);
+
 		private:
 			std::vector<UStringSpan> getLines() const;
 

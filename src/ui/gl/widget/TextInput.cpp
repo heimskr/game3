@@ -217,7 +217,7 @@ namespace Game3 {
 		return SizeRequestMode::HeightForWidth;
 	}
 
-	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void TextInput::measure(const RendererContext &renderers, Orientation orientation, float for_width, float, float &minimum, float &natural) {
 		const float border = 2 * thickness * selfScale;
 
 		if (orientation == Orientation::Horizontal) {
@@ -322,15 +322,16 @@ namespace Game3 {
 			return;
 		}
 
-		cursorIterator = text.insert(cursorIterator, character);
-		++cursorIterator;
+		cursorIterator = std::next(text.insert(cursorIterator, character));
+		++textPosition;
 		if (character == '\n') {
 			++lineNumber;
 			columnNumber = 0;
+			cursorXOffset = 0;
 		} else {
 			++columnNumber;
+			adjustCursorOffset(ui.getRenderers(0).text.textWidth(character));
 		}
-		adjustCursorOffset(ui.getRenderers(0).text.textWidth(UString(1, character)));
 	}
 
 	void TextInput::eraseWord() {
@@ -396,24 +397,29 @@ namespace Game3 {
 		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
 			if (*--cursorIterator == '\n') {
 				columnNumber = getColumnCount(--lineNumber);
+				cursorXOffset = renderers.text.textWidth(getLineSpan(lineNumber));
 			} else {
 				--columnNumber;
+				adjustCursorOffset(-renderers.text.textWidth(UStringSpan(cursorIterator, std::next(cursorIterator))));
 			}
-			adjustCursorOffset(-renderers.text.textWidth(text.substr(--textPosition, 1)));
+			--textPosition;
 		}
 	}
 
 	void TextInput::goRight(size_t count) {
 		RendererContext renderers = ui.getRenderers(0);
 
-		for (size_t i = 0; i < count && cursorIterator != text.end() && std::next(cursorIterator) != text.end(); ++i) {
-			if (*cursorIterator++ == '\n') {
+		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
+			auto old_iterator = cursorIterator++;
+			if (*old_iterator == '\n') {
 				++lineNumber;
 				columnNumber = 0;
+				cursorXOffset = 0;
 			} else {
 				++columnNumber;
+				adjustCursorOffset(renderers.text.textWidth(UStringSpan(old_iterator, cursorIterator)));
 			}
-			adjustCursorOffset(renderers.text.textWidth(text.substr(textPosition++, 1)));
+			++textPosition;
 		}
 	}
 
@@ -431,7 +437,7 @@ namespace Game3 {
 		cursorIterator = text.end();
 		textPosition = text.size();
 		xOffset = 0;
-		setCursorOffset(ui.getRenderers(0).text.textWidth(text));
+		setCursorOffset(ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber)));
 	}
 
 	void TextInput::autocomplete(const UString &completion) {
@@ -569,5 +575,27 @@ namespace Game3 {
 			}
 		}
 		counts.emplace_back(current_count);
+	}
+
+	UStringSpan TextInput::getLineSpan(size_t line_number) const {
+		if (text.empty()) {
+			return {text.end(), text.end()};
+		}
+
+		if (!cachedColumnCounts) {
+			setCachedColumnCounts();
+		}
+
+		using iterator = Glib::ustring::const_iterator;
+
+		iterator begin = text.begin();
+
+		for (size_t i = 0; i < line_number; ++i) {
+			std::advance(begin, cachedColumnCounts->at(i) + 1); // + 1 to account for the newline
+		}
+
+		iterator end = std::next(begin, cachedColumnCounts->at(line_number));
+
+		return {begin, end};
 	}
 }

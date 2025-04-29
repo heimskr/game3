@@ -375,6 +375,10 @@ namespace Game3 {
 	}
 
 	float TextRenderer::textWidth(const UString &text, float scale) const {
+		return textWidth(UStringSpan(text), scale);
+	}
+
+	float TextRenderer::textWidth(UStringSpan text, float scale) const {
 		float out = 0;
 
 		for (const auto ch: text) {

@@ -103,5 +103,6 @@ namespace Game3 {
 			size_t getLastLineNumber() const;
 			size_t getColumnCount(size_t line) const;
 			void setCachedColumnCounts() const;
+			UStringSpan getLineSpan(size_t line_number) const;
 	};
 }

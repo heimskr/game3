@@ -18,6 +18,7 @@
 
 namespace Game3 {
 	class UString;
+	class UStringSpan;
 	class Window;
 
 	enum class TextAlign {Left, Center, Right};
@@ -68,6 +69,7 @@ namespace Game3 {
 			void operator()(const UString &text, const TextRenderOptions & = {});
 			float textWidth(uint32_t character, float scale = 1.f) const;
 			float textWidth(const UString &text, float scale = 1.f) const;
+			float textWidth(UStringSpan text, float scale = 1.f) const;
 			float textHeight(const UString &text, float scale = 1.f) const;
 			float textHeight(const UString &text, float scale, float wrap_width) const;
 			float getIHeight() const;

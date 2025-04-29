@@ -192,6 +192,17 @@ namespace Game3 {
 		return output;
 	}
 
+	UStringSpan UString::span(size_t pos, size_t n) {
+		auto start = std::next(begin(), pos);
+		auto last = start;
+
+		for (size_t i = 0; i < n && last != end(); ++i) {
+			++last;
+		}
+
+		return {start, last};
+	}
+
 	std::vector<UStringSpan> UString::getLines() const {
 		std::vector<UStringSpan> out;
 
