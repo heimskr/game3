@@ -98,7 +98,8 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
+		float cursor_height = texter.getIHeight() * TextRenderer::getLineHeight() * getTextScale();
+		rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start + lineNumber * cursor_height, start / 2, cursor_height);
 
 		texter(text, TextRenderOptions{
 			.x = start - xOffset * getScale(),
