@@ -57,6 +57,8 @@ namespace Game3 {
 			void goRight(size_t = 1);
 			void goStart();
 			void goEnd();
+			void goUp();
+			void goDown();
 
 			void setMultiline(bool);
 			bool getMultiline() const { return multiline; }
@@ -99,10 +101,11 @@ namespace Game3 {
 			void makeDropdown();
 			bool ownsDropdown() const;
 			bool atBeginning() const;
+			bool atEnd() const;
 			size_t & getLineCount() const;
 			size_t getLastLineNumber() const;
 			size_t getColumnCount(size_t line) const;
 			void setCachedColumnCounts() const;
-			UStringSpan getLineSpan(size_t line_number) const;
+			UStringSpan getLineSpan(size_t line_number, size_t max_length = std::string::npos) const;
 	};
 }

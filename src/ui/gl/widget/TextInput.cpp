@@ -98,8 +98,12 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		float cursor_height = texter.getIHeight() * TextRenderer::getLineHeight() * getTextScale();
-		rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start + lineNumber * cursor_height, start / 2, cursor_height);
+		if (multiline) {
+			float cursor_height = texter.getIHeight() * TextRenderer::getLineHeight() * getTextScale();
+			rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start + lineNumber * cursor_height, start / 2, cursor_height);
+		} else {
+			rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
+		}
 
 		texter(text, TextRenderOptions{
 			.x = start - xOffset * getScale(),
@@ -172,13 +176,19 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_HOME:
-			case GLFW_KEY_UP:
 				goStart();
 				return true;
 
 			case GLFW_KEY_END:
-			case GLFW_KEY_DOWN:
 				goEnd();
+				return true;
+
+			case GLFW_KEY_UP:
+				goUp();
+				return true;
+
+			case GLFW_KEY_DOWN:
+				goDown();
 				return true;
 
 			case GLFW_KEY_MENU:
@@ -449,6 +459,66 @@ namespace Game3 {
 		setCursorOffset(ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber)));
 	}
 
+	void TextInput::goUp() {
+		if (lineNumber == 0) {
+			if (!atBeginning()) {
+				goStart();
+			}
+		} else {
+			while (0 < textPosition) {
+				--textPosition;
+				if (*--cursorIterator == '\n') {
+					break;
+				}
+			}
+
+			const size_t old_column_number = std::exchange(columnNumber, getColumnCount(--lineNumber));
+
+			while (columnNumber > old_column_number) {
+				--columnNumber;
+				--cursorIterator;
+				--textPosition;
+			}
+
+			auto last = cursorIterator;
+			auto start = std::prev(last, columnNumber);
+
+			setCursorOffset(ui.getRenderers(0).text.textWidth(UStringSpan(start, last)));
+		}
+	}
+
+	void TextInput::goDown() {
+		if (lineNumber + 1 >= getLineCount()) {
+			if (!atEnd()) {
+				goEnd();
+			}
+		} else {
+			while (textPosition < text.length()) {
+				++textPosition;
+				if (*cursorIterator++ == '\n') {
+					break;
+				}
+			}
+
+			auto start = cursorIterator;
+			auto last = start;
+
+			size_t i = 0;
+
+			for (; i < columnNumber && textPosition < text.length(); ++i) {
+				++textPosition;
+				if (*cursorIterator++ == '\n') {
+					break;
+				}
+				++last;
+			}
+
+			columnNumber = i;
+			++lineNumber;
+			setCursorOffset(ui.getRenderers(0).text.textWidth(UStringSpan(start, last)));
+		}
+	}
+
 	void TextInput::autocomplete(const UString &completion) {
 		setText(completion);
 		onAcceptSuggestion(*this, completion);
@@ -548,6 +618,10 @@ namespace Game3 {
 		return lineNumber == 0 && columnNumber == 0;
 	}
 
+	bool TextInput::atEnd() const {
+		return cursorIterator == text.end();
+	}
+
 	size_t & TextInput::getLineCount() const {
 		if (!cachedLineCount) {
 			cachedLineCount = 1 + std::count(text.begin(), text.end(), '\n');
@@ -587,7 +661,7 @@ namespace Game3 {
 		counts.emplace_back(current_count);
 	}
 
-	UStringSpan TextInput::getLineSpan(size_t line_number) const {
+	UStringSpan TextInput::getLineSpan(size_t line_number, size_t max_length) const {
 		if (text.empty()) {
 			return {text.end(), text.end()};
 		}
@@ -604,7 +678,7 @@ namespace Game3 {
 			std::advance(begin, cachedColumnCounts->at(i) + 1); // + 1 to account for the newline
 		}
 
-		iterator end = std::next(begin, cachedColumnCounts->at(line_number));
+		iterator end = std::next(begin, std::min(max_length, cachedColumnCounts->at(line_number)));
 
 		return {begin, end};
 	}
