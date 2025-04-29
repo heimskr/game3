@@ -46,6 +46,8 @@ namespace Game3 {
 		contentsInput = make<TextInput>(ui, selfScale);
 		contentsInput->setText(std::move(initialContents));
 		contentsInput->setHorizontalExpand(true);
+		contentsInput->setMultiline(true);
+		contentsInput->setFixedHeight(-1);
 		grid->attach(contentsInput, 1, 1);
 
 		buttonBox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});

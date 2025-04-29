@@ -53,10 +53,13 @@ namespace Game3 {
 			void eraseWord();
 			void eraseCharacter();
 			void eraseForward();
-			void goLeft(std::size_t = 1);
-			void goRight(std::size_t = 1);
+			void goLeft(size_t = 1);
+			void goRight(size_t = 1);
 			void goStart();
 			void goEnd();
+
+			void setMultiline(bool);
+			bool getMultiline() const { return multiline; }
 
 			void autocomplete(const UString &) final;
 			void hideDropdown() const;
@@ -72,12 +75,17 @@ namespace Game3 {
 			Color focusedCursorColor;
 			UString text;
 			UString::iterator cursorIterator = text.begin();
-			std::size_t cursor = 0;
+			size_t lineNumber = 0;
+			size_t columnNumber = 0;
+			size_t textPosition = 0;
 			bool cursorFixQueued = false;
 			bool focused = false;
+			bool multiline = false;
 			std::optional<std::vector<UString>> suggestions;
 			std::optional<UString> deferredText;
 			std::optional<std::pair<uint32_t, std::chrono::system_clock::time_point>> lastPress;
+			mutable std::optional<size_t> cachedLineCount;
+			mutable std::optional<std::vector<size_t>> cachedColumnCounts;
 
 			float getTextScale() const;
 			float getXPadding() const;
@@ -90,5 +98,10 @@ namespace Game3 {
 			void forwardSuggestions();
 			void makeDropdown();
 			bool ownsDropdown() const;
+			bool atBeginning() const;
+			size_t getLineCount() const;
+			size_t getLastLineNumber() const;
+			size_t getColumnCount(size_t line) const;
+			void setCachedColumnCounts() const;
 	};
 }

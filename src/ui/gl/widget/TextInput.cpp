@@ -108,7 +108,7 @@ namespace Game3 {
 			.color = textColor,
 			.alignTop = true,
 			.shadow{0, 0, 0, 0},
-			.ignoreNewline = true,
+			.ignoreNewline = !multiline,
 		});
 	}
 
@@ -193,7 +193,11 @@ namespace Game3 {
 
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER:
-				onSubmit(*this, text);
+				if (!multiline || modifiers.onlyShift()) {
+					onSubmit(*this, text);
+				} else {
+					charPressed('\n', modifiers);
+				}
 				return true;
 
 			default:
@@ -227,8 +231,17 @@ namespace Game3 {
 			if (0 < fixedHeight) {
 				minimum = natural = fixedHeight * ui.scale;
 			} else {
+				int line_count = 1;
+				if (multiline) {
+					for (gunichar character: text) {
+						if (character == '\n') {
+							++line_count;
+						}
+					}
+				}
+
 				minimum = border;
-				natural = std::min(for_height, border + renderers.text.textHeight(text, getTextScale(), for_width - border));
+				natural = border + renderers.text.textHeight(text, getTextScale(), for_width - border) * line_count;
 			}
 		}
 	}
@@ -296,7 +309,8 @@ namespace Game3 {
 
 	UString TextInput::clear() {
 		UString out = std::move(text);
-		cursor = 0;
+		lineNumber = 0;
+		columnNumber = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
 		cursorXOffset = 0;
@@ -310,12 +324,17 @@ namespace Game3 {
 
 		cursorIterator = text.insert(cursorIterator, character);
 		++cursorIterator;
-		++cursor;
+		if (character == '\n') {
+			++lineNumber;
+			columnNumber = 0;
+		} else {
+			++columnNumber;
+		}
 		adjustCursorOffset(ui.getRenderers(0).text.textWidth(UString(1, character)));
 	}
 
 	void TextInput::eraseWord() {
-		if (cursor == 0) {
+		if (atBeginning()) {
 			return;
 		}
 
@@ -351,12 +370,18 @@ namespace Game3 {
 	}
 
 	void TextInput::eraseCharacter() {
-		if (cursor == 0) {
+		if (atBeginning()) {
 			return;
 		}
 
-		adjustCursorOffset(-ui.getRenderers(0).text.textWidth(text.substr(--cursor, 1)));
-		cursorIterator = text.erase(--cursorIterator);
+		if (*--cursorIterator == '\n') {
+			columnNumber = getColumnCount(--lineNumber);
+		} else {
+			--columnNumber;
+		}
+
+		adjustCursorOffset(-ui.getRenderers(0).text.textWidth(text.substr(--textPosition, 1)));
+		cursorIterator = text.erase(cursorIterator);
 	}
 
 	void TextInput::eraseForward() {
@@ -367,36 +392,44 @@ namespace Game3 {
 
 	void TextInput::goLeft(size_t count) {
 		RendererContext renderers = ui.getRenderers(0);
-		UString piece;
 
 		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
-			piece = text.substr(--cursor, 1);
-			adjustCursorOffset(-renderers.text.textWidth(piece));
-			--cursorIterator;
+			if (*--cursorIterator == '\n') {
+				columnNumber = getColumnCount(--lineNumber);
+			} else {
+				--columnNumber;
+			}
+			adjustCursorOffset(-renderers.text.textWidth(text.substr(--textPosition, 1)));
 		}
 	}
 
 	void TextInput::goRight(size_t count) {
 		RendererContext renderers = ui.getRenderers(0);
-		UString piece;
 
-		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
-			piece = text.substr(cursor++, 1);
-			adjustCursorOffset(renderers.text.textWidth(piece));
-			++cursorIterator;
+		for (size_t i = 0; i < count && cursorIterator != text.end() && std::next(cursorIterator) != text.end(); ++i) {
+			if (*cursorIterator++ == '\n') {
+				++lineNumber;
+				columnNumber = 0;
+			} else {
+				++columnNumber;
+			}
+			adjustCursorOffset(renderers.text.textWidth(text.substr(textPosition++, 1)));
 		}
 	}
 
 	void TextInput::goStart() {
-		cursor = 0;
+		lineNumber = 0;
+		columnNumber = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
 		setCursorOffset(0);
 	}
 
 	void TextInput::goEnd() {
-		cursor = text.length();
+		lineNumber = getLastLineNumber();
+		columnNumber = getColumnCount(lineNumber);
 		cursorIterator = text.end();
+		textPosition = text.size();
 		xOffset = 0;
 		setCursorOffset(ui.getRenderers(0).text.textWidth(text));
 	}
@@ -481,6 +514,11 @@ namespace Game3 {
 		ui.setAutocompleteDropdown(std::move(dropdown));
 	}
 
+	void TextInput::setMultiline(bool value) {
+		multiline = value;
+		lastRectangle = {-1, -1, -1, -1};
+	}
+
 	bool TextInput::ownsDropdown() const {
 		std::shared_ptr<AutocompleteDropdown> dropdown = ui.getAutocompleteDropdown();
 		return dropdown && dropdown->checkParent(*this);
@@ -488,5 +526,48 @@ namespace Game3 {
 
 	void TextInput::hideDropdown() const {
 		ui.setAutocompleteDropdown(nullptr);
+	}
+
+	bool TextInput::atBeginning() const {
+		return lineNumber == 0 && columnNumber == 0;
+	}
+
+	size_t TextInput::getLineCount() const {
+		if (!cachedLineCount) {
+			cachedLineCount = 1 + std::count(text.begin(), text.end(), '\n');
+		}
+		return *cachedLineCount;
+	}
+
+	size_t TextInput::getLastLineNumber() const {
+		const size_t count = getLineCount();
+		return count == 0? 0 : count - 1;
+	}
+
+	size_t TextInput::getColumnCount(size_t line) const {
+		if (!cachedColumnCounts) {
+			setCachedColumnCounts();
+		}
+
+		if (cachedColumnCounts->empty() && line == 0) {
+			return 0;
+		}
+
+		return cachedColumnCounts->at(line);
+	}
+
+	void TextInput::setCachedColumnCounts() const {
+		std::vector<size_t> &counts = cachedColumnCounts.emplace();
+		counts.reserve(cachedLineCount.value_or(16));
+		size_t current_count = 0;
+		for (gunichar character: text) {
+			if (character == '\n') {
+				counts.emplace_back(current_count);
+				current_count = 0;
+			} else {
+				++current_count;
+			}
+		}
+		counts.emplace_back(current_count);
 	}
 }
