@@ -386,6 +386,7 @@ namespace Game3 {
 			--getLineCount();
 			cachedColumnCounts.reset();
 			cursorXOffset = ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber));
+			fixCursorOffset();
 		} else {
 			if (cachedColumnCounts) {
 				--cachedColumnCounts->at(lineNumber);
@@ -411,6 +412,7 @@ namespace Game3 {
 			if (*--cursorIterator == '\n') {
 				columnNumber = getColumnCount(--lineNumber);
 				cursorXOffset = renderers.text.textWidth(getLineSpan(lineNumber));
+				fixCursorOffset();
 			} else {
 				--columnNumber;
 				adjustCursorOffset(-renderers.text.textWidth(UStringSpan(cursorIterator, std::next(cursorIterator))));
@@ -494,9 +496,9 @@ namespace Game3 {
 		const float boundary = getBoundary();
 
 		if (visual > boundary) {
-			xOffset += (visual - boundary + getXPadding() * 2) / selfScale;
+			xOffset += (visual - boundary + getXPadding() * 2) / getScale();
 		} else if (visual < getXPadding()) {
-			xOffset -= (getXPadding() - visual) / selfScale;
+			xOffset -= (getXPadding() - visual) / getScale();
 		}
 
 		cursorFixQueued = false;
