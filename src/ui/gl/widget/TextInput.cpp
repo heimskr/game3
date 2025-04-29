@@ -176,11 +176,11 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_HOME:
-				goStart();
+				goStart(!modifiers.ctrl);
 				return true;
 
 			case GLFW_KEY_END:
-				goEnd();
+				goEnd(!modifiers.ctrl);
 				return true;
 
 			case GLFW_KEY_UP:
@@ -307,7 +307,7 @@ namespace Game3 {
 			onChange(*this, text);
 		}
 
-		goEnd();
+		goEnd(false);
 	}
 
 	UString TextInput::clear() {
@@ -442,27 +442,46 @@ namespace Game3 {
 		}
 	}
 
-	void TextInput::goStart() {
-		lineNumber = 0;
-		columnNumber = 0;
-		cursorIterator = text.begin();
+	void TextInput::goStart(bool within_line) {
+		if (within_line) {
+			textPosition -= columnNumber;
+			while (columnNumber > 0) {
+				--columnNumber;
+				--cursorIterator;
+			}
+		} else {
+			lineNumber = 0;
+			columnNumber = 0;
+			cursorIterator = text.begin();
+			textPosition = 0;
+		}
+
 		xOffset = 0;
 		setCursorOffset(0);
 	}
 
-	void TextInput::goEnd() {
-		lineNumber = getLastLineNumber();
-		columnNumber = getColumnCount(lineNumber);
-		cursorIterator = text.end();
-		textPosition = text.size();
-		xOffset = 0;
+	void TextInput::goEnd(bool within_line) {
+		if (within_line) {
+			const size_t column_count = getColumnCount(lineNumber);
+			textPosition += column_count - columnNumber;
+			while (columnNumber < column_count) {
+				++columnNumber;
+				++cursorIterator;
+			}
+		} else {
+			lineNumber = getLastLineNumber();
+			columnNumber = getColumnCount(lineNumber);
+			cursorIterator = text.end();
+			textPosition = text.size();
+		}
+
 		setCursorOffset(ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber)));
 	}
 
 	void TextInput::goUp() {
 		if (lineNumber == 0) {
 			if (!atBeginning()) {
-				goStart();
+				goStart(false);
 			}
 		} else {
 			while (0 < textPosition) {
@@ -490,7 +509,7 @@ namespace Game3 {
 	void TextInput::goDown() {
 		if (lineNumber + 1 >= getLineCount()) {
 			if (!atEnd()) {
-				goEnd();
+				goEnd(false);
 			}
 		} else {
 			while (textPosition < text.length()) {

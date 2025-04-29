@@ -55,8 +55,8 @@ namespace Game3 {
 			void eraseForward();
 			void goLeft(size_t = 1);
 			void goRight(size_t = 1);
-			void goStart();
-			void goEnd();
+			void goStart(bool within_line);
+			void goEnd(bool within_line);
 			void goUp();
 			void goDown();
 
