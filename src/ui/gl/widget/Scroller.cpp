@@ -255,7 +255,7 @@ namespace Game3 {
 		return true;
 	}
 
-	void Scroller::childResized(const WidgetPtr &, int new_width, int new_height) {
+	void Scroller::childResized(const WidgetPtr &, Orientation, int new_width, int new_height) {
 		lastChildWidth = new_width;
 		lastChildHeight = new_height;
 	}

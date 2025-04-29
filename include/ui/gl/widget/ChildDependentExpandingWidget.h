@@ -5,27 +5,31 @@
 namespace Game3 {
 	// No uses with Base being anything other than Widget. Perhaps move back to being a non-template class?
 
-	template <class Base>
+	template <typename Base>
 	class ChildDependentExpandingWidget: public Base {
 		public:
 			using Base::Base;
 
 			bool getHorizontalExpand() const override {
-				if (this->horizontalExpand)
+				if (this->horizontalExpand) {
 					return true;
+				}
 
-				if (lastCalculatedHorizontalExpand)
+				if (lastCalculatedHorizontalExpand) {
 					return *lastCalculatedHorizontalExpand;
+				}
 
 				return recalculateExpand(Orientation::Horizontal);
 			}
 
 			bool getVerticalExpand() const override {
-				if (this->verticalExpand)
+				if (this->verticalExpand) {
 					return true;
+				}
 
-				if (lastCalculatedVerticalExpand)
+				if (lastCalculatedVerticalExpand) {
 					return *lastCalculatedVerticalExpand;
+				}
 
 				return recalculateExpand(Orientation::Vertical);
 			}

@@ -25,7 +25,7 @@ namespace Game3 {
 
 			void clearChildren() final;
 			bool onChildrenUpdated() final;
-			void childResized(const WidgetPtr &, int, int) final;
+			void childResized(const WidgetPtr &, Orientation, int, int) final;
 
 			void setChild(WidgetPtr);
 

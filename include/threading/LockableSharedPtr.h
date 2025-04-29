@@ -33,19 +33,19 @@ namespace Game3 {
 			Base::reset();
 		}
 
-		template <class U>
+		template <typename U>
 		void reset(U *pointer) {
 			auto unique_lock = this->uniqueLock();
 			Base::reset(pointer);
 		}
 
-		template <class U, class D>
+		template <typename U, typename D>
 		void reset(U *pointer, D deleter) {
 			auto unique_lock = this->uniqueLock();
 			Base::reset(pointer, deleter);
 		}
 
-		template <class U, class D, class Alloc>
+		template <typename U, typename D, typename Alloc>
 		void reset(U *pointer, D deleter, Alloc allocator) {
 			auto unique_lock = this->uniqueLock();
 			Base::reset(pointer, deleter, allocator);

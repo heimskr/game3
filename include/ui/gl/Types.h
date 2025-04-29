@@ -3,7 +3,7 @@
 #include <format>
 
 namespace Game3 {
-	enum class Orientation {Vertical, Horizontal};
+	enum class Orientation {Neither, Vertical, Horizontal, Both};
 	enum class SizeRequestMode {HeightForWidth, WidthForHeight, ConstantSize, Expansive};
 	enum class Alignment {Start, Center, End};
 	enum class ButtonsType {None, Cancel, Okay, CancelOkay, No, Yes, NoYes};

@@ -78,4 +78,16 @@ namespace Game3 {
 
 		return false;
 	}
+
+	void EditSignDialog::childResized(const WidgetPtr &, Orientation, int new_width, int new_height) {
+		const auto scale = getScale();
+
+		if (new_width >= 0) {
+			position.width = new_width + 4 * scale;
+		}
+
+		if (new_height >= 0) {
+			position.height = new_height + 12 * scale;
+		}
+	}
 }

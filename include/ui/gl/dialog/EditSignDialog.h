@@ -23,6 +23,7 @@ namespace Game3 {
 
 			void init() override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
+			void childResized(const WidgetPtr &child, Orientation, int new_width, int new_height) override;
 
 		private:
 			UString initialTilename;

@@ -174,7 +174,7 @@ namespace Game3 {
 		return lastRectangle.contains(x, y);
 	}
 
-	void Widget::childResized(const WidgetPtr &, int, int) {}
+	void Widget::childResized(const WidgetPtr &, Orientation, int, int) {}
 
 	WidgetPtr Widget::getParent() const {
 		return weakParent.lock();
@@ -405,7 +405,7 @@ namespace Game3 {
 		if (lastRectangle.width != new_width) {
 			lastRectangle.width = new_width;
 			if (WidgetPtr parent = getParent()) {
-				parent->childResized(shared_from_this(), new_width, lastRectangle.height);
+				parent->childResized(shared_from_this(), Orientation::Horizontal, new_width, lastRectangle.height);
 			}
 		}
 	}
@@ -414,10 +414,29 @@ namespace Game3 {
 		if (lastRectangle.height != new_height) {
 			lastRectangle.height = new_height;
 			if (WidgetPtr parent = getParent()) {
-				parent->childResized(shared_from_this(), lastRectangle.width, new_height);
+				parent->childResized(shared_from_this(), Orientation::Vertical, lastRectangle.width, new_height);
 			}
 		}
+	}
 
+	void Widget::setLastSize(int new_width, int new_height) {
+		Orientation orientation = Orientation::Neither;
+
+		if (lastRectangle.width != new_width) {
+			lastRectangle.width = new_width;
+			orientation = Orientation::Horizontal;
+		}
+
+		if (lastRectangle.height != new_height) {
+			lastRectangle.height = new_height;
+			orientation = orientation == Orientation::Horizontal? Orientation::Both : Orientation::Vertical;
+		}
+
+		if (orientation != Orientation::Neither) {
+			if (WidgetPtr parent = getParent()) {
+				parent->childResized(shared_from_this(), orientation, new_width, new_height);
+			}
+		}
 	}
 
 	bool Widget::findAttributeUp(const std::string &attribute, int depth_limit) const {

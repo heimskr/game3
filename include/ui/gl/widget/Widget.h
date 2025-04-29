@@ -62,7 +62,7 @@ namespace Game3 {
 			virtual void maybeRemeasure(const RendererContext &, int width, int height);
 			/** Returns whether the given mouse coordinate is over this widget. */
 			virtual bool contains(int x, int y) const;
-			virtual void childResized(const WidgetPtr &child, int new_width, int new_height);
+			virtual void childResized(const WidgetPtr &child, Orientation, int new_width, int new_height);
 
 			WidgetPtr getParent() const;
 			WidgetPtr getPreviousSibling() const;
@@ -117,6 +117,7 @@ namespace Game3 {
 			virtual bool shouldCull() const;
 			virtual void setLastWidth(int new_width);
 			virtual void setLastHeight(int new_height);
+			virtual void setLastSize(int new_width, int new_height);
 
 		public:
 			/** Returns false if updates are suppressed. */
