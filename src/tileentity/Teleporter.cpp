@@ -7,23 +7,32 @@
 #include "tileentity/Teleporter.h"
 
 namespace Game3 {
-	Teleporter::Teleporter(Identifier tilename, Position position_, RealmID target_realm, Position target_position):
-		TileEntity(std::move(tilename), ID(), position_, false),
-		targetRealm(target_realm),
-		targetPosition(target_position) {}
+	Teleporter::Teleporter(Identifier tilename, Position position, RealmID targetRealm, Position targetPosition, Identifier soundSetID):
+		TileEntity(std::move(tilename), ID(), position, false),
+		HasSoundSet(std::move(soundSetID)),
+		targetRealm(targetRealm),
+		targetPosition(targetPosition) {}
+
+	GamePtr Teleporter::getGame() const {
+		return TileEntity::getGame();
+	}
 
 	void Teleporter::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		auto &object = ensureObject(json);
 		object["targetRealm"] = targetRealm;
 		object["targetPosition"] = boost::json::value_from(targetPosition);
+		object["soundSetID"] = boost::json::value_from(soundSetID);
 	}
 
 	void Teleporter::onOverlap(const std::shared_ptr<Entity> &entity) {
 		GamePtr game = getGame();
 
-		if (game->getSide() != Side::Server)
+		if (game->getSide() != Side::Server) {
 			return;
+		}
+
+		playSound(entity->getPlace());
 
 		getRealm()->queue([entity, position = targetPosition, target = game->getRealm(targetRealm)] {
 			entity->teleport(position, target, MovementContext{.isTeleport = true});
@@ -34,17 +43,21 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		targetRealm = boost::json::value_to<RealmID>(json.at("targetRealm"));
 		targetPosition = boost::json::value_to<Position>(json.at("targetPosition"));
+		soundSetID = boost::json::value_to<Identifier>(json.at("soundSetID"));
+		soundSet.reset();
 	}
 
 	void Teleporter::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		buffer << targetRealm;
 		buffer << targetPosition;
+		encodeSoundSet(buffer);
 	}
 
 	void Teleporter::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> targetRealm;
 		buffer >> targetPosition;
+		decodeSoundSet(buffer);
 	}
 }

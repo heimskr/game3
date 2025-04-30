@@ -1,18 +1,19 @@
 #pragma once
 
 #include "data/SoundSet.h"
+#include "mixin/HasSoundSet.h"
 #include "tileentity/TileEntity.h"
 
 namespace Game3 {
-	class Building: public TileEntity {
+	class Building: public TileEntity, public HasSoundSet {
 		public:
 			static Identifier ID() { return {"base", "te/building"}; }
 			RealmID innerRealmID = 0;
 			Position entrance;
-			SoundSetPtr soundSet;
 
 			std::string getName() const override { return "Building"; }
 
+			GamePtr getGame() const override;
 			void toJSON(boost::json::value &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
@@ -26,11 +27,6 @@ namespace Game3 {
 		protected:
 			Building() = default;
 			Building(Identifier, Position, RealmID innerRealmID, Position entrance, Identifier soundSetID = {});
-
-		private:
-			Identifier soundSetID;
-
-			const SoundSetPtr & getSoundSet();
 
 		friend class TileEntity;
 	};

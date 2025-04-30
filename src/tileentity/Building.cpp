@@ -10,15 +10,20 @@
 namespace Game3 {
 	Building::Building(Identifier id, Position position, RealmID innerRealmID, Position entrance, Identifier soundSetID):
 		TileEntity(std::move(id), ID(), position, true),
+		HasSoundSet(std::move(soundSetID)),
 		innerRealmID(innerRealmID),
-		entrance(entrance),
-		soundSetID(std::move(soundSetID)) {}
+		entrance(entrance) {}
+
+	GamePtr Building::getGame() const {
+		return TileEntity::getGame();
+	}
 
 	void Building::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		auto &object = ensureObject(json);
 		object["innerRealmID"] = innerRealmID;
 		object["entrance"] = boost::json::value_from(entrance);
+		object["soundSetID"] = boost::json::value_from(soundSetID);
 	}
 
 	bool Building::onInteractOn(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
@@ -30,15 +35,7 @@ namespace Game3 {
 			return false;
 		}
 
-		if (const SoundSetPtr &sound_set = getSoundSet()) {
-			float pitch = 1;
-			if (float variance = sound_set->pitchVariance; variance != 1) {
-				pitch = threadContext.getPitch(variance);
-			}
-
-			player->getRealm()->playSound(player->getPosition(), sound_set->choose(), pitch, 64);
-		}
-
+		playSound(player->getPlace());
 		teleport(player);
 		return true;
 	}
@@ -47,6 +44,8 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		innerRealmID = boost::json::value_to<RealmID>(json.at("innerRealmID"));
 		entrance = boost::json::value_to<Position>(json.at("entrance"));
+		soundSetID = boost::json::value_to<Identifier>(json.at("soundSetID"));
+		soundSet.reset();
 	}
 
 	void Building::teleport(const std::shared_ptr<Entity> &entity) {
@@ -62,26 +61,13 @@ namespace Game3 {
 		TileEntity::encode(game, buffer);
 		buffer << innerRealmID;
 		buffer << entrance;
-		if (soundSet) {
-			buffer << soundSet->identifier;
-		} else {
-			buffer << soundSetID;
-		}
+		encodeSoundSet(buffer);
 	}
 
 	void Building::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> innerRealmID;
 		buffer >> entrance;
-		buffer >> soundSetID;
-		soundSet.reset();
-	}
-
-	const SoundSetPtr & Building::getSoundSet() {
-		if (!soundSet && soundSetID) {
-			soundSet = getGame()->registry<SoundSetRegistry>().at(soundSetID);
-		}
-
-		return soundSet;
+		decodeSoundSet(buffer);
 	}
 }

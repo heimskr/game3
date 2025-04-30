@@ -37,7 +37,7 @@ namespace Game3::WorldGen {
 		realm->setTile(Layer::Objects, exit_position + Position(0, 1), wall, true);
 
 		const auto door_name = choose(realm->getTileset().getTilesByCategory("base:category/doors"), rng);
-		TileEntity::spawn<Teleporter>(Place(exit_position, realm, {}), door_name, exit_position, parent_realm->id, entrance);
+		TileEntity::spawn<Teleporter>(Place(exit_position, realm, {}), door_name, exit_position, parent_realm->id, entrance, "base:sound_set/doors");
 
 		return exit_position;
 	}
