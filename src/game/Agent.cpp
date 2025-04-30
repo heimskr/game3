@@ -3,6 +3,7 @@
 #include "game/Game.h"
 #include "net/LocalClient.h"
 #include "realm/Realm.h"
+#include "util/ConstexprHash.h"
 #include "util/Log.h"
 
 #include <mutex>
@@ -41,6 +42,17 @@ namespace Game3 {
 	void Agent::sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data) {
 		assert(getSide() != Side::Client);
 		destination->handleMessage(shared_from_this(), name, data);
+	}
+
+	bool Agent::setField(uint32_t field_name, Buffer field_value) {
+		switch (field_name) {
+			case "globalID"_fnv:
+				field_value >> globalID;
+				return true;
+
+			default:
+				return false;
+		}
 	}
 
 	bool Agent::validateGID(GlobalID gid) {

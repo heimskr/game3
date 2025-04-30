@@ -27,6 +27,7 @@
 #include "types/Position.h"
 #include "ui/Window.h"
 #include "util/Cast.h"
+#include "util/ConstexprHash.h"
 #include "util/Log.h"
 #include "util/Util.h"
 
@@ -1331,7 +1332,7 @@ namespace Game3 {
 		}
 
 		PlayerPtr player = client.getPlayer();
-		if (player == excludedPlayer) {
+		if (player == weakExcludedPlayer.lock()) {
 			return;
 		}
 
@@ -1341,10 +1342,11 @@ namespace Game3 {
 	}
 
 	void Entity::sendToVisible() {
+		PlayerPtr excluded_player = weakExcludedPlayer.lock();
 		auto lock = visiblePlayers.sharedLock();
 		for (const auto &weak_player: visiblePlayers) {
 			if (PlayerPtr player = weak_player.lock()) {
-				if (player != excludedPlayer) {
+				if (player != excluded_player) {
 					sendTo(*player->toServer()->getClient());
 				}
 			}
@@ -1415,6 +1417,24 @@ namespace Game3 {
 	Tick Entity::enqueueTick() {
 		GamePtr game = getGame();
 		return tickEnqueued(game->enqueue(getTickFunction()));
+	}
+
+	bool Entity::setField(uint32_t field_name, Buffer field_value) {
+		switch (field_name) {
+			AGENT_FIELD(type);
+			AGENT_FIELD(position);
+			AGENT_FIELD(realmID);
+			AGENT_FIELD(direction);
+			AGENT_FIELD(offset);
+			AGENT_FIELD(velocity);
+			AGENT_FIELD(path);
+			AGENT_FIELD(age);
+			AGENT_FIELD(baseSpeed);
+			AGENT_FIELD(speedMultiplier);
+
+			default:
+				return Agent::setField(field_name, std::move(field_value));
+		}
 	}
 
 #ifndef __MINGW32__

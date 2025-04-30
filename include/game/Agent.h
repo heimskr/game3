@@ -46,6 +46,8 @@ namespace Game3 {
 			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data);
 			virtual void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data);
 
+			virtual bool setField(uint32_t field_name, Buffer field_value);
+
 			template <typename... Args>
 			void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, Args &&...args) {
 				std::any data{Buffer{Side::Server, std::forward<Args>(args)...}};
@@ -87,3 +89,5 @@ namespace Game3 {
 
 	using AgentPtr = std::shared_ptr<Agent>;
 }
+
+#define AGENT_FIELD(field) case ::Game3::computeFNV1A(#field, sizeof(#field) - 1): field_value >> field; return true;

@@ -475,6 +475,12 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u64` Global ID
 	- `StatusEffectMap`
 
+71. **Update Agent Field**: tells a client to update a field of an agent.
+
+	- `u64` Global ID
+	- `u32` Field name hash (32-bit FNV1A; see `/util/ConstexprHash.h`).
+	- `...` Field value
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

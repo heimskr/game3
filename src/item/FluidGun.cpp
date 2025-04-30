@@ -252,7 +252,7 @@ namespace Game3 {
 		setFluidGunData(place.player, slot, stack, fluid, amount, last_slurp);
 
 		auto entity = makeParticle(game, fluid, place, offsets);
-		entity->excludedPlayer = place.player;
+		entity->weakExcludedPlayer = place.player;
 		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());
 		return true;
 	}

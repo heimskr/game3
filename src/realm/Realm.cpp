@@ -2025,9 +2025,10 @@ namespace Game3 {
 			auto lock = entity->visiblePlayers.sharedLock();
 			if (!entity->visiblePlayers.empty()) {
 				const auto packet = make<EntityPacket>(entity);
+				PlayerPtr excluded_player = entity->weakExcludedPlayer.lock();
 				for (const auto &weak_player: entity->visiblePlayers) {
 					if (PlayerPtr player = weak_player.lock()) {
-						if (player != entity->excludedPlayer) {
+						if (player != excluded_player) {
 							player->notifyOfRealm(*this);
 							player->send(packet);
 						}

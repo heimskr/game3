@@ -93,7 +93,7 @@ namespace Game3 {
 			Atomic<float> baseSpeed{MAX_SPEED};
 			Atomic<float> speedMultiplier{1.0};
 			/** Packets about this entity won't be sent to this player because they have a client-side instance already and don't need updates. */
-			PlayerPtr excludedPlayer;
+			std::weak_ptr<Player> weakExcludedPlayer;
 
 			virtual void destroy();
 
@@ -244,6 +244,8 @@ namespace Game3 {
 
 			Tick enqueueTick(std::chrono::nanoseconds);
 			Tick enqueueTick() override;
+
+			bool setField(uint32_t field_name, Buffer field_value) override;
 
 		protected:
 			struct Held {
