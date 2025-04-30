@@ -27,6 +27,7 @@ namespace Game3 {
 			void decode(Buffer &) override;
 			bool isAffectedByKnockback() const override;
 			std::pair<Color, Color> getColors() const override;
+			bool setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) override;
 
 			virtual bool canShowHealthBar() const;
 			virtual int getDefense() const;

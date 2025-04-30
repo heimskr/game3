@@ -9,8 +9,10 @@
 #include "lib/JSON.h"
 #include "packet/LivingEntityHealthChangedPacket.h"
 #include "packet/StatusEffectsPacket.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "statuseffect/StatusEffect.h"
 #include "threading/ThreadContext.h"
+#include "util/ConstexprHash.h"
 
 namespace Game3 {
 	LivingEntity::LivingEntity():
@@ -150,6 +152,23 @@ namespace Game3 {
 		});
 
 		return {multiplier, composite};
+	}
+
+	bool LivingEntity::setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) {
+		if (getSide() == Side::Server) {
+			return Entity::setField(field_name, field_value, updater);
+		}
+
+		switch (field_name) {
+			AGENT_FIELD(health, true);
+			AGENT_FIELD(statusEffects, true);
+			AGENT_FIELD(luckStat, true);
+			AGENT_FIELD(speedStat, true);
+			AGENT_FIELD(defenseStat, true);
+
+			default:
+				return Entity::setField(field_name, field_value, updater);
+		}
 	}
 
 	bool LivingEntity::canShowHealthBar() const {

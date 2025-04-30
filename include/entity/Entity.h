@@ -245,7 +245,7 @@ namespace Game3 {
 			Tick enqueueTick(std::chrono::nanoseconds);
 			Tick enqueueTick() override;
 
-			bool setField(uint32_t field_name, Buffer field_value) override;
+			bool setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) override;
 
 		protected:
 			struct Held {

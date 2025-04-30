@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace Game3 {
+	class Buffer;
 	class TextRenderer;
 	class UStringSpan;
 
@@ -40,6 +41,14 @@ namespace Game3 {
 
 		friend class UStringTest;
 	};
+
+	template <typename T>
+	T popBuffer(Buffer &);
+	template <>
+	UString popBuffer<UString>(Buffer &);
+	Buffer & operator+=(Buffer &, const UString &);
+	Buffer & operator<<(Buffer &, const UString &);
+	Buffer & operator>>(Buffer &, UString &);
 
 	class UStringSpan {
 		public:

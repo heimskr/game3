@@ -1,7 +1,9 @@
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/Game.h"
+#include "game/ServerGame.h"
 #include "net/LocalClient.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "realm/Realm.h"
 #include "util/ConstexprHash.h"
 #include "util/Log.h"
@@ -44,12 +46,14 @@ namespace Game3 {
 		destination->handleMessage(shared_from_this(), name, data);
 	}
 
-	bool Agent::setField(uint32_t field_name, Buffer field_value) {
-		switch (field_name) {
-			case "globalID"_fnv:
-				field_value >> globalID;
-				return true;
+	bool Agent::setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &) {
+		if (getSide() == Side::Server) {
+			// Don't allow clients to change globalID
+			return false;
+		}
 
+		switch (field_name) {
+			AGENT_FIELD(globalID, true);
 			default:
 				return false;
 		}

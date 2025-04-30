@@ -46,7 +46,7 @@ namespace Game3 {
 			virtual void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &data);
 			virtual void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, std::any &data);
 
-			virtual bool setField(uint32_t field_name, Buffer field_value);
+			virtual bool setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater);
 
 			template <typename... Args>
 			void sendMessage(const std::shared_ptr<Agent> &destination, const std::string &name, Args &&...args) {
@@ -90,4 +90,16 @@ namespace Game3 {
 	using AgentPtr = std::shared_ptr<Agent>;
 }
 
-#define AGENT_FIELD(field) case ::Game3::computeFNV1A(#field, sizeof(#field) - 1): field_value >> field; return true;
+#define AGENT_FIELD_CUSTOM(field, do_broadcast, action) \
+	case ::Game3::computeFNV1A(#field, sizeof(#field) - 1): \
+		field_value >> field; \
+		action; \
+		if constexpr (do_broadcast) { \
+			if (getSide() == Side::Server) { \
+				getRealm()->getGame()->toServer().broadcast(make<UpdateAgentFieldPacket>(*this, ::Game3::computeFNV1A(#field, sizeof(#field) - 1), field)); \
+			} \
+		} \
+		return true;
+
+#define AGENT_FIELD(field, do_broadcast) \
+	AGENT_FIELD_CUSTOM(field, do_broadcast, {});

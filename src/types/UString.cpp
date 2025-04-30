@@ -1,4 +1,5 @@
 #include "graphics/TextRenderer.h"
+#include "net/Buffer.h"
 #include "test/Testing.h"
 #include "types/UString.h"
 #include "util/Log.h"
@@ -223,6 +224,34 @@ namespace Game3 {
 		}
 
 		return out;
+	}
+
+	template <>
+	UString popBuffer<UString>(Buffer &buffer) {
+		return {popBuffer<std::string>(buffer)};
+	}
+
+	template <>
+	std::string Buffer::getType<UString>(const UString &string, bool in_container) {
+		if (in_container) {
+			return getType(std::string{}, true);
+		}
+		return getType(string.raw(), false);
+	}
+
+	Buffer & operator+=(Buffer &buffer, const UString &string) {
+		return buffer += string.raw();
+	}
+
+	Buffer & operator<<(Buffer &buffer, const UString &string) {
+		return buffer << string.raw();
+	}
+
+	Buffer & operator>>(Buffer &buffer, UString &string) {
+		std::string raw;
+		buffer >> raw;
+		string = std::move(raw);
+		return buffer;
 	}
 
 	UStringSpan::UStringSpan(iterator left, iterator right):

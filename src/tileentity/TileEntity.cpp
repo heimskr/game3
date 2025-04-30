@@ -229,6 +229,19 @@ namespace Game3 {
 
 	void TileEntity::mouseOut() {}
 
+	void TileEntity::setTileID(Identifier value) {
+		if (tileID != value) {
+			tileID = std::move(value);
+			resetTileCache();
+		}
+	}
+
+	void TileEntity::resetTileCache() {
+		cachedTile = -1;
+		cachedUpperTile = -1;
+		tileLookupFailed = false;
+	}
+
 	void TileEntity::handleMessage(const std::shared_ptr<Agent> &, const std::string &name, std::any &data) {
 		if (name == "GetName") {
 			data = Buffer{Side::Client, getName()};

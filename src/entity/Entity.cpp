@@ -21,6 +21,7 @@
 #include "packet/EntityRiddenPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/HeldItemSetPacket.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
 #include "tile/Tile.h"
@@ -1419,21 +1420,24 @@ namespace Game3 {
 		return tickEnqueued(game->enqueue(getTickFunction()));
 	}
 
-	bool Entity::setField(uint32_t field_name, Buffer field_value) {
-		switch (field_name) {
-			AGENT_FIELD(type);
-			AGENT_FIELD(position);
-			AGENT_FIELD(realmID);
-			AGENT_FIELD(direction);
-			AGENT_FIELD(offset);
-			AGENT_FIELD(velocity);
-			AGENT_FIELD(path);
-			AGENT_FIELD(age);
-			AGENT_FIELD(baseSpeed);
-			AGENT_FIELD(speedMultiplier);
+	bool Entity::setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) {
+		if (getSide() == Side::Server) {
+			return Agent::setField(field_name, field_value, updater);
+		}
 
+		switch (field_name) {
+			AGENT_FIELD(type, true);
+			AGENT_FIELD(position, true);
+			AGENT_FIELD(realmID, true);
+			AGENT_FIELD(direction, true);
+			AGENT_FIELD(offset, true);
+			AGENT_FIELD(velocity, true);
+			AGENT_FIELD(path, true);
+			AGENT_FIELD(age, true);
+			AGENT_FIELD(baseSpeed, true);
+			AGENT_FIELD(speedMultiplier, true);
 			default:
-				return Agent::setField(field_name, std::move(field_value));
+				return Agent::setField(field_name, field_value, updater);
 		}
 	}
 

@@ -1,5 +1,7 @@
 #include "game/Agent.h"
 #include "game/ClientGame.h"
+#include "game/ServerGame.h"
+#include "net/GenericClient.h"
 #include "packet/UpdateAgentFieldPacket.h"
 
 namespace Game3 {
@@ -12,6 +14,16 @@ namespace Game3 {
 		buffer >> globalID >> fieldNameHash >> fieldValue;
 	}
 
+	void UpdateAgentFieldPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
+		AgentPtr agent = game->getAgent(globalID);
+		if (!agent) {
+			WARN("Couldn't find agent {}", globalID);
+			return;
+		}
+
+		agent->setField(fieldNameHash, fieldValue, client.getPlayer());
+	}
+
 	void UpdateAgentFieldPacket::handle(const std::shared_ptr<ClientGame> &game) {
 		AgentPtr agent = game->getAgent(globalID);
 		if (!agent) {
@@ -19,6 +31,6 @@ namespace Game3 {
 			return;
 		}
 
-		agent->setField(fieldNameHash, std::move(fieldValue));
+		agent->setField(fieldNameHash, fieldValue, nullptr);
 	}
 }

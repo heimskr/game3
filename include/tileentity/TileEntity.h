@@ -78,6 +78,8 @@ namespace Game3 {
 			void queueDestruction();
 			virtual bool mouseOver();
 			virtual void mouseOut();
+			void setTileID(Identifier);
+			void resetTileCache();
 
 			void handleMessage(const std::shared_ptr<Agent> &source, const std::string &name, std::any &) override;
 

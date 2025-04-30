@@ -1,13 +1,16 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
+#include "game/ServerGame.h"
 #include "graphics/SpriteRenderer.h"
 #include "graphics/Tileset.h"
 #include "lib/JSON.h"
 #include "packet/InteractPacket.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
 #include "ui/Window.h"
 #include "ui/gl/dialog/EditSignDialog.h"
+#include "util/ConstexprHash.h"
 
 namespace Game3 {
 	Sign::Sign(Identifier tilename, Position position_, std::string text_, std::string name_):
@@ -21,14 +24,19 @@ namespace Game3 {
 	}
 
 	bool Sign::onInteractNextTo(const std::shared_ptr<Player> &player, Modifiers modifiers, const ItemStackPtr &, Hand hand) {
-		INFO("Sign side: {}", player->getSide());
 		if (player->getSide() == Side::Server) {
 			player->send(make<InteractPacket>(false, hand, modifiers, getGID()));
+		} else if (!modifiers.onlyShift()) {
+			player->showText(text, name);
 		} else {
-			// player->showText(text, name);
-			WindowPtr window = player->getGame()->toClient().getWindow();
-			window->queue([this](Window &window) {
-				window.uiContext.emplaceDialog<EditSignDialog>(1.f, 800, 400, tileID.str(), text);
+			ClientGamePtr game = player->getGame()->toClientPointer();
+			WindowPtr window = game->getWindow();
+			window->queue([this, game](Window &window) {
+				auto dialog = window.uiContext.emplaceDialog<EditSignDialog>(1.f, 1200, 400, tileID.str(), text);
+				dialog->onSubmit.connect([this, game](UString tilename, UString contents) {
+					game->send(make<UpdateAgentFieldPacket>(*this, "tileID"_fnv, tilename));
+					game->send(make<UpdateAgentFieldPacket>(*this, "text"_fnv, contents));
+				});
 			});
 		}
 		return true;
@@ -38,6 +46,16 @@ namespace Game3 {
 		TileEntity::absorbJSON(game, json);
 		text = json.at("text").as_string();
 		name = json.at("name").as_string();
+	}
+
+	bool Sign::setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) {
+		switch (field_name) {
+			AGENT_FIELD_CUSTOM(tileID, true, resetTileCache());
+			AGENT_FIELD(text, true);
+			AGENT_FIELD(name, true);
+			default:
+				return TileEntity::setField(field_name, field_value, updater);
+		}
 	}
 
 	void Sign::encode(Game &game, Buffer &buffer) {
