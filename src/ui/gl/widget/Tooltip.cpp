@@ -51,8 +51,8 @@ namespace Game3 {
 		const float text_width = texter.textWidth(text, text_scale) + 2 * padding + scale / 2;
 		const float effective_width = std::min(maxWidth, width < 0? text_width : std::min(width, text_width));
 
-		const float text_height = texter.textHeight(text, text_scale, effective_width - 2 * padding) + 2 * padding;
-		const float effective_height = height < 0? text_height : std::min(height, text_height);
+		const float text_height = texter.textHeight(text, text_scale, effective_width - 2 * padding) * text_scale /* ??? */;
+		const float effective_height = (height < 0? text_height : std::min(height, text_height)) + 2 * padding;
 
 		lastRectangle.width  = effective_width;
 		lastRectangle.height = effective_height;

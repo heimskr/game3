@@ -449,7 +449,7 @@ namespace Game3 {
 			x += (character.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 		}
 
-		if (y != 0 && text_in_last_line) {
+		if (text_in_last_line) {
 			next_line();
 		}
 
