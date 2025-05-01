@@ -228,28 +228,40 @@ namespace Game3 {
 	bool TextInput::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		constexpr float scroll_speed = 2;
 
-		if (multiline) {
-			if (y_delta < 0) {
-				const float height = (getTextHeight() - lastRectangle.height) / getScale();
-				if (height >= 0) {
-					yOffset = std::min<float>(height, yOffset - scroll_speed * y_delta);
+		if (multiline && y_delta != 0) {
+			const float height = (getTextHeight() - lastRectangle.height) / getScale();
+			if (height >= 0 || yOffset != 0) {
+				if (y_delta < 0) {
+					if (height >= 0) {
+						yOffset = std::min<float>(height, yOffset - scroll_speed * y_delta);
+					}
+					return true;
 				}
-				return true;
-			} else if (y_delta > 0) {
-				yOffset = std::max<float>(0, yOffset - scroll_speed * y_delta);
-				return true;
+
+				const float new_offset = std::max<float>(0, yOffset - scroll_speed * y_delta);
+				if (yOffset != new_offset || yOffset == 0) {
+					yOffset = new_offset;
+					return true;
+				}
 			}
 		}
 
-		if (x_delta < 0) {
+		if (x_delta != 0) {
 			const float width = (getTextWidth() - lastRectangle.width) / getScale() + 4 * thickness;
-			if (width >= 0) {
-				xOffset = std::min<float>(width, xOffset - scroll_speed * x_delta);
+			if (width >= 0 || xOffset != 0) {
+				if (x_delta < 0) {
+					if (width >= 0) {
+						xOffset = std::min<float>(width, xOffset - scroll_speed * x_delta);
+					}
+					return true;
+				}
+
+				const float new_offset = std::max<float>(0, xOffset - scroll_speed * x_delta);
+				if (xOffset != new_offset || xOffset == 0) {
+					xOffset = new_offset;
+					return true;
+				}
 			}
-			return true;
-		} else if (x_delta > 0) {
-			xOffset = std::max<float>(0, xOffset - scroll_speed * x_delta);
-			return true;
 		}
 
 		return Widget::scroll(x_delta, y_delta, x, y, modifiers);
