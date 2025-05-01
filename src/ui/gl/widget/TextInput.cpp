@@ -81,8 +81,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (cursorFixQueued) {
-			fixCursorOffset();
+		if (offsetFixQueued) {
+			fixXOffset();
+			fixYOffset();
 		}
 
 		RectangleRenderer &rectangler = renderers.rectangle;
@@ -99,15 +100,15 @@ namespace Game3 {
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
 		if (multiline) {
-			float cursor_height = texter.getIHeight() * TextRenderer::getLineHeight() * getTextScale();
-			rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start + lineNumber * cursor_height, start / 2, cursor_height);
+			float cursor_height = getCursorHeight(texter);
+			rectangler(focused? focusedCursorColor : cursorColor, getCursorXPosition(), getCursorYPosition(), start / 2, cursor_height);
 		} else {
-			rectangler(focused? focusedCursorColor : cursorColor, getCursorPosition(), start, start / 2, interior.height - 2 * start);
+			rectangler(focused? focusedCursorColor : cursorColor, getCursorXPosition(), start, start / 2, interior.height - 2 * start);
 		}
 
 		texter(text, TextRenderOptions{
 			.x = start - xOffset * getScale(),
-			.y = getScale() * 2,
+			.y = 2 * start - yOffset * getScale(),
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,
@@ -316,6 +317,7 @@ namespace Game3 {
 		columnNumber = 0;
 		cursorIterator = text.begin();
 		xOffset = 0;
+		yOffset = 0;
 		cursorXOffset = 0;
 		return out;
 	}
@@ -334,12 +336,13 @@ namespace Game3 {
 			xOffset = 0;
 			++getLineCount();
 			cachedColumnCounts.reset();
+			fixYOffset();
 		} else {
 			if (cachedColumnCounts) {
 				++cachedColumnCounts->at(lineNumber);
 			}
 			++columnNumber;
-			adjustCursorOffset(ui.getRenderers(0).text.textWidth(character));
+			adjustCursorXOffset(ui.getRenderers(0).text.textWidth(character));
 		}
 	}
 
@@ -384,18 +387,20 @@ namespace Game3 {
 			return;
 		}
 
+		TextRenderer &texter = ui.getRenderers(0).text;
+
 		if (*--cursorIterator == '\n') {
 			columnNumber = getColumnCount(--lineNumber);
 			--getLineCount();
 			cachedColumnCounts.reset();
-			cursorXOffset = ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber));
-			fixCursorOffset();
+			fixYOffset();
+			setCursorXOffset(texter.textWidth(getLineSpan(lineNumber)));
 		} else {
 			if (cachedColumnCounts) {
 				--cachedColumnCounts->at(lineNumber);
 			}
 			--columnNumber;
-			adjustCursorOffset(-ui.getRenderers(0).text.textWidth(*cursorIterator));
+			adjustCursorXOffset(-texter.textWidth(*cursorIterator));
 		}
 
 		--textPosition;
@@ -420,18 +425,18 @@ namespace Game3 {
 		for (size_t i = 0; i < count && cursorIterator != text.begin(); ++i) {
 			if (*--cursorIterator == '\n') {
 				columnNumber = getColumnCount(--lineNumber);
-				cursorXOffset = renderers.text.textWidth(getLineSpan(lineNumber));
-				fixCursorOffset();
+				setCursorXOffset(renderers.text.textWidth(getLineSpan(lineNumber)));
+				fixYOffset();
 			} else {
 				--columnNumber;
-				adjustCursorOffset(-renderers.text.textWidth(UStringSpan(cursorIterator, std::next(cursorIterator))));
+				adjustCursorXOffset(-renderers.text.textWidth(UStringSpan(cursorIterator, std::next(cursorIterator))));
 			}
 			--textPosition;
 		}
 	}
 
 	void TextInput::goRight(size_t count) {
-		RendererContext renderers = ui.getRenderers(0);
+		TextRenderer &texter = ui.getRenderers(0).text;
 
 		for (size_t i = 0; i < count && cursorIterator != text.end(); ++i) {
 			auto old_iterator = cursorIterator++;
@@ -442,7 +447,7 @@ namespace Game3 {
 				xOffset = 0;
 			} else {
 				++columnNumber;
-				adjustCursorOffset(renderers.text.textWidth(UStringSpan(old_iterator, cursorIterator)));
+				adjustCursorXOffset(texter.textWidth(UStringSpan(old_iterator, cursorIterator)));
 			}
 			++textPosition;
 		}
@@ -463,7 +468,7 @@ namespace Game3 {
 		}
 
 		xOffset = 0;
-		setCursorOffset(0);
+		setCursorXOffset(0);
 	}
 
 	void TextInput::goEnd(bool within_line) {
@@ -481,7 +486,7 @@ namespace Game3 {
 			textPosition = text.size();
 		}
 
-		setCursorOffset(ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber)));
+		setCursorXOffset(ui.getRenderers(0).text.textWidth(getLineSpan(lineNumber)));
 	}
 
 	void TextInput::goUp() {
@@ -508,7 +513,8 @@ namespace Game3 {
 			auto last = cursorIterator;
 			auto start = std::prev(last, columnNumber);
 
-			setCursorOffset(ui.getRenderers(0).text.textWidth(UStringSpan(start, last)));
+			setCursorXOffset(ui.getRenderers(0).text.textWidth(UStringSpan(start, last)));
+			fixYOffset();
 		}
 	}
 
@@ -540,7 +546,9 @@ namespace Game3 {
 
 			columnNumber = i;
 			++lineNumber;
-			setCursorOffset(ui.getRenderers(0).text.textWidth(UStringSpan(start, last)));
+			TextRenderer &texter = ui.getRenderers(0).text;
+			setCursorXOffset(texter.textWidth(UStringSpan(start, last)));
+			fixYOffset();
 		}
 	}
 
@@ -553,44 +561,73 @@ namespace Game3 {
 		return getScale() / 16;
 	}
 
-	float TextInput::getXPadding() const {
+	float TextInput::getPadding() const {
 		return thickness * getScale();
 	}
 
-	float TextInput::getBoundary() const {
-		return lastRectangle.width - getXPadding();
+	float TextInput::getXBoundary() const {
+		return lastRectangle.width - getPadding();
 	}
 
-	float TextInput::getCursorPosition() const {
-		return getXPadding() - xOffset * getScale() + cursorXOffset * getTextScale();
+	float TextInput::getYBoundary() const {
+		return lastRectangle.height - getPadding();
 	}
 
-	void TextInput::adjustCursorOffset(float offset) {
+	float TextInput::getCursorXPosition() const {
+		return getPadding() - xOffset * getScale() + cursorXOffset * getTextScale();
+	}
+
+	float TextInput::getCursorYPosition() const {
+		return getPadding() - yOffset * getScale() + lineNumber * getCursorHeight(ui.getRenderers(0).text);
+	}
+
+	void TextInput::adjustCursorXOffset(float offset) {
 		cursorXOffset += offset;
-		fixCursorOffset();
+		fixXOffset();
 	}
 
-	void TextInput::setCursorOffset(float new_offset) {
+	void TextInput::setCursorXOffset(float new_offset) {
 		cursorXOffset = new_offset;
-		fixCursorOffset();
+		fixXOffset();
 	}
 
-	void TextInput::fixCursorOffset() {
+	void TextInput::fixXOffset() {
 		if (lastRectangle.width < 0) {
-			cursorFixQueued = true;
+			offsetFixQueued = true;
 			return;
 		}
 
-		const float visual = getCursorPosition();
-		const float boundary = getBoundary();
+		const float visual = getCursorXPosition();
+		const float boundary = getXBoundary();
+		const float padding = getPadding();
 
 		if (visual > boundary) {
-			xOffset += (visual - boundary + getXPadding() * 2) / getScale();
-		} else if (visual < getXPadding()) {
-			xOffset -= (getXPadding() - visual) / getScale();
+			xOffset += (visual - boundary + padding * 2) / getScale();
+		} else if (visual < padding) {
+			xOffset -= (padding - visual) / getScale();
 		}
 
-		cursorFixQueued = false;
+		offsetFixQueued = false;
+	}
+
+	void TextInput::fixYOffset() {
+		if (lastRectangle.height < 0) {
+			offsetFixQueued = true;
+			return;
+		}
+
+		const float visual = getCursorYPosition();
+		const float boundary = getYBoundary();
+		const float padding = getPadding();
+		const float cursor_height = getCursorHeight(ui.getRenderers(0).text);
+
+		if (visual + cursor_height > boundary) {
+			yOffset += (visual - boundary + padding * 2 + cursor_height) / getScale();
+		} else if (visual < padding) {
+			yOffset -= (padding - visual) / getScale();
+		}
+
+		offsetFixQueued = false;
 	}
 
 	void TextInput::changed() {
@@ -706,5 +743,9 @@ namespace Game3 {
 		iterator end = std::next(begin, std::min(max_length, cachedColumnCounts->at(line_number)));
 
 		return {begin, end};
+	}
+
+	float TextInput::getCursorHeight(const TextRenderer &texter) const {
+		return texter.getIHeight() * TextRenderer::getLineHeight() * getTextScale();
 	}
 }

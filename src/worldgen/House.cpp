@@ -57,7 +57,7 @@ namespace Game3::WorldGen {
 					"Use support libraries as appropriate.",
 					"ha HA!\ntrapped in my furniture hellscape\nit's all so wrong and I made it just for you!\ngood luck!\n\n-- Louie Zong",
 					"This is a work of nonfiction and any resemblance to actual events, locales or persons, living or dead, is entirely intentional. We are in your walls.",
-					"Gangblanc, Gangblanc, give me your answer, do\nI'm half forswonk all for the code of you\nIt won't be a stylish shader\nI can't code up a trader\nBut you'll look cool without the tools\nOf a game engine built for three",
+					"Gangblanc, Gangblanc, give me your answer, do\nI'm half forswonk all for the code of you\nIt won't be a stylish shader\nI can't code up a trader\nBut you'll look cool without the tools\nOf a game engine built for you",
 					"U18446744073709551615 is totally a valid molecule.",
 					"Gangblanc is 1 cubic meter but a lot of it is hidden inside pocket dimensions so he appears to have a normal human volume.",
 					"I've heard whispers of a vending machine deep beneath the surface that takes quarters... but what kind?",

@@ -16,6 +16,8 @@
 #include <vector>
 
 namespace Game3 {
+	class TextRenderer;
+
 	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public Autocompleter {
 		public:
 			sigc::signal<void(TextInput &, const UString &)> onSubmit;
@@ -68,8 +70,9 @@ namespace Game3 {
 
 		private:
 			float xOffset = 0;
+			float yOffset = 0;
 			float thickness{};
-			float cursorXOffset{};
+			float cursorXOffset = 0;
 			Color borderColor;
 			Color interiorColor;
 			Color textColor;
@@ -80,7 +83,7 @@ namespace Game3 {
 			size_t lineNumber = 0;
 			size_t columnNumber = 0;
 			size_t textPosition = 0;
-			bool cursorFixQueued = false;
+			bool offsetFixQueued = false;
 			bool focused = false;
 			bool multiline = false;
 			std::optional<std::vector<UString>> suggestions;
@@ -90,12 +93,15 @@ namespace Game3 {
 			mutable std::optional<std::vector<size_t>> cachedColumnCounts;
 
 			float getTextScale() const;
-			float getXPadding() const;
-			float getBoundary() const;
-			float getCursorPosition() const;
-			void adjustCursorOffset(float offset);
-			void setCursorOffset(float);
-			void fixCursorOffset();
+			float getPadding() const;
+			float getXBoundary() const;
+			float getYBoundary() const;
+			float getCursorXPosition() const;
+			float getCursorYPosition() const;
+			void adjustCursorXOffset(float offset);
+			void setCursorXOffset(float);
+			void fixXOffset();
+			void fixYOffset();
 			void changed();
 			void forwardSuggestions();
 			void makeDropdown();
@@ -107,5 +113,6 @@ namespace Game3 {
 			size_t getColumnCount(size_t line) const;
 			void setCachedColumnCounts() const;
 			UStringSpan getLineSpan(size_t line_number, size_t max_length = std::string::npos) const;
+			float getCursorHeight(const TextRenderer &) const;
 	};
 }
