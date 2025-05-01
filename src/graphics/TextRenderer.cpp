@@ -285,7 +285,7 @@ namespace Game3 {
 		auto &scale_x = options.scaleX;
 		auto &scale_y = options.scaleY;
 
-		const auto i_height = getCharacter('I').size.y * scale_y;
+		const auto i_height = getIHeight() * scale_y;
 
 		if (options.alignTop) {
 			y += i_height;
@@ -422,15 +422,10 @@ namespace Game3 {
 			y += i_height * LINE_HEIGHT;
 		};
 
-		bool text_in_last_line = false;
-
 		for (const uint32_t ch: text) {
 			if (ch == '\n') {
 				next_line();
-				text_in_last_line = false;
 				continue;
-			} else {
-				text_in_last_line = true;
 			}
 
 			const Character &character = getCharacter(ch);
@@ -447,10 +442,6 @@ namespace Game3 {
 			}
 
 			x += (character.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
-		}
-
-		if (text_in_last_line) {
-			next_line();
 		}
 
 		return y + first_line_height;

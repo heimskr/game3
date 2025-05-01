@@ -244,7 +244,7 @@ namespace Game3 {
 				minimum = natural = fixedHeight * ui.scale;
 			} else {
 				minimum = border;
-				natural = border + renderers.text.textHeight(text, getTextScale(), multiline? -1 : for_width - border);
+				natural = border + renderers.text.textHeight(text, getTextScale(), multiline? -1 : for_width - border) + getCursorHeight(renderers.text);
 			}
 		}
 	}

@@ -51,8 +51,8 @@ namespace Game3 {
 		const float text_width = texter.textWidth(text, text_scale) + 2 * padding + scale / 2;
 		const float effective_width = std::min(maxWidth, width < 0? text_width : std::min(width, text_width));
 
-		const float text_height = texter.textHeight(text, text_scale, effective_width - 2 * padding) * text_scale /* ??? */;
-		const float effective_height = (height < 0? text_height : std::min(height, text_height)) + 2 * padding;
+		const float text_height = texter.textHeight(text, text_scale, effective_width - 2 * padding) + 2 * padding;
+		const float effective_height = (height < 0? text_height : std::min(height, text_height));
 
 		lastRectangle.width  = effective_width;
 		lastRectangle.height = effective_height;
@@ -62,9 +62,8 @@ namespace Game3 {
 			x -= effective_width;
 		}
 
-		rectangler(backgroundColor, Rectangle(x, y, effective_width, effective_height));
-
 		const Rectangle interior(x, y, effective_width, effective_height);
+		rectangler(backgroundColor, interior);
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
 		texter(text, TextRenderOptions{
@@ -72,7 +71,7 @@ namespace Game3 {
 			.y = padding,
 			.scaleX = text_scale,
 			.scaleY = text_scale,
-			.wrapWidth = static_cast<double>(interior.width - 2 * padding),
+			.wrapWidth = static_cast<double>(effective_width - 2 * padding),
 			.color = textColor,
 			.alignTop = true,
 			.shadow{0, 0, 0, 0},
