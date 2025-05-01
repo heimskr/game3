@@ -225,6 +225,36 @@ namespace Game3 {
 		return true;
 	}
 
+	bool TextInput::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
+		constexpr float scroll_speed = 2;
+
+		if (multiline) {
+			if (y_delta < 0) {
+				const float height = (getTextHeight() - lastRectangle.height) / getScale();
+				if (height >= 0) {
+					yOffset = std::min<float>(height, yOffset - scroll_speed * y_delta);
+				}
+				return true;
+			} else if (y_delta > 0) {
+				yOffset = std::max<float>(0, yOffset - scroll_speed * y_delta);
+				return true;
+			}
+		}
+
+		if (x_delta < 0) {
+			const float width = (getTextWidth() - lastRectangle.width) / getScale() + 4 * thickness;
+			if (width >= 0) {
+				xOffset = std::min<float>(width, xOffset - scroll_speed * x_delta);
+			}
+			return true;
+		} else if (x_delta > 0) {
+			xOffset = std::max<float>(0, xOffset - scroll_speed * x_delta);
+			return true;
+		}
+
+		return Widget::scroll(x_delta, y_delta, x, y, modifiers);
+	}
+
 	SizeRequestMode TextInput::getRequestMode() const {
 		return SizeRequestMode::HeightForWidth;
 	}
@@ -337,12 +367,19 @@ namespace Game3 {
 			++getLineCount();
 			cachedColumnCounts.reset();
 			fixYOffset();
+			textHeight.reset();
+			textWidth.reset();
+			widestLine.reset();
 		} else {
 			if (cachedColumnCounts) {
 				++cachedColumnCounts->at(lineNumber);
 			}
 			++columnNumber;
-			adjustCursorXOffset(ui.getRenderers(0).text.textWidth(character));
+			const float width = ui.getRenderers(0).text.textWidth(character);
+			adjustCursorXOffset(width);
+			if (widestLine == lineNumber) {
+				textWidth.reset();
+			}
 		}
 	}
 
@@ -395,12 +432,19 @@ namespace Game3 {
 			cachedColumnCounts.reset();
 			fixYOffset();
 			setCursorXOffset(texter.textWidth(getLineSpan(lineNumber)));
+			textWidth.reset();
+			textHeight.reset();
+			widestLine.reset();
 		} else {
 			if (cachedColumnCounts) {
 				--cachedColumnCounts->at(lineNumber);
 			}
 			--columnNumber;
 			adjustCursorXOffset(-texter.textWidth(*cursorIterator));
+			if (widestLine == lineNumber) {
+				textWidth.reset();
+				widestLine.reset();
+			}
 		}
 
 		--textPosition;
@@ -412,8 +456,18 @@ namespace Game3 {
 			if (*cursorIterator == '\n') {
 				--getLineCount();
 				cachedColumnCounts.reset();
-			} else if (cachedColumnCounts) {
-				--cachedColumnCounts->at(lineNumber);
+				textHeight.reset();
+				textWidth.reset();
+				widestLine.reset();
+			} else {
+				if (cachedColumnCounts) {
+					--cachedColumnCounts->at(lineNumber);
+				}
+
+				if (widestLine == lineNumber) {
+					textWidth.reset();
+					widestLine.reset();
+				}
 			}
 			cursorIterator = text.erase(cursorIterator);
 		}
@@ -747,5 +801,50 @@ namespace Game3 {
 
 	float TextInput::getCursorHeight(const TextRenderer &texter) const {
 		return texter.getIHeight() * TextRenderer::getLineHeight() * getTextScale();
+	}
+
+	float TextInput::getTextWidth() const {
+		if (!textWidth) {
+			TextRenderer &texter = ui.getRenderers(0).text;
+			const float text_scale = getTextScale();
+
+			textWidth.emplace(0);
+			widestLine.emplace(0);
+			auto end = text.end();
+			auto start = text.begin();
+			auto last = start;
+			size_t line = 0;
+
+			while (start != end) {
+				while (last != end && *last != '\n') {
+					++last;
+				}
+
+				const float width = texter.textWidth(UStringSpan(start, last), text_scale);
+
+				if (*textWidth < width) {
+					*textWidth = width;
+					widestLine = line;
+				}
+
+				if (last == end) {
+					break;
+				}
+
+				start = ++last;
+				++line;
+			}
+		}
+
+		return *textWidth;
+	}
+
+	float TextInput::getTextHeight() const {
+		if (!textHeight) {
+			TextRenderer &texter = ui.getRenderers(0).text;
+			textHeight = texter.textHeight(text, getTextScale(), -1) + getCursorHeight(texter);
+		}
+
+		return *textHeight;
 	}
 }

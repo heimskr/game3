@@ -34,6 +34,7 @@ namespace Game3 {
 			bool click(int button, int x, int y, Modifiers) final;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 			bool charPressed(uint32_t character, Modifiers) final;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
 			void onFocus() final;
@@ -83,14 +84,17 @@ namespace Game3 {
 			size_t lineNumber = 0;
 			size_t columnNumber = 0;
 			size_t textPosition = 0;
-			bool offsetFixQueued = false;
-			bool focused = false;
-			bool multiline = false;
 			std::optional<std::vector<UString>> suggestions;
 			std::optional<UString> deferredText;
 			std::optional<std::pair<uint32_t, std::chrono::system_clock::time_point>> lastPress;
-			mutable std::optional<size_t> cachedLineCount;
 			mutable std::optional<std::vector<size_t>> cachedColumnCounts;
+			mutable std::optional<size_t> cachedLineCount;
+			mutable std::optional<size_t> widestLine;
+			mutable std::optional<float> textWidth;
+			mutable std::optional<float> textHeight;
+			bool offsetFixQueued = false;
+			bool focused = false;
+			bool multiline = false;
 
 			float getTextScale() const;
 			float getPadding() const;
@@ -114,5 +118,7 @@ namespace Game3 {
 			void setCachedColumnCounts() const;
 			UStringSpan getLineSpan(size_t line_number, size_t max_length = std::string::npos) const;
 			float getCursorHeight(const TextRenderer &) const;
+			float getTextWidth() const;
+			float getTextHeight() const;
 	};
 }
