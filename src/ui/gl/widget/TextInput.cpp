@@ -820,8 +820,8 @@ namespace Game3 {
 			TextRenderer &texter = ui.getRenderers(0).text;
 			const float text_scale = getTextScale();
 
-			textWidth.emplace(0);
-			widestLine.emplace(0);
+			textWidth = 0;
+			widestLine = 0;
 			auto end = text.end();
 			auto start = text.begin();
 			auto last = start;
