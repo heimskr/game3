@@ -274,6 +274,14 @@ namespace Game3 {
 		return iterator == owner.text.end();
 	}
 
+	bool TextCursor::atLineBeginning() const {
+		return columnNumber == 0;
+	}
+
+	bool TextCursor::atLineEnd() const {
+		return columnNumber == owner.getColumnCount(lineNumber);
+	}
+
 	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
 		Widget(ui, selfScale),
 		HasFixedSize(-1, selfScale * TEXT_INPUT_HEIGHT_FACTOR),
@@ -1175,12 +1183,17 @@ namespace Game3 {
 			}
 		}
 
-		rectangler(fg, left_x + pixel, left_y,                         pixel, pixel);
-		rectangler(fg, left_x,         left_y,                         pixel, cursor_height);
-		rectangler(fg, left_x + pixel, left_y + cursor_height - pixel, pixel, pixel);
+		rectangler(fg, left_x, left_y, pixel, cursor_height);
+		rectangler(fg, right_x, right_y, pixel, cursor_height);
 
-		rectangler(fg, right_x - pixel, right_y,                         pixel, pixel);
-		rectangler(fg, right_x,         right_y,                         pixel, cursor_height);
-		rectangler(fg, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
+		if (!left->atLineEnd()) {
+			rectangler(fg, left_x + pixel, left_y,                         pixel, pixel);
+			rectangler(fg, left_x + pixel, left_y + cursor_height - pixel, pixel, pixel);
+		}
+
+		if (!right->atLineBeginning()) {
+			rectangler(fg, right_x - pixel, right_y,                         pixel, pixel);
+			rectangler(fg, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
+		}
 	}
 }

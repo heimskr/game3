@@ -46,6 +46,8 @@ namespace Game3 {
 			float getYPosition() const;
 			bool atBeginning() const;
 			bool atEnd() const;
+			bool atLineBeginning() const;
+			bool atLineEnd() const;
 
 		private:
 			TextInput &owner;
