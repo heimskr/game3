@@ -44,8 +44,8 @@ game3_deps = [
 ]
 
 if build_machine.system() == 'linux'
-	# No clue why the libunwind package for MSYS2 doesn't include a .pc file. We just have to trust it's installed.
 	game3_deps += dependency('libunwind')
+	game3_deps += dependency('xcb')
 endif
 
 inc_dirs = [

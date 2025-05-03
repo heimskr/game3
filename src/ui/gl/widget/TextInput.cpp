@@ -10,6 +10,8 @@
 #include "ui/gl/widget/Tooltip.h"
 #include "util/Util.h"
 
+#include "clip.h"
+
 namespace {
 	constexpr Game3::Color DEFAULT_BORDER_COLOR{"#926641"};
 	constexpr Game3::Color DEFAULT_TEXT_COLOR{"#341903"};
@@ -390,7 +392,7 @@ namespace Game3 {
 			return true;
 		}
 
-		if (modifiers.ctrl) {
+		if (modifiers.onlyCtrl()) {
 			switch (key) {
 				case GLFW_KEY_BACKSPACE:
 					eraseWord();
@@ -476,7 +478,25 @@ namespace Game3 {
 		return true;
 	}
 
-	bool TextInput::charPressed(uint32_t codepoint, Modifiers) {
+	bool TextInput::charPressed(uint32_t codepoint, Modifiers modifiers) {
+		if (modifiers.onlyCtrl()) {
+			switch (codepoint) {
+				case 'c':
+					copy();
+					break;
+
+				case 'v':
+					paste();
+					break;
+
+				default:
+					break;
+			}
+
+			// Ignore other ctrl sequences.
+			return true;
+		}
+
 		insert(static_cast<gunichar>(codepoint));
 		changed();
 		return true;
@@ -668,6 +688,28 @@ namespace Game3 {
 		}
 	}
 
+	void TextInput::insert(const UString &string) {
+		ensureCursor();
+
+		const auto [left, right] = getCursors();
+		const size_t new_position = left->position + string.size();
+
+		if (hasSelection()) {
+			INFO("replacing. byte diff: {}", right->iterator.base() - left->iterator.base());
+			text.replace(left->iterator, right->iterator, string);
+		} else {
+			INFO("inserting");
+			text.insert(left->position, string);
+		}
+
+		clearCachedData();
+		cursor->reset();
+		cursor->goRight(new_position);
+		anchor.reset();
+		fixXOffset(*cursor);
+		fixYOffset(*cursor);
+	}
+
 	void TextInput::eraseWord() {
 		ensureCursor();
 
@@ -719,7 +761,7 @@ namespace Game3 {
 			auto iterator = text.erase(left->iterator, right->iterator);
 
 			// Do compiler-generated implementations of T & T::operator=(const T &)
-			// do an address check and do nothing if the addresses are equal?
+			// do an address check and return early if the addresses are equal?
 			// If not, I might need to implement one myself. Otherwise this might be silly.
 			cursor.emplace(*left);
 
@@ -925,6 +967,21 @@ namespace Game3 {
 		return anchor && cursor && *anchor != *cursor;
 	}
 
+	void TextInput::copy() {
+		if (!hasSelection()) {
+			return;
+		}
+
+		auto [left, right] = getIterators();
+		clip::set_text(std::string(left.base(), right.base()));
+	}
+
+	void TextInput::paste() {
+		if (std::string pasted; clip::get_text(pasted) && !pasted.empty()) {
+			insert(pasted);
+		}
+	}
+
 	size_t & TextInput::getLineCount() const {
 		if (!cachedLineCount) {
 			cachedLineCount = 1 + std::count(text.begin(), text.end(), '\n');
@@ -1050,12 +1107,16 @@ namespace Game3 {
 
 	std::pair<const TextCursor *, const TextCursor *> TextInput::getCursors() const {
 		assert(cursor.has_value());
-		assert(anchor.has_value());
-		std::pair out{&*cursor, &*anchor};
-		if (anchor->position < cursor->position) {
-			std::swap(out.first, out.second);
+
+		if (anchor) {
+			std::pair out{&*cursor, &*anchor};
+			if (anchor->position < cursor->position) {
+				std::swap(out.first, out.second);
+			}
+			return out;
 		}
-		return out;
+
+		return {&*cursor, &*cursor};
 	}
 
 	TextRenderer & TextInput::getTexter() const {
@@ -1066,5 +1127,13 @@ namespace Game3 {
 		if (!cursor) {
 			cursor.emplace(*this, true, text.begin());
 		}
+	}
+
+	void TextInput::clearCachedData() const {
+		cachedColumnCounts.reset();
+		cachedLineCount.reset();
+		widestLine.reset();
+		textWidth.reset();
+		textHeight.reset();
 	}
 }

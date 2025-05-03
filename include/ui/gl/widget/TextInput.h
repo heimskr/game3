@@ -85,6 +85,7 @@ namespace Game3 {
 			void setText(UString);
 			UString clear();
 			void insert(uint32_t);
+			void insert(const UString &);
 			void eraseWord();
 			void eraseCharacter();
 			void eraseForward();
@@ -94,6 +95,9 @@ namespace Game3 {
 
 			/** Returns whether there is an anchor at a different position from the cursor. */
 			bool hasSelection() const;
+
+			void copy();
+			void paste();
 
 			void autocomplete(const UString &) final;
 			void hideDropdown() const;
@@ -145,10 +149,10 @@ namespace Game3 {
 			float getTextWidth() const;
 			float getTextHeight() const;
 			std::pair<UString::iterator, UString::iterator> getIterators() const;
-			/** Requires that an anchor be present. */
 			std::pair<const TextCursor *, const TextCursor *> getCursors() const;
 			TextRenderer & getTexter() const;
 			void ensureCursor();
+			void clearCachedData() const;
 
 		friend class TextCursor;
 	};
