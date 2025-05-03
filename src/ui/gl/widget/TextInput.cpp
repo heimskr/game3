@@ -331,15 +331,27 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
+		Color color = focused? focusedCursorColor : cursorColor;
+
+		const float cursor_height = getCursorHeight();
+		const float pixel = start / 2;
+
 		if (!anchor || *anchor == cursor) {
-			if (multiline) {
-				float cursor_height = getCursorHeight();
-				rectangler(focused? focusedCursorColor : cursorColor, cursor.getXPosition(), cursor.getYPosition(), start / 2, cursor_height);
-			} else {
-				rectangler(focused? focusedCursorColor : cursorColor, cursor.getXPosition(), start, start / 2, interior.height - 2 * start);
-			}
+			rectangler(color, cursor.getXPosition(), multiline? cursor.getYPosition() : start, pixel, cursor_height);
 		} else {
-			// TODO!: handle multi-cursor
+			const auto [left, right] = getCursors();
+
+			const float left_x = left->getXPosition();
+			const float left_y = multiline? left->getYPosition() : start;
+			rectangler(color, left_x + pixel, left_y,                         pixel, pixel);
+			rectangler(color, left_x,         left_y,                         pixel, cursor_height);
+			rectangler(color, left_x + pixel, left_y + cursor_height - pixel, pixel, pixel);
+
+			const float right_x = right->getXPosition();
+			const float right_y = multiline? right->getYPosition() : start;
+			rectangler(color, right_x - pixel, right_y,                         pixel, pixel);
+			rectangler(color, right_x,         right_y,                         pixel, cursor_height);
+			rectangler(color, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
 		}
 
 		texter(text, TextRenderOptions{
@@ -959,6 +971,15 @@ namespace Game3 {
 		}
 
 		return {cursor.iterator, cursor.iterator};
+	}
+
+	std::pair<const TextCursor *, const TextCursor *> TextInput::getCursors() const {
+		assert(anchor.has_value());
+		std::pair out{&cursor, &*anchor};
+		if (anchor->position < cursor.position) {
+			std::swap(out.first, out.second);
+		}
+		return out;
 	}
 
 	TextRenderer & TextInput::getTexter() const {

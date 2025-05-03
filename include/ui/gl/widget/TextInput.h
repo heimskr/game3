@@ -140,6 +140,8 @@ namespace Game3 {
 			float getTextWidth() const;
 			float getTextHeight() const;
 			std::pair<UString::iterator, UString::iterator> getIterators() const;
+			/** Requires that an anchor be present. */
+			std::pair<const TextCursor *, const TextCursor *> getCursors() const;
 			TextRenderer & getTexter() const;
 
 		friend class TextCursor;
