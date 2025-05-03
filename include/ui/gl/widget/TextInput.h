@@ -121,6 +121,8 @@ namespace Game3 {
 			bool focused = false;
 			bool multiline = false;
 
+			void goLeft(Modifiers);
+			void goRight(Modifiers);
 			float getTextScale() const;
 			float getPadding() const;
 			float getXBoundary() const;

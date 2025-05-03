@@ -417,11 +417,11 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_LEFT:
-				cursor.goLeft();
+				goLeft(modifiers);
 				return true;
 
 			case GLFW_KEY_RIGHT:
-				cursor.goRight();
+				goRight(modifiers);
 				return true;
 
 			case GLFW_KEY_HOME:
@@ -753,6 +753,32 @@ namespace Game3 {
 	void TextInput::autocomplete(const UString &completion) {
 		setText(completion);
 		onAcceptSuggestion(*this, completion);
+	}
+
+	void TextInput::goLeft(Modifiers modifiers) {
+		if (modifiers.onlyShift()) {
+			if (!anchor) {
+				anchor.emplace(cursor);
+			}
+			cursor.goLeft();
+		} else if (anchor) {
+			anchor.reset();
+		} else {
+			cursor.goLeft();
+		}
+	}
+
+	void TextInput::goRight(Modifiers modifiers) {
+		if (modifiers.onlyShift()) {
+			if (!anchor) {
+				anchor.emplace(cursor);
+			}
+			cursor.goRight();
+		} else if (anchor) {
+			anchor.reset();
+		} else {
+			cursor.goRight();
+		}
 	}
 
 	float TextInput::getTextScale() const {
