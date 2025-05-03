@@ -191,70 +191,74 @@ namespace Game3 {
 		owner.fixXOffset(*this);
 	}
 
-	void TextCursor::goUp() {
-		if (lineNumber == 0) {
-			if (!atBeginning()) {
-				goStart(false);
-			}
-		} else {
-			while (0 < position) {
-				--position;
-				if (*--iterator == '\n') {
-					break;
+	void TextCursor::goUp(size_t delta) {
+		for (size_t i = 0; i < delta; ++i) {
+			if (lineNumber == 0) {
+				if (!atBeginning()) {
+					goStart(false);
 				}
+			} else {
+				while (0 < position) {
+					--position;
+					if (*--iterator == '\n') {
+						break;
+					}
+				}
+
+				const size_t old_column_number = std::exchange(columnNumber, owner.getColumnCount(--lineNumber));
+
+				while (columnNumber > old_column_number) {
+					--columnNumber;
+					--iterator;
+					--position;
+				}
+
+				auto last = iterator;
+				auto start = std::prev(last, columnNumber);
+
+				xOffset = owner.getTexter().textWidth(UStringSpan(start, last));
+				owner.fixXOffset(*this);
+				owner.fixYOffset(*this);
 			}
-
-			const size_t old_column_number = std::exchange(columnNumber, owner.getColumnCount(--lineNumber));
-
-			while (columnNumber > old_column_number) {
-				--columnNumber;
-				--iterator;
-				--position;
-			}
-
-			auto last = iterator;
-			auto start = std::prev(last, columnNumber);
-
-			xOffset = owner.getTexter().textWidth(UStringSpan(start, last));
-			owner.fixXOffset(*this);
-			owner.fixYOffset(*this);
 		}
 	}
 
-	void TextCursor::goDown() {
-		if (lineNumber + 1 >= owner.getLineCount()) {
-			if (!atEnd()) {
-				goEnd(false);
-			}
-		} else {
-			const size_t text_length = owner.text.length();
-
-			while (position < text_length) {
-				++position;
-				if (*iterator++ == '\n') {
-					break;
+	void TextCursor::goDown(size_t delta) {
+		for (size_t i = 0; i < delta; ++i) {
+			if (lineNumber + 1 >= owner.getLineCount()) {
+				if (!atEnd()) {
+					goEnd(false);
 				}
-			}
+			} else {
+				const size_t text_length = owner.text.length();
 
-			auto start = iterator;
-			auto last = start;
-
-			size_t i = 0;
-
-			for (; i < columnNumber && position < text_length; ++i) {
-				++position;
-				if (*iterator++ == '\n') {
-					break;
+				while (position < text_length) {
+					++position;
+					if (*iterator++ == '\n') {
+						break;
+					}
 				}
-				++last;
-			}
 
-			columnNumber = i;
-			++lineNumber;
-			TextRenderer &texter = owner.getTexter();
-			xOffset = texter.textWidth(UStringSpan(start, last));
-			owner.fixXOffset(*this);
-			owner.fixYOffset(*this);
+				auto start = iterator;
+				auto last = start;
+
+				size_t i = 0;
+
+				for (; i < columnNumber && position < text_length; ++i) {
+					++position;
+					if (*iterator++ == '\n') {
+						break;
+					}
+					++last;
+				}
+
+				columnNumber = i;
+				++lineNumber;
+				TextRenderer &texter = owner.getTexter();
+				xOffset = texter.textWidth(UStringSpan(start, last));
+				owner.fixXOffset(*this);
+				owner.fixYOffset(*this);
+			}
 		}
 	}
 
@@ -341,13 +345,15 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		if (!anchor || (cursor && *anchor == *cursor)) {
-			Color color = focused? focusedCursorColor : cursorColor;
-			const float cursor_height = getCursorHeight();
-			const float pixel = start / 2;
-			rectangler(color, cursor->getXPosition(), multiline? cursor->getYPosition() : start, pixel, cursor_height);
-		} else {
-			renderSelection(rectangler);
+		if (cursor) {
+			if (!anchor || *anchor == *cursor) {
+				Color color = focused? focusedCursorColor : cursorColor;
+				const float cursor_height = getCursorHeight();
+				const float pixel = start / 2;
+				rectangler(color, cursor->getXPosition(), multiline? cursor->getYPosition() : start, pixel, cursor_height);
+			} else {
+				renderSelection(rectangler);
+			}
 		}
 
 		texter(text, TextRenderOptions{
@@ -369,10 +375,39 @@ namespace Game3 {
 
 		if (button == LEFT_BUTTON) {
 			ui.focusWidget(shared_from_this());
+			setAnchorAt(x - lastRectangle.x, y - lastRectangle.y);
 			return true;
 		}
 
 		return false;
+	}
+
+	bool TextInput::dragStart(int x, int y) {
+		if (Widget::dragStart(x, y)) {
+			return true;
+		}
+
+		WidgetPtr self = getSelf();
+		ui.focusWidget(self);
+		ui.addDragUpdater(std::move(self));
+		setAnchorAt(x - lastRectangle.x, y - lastRectangle.y);
+
+		return true;
+	}
+
+	bool TextInput::dragUpdate(int x, int y) {
+		if (Widget::dragUpdate(x, y)) {
+			return true;
+		}
+
+		const auto [line_number, column] = getLineAndColumn(x - lastRectangle.x, y - lastRectangle.y);
+		if (!ensureCursor()) {
+			cursor->reset();
+		}
+		cursor->goDown(line_number);
+		cursor->goRight(column);
+
+		return true;
 	}
 
 	bool TextInput::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
@@ -1130,10 +1165,21 @@ namespace Game3 {
 		return ui.getRenderers(0).text;
 	}
 
-	void TextInput::ensureCursor() {
-		if (!cursor) {
-			cursor.emplace(*this, true, text.begin());
+	bool TextInput::ensureCursor() {
+		return ensureCursor(cursor);
+	}
+
+	bool TextInput::ensureAnchor() {
+		return ensureCursor(anchor);
+	}
+
+	bool TextInput::ensureCursor(std::optional<TextCursor> &target) {
+		if (!target) {
+			target.emplace(*this, true, text.begin());
+			return true;
 		}
+
+		return false;
 	}
 
 	void TextInput::clearCachedData() const {
@@ -1195,5 +1241,64 @@ namespace Game3 {
 			rectangler(fg, right_x - pixel, right_y,                         pixel, pixel);
 			rectangler(fg, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
 		}
+	}
+
+	std::pair<int, int> TextInput::getLineAndColumn(int x, int y) const {
+		if (text.empty()) {
+			return {0, 0};
+		}
+
+		const float scale = getScale();
+		const float start = thickness * scale;
+		const float cursor_height = getCursorHeight();
+
+		const float text_y = 2 * start - yOffset * scale;
+		int line_number = std::max<int>(0, (y - text_y) / cursor_height);
+
+		if (size_t line_count = getLineCount(); static_cast<size_t>(line_number) >= line_count) {
+			line_number = static_cast<int>(getLastLineNumber());
+		}
+
+		int column = -1;
+
+		if (size_t column_count = getColumnCount(line_number); column_count > 0) {
+			// TODO: monospace optimizations
+			const float text_scale = getTextScale();
+			float text_left = start - xOffset * scale;
+
+			if (x <= text_left) {
+				column = 0;
+			} else {
+				TextRenderer &texter = getTexter();
+				for (int i = 0; gunichar character: getLineSpan(static_cast<size_t>(line_number))) {
+					const float width = texter.textWidth(character, text_scale);
+					const float text_right = text_left + width;
+					if (text_left <= x && x <= text_right) {
+						column = i;
+						break;
+					}
+					text_left = text_right;
+					++i;
+				}
+
+				if (column == -1) {
+					column = column_count;
+				}
+			}
+		} else {
+			column = 0;
+		}
+
+		return std::pair{line_number, column};
+	}
+
+	void TextInput::setAnchorAt(int x, int y) {
+		const auto [line_number, column] = getLineAndColumn(x, y);
+		if (!ensureAnchor()) {
+			anchor->reset();
+		}
+		anchor->goDown(line_number);
+		anchor->goRight(column);
+		cursor.emplace(*anchor);
 	}
 }

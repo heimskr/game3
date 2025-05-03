@@ -38,10 +38,10 @@ namespace Game3 {
 			void reset();
 			void goLeft(size_t delta = 1);
 			void goRight(size_t delta = 1);
+			void goUp(size_t delta = 1);
+			void goDown(size_t delta = 1);
 			void goStart(bool within_line);
 			void goEnd(bool within_line);
-			void goUp();
-			void goDown();
 			float getXPosition() const;
 			float getYPosition() const;
 			bool atBeginning() const;
@@ -67,6 +67,8 @@ namespace Game3 {
 
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			bool click(int button, int x, int y, Modifiers) final;
+			bool dragStart(int x, int y) final;
+			bool dragUpdate(int x, int y) final;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 			bool charPressed(uint32_t character, Modifiers) final;
 			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
@@ -156,9 +158,13 @@ namespace Game3 {
 			std::pair<UString::iterator, UString::iterator> getIterators() const;
 			std::pair<const TextCursor *, const TextCursor *> getCursors() const;
 			TextRenderer & getTexter() const;
-			void ensureCursor();
+			bool ensureCursor();
+			bool ensureAnchor();
+			bool ensureCursor(std::optional<TextCursor> &);
 			void clearCachedData() const;
 			void renderSelection(RectangleRenderer &);
+			std::pair<int, int> getLineAndColumn(int x, int y) const;
+			void setAnchorAt(int x, int y);
 
 		friend class TextCursor;
 	};
