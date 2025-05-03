@@ -18,6 +18,20 @@
 namespace Game3 {
 	class TextRenderer;
 
+	struct TextCursor {
+		UString::iterator iterator;
+		size_t lineNumber = 0;
+		size_t columnNumber = 0;
+		size_t position = 0;
+		float xOffset = 0;
+
+		TextCursor(UString::iterator iterator):
+			iterator(iterator) {}
+
+		std::strong_ordering operator<=>(const TextCursor &other) const { return position <=> other.position; }
+		TextCursor & operator--();
+	};
+
 	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public Autocompleter {
 		public:
 			sigc::signal<void(TextInput &, const UString &)> onSubmit;
@@ -73,17 +87,16 @@ namespace Game3 {
 			float xOffset = 0;
 			float yOffset = 0;
 			float thickness{};
-			float cursorXOffset = 0;
 			Color borderColor;
 			Color interiorColor;
 			Color textColor;
 			Color cursorColor;
 			Color focusedCursorColor;
 			UString text;
-			UString::iterator cursorIterator = text.begin();
-			size_t lineNumber = 0;
-			size_t columnNumber = 0;
-			size_t textPosition = 0;
+			/** The start position of selected text. Note that this may be after the cursor if the user selects text backwards. */
+			std::optional<TextCursor> anchor;
+			/** The end position of selected text if any text is selected, or the position of the cursor otherwise. */
+			TextCursor cursor;
 			std::optional<std::vector<UString>> suggestions;
 			std::optional<UString> deferredText;
 			std::optional<std::pair<uint32_t, std::chrono::system_clock::time_point>> lastPress;
@@ -102,8 +115,6 @@ namespace Game3 {
 			float getYBoundary() const;
 			float getCursorXPosition() const;
 			float getCursorYPosition() const;
-			void adjustCursorXOffset(float offset);
-			void setCursorXOffset(float);
 			void fixXOffset();
 			void fixYOffset();
 			void changed();

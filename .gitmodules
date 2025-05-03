@@ -43,3 +43,6 @@
 [submodule "subprojects/Zipios"]
 	path = subprojects/Zipios
 	url = https://github.com/heimskr/zipios.git
+[submodule "subprojects/clip"]
+	path = subprojects/clip
+	url = https://github.com/dacap/clip.git

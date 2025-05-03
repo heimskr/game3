@@ -11,6 +11,7 @@ namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
 curlpp = cmake.subproject('curlpp')
+clip = cmake.subproject('clip')
 
 zipios_options = cmake.subproject_options()
 zipios_options.add_cmake_defines({'BUILD_SHARED_LIBS': false, 'BUILD_DOCUMENTATION': false, 'BUILD_ZIPIOS_TESTS': false})
@@ -35,6 +36,7 @@ game3_deps = [
 	dependency('libpng'),
 	dependency('libcurl'),
 	zipios.dependency('zipios'),
+	clip.dependency('clip'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
