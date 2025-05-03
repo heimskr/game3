@@ -103,6 +103,7 @@ namespace Game3 {
 
 			void copy();
 			void paste();
+			void cut();
 
 			void autocomplete(const UString &) final;
 			void hideDropdown() const;

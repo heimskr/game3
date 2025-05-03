@@ -515,6 +515,10 @@ namespace Game3 {
 					paste();
 					break;
 
+				case 'x':
+					cut();
+					break;
+
 				default:
 					break;
 			}
@@ -1019,6 +1023,13 @@ namespace Game3 {
 	void TextInput::paste() {
 		if (std::string pasted; clip::get_text(pasted) && !pasted.empty()) {
 			insert(pasted);
+		}
+	}
+
+	void TextInput::cut() {
+		if (hasSelection()) {
+			copy();
+			eraseCharacter();
 		}
 	}
 
