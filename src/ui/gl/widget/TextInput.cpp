@@ -1156,7 +1156,7 @@ namespace Game3 {
 			const float width = (right->xOffset - left->xOffset) * text_scale - pixel;
 			rectangler(bg, left_x + pixel, left_y, width, cursor_height);
 		} else {
-			const float full_width = getTextWidth();
+			const float full_width = std::max<float>(getTextWidth(), lastRectangle.width);
 
 			{
 				const float width = full_width - left->xOffset * text_scale - pixel;
