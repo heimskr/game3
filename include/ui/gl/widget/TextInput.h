@@ -16,20 +16,38 @@
 #include <vector>
 
 namespace Game3 {
+	class TextInput;
 	class TextRenderer;
 
-	struct TextCursor {
-		UString::iterator iterator;
-		size_t lineNumber = 0;
-		size_t columnNumber = 0;
-		size_t position = 0;
-		float xOffset = 0;
+	class TextCursor {
+		public:
+			UString::iterator iterator;
+			size_t lineNumber = 0;
+			size_t columnNumber = 0;
+			size_t position = 0;
+			float xOffset = 0;
+			bool primary = true;
 
-		TextCursor(UString::iterator iterator):
-			iterator(iterator) {}
+			TextCursor(TextInput &, bool primary, UString::iterator);
 
-		std::strong_ordering operator<=>(const TextCursor &other) const { return position <=> other.position; }
-		TextCursor & operator--();
+			std::strong_ordering operator<=>(const TextCursor &) const;
+			bool operator==(const TextCursor &) const;
+			bool operator!=(const TextCursor &) const;
+
+			void reset();
+			void goLeft(size_t delta = 1);
+			void goRight(size_t delta = 1);
+			void goStart(bool within_line);
+			void goEnd(bool within_line);
+			void goUp();
+			void goDown();
+			float getXPosition() const;
+			float getYPosition() const;
+			bool atBeginning() const;
+			bool atEnd() const;
+
+		private:
+			TextInput &owner;
 	};
 
 	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public Autocompleter {
@@ -70,12 +88,6 @@ namespace Game3 {
 			void eraseWord();
 			void eraseCharacter();
 			void eraseForward();
-			void goLeft(size_t = 1);
-			void goRight(size_t = 1);
-			void goStart(bool within_line);
-			void goEnd(bool within_line);
-			void goUp();
-			void goDown();
 
 			void setMultiline(bool);
 			bool getMultiline() const { return multiline; }
@@ -105,7 +117,7 @@ namespace Game3 {
 			mutable std::optional<size_t> widestLine;
 			mutable std::optional<float> textWidth;
 			mutable std::optional<float> textHeight;
-			bool offsetFixQueued = false;
+			const TextCursor *offsetFixQueued = nullptr;
 			bool focused = false;
 			bool multiline = false;
 
@@ -113,23 +125,23 @@ namespace Game3 {
 			float getPadding() const;
 			float getXBoundary() const;
 			float getYBoundary() const;
-			float getCursorXPosition() const;
-			float getCursorYPosition() const;
-			void fixXOffset();
-			void fixYOffset();
+			void fixXOffset(const TextCursor &);
+			void fixYOffset(const TextCursor &);
 			void changed();
 			void forwardSuggestions();
 			void makeDropdown();
 			bool ownsDropdown() const;
-			bool atBeginning() const;
-			bool atEnd() const;
 			size_t & getLineCount() const;
 			size_t getLastLineNumber() const;
 			size_t getColumnCount(size_t line) const;
 			void setCachedColumnCounts() const;
 			UStringSpan getLineSpan(size_t line_number, size_t max_length = std::string::npos) const;
-			float getCursorHeight(const TextRenderer &) const;
+			float getCursorHeight() const;
 			float getTextWidth() const;
 			float getTextHeight() const;
+			std::pair<UString::iterator, UString::iterator> getIterators() const;
+			TextRenderer & getTexter() const;
+
+		friend class TextCursor;
 	};
 }

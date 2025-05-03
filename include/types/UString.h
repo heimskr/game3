@@ -36,6 +36,18 @@ namespace Game3 {
 
 			UStringSpan span(size_t pos, size_t n = npos);
 
+			std::strong_ordering operator<=>(const UString &other) const { return raw() <=> other.raw(); }
+			std::strong_ordering operator<=>(const Glib::ustring &other) const { return raw() <=> other.raw(); }
+			std::strong_ordering operator<=>(const std::string &other) const { return raw() <=> other; }
+			std::strong_ordering operator<=>(std::string_view other) const { return raw() <=> other; }
+			std::strong_ordering operator<=>(const char *other) const { return raw() <=> other; }
+
+			bool operator==(const UString &other) const { return raw() == other.raw(); }
+			bool operator==(const Glib::ustring &other) const { return raw() == other.raw(); }
+			bool operator==(const std::string &other) const { return raw() == other; }
+			bool operator==(std::string_view other) const { return raw() == other; }
+			bool operator==(const char *other) const { return raw() == other; }
+
 		private:
 			std::vector<UStringSpan> getLines() const;
 
