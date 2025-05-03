@@ -281,7 +281,7 @@ namespace Game3 {
 		textColor(text_color),
 		cursorColor(cursor_color),
 		focusedCursorColor(cursorColor.darken(3)),
-		cursor(*this, true, text.begin()) {}
+		cursor(std::in_place, *this, true, text.begin()) {}
 
 	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
 		TextInput(ui, selfScale, border_color, interior_color, text_color, cursor_color, DEFAULT_THICKNESS) {}
@@ -336,8 +336,8 @@ namespace Game3 {
 		const float cursor_height = getCursorHeight();
 		const float pixel = start / 2;
 
-		if (!anchor || *anchor == cursor) {
-			rectangler(color, cursor.getXPosition(), multiline? cursor.getYPosition() : start, pixel, cursor_height);
+		if (!anchor || (cursor && *anchor == *cursor)) {
+			rectangler(color, cursor->getXPosition(), multiline? cursor->getYPosition() : start, pixel, cursor_height);
 		} else {
 			const auto [left, right] = getCursors();
 
@@ -425,20 +425,28 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_HOME:
-				cursor.goStart(!modifiers.ctrl);
-				xOffset = 0;
+				if (cursor) {
+					cursor->goStart(!modifiers.ctrl);
+					xOffset = 0;
+				}
 				return true;
 
 			case GLFW_KEY_END:
-				cursor.goEnd(!modifiers.ctrl);
+				if (cursor) {
+					cursor->goEnd(!modifiers.ctrl);
+				}
 				return true;
 
 			case GLFW_KEY_UP:
-				cursor.goUp();
+				if (cursor) {
+					cursor->goUp();
+				}
 				return true;
 
 			case GLFW_KEY_DOWN:
-				cursor.goDown();
+				if (cursor) {
+					cursor->goDown();
+				}
 				return true;
 
 			case GLFW_KEY_MENU:
@@ -599,7 +607,10 @@ namespace Game3 {
 			onChange(*this, text);
 		}
 
-		cursor.goEnd(false);
+		if (cursor) {
+			cursor->goEnd(false);
+		}
+
 		anchor.reset();
 	}
 
@@ -613,124 +624,152 @@ namespace Game3 {
 	}
 
 	void TextInput::insert(uint32_t character) {
-		if (characterFilter && !characterFilter(character, cursor.iterator)) {
+		ensureCursor();
+
+		if (characterFilter && !characterFilter(character, cursor->iterator)) {
 			return;
 		}
 
 		if (anchor) {
-			if (anchor->position != cursor.position) {
+			if (anchor->position != cursor->position) {
 				auto [begin, end] = getIterators();
 				text.replace(begin, end, 1, character);
 			} else {
-				cursor.iterator = std::next(text.insert(cursor.iterator, character));
+				cursor->iterator = std::next(text.insert(cursor->iterator, character));
 			}
 			anchor.reset();
 		} else {
-			cursor.iterator = std::next(text.insert(cursor.iterator, character));
+			cursor->iterator = std::next(text.insert(cursor->iterator, character));
 		}
 
-		++cursor.position;
+		++cursor->position;
 		if (character == '\n') {
-			++cursor.lineNumber;
-			cursor.columnNumber = 0;
-			cursor.xOffset = 0;
+			++cursor->lineNumber;
+			cursor->columnNumber = 0;
+			cursor->xOffset = 0;
 			xOffset = 0;
 			++getLineCount();
 			cachedColumnCounts.reset();
-			fixYOffset(cursor);
+			fixYOffset(*cursor);
 			textHeight.reset();
 			textWidth.reset();
 			widestLine.reset();
 		} else {
 			if (cachedColumnCounts) {
-				++cachedColumnCounts->at(cursor.lineNumber);
+				++cachedColumnCounts->at(cursor->lineNumber);
 			}
-			++cursor.columnNumber;
+			++cursor->columnNumber;
 			const float width = getTexter().textWidth(character);
-			cursor.xOffset += width;
-			if (widestLine == cursor.lineNumber) {
+			cursor->xOffset += width;
+			if (widestLine == cursor->lineNumber) {
 				textWidth.reset();
 			}
-			fixXOffset(cursor);
+			fixXOffset(*cursor);
 		}
 	}
 
 	void TextInput::eraseWord() {
-		// TODO!: handle selected text
+		ensureCursor();
 
-		if (cursor.atBeginning()) {
+		if (hasSelection()) {
+			eraseCharacter();
+			return;
+		}
+
+		if (cursor->atBeginning()) {
 			return;
 		}
 
 		// TODO: instead of erasing multiple times, search the string for how much to erase and erase it all in one go.
 
-		if (isWhitespace(cursor.iterator)) {
+		if (isWhitespace(cursor->iterator)) {
 			do {
 				eraseCharacter();
-			} while (cursor.iterator != text.begin() && isWhitespace(cursor.iterator));
+			} while (cursor->iterator != text.begin() && isWhitespace(cursor->iterator));
 
-			while (cursor.iterator != text.begin() && !isStopChar(cursor.iterator)) {
+			while (cursor->iterator != text.begin() && !isStopChar(cursor->iterator)) {
 				eraseCharacter();
 			}
 
 			return;
 		}
 
-		if (isStopChar(cursor.iterator)) {
+		if (isStopChar(cursor->iterator)) {
 			do {
 				eraseCharacter();
-			} while (cursor.iterator != text.begin() && isStopChar(cursor.iterator));
+			} while (cursor->iterator != text.begin() && isStopChar(cursor->iterator));
 
 			return;
 		}
 
 		do {
 			eraseCharacter();
-		} while (cursor.iterator != text.begin() && !isStopChar(cursor.iterator));
+		} while (cursor->iterator != text.begin() && !isStopChar(cursor->iterator));
 
-		while (cursor.iterator != text.begin() && isWhitespace(cursor.iterator)) {
+		while (cursor->iterator != text.begin() && isWhitespace(cursor->iterator)) {
 			eraseCharacter();
 		}
 	}
 
 	void TextInput::eraseCharacter() {
-		// TODO!: handle selected text
+		ensureCursor();
 
-		if (cursor.atBeginning()) {
+		if (hasSelection()) {
+			const auto [left, right] = getCursors();
+			auto iterator = text.erase(left->iterator, right->iterator);
+
+			// Do compiler-generated implementations of T & T::operator=(const T &)
+			// do an address check and do nothing if the addresses are equal?
+			// If not, I might need to implement one myself. Otherwise this might be silly.
+			cursor.emplace(*left);
+
+			cursor->iterator = iterator;
+			anchor.reset();
+			return;
+		}
+
+		if (cursor->atBeginning()) {
 			return;
 		}
 
 		TextRenderer &texter = getTexter();
 
-		if (*--cursor.iterator == '\n') {
-			cursor.columnNumber = getColumnCount(--cursor.lineNumber);
+		if (*--cursor->iterator == '\n') {
+			cursor->columnNumber = getColumnCount(--cursor->lineNumber);
 			--getLineCount();
 			cachedColumnCounts.reset();
-			fixYOffset(cursor);
-			cursor.xOffset = texter.textWidth(getLineSpan(cursor.lineNumber));
+			fixYOffset(*cursor);
+			cursor->xOffset = texter.textWidth(getLineSpan(cursor->lineNumber));
 			textWidth.reset();
 			textHeight.reset();
 			widestLine.reset();
 		} else {
 			if (cachedColumnCounts) {
-				--cachedColumnCounts->at(cursor.lineNumber);
+				--cachedColumnCounts->at(cursor->lineNumber);
 			}
-			--cursor.columnNumber;
-			cursor.xOffset -= texter.textWidth(*cursor.iterator);
-			if (widestLine == cursor.lineNumber) {
+			--cursor->columnNumber;
+			cursor->xOffset -= texter.textWidth(*cursor->iterator);
+			if (widestLine == cursor->lineNumber) {
 				textWidth.reset();
 				widestLine.reset();
 			}
 		}
 
-		fixXOffset(cursor);
-		--cursor.position;
-		cursor.iterator = text.erase(cursor.iterator);
+		fixXOffset(*cursor);
+		--cursor->position;
+		cursor->iterator = text.erase(cursor->iterator);
 	}
 
 	void TextInput::eraseForward() {
-		if (!text.empty() && cursor.iterator != text.end()) {
-			if (*cursor.iterator == '\n') {
+		ensureCursor();
+
+		if (hasSelection()) {
+			eraseCharacter();
+			return;
+		}
+
+		if (!text.empty() && cursor->iterator != text.end()) {
+			if (*cursor->iterator == '\n') {
 				--getLineCount();
 				cachedColumnCounts.reset();
 				textHeight.reset();
@@ -738,15 +777,15 @@ namespace Game3 {
 				widestLine.reset();
 			} else {
 				if (cachedColumnCounts) {
-					--cachedColumnCounts->at(cursor.lineNumber);
+					--cachedColumnCounts->at(cursor->lineNumber);
 				}
 
-				if (widestLine == cursor.lineNumber) {
+				if (widestLine == cursor->lineNumber) {
 					textWidth.reset();
 					widestLine.reset();
 				}
 			}
-			cursor.iterator = text.erase(cursor.iterator);
+			cursor->iterator = text.erase(cursor->iterator);
 		}
 	}
 
@@ -756,28 +795,32 @@ namespace Game3 {
 	}
 
 	void TextInput::goLeft(Modifiers modifiers) {
+		ensureCursor();
+
 		if (modifiers.onlyShift()) {
 			if (!anchor) {
-				anchor.emplace(cursor);
+				anchor.emplace(*cursor);
 			}
-			cursor.goLeft();
+			cursor->goLeft();
 		} else if (anchor) {
 			anchor.reset();
 		} else {
-			cursor.goLeft();
+			cursor->goLeft();
 		}
 	}
 
 	void TextInput::goRight(Modifiers modifiers) {
+		ensureCursor();
+
 		if (modifiers.onlyShift()) {
 			if (!anchor) {
-				anchor.emplace(cursor);
+				anchor.emplace(*cursor);
 			}
-			cursor.goRight();
+			cursor->goRight();
 		} else if (anchor) {
 			anchor.reset();
 		} else {
-			cursor.goRight();
+			cursor->goRight();
 		}
 	}
 
@@ -876,6 +919,10 @@ namespace Game3 {
 
 	void TextInput::hideDropdown() const {
 		ui.setAutocompleteDropdown(nullptr);
+	}
+
+	bool TextInput::hasSelection() const {
+		return anchor && cursor && *anchor != *cursor;
 	}
 
 	size_t & TextInput::getLineCount() const {
@@ -988,21 +1035,24 @@ namespace Game3 {
 	}
 
 	std::pair<UString::iterator, UString::iterator> TextInput::getIterators() const {
+		assert(cursor.has_value());
+
 		if (anchor) {
-			std::pair out{cursor.iterator, anchor->iterator};
-			if (anchor->position < cursor.position) {
+			std::pair out{cursor->iterator, anchor->iterator};
+			if (anchor->position < cursor->position) {
 				std::swap(out.first, out.second);
 			}
 			return out;
 		}
 
-		return {cursor.iterator, cursor.iterator};
+		return {cursor->iterator, cursor->iterator};
 	}
 
 	std::pair<const TextCursor *, const TextCursor *> TextInput::getCursors() const {
+		assert(cursor.has_value());
 		assert(anchor.has_value());
-		std::pair out{&cursor, &*anchor};
-		if (anchor->position < cursor.position) {
+		std::pair out{&*cursor, &*anchor};
+		if (anchor->position < cursor->position) {
 			std::swap(out.first, out.second);
 		}
 		return out;
@@ -1010,5 +1060,11 @@ namespace Game3 {
 
 	TextRenderer & TextInput::getTexter() const {
 		return ui.getRenderers(0).text;
+	}
+
+	void TextInput::ensureCursor() {
+		if (!cursor) {
+			cursor.emplace(*this, true, text.begin());
+		}
 	}
 }

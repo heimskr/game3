@@ -92,6 +92,9 @@ namespace Game3 {
 			void setMultiline(bool);
 			bool getMultiline() const { return multiline; }
 
+			/** Returns whether there is an anchor at a different position from the cursor. */
+			bool hasSelection() const;
+
 			void autocomplete(const UString &) final;
 			void hideDropdown() const;
 
@@ -108,7 +111,7 @@ namespace Game3 {
 			/** The start position of selected text. Note that this may be after the cursor if the user selects text backwards. */
 			std::optional<TextCursor> anchor;
 			/** The end position of selected text if any text is selected, or the position of the cursor otherwise. */
-			TextCursor cursor;
+			std::optional<TextCursor> cursor;
 			std::optional<std::vector<UString>> suggestions;
 			std::optional<UString> deferredText;
 			std::optional<std::pair<uint32_t, std::chrono::system_clock::time_point>> lastPress;
@@ -145,6 +148,7 @@ namespace Game3 {
 			/** Requires that an anchor be present. */
 			std::pair<const TextCursor *, const TextCursor *> getCursors() const;
 			TextRenderer & getTexter() const;
+			void ensureCursor();
 
 		friend class TextCursor;
 	};
