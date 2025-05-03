@@ -16,6 +16,7 @@
 #include <vector>
 
 namespace Game3 {
+	class RectangleRenderer;
 	class TextInput;
 	class TextRenderer;
 
@@ -153,6 +154,7 @@ namespace Game3 {
 			TextRenderer & getTexter() const;
 			void ensureCursor();
 			void clearCachedData() const;
+			void renderSelection(RectangleRenderer &);
 
 		friend class TextCursor;
 	};

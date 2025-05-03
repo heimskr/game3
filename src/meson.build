@@ -25,8 +25,6 @@ game3_deps = [
 	dependency('freetype2'),
 	dependency('libzstd'),
 	dependency('gl'),
-#	dependency('glew'),
-#	dependency('freeglut'),
 	dependency('glfw3'),
 	dependency('asio'),
 	dependency('liblz4'),

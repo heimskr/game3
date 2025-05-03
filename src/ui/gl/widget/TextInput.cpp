@@ -333,27 +333,13 @@ namespace Game3 {
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
-		Color color = focused? focusedCursorColor : cursorColor;
-
-		const float cursor_height = getCursorHeight();
-		const float pixel = start / 2;
-
 		if (!anchor || (cursor && *anchor == *cursor)) {
+			Color color = focused? focusedCursorColor : cursorColor;
+			const float cursor_height = getCursorHeight();
+			const float pixel = start / 2;
 			rectangler(color, cursor->getXPosition(), multiline? cursor->getYPosition() : start, pixel, cursor_height);
 		} else {
-			const auto [left, right] = getCursors();
-
-			const float left_x = left->getXPosition();
-			const float left_y = multiline? left->getYPosition() : start;
-			rectangler(color, left_x + pixel, left_y,                         pixel, pixel);
-			rectangler(color, left_x,         left_y,                         pixel, cursor_height);
-			rectangler(color, left_x + pixel, left_y + cursor_height - pixel, pixel, pixel);
-
-			const float right_x = right->getXPosition();
-			const float right_y = multiline? right->getYPosition() : start;
-			rectangler(color, right_x - pixel, right_y,                         pixel, pixel);
-			rectangler(color, right_x,         right_y,                         pixel, cursor_height);
-			rectangler(color, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
+			renderSelection(rectangler);
 		}
 
 		texter(text, TextRenderOptions{
@@ -1135,5 +1121,35 @@ namespace Game3 {
 		widestLine.reset();
 		textWidth.reset();
 		textHeight.reset();
+	}
+
+	void TextInput::renderSelection(RectangleRenderer &rectangler) {
+		const float cursor_height = getCursorHeight();
+		const float start = thickness * getScale();
+		const float pixel = start / 2;
+
+		const Color fg = focused? focusedCursorColor : cursorColor;
+		const Color bg = fg.withAlpha(0.25);
+		const auto [left, right] = getCursors();
+
+		const float left_x = left->getXPosition();
+		const float left_y = multiline? left->getYPosition() : start;
+
+		if (left->lineNumber == right->lineNumber) {
+			const float width = (right->xOffset - left->xOffset) * getTextScale() - pixel;
+			rectangler(bg, left_x + pixel, left_y, width, cursor_height);
+		} else {
+			// TODO!
+		}
+
+		rectangler(fg, left_x + pixel, left_y,                         pixel, pixel);
+		rectangler(fg, left_x,         left_y,                         pixel, cursor_height);
+		rectangler(fg, left_x + pixel, left_y + cursor_height - pixel, pixel, pixel);
+
+		const float right_x = right->getXPosition();
+		const float right_y = multiline? right->getYPosition() : start;
+		rectangler(fg, right_x - pixel, right_y,                         pixel, pixel);
+		rectangler(fg, right_x,         right_y,                         pixel, cursor_height);
+		rectangler(fg, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
 	}
 }
