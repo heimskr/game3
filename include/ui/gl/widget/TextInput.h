@@ -125,6 +125,7 @@ namespace Game3 {
 			mutable std::optional<size_t> widestLine;
 			mutable std::optional<float> textWidth;
 			mutable std::optional<float> textHeight;
+			mutable std::optional<std::vector<std::optional<float>>> lineWidths;
 			const TextCursor *offsetFixQueued = nullptr;
 			bool focused = false;
 			bool multiline = false;
@@ -149,6 +150,7 @@ namespace Game3 {
 			float getCursorHeight() const;
 			float getTextWidth() const;
 			float getTextHeight() const;
+			float getLineWidth(size_t line_number) const;
 			std::pair<UString::iterator, UString::iterator> getIterators() const;
 			std::pair<const TextCursor *, const TextCursor *> getCursors() const;
 			TextRenderer & getTexter() const;

@@ -1077,6 +1077,19 @@ namespace Game3 {
 		return *textHeight;
 	}
 
+	float TextInput::getLineWidth(size_t line_number) const {
+		if (!lineWidths) {
+			lineWidths.emplace(getLineCount());
+		}
+
+		std::optional<float> &width = lineWidths->at(line_number);
+		if (!width) {
+			width.emplace(getTexter().textWidth(getLineSpan(line_number), getTextScale()));
+		}
+
+		return *width;
+	}
+
 	std::pair<UString::iterator, UString::iterator> TextInput::getIterators() const {
 		assert(cursor.has_value());
 
@@ -1121,10 +1134,12 @@ namespace Game3 {
 		widestLine.reset();
 		textWidth.reset();
 		textHeight.reset();
+		lineWidths.reset();
 	}
 
 	void TextInput::renderSelection(RectangleRenderer &rectangler) {
 		const float cursor_height = getCursorHeight();
+		const float text_scale = getTextScale();
 		const float start = thickness * getScale();
 		const float pixel = start / 2;
 
@@ -1134,20 +1149,36 @@ namespace Game3 {
 
 		const float left_x = left->getXPosition();
 		const float left_y = multiline? left->getYPosition() : start;
+		const float right_x = right->getXPosition();
+		const float right_y = multiline? right->getYPosition() : start;
 
 		if (left->lineNumber == right->lineNumber) {
-			const float width = (right->xOffset - left->xOffset) * getTextScale() - pixel;
+			const float width = (right->xOffset - left->xOffset) * text_scale - pixel;
 			rectangler(bg, left_x + pixel, left_y, width, cursor_height);
 		} else {
-			// TODO!
+			const float full_width = getTextWidth();
+
+			{
+				const float width = full_width - left->xOffset * text_scale - pixel;
+				rectangler(bg, left_x + pixel, left_y, width, cursor_height);
+			}
+
+			const float middle_x = getPadding() - xOffset * getScale();
+			float middle_y = left_y;
+			for (size_t line = left->lineNumber + 1; line < right->lineNumber; ++line) {
+				rectangler(bg, middle_x, middle_y += cursor_height, full_width, cursor_height);
+			}
+
+			{
+				const float width = right->xOffset * text_scale;
+				rectangler(bg, middle_x, right_y, width, cursor_height);
+			}
 		}
 
 		rectangler(fg, left_x + pixel, left_y,                         pixel, pixel);
 		rectangler(fg, left_x,         left_y,                         pixel, cursor_height);
 		rectangler(fg, left_x + pixel, left_y + cursor_height - pixel, pixel, pixel);
 
-		const float right_x = right->getXPosition();
-		const float right_y = multiline? right->getYPosition() : start;
 		rectangler(fg, right_x - pixel, right_y,                         pixel, pixel);
 		rectangler(fg, right_x,         right_y,                         pixel, cursor_height);
 		rectangler(fg, right_x - pixel, right_y + cursor_height - pixel, pixel, pixel);
