@@ -900,9 +900,8 @@ namespace Game3 {
 				anchor.emplace(*cursor);
 			}
 			((*cursor).*function)(1);
-		} else if (anchor) {
-			anchor.reset();
 		} else {
+			anchor.reset();
 			((*cursor).*function)(1);
 		}
 	}
