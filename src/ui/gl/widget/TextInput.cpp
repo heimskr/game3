@@ -93,7 +93,7 @@ namespace Game3 {
 			}
 
 			assert(lineNumber != 0);
-			delta -= columnNumber;
+			delta -= columnNumber + 1;
 			columnNumber = owner.getColumnCount(--lineNumber);
 		}
 
@@ -136,7 +136,7 @@ namespace Game3 {
 				break;
 			}
 
-			delta -= line_length - columnNumber;
+			delta -= line_length - columnNumber + 1;
 			columnNumber = 0;
 			++lineNumber;
 			assert(lineNumber < owner.getLineCount());
