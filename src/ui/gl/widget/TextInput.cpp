@@ -376,6 +376,7 @@ namespace Game3 {
 		if (button == LEFT_BUTTON) {
 			ui.focusWidget(shared_from_this());
 			setAnchorAt(x - lastRectangle.x, y - lastRectangle.y);
+			anchor.reset();
 			return true;
 		}
 
@@ -469,15 +470,11 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_UP:
-				if (cursor) {
-					cursor->goUp();
-				}
+				goUp(modifiers);
 				return true;
 
 			case GLFW_KEY_DOWN:
-				if (cursor) {
-					cursor->goDown();
-				}
+				goDown(modifiers);
 				return true;
 
 			case GLFW_KEY_MENU:
@@ -866,32 +863,47 @@ namespace Game3 {
 	}
 
 	void TextInput::goLeft(Modifiers modifiers) {
-		ensureCursor();
-
-		if (modifiers.onlyShift()) {
-			if (!anchor) {
-				anchor.emplace(*cursor);
-			}
-			cursor->goLeft();
-		} else if (anchor) {
+		if (!modifiers.onlyShift() && hasSelection()) {
+			auto [left, right] = getCursors();
+			cursor.emplace(*left);
 			anchor.reset();
-		} else {
-			cursor->goLeft();
+			return;
 		}
+
+		go(modifiers, &TextCursor::goLeft);
 	}
 
 	void TextInput::goRight(Modifiers modifiers) {
+		if (!modifiers.onlyShift() && hasSelection()) {
+			auto [left, right] = getCursors();
+			cursor.emplace(*right);
+			anchor.reset();
+			return;
+		}
+
+		go(modifiers, &TextCursor::goRight);
+	}
+
+	void TextInput::goUp(Modifiers modifiers) {
+		go(modifiers, &TextCursor::goUp);
+	}
+
+	void TextInput::goDown(Modifiers modifiers) {
+		go(modifiers, &TextCursor::goDown);
+	}
+
+	void TextInput::go(Modifiers modifiers, void (TextCursor::*function)(size_t)) {
 		ensureCursor();
 
 		if (modifiers.onlyShift()) {
 			if (!anchor) {
 				anchor.emplace(*cursor);
 			}
-			cursor->goRight();
+			((*cursor).*function)(1);
 		} else if (anchor) {
 			anchor.reset();
 		} else {
-			cursor->goRight();
+			((*cursor).*function)(1);
 		}
 	}
 

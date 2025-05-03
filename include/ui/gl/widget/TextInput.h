@@ -136,6 +136,9 @@ namespace Game3 {
 
 			void goLeft(Modifiers);
 			void goRight(Modifiers);
+			void goUp(Modifiers);
+			void goDown(Modifiers);
+			void go(Modifiers, void (TextCursor::*)(size_t));
 			float getTextScale() const;
 			float getPadding() const;
 			float getXBoundary() const;
