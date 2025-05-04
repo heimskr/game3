@@ -729,10 +729,8 @@ namespace Game3 {
 		const size_t new_position = left->position + string.size();
 
 		if (hasSelection()) {
-			INFO("replacing. byte diff: {}", right->iterator.base() - left->iterator.base());
 			text.replace(left->iterator, right->iterator, string);
 		} else {
-			INFO("inserting");
 			text.insert(left->position, string);
 		}
 
@@ -1167,17 +1165,8 @@ namespace Game3 {
 	}
 
 	std::pair<UString::iterator, UString::iterator> TextInput::getIterators() const {
-		assert(cursor.has_value());
-
-		if (anchor) {
-			std::pair out{cursor->iterator, anchor->iterator};
-			if (anchor->position < cursor->position) {
-				std::swap(out.first, out.second);
-			}
-			return out;
-		}
-
-		return {cursor->iterator, cursor->iterator};
+		auto [left, right] = getCursors();
+		return {left->iterator, right->iterator};
 	}
 
 	std::pair<const TextCursor *, const TextCursor *> TextInput::getCursors() const {
