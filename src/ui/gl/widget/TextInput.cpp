@@ -519,6 +519,10 @@ namespace Game3 {
 					cut();
 					break;
 
+				case 'a':
+					selectAll();
+					break;
+
 				default:
 					break;
 			}
@@ -1031,6 +1035,13 @@ namespace Game3 {
 			copy();
 			eraseCharacter();
 		}
+	}
+
+	void TextInput::selectAll() {
+		ensureCursor();
+		ensureAnchor();
+		cursor->goStart(false);
+		anchor->goEnd(false);
 	}
 
 	size_t & TextInput::getLineCount() const {
