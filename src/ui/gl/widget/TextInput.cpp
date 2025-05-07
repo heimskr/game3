@@ -263,12 +263,12 @@ namespace Game3 {
 		}
 	}
 
-	float TextCursor::getXPosition() const {
-		return owner.getPadding() - owner.xOffset * owner.getScale() + xOffset * owner.getTextScale();
+	float TextCursor::getXPosition(bool use_target) const {
+		return owner.getPadding() - (use_target? owner.xOffset.getTarget() : owner.xOffset) * owner.getScale() + xOffset * owner.getTextScale();
 	}
 
-	float TextCursor::getYPosition() const {
-		return owner.getPadding() - owner.yOffset * owner.getScale() + lineNumber * owner.getCursorHeight();
+	float TextCursor::getYPosition(bool use_target) const {
+		return owner.getPadding() - (use_target? owner.yOffset.getTarget() : owner.yOffset) * owner.getScale() + lineNumber * owner.getCursorHeight();
 	}
 
 	bool TextCursor::atBeginning() const {
@@ -308,6 +308,13 @@ namespace Game3 {
 		TextInput(ui, selfScale, DEFAULT_THICKNESS) {}
 
 	void TextInput::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		const float scale = getScale();
+
+		xOffset.setMultiplier(scale);
+		yOffset.setMultiplier(scale);
+		xOffset.tick(renderers.delta);
+		yOffset.tick(renderers.delta);
+
 		if (width < -1 || height < -1) {
 			Widget::render(renderers, x, y, width, height);
 			return;
@@ -336,7 +343,7 @@ namespace Game3 {
 		RectangleRenderer &rectangler = renderers.rectangle;
 		TextRenderer &texter = renderers.text;
 
-		const float start = thickness * getScale();
+		const float start = thickness * scale;
 		// TODO: check for negative sizes
 		auto interior = Rectangle(x + start, y + start, width - 2 * start, height - 2 * start);
 
@@ -358,8 +365,8 @@ namespace Game3 {
 		}
 
 		texter(text, TextRenderOptions{
-			.x = start - xOffset * getScale(),
-			.y = 2 * start - yOffset * getScale(),
+			.x = start - xOffset * scale,
+			.y = 2 * start - yOffset * scale,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,

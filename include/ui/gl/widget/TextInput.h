@@ -7,6 +7,7 @@
 #include "ui/gl/Autocompleter.h"
 #include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasFixedSize.h"
+#include "util/Gradual.h"
 
 #include <sigc++/sigc++.h>
 
@@ -42,8 +43,8 @@ namespace Game3 {
 			void goDown(size_t delta = 1);
 			void goStart(bool within_line);
 			void goEnd(bool within_line);
-			float getXPosition() const;
-			float getYPosition() const;
+			float getXPosition(bool use_target = false) const;
+			float getYPosition(bool use_target = false) const;
 			bool atBeginning() const;
 			bool atEnd() const;
 			bool atLineBeginning() const;
@@ -110,8 +111,8 @@ namespace Game3 {
 			void hideDropdown() const;
 
 		private:
-			float xOffset = 0;
-			float yOffset = 0;
+			GradualFloat xOffset{0, 10};
+			GradualFloat yOffset{0, 10};
 			float thickness{};
 			Color borderColor;
 			Color interiorColor;
