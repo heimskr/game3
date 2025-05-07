@@ -235,7 +235,7 @@ namespace Game3::WorldGen {
 						static const std::array arcades{"base:tile/arcade1"_id};
 						constexpr size_t arcade_width  = 8;
 						constexpr size_t arcade_height = 8;
-						gen_building(choose(arcades), arcade_width, arcade_height, "base:realm/arcade", WorldGen::generateArcade, Position(arcade_height - 2, arcade_width / 2));
+						gen_building(choose(arcades), arcade_width, arcade_height, "base:realm/arcade", WorldGen::generateArcade, Position(arcade_height - 2, arcade_width / 2 + 1));
 						break;
 					}
 
