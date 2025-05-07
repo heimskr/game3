@@ -233,6 +233,7 @@ namespace Game3 {
 	}
 
 	void SettingsTab::render(const RendererContext &renderers, float x, float y, float width, float height) {
+		Tab::render(renderers, x, y, width, height);
 		scroller->render(renderers, x, y, width, height);
 	}
 
