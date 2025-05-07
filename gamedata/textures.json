@@ -34,7 +34,8 @@
 			"base:texture/crab_blue":   ["resources/animals/crab_blue.png"],
 			"base:texture/duck":        ["resources/animals/duck.png"],
 			"base:texture/quarter":     ["resources/animals/quarter.png"],
-			"base:texture/voidbug":     ["resources/animals/voidbug.png"]
+			"base:texture/voidbug":     ["resources/animals/voidbug.png"],
+			"base:texture/goneblanc":   ["resources/characters/goneblanc.png"]
 		}]
 	]
 }
