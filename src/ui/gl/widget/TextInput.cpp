@@ -225,6 +225,8 @@ namespace Game3 {
 	}
 
 	void TextCursor::goDown(size_t delta) {
+		bool fix = false;
+
 		for (size_t i = 0; i < delta; ++i) {
 			if (lineNumber + 1 >= owner.getLineCount()) {
 				if (!atEnd()) {
@@ -257,9 +259,13 @@ namespace Game3 {
 				++lineNumber;
 				TextRenderer &texter = owner.getTexter();
 				xOffset = texter.textWidth(UStringSpan(start, last));
-				owner.fixXOffset(*this);
-				owner.fixYOffset(*this);
+				fix = true;
 			}
+		}
+
+		if (fix) {
+			owner.fixXOffset(*this);
+			owner.fixYOffset(*this);
 		}
 	}
 
@@ -552,14 +558,14 @@ namespace Game3 {
 			if (height >= 0 || yOffset != 0) {
 				if (y_delta < 0) {
 					if (height >= 0) {
-						yOffset = std::min<float>(height, yOffset - scroll_speed * y_delta);
+						yOffset.setValue(std::min<float>(height, yOffset - scroll_speed * y_delta));
 					}
 					return true;
 				}
 
 				const float new_offset = std::max<float>(0, yOffset - scroll_speed * y_delta);
 				if (yOffset != new_offset || yOffset == 0) {
-					yOffset = new_offset;
+					yOffset.setValue(new_offset);
 					return true;
 				}
 			}
@@ -570,14 +576,14 @@ namespace Game3 {
 			if (width >= 0 || xOffset != 0) {
 				if (x_delta < 0) {
 					if (width >= 0) {
-						xOffset = std::min<float>(width, xOffset - scroll_speed * x_delta);
+						xOffset.setValue(std::min<float>(width, xOffset - scroll_speed * x_delta));
 					}
 					return true;
 				}
 
 				const float new_offset = std::max<float>(0, xOffset - scroll_speed * x_delta);
 				if (xOffset != new_offset || xOffset == 0) {
-					xOffset = new_offset;
+					xOffset.setValue(new_offset);
 					return true;
 				}
 			}
@@ -942,14 +948,14 @@ namespace Game3 {
 			return;
 		}
 
-		const float visual = target.getXPosition();
+		const float visual = target.getXPosition(true);
 		const float boundary = getXBoundary();
 		const float padding = getPadding();
 
 		if (visual > boundary) {
 			xOffset += (visual - boundary + padding * 2) / getScale();
 		} else if (visual < padding) {
-			xOffset -= (padding - visual) / getScale();
+			xOffset = 0;
 		}
 	}
 
@@ -959,7 +965,7 @@ namespace Game3 {
 			return;
 		}
 
-		const float visual = target.getYPosition();
+		const float visual = target.getYPosition(true);
 		const float boundary = getYBoundary();
 		const float padding = getPadding();
 		const float cursor_height = getCursorHeight();
@@ -967,7 +973,7 @@ namespace Game3 {
 		if (visual + cursor_height > boundary) {
 			yOffset += (visual - boundary + padding * 2 + cursor_height) / getScale();
 		} else if (visual < padding) {
-			yOffset -= (padding - visual) / getScale();
+			yOffset = 0;
 		}
 	}
 

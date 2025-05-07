@@ -61,8 +61,25 @@ namespace Game3 {
 				return *this;
 			}
 
-			T getValue() const { return value; }
+			void clampMin(T minimum) {
+				if (value + accumulator < minimum) {
+					accumulator = minimum - value;
+				}
+			}
+
+			void clampMax(T maximum) {
+				if (value + accumulator > maximum) {
+					accumulator = maximum - value;
+				}
+			}
+
 			operator T() const { return value; }
+
+			T getValue() const { return value; }
+			void setValue(T new_value) {
+				value = new_value;
+				accumulator = 0;
+			}
 
 			T getAccumulator() const { return accumulator; }
 
@@ -73,6 +90,9 @@ namespace Game3 {
 			void setMultiplier(T new_multiplier) { multiplier = new_multiplier; }
 
 			T getTarget() const { return value + accumulator; }
+			void setTarget(T new_value) {
+				accumulator = new_value - (value + accumulator);
+			}
 
 			/** `delta` is in seconds. */
 			template <typename D>

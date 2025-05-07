@@ -111,8 +111,8 @@ namespace Game3 {
 			void hideDropdown() const;
 
 		private:
-			GradualFloat xOffset{0, 10};
-			GradualFloat yOffset{0, 10};
+			GradualFloat xOffset{0, 25};
+			GradualFloat yOffset{0, 25};
 			float thickness{};
 			Color borderColor;
 			Color interiorColor;
