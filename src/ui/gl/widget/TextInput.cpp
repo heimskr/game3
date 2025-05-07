@@ -8,6 +8,7 @@
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/widget/Tooltip.h"
+#include "ui/Window.h"
 #include "util/Util.h"
 
 #include "clip.h"
@@ -1184,7 +1185,7 @@ namespace Game3 {
 	}
 
 	TextRenderer & TextInput::getTexter() const {
-		return ui.getRenderers(0).text;
+		return ui.window.textRenderer;
 	}
 
 	bool TextInput::ensureCursor() {
