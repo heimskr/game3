@@ -66,7 +66,7 @@ namespace Game3 {
 			}
 		}
 
-		return static_cast<bool>(onClick);
+		return true;
 	}
 
 	bool Widget::mouseUp(int button, int x, int y, Modifiers modifiers) {
