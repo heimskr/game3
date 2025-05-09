@@ -66,6 +66,19 @@ namespace Game3 {
 		Vector3 operator*(const Vector3 &other) const {
 			return {x * other.x, y * other.y, z * other.z};
 		}
+
+		template <Numeric N>
+		Vector3 operator*(N multiplier) {
+			return {x * multiplier, y * multiplier, z * multiplier};
+		}
+
+		template <Numeric N>
+		Vector3 & operator*=(N multiplier) {
+			x *= multiplier;
+			y *= multiplier;
+			z *= multiplier;
+			return *this;
+		}
 	};
 
 	Buffer & operator+=(Buffer &, const Vector3 &);
