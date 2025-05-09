@@ -1,6 +1,6 @@
 #include "util/Log.h"
 #include "graphics/GL.h"
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 
 namespace Game3 {
 	int Rectangle::area() const {

@@ -10,7 +10,7 @@
 #include "graphics/Overlayer.h"
 #include "graphics/PathmapTextureCache.h"
 #include "graphics/Recolor.h"
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/Reshader.h"
 #include "graphics/SingleSpriteRenderer.h"

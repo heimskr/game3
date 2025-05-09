@@ -2,7 +2,7 @@
 
 #include "game/Game.h"
 #include "graphics/Omniatlas.h"
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 #include "threading/Atomic.h"
 #include "threading/Waiter.h"
 #include "types/UString.h"

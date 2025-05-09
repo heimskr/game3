@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity/Entity.h"
+#include "math/Vector.h"
 
 namespace Game3 {
 	class Ship: public Entity {

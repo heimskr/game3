@@ -1,12 +1,13 @@
 #pragma once
 
-#include "graphics/Shader.h"
-#include "types/Types.h"
 #include "game/TileProvider.h"
 #include "graphics/GL.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/Reshader.h"
+#include "graphics/Shader.h"
+#include "math/Vector.h"
 #include "threading/Lockable.h"
+#include "types/Types.h"
 
 #include <atomic>
 #include <future>

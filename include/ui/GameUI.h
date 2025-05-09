@@ -3,7 +3,7 @@
 #include "data/Identifier.h"
 #include "graphics/GL.h"
 #include "graphics/PathmapTextureCache.h"
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 #include "graphics/Texture.h"
 #include "ui/UI.h"
 

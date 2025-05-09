@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 #include "threading/LockableSharedPtr.h"
 #include "ui/gl/tab/Tab.h"
 

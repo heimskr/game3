@@ -1,9 +1,10 @@
 #pragma once
 
-#include "util/Log.h"
 #include "types/Types.h"
+#include "math/Concepts.h"
 #include "util/Concepts.h"
 #include "util/Demangle.h"
+#include "util/Log.h"
 
 #include <boost/json/fwd.hpp>
 

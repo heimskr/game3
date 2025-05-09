@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 #include "types/Types.h"
 #include "ui/gl/HasExpand.h"
 #include "ui/gl/Types.h"

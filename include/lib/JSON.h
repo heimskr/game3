@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util/Concepts.h"
 #include "util/Strings.h"
 
 #include <boost/json.hpp>

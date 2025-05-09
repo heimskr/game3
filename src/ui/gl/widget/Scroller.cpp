@@ -1,5 +1,5 @@
 #include "graphics/GL.h"
-#include "graphics/Rectangle.h"
+#include "math/Rectangle.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "ui/gl/widget/Scroller.h"

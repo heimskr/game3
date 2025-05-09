@@ -210,7 +210,7 @@ namespace Game3::WorldGen {
 				new_realm->outdoors = false;
 				gen_fn(new_realm, rng, realm, realm_width, realm_height, building_position + Position(1, 0));
 				game->addRealm(realm_id, new_realm);
-				new_realm->remakePathMap(ChunkRange({-1, -1}, {1, 1}));
+				new_realm->remakePathMap(ChunkRange{{-1, -1}, {1, 1}});
 				realm->add(building);
 			};
 

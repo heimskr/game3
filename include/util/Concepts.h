@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <climits>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <deque>
@@ -45,9 +46,6 @@ namespace Game3 {
 	concept Reservable = requires(T t) {
 		t.reserve(static_cast<size_t>(UINT32_MAX));
 	};
-
-	template <typename T>
-	concept Numeric = std::integral<T> || std::floating_point<T>;
 
 	template <typename T, typename R, typename... Args>
 	concept Returns = requires(T t, Args &&...args) {

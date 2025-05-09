@@ -6,6 +6,7 @@
 #include "graphics/GL.h"
 #include "graphics/HasBackbuffer.h"
 #include "graphics/Shader.h"
+#include "math/Vector.h"
 #include "types/Position.h"
 #include "types/Types.h"
 
