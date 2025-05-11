@@ -675,11 +675,8 @@ namespace Game3 {
 			onChange(*this, text);
 		}
 
-		if (cursor) {
-			cursor->goEnd(false);
-		}
-
 		anchor.reset();
+		cursor.emplace(*this, true, text.begin()).goEnd(false);
 	}
 
 	UString TextInput::clear() {
