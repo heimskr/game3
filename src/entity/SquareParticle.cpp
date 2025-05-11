@@ -54,6 +54,7 @@ namespace Game3 {
 
 	void SquareParticle::onSpawn() {
 		Entity::onSpawn();
+
 		if (initialVelocity) {
 			velocity = initialVelocity;
 		} else {
@@ -61,6 +62,21 @@ namespace Game3 {
 			velocity.x = std::uniform_real_distribution(2.,  4.)(threadContext.rng) * (std::uniform_int_distribution(0, 1)(threadContext.rng) == 1? 1 : -1);
 			velocity.z = std::uniform_real_distribution(8., 12.)(threadContext.rng);
 		}
+
+		if (randomizationOptions) {
+			RandomizationOptions &options = *randomizationOptions;
+			size = threadContext.random(options.sizeMin, options.sizeMax);
+			color = OKHsv{
+				threadContext.random(options.hueMin, options.hueMax),
+				threadContext.random(options.saturationMin, options.saturationMax),
+				threadContext.random(options.valueMin, options.valueMax),
+				threadContext.random(options.alphaMin, options.alphaMax),
+			}.convert<Color>();
+		}
+	}
+
+	void SquareParticle::setRandomizationParameters(Buffer buffer) {
+		randomizationOptions.emplace(RandomizationOptions{}).decode(buffer);
 	}
 
 	int SquareParticle::getZIndex() const {
@@ -81,5 +97,13 @@ namespace Game3 {
 		buffer >> color;
 		buffer >> depth;
 		buffer >> lingerTime;
+	}
+
+	void SquareParticle::RandomizationOptions::encode(Buffer &buffer) {
+		buffer << sizeMin << sizeMax << hueMin << hueMax << saturationMin << saturationMax << valueMin << valueMax;
+	}
+
+	void SquareParticle::RandomizationOptions::decode(Buffer &buffer) {
+		buffer >> sizeMin >> sizeMax >> hueMin >> hueMax >> saturationMin >> saturationMax >> valueMin >> valueMax;
 	}
 }

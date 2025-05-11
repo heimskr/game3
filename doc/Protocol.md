@@ -481,6 +481,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `u32` Field name hash (32-bit FNV1A; see `/util/ConstexprHash.h`).
 	- `...` Field value
 
+72. **Explosion**: tells a client to cause the client-side effects of an explosion.
+
+	- `i32` Realm ID
+	- `Position` Origin
+	- `f32` Radius
+	- `u32` Particle count
+	- `string` Particle type
+	- `...` Particle randomization parameters
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

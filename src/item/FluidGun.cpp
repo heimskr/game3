@@ -19,6 +19,7 @@
 #include "ui/gl/widget/ProgressBar.h"
 #include "ui/gl/Constants.h"
 #include "ui/Window.h"
+#include "util/Explosion.h"
 
 #include <tuple>
 
@@ -250,6 +251,8 @@ namespace Game3 {
 
 		amount -= cost;
 		setFluidGunData(place.player, slot, stack, fluid, amount, last_slurp);
+
+		causeExplosion(place, 10, 10);
 
 		auto entity = makeParticle(game, fluid, place, offsets);
 		entity->weakExcludedPlayer = place.player;

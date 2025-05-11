@@ -124,6 +124,7 @@ namespace Game3 {
 			virtual void onSpawn() {}
 			/** Called at the beginning of destroy(). */
 			virtual void onDestroy() {}
+			virtual void setRandomizationParameters(Buffer) {}
 			std::string getName() const override { return "Unknown Entity (" + std::string(type) + ')'; }
 
 			virtual bool isPlayer() const { return false; }

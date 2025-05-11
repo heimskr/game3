@@ -8,30 +8,27 @@ namespace Game3 {
 	class Entity;
 
 	struct UpdateAgentFieldPacket: Packet {
-		public:
-			static PacketID ID() { return 71; }
+		static PacketID ID() { return 71; }
 
-			GlobalID globalID = -1;
-			uint32_t fieldNameHash = -1;
-			Buffer fieldValue{Side::Client};
+		GlobalID globalID = -1;
+		uint32_t fieldNameHash = -1;
+		Buffer fieldValue{Side::Client};
 
-			UpdateAgentFieldPacket() = default;
+		UpdateAgentFieldPacket() = default;
 
-			template <typename T>
-			UpdateAgentFieldPacket(Agent &agent, uint32_t fieldNameHash, T &&value):
-				globalID(agent.globalID),
-				fieldNameHash(fieldNameHash) {
-					fieldValue << std::forward<T>(value);
-				}
+		template <typename T>
+		UpdateAgentFieldPacket(Agent &agent, uint32_t fieldNameHash, T &&value):
+			globalID(agent.globalID),
+			fieldNameHash(fieldNameHash) {
+				fieldValue << std::forward<T>(value);
+			}
 
-			PacketID getID() const final { return ID(); }
+		PacketID getID() const final { return ID(); }
 
-			void encode(Game &, Buffer &) const override;
-			void decode(Game &, Buffer &)       override;
+		void encode(Game &, Buffer &) const override;
+		void decode(Game &, Buffer &)       override;
 
-			void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
-			void handle(const std::shared_ptr<ClientGame> &) final;
-
-		private:
+		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
+		void handle(const std::shared_ptr<ClientGame> &) final;
 	};
 }

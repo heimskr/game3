@@ -23,6 +23,7 @@
 #include "packet/EntityRiddenPacket.h"
 #include "packet/EntitySetPathPacket.h"
 #include "packet/ErrorPacket.h"
+#include "packet/ExplosionPacket.h"
 #include "packet/FluidUpdatePacket.h"
 #include "packet/HeldItemSetPacket.h"
 #include "packet/InteractPacket.h"
@@ -66,6 +67,7 @@
 #include "packet/TilesetRequestPacket.h"
 #include "packet/TilesetResponsePacket.h"
 #include "packet/TimePacket.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "packet/UseFluidGunPacket.h"
 #include "packet/UseItemPacket.h"
 #include "packet/VillageUpdatePacket.h"
@@ -148,5 +150,7 @@ namespace Game3 {
 		add(PacketFactory::create<SetFiringPacket>());
 		add(PacketFactory::create<UseFluidGunPacket>());
 		add(PacketFactory::create<StatusEffectsPacket>());
+		add(PacketFactory::create<UpdateAgentFieldPacket>());
+		add(PacketFactory::create<ExplosionPacket>());
 	}
 }
