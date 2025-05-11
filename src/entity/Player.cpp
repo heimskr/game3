@@ -36,11 +36,11 @@ namespace Game3 {
 		size_t times = 0;
 
 		{
-			auto lock = visibleEntities.sharedLock();
-			if (!visibleEntities.empty()) {
+			auto locks = getVisibleEntitiesLocks();
+			if (visibleEntities && !visibleEntities->empty()) {
 				auto shared = getShared();
-				for (const auto &weak_visible: visibleEntities) {
-					if (auto visible = weak_visible.lock()) {
+				for (const WeakEntityPtr &weak_visible: *visibleEntities) {
+					if (EntityPtr visible = weak_visible.lock()) {
 						times += visible->removeVisible(weak);
 					}
 				}

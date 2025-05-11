@@ -2020,7 +2020,7 @@ namespace Game3 {
 		GamePtr game = getGame();
 		entity->init(game);
 		add(entity, position);
-		entity->calculateVisibleEntities();
+		entity->calculateVisiblePlayers();
 		entity->spawning = false;
 		entity->onSpawn();
 

@@ -146,20 +146,25 @@ namespace Game3 {
 		PlayerPtr shared = getShared();
 
 		{
-			auto lock = visibleEntities.sharedLock();
-			for (const auto &weak_visible: visibleEntities) {
-				if (EntityPtr visible = weak_visible.lock()) {
-					if (!visible->path.empty() && visible->hasSeenPath(shared)) {
-						// INFO("Late sending EntitySetPathPacket (Player)");
-						toServer()->ensureEntity(visible);
-						send(make<EntitySetPathPacket>(*visible));
-						visible->setSeenPath(shared);
-					}
+			auto locks = getVisibleEntitiesLocks();
+			if (visibleEntities) {
+				for (const auto &weak_visible: *visibleEntities) {
+					if (EntityPtr visible = weak_visible.lock()) {
+						if (!visible->path.empty() && visible->hasSeenPath(shared)) {
+							// INFO("Late sending EntitySetPathPacket (Player)");
+							toServer()->ensureEntity(visible);
+							send(make<EntitySetPathPacket>(*visible));
+							visible->setSeenPath(shared);
+						}
 
-					if (!canSee(*visible)) {
-						auto visible_lock = visible->visibleEntities.uniqueLock();
-						visible->visiblePlayers.erase(shared);
-						visible->visibleEntities.erase(shared);
+						if (!canSee(*visible)) {
+							auto visible_lock = visible->visibleEntities.uniqueLock();
+							visible->visiblePlayers.erase(shared);
+							auto other_locks = visible->getVisibleEntitiesLocks();
+							if (visible->visibleEntities) {
+								visible->visibleEntities->erase(shared);
+							}
+						}
 					}
 				}
 			}

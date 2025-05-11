@@ -78,7 +78,7 @@ namespace Game3 {
 			/** Only the z component is handled in the default Entity tick method. */
 			Lockable<Vector3> velocity;
 			Lockable<std::deque<Direction>> path;
-			Lockable<WeakSet<Entity>> visibleEntities;
+			Lockable<std::optional<Lockable<WeakSet<Entity>>>> visibleEntities;
 			Lockable<WeakSet<Player>> visiblePlayers;
 			/** Set when an entity is beginning to teleport so that an EntityMovedPacket can be sent with the proper realm ID
 			 *  before the actual realm switch has occurred. */
@@ -193,7 +193,10 @@ namespace Game3 {
 			size_t removeVisible(const std::weak_ptr<Entity> &);
 			/** Returns the number of visible sets the player was removed from. */
 			size_t removeVisible(const std::weak_ptr<Player> &);
-			void calculateVisibleEntities();
+			void calculateVisiblePlayers();
+			Lockable<WeakSet<Entity>> & getVisibleEntities(std::unique_lock<DefaultMutex> &outer_lock, bool recalculate = false);
+			std::pair<std::unique_lock<DefaultMutex>, std::unique_lock<DefaultMutex>> getVisibleEntitiesLocks();
+
 			virtual void jump();
 			void clearOffset();
 			inline bool is(const Identifier &check) const { return type == check; }

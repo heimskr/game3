@@ -94,10 +94,10 @@ namespace Game3 {
 
 		if (game->getSide() == Side::Server) {
 			{
-				auto lock = visibleEntities.sharedLock();
-				if (!visibleEntities.empty()) {
-					for (const auto &weak_visible: visibleEntities) {
-						if (auto visible = weak_visible.lock()) {
+				auto locks = getVisibleEntitiesLocks();
+				if (visibleEntities && !visibleEntities->empty()) {
+					for (const WeakEntityPtr &weak_visible: *visibleEntities) {
+						if (EntityPtr visible = weak_visible.lock()) {
 							visible->removeVisible(shared);
 						}
 					}
@@ -1080,9 +1080,9 @@ namespace Game3 {
 	}
 
 	void Entity::movedToNewChunk(const std::optional<ChunkPosition> &old_chunk_position) {
-		auto shared = getSelf();
+		EntityPtr shared = getSelf();
 
-		if (auto realm = weakRealm.lock()) {
+		if (RealmPtr realm = weakRealm.lock()) {
 			if (old_chunk_position) {
 				realm->queue([realm, shared, chunk_position = *old_chunk_position] {
 					realm->detach(shared, chunk_position);
@@ -1095,46 +1095,74 @@ namespace Game3 {
 			}
 		}
 
-		auto entities_lock = visibleEntities.uniqueLock();
+		bool visible_entities_present = false;
 
-		std::vector<std::weak_ptr<Entity>> entities_to_erase;
-		entities_to_erase.reserve(visibleEntities.size());
+		{
+			auto outer_lock = visibleEntities.uniqueLock();
+			if (visibleEntities) {
+				visible_entities_present = true;
+				Lockable<WeakSet<Entity>> &visibles = *visibleEntities;
+				std::vector<std::weak_ptr<Player>> players_to_erase;
+				players_to_erase.reserve(visibles.size() / 20);
+				auto inner_lock = visibles.uniqueLock();
 
-		std::vector<std::weak_ptr<Player>> players_to_erase;
-		players_to_erase.reserve(visibleEntities.size() / 20);
+				std::vector<std::weak_ptr<Entity>> entities_to_erase;
+				entities_to_erase.reserve(visibles.size());
 
-		for (const auto &weak_visible: visibleEntities) {
-			if (auto visible = weak_visible.lock()) {
-				if (!canSee(*visible)) {
-					assert(visible.get() != this);
-					entities_to_erase.push_back(visible);
+				for (const auto &weak_visible: visibles) {
+					if (auto visible = weak_visible.lock()) {
+						if (!canSee(*visible)) {
+							assert(visible.get() != this);
+							entities_to_erase.push_back(visible);
 
-					{
-						auto other_lock = visible->visibleEntities.uniqueLock();
-						visible->visibleEntities.erase(shared);
-					}
+							{
+								auto other_outer_lock = visible->visibleEntities.uniqueLock();
+								if (visible->visibleEntities) {
+									Lockable<WeakSet<Entity>> &other_visibles = *visible->visibleEntities;
+									auto other_inner_lock = other_visibles.uniqueLock();
+									other_visibles.erase(shared);
+								}
+							}
 
-					if (visible->isPlayer()) {
-						players_to_erase.emplace_back(safeDynamicCast<Player>(visible));
+							if (visible->isPlayer()) {
+								players_to_erase.emplace_back(safeDynamicCast<Player>(visible));
+							}
+						}
 					}
 				}
+
+				for (const auto &entity: entities_to_erase) {
+					visibles.erase(entity);
+				}
+
+				visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
+					for (const auto &player: players_to_erase) {
+						visible.erase(player);
+					}
+				});
 			}
 		}
 
-		for (const auto &entity: entities_to_erase) {
-			visibleEntities.erase(entity);
+		if (!visible_entities_present) {
+			visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
+				std::erase_if(visible, [&](const std::weak_ptr<Player> &weak_player) {
+					if (PlayerPtr player = weak_player.lock()) {
+						return !canSee(*player);
+					}
+
+					return true;
+				});
+			});
 		}
 
-		visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
-			for (const auto &player: players_to_erase) {
-				visible.erase(player);
-			}
-		});
-
-		if (auto realm = weakRealm.lock()) {
+		if (RealmPtr realm = weakRealm.lock()) {
 			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
 			// Go through each chunk now visible and update both this entity's visible sets and the visible sets
 			// of all the entities in each chunk.
+
+			std::unique_lock players_lock = visiblePlayers.uniqueLock();
+			std::pair locks = getVisibleEntitiesLocks();
+
 			ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
 				if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
 					auto chunk_lock = visible_at_chunk->sharedLock();
@@ -1146,7 +1174,9 @@ namespace Game3 {
 						}
 
 						assert(visible->getGID() != getGID());
-						visibleEntities.insert(visible);
+						if (visibleEntities) {
+							visibleEntities->insert(visible);
+						}
 
 						if (visible->isPlayer()) {
 							visiblePlayers.emplace(safeDynamicCast<Player>(visible));
@@ -1155,8 +1185,10 @@ namespace Game3 {
 						if (visible->otherEntityToLock != globalID) {
 							otherEntityToLock = visible->globalID;
 							{
-								auto other_lock = visible->visibleEntities.uniqueLock();
-								visible->visibleEntities.insert(shared);
+								auto other_locks = visible->getVisibleEntitiesLocks();
+								if (visible->visibleEntities) {
+									visible->visibleEntities->insert(shared);
+								}
 							}
 							if (this_player) {
 								auto other_lock = visible->visiblePlayers.uniqueLock();
@@ -1178,14 +1210,12 @@ namespace Game3 {
 		auto path_lock = path.sharedLock();
 
 		if (!path.empty()) {
-			entities_lock.unlock();
 			auto shared_lock = visiblePlayers.sharedLock();
 
 			if (!visiblePlayers.empty()) {
-				auto shared = getSelf();
 				const auto packet = make<EntitySetPathPacket>(*this);
 				for (const auto &weak_player: visiblePlayers) {
-					if (auto player = weak_player.lock(); player && !hasSeenPath(player)) {
+					if (PlayerPtr player = weak_player.lock(); player && !hasSeenPath(player)) {
 						// INFO("Late sending EntitySetPathPacket (Entity)");
 						player->toServer()->ensureEntity(shared);
 						player->send(packet);
@@ -1212,10 +1242,10 @@ namespace Game3 {
 	}
 
 	size_t Entity::removeVisible(const std::weak_ptr<Entity> &entity) {
-		{
-			auto lock = visibleEntities.uniqueLock();
-			if (visibleEntities.contains(entity)) {
-				visibleEntities.erase(entity);
+		auto locks = getVisibleEntitiesLocks();
+		if (visibleEntities) {
+			if (auto iter = visibleEntities->find(entity); iter != visibleEntities->end()) {
+				visibleEntities->erase(iter);
 				return 1;
 			}
 		}
@@ -1231,8 +1261,10 @@ namespace Game3 {
 			out += visiblePlayers.erase(iter) != visiblePlayers.end();
 			players_lock.unlock();
 			{
-				auto entities_lock = visibleEntities.uniqueLock();
-				out += visibleEntities.erase(player);
+				auto locks = getVisibleEntitiesLocks();
+				if (visibleEntities) {
+					out += visibleEntities->erase(player);
+				}
 			}
 			return out;
 		}
@@ -1452,7 +1484,7 @@ namespace Game3 {
 	}
 #endif
 
-	void Entity::calculateVisibleEntities() {
+	void Entity::calculateVisiblePlayers() {
 		if (getSide() != Side::Server) {
 			return;
 		}
@@ -1462,30 +1494,59 @@ namespace Game3 {
 			return;
 		}
 
-		{
-			auto entities_lock = realm->entities.sharedLock();
-			auto visible_lock = visibleEntities.uniqueLock();
-			visibleEntities.clear();
-			for (const EntityPtr &entity: realm->entities) {
-				if (entity.get() != this && entity->canSee(*this)) {
-					visibleEntities.insert(entity);
-				}
+		auto players_lock = realm->players.sharedLock();
+		auto visible_lock = visiblePlayers.uniqueLock();
+		visiblePlayers.clear();
+		std::erase_if(realm->players, [this](const std::weak_ptr<Player> &weak_player) {
+			if (std::shared_ptr<Player> player = weak_player.lock()) {
+				visiblePlayers.emplace(player);
+				return false;
+			}
+
+			return true;
+		});
+	}
+
+	Lockable<WeakSet<Entity>> & Entity::getVisibleEntities(std::unique_lock<DefaultMutex> &outer_lock, bool recalculate) {
+		if (getSide() != Side::Server) {
+			throw std::runtime_error("getVisibleEntities is server-side only");
+		}
+
+		RealmPtr realm = weakRealm.lock();
+		if (!realm) {
+			throw std::runtime_error("Can't find visible entities of realmless entity");
+		}
+
+		outer_lock = visibleEntities.uniqueLock();
+
+		if (recalculate) {
+			visibleEntities.reset();
+		}
+
+		if (visibleEntities) {
+			return *visibleEntities;
+		}
+
+		Lockable<WeakSet<Entity>> &visible = visibleEntities.emplace();
+		auto inner_lock = visible.uniqueLock();
+		auto entities_lock = realm->entities.sharedLock();
+
+		for (const EntityPtr &entity: realm->entities) {
+			if (entity.get() != this && entity->canSee(*this)) {
+				visible.insert(entity);
 			}
 		}
 
-		{
-			auto players_lock = realm->players.sharedLock();
-			auto visible_lock = visiblePlayers.uniqueLock();
-			visiblePlayers.clear();
-			std::erase_if(realm->players, [this](const std::weak_ptr<Player> &weak_player) {
-				if (std::shared_ptr<Player> player = weak_player.lock()) {
-					visiblePlayers.emplace(player);
-					return false;
-				}
+		return *visibleEntities;
+	}
 
-				return true;
-			});
+	std::pair<std::unique_lock<DefaultMutex>, std::unique_lock<DefaultMutex>> Entity::getVisibleEntitiesLocks() {
+		std::pair<std::unique_lock<DefaultMutex>, std::unique_lock<DefaultMutex>> locks;
+		locks.first = visibleEntities.uniqueLock();
+		if (visibleEntities) {
+			locks.second = visibleEntities->uniqueLock();
 		}
+		return locks;
 	}
 
 	void Entity::jump() {

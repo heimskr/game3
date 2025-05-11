@@ -65,8 +65,12 @@ namespace Game3 {
 			INFO("  Player is visible? {:s}", visiblePlayers.contains(player));
 		}
 		{
-			auto lock = player->visibleEntities.sharedLock();
-			INFO("  Visible to player? {:s}", player->visibleEntities.contains(getSelf()));
+			auto locks = player->getVisibleEntitiesLocks();
+			if (player->visibleEntities) {
+				INFO("  Visible to player? {:s}", player->visibleEntities->contains(getSelf()));
+			} else {
+				INFO("  Visible to player? Definitely not.");
+			}
 		}
 		if (auto ptr = realm->getEntities(getChunk()); ptr && ptr->contains(getSelf())) {
 			SUCCESS("  In chunk.");
