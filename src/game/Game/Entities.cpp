@@ -6,6 +6,7 @@
 #include "entity/Dog.h"
 #include "entity/Egg.h"
 #include "entity/EntityFactory.h"
+#include "entity/ExplosionParticle.h"
 #include "entity/Eye.h"
 #include "entity/FluidParticle.h"
 #include "entity/ItemEntity.h"
@@ -44,6 +45,7 @@ namespace Game3 {
 		add(EntityFactory::create<Cyclops>());
 		add(EntityFactory::create<Dog>());
 		add(EntityFactory::create<Egg>());
+		add(EntityFactory::create<ExplosionParticle>());
 		add(EntityFactory::create<Eye>());
 		add(EntityFactory::create<FluidParticle>());
 		add(EntityFactory::create<ItemEntity>());

@@ -18,8 +18,9 @@ namespace Game3 {
 	void Ship::onSpawn() {
 		GamePtr game = getGame();
 
-		if (game->getSide() != Side::Server)
+		if (game->getSide() != Side::Server) {
 			return;
+		}
 
 		internalRealmID = game->newRealmID();
 		INFO("Creating ship realm {}", internalRealmID);
@@ -49,8 +50,9 @@ namespace Game3 {
 	}
 
 	bool Ship::canMoveTo(const Place &place) const {
-		if (!Entity::canMoveTo(place))
+		if (!Entity::canMoveTo(place)) {
 			return false;
+		}
 
 		RealmPtr realm = place.realm;
 		Position position = getPosition();
@@ -141,13 +143,15 @@ namespace Game3 {
 	}
 
 	void Ship::teleportToRealm(const std::shared_ptr<Player> &player) {
-		if (internalRealmID == 0)
+		if (internalRealmID == 0) {
 			throw std::runtime_error("Ship is missing internal realm");
+		}
 
 		RealmPtr internal_realm = getGame()->tryRealm(internalRealmID);
 
-		if (!internal_realm)
+		if (!internal_realm) {
 			throw std::runtime_error("Ship is missing internal realm");
+		}
 
 		player->teleport(realmOrigin, internal_realm, MovementContext{
 			.isTeleport = true,

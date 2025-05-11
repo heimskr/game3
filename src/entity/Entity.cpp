@@ -500,14 +500,14 @@ namespace Game3 {
 		double fluid_offset = 0.;
 
 		if (std::optional<FluidTile> fluid_tile = getRealm()->tileProvider.copyFluidTile({row, column}); fluid_tile && 0 < fluid_tile->level) {
-			fluid_offset = std::sin(game->time * 1.5) + .5;
+			fluid_offset = (std::sin(game->time * 1.5) + .5) / 16.;
 			renderHeight = 10. + fluid_offset;
 		} else {
 			renderHeight = 16.;
 		}
 
 		const double x = column + offset_x;
-		const double y = row    + offset_y - offset_z - fluid_offset / 16.;
+		const double y = row    + offset_y - offset_z - fluid_offset;
 
 		const auto [multiplier, composite] = getColors();
 
