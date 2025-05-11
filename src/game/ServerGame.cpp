@@ -22,6 +22,7 @@
 #include "threading/ThreadContext.h"
 #include "util/Cast.h"
 #include "util/Demangle.h"
+#include "util/Explosion.h"
 #include "util/Log.h"
 #include "util/Timer.h"
 #include "util/Util.h"
@@ -982,6 +983,21 @@ namespace Game3 {
 					return {false, "Invalid parameters."};
 				}
 
+				return {true, ""};
+			}
+
+			if (first == "boom") {
+				float radius = 2;
+
+				if (words.size() > 1) {
+					try {
+						radius = parseNumber<float>(words[1]);
+					} catch (const std::invalid_argument &) {
+						return {false, "Couldn't parse radius."};
+					}
+				}
+
+				causeExplosion(player->getPlace(), radius, 1, false);
 				return {true, ""};
 			}
 

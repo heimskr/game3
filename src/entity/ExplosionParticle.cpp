@@ -34,8 +34,6 @@ namespace Game3 {
 		float texture_x_offset = 8 * (stage % 4);
 		float texture_y_offset = 8 * (stage / 4);
 
-		INFO("({}, {})", texture_x_offset, texture_y_offset);
-
 		const float x = column + offset_x;
 		const float y = row    + offset_y - offset_z;
 

@@ -20,16 +20,10 @@ namespace Game3 {
 
 	void causeExplosion(const Place &place, float radius, uint32_t particle_count, bool destroys_tile_entities) {
 		ExplosionOptions options{
+			.particleType = "base:entity/explosion_particle",
 			.radius = radius,
 			.particleCount = particle_count,
 			.destroysTileEntities = destroys_tile_entities,
-		};
-
-		options << SquareParticle::RandomizationOptions{
-			.sizeMin = 0.2,
-			.sizeMax = 0.4,
-			.valueMin = 0.3,
-			.valueMax = 0.7,
 		};
 
 		causeExplosion(place, options);

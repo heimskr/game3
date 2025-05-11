@@ -252,8 +252,6 @@ namespace Game3 {
 		amount -= cost;
 		setFluidGunData(place.player, slot, stack, fluid, amount, last_slurp);
 
-		causeExplosion(place, 10, 10);
-
 		auto entity = makeParticle(game, fluid, place, offsets);
 		entity->weakExcludedPlayer = place.player;
 		place.realm->queueEntityInit(std::move(entity), place.player->getPosition());

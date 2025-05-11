@@ -2,6 +2,7 @@
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
+#include "math/FilledCircle.h"
 #include "math/Random.h"
 #include "net/GenericClient.h"
 #include "packet/ExplosionPacket.h"
@@ -38,11 +39,10 @@ namespace Game3 {
 			return;
 		}
 
-		for (uint32_t i = 0; i < particleCount; ++i) {
+		iterateFilledCircle<Position::IntType>(origin.column, origin.row, radius, [&](auto x, auto y) {
 			EntityPtr entity = (*factory)(game);
 			entity->setRandomizationParameters(randomizationParameters);
-			entity->velocity = randomOnSphereUpperHalf(threadContext.rng) * radius;
-			realm->spawn(entity, origin);
-		}
+			realm->spawn(entity, Position{y, x});
+		});
 	}
 }
