@@ -15,6 +15,7 @@ namespace Game3 {
 
 			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;
+			bool visibilityMatters() const override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
 

@@ -47,6 +47,10 @@ namespace Game3 {
 		});
 	}
 
+	bool ExplosionParticle::visibilityMatters() const {
+		return false;
+	}
+
 	void ExplosionParticle::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		buffer << age;

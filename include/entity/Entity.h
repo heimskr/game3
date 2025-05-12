@@ -221,6 +221,7 @@ namespace Game3 {
 			/** Returns [multiplier, composite]. */
 			virtual std::pair<Color, Color> getColors() const;
 			virtual ShadowParams getShadowParams() const;
+			virtual bool visibilityMatters() const;
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
@@ -289,7 +290,6 @@ namespace Game3 {
 			std::function<void(const TickArgs &)> getTickFunction();
 
 		private:
-
 			Atomic<GlobalID> otherEntityToLock = -1;
 
 			/** The set of all players who have been sent a packet about the entity's current path. */

@@ -778,6 +778,10 @@ namespace Game3 {
 		return {};
 	}
 
+	bool Entity::visibilityMatters() const {
+		return true;
+	}
+
 	void Entity::focus(Window &window, bool is_autofocus) {
 		if (EntityPtr ridden = getRidden()) {
 			ridden->focus(window, is_autofocus);
@@ -1095,10 +1099,10 @@ namespace Game3 {
 			}
 		}
 
-		bool visible_entities_present = false;
-
-		{
+		if (visibilityMatters()) {
+			bool visible_entities_present = false;
 			auto outer_lock = visibleEntities.uniqueLock();
+
 			if (visibleEntities) {
 				visible_entities_present = true;
 				Lockable<WeakSet<Entity>> &visibles = *visibleEntities;
@@ -1141,66 +1145,66 @@ namespace Game3 {
 					}
 				});
 			}
-		}
 
-		if (!visible_entities_present) {
-			visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
-				std::erase_if(visible, [&](const std::weak_ptr<Player> &weak_player) {
-					if (PlayerPtr player = weak_player.lock()) {
-						return !canSee(*player);
-					}
+			if (!visible_entities_present) {
+				visiblePlayers.withUnique([&](WeakSet<Player> &visible) {
+					std::erase_if(visible, [&](const std::weak_ptr<Player> &weak_player) {
+						if (PlayerPtr player = weak_player.lock()) {
+							return !canSee(*player);
+						}
 
-					return true;
+						return true;
+					});
 				});
-			});
-		}
+			}
 
-		if (RealmPtr realm = weakRealm.lock()) {
-			const auto this_player = std::dynamic_pointer_cast<Player>(shared);
-			// Go through each chunk now visible and update both this entity's visible sets and the visible sets
-			// of all the entities in each chunk.
+			if (RealmPtr realm = weakRealm.lock()) {
+				const auto this_player = std::dynamic_pointer_cast<Player>(shared);
+				// Go through each chunk now visible and update both this entity's visible sets and the visible sets
+				// of all the entities in each chunk.
 
-			std::unique_lock players_lock = visiblePlayers.uniqueLock();
-			std::pair locks = getVisibleEntitiesLocks();
+				std::unique_lock players_lock = visiblePlayers.uniqueLock();
+				std::pair locks = getVisibleEntitiesLocks();
 
-			ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
-				if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
-					auto chunk_lock = visible_at_chunk->sharedLock();
-					for (const WeakEntityPtr &weak_visible: *visible_at_chunk) {
-						EntityPtr visible = weak_visible.lock();
+				ChunkRange(getChunk()).iterate([this, realm, shared, this_player](ChunkPosition chunk_position) {
+					if (auto visible_at_chunk = realm->getEntities(chunk_position)) {
+						auto chunk_lock = visible_at_chunk->sharedLock();
+						for (const WeakEntityPtr &weak_visible: *visible_at_chunk) {
+							EntityPtr visible = weak_visible.lock();
 
-						if (!visible || visible.get() == this) {
-							continue;
-						}
+							if (!visible || visible.get() == this) {
+								continue;
+							}
 
-						assert(visible->getGID() != getGID());
-						if (visibleEntities) {
-							visibleEntities->insert(visible);
-						}
+							assert(visible->getGID() != getGID());
+							if (visibleEntities) {
+								visibleEntities->insert(visible);
+							}
 
-						if (visible->isPlayer()) {
-							visiblePlayers.emplace(safeDynamicCast<Player>(visible));
-						}
+							if (visible->isPlayer()) {
+								visiblePlayers.emplace(safeDynamicCast<Player>(visible));
+							}
 
-						if (visible->otherEntityToLock != globalID) {
-							otherEntityToLock = visible->globalID;
-							{
-								auto other_locks = visible->getVisibleEntitiesLocks();
-								if (visible->visibleEntities) {
-									visible->visibleEntities->insert(shared);
+							if (visible->otherEntityToLock != globalID) {
+								otherEntityToLock = visible->globalID;
+								{
+									auto other_locks = visible->getVisibleEntitiesLocks();
+									if (visible->visibleEntities) {
+										visible->visibleEntities->insert(shared);
+									}
 								}
+								if (this_player) {
+									auto other_lock = visible->visiblePlayers.uniqueLock();
+									visible->visiblePlayers.insert(this_player);
+								}
+								otherEntityToLock = -1;
+							} else {
+								// The other entity is already handling this.
 							}
-							if (this_player) {
-								auto other_lock = visible->visiblePlayers.uniqueLock();
-								visible->visiblePlayers.insert(this_player);
-							}
-							otherEntityToLock = -1;
-						} else {
-							// The other entity is already handling this.
 						}
 					}
-				}
-			});
+				});
+			}
 		}
 
 		if (getSide() != Side::Server) {
