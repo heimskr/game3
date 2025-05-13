@@ -1,18 +1,14 @@
-#include "Options.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
-#include "threading/ThreadContext.h"
-#include "tile/AshTile.h"
-#include "types/Position.h"
-#include "util/Log.h"
-#include "util/Util.h"
+#include "tile/FiniteShovelableTile.h"
 
 namespace Game3 {
-	AshTile::AshTile():
-		Tile(ID()) {}
+	FiniteShovelableTile::FiniteShovelableTile(Identifier identifier, Identifier itemID):
+		Tile(std::move(identifier)),
+		itemID(std::move(itemID)) {}
 
-	bool AshTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
+	bool FiniteShovelableTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		if (layer != Layer::Submerged) {
 			return false;
 		}
@@ -25,7 +21,7 @@ namespace Game3 {
 
 		if (active && active->hasAttribute("base:attribute/shovel")) {
 			place.realm->setTile(layer, place.position, 0);
-			player->give(ItemStack::create(place.getGame(), "base:item/ash", 1));
+			player->give(ItemStack::create(place.getGame(), itemID, 1));
 
 			if (active->reduceDurability()) {
 				inventory->erase(used_item? player->getHeldSlot(hand) : inventory->activeSlot.load());

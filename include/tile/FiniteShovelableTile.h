@@ -3,11 +3,11 @@
 #include "tile/Tile.h"
 
 namespace Game3 {
-	class AshTile: public Tile {
+	class FiniteShovelableTile: public Tile {
 		public:
-			static Identifier ID() { return {"base", "tile/ash"}; }
+			Identifier itemID;
 
-			AshTile();
+			FiniteShovelableTile(Identifier identifier, Identifier itemID);
 
 			bool interact(const Place &, Layer, const ItemStackPtr &used_item, Hand) override;
 	};

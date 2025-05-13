@@ -1,13 +1,13 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
-#include "tile/AshTile.h"
 #include "tile/BedTile.h"
 #include "tile/CaveTile.h"
 #include "tile/CropTile.h"
 #include "tile/DirtTile.h"
 #include "tile/FarmlandTile.h"
 #include "tile/FenceGateTile.h"
+#include "tile/FiniteShovelableTile.h"
 #include "tile/FoodTile.h"
 #include "tile/ForestFloorTile.h"
 #include "tile/GrassTile.h"
@@ -31,7 +31,6 @@ namespace Game3 {
 		GamePtr self = shared_from_this();
 		TileRegistry &reg = *tileRegistry;
 
-		reg.add<AshTile>();
 		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
@@ -59,6 +58,7 @@ namespace Game3 {
 		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
 
+		reg.add("base:tile/ash",  std::make_shared<FiniteShovelableTile>("base:tile/ash", "base:item/ash"));
 		reg.add("base:tile/cake", std::make_shared<FoodTile>("base:tile/cake", "base:item/cake"));
 
 		static const std::array rares{
