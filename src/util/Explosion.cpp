@@ -31,11 +31,10 @@ namespace Game3 {
 		});
 	}
 
-	void causeExplosion(const Place &place, float radius, uint32_t particle_count, bool destroys_tile_entities) {
+	void causeExplosion(const Place &place, float radius, bool destroys_tile_entities) {
 		ExplosionOptions options{
 			.particleType = "base:entity/explosion_particle",
 			.radius = radius,
-			.particleCount = particle_count,
 			.destroysTileEntities = destroys_tile_entities,
 		};
 

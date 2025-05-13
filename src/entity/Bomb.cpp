@@ -25,13 +25,13 @@ namespace Game3 {
 		}
 
 		queueDestruction();
-		constexpr static Index DIAMETER = 5;
-		constexpr static double RADIUS = DIAMETER / 2.;
+		constexpr Index DIAMETER = 5;
+		constexpr float RADIUS = DIAMETER / 2.;
 
 		Position position = getPosition();
 		position.row += offset.y;
 		position.column += offset.x;
 
-		causeExplosion(Place{position, realm}, RADIUS, 0, true);
+		causeExplosion(Place{position, realm}, RADIUS, true);
 	}
 }

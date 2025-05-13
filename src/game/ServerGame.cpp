@@ -997,7 +997,7 @@ namespace Game3 {
 					}
 				}
 
-				causeExplosion(player->getPlace(), radius, 1, false);
+				causeExplosion(player->getPlace(), radius, false);
 				return {true, ""};
 			}
 

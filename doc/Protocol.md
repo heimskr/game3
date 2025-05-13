@@ -486,7 +486,6 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `i32` Realm ID
 	- `Position` Origin
 	- `f32` Radius
-	- `u32` Particle count
 	- `string` Particle type
 	- `optional<string>` Sound effect ID
 	- `optional<f32>` Sound effect pitch variance

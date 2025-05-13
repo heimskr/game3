@@ -19,7 +19,6 @@ namespace Game3 {
 		std::optional<float> pitchVariance;
 		RealmID realmID{};
 		float radius{};
-		uint32_t particleCount{};
 
 		ExplosionPacket() = default;
 		ExplosionPacket(RealmID realmID, Position origin, ExplosionOptions);

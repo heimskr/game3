@@ -19,16 +19,15 @@ namespace Game3 {
 		randomizationParameters(std::move(options.randomizationParameters)),
 		pitchVariance(options.pitchVariance),
 		realmID(realmID),
-		radius(options.radius),
-		particleCount(options.particleCount) {}
+		radius(options.radius) {}
 
 	void ExplosionPacket::encode(Game &, Buffer &buffer) const {
-		buffer << realmID << origin << radius << particleCount << particleType << soundEffect << pitchVariance << randomizationParameters;
+		buffer << realmID << origin << radius << particleType << soundEffect << pitchVariance << randomizationParameters;
 	}
 
 	void ExplosionPacket::decode(Game &game, Buffer &buffer) {
 		randomizationParameters.context = game.shared_from_this();
-		buffer >> realmID >> origin >> radius >> particleCount >> particleType >> soundEffect >> pitchVariance >> randomizationParameters;
+		buffer >> realmID >> origin >> radius >> particleType >> soundEffect >> pitchVariance >> randomizationParameters;
 	}
 
 	void ExplosionPacket::handle(const std::shared_ptr<ClientGame> &game) {

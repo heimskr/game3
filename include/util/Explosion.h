@@ -13,7 +13,6 @@ namespace Game3 {
 		std::optional<Identifier> soundEffect = "base:sound/explosion";
 		std::optional<float> pitchVariance = 1.2f;
 		float radius = 0;
-		uint32_t particleCount = 0;
 		bool destroysTileEntities = false;
 
 		template <typename T>
@@ -30,5 +29,5 @@ namespace Game3 {
 	};
 
 	void causeExplosion(const Place &, const ExplosionOptions &);
-	void causeExplosion(const Place &, float radius, uint32_t particle_count, bool destroys_tile_entities = false);
+	void causeExplosion(const Place &, float radius, bool destroys_tile_entities = false);
 }
