@@ -95,10 +95,9 @@ namespace Game3 {
 			}
 
 			place.set(Layer::Submerged, "base:tile/ash");
-		}
-
-		if (place.getName(Layer::Objects) == "base:tile/charred_stump"_id) {
+		} else if (place.getName(Layer::Objects) == "base:tile/charred_stump"_id) {
 			place.realm->setTile(Layer::Objects, place.position, "base:tile/empty"_id);
+			ItemStack::spawn(place, place.getGame(), "base:item/wood");
 			return true;
 		}
 
