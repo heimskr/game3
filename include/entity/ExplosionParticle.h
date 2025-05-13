@@ -15,9 +15,13 @@ namespace Game3 {
 
 			void tick(const TickArgs &) override;
 			void render(const RendererContext &) override;
+			void renderShadow(const RendererContext &) override;
+			bool isVisible() const override;
 			bool visibilityMatters() const override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
+
+			static float getLifetime();
 
 		protected:
 			ExplosionParticle();

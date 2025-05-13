@@ -22,7 +22,7 @@ namespace Game3 {
 	}
 
 	void ExplosionParticle::render(const RendererContext &context) {
-		if (!texture || !isVisible()) {
+		if (!texture || !isVisible() || age < 0) {
 			return;
 		}
 
@@ -47,6 +47,12 @@ namespace Game3 {
 		});
 	}
 
+	void ExplosionParticle::renderShadow(const RendererContext &) {}
+
+	bool ExplosionParticle::isVisible() const {
+		return age >= 0 && Entity::isVisible();
+	}
+
 	bool ExplosionParticle::visibilityMatters() const {
 		return false;
 	}
@@ -59,5 +65,9 @@ namespace Game3 {
 	void ExplosionParticle::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> age;
+	}
+
+	float ExplosionParticle::getLifetime() {
+		return EXPLOSION_LIFETIME;
 	}
 }

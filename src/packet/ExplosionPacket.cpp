@@ -1,4 +1,5 @@
 #include "entity/EntityFactory.h"
+#include "entity/ExplosionParticle.h"
 #include "game/Agent.h"
 #include "game/ClientGame.h"
 #include "game/ServerGame.h"
@@ -41,10 +42,22 @@ namespace Game3 {
 
 		realm->playSound(origin, "base:sound/explosion", threadContext.getPitch(1.2f), std::max<uint16_t>(radius * 2, 64));
 
+		std::optional<float> lifetime;
+		if (particleType == ExplosionParticle::ID()) {
+			lifetime = ExplosionParticle::getLifetime();
+		}
+
 		iterateFilledCircle<Position::IntType>(origin.column, origin.row, radius, [&](auto x, auto y) {
 			EntityPtr entity = (*factory)(game);
 			entity->setRandomizationParameters(randomizationParameters);
-			realm->spawn(entity, Position{y, x});
+
+			Position position{y, x};
+			if (lifetime) {
+				float distance = position.distance(origin);
+				entity->age = -distance / radius * *lifetime / M_PI;
+			}
+
+			realm->spawn(entity, position);
 		});
 	}
 }
