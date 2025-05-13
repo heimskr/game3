@@ -18,5 +18,6 @@ namespace Game3 {
 			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
 
 			bool isRipe(const Identifier &) const;
+			bool doPartialHarvest(const Place &, Layer);
 	};
 }

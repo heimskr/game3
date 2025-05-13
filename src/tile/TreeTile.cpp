@@ -26,20 +26,24 @@ namespace Game3 {
 				place.set(layer, 0);
 
 				// Handle axe durability
-				if (active_stack->reduceDurability())
+				if (active_stack->reduceDurability()) {
 					inventory->erase(inventory->activeSlot);
+				}
 
 				// Make sure tree is fully grown before giving any products
-				if (tilename && isRipe(*tilename))
-					for (const ItemStackPtr &stack: crop->products.getStacks())
-						if (ItemStackPtr leftover = inventory->add(stack))
+				if (tilename && isRipe(*tilename)) {
+					for (const ItemStackPtr &stack: crop->products.getStacks()) {
+						if (ItemStackPtr leftover = inventory->add(stack)) {
 							leftover->spawn(Place{place.position, place.realm});
+						}
+					}
+				}
 
 				inventory->notifyOwner({});
 				return true;
 			}
 		}
 
-		return CropTile::interact(place, layer, used_item, hand);
+		return doPartialHarvest(place, layer) || Tile::interact(place, layer, used_item, hand);
 	}
 }

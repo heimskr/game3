@@ -50,17 +50,8 @@ namespace Game3 {
 	bool CropTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		assert(!crop->stages.empty());
 
-		if (auto *object = crop->customData.if_object()) {
-			if (auto *partial_harvest = object->if_contains("partialHarvest")) {
-				if (place.getName(layer) == boost::json::value_to<Identifier>(partial_harvest->at("full"))) {
-					const InventoryPtr inventory = place.player->getInventory(0);
-					auto inventory_lock = inventory->uniqueLock();
-					if (!inventory->add(ItemStack::create(place.getGame(), boost::json::value_to<Identifier>(partial_harvest->at("item"))))) {
-						place.set(layer, boost::json::value_to<Identifier>(partial_harvest->at("empty")));
-						return true;
-					}
-				}
-			}
+		if (doPartialHarvest(place, layer)) {
+			return true;
 		}
 
 		if (auto tilename = place.getName(layer); tilename && isRipe(*tilename)) {
@@ -76,5 +67,22 @@ namespace Game3 {
 
 	bool CropTile::isRipe(const Identifier &tilename) const {
 		return tilename == crop->stages.back();
+	}
+
+	bool CropTile::doPartialHarvest(const Place &place, Layer layer) {
+		if (auto *object = crop->customData.if_object()) {
+			if (auto *partial_harvest = object->if_contains("partialHarvest")) {
+				if (place.getName(layer) == boost::json::value_to<Identifier>(partial_harvest->at("full"))) {
+					const InventoryPtr inventory = place.player->getInventory(0);
+					auto inventory_lock = inventory->uniqueLock();
+					if (!inventory->add(ItemStack::create(place.getGame(), boost::json::value_to<Identifier>(partial_harvest->at("item"))))) {
+						place.set(layer, boost::json::value_to<Identifier>(partial_harvest->at("empty")));
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 }
