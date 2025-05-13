@@ -583,6 +583,10 @@ namespace Game3 {
 	void Entity::renderLighting(const RendererContext &) {}
 
 	void Entity::renderShadow(const RendererContext &renderers) {
+		if (!isVisible() || isInFluid()) {
+			return;
+		}
+
 		const ShadowParams params = getShadowParams();
 		const auto [offset_x, offset_y, offset_z] = offset.copyBase();
 

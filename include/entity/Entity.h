@@ -172,7 +172,7 @@ namespace Game3 {
 			bool pathfind(const Position &goal, size_t loop_max = 1'000);
 			virtual float getMovementSpeed() const;
 			std::shared_ptr<Game> getGame() const override;
-			bool isVisible() const;
+			virtual bool isVisible() const;
 			bool isInFluid() const;
 			bool setHeldLeft(Slot);
 			bool setHeldRight(Slot);
