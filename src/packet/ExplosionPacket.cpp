@@ -39,6 +39,8 @@ namespace Game3 {
 			return;
 		}
 
+		realm->playSound(origin, "base:sound/explosion", threadContext.getPitch(1.2f), std::max<uint16_t>(radius * 2, 64));
+
 		iterateFilledCircle<Position::IntType>(origin.column, origin.row, radius, [&](auto x, auto y) {
 			EntityPtr entity = (*factory)(game);
 			entity->setRandomizationParameters(randomizationParameters);
