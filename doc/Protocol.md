@@ -488,6 +488,8 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `f32` Radius
 	- `u32` Particle count
 	- `string` Particle type
+	- `optional<string>` Sound effect ID
+	- `optional<f32>` Sound effect pitch variance
 	- `...` Particle randomization parameters
 
 # Message Format

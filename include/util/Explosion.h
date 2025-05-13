@@ -10,6 +10,8 @@ namespace Game3 {
 		Buffer randomizationParameters{Side::Invalid};
 		std::string type = "default";
 		Identifier particleType = "base:entity/square_particle";
+		std::optional<Identifier> soundEffect = "base:sound/explosion";
+		std::optional<float> pitchVariance = 1.2f;
 		float radius = 0;
 		uint32_t particleCount = 0;
 		bool destroysTileEntities = false;

@@ -37,21 +37,26 @@ namespace Game3 {
 				colMax(col_max),
 				valid(true) {}
 
-			template <std::integral T>
 			/** [min, max] */
+			template <std::integral T>
 			T random(T min, T max) {
 				return std::uniform_int_distribution(min, max)(rng);
 			}
 
-			template <std::floating_point T>
 			/** [min, max) */
+			template <std::floating_point T>
 			T random(T min, T max) {
 				return std::uniform_real_distribution(min, max)(rng);
 			}
 
+			/** variance >= 1 */
 			template <typename T>
 			T getPitch(T variance) {
-				return std::uniform_real_distribution<T>(1.0 / variance, variance)(rng);
+				if (variance == 1) {
+					return 1;
+				}
+
+				return std::uniform_real_distribution<T>(static_cast<T>(1.0) / variance, variance)(rng);
 			}
 
 			void rename(const char *);

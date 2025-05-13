@@ -15,18 +15,20 @@ namespace Game3 {
 		origin(origin),
 		type(std::move(options.type)),
 		particleType(std::move(options.particleType)),
+		soundEffect(std::move(options.soundEffect)),
 		randomizationParameters(std::move(options.randomizationParameters)),
+		pitchVariance(options.pitchVariance),
 		realmID(realmID),
 		radius(options.radius),
 		particleCount(options.particleCount) {}
 
 	void ExplosionPacket::encode(Game &, Buffer &buffer) const {
-		buffer << realmID << origin << radius << particleCount << particleType << randomizationParameters;
+		buffer << realmID << origin << radius << particleCount << particleType << soundEffect << pitchVariance << randomizationParameters;
 	}
 
 	void ExplosionPacket::decode(Game &game, Buffer &buffer) {
 		randomizationParameters.context = game.shared_from_this();
-		buffer >> realmID >> origin >> radius >> particleCount >> particleType >> randomizationParameters;
+		buffer >> realmID >> origin >> radius >> particleCount >> particleType >> soundEffect >> pitchVariance >> randomizationParameters;
 	}
 
 	void ExplosionPacket::handle(const std::shared_ptr<ClientGame> &game) {
@@ -40,7 +42,9 @@ namespace Game3 {
 			return;
 		}
 
-		realm->playSound(origin, "base:sound/explosion", threadContext.getPitch(1.2f), std::max<uint16_t>(radius * 2, 64));
+		if (soundEffect) {
+			realm->playSound(origin, *soundEffect, threadContext.getPitch(pitchVariance.value_or(1.f)), std::max<uint16_t>(radius * 2, 64));
+		}
 
 		std::optional<float> lifetime;
 		if (particleType == ExplosionParticle::ID()) {

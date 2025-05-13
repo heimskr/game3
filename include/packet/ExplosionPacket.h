@@ -14,7 +14,9 @@ namespace Game3 {
 		Position origin;
 		std::string type = "default";
 		Identifier particleType = "base:entity/square_particle";
+		std::optional<Identifier> soundEffect;
 		Buffer randomizationParameters{Side::Client};
+		std::optional<float> pitchVariance;
 		RealmID realmID{};
 		float radius{};
 		uint32_t particleCount{};
