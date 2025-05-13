@@ -35,15 +35,6 @@ namespace Game3 {
 				if (active->item->canUseOnWorld() && active->item->use(inventory->activeSlot, active, place, modifiers, {0.f, 0.f})) {
 					return true;
 				}
-
-				if (active->hasAttribute("base:attribute/shovel"_id)) {
-					if (*submerged_tile == "base:tile/ash"_id) {
-						realm->setTile(Layer::Submerged, position, "base:tile/empty"_id);
-						player->give(ItemStack::create(game, "base:item/ash"_id, 1));
-						realm->reupload();
-						return true;
-					}
-				}
 			}
 		} else if (used_item->item->use(player->getHeldSlot(hand), used_item, place, modifiers, hand)) {
 			return true;

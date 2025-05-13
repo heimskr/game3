@@ -1,6 +1,7 @@
 #include "game/Crop.h"
 #include "game/Game.h"
 #include "graphics/Tileset.h"
+#include "tile/AshTile.h"
 #include "tile/BedTile.h"
 #include "tile/CaveTile.h"
 #include "tile/CropTile.h"
@@ -30,6 +31,7 @@ namespace Game3 {
 		GamePtr self = shared_from_this();
 		TileRegistry &reg = *tileRegistry;
 
+		reg.add<AshTile>();
 		reg.add<DirtTile>();
 		reg.add<FarmlandTile>();
 		reg.add<ForestFloorTile>();
