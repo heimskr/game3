@@ -1,3 +1,4 @@
+#include "util/Log.h"
 #include "util/JSON.h"
 #include "util/Util.h"
 
@@ -67,9 +68,15 @@ namespace Game3 {
 		return out;
 	}
 
-	boost::json::value * resolveJSON(boost::json::value &value, const boost::json::array &path) {
-		if (path.empty()) {
+	boost::json::value * resolveJSON(boost::json::value &value, const boost::json::string &path_string) {
+		if (path_string.empty()) {
 			return nullptr;
+		}
+
+		boost::json::array path;
+
+		for (std::string_view piece: split(path_string, "/", false)) {
+			path.emplace_back(piece);
 		}
 
 		boost::json::value *current = &value;
@@ -121,7 +128,7 @@ namespace Game3 {
 			std::string_view op(object.at("op").as_string());
 
 			if (op == "test") {
-				if (auto *value = resolveJSON(json, object.at("path").as_array())) {
+				if (auto *value = resolveJSON(json, object.at("path").as_string())) {
 					if (*value == object.at("value")) {
 						continue;
 					}
@@ -130,7 +137,7 @@ namespace Game3 {
 			}
 
 			if (op == "replace") {
-				if (auto *value = resolveJSON(json, object.at("path").as_array())) {
+				if (auto *value = resolveJSON(json, object.at("path").as_string())) {
 					*value = object.at("value");
 					continue;
 				}

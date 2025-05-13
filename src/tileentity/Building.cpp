@@ -42,9 +42,13 @@ namespace Game3 {
 
 	void Building::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
-		innerRealmID = boost::json::value_to<RealmID>(json.at("innerRealmID"));
-		entrance = boost::json::value_to<Position>(json.at("entrance"));
-		soundSetID = boost::json::value_to<Identifier>(json.at("soundSetID"));
+		if (const auto *object = json.if_object()) {
+			innerRealmID = boost::json::value_to<RealmID>(object->at("innerRealmID"));
+			entrance = boost::json::value_to<Position>(object->at("entrance"));
+			if (const auto *value = object->if_contains("soundSetID")) {
+				soundSetID = boost::json::value_to<Identifier>(*value);
+			}
+		}
 		soundSet.reset();
 	}
 

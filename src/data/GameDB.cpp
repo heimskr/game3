@@ -11,6 +11,7 @@
 #include "tileentity/TileEntity.h"
 #include "tileentity/TileEntityFactory.h"
 #include "util/Endian.h"
+#include "util/JSON.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 
@@ -19,15 +20,6 @@
 #include <sstream>
 
 namespace Game3 {
-	template <template <typename...> typename M, typename K, typename V>
-	static M<K, V> loadKeyValuePairs(const boost::json::value &json) {
-		M<K, V> out;
-		for (const boost::json::value &value: json.as_array()) {
-			out.emplace(boost::json::value_to<K>(value.at(0)), boost::json::value_to<V>(value.at(1)));
-		}
-		return out;
-	}
-
 	GameDB::GameDB(const ServerGamePtr &game):
 		weakGame(game) {}
 

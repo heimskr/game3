@@ -41,6 +41,25 @@ struct std::formatter<boost::json::string> {
 	}
 };
 
+template <>
+struct std::formatter<boost::json::object> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(const boost::json::object &json, auto &ctx) const {
+		boost::json::serializer serializer;
+		serializer.reset(&json);
+		char buf[512];
+
+		while (!serializer.done()) {
+			std::format_to(ctx.out(), "{}", static_cast<std::string_view>(serializer.read(buf)));
+		}
+
+		return ctx.out();
+	}
+};
+
 namespace Game3 {
 	namespace JSON = boost::json;
 
