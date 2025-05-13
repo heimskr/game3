@@ -298,8 +298,9 @@ namespace Game3 {
 		std::thread tick_thread([&] {
 			threadContext.rename("ServerTick");
 			while (running) {
-				if (!game->tickingPaused)
+				if (!game->tickingPaused) {
 					game->tick();
+				}
 				std::this_thread::sleep_for(std::chrono::milliseconds(SERVER_TICK_PERIOD));
 			}
 		});

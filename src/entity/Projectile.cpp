@@ -97,6 +97,11 @@ namespace Game3 {
 		velocity = initialVelocity;
 	}
 
+	bool Projectile::shouldBroadcastDestruction() const {
+		// Clients will handle projectile destruction themselves.
+		return false;
+	}
+
 	int Projectile::getZIndex() const {
 		return 2;
 	}

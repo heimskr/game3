@@ -20,11 +20,12 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		GamePtr game = realm->getGame();
 
+		queueDestruction();
+
 		if (game->getSide() != Side::Server) {
 			return;
 		}
 
-		queueDestruction();
 		constexpr Index DIAMETER = 5;
 		constexpr float RADIUS = DIAMETER / 2.;
 

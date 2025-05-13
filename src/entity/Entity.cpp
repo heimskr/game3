@@ -1557,6 +1557,10 @@ namespace Game3 {
 		return locks;
 	}
 
+	bool Entity::shouldBroadcastDestruction() const {
+		return true;
+	}
+
 	void Entity::jump() {
 		RealmPtr realm = getRealm();
 		GamePtr game = realm->getGame();

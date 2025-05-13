@@ -107,7 +107,7 @@ namespace Game3 {
 			timeSinceTimeUpdate = 0.;
 		}
 
-		for (const auto &player: players) {
+		for (const ServerPlayerPtr &player: players) {
 			player->ticked = false;
 
 			if (time_packet) {
@@ -242,11 +242,15 @@ namespace Game3 {
 	}
 
 	void ServerGame::entityDestroyed(const Entity &entity) {
+		if (!entity.shouldBroadcastDestruction()) {
+			return;
+		}
+
 		const auto packet = make<DestroyEntityPacket>(entity, false);
-		auto server = weakServer.lock();
-		assert(server);
+		ServerPtr server = weakServer.lock();
+		assert(server != nullptr);
 		auto &clients = server->getClients();
-		auto lock = clients.sharedLock();
+		std::shared_lock lock = clients.sharedLock();
 		for (const auto &client: clients) {
 			if (PlayerPtr player = client->getPlayer(); player && player == entity.weakExcludedPlayer.lock()) {
 				continue;

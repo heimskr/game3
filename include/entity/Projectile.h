@@ -20,6 +20,7 @@ namespace Game3 {
 			void render(const RendererContext &) override;
 			void onSpawn() override;
 			std::string getName() const override { return "Projectile"; }
+			bool shouldBroadcastDestruction() const override;
 
 			int getZIndex() const override;
 
