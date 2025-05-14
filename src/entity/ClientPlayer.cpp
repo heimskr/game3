@@ -88,10 +88,12 @@ namespace Game3 {
 					Place place = getPlace();
 					ClientGamePtr game = getGame()->toClientPointer();
 					WindowPtr window = game->getWindow();
-					auto [x, y] = window->getMouseCoordinates<double>();
-					double x_offset{}, y_offset{};
-					place.position = game->translateCanvasCoordinates(x, y, &x_offset, &y_offset);
-					active->item->fire(inventory->activeSlot, active, place, window->getModifiers(), {x_offset, y_offset});
+					if (auto coords = window->getMouseCoordinates<double>()) {
+						auto [x, y] = *coords;
+						double x_offset{}, y_offset{};
+						place.position = game->translateCanvasCoordinates(x, y, &x_offset, &y_offset);
+						active->item->fire(inventory->activeSlot, active, place, window->getModifiers(), {x_offset, y_offset});
+					}
 				}
 			}
 		}

@@ -402,13 +402,17 @@ namespace Game3 {
 		pressedWidget.reset();
 	}
 
-	std::pair<double, double> UIContext::getMouseCoordinates() const {
+	std::optional<std::pair<double, double>> UIContext::getMouseCoordinates() const {
 		return window.getMouseCoordinates<double>();
 	}
 
 	bool UIContext::checkMouse(const Rectangle &rectangle) const {
-		const auto [x, y] = window.getMouseCoordinates<int>();
-		return rectangle.contains(x, y);
+		if (const auto mouse = window.getMouseCoordinates<int>()) {
+			const auto [x, y] = *mouse;
+			return rectangle.contains(x, y);
+		}
+
+		return false;
 	}
 
 	std::shared_ptr<Tooltip> UIContext::getTooltip() const {

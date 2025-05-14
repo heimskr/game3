@@ -81,12 +81,12 @@ namespace Game3 {
 			std::pair<int, int> getDimensions() const;
 			float getXFactor() const;
 			float getYFactor() const;
-			int getMouseX() const;
-			int getMouseY() const;
+			std::optional<int> getMouseX() const;
+			std::optional<int> getMouseY() const;
 			Rectangle inset(int distance = 0) const;
 
 			template <Numeric T>
-			std::pair<T, T> getMouseCoordinates() const;
+			std::optional<std::pair<T, T>> getMouseCoordinates() const;
 
 			/** Displays an alert. This will reset the dialog pointer. If you need to use this inside a dialog's code, use delay or queue. */
 			void alert(const UString &message, bool do_queue = true, bool use_markup = false);
@@ -141,6 +141,7 @@ namespace Game3 {
 			bool dragStarted = false;
 			bool connectedLocally = false;
 			bool connected = false;
+			bool mouseMoved = false;
 
 			void keyCallback(int key, int scancode, int action, int mods);
 			void charCallback(uint32_t codepoint, int mods);

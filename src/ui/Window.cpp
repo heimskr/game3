@@ -178,15 +178,21 @@ namespace Game3 {
 		return yScale;
 	}
 
-	int Window::getMouseX() const {
+	std::optional<int> Window::getMouseX() const {
 		double x{};
 		glfwGetCursorPos(glfwWindow, &x, nullptr);
+		if (glfwGetError(nullptr) != GLFW_NO_ERROR || !mouseMoved) [[unlikely]] {
+			return std::nullopt;
+		}
 		return static_cast<int>(std::floor(x * xScale));
 	}
 
-	int Window::getMouseY() const {
+	std::optional<int> Window::getMouseY() const {
 		double y{};
 		glfwGetCursorPos(glfwWindow, nullptr, &y);
+		if (glfwGetError(nullptr) != GLFW_NO_ERROR || !mouseMoved) [[unlikely]] {
+			return std::nullopt;
+		}
 		return static_cast<int>(std::floor(y * yScale));
 	}
 
@@ -195,24 +201,33 @@ namespace Game3 {
 	}
 
 	template <>
-	std::pair<int, int> Window::getMouseCoordinates() const {
+	std::optional<std::pair<int, int>> Window::getMouseCoordinates<int>() const {
 		double x{}, y{};
 		glfwGetCursorPos(glfwWindow, &x, &y);
-		return {static_cast<int>(std::floor(x * xScale)), static_cast<int>(std::floor(y * yScale))};
+		if (glfwGetError(nullptr) != GLFW_NO_ERROR || !mouseMoved) [[unlikely]] {
+			return std::nullopt;
+		}
+		return std::optional<std::pair<int, int>>{std::in_place, static_cast<int>(x * xScale), static_cast<int>(y * yScale)};
 	}
 
 	template <>
-	std::pair<float, float> Window::getMouseCoordinates() const {
+	std::optional<std::pair<float, float>> Window::getMouseCoordinates<float>() const {
 		double x{}, y{};
 		glfwGetCursorPos(glfwWindow, &x, &y);
-		return {static_cast<float>(x * xScale), static_cast<float>(y * yScale)};
+		if (glfwGetError(nullptr) != GLFW_NO_ERROR || !mouseMoved) [[unlikely]] {
+			return std::nullopt;
+		}
+		return std::optional<std::pair<float, float>>{std::in_place, static_cast<float>(x * xScale), static_cast<float>(y * yScale)};
 	}
 
 	template <>
-	std::pair<double, double> Window::getMouseCoordinates() const {
+	std::optional<std::pair<double, double>> Window::getMouseCoordinates<double>() const {
 		double x{}, y{};
 		glfwGetCursorPos(glfwWindow, &x, &y);
-		return {x * xScale, y * yScale};
+		if (glfwGetError(nullptr) != GLFW_NO_ERROR || !mouseMoved) [[unlikely]] {
+			return std::nullopt;
+		}
+		return std::optional<std::pair<double, double>>{std::in_place, x * xScale, y * yScale};
 	}
 
 	void Window::alert(const UString &message, bool do_queue, bool use_markup) {
@@ -337,7 +352,12 @@ namespace Game3 {
 		multiplier.update(width, height);
 		overlayer.update(width, height);
 
-		uiContext.render(getMouseX(), getMouseY(), delta);
+		if (auto coords = getMouseCoordinates<float>()) {
+			auto [x, y] = *coords;
+			uiContext.render(x, y, delta);
+		} else {
+			uiContext.render(-1, -1, delta);
+		}
 
 		if (settings.showFPS && runningFPS > 0) {
 			renderFPSCounter();
@@ -578,9 +598,13 @@ namespace Game3 {
 		Modifiers modifiers(mods);
 		lastModifiers = modifiers;
 
-		const auto [x_pos, y_pos] = getMouseCoordinates<double>();
-		const int x = static_cast<int>(std::floor(x_pos));
-		const int y = static_cast<int>(std::floor(y_pos));
+		const auto coords = getMouseCoordinates<double>();
+		if (!coords) {
+			return;
+		}
+
+		const int x = static_cast<int>(std::floor(coords->first));
+		const int y = static_cast<int>(std::floor(coords->second));
 
 		if (action == GLFW_PRESS) {
 			heldMouseButton = button;
@@ -627,12 +651,13 @@ namespace Game3 {
 			}
 
 			if (!result && game) {
-				game->click(button, 1, x_pos, y_pos, modifiers);
+				game->click(button, 1, coords->first, coords->second, modifiers);
 			}
 		}
 	}
 
 	void Window::mousePositionCallback(int x, int y) {
+		mouseMoved = true;
 		if (heldMouseButton == GLFW_MOUSE_BUTTON_LEFT) {
 			if (dragStarted) {
 				uiContext.dragUpdate(x, y);
@@ -644,9 +669,14 @@ namespace Game3 {
 	}
 
 	void Window::scrollCallback(double x_delta, double y_delta) {
-		const auto [x, y] = getMouseCoordinates<double>();
+		const auto coords = getMouseCoordinates<double>();
+		if (!coords) {
+			return;
+		}
 
-		if (uiContext.scroll(x_delta, y_delta, std::floor(x), std::floor(y), lastModifiers)) {
+		const auto [x, y] = *coords;
+
+		if (uiContext.scroll(x_delta, y_delta, std::floor(coords->first), std::floor(coords->second), lastModifiers)) {
 			return;
 		}
 

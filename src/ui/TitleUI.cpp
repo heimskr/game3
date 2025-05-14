@@ -90,11 +90,9 @@ namespace Game3 {
 
 		static float hue = 0;
 		static TexturePtr gangblanc = cacheTexture("resources/gangblanc.png");
-		static bool has_been_nonzero = false;
 
-		const auto [mouse_x, mouse_y] = window.getMouseCoordinates<double>();
-
-		if (has_been_nonzero || mouse_x != 0 || mouse_y != 0) {
+		if (const auto mouse = window.getMouseCoordinates<double>()) {
+			const auto [mouse_x, mouse_y] = *mouse;
 			renderers.singleSprite.drawOnScreen(gangblanc, RenderOptions{
 				.x = mouse_x,
 				.y = mouse_y,
@@ -102,10 +100,6 @@ namespace Game3 {
 				.scaleY = 16,
 				.invertY = false,
 			});
-		}
-
-		if (!has_been_nonzero && (mouse_x != 0 || mouse_y != 0)) {
-			has_been_nonzero = true;
 		}
 
 		auto now = getTime();

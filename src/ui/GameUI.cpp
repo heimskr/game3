@@ -110,24 +110,26 @@ namespace Game3 {
 			realm->getRenderer()->render(renderers, realm, window, *this);
 			realmBounds = game->getVisibleRealmBounds();
 
-			auto [mouse_x, mouse_y] = window.getMouseCoordinates<double>();
-			Position hovered_position = game->translateCanvasCoordinates(mouse_x, mouse_y);
-			TileEntityPtr previous_hovered = hoveredTileEntity.lock();
-			if (TileEntityPtr tile_entity = realm->tileEntityAt(hovered_position)) {
-				if (previous_hovered != tile_entity) {
-					if (previous_hovered) {
-						previous_hovered->mouseOut();
-					}
+			if (auto mouse = window.getMouseCoordinates<double>()) {
+				const auto [mouse_x, mouse_y] = *mouse;
+				Position hovered_position = game->translateCanvasCoordinates(mouse_x, mouse_y);
+				TileEntityPtr previous_hovered = hoveredTileEntity.lock();
+				if (TileEntityPtr tile_entity = realm->tileEntityAt(hovered_position)) {
+					if (previous_hovered != tile_entity) {
+						if (previous_hovered) {
+							previous_hovered->mouseOut();
+						}
 
-					if (tile_entity->mouseOver()) {
-						hoveredTileEntity = tile_entity;
-					} else {
-						hoveredTileEntity.reset();
+						if (tile_entity->mouseOver()) {
+							hoveredTileEntity = tile_entity;
+						} else {
+							hoveredTileEntity.reset();
+						}
 					}
+				} else if (previous_hovered) {
+					previous_hovered->mouseOut();
+					hoveredTileEntity.reset();
 				}
-			} else if (previous_hovered) {
-				previous_hovered->mouseOut();
-				hoveredTileEntity.reset();
 			}
 		}
 	}
