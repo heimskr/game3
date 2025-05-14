@@ -65,6 +65,15 @@ namespace Game3 {
 		return Tile::interact(place, layer, used_item, hand);
 	}
 
+	bool CropTile::damage(const Place &place, Layer layer) {
+		if (layer != Layer::Submerged) {
+			return Tile::damage(place, layer);
+		}
+
+		place.set(layer, "base:tile/ash");
+		return true;
+	}
+
 	bool CropTile::isRipe(const Identifier &tilename) const {
 		return tilename == crop->stages.back();
 	}

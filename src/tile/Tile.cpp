@@ -81,6 +81,10 @@ namespace Game3 {
 		return {};
 	}
 
+	bool Tile::damage(const Place &, Layer) {
+		return false;
+	}
+
 	void Tile::makeMonsterFactories(const GamePtr &game) {
 		{
 			auto shared = monsterFactories.sharedLock();

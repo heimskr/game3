@@ -44,6 +44,8 @@ namespace Game3 {
 
 			virtual std::optional<FluidTile> yieldFluid(const Place &);
 
+			virtual bool damage(const Place &, Layer);
+
 		private:
 			Lockable<std::optional<std::vector<std::shared_ptr<EntityFactory>>>> monsterFactories;
 

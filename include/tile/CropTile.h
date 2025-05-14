@@ -16,6 +16,7 @@ namespace Game3 {
 
 			void randomTick(const Place &) override;
 			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
+			bool damage(const Place &, Layer) override;
 
 			bool isRipe(const Identifier &) const;
 			bool doPartialHarvest(const Place &, Layer);

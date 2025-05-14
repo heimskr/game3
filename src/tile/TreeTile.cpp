@@ -6,8 +6,8 @@
 #include "tile/TreeTile.h"
 
 namespace Game3 {
-	TreeTile::TreeTile(std::shared_ptr<Crop> crop_):
-		CropTile(ID(), std::move(crop_)) {}
+	TreeTile::TreeTile(std::shared_ptr<Crop> crop):
+		CropTile(ID(), std::move(crop)) {}
 
 	bool TreeTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		assert(!crop->stages.empty());
@@ -45,5 +45,20 @@ namespace Game3 {
 		}
 
 		return doPartialHarvest(place, layer) || Tile::interact(place, layer, used_item, hand);
+	}
+
+	bool TreeTile::damage(const Place &place, Layer layer) {
+		if (layer != Layer::Submerged) {
+			return CropTile::damage(place, layer);
+		}
+
+		if (threadContext.random(0.0, 1.0) < M_PI / 10.) {
+			place.set(Layer::Submerged, "base:tile/charred_stump");
+		} else {
+			ItemStack::spawn(place, place.getGame(), "base:item/wood");
+		}
+
+		place.set(Layer::Submerged, "base:tile/ash");
+		return true;
 	}
 }

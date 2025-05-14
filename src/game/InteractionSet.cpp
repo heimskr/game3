@@ -6,6 +6,7 @@
 #include "item/Flower.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
+#include "tile/Tile.h"
 #include "types/Position.h"
 
 namespace Game3 {
@@ -85,22 +86,18 @@ namespace Game3 {
 	}
 
 	bool StandardInteractions::damageGround(const Place &place) const {
-		const Tileset &tileset = place.realm->getTileset();
-
-		if (const auto submerged = place.get(Layer::Submerged); submerged && tileset.isInCategory(*submerged, "base:category/trees")) {
-			if (threadContext.random(0.0, 1.0) < M_PI / 10.) {
-				place.set(Layer::Objects, "base:tile/charred_stump");
-			} else {
-				ItemStack::spawn(place, place.getGame(), "base:item/wood");
-			}
-
-			place.set(Layer::Submerged, "base:tile/ash");
-		} else if (place.getName(Layer::Objects) == "base:tile/charred_stump"_id) {
+		if (place.getName(Layer::Objects) == "base:tile/charred_stump"_id) {
 			place.realm->setTile(Layer::Objects, place.position, "base:tile/empty"_id);
 			ItemStack::spawn(place, place.getGame(), "base:item/wood");
 			return true;
 		}
 
-		return false;
+		bool result = false;
+
+		for (Layer layer: allLayers) {
+			result = place.getTile(layer)->damage(place, layer) || result;
+		}
+
+		return result;
 	}
 }
