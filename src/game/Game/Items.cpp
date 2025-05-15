@@ -80,6 +80,7 @@ namespace Game3 {
 		add(std::make_shared<BasicFood>("base:item/onion",       "Onion",           8));
 		add(std::make_shared<BasicFood>("base:item/bean",        "Bean",            8));
 		add(std::make_shared<BasicFood>("base:item/chili",       "Chili",           9));
+		add(std::make_shared<BasicFood>("base:item/sugarbeet",   "Sugar Beet",      9));
 		add(std::make_shared<BasicFood>("base:item/cactus",      "Cactus",          4, -1));
 		add(std::make_shared<BasicFood>("base:item/baguette",    "Baguette",       24,  8));
 		add(std::make_shared<BasicFood>("base:item/bread",       "Bread",          12,  4));
@@ -301,6 +302,7 @@ namespace Game3 {
 		add(std::make_shared<Seed>("base:item/onion_seeds",      "Onion Seeds",       "base:tile/onion_0",      4));
 		add(std::make_shared<Seed>("base:item/bean_seeds",       "Bean Seeds",        "base:tile/bean_0",       4));
 		add(std::make_shared<Seed>("base:item/chili_seeds",      "Chili Seeds",       "base:tile/chili_0",      5));
+		add(std::make_shared<Seed>("base:item/sugarbeet_seeds",  "Sugar Beet Seeds",  "base:tile/sugarbeet_0",  5));
 
 		add(std::make_shared<SequencerItem>("base:item/sequencer", "Sequencer", 999, 64)); // TODO: cost
 

@@ -165,6 +165,11 @@
 				"station": "base:station/millstone"
 			}],
 			["base:registry/crafting_recipe", {
+				"input":  [["base:item/sugarbeet", 1]],
+				"output": [["base:item/sugar", 1]],
+				"station": "base:station/millstone"
+			}],
+			["base:registry/crafting_recipe", {
 				"input":  [["base:item/sand", 2]],
 				"output": [["base:item/silicon", 1]],
 				"station": "base:station/purifier"

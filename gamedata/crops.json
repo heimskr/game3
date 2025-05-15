@@ -15,6 +15,16 @@
 				"canSpawnInTown": true
 			},
 
+			"base:crop/sugarbeet": {
+				"stages": ["base:tile/sugarbeet_0", "base:tile/sugarbeet_1", "base:tile/sugarbeet_2"],
+				"products": [
+					["constant", ["base:item/sugarbeet"], 1],
+					["exponential", ["base:item/sugarbeet_seeds"], 1, 0.25]
+				],
+				"chance": 1.0,
+				"canSpawnInTown": true
+			},
+
 			"base:crop/wheat": {
 				"stages": ["base:tile/wheat_0", "base:tile/wheat_1", "base:tile/wheat_2", "base:tile/wheat_3", "base:tile/wheat_4"],
 				"products": [
