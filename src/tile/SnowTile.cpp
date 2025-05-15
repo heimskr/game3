@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	SnowTile::SnowTile():
-		Tile(ID()) {}
+		InfiniteShovelableTile(ID(), "base:item/snowball") {}
 
 	std::optional<FluidTile> SnowTile::yieldFluid(const Place &place) {
 		if (!cachedFluidID) {
