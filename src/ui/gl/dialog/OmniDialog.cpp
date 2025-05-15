@@ -240,6 +240,10 @@ namespace Game3 {
 		return Dialog::dragEnd(x, y);
 	}
 
+	bool OmniDialog::blocksMouse(int x, int y, bool is_drag_update) const {
+		return !is_drag_update && getPosition().contains(x, y);
+	}
+
 	bool OmniDialog::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
 		if (!getPosition().contains(x, y)) {
 			return false;
