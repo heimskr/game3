@@ -204,13 +204,9 @@ namespace Game3 {
 		}
 	}
 
-	bool Player::setTooldown(float multiplier) {
-		if (getSide() != Side::Server) {
-			return false;
-		}
-
-		if (ItemStackPtr active = getInventory(0)->getActive()) {
-			if (auto tool = std::dynamic_pointer_cast<Tool>(active->item)) {
+	bool Player::setTooldown(float multiplier, const ItemStackPtr &used_item) {
+		if (getSide() == Side::Server && used_item) {
+			if (auto tool = std::dynamic_pointer_cast<Tool>(used_item->item)) {
 				tooldown = multiplier * tool->baseCooldown;
 				increaseUpdateCounter();
 				return true;

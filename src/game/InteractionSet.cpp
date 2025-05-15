@@ -60,7 +60,7 @@ namespace Game3 {
 
 		if (used_item && item && attribute && !player->hasTooldown()) {
 			if (used_item->hasAttribute(*attribute) && !inventory->add(ItemStack::create(game, *item, 1))) {
-				player->setTooldown(1.f);
+				player->setTooldown(1, used_item);
 				if (used_item->reduceDurability()) {
 					inventory->erase(player->getHeldSlot(hand));
 				}

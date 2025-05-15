@@ -1,43 +1,51 @@
-#include "util/Log.h"
-#include "types/Position.h"
 #include "entity/ItemEntity.h"
 #include "entity/Player.h"
 #include "game/Inventory.h"
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tile/ForestFloorTile.h"
+#include "types/Position.h"
+#include "util/Log.h"
 #include "util/Util.h"
 
 namespace Game3 {
 	ForestFloorTile::ForestFloorTile():
 		Tile(ID()) {}
 
-	bool ForestFloorTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {
-		if (layer != Layer::Terrain)
+	bool ForestFloorTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
+		if (layer != Layer::Terrain) {
 			return false;
+		}
 
 		RealmPtr realm = place.realm;
-		assert(realm);
 		PlayerPtr player = place.player;
-		assert(player);
 		InventoryPtr inventory = player->getInventory(0);
+
+		assert(realm);
+		assert(player);
 		assert(inventory);
 
 		auto lock = inventory->uniqueLock();
 
-		if (player->hasTooldown())
+		if (player->hasTooldown()) {
 			return false;
+		}
 
-		if (ItemStackPtr active = inventory->getActive(); active && active->hasAttribute("base:attribute/shovel")) {
-			player->setTooldown(1.f);
+		ItemStackPtr active = used_item? used_item : inventory->getActive();
 
-			if (active->reduceDurability())
-				inventory->erase(inventory->activeSlot);
+		if (active && active->hasAttribute("base:attribute/shovel")) {
+			player->setTooldown(1, active);
 
-			std::shared_ptr<Game> game = realm->getGame();
+			if (active->reduceDurability()) {
+				inventory->erase(used_item? player->getHeldSlot(hand) : inventory->activeSlot.load());
+			}
+
+			GamePtr game = realm->getGame();
+
 			player->give(ItemStack::create(game, "base:item/dirt"));
-			if (std::uniform_int_distribution(1, 10)(threadContext.rng) <= 2)
+			if (threadContext.random(1, 10) <= 2) {
 				player->give(ItemStack::create(game, "base:item/moss"));
+			}
 
 			inventory->notifyOwner({});
 			return true;
@@ -49,26 +57,29 @@ namespace Game3 {
 	void ForestFloorTile::randomTick(const Place &place) {
 		Tile::randomTick(place);
 
-		Realm &realm = *place.realm;
-		std::shared_ptr<Game> game = realm.getGame();
-
-		std::uniform_int_distribution distribution{0, 99};
-		if (distribution(threadContext.rng) != 0)
+		if (threadContext.random(0, 99) != 0) {
 			return;
-
-		// If there are any adjacent or overlapping items, give up and don't spawn anything.
-		if (auto entities = realm.getEntities(place.position.getChunk())) {
-			auto lock = entities->sharedLock();
-			for (const WeakEntityPtr &weak_entity: *entities)
-				if (EntityPtr entity = weak_entity.lock())
-					if (entity->position.taxiDistance(place.position) <= 3 && std::dynamic_pointer_cast<ItemEntity>(entity))
-						return;
 		}
 
-		if (!place.isPathable())
-			return;
+		GamePtr game = place.realm->getGame();
 
-		std::vector<const char *> mushrooms {
+		// If there are any adjacent or overlapping items, give up and don't spawn anything.
+		if (auto entities = place.realm->getEntities(place.position.getChunk())) {
+			auto lock = entities->sharedLock();
+			for (const WeakEntityPtr &weak_entity: *entities) {
+				if (EntityPtr entity = weak_entity.lock()) {
+					if (entity->position.taxiDistance(place.position) <= 3 && std::dynamic_pointer_cast<ItemEntity>(entity)) {
+						return;
+					}
+				}
+			}
+		}
+
+		if (!place.isPathable()) {
+			return;
+		}
+
+		static const std::vector<Identifier> mushrooms{
 			"base:item/saffron_milkcap",
 			"base:item/saffron_milkcap",
 			"base:item/saffron_milkcap",

@@ -59,7 +59,7 @@ namespace Game3 {
 			virtual void addMoney(MoneyCount) = 0;
 			/** Returns whether the player had enough money. If false, no change was made. */
 			virtual bool removeMoney(MoneyCount) = 0;
-			bool setTooldown(float multiplier);
+			bool setTooldown(float multiplier, const ItemStackPtr &used_item);
 			inline bool hasTooldown() const { return 0.f < tooldown; }
 			virtual void showText(const UString &text, const UString &name) = 0;
 			std::string getName() const override { return "Player"; }
