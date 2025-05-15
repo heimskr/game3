@@ -58,8 +58,25 @@ namespace Game3 {
 		reg.add("base:tile/grim_uranium",  std::make_shared<CaveTile>("base:tile/grim_uranium",  ItemStack::create(self, "base:item/uranium_ore"), "base:tile/grimdirt"));
 		reg.add("base:tile/grim_fireopal", std::make_shared<CaveTile>("base:tile/grim_fireopal", ItemStack::create(self, "base:item/fire_opal"),   "base:tile/grimdirt"));
 
-		reg.add("base:tile/ash",  std::make_shared<FiniteShovelableTile>("base:tile/ash", "base:item/ash"));
 		reg.add("base:tile/cake", std::make_shared<FoodTile>("base:tile/cake", "base:item/cake"));
+
+		auto finite = [&](const char *tile_name, const char *item_name) {
+			Identifier tile_id{"base", std::string("tile/") + tile_name};
+			Identifier item_id{"base", std::string("item/") + item_name};
+			auto tile = std::make_shared<FiniteShovelableTile>(tile_id, std::move(item_id));
+			reg.add(std::move(tile_id), std::move(tile));
+		};
+
+		auto infinite = [&](const char *tile_name, const char *item_name) {
+			Identifier tile_id{"base", std::string("tile/") + tile_name};
+			Identifier item_id{"base", std::string("item/") + item_name};
+			auto tile = std::make_shared<InfiniteShovelableTile>(tile_id, std::move(item_id));
+			reg.add(std::move(tile_id), std::move(tile));
+		};
+
+		finite("ash", "ash");
+		infinite("volcanic_sand", "sulfur");
+		infinite("sand", "sand");
 
 		static const std::array rares{
 			"apatite",

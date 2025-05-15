@@ -41,32 +41,6 @@ namespace Game3 {
 			return true;
 		}
 
-		std::optional<Identifier> item;
-		std::optional<Identifier> attribute;
-
-		if (*terrain_tile == "base:tile/sand"_id) {
-			item.emplace("base:item/sand"_id);
-			attribute.emplace("base:attribute/shovel"_id);
-		} else if (*terrain_tile == "base:tile/shallow_water"_id) {
-			item.emplace("base:item/clay"_id);
-			attribute.emplace("base:attribute/shovel"_id);
-		} else if (*terrain_tile == "base:tile/volcanic_sand"_id) {
-			item.emplace("base:item/volcanic_sand"_id);
-			attribute.emplace("base:attribute/shovel"_id);
-		}
-
-		if (used_item && item && attribute && !player->hasTooldown()) {
-			if (used_item->hasAttribute(*attribute) && !inventory->add(ItemStack::create(game, *item, 1))) {
-				player->setTooldown(1, used_item);
-				if (used_item->reduceDurability()) {
-					inventory->erase(player->getHeldSlot(hand));
-				}
-				// setTooldown doesn't call notifyOwner on the player's inventory, so we have to do it here.
-				inventory->notifyOwner({});
-				return true;
-			}
-		}
-
 		if (tileset.isInCategory(*submerged_tile, "base:category/plantable"_id)) {
 			if (auto iter = game->itemsByAttribute.find("base:attribute/plantable"_id); iter != game->itemsByAttribute.end()) {
 				for (const ItemPtr &item: iter->second) {

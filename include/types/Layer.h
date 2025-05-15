@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <format>
 
 namespace Game3 {
 	/** Doesn't include the fluid layer between Submerged and Objects. */
@@ -23,3 +24,24 @@ namespace Game3 {
 		return static_cast<Layer>(index + (one_based? 0 : 1));
 	}
 }
+
+template <>
+struct std::formatter<Game3::Layer> {
+	constexpr auto parse(auto &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(Game3::Layer layer, auto &ctx) const {
+		const char *name = nullptr;
+		switch (layer) {
+			using enum Game3::Layer;
+			case Invalid: name = "Invalid"; break;
+			case Terrain: name = "Terrain"; break;
+			case Objects: name = "Objects"; break;
+			case Highest: name = "Highest"; break;
+			case Submerged: name = "Submerged"; break;
+			default: name = "?"; break;
+		}
+		return std::format_to(ctx.out(), "{}", name);
+	}
+};
