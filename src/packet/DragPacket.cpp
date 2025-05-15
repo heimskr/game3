@@ -12,14 +12,23 @@ namespace Game3 {
 			return;
 		}
 
-		auto player = client.getPlayer();
+		PlayerPtr player = client.getPlayer();
 		if (!player) {
 			return;
 		}
 
 		const InventoryPtr inventory = player->getInventory(0);
-		if (ItemStackPtr stack = inventory->getActive()) {
-			stack->item->drag(inventory->activeSlot, stack, {position, player->getRealm(), player}, modifiers, offsets);
+
+		ItemStackPtr active_stack;
+		Slot active_slot{};
+		{
+			auto lock = inventory->sharedLock();
+			active_stack = inventory->getActive();
+			active_slot = inventory->activeSlot;
+		}
+
+		if (active_stack) {
+			active_stack->item->drag(active_slot, active_stack, {position, player->getRealm(), player}, modifiers, offsets);
 		}
 	}
 }

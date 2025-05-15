@@ -52,7 +52,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return blocksMouse(x, y, false);
 	}
 
 	bool Widget::mouseDown(int button, int x, int y, Modifiers modifiers) {
@@ -66,7 +66,7 @@ namespace Game3 {
 			}
 		}
 
-		return static_cast<bool>(onClick);
+		return static_cast<bool>(onClick) || blocksMouse(x, y, false);
 	}
 
 	bool Widget::mouseUp(int button, int x, int y, Modifiers modifiers) {
@@ -76,7 +76,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return blocksMouse(x, y, false);
 	}
 
 	bool Widget::dragStart(int x, int y) {
@@ -96,7 +96,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return blocksMouse(x, y, false);
 	}
 
 	bool Widget::dragUpdate(int x, int y) {
@@ -113,7 +113,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return blocksMouse(x, y, true);
 	}
 
 	bool Widget::dragEnd(int x, int y) {
@@ -125,7 +125,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return blocksMouse(x, y, false);
 	}
 
 	bool Widget::scroll(float x_delta, float y_delta, int x, int y, Modifiers modifiers) {
@@ -135,7 +135,7 @@ namespace Game3 {
 			}
 		}
 
-		return false;
+		return blocksMouse(x, y, false);
 	}
 
 	bool Widget::keyPressed(uint32_t, Modifiers, bool) {
@@ -175,6 +175,10 @@ namespace Game3 {
 	}
 
 	void Widget::childResized(const WidgetPtr &, Orientation, int, int) {}
+
+	bool Widget::blocksMouse(int, int, bool) const {
+		return false;
+	}
 
 	WidgetPtr Widget::getParent() const {
 		return weakParent.lock();

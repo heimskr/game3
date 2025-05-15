@@ -40,11 +40,11 @@ namespace Game3 {
 	void ServerWrapper::runInThread(size_t overworld_seed) {
 		stop();
 
-		runThread = std::thread([this, overworld_seed] {
+		runThread = std::thread([this](int overworld_seed) {
 			threadContext.rename("ServerRun");
 			threadActive = true;
 			run(overworld_seed);
-		});
+		}, overworld_seed);
 	}
 
 	void ServerWrapper::run(size_t overworld_seed) {

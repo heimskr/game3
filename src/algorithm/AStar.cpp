@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace Game3 {
-	template<typename T, typename Priority>
+	template <typename T, typename Priority>
 	struct PriorityQueue {
 		using Element = std::pair<Priority, T>;
 		std::priority_queue<Element, std::vector<Element>, std::greater<Element>> elements;

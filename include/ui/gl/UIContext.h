@@ -124,8 +124,6 @@ namespace Game3 {
 			std::vector<std::shared_ptr<Dialog>> dialogs;
 			ScissorStack internalScissorStack; // TODO: remove this
 			WidgetPtr draggedWidget;
-			bool draggedWidgetActive = false;
-			std::optional<std::pair<int, int>> dragOrigin;
 			std::shared_ptr<Hotbar> hotbar;
 			std::shared_ptr<Tooltip> tooltip;
 			std::shared_ptr<AutocompleteDropdown> autocompleteDropdown;
@@ -134,6 +132,9 @@ namespace Game3 {
 			WeakWidgetPtr pressedWidget;
 			WeakDialogPtr focusedDialog;
 			std::set<WidgetPtr> extraDragUpdaters;
+			std::optional<std::pair<int, int>> dragOrigin;
+			bool draggedWidgetActive = false;
+			bool dragging = false;
 
 			void refocusDialogs(int x, int y);
 			void initUI();

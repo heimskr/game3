@@ -16,7 +16,7 @@ namespace Game3 {
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
-			bool mouseDown(int button, int x, int y, Modifiers) final;
+			bool blocksMouse(int x, int y, bool is_drag_update) const final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

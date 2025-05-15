@@ -63,6 +63,7 @@ namespace Game3 {
 			/** Returns whether the given mouse coordinate is over this widget. */
 			virtual bool contains(int x, int y) const;
 			virtual void childResized(const WidgetPtr &child, Orientation, int new_width, int new_height);
+			virtual bool blocksMouse(int x, int y, bool is_drag_update) const;
 
 			WidgetPtr getParent() const;
 			WidgetPtr getPreviousSibling() const;

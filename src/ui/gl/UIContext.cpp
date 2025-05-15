@@ -134,11 +134,11 @@ namespace Game3 {
 		refocusDialogs(x, y);
 
 		if (contextMenu && contextMenu->dragStart(x, y)) {
-			return true;
+			return dragging = true;
 		}
 
 		if (autocompleteDropdown && autocompleteDropdown->dragStart(x, y)) {
-			return true;
+			return dragging = true;
 		}
 
 		unfocusWidget();
@@ -146,23 +146,27 @@ namespace Game3 {
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
 			if (dialog->dragStart(x, y)) {
-				return true;
+				return dragging = true;
 			}
 		}
 
 		if (hotbar->contains(x, y)) {
-			return hotbar->dragStart(x, y);
+			return dragging = hotbar->dragStart(x, y);
 		}
 
 		if (ClientGamePtr game = getGame()) {
 			game->dragStart(x, y, window.getModifiers());
-			return true;
+			return dragging = true;
 		}
 
-		return false;
+		return dragging = false;
 	}
 
 	bool UIContext::dragUpdate(int x, int y) {
+		if (!dragging) {
+			return false;
+		}
+
 		if (contextMenu && contextMenu->dragUpdate(x, y)) {
 			return true;
 		}
@@ -200,6 +204,18 @@ namespace Game3 {
 	}
 
 	bool UIContext::dragEnd(int x, int y) {
+		Defer defer_game{[=, this] {
+			if (ClientGamePtr game = getGame()) {
+				game->dragEnd(x, y, window.getModifiers());
+			}
+		}};
+
+		if (!dragging) {
+			return false;
+		}
+
+		dragging = false;
+
 		if (contextMenu && contextMenu->dragEnd(x, y)) {
 			return true;
 		}
@@ -236,8 +252,9 @@ namespace Game3 {
 			defer = [this] { setDraggedWidget(nullptr); };
 		}
 
-		if (!out) {
-			return hotbar->contains(x, y) && hotbar->dragEnd(x, y);
+		if (!out && hotbar->contains(x, y)) {
+			hotbar->dragEnd(x, y);
+			return true;
 		}
 
 		return true;

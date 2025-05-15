@@ -155,13 +155,14 @@ namespace Game3 {
 				texter.drawOnScreen("R", options);
 			}
 
-			heldLeft ->render(renderers, x, y,                                held_size, held_size);
-			heldRight->render(renderers, x, y + 2 * held_padding + held_size, held_size, held_size);
+			heldLeft ->render(renderers, x, y, held_size, held_size);
+			y += 2 * held_padding + held_size;
+			heldRight->render(renderers, x, y, held_size, held_size);
 		}
 	}
 
-	bool Hotbar::mouseDown(int, int x, int y, Modifiers) {
-		return contains(x, y);
+	bool Hotbar::blocksMouse(int x, int y, bool is_drag_update) const {
+		return !is_drag_update && contains(x, y);
 	}
 
 	SizeRequestMode Hotbar::getRequestMode() const {
