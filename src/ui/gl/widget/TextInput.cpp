@@ -675,6 +675,7 @@ namespace Game3 {
 			onChange(*this, text);
 		}
 
+		clearCachedData();
 		anchor.reset();
 		cursor.emplace(*this, true, text.begin()).goEnd(false);
 	}
