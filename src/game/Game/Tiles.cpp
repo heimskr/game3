@@ -93,9 +93,16 @@ namespace Game3 {
 		}
 
 		const auto monomap = registry<TilesetRegistry>().at("base:tileset/monomap");
-		auto grass = std::make_shared<GrassTile>();
-		for (const auto &tilename: monomap->getTilesByCategory("base:category/flower_spawners")) {
-			reg.add(tilename, grass);
+
+		const auto &flower_spawners = monomap->getTilesByCategory("base:category/flower_spawners");
+		for (const Identifier &tilename: flower_spawners) {
+			reg.add(tilename, std::make_shared<GrassTile>(tilename));
+		}
+
+		for (const Identifier &tilename: monomap->getTilesByCategory("base:category/dirt")) {
+			if (tilename != "base:tile/dirt" && !flower_spawners.contains(tilename)) {
+				reg.add(tilename, std::make_shared<InfiniteShovelableTile>(tilename, "base:item/dirt"));
+			}
 		}
 
 		for (const auto &[crop_name, crop]: registry<CropRegistry>()) {
@@ -112,5 +119,6 @@ namespace Game3 {
 				}
 			}
 		}
+
 	}
 }

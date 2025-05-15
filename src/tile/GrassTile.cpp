@@ -10,7 +10,10 @@
 
 namespace Game3 {
 	GrassTile::GrassTile():
-		Tile(ID()) {}
+		GrassTile(ID()) {}
+
+	GrassTile::GrassTile(Identifier tileID):
+		InfiniteShovelableTile(std::move(tileID), "base:item/dirt") {}
 
 	void GrassTile::randomTick(const Place &place) {
 		Tile::randomTick(place);

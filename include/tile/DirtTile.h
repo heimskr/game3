@@ -1,9 +1,9 @@
 #pragma once
 
-#include "tile/Tile.h"
+#include "tile/InfiniteShovelableTile.h"
 
 namespace Game3 {
-	class DirtTile: public Tile {
+	class DirtTile: public InfiniteShovelableTile {
 		public:
 			static Identifier ID() { return {"base", "tile/dirt"}; }
 

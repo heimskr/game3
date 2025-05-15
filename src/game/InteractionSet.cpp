@@ -53,9 +53,6 @@ namespace Game3 {
 		} else if (*terrain_tile == "base:tile/volcanic_sand"_id) {
 			item.emplace("base:item/volcanic_sand"_id);
 			attribute.emplace("base:attribute/shovel"_id);
-		} else if (tileset.isInCategory(*terrain_tile, "base:category/dirt")) {
-			item.emplace("base:item/dirt"_id);
-			attribute.emplace("base:attribute/shovel"_id);
 		}
 
 		if (used_item && item && attribute && !player->hasTooldown()) {

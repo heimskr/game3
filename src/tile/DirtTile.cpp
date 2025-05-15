@@ -8,7 +8,7 @@
 
 namespace Game3 {
 	DirtTile::DirtTile():
-		Tile(ID()) {}
+		InfiniteShovelableTile(ID(), "base:item/dirt") {}
 
 	void DirtTile::randomTick(const Place &place) {
 		Tile::randomTick(place);
