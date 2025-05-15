@@ -672,10 +672,10 @@ namespace Game3 {
 	void TextInput::setText(UString new_text) {
 		if (text != new_text) {
 			text = std::move(new_text);
+			clearCachedData();
 			onChange(*this, text);
 		}
 
-		clearCachedData();
 		anchor.reset();
 		cursor.emplace(*this, true, text.begin()).goEnd(false);
 	}
