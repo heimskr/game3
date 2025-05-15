@@ -10,8 +10,9 @@ namespace Game3 {
 		Projectile(ID(), std::move(item_id), initial_velocity, angular_velocity, linger_time) {}
 
 	void Egg::onHit(const EntityPtr &target) {
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return;
+		}
 
 		hasHit = true;
 		applyKnockback(target, 1.5);
@@ -21,10 +22,12 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		GamePtr game = realm->getGame();
 
-		if (game->getSide() != Side::Server)
-			return;
-
 		queueDestruction();
+
+		if (game->getSide() != Side::Server) {
+			return;
+		}
+
 		const float random = threadContext.random(0.f, 1.f);
 
 		int count{};

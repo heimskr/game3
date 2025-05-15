@@ -5,8 +5,9 @@ namespace Game3 {
 		Projectile(ID(), std::move(item_id), initial_velocity, angular_velocity, linger_time) {}
 
 	void Snowball::onHit(const EntityPtr &target) {
-		if (getSide() != Side::Server)
+		if (getSide() != Side::Server) {
 			return;
+		}
 
 		hasHit = true;
 		applyKnockback(target, 1.5);
