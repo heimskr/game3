@@ -7,7 +7,7 @@ namespace Game3 {
 	Bomb::Bomb(Identifier itemID, const Vector3 &initialVelocity, double angularVelocity, const std::optional<Position> &intendedTarget, double lingerTime):
 		Projectile(ID(), std::move(itemID), initialVelocity, angularVelocity, intendedTarget, lingerTime) {}
 
-	void Bomb::onHit(const EntityPtr &target) {
+	void Bomb::onHit(const EntityPtr &) {
 		if (getSide() != Side::Server) {
 			return;
 		}

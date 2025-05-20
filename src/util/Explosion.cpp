@@ -40,7 +40,7 @@ namespace Game3 {
 				}
 			}
 
-			if (options.destroysTileEntities) {
+			if (options.affectsTileEntities) {
 				if (TileEntityPtr tile = realm.tileEntityAt(position); tile && tile->kill()) {
 					tile->destroy();
 				}
@@ -48,12 +48,12 @@ namespace Game3 {
 		});
 	}
 
-	void causeExplosion(const Place &place, float radius, float damage_scale, bool destroys_tile_entities) {
+	void causeExplosion(const Place &place, float radius, float damage_scale, bool affects_tile_entities) {
 		ExplosionOptions options{
 			.particleType = "base:entity/explosion_particle",
 			.radius = radius,
 			.damageScale = damage_scale,
-			.destroysTileEntities = destroys_tile_entities,
+			.affectsTileEntities = affects_tile_entities,
 		};
 
 		causeExplosion(place, options);

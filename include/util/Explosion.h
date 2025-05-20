@@ -14,7 +14,7 @@ namespace Game3 {
 		std::optional<float> pitchVariance = 1.2f;
 		float radius = 0;
 		float damageScale = 1;
-		bool destroysTileEntities = false;
+		bool affectsTileEntities = false;
 
 		template <typename T>
 		ExplosionOptions & operator>>(T &&data) {
@@ -30,5 +30,5 @@ namespace Game3 {
 	};
 
 	void causeExplosion(const Place &, const ExplosionOptions &);
-	void causeExplosion(const Place &, float radius, float damage_scale = 1, bool destroys_tile_entities = false);
+	void causeExplosion(const Place &, float radius, float damage_scale = 1, bool affects_tile_entities = false);
 }
