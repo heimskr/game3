@@ -110,7 +110,7 @@ namespace Game3 {
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
 			void showWorldSelector();
-			void playLocally();
+			void playLocally(std::filesystem::path world_path);
 			void feedFPS(double);
 			void showLoginAndRegisterDialogs(const std::string &hostname);
 			bool isConnectedLocally() const;

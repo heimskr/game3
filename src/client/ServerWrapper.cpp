@@ -33,6 +33,9 @@ namespace Game3 {
 		std::filesystem::path CERT_PATH{"localserver.crt"};
 	}
 
+	ServerWrapper::ServerWrapper(std::filesystem::path worldPath):
+		worldPath(std::move(worldPath)) {}
+
 	ServerWrapper::~ServerWrapper() {
 		stop();
 	}
@@ -153,11 +156,10 @@ namespace Game3 {
 				saveCV.notify_all();
 			};
 
-			std::filesystem::path world_path = "localworld.db";
-			const bool database_existed = std::filesystem::exists(world_path);
+			const bool database_existed = std::filesystem::exists(worldPath);
 
 			try {
-				game->openDatabase(world_path);
+				game->openDatabase(worldPath);
 			} catch (const IncompatibleError &) {
 				failure = std::current_exception();
 				stop();

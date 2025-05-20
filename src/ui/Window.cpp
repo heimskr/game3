@@ -926,11 +926,15 @@ namespace Game3 {
 
 	void Window::showWorldSelector() {
 		if (!uiContext.hasDialog<WorldsDialog>()) {
-			uiContext.focusDialog(uiContext.emplaceDialog<WorldsDialog>(1));
+			auto dialog = uiContext.emplaceDialog<WorldsDialog>(1);
+			uiContext.focusDialog(dialog);
+			dialog->signalSubmit.connect([this](const std::filesystem::path &world_path) {
+				playLocally(world_path);
+			});
 		}
 	}
 
-	void Window::playLocally() {
+	void Window::playLocally(std::filesystem::path world_path) {
 		if (game) {
 			game->suppressDisconnectionMessage = true;
 		}
@@ -945,6 +949,10 @@ namespace Game3 {
 			} catch (const std::exception &err) {
 				ERR("Failed to load seed from .seed: {}", err.what());
 			}
+		}
+
+		if (!world_path.empty()) {
+			serverWrapper.worldPath = std::move(world_path);
 		}
 
 		serverWrapper.onError = [this](const std::exception &exception) {

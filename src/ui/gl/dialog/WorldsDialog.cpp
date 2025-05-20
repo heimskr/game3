@@ -45,9 +45,8 @@ namespace Game3 {
 					icon->insertAtEnd(self);
 
 					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
-					label->insertAtEnd(self);
-
 					label->setVerticalAlignment(Alignment::Center);
+					label->insertAtEnd(self);
 				}
 
 				bool click(int button, int, int, Modifiers) final {
@@ -73,13 +72,17 @@ namespace Game3 {
 					icon->insertAtEnd(self);
 
 					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
-					label->insertAtEnd(self);
-
 					label->setVerticalAlignment(Alignment::Center);
+					label->insertAtEnd(self);
+				}
 
-					setOnClick([this](Widget &) {
-						dialog.submit(path);
-					});
+				bool click(int button, int, int, Modifiers) final {
+					if (button != LEFT_BUTTON) {
+						return false;
+					}
+
+					dialog.submit(path);
+					return true;
 				}
 		};
 	}
@@ -117,7 +120,8 @@ namespace Game3 {
 			return true;
 		}
 
-		return Dialog::keyPressed(key, modifiers, is_repeat);
+		Dialog::keyPressed(key, modifiers, is_repeat);
+		return true;
 	}
 
 	void WorldsDialog::rescale(float new_scale) {
@@ -127,8 +131,9 @@ namespace Game3 {
 	}
 
 	void WorldsDialog::submit(const std::filesystem::path &world_path) {
+		auto self = getSelf();
+		ui.removeDialog(self);
 		signalSubmit(world_path);
-		ui.removeDialog(getSelf());
 	}
 
 	void WorldsDialog::populate() {

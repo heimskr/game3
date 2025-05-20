@@ -23,10 +23,11 @@ namespace Game3 {
 	/** Encapsulates a server that runs inside the client to enable local singleplayer gameplay. */
 	class ServerWrapper {
 		public:
+			std::filesystem::path worldPath;
 			std::function<void(std::string_view)> onLog;
 			std::function<void(const std::exception &)> onError;
 
-			ServerWrapper() = default;
+			ServerWrapper(std::filesystem::path worldPath = "localworld.db");
 			~ServerWrapper();
 
 			void runInThread(size_t overworld_seed = -1);
