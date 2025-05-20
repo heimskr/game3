@@ -40,6 +40,8 @@ namespace Game3 {
 			virtual bool heal(HitPoints);
 			/** Returns whether the entity died. */
 			virtual bool takeDamage(HitPoints);
+			/** Returns whether the entity died. `angle` is in radians. */
+			virtual bool hitByExplosion(float damage_scale, float radius, float distance, float angle);
 			virtual void enqueueDamage(HitPoints);
 			virtual void spawnBlood(size_t count);
 			virtual void kill();

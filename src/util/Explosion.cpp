@@ -20,21 +20,39 @@ namespace Game3 {
 			}
 		}
 
-		iterateFilledCircle<Position::IntType>(place.position.column, place.position.row, options.radius, [&](auto x, auto y) {
+		const Vector2d origin(place.position);
+
+		iterateFilledCircle<Position::IntType>(place.position.column, place.position.row, options.radius, [&, &realm = *place.realm, origin, damage_scale = options.damageScale, radius = options.radius](auto x, auto y) {
 			Position position{y, x};
+
 			place.realm->damageGround(position);
+
+			if (options.damageScale != 0) {
+				for (const EntityPtr &hit_entity: realm.findEntities(position)) {
+					if (LivingEntityPtr living_entity = std::dynamic_pointer_cast<LivingEntity>(hit_entity)) {
+						Vector2d entity_vector = Vector2d(living_entity->getPosition()) + living_entity->getOffset();
+						float distance = entity_vector.distance(origin);
+						float angle = (entity_vector - origin).atan2();
+						living_entity->hitByExplosion(damage_scale, radius, distance, angle);
+						living_entity->increaseUpdateCounter();
+						living_entity->sendToVisible();
+					}
+				}
+			}
+
 			if (options.destroysTileEntities) {
-				if (TileEntityPtr tile = place.realm->tileEntityAt(position); tile && tile->kill()) {
+				if (TileEntityPtr tile = realm.tileEntityAt(position); tile && tile->kill()) {
 					tile->destroy();
 				}
 			}
 		});
 	}
 
-	void causeExplosion(const Place &place, float radius, bool destroys_tile_entities) {
+	void causeExplosion(const Place &place, float radius, float damage_scale, bool destroys_tile_entities) {
 		ExplosionOptions options{
 			.particleType = "base:entity/explosion_particle",
 			.radius = radius,
+			.damageScale = damage_scale,
 			.destroysTileEntities = destroys_tile_entities,
 		};
 

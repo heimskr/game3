@@ -14,7 +14,12 @@
 #include "threading/ThreadContext.h"
 #include "util/ConstexprHash.h"
 
+namespace {
+	constexpr float BASE_EXPLOSION_DAMAGE = 5;
+}
+
 namespace Game3 {
+
 	LivingEntity::LivingEntity():
 		Entity("base:invalid/LivingEntity") {}
 
@@ -256,6 +261,28 @@ namespace Game3 {
 		GamePtr game = realm->getGame();
 		game->toServer().broadcast(make<LivingEntityHealthChangedPacket>(*this));
 		return false;
+	}
+
+	bool LivingEntity::hitByExplosion(float damage_scale, float radius, float distance, float angle) {
+		// 1: multiplier ranges from 1 at a distance of 0, to 0 at distance = radius.
+		// >1: multiplier falls to 0 faster.
+		// (0, 1): multiplier reaches 0 at a distance of radius/smoothing.
+		// 0: multiplier is always 1
+		// <0: wat
+		constexpr float smoothing = 0.5;
+		const float multiplier = -distance / radius * smoothing + 1;
+
+		HitPoints damage = BASE_EXPLOSION_DAMAGE * damage_scale * multiplier;
+
+		if (isAffectedByKnockback()) {
+			constexpr float knockback_scale = 16;
+			const float knockback = damage_scale * multiplier * knockback_scale;
+			velocity.x += std::cos(angle) * knockback;
+			velocity.y += std::sin(angle) * knockback;
+			velocity.z += damage_scale * knockback_scale / 2;
+		}
+
+		return takeDamage(damage);
 	}
 
 	void LivingEntity::enqueueDamage(HitPoints damage) {

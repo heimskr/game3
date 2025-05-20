@@ -30,12 +30,13 @@ namespace Game3 {
 		offset.y += args.delta * velocity.y;
 
 		if (offset.z <= 0.) {
-			velocity.getBase() = {};
 			age += args.delta;
 			if (lingerTime <= age) {
 				onExpire();
+				velocity.getBase() = {};
 				return;
 			}
+			velocity.getBase() = {};
 		} else {
 			angle += angularVelocity * args.delta;
 

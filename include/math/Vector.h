@@ -115,6 +115,12 @@ namespace Game3 {
 			return *this;
 		}
 
+		Vector2d & operator+=(const Vector3 &other) {
+			x += other.x;
+			y += other.y;
+			return *this;
+		}
+
 		Vector2d & operator-=(const Vector2d &other) {
 			x -= other.x;
 			y -= other.y;
@@ -122,6 +128,10 @@ namespace Game3 {
 		}
 
 		Vector2d operator+(const Vector2d &other) const {
+			return {x + other.x, y + other.y};
+		}
+
+		Vector2d operator+(const Vector3 &other) const {
 			return {x + other.x, y + other.y};
 		}
 

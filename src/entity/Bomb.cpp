@@ -13,7 +13,7 @@ namespace Game3 {
 		}
 
 		hasHit = true;
-		applyKnockback(target, 3);
+		// No knockback; will be handled by the explosion
 	}
 
 	void Bomb::onExpire() {
@@ -34,9 +34,9 @@ namespace Game3 {
 		position.column = std::floor(position.column + offset.x);
 
 		if (intendedTarget && position.taxiDistance(*intendedTarget) <= 2) {
-			causeExplosion(Place{*intendedTarget, realm}, RADIUS, true);
+			causeExplosion(Place{*intendedTarget, realm}, RADIUS, 1, true);
 		} else {
-			causeExplosion(Place{position, realm}, RADIUS, true);
+			causeExplosion(Place{position, realm}, RADIUS, 1, true);
 		}
 	}
 }
