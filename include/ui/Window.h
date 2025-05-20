@@ -130,9 +130,9 @@ namespace Game3 {
 			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
-			std::pair<int, int> lastWindowSize{-1, -1};
+			std::optional<Vector2i> lastWindowSize;
 			Modifiers lastModifiers;
-			std::optional<std::pair<int, int>> clickPosition;
+			std::optional<Vector2i> clickPosition;
 			std::optional<int> heldMouseButton;
 			std::deque<double> fpses;
 			double runningSum = 0;

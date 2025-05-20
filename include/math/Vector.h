@@ -150,11 +150,19 @@ namespace Game3 {
 	Buffer & operator>>(Buffer &, Vector2d &);
 
 	struct Vector2i {
-		int x = 0;
-		int y = 0;
+		int32_t x = 0;
+		int32_t y = 0;
 
 		double magnitude() const {
 			return std::sqrt(static_cast<double>(x * x + y * y));
+		}
+
+		double distance(Vector2i other) const {
+			return std::sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2));
+		}
+
+		uint32_t taxiDistance(Vector2i other) const {
+			return static_cast<uint32_t>(std::abs(x - other.x) + std::abs(y - other.y));
 		}
 	};
 

@@ -21,6 +21,8 @@ namespace Game3 {
 		float uiScale = 1;
 		int logLevel = 1;
 		uint16_t port = 12255;
+		/** If a drag action's final displacement is less than this, it will count as a click. */
+		uint16_t dragThreshold = 2;
 		bool alertOnConnection = false;
 		bool renderLighting = false;
 		bool hideTimers = true;

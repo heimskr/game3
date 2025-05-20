@@ -312,7 +312,7 @@ namespace Game3 {
 	void Window::tick(float delta) {
 		const auto [width, height] = getDimensions();
 
-		if (width != lastWindowSize.first || height != lastWindowSize.second) {
+		if (!lastWindowSize || width != lastWindowSize->x || height != lastWindowSize->y) {
 			uiContext.onResize(width, height);
 			lastWindowSize = {width, height};
 		}
@@ -643,7 +643,7 @@ namespace Game3 {
 
 			bool result = uiContext.mouseUp(button, x, y, modifiers);
 
-			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition == std::pair{x, y}) {
+			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition->distance({x, y}) < uiContext.dragThreshold) {
 				result = uiContext.click(button, x, y, modifiers) || result;
 			} else {
 				result = uiContext.dragEnd(x, y) || result;
@@ -690,16 +690,18 @@ namespace Game3 {
 			scale *= 1 + .08 * y_delta;
 		}
 
-		const float width = lastWindowSize.first;
-		const float height = lastWindowSize.second;
+		if (lastWindowSize) {
+			const float width = lastWindowSize->x;
+			const float height = lastWindowSize->y;
 
-		const auto difference_x = width / old_scale - width / scale;
-		const auto side_ratio_x = (x - width / 2.f) / width;
-		center.first -= difference_x * side_ratio_x / 8.f * x_factor;
+			const auto difference_x = width / old_scale - width / scale;
+			const auto side_ratio_x = (x - width / 2.f) / width;
+			center.first -= difference_x * side_ratio_x / 8.f * x_factor;
 
-		const auto difference_y = height / old_scale - height / scale;
-		const auto side_ratio_y = (y - height / 2.f) / height;
-		center.second -= difference_y * side_ratio_y / 8.f * y_factor;
+			const auto difference_y = height / old_scale - height / scale;
+			const auto side_ratio_y = (y - height / 2.f) / height;
+			center.second -= difference_y * side_ratio_y / 8.f * y_factor;
+		}
 	}
 
 	void Window::contentScaleCallback(float x_scale, float y_scale) {

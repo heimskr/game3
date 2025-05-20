@@ -32,6 +32,7 @@ namespace Game3 {
 			std::shared_ptr<UI> currentUI;
 			ScissorStack scissorStack;
 			float scale = 1;
+			uint16_t dragThreshold = 2;
 			bool renderingDraggedWidget = false;
 
 			UIContext(Window &);

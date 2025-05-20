@@ -178,15 +178,6 @@ namespace Game3 {
 		add_checkbox("Cap FPS", &ClientSettings::capFPS);
 		add_checkbox("Special Effects", &ClientSettings::specialEffects);
 
-		auto mystery_slider = add_slider("Mystery");
-		mystery_slider->setRange(0, 40);
-		mystery_slider->setStep(0.00000000001);
-		mystery_slider->setValue(settings.mystery);
-		mystery_slider->setDisplayDigits(5);
-		mystery_slider->onValueUpdate.connect([this](Slider &, double value) {
-			applySetting(&ClientSettings::mystery, value);
-		});
-
 		auto scale_slider = add_slider("UI Scale");
 		scale_slider->setRange(0.5, 16);
 		scale_slider->setStep(0.5);
@@ -194,14 +185,6 @@ namespace Game3 {
 		scale_slider->setDisplayDigits(1);
 		scale_slider->onRelease.connect([this](Slider &, double value) {
 			applySetting(&ClientSettings::uiScale, value);
-		});
-
-		auto level_slider = add_slider("Log Level");
-		level_slider->setRange(0, 3);
-		level_slider->setStep(1);
-		level_slider->setValue(Logger::level);
-		level_slider->onValueUpdate.connect([this](Slider &, double value) {
-			applySetting(&ClientSettings::logLevel, value);
 		});
 
 		auto frequency_slider = add_slider("Tick Frequency");
@@ -213,6 +196,15 @@ namespace Game3 {
 			applySetting(&ClientSettings::tickFrequency, value);
 		});
 
+		auto threshold_slider = add_slider("Drag Threshold");
+		threshold_slider->setRange(1, 32);
+		threshold_slider->setStep(1);
+		threshold_slider->setDisplayDigits(0);
+		threshold_slider->setValue(settings.dragThreshold);
+		threshold_slider->onValueUpdate.connect([&](Slider &, double value) {
+			applySetting(&ClientSettings::dragThreshold, value);
+		});
+
 		auto smoothing_slider = add_slider("FPS Accumulation", "Affects the FPS counter,\nnot the FPS itself.");
 		smoothing_slider->setRange(1, 1000);
 		smoothing_slider->setStep(1);
@@ -220,6 +212,23 @@ namespace Game3 {
 		smoothing_slider->setValue(settings.fpsSmoothing);
 		smoothing_slider->onValueUpdate.connect([&](Slider &, double value) {
 			applySetting(&ClientSettings::fpsSmoothing, value);
+		});
+
+		auto level_slider = add_slider("Log Level");
+		level_slider->setRange(0, 3);
+		level_slider->setStep(1);
+		level_slider->setValue(Logger::level);
+		level_slider->onValueUpdate.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::logLevel, value);
+		});
+
+		auto mystery_slider = add_slider("Mystery");
+		mystery_slider->setRange(0, 40);
+		mystery_slider->setStep(0.00000000001);
+		mystery_slider->setValue(settings.mystery);
+		mystery_slider->setDisplayDigits(5);
+		mystery_slider->onValueUpdate.connect([this](Slider &, double value) {
+			applySetting(&ClientSettings::mystery, value);
 		});
 
 		auto save_button = std::make_shared<Button>(ui, selfScale);

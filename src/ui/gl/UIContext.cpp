@@ -115,6 +115,15 @@ namespace Game3 {
 	bool UIContext::click(int button, int x, int y, Modifiers modifiers) {
 		refocusDialogs(x, y);
 
+		if (dragging) {
+			dragging = false;
+			if (draggedWidget != nullptr && draggedWidgetActive) {
+				draggedWidget->dragEnd(x, y);
+				draggedWidgetActive = false;
+				setDraggedWidget(nullptr);
+			}
+		}
+
 		return dispatch(&Widget::click, button, x, y, modifiers);
 	}
 

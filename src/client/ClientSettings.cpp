@@ -17,6 +17,7 @@ namespace Game3 {
 
 	void ClientSettings::apply(UIContext &ui) const {
 		ui.setScale(uiScale);
+		ui.dragThreshold = dragThreshold;
 		apply();
 	}
 
@@ -49,6 +50,7 @@ namespace Game3 {
 		get("capFPS", &ClientSettings::capFPS);
 		get("specialEffects", &ClientSettings::specialEffects);
 		get("uiScale", &ClientSettings::uiScale);
+		get("dragThreshold", &ClientSettings::dragThreshold);
 
 		return out;
 	}
@@ -70,5 +72,6 @@ namespace Game3 {
 		object["capFPS"] = settings.capFPS;
 		object["specialEffects"] = settings.specialEffects;
 		object["uiScale"] = settings.uiScale;
+		object["dragThreshold"] = settings.dragThreshold;
 	}
 }
