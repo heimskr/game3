@@ -21,6 +21,7 @@
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
+#include "ui/gl/dialog/WorldsDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
@@ -400,7 +401,7 @@ namespace Game3 {
 
 			if (modifiers.onlyCtrl() && action == GLFW_PRESS) {
 				if (key == GLFW_KEY_P) {
-					playLocally();
+					showWorldSelector();
 					return;
 				}
 			}
@@ -920,6 +921,12 @@ namespace Game3 {
 			});
 		} else {
 			error("Couldn't find token for user " + settings.username + " on host " + hostname);
+		}
+	}
+
+	void Window::showWorldSelector() {
+		if (!uiContext.hasDialog<WorldsDialog>()) {
+			uiContext.focusDialog(uiContext.emplaceDialog<WorldsDialog>(1));
 		}
 	}
 

@@ -128,6 +128,6 @@ namespace Game3 {
 	}
 
 	void ConnectionDialog::playLocally() {
-		ui.window.playLocally();
+		ui.window.showWorldSelector();
 	}
 }

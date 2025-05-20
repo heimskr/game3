@@ -109,6 +109,7 @@ namespace Game3 {
 			void closeGame();
 			void goToTitle();
 			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
+			void showWorldSelector();
 			void playLocally();
 			void feedFPS(double);
 			void showLoginAndRegisterDialogs(const std::string &hostname);

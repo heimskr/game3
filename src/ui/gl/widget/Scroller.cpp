@@ -277,15 +277,11 @@ namespace Game3 {
 		lastChildHeight.reset();
 	}
 
-	bool Scroller::getNatural() const {
-		return false;
-	}
-
-	float Scroller::getBarThickness() const {
-		return 2 * selfScale;
-	}
-
 	float Scroller::getHorizontalOffset() const {
+		if (!lastChildWidth) {
+			return 0;
+		}
+
 		const float width = lastRectangle.width;
 		const float horizontal_fraction = replaceNaN(width / (ALLOW_HORIZONTAL_OVERSCROLL? width + lastChildWidth.value() : lastChildWidth.value()), 0);
 		const float horizontal_width = horizontal_fraction * width;
@@ -293,10 +289,26 @@ namespace Game3 {
 	}
 
 	float Scroller::getVerticalOffset() const {
+		if (!lastChildHeight) {
+			return 0;
+		}
+
 		const float height = lastRectangle.height;
 		const float vertical_fraction = replaceNaN(height / (ALLOW_VERTICAL_OVERSCROLL? height + lastChildHeight.value() : lastChildHeight.value()), 0);
 		const float vertical_height = vertical_fraction * height;
 		return replaceNaN(yOffset / lastChildHeight.value() * ((ALLOW_VERTICAL_OVERSCROLL? vertical_height : 0) - height), 0);
+	}
+
+	void Scroller::scrollToTop() {
+		yOffset = 0;
+	}
+
+	bool Scroller::getNatural() const {
+		return false;
+	}
+
+	float Scroller::getBarThickness() const {
+		return 2 * selfScale;
 	}
 
 	float Scroller::recalculateXOffset(float horizontal_offset) const {

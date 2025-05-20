@@ -28,6 +28,9 @@ namespace Game3 {
 			void childResized(const WidgetPtr &, Orientation, int, int) final;
 
 			void setChild(WidgetPtr);
+			float getVerticalOffset() const;
+			float getHorizontalOffset() const;
+			void scrollToTop();
 
 		private:
 			Color scrollbarColor;
@@ -43,8 +46,6 @@ namespace Game3 {
 
 			bool getNatural() const;
 			float getBarThickness() const;
-			float getVerticalOffset() const;
-			float getHorizontalOffset() const;
 			float recalculateYOffset(float vertical_offset) const;
 			float recalculateXOffset(float horizontal_offset) const;
 			float fixXOffset(float) const;

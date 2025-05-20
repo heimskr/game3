@@ -270,9 +270,8 @@ namespace Game3 {
 		// 0: multiplier is always 1
 		// <0: wat
 		constexpr float smoothing = 0.5;
-		const float multiplier = -distance / radius * smoothing + 1;
-
-		HitPoints damage = BASE_EXPLOSION_DAMAGE * damage_scale * multiplier;
+		const float multiplier = std::max<float>(0, -distance / radius * smoothing + 1);
+		const HitPoints damage = BASE_EXPLOSION_DAMAGE * damage_scale * multiplier;
 
 		if (isAffectedByKnockback()) {
 			constexpr float knockback_scale = 16;

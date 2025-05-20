@@ -340,8 +340,9 @@ namespace Game3 {
 		{
 			suppressChildUpdates = true;
 			Defer defer([this] { suppressChildUpdates = false; });
-			while (firstChild)
+			while (firstChild) {
 				remove(firstChild);
+			}
 		}
 
 		onChildrenUpdated();

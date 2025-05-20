@@ -87,9 +87,12 @@ int main(int argc, char **argv) {
 	}
 
 	std::filesystem::current_path(".var/app/gay.heimskr.Game3/data");
-	if (!std::filesystem::exists("resources"))
+	if (!std::filesystem::exists("resources")) {
 		std::filesystem::create_symlink(dataRoot / "resources", "resources");
+	}
 #endif
+
+	std::filesystem::create_directory("worlds");
 
 	if (2 <= argc) {
 		if (chemskrTest(argc, argv))

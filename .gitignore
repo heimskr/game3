@@ -60,3 +60,4 @@ vgcore.*
 /update
 /*.hash
 /*.stamp
+/worlds

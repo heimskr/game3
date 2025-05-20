@@ -5,7 +5,6 @@
 namespace {
 	constexpr float DEFAULT_SEPARATOR_THICKNESS = 1;
 	constexpr float DEFAULT_PADDING = 2;
-	constexpr Game3::Color DEFAULT_SEPARATOR_COLOR{"#49120060"};
 }
 
 namespace Game3 {
@@ -231,6 +230,8 @@ namespace Game3 {
 		}
 
 		childMeasurements.clear();
+		lastRectangle.width = -1;
+		lastRectangle.height = -1;
 		return true;
 	}
 
