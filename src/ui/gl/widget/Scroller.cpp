@@ -68,10 +68,6 @@ namespace Game3 {
 	}
 
 	bool Scroller::click(int button, int x, int y, Modifiers modifiers) {
-		if (lastHorizontalScrollMouse || lastVerticalScrollMouse) {
-			return false;
-		}
-
 		return firstChild && firstChild->click(button, x, y, modifiers);
 	}
 

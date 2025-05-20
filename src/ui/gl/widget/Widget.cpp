@@ -42,7 +42,7 @@ namespace Game3 {
 			return false;
 		}
 
-		if ((!dragOrigin || *dragOrigin == std::pair{x, y}) && onClick) {
+		if (onClick) {
 			return onClick(*this, button, x - lastRectangle.x, y - lastRectangle.y);
 		}
 
