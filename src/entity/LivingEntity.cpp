@@ -15,7 +15,7 @@
 #include "util/ConstexprHash.h"
 
 namespace {
-	constexpr float BASE_EXPLOSION_DAMAGE = 5;
+	constexpr float BASE_EXPLOSION_DAMAGE = 10;
 }
 
 namespace Game3 {
