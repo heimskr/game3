@@ -1,5 +1,5 @@
 #include "entity/Player.h"
-#include "entity/SquareParticle.h"
+#include "entity/ServerPlayer.h"
 #include "math/FilledCircle.h"
 #include "packet/ExplosionPacket.h"
 #include "realm/Realm.h"
@@ -36,6 +36,10 @@ namespace Game3 {
 						living_entity->hitByExplosion(damage_scale, radius, distance, angle);
 						living_entity->increaseUpdateCounter();
 						living_entity->sendToVisible();
+						if (living_entity->isPlayer()) {
+							ServerPlayerPtr player = std::dynamic_pointer_cast<ServerPlayer>(living_entity);
+							living_entity->sendTo(*player->getClient());
+						}
 					}
 				}
 			}
