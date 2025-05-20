@@ -19,7 +19,7 @@ namespace Game3 {
 		class Row: public Box {
 			public:
 				Row(WorldsDialog &dialog, std::filesystem::path path):
-					Box(dialog.getUI(), 0.5, Orientation::Horizontal, 5, 0, Color{}),
+					Box(dialog.getUI(), 0.6, Orientation::Horizontal, 5, 0, Color{}),
 					dialog(dialog),
 					path(std::move(path)) {}
 
@@ -44,7 +44,7 @@ namespace Game3 {
 					icon->setIconTexture(cacheTexture("resources/gui/folder.png"));
 					icon->insertAtEnd(self);
 
-					auto label = make<Label>(ui, selfScale, path.filename().string());
+					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
 					label->insertAtEnd(self);
 
 					label->setVerticalAlignment(Alignment::Center);
@@ -72,7 +72,7 @@ namespace Game3 {
 					icon->setIconTexture(cacheTexture("resources/gui/picture.png"));
 					icon->insertAtEnd(self);
 
-					auto label = make<Label>(ui, selfScale, path.filename().string());
+					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
 					label->insertAtEnd(self);
 
 					label->setVerticalAlignment(Alignment::Center);
@@ -117,7 +117,7 @@ namespace Game3 {
 			return true;
 		}
 
-		return Widget::keyPressed(key, modifiers, is_repeat);
+		return Dialog::keyPressed(key, modifiers, is_repeat);
 	}
 
 	void WorldsDialog::rescale(float new_scale) {
@@ -141,7 +141,7 @@ namespace Game3 {
 		std::set<std::filesystem::path> directories;
 		std::set<std::filesystem::path> worlds;
 
-		for (const auto &entry: std::filesystem::directory_iterator(currentPath)) {
+		for (const auto &entry: std::filesystem::directory_iterator(currentPath, std::filesystem::directory_options::skip_permission_denied)) {
 			const std::filesystem::path &path = entry.path();
 
 			if (showHidden && path.filename().string().starts_with('.')) {
