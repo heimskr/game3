@@ -41,12 +41,17 @@ namespace Game3 {
 					Row::init();
 					auto self = getSelf();
 					auto icon = make<Icon>(ui, selfScale);
-					icon->setIconTexture(cacheTexture("resources/gui/folder.png"));
-					icon->insertAtEnd(self);
-
-					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
-					label->setVerticalAlignment(Alignment::Center);
-					label->insertAtEnd(self);
+					std::string filename = path.filename().string();
+					if (filename == "..") {
+						icon->setIconTexture(cacheTexture("resources/gui/up.png"));
+						icon->insertAtEnd(self);
+					} else {
+						icon->setIconTexture(cacheTexture("resources/gui/folder.png"));
+						icon->insertAtEnd(self);
+						auto label = make<Label>(ui, selfScale * 1.25, std::move(filename));
+						label->setVerticalAlignment(Alignment::Center);
+						label->insertAtEnd(self);
+					}
 				}
 
 				bool click(int button, int, int, Modifiers) final {
