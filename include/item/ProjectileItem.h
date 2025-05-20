@@ -28,7 +28,7 @@ namespace Game3 {
 
 				player->getInventory(0)->decrease(stack, slot, 1, true);
 
-				constexpr static double scale = 1.5;
+				constexpr static double scale = 1;
 				const Position relative = place.position - player->getPosition();
 				Vector3 velocity(relative.column + (0.5 - offsets.first), relative.row + (0.5 - offsets.second), 16.0);
 				velocity.x *= scale;
