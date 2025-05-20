@@ -27,7 +27,7 @@ namespace Game3 {
 			bool click(int button, int x, int y, Modifiers) override;
 			bool dragStart(int x, int y) override;
 			bool dragUpdate(int x, int y) override;
-			bool dragEnd(int x, int y) override;
+			bool dragEnd(int x, int y, double) override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 
 			virtual float getTitleScale() const = 0;

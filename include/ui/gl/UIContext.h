@@ -48,7 +48,7 @@ namespace Game3 {
 			bool mouseUp(int button, int x, int y, Modifiers);
 			bool dragStart(int x, int y);
 			bool dragUpdate(int x, int y);
-			bool dragEnd(int x, int y);
+			bool dragEnd(int x, int y, double displacement);
 			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers);
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			bool charPressed(uint32_t character, Modifiers);

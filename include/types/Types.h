@@ -112,9 +112,10 @@ namespace Game3 {
 		return static_cast<Index>(value);
 	}
 
-	enum class PathResult: uint8_t {Invalid, Trivial, Unpathable, Success};
+	enum class PathResult: uint8_t {Invalid = 0, Trivial, Unpathable, Success};
 	enum class Substance: uint8_t {Invalid = 0, Item, Fluid, Energy, Data};
 	enum class Hand: uint8_t {None = 0, Left, Right};
+	enum class DragAction: uint8_t {Invalid = 0, Start, Update, End};
 }
 
 template <>

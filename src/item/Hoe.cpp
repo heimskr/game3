@@ -25,7 +25,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Hoe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool Hoe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 }

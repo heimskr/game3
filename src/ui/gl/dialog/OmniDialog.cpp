@@ -228,16 +228,16 @@ namespace Game3 {
 		return Dialog::dragUpdate(x, y);
 	}
 
-	bool OmniDialog::dragEnd(int x, int y) {
+	bool OmniDialog::dragEnd(int x, int y, double displacement) {
 		if (!getPosition().contains(x, y)) {
 			return false;
 		}
 
-		if (activeTab && activeTab->dragEnd(x, y)) {
+		if (activeTab && activeTab->dragEnd(x, y, displacement)) {
 			return true;
 		}
 
-		return Dialog::dragEnd(x, y);
+		return Dialog::dragEnd(x, y, displacement);
 	}
 
 	bool OmniDialog::blocksMouse(int x, int y, bool is_drag_update) const {

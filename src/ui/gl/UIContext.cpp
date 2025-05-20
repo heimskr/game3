@@ -118,7 +118,7 @@ namespace Game3 {
 		if (dragging) {
 			dragging = false;
 			if (draggedWidget != nullptr && draggedWidgetActive) {
-				draggedWidget->dragEnd(x, y);
+				draggedWidget->dragEnd(x, y, -1);
 				draggedWidgetActive = false;
 				setDraggedWidget(nullptr);
 			}
@@ -212,7 +212,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool UIContext::dragEnd(int x, int y) {
+	bool UIContext::dragEnd(int x, int y, double displacement) {
 		Defer defer_game{[=, this] {
 			if (ClientGamePtr game = getGame()) {
 				game->dragEnd(x, y, window.getModifiers());
@@ -225,21 +225,21 @@ namespace Game3 {
 
 		dragging = false;
 
-		if (contextMenu && contextMenu->dragEnd(x, y)) {
+		if (contextMenu && contextMenu->dragEnd(x, y, displacement)) {
 			return true;
 		}
 
-		if (autocompleteDropdown && autocompleteDropdown->dragEnd(x, y)) {
+		if (autocompleteDropdown && autocompleteDropdown->dragEnd(x, y, displacement)) {
 			return true;
 		}
 
 		if (auto pressed = getPressedWidget()) {
-			return pressed->dragEnd(x, y);
+			return pressed->dragEnd(x, y, displacement);
 		}
 
 		for (const WidgetPtr &widget: extraDragUpdaters) {
 			widget->dragOrigin.reset();
-			widget->dragEnd(x, y);
+			widget->dragEnd(x, y, displacement);
 		}
 
 		extraDragUpdaters.clear();
@@ -247,7 +247,7 @@ namespace Game3 {
 		bool out = false;
 
 		for (const DialogPtr &dialog: reverse(dialogs)) {
-			if (dialog->contains(x, y) && dialog->dragEnd(x, y)) {
+			if (dialog->contains(x, y) && dialog->dragEnd(x, y, displacement)) {
 				out = true;
 				break;
 			}
@@ -256,13 +256,13 @@ namespace Game3 {
 		Defer defer;
 
 		if (draggedWidget != nullptr && draggedWidgetActive) {
-			draggedWidget->dragEnd(x, y);
+			draggedWidget->dragEnd(x, y, displacement);
 			draggedWidgetActive = false;
 			defer = [this] { setDraggedWidget(nullptr); };
 		}
 
 		if (!out && hotbar->contains(x, y)) {
-			hotbar->dragEnd(x, y);
+			hotbar->dragEnd(x, y, displacement);
 			return true;
 		}
 

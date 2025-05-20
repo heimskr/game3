@@ -24,7 +24,7 @@ namespace Game3 {
 
 			bool dragStart(int x, int y) final;
 			bool dragUpdate(int x, int y) final;
-			bool dragEnd(int x, int y) final;
+			bool dragEnd(int x, int y, double) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

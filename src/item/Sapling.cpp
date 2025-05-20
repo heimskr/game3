@@ -29,7 +29,7 @@ namespace Game3 {
 		return plant(inventory, slot, stack, place);
 	}
 
-	bool Sapling::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool Sapling::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 

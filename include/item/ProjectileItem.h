@@ -20,7 +20,7 @@ namespace Game3 {
 			ProjectileItem(ItemID id, std::string name, MoneyCount base_price, Identifier projectile_id, ItemCount max_count = 64):
 				Item(std::move(id), std::move(name), base_price, max_count), projectileID(std::move(projectile_id)) {}
 
-			bool use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float> offsets) {
+			bool use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float> offsets) override {
 				PlayerPtr player = place.player;
 				GamePtr game = player->getGame();
 
@@ -45,6 +45,14 @@ namespace Game3 {
 				realm->playSound(place.position, "base:sound/throw", threadContext.getPitch(1.111f));
 
 				return true;
+			}
+
+			bool drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction action) override {
+				if (action == DragAction::End) {
+					return use(slot, stack, place, modifiers, offsets);
+				}
+
+				return Item::drag(slot, stack, place, modifiers, offsets, action);
 			}
 
 		private:

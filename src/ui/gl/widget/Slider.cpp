@@ -81,8 +81,8 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Slider::dragEnd(int x, int y) {
-		Widget::dragEnd(x, y);
+	bool Slider::dragEnd(int x, int y, double displacement) {
+		Widget::dragEnd(x, y, displacement);
 		onRelease(*this, value);
 		return true;
 	}

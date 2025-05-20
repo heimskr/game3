@@ -41,7 +41,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool VoidPickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool VoidPickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		if (modifiers.onlyShift()) {
 			return use(slot, stack, place, modifiers, offsets);
 		}

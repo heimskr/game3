@@ -96,14 +96,14 @@ namespace Game3 {
 		return false;
 	}
 
-	bool InventoryTab::dragEnd(int x, int y) {
-		if (playerScroller->contains(x, y) && playerScroller->dragEnd(x, y))
+	bool InventoryTab::dragEnd(int x, int y, double displacement) {
+		if (playerScroller->contains(x, y) && playerScroller->dragEnd(x, y, displacement))
 			return true;
 
 		std::unique_lock<DefaultMutex> lock;
 		if (getModule(lock)) {
 			if (moduleScroller->contains(x, y)) {
-				return moduleScroller->dragEnd(x, y);
+				return moduleScroller->dragEnd(x, y, displacement);
 			}
 		}
 

@@ -7,7 +7,7 @@ namespace Game3 {
 		public:
 			using Plantable::Plantable;
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
 			bool plant(InventoryPtr, Slot, const ItemStackPtr &, const Place &) override;
 
 			virtual Identifier getRealmType() const { return "base:realm/overworld"; }

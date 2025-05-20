@@ -642,11 +642,12 @@ namespace Game3 {
 			}
 
 			bool result = uiContext.mouseUp(button, x, y, modifiers);
+			auto displacement = clickPosition? clickPosition->distance({x, y}) : 0;
 
-			if (button != GLFW_MOUSE_BUTTON_LEFT || clickPosition->distance({x, y}) < uiContext.dragThreshold) {
+			if (button != GLFW_MOUSE_BUTTON_LEFT || displacement < uiContext.dragThreshold) {
 				result = uiContext.click(button, x, y, modifiers) || result;
 			} else {
-				result = uiContext.dragEnd(x, y) || result;
+				result = uiContext.dragEnd(x, y, displacement) || result;
 				dragStarted = false;
 			}
 

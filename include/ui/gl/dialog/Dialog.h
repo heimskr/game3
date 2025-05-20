@@ -45,7 +45,7 @@ namespace Game3 {
 			bool mouseUp(int button, int x, int y, Modifiers) override;
 			bool dragStart(int x, int y) override;
 			bool dragUpdate(int x, int y) override;
-			bool dragEnd(int x, int y) override;
+			bool dragEnd(int x, int y, double) override;
 			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) override;
 			bool contains(int x, int y) const override;
 

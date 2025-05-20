@@ -8,6 +8,6 @@ namespace Game3 {
 			Identifier tilename;
 			Floor(ItemID, std::string name_, Identifier tilename_, MoneyCount base_price, ItemCount max_count = 64);
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
 	};
 }

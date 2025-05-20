@@ -173,7 +173,7 @@ namespace Game3 {
 		return firstChild && firstChild->dragUpdate(x, y);
 	}
 
-	bool Scroller::dragEnd(int x, int y) {
+	bool Scroller::dragEnd(int x, int y, double displacement) {
 		reverseScroll = false;
 
 		if (lastHorizontalScrollMouse) {
@@ -186,7 +186,7 @@ namespace Game3 {
 			return true;
 		}
 
-		return firstChild && firstChild->dragEnd(x, y);
+		return firstChild && firstChild->dragEnd(x, y, displacement);
 	}
 
 	bool Scroller::scroll(float x_delta, float y_delta, int, int, Modifiers) {

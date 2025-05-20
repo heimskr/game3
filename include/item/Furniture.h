@@ -20,7 +20,7 @@ namespace Game3 {
 			using Item::Item;
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
 
 			virtual bool preCheck(const Place &) const;
 			virtual Layer getLayer() const = 0;

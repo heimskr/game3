@@ -169,7 +169,7 @@ namespace Game3 {
 		return combined;
 	}
 
-	bool Copier::drag(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+	bool Copier::drag(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>, DragAction) {
 		if (modifiers == Modifiers(true, true, false, false)) {
 			std::string tiles = getString(stack, place.realm);
 			try {

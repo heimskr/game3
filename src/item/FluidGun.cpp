@@ -180,7 +180,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool FluidGun::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool FluidGun::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 

@@ -33,7 +33,7 @@ namespace Game3 {
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 
 			bool click(int button, int x, int y, Modifiers) final;
-			bool dragEnd(int x, int y) final;
+			bool dragEnd(int x, int y, double) final;
 
 			SizeRequestMode getRequestMode() const final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;

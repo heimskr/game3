@@ -131,8 +131,8 @@ namespace Game3 {
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
 			std::optional<Vector2i> lastWindowSize;
-			Modifiers lastModifiers;
 			std::optional<Vector2i> clickPosition;
+			Modifiers lastModifiers;
 			std::optional<int> heldMouseButton;
 			std::deque<double> fpses;
 			double runningSum = 0;

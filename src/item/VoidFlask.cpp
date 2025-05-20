@@ -27,7 +27,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool VoidFlask::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool VoidFlask::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		if (modifiers.onlyShift()) {
 			return use(slot, stack, place, modifiers, offsets);
 		}

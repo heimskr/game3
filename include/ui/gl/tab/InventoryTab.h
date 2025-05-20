@@ -18,7 +18,7 @@ namespace Game3 {
 			void renderIcon(const RendererContext &) final;
 			bool click(int button, int x, int y, Modifiers) final;
 			bool dragStart(int x, int y) final;
-			bool dragEnd(int x, int y) final;
+			bool dragEnd(int x, int y, double) final;
 			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
 
 			void setModule(std::shared_ptr<Module>);

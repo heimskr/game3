@@ -67,9 +67,9 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Dialog::dragEnd(int x, int y) {
+	bool Dialog::dragEnd(int x, int y, double displacement) {
 		if (contains(x, y)) {
-			return Widget::dragEnd(x, y);
+			return Widget::dragEnd(x, y, displacement);
 		}
 
 		return false;

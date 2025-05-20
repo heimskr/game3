@@ -8,10 +8,6 @@
 
 namespace Game3 {
 	void DragPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {
-		if (action != Action::Start && action != Action::Update) {
-			return;
-		}
-
 		PlayerPtr player = client.getPlayer();
 		if (!player) {
 			return;
@@ -28,7 +24,7 @@ namespace Game3 {
 		}
 
 		if (active_stack) {
-			active_stack->item->drag(active_slot, active_stack, {position, player->getRealm(), player}, modifiers, offsets);
+			active_stack->item->drag(active_slot, active_stack, {position, player->getRealm(), player}, modifiers, offsets, action);
 		}
 	}
 }

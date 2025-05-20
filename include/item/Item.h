@@ -68,7 +68,7 @@ namespace Game3 {
 			/** Called when the user uses the item via the context menu or via a keyboard shortcut. Returns true iff propagation should stop. */
 			virtual bool use(Slot, const ItemStackPtr &, const std::shared_ptr<Player> &, Modifiers);
 
-			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);
+			virtual bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets, DragAction);
 
 			/** Called on the client every tick while the user is holding the mouse button on the world with the item selected. */
 			virtual bool fire(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float> offsets);

@@ -134,7 +134,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool InventoryModule::dragEnd(int x, int y) {
+	bool InventoryModule::dragEnd(int x, int y, double) {
 		auto dragged = std::dynamic_pointer_cast<ItemSlot>(ui.getDraggedWidget());
 
 		if (!dragged) {

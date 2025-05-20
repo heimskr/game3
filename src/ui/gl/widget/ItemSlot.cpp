@@ -125,7 +125,7 @@ namespace Game3 {
 		return Widget::dragStart(x, y) || out;
 	}
 
-	bool ItemSlot::dragEnd(int x, int y) {
+	bool ItemSlot::dragEnd(int x, int y, double displacement) {
 		if (!onDrop.empty()) {
 			if (WidgetPtr dragged = ui.getDraggedWidget()) {
 				if (dragged.get() == this) {
@@ -137,7 +137,7 @@ namespace Game3 {
 			}
 		}
 
-		return Widget::dragEnd(x, y);
+		return Widget::dragEnd(x, y, displacement);
 	}
 
 	SizeRequestMode ItemSlot::getRequestMode() const {

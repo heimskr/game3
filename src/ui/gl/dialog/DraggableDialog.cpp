@@ -119,9 +119,9 @@ namespace Game3 {
 		return Dialog::dragUpdate(x, y);
 	}
 
-	bool BaseDraggableDialog::dragEnd(int x, int y) {
+	bool BaseDraggableDialog::dragEnd(int x, int y, double displacement) {
 		dragOffset.reset();
-		return Dialog::dragEnd(x, y);
+		return Dialog::dragEnd(x, y, displacement);
 	}
 
 	bool BaseDraggableDialog::keyPressed(uint32_t key, Modifiers, bool) {

@@ -133,7 +133,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Item::drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) {
+	bool Item::drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) {
 		return false;
 	}
 

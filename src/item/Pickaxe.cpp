@@ -30,7 +30,7 @@ namespace Game3 {
 		return false;
 	}
 
-	bool Pickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool Pickaxe::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 

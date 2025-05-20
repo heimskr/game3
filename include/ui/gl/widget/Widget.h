@@ -48,7 +48,7 @@ namespace Game3 {
 			virtual bool mouseUp(int button, int x, int y, Modifiers);
 			virtual bool dragStart(int x, int y);
 			virtual bool dragUpdate(int x, int y);
-			virtual bool dragEnd(int x, int y);
+			virtual bool dragEnd(int x, int y, double);
 			virtual bool scroll(float x_delta, float y_delta, int x, int y, Modifiers);
 			virtual bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 			virtual bool charPressed(uint32_t codepoint, Modifiers);

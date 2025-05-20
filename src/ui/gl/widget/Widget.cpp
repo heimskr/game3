@@ -116,11 +116,11 @@ namespace Game3 {
 		return blocksMouse(x, y, true);
 	}
 
-	bool Widget::dragEnd(int x, int y) {
+	bool Widget::dragEnd(int x, int y, double displacement) {
 		dragOrigin.reset();
 
 		for (WidgetPtr child = firstChild; child; child = child->nextSibling) {
-			if (child->contains(x, y) && child->dragEnd(x, y)) {
+			if (child->contains(x, y) && child->dragEnd(x, y, displacement)) {
 				return true;
 			}
 		}
