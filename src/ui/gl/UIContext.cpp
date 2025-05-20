@@ -379,6 +379,8 @@ namespace Game3 {
 			return;
 		}
 
+		unfocusWidget();
+
 		if (locked) {
 			locked->onBlur();
 		}
