@@ -6,7 +6,7 @@
 #include "ui/gl/UIContext.h"
 
 namespace {
-	constexpr float SCROLL_SPEED = 64;
+	constexpr float SCROLL_SPEED = 100;
 	constexpr bool ALLOW_VERTICAL_OVERSCROLL = false;
 	constexpr bool ALLOW_HORIZONTAL_OVERSCROLL = false;
 	constexpr Game3::Color DEFAULT_SCROLLBAR_COLOR{"#49120080"};
