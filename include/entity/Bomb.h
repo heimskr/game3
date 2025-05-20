@@ -18,7 +18,7 @@ namespace Game3 {
 			void onExpire() final;
 
 		private:
-			Bomb(Identifier item_id = "base:item/bomb", const Vector3 &initial_velocity = {}, double angular_velocity = 0, double linger_time = 0);
+			Bomb(Identifier itemID = "base:item/bomb", const Vector3 &initialVelocity = {}, double angularVelocity = 0, const std::optional<Position> &intendedTarget = {}, double lingerTIme = 0);
 
 		friend class Entity;
 	};

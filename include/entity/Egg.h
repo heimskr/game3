@@ -18,7 +18,7 @@ namespace Game3 {
 			void onExpire() final;
 
 		private:
-			Egg(Identifier item_id = "base:item/egg", const Vector3 &initial_velocity = {}, double angular_velocity = 0, double linger_time = 0);
+			Egg(Identifier itemID = "base:item/egg", const Vector3 &initialVelocity = {}, double angularVelocity = 0, const std::optional<Position> &intendedTarget = {}, double lingerTime = 0);
 
 		friend class Entity;
 	};

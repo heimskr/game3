@@ -12,8 +12,13 @@ namespace {
 }
 
 namespace Game3 {
-	Projectile::Projectile(EntityType type, Identifier item_id, const Vector3 &initial_velocity, double angular_velocity, double linger_time):
-		Entity(std::move(type)), itemID(std::move(item_id)), initialVelocity(initial_velocity), angularVelocity(angular_velocity), lingerTime(linger_time) {}
+	Projectile::Projectile(EntityType type, Identifier item_id, const Vector3 &initialVelocity, double angularVelocity, const std::optional<Position> &intendedTarget, double lingerTime):
+		Entity(std::move(type)),
+		itemID(std::move(item_id)),
+		initialVelocity(initialVelocity),
+		intendedTarget(intendedTarget),
+		angularVelocity(angularVelocity),
+		lingerTime(lingerTime) {}
 
 	void Projectile::tick(const TickArgs &args) {
 		auto offset_lock = offset.uniqueLock();
@@ -113,6 +118,7 @@ namespace Game3 {
 		buffer << angle;
 		buffer << hasHit;
 		buffer << thrower;
+		buffer << intendedTarget;
 	}
 
 	void Projectile::decode(Buffer &buffer) {
@@ -122,6 +128,7 @@ namespace Game3 {
 		buffer >> angle;
 		buffer >> hasHit;
 		buffer >> thrower;
+		buffer >> intendedTarget;
 	}
 
 	const Identifier & Projectile::getItemID() const {

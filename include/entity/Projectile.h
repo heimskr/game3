@@ -35,6 +35,7 @@ namespace Game3 {
 		protected:
 			Identifier itemID;
 			Vector3 initialVelocity;
+			std::optional<Position> intendedTarget;
 			double angularVelocity = 0;
 			double lingerTime{};
 
@@ -48,7 +49,7 @@ namespace Game3 {
 			bool hasHit = false;
 			GlobalID thrower = -1;
 
-			Projectile(EntityType type, Identifier item_id, const Vector3 &initial_velocity = {}, double angular_velocity = 0, double linger_time = DEFAULT_LINGER_TIME);
+			Projectile(EntityType type, Identifier item_id, const Vector3 &initial_velocity = {}, double angular_velocity = 0, const std::optional<Position> &intendedTarget = std::nullopt, double linger_time = DEFAULT_LINGER_TIME);
 
 			std::shared_ptr<Texture> getTexture() override;
 			void setTexture(const ClientGamePtr &);

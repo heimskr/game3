@@ -36,7 +36,7 @@ namespace Game3 {
 				velocity.z /= scale;
 
 				RealmPtr realm = place.realm;
-				std::shared_ptr<T> entity = T::create(game, projectileID, velocity, 720 * (relative.column < 0? -1 : 1));
+				std::shared_ptr<T> entity = T::create(game, projectileID, velocity, 720 * (relative.column < 0? -1 : 1), place.position);
 				entity->setThrower(place.player);
 				entity->spawning = true;
 				entity->setRealm(realm);

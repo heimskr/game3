@@ -17,7 +17,7 @@ namespace Game3 {
 			void onHit(const EntityPtr &target) final;
 
 		private:
-			Snowball(Identifier item_id = "base:item/snowball", const Vector3 &initial_velocity = {}, double angular_velocity = 0, double linger_time = 5);
+			Snowball(Identifier itemID = "base:item/snowball", const Vector3 &initialVelocity = {}, double angularVelocity = 0, const std::optional<Position> &intendedTarget = {}, double lingerTime = 5);
 
 		friend class Entity;
 	};

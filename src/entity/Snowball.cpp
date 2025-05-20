@@ -1,8 +1,8 @@
 #include "entity/Snowball.h"
 
 namespace Game3 {
-	Snowball::Snowball(Identifier item_id, const Vector3 &initial_velocity, double angular_velocity, double linger_time):
-		Projectile(ID(), std::move(item_id), initial_velocity, angular_velocity, linger_time) {}
+	Snowball::Snowball(Identifier itemID, const Vector3 &initialVelocity, double angularVelocity, const std::optional<Position> &intendedTarget, double lingerTime):
+		Projectile(ID(), std::move(itemID), initialVelocity, angularVelocity, intendedTarget, lingerTime) {}
 
 	void Snowball::onHit(const EntityPtr &target) {
 		if (getSide() != Side::Server) {

@@ -7,6 +7,11 @@
 #include <type_traits>
 
 namespace Game3 {
+	template <std::floating_point F>
+	inline F awayFromZero(F number) {
+		return number < 0? std::floor(number) : std::ceil(number);
+	}
+
 	template <std::floating_point F, typename R>
 	inline F replaceNaN(F number, R replacement) {
 		return std::isnan(number)? static_cast<F>(replacement) : number;

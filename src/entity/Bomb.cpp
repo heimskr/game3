@@ -4,8 +4,8 @@
 #include "util/Explosion.h"
 
 namespace Game3 {
-	Bomb::Bomb(Identifier item_id, const Vector3 &initial_velocity, double angular_velocity, double linger_time):
-		Projectile(ID(), std::move(item_id), initial_velocity, angular_velocity, linger_time) {}
+	Bomb::Bomb(Identifier itemID, const Vector3 &initialVelocity, double angularVelocity, const std::optional<Position> &intendedTarget, double lingerTime):
+		Projectile(ID(), std::move(itemID), initialVelocity, angularVelocity, intendedTarget, lingerTime) {}
 
 	void Bomb::onHit(const EntityPtr &target) {
 		if (getSide() != Side::Server) {
@@ -30,9 +30,13 @@ namespace Game3 {
 		constexpr float RADIUS = DIAMETER / 2.;
 
 		Position position = getPosition();
-		position.row += offset.y;
-		position.column += offset.x;
+		position.row = std::floor(position.row + offset.y);
+		position.column = std::floor(position.column + offset.x);
 
-		causeExplosion(Place{position, realm}, RADIUS, true);
+		if (intendedTarget && position.taxiDistance(*intendedTarget) <= 2) {
+			causeExplosion(Place{*intendedTarget, realm}, RADIUS, true);
+		} else {
+			causeExplosion(Place{position, realm}, RADIUS, true);
+		}
 	}
 }
