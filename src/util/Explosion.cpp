@@ -37,7 +37,7 @@ namespace Game3 {
 						living_entity->increaseUpdateCounter();
 						living_entity->sendToVisible();
 						if (living_entity->isPlayer()) {
-							ServerPlayerPtr player = std::dynamic_pointer_cast<ServerPlayer>(living_entity);
+							ServerPlayerPtr player = std::static_pointer_cast<ServerPlayer>(living_entity);
 							living_entity->sendTo(*player->getClient());
 						}
 					}
