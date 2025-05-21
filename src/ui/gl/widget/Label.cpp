@@ -1,3 +1,4 @@
+#include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
 #include "graphics/Texture.h"
@@ -20,8 +21,11 @@ namespace Game3 {
 
 		const float padding = getPadding();
 
-		tryWrap(renderers.text, width);
-		const UString &string = wrapped? wrapped.value() : text;
+		if (mayWrap) {
+			tryWrap(renderers.text, width);
+		}
+
+		const UString &string = wrapped && mayWrap? wrapped.value() : text;
 
 		if (0 <= lastUnwrappedTextWidth) {
 			adjustCoordinate(Orientation::Horizontal, x, width, std::min(width, lastUnwrappedTextWidth));
@@ -55,7 +59,7 @@ namespace Game3 {
 			.y = y_pos,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
-			.wrapWidth = wrapped? 0 : getWrapWidth(width),
+			.wrapWidth = wrapped || !mayWrap? 0 : getWrapWidth(width),
 			.color = textColor,
 			.alignTop = align_top,
 			.shadow{0, 0, 0, 0},
@@ -86,7 +90,7 @@ namespace Game3 {
 		if (orientation == Orientation::Horizontal) {
 			minimum = 0;
 
-			if (horizontalExpand && 0 < for_width) {
+			if (horizontalExpand == Expansion::Expand && 0 < for_width) {
 				natural = for_width;
 			} else if (0 < for_width) {
 				natural = std::min(for_width, renderers.text.textWidth(text, getTextScale()) + scale);
@@ -111,12 +115,14 @@ namespace Game3 {
 
 			if (!wrapped) {
 				minimum = natural = 0;
-			} else {
+			} else if (mayWrap) {
 				minimum = natural = (lastTextHeight = renderers.text.textHeight(wrapped.value(), getTextScale(), for_width)) + addend;
+			} else {
+				minimum = natural = (lastTextHeight = renderers.text.textHeight(text, getTextScale())) + addend;
 			}
 		}
 
-		if (verticalExpand) {
+		if (verticalExpand == Expansion::Expand) {
 			natural = std::max(natural, for_height);
 		}
 	}
@@ -153,6 +159,14 @@ namespace Game3 {
 
 	float Label::getWrapWidth(float width) const {
 		return width;
+	}
+
+	bool Label::getMayWrap() const {
+		return mayWrap;
+	}
+
+	void Label::setMayWrap(bool value) {
+		mayWrap = value;
 	}
 
 	void Label::tryWrap(const TextRenderer &texter, float width) {

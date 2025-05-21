@@ -14,8 +14,8 @@ namespace Game3 {
 
 	class ProgressBar: public Widget, public HasFixedSize {
 		public:
-			ProgressBar(UIContext &, float scale, Color interior_color, Color background_color, Color exterior_color, float progress = 0);
-			ProgressBar(UIContext &, float scale, Color interior_color, float progress = 0);
+			ProgressBar(UIContext &, float scale, Color interiorColor, Color backgroundColor, Color exteriorColor, float progress = 0);
+			ProgressBar(UIContext &, float scale, Color interiorColor, float progress = 0);
 			ProgressBar(UIContext &, float scale, float progress = 0);
 
 			using Widget::render;

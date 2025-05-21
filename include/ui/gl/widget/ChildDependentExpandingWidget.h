@@ -10,9 +10,9 @@ namespace Game3 {
 		public:
 			using Base::Base;
 
-			bool getHorizontalExpand() const override {
-				if (this->horizontalExpand) {
-					return true;
+			Expansion getHorizontalExpand() const override {
+				if (this->horizontalExpand == Expansion::Expand) {
+					return Expansion::Expand;
 				}
 
 				if (lastCalculatedHorizontalExpand) {
@@ -22,9 +22,9 @@ namespace Game3 {
 				return recalculateExpand(Orientation::Horizontal);
 			}
 
-			bool getVerticalExpand() const override {
-				if (this->verticalExpand) {
-					return true;
+			Expansion getVerticalExpand() const override {
+				if (this->verticalExpand == Expansion::Expand) {
+					return Expansion::Expand;
 				}
 
 				if (lastCalculatedVerticalExpand) {
@@ -35,22 +35,22 @@ namespace Game3 {
 			}
 
 		protected:
-			mutable std::optional<bool> lastCalculatedHorizontalExpand;
-			mutable std::optional<bool> lastCalculatedVerticalExpand;
+			mutable std::optional<Expansion> lastCalculatedHorizontalExpand;
+			mutable std::optional<Expansion> lastCalculatedVerticalExpand;
 
-			bool recalculateExpand(Orientation orientation) const {
-				std::optional<bool> &cached = orientation == Orientation::Horizontal? lastCalculatedHorizontalExpand : lastCalculatedVerticalExpand;
+			Expansion recalculateExpand(Orientation orientation) const {
+				std::optional<Expansion> &cached = orientation == Orientation::Horizontal? lastCalculatedHorizontalExpand : lastCalculatedVerticalExpand;
 
-				if (orientation == Orientation::Horizontal? this->horizontalExpand : this->verticalExpand) {
-					cached = true;
-					return true;
+				if ((orientation == Orientation::Horizontal? this->horizontalExpand : this->verticalExpand) == Expansion::Expand) {
+					cached = Expansion::Expand;
+					return Expansion::Expand;
 				}
 
-				bool expands = false;
+				Expansion expands = Expansion::None;
 
 				for (WidgetPtr child = this->firstChild; child; child = child->getNextSibling()) {
-					if (child->getExpand(orientation)) {
-						expands = true;
+					if (child->getExpand(orientation) == Expansion::Expand) {
+						expands = Expansion::Expand;
 						break;
 					}
 				}

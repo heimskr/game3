@@ -1,5 +1,6 @@
 #include "graphics/Texture.h"
 #include "ui/gl/dialog/FileChooserDialog.h"
+#include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/Label.h"
@@ -94,13 +95,35 @@ namespace Game3 {
 	void FileChooserDialog::init() {
 		DraggableDialog::init();
 
+		currentPath = std::filesystem::current_path() / "worlds";
+
 		scroller = make<Scroller>(ui, selfScale);
 		scroller->setExpand(true, true);
 
-		vbox = make<Box>(ui, selfScale, Orientation::Vertical, 0);
-		vbox->setHorizontalExpand(true);
+		outerVbox = make<Box>(ui, selfScale, Orientation::Vertical, 0);
+		outerVbox->setHorizontalExpand(true);
+		outerVbox->setVerticalExpand(true);
 
-		vbox->insertAtEnd(scroller);
+		pathScroller = make<Scroller>(ui, selfScale);
+		pathScroller->setExpand(Expansion::Expand, Expansion::Shrink);
+
+		aligner = make<Aligner>(ui, Orientation::Vertical, Alignment::Start);
+		aligner->setFixedHeight(ui.window.textRenderer.getIHeight() * ui.window.textRenderer.getLineHeight());
+		aligner->setExpand(true, false);
+
+		pathHeader = make<Label>(ui, selfScale, currentPath.string());
+		pathHeader->setMayWrap(false);
+		pathHeader->setExpand(true, false);
+
+		entryList = make<Box>(ui, selfScale, Orientation::Vertical, 0);
+		entryList->setHorizontalExpand(true);
+		entryList->setVerticalExpand(true);
+
+		pathHeader->insertAtEnd(pathScroller);
+		pathScroller->insertAtEnd(outerVbox);
+
+		entryList->insertAtEnd(outerVbox);
+		outerVbox->insertAtEnd(scroller);
 		scroller->insertAtEnd(shared_from_this());
 
 		recenter();
@@ -136,11 +159,9 @@ namespace Game3 {
 	}
 
 	void FileChooserDialog::populate() {
-		vbox->clearChildren();
+		entryList->clearChildren();
 
-		if (currentPath.empty()) {
-			currentPath = std::filesystem::current_path() / "worlds";
-		}
+		pathHeader->setText(currentPath.string());
 
 		std::set<std::filesystem::directory_entry> directories;
 		std::set<std::filesystem::directory_entry> worlds;
@@ -160,16 +181,16 @@ namespace Game3 {
 		}
 
 		std::filesystem::path parent = currentPath / "..";
-		make<FileChooser::DirectoryRow>(*this, parent, getTexture(std::filesystem::directory_entry(parent)))->insertAtEnd(vbox);
+		make<FileChooser::DirectoryRow>(*this, parent, getTexture(std::filesystem::directory_entry(parent)))->insertAtEnd(entryList);
 
 		for (const std::filesystem::directory_entry &entry: directories) {
 			auto row = make<FileChooser::DirectoryRow>(*this, entry.path(), getTexture(entry));
-			row->insertAtEnd(vbox);
+			row->insertAtEnd(entryList);
 		}
 
 		for (const std::filesystem::directory_entry &entry: worlds) {
 			auto row = make<FileChooser::FileRow>(*this, entry.path(), getTexture(entry));
-			row->insertAtEnd(vbox);
+			row->insertAtEnd(entryList);
 		}
 
 		scroller->scrollToTop();

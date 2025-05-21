@@ -215,6 +215,22 @@ namespace Game3 {
 	}
 
 	void Scroller::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
+		if (firstChild) {
+			if (orientation == Orientation::Horizontal) {
+				if (getHorizontalExpand() == Expansion::Shrink) {
+					firstChild->measure(renderers, orientation, for_width, for_height, minimum, natural);
+					minimum = std::min(minimum, for_width);
+					natural = std::min(natural, for_width);
+					return;
+				}
+			} else if (getVerticalExpand() == Expansion::Shrink) {
+				firstChild->measure(renderers, orientation, for_width, for_height, minimum, natural);
+				minimum = std::min(minimum, for_height);
+				natural = std::min(natural, for_height);
+				return;
+			}
+		}
+
 		WidgetPtr child = firstChild;
 
 		natural = orientation == Orientation::Horizontal? for_width : for_height;

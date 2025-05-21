@@ -138,7 +138,7 @@ namespace Game3 {
 					child->measure(renderers, orientation, -1, -1, child_minimum, child_natural);
 					max_minimum = std::max(max_minimum, child_minimum);
 					max_natural = std::max(max_natural, child_natural);
-					expands = expands || child->getExpand(orientation);
+					expands = expands || child->getExpand(orientation) == Expansion::Expand;
 				}
 			}
 

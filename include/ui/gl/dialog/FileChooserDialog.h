@@ -10,7 +10,9 @@
 #include <memory>
 
 namespace Game3 {
+	class Aligner;
 	class Box;
+	class Label;
 	class Scroller;
 
 	class FileChooserDialog: public DraggableDialog {
@@ -29,15 +31,17 @@ namespace Game3 {
 			void populate();
 
 		protected:
-			int baseWidth{};
-			int baseHeight{};
-
 			virtual bool filter(const std::filesystem::directory_entry &) const;
 			virtual TexturePtr getTexture(const std::filesystem::directory_entry &) const;
 
 		private:
 			std::shared_ptr<Scroller> scroller;
-			std::shared_ptr<Box> vbox;
+			std::shared_ptr<Scroller> pathScroller;
+			/** Contains the current path header and the entry list. */
+			std::shared_ptr<Box> outerVbox;
+			std::shared_ptr<Box> entryList;
+			std::shared_ptr<Label> pathHeader;
+			std::shared_ptr<Aligner> aligner;
 			bool showHidden = true;
 	};
 }

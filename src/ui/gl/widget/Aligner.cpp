@@ -1,6 +1,7 @@
 #include "ui/gl/widget/Aligner.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "util/Log.h"
 
 #include <cassert>
 
@@ -12,9 +13,9 @@ namespace Game3 {
 
 	void Aligner::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);
-		Widget::render(renderers, x, y, width, height);
 
 		if (!firstChild) {
+			Widget::render(renderers, x, y, width, height);
 			return;
 		}
 
@@ -32,6 +33,8 @@ namespace Game3 {
 		} else {
 			height = *childSize;
 		}
+
+		Widget::render(renderers, x, y, width, height);
 
 		if (alignment == Alignment::Start) {
 			firstChild->render(renderers, x, y, width, height);
@@ -56,21 +59,40 @@ namespace Game3 {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void Aligner::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void Aligner::measure(const RendererContext &renderers, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
-			if (getHorizontalExpand()) {
+			Expansion expansion = getHorizontalExpand();
+
+			if (expansion == Expansion::Expand) {
 				minimum = fixedWidth < 0? for_width : std::min(for_width, fixedWidth * ui.scale);
 				natural = for_width;
-			} else {
+				return;
+			}
+
+			if (expansion == Expansion::None) {
 				minimum = natural = fixedWidth < 0? for_width : fixedWidth * ui.scale;
+				return;
 			}
 		} else {
-			if (getVerticalExpand()) {
+			Expansion expansion = getVerticalExpand();
+
+			if (expansion == Expansion::Expand) {
 				minimum = fixedHeight < 0? for_height : std::min(for_height, fixedHeight * ui.scale);
 				natural = for_height;
-			} else {
-				minimum = natural = fixedHeight < 0? for_height : fixedHeight * ui.scale;
+				return;
 			}
+
+			if (expansion == Expansion::None) {
+				minimum = natural = fixedHeight < 0? for_height : fixedHeight * ui.scale;
+				return;
+			}
+		}
+
+		// Shrink: forward request to child
+		if (firstChild) {
+			firstChild->measure(renderers, measure_orientation, for_width, for_height, minimum, natural);
+		} else {
+			minimum = natural = 0;
 		}
 	}
 

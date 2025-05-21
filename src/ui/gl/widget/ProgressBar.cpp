@@ -14,12 +14,12 @@ namespace Game3 {
 		constexpr std::chrono::milliseconds PROGRESS_UPDATE_TIME{100};
 	}
 
-	ProgressBar::ProgressBar(UIContext &ui, float scale, Color interior_color, Color background_color, Color exterior_color, float progress):
+	ProgressBar::ProgressBar(UIContext &ui, float scale, Color interiorColor, Color backgroundColor, Color exteriorColor, float progress):
 		Widget(ui, scale),
-		topInteriorColor(interior_color),
+		topInteriorColor(interiorColor),
 		bottomInteriorColor(topInteriorColor.darken()),
-		backgroundColor(background_color),
-		topExteriorColor(exterior_color),
+		backgroundColor(backgroundColor),
+		topExteriorColor(exteriorColor),
 		bottomExteriorColor(topExteriorColor.darken()),
 		progress(progress) {}
 
@@ -97,15 +97,28 @@ namespace Game3 {
 
 	void ProgressBar::measure(const RendererContext &, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (measure_orientation == Orientation::Horizontal) {
-			minimum = natural = 0 < fixedWidth? fixedWidth * getScale() : (horizontalExpand? for_width : getDefaultWidth() * ui.scale);
+			if (0 < fixedWidth) {
+				minimum = natural = fixedWidth * getScale();
+			} else if (horizontalExpand == Expansion::Expand) {
+				minimum = natural = for_width;
+			} else {
+				minimum = natural = getDefaultWidth() * ui.scale;
+			}
 		} else {
-			minimum = natural = 0 < fixedHeight? fixedHeight * getScale() : (verticalExpand? for_height : getDefaultHeight() * ui.scale);
+			if (0 < fixedHeight) {
+				minimum = natural = fixedHeight * getScale();
+			} else if (verticalExpand == Expansion::Expand) {
+				minimum = natural = for_height;
+			} else {
+				minimum = natural = getDefaultHeight() * ui.scale;
+			}
 		}
 	}
 
 	void ProgressBar::setProgress(float new_progress) {
-		if (std::abs(new_progress - progress) < 0.0001f)
+		if (std::abs(new_progress - progress) < 0.0001f) {
 			return;
+		}
 
 		oldProgress = progress;
 		progress = std::min(1.f, std::max(0.f, new_progress));

@@ -18,14 +18,14 @@ namespace {
 }
 
 namespace Game3 {
-	Button::Button(UIContext &ui, float selfScale, Color top_border_color, Color bottom_border_color, Color text_color, TexturePtr texture):
+	Button::Button(UIContext &ui, float selfScale, Color topBorderColor, Color bottomBorderColor, Color textColor, TexturePtr texture):
 		Widget(ui, selfScale),
 		texture(std::move(texture)) {
-			setColors(top_border_color, bottom_border_color, text_color);
+			setColors(topBorderColor, bottomBorderColor, textColor);
 		}
 
-	Button::Button(UIContext &ui, float selfScale, Color border_color, Color text_color, TexturePtr texture):
-		Button(ui, selfScale, border_color, border_color.darken(), text_color, std::move(texture)) {}
+	Button::Button(UIContext &ui, float selfScale, Color borderColor, Color textColor, TexturePtr texture):
+		Button(ui, selfScale, borderColor, borderColor.darken(), textColor, std::move(texture)) {}
 
 	Button::Button(UIContext &ui, float selfScale, TexturePtr texture):
 		Button(ui, selfScale, DEFAULT_BORDER_COLOR, DEFAULT_TEXT_COLOR, std::move(texture)) {}
@@ -165,7 +165,7 @@ namespace Game3 {
 
 	void Button::measure(const RendererContext &renderers, Orientation orientation, float for_width, float for_height, float &minimum, float &natural) {
 		if (orientation == Orientation::Horizontal) {
-			if (horizontalExpand && 0 <= for_width) {
+			if (horizontalExpand == Expansion::Expand && 0 <= for_width) {
 				minimum = 0;
 				natural = for_width;
 				return;
@@ -175,7 +175,7 @@ namespace Game3 {
 		} else {
 			minimum = getMinimumPreferredHeight();
 
-			if (verticalExpand && 0 <= for_height) {
+			if (verticalExpand == Expansion::Expand && 0 <= for_height) {
 				natural = for_height;
 			} else {
 				natural = std::max(minimum, fixedHeight * ui.scale);

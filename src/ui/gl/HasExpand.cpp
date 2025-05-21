@@ -1,29 +1,42 @@
 #include "ui/gl/HasExpand.h"
 
 namespace Game3 {
-	HasExpand::HasExpand(bool horizontal, bool vertical):
+	HasExpand::HasExpand(Expansion horizontal, Expansion vertical):
 		horizontalExpand(horizontal), verticalExpand(vertical) {}
 
 	HasExpand::HasExpand() = default;
 
-	bool HasExpand::getHorizontalExpand() const {
+	Expansion HasExpand::getHorizontalExpand() const {
 		return horizontalExpand;
 	}
 
-	bool HasExpand::getVerticalExpand() const {
+	Expansion HasExpand::getVerticalExpand() const {
 		return verticalExpand;
 	}
 
-	bool HasExpand::getExpand(Orientation orientation) const {
+	Expansion HasExpand::getExpand(Orientation orientation) const {
 		return orientation == Orientation::Horizontal? getHorizontalExpand() : getVerticalExpand();
 	}
 
-	void HasExpand::setHorizontalExpand(bool expand) {
+	void HasExpand::setHorizontalExpand(Expansion expand) {
 		horizontalExpand = expand;
 	}
 
-	void HasExpand::setVerticalExpand(bool expand) {
+	void HasExpand::setVerticalExpand(Expansion expand) {
 		verticalExpand = expand;
+	}
+
+	void HasExpand::setExpand(Expansion horizontal, Expansion vertical) {
+		setHorizontalExpand(horizontal);
+		setVerticalExpand(vertical);
+	}
+
+	void HasExpand::setHorizontalExpand(bool expand) {
+		setHorizontalExpand(expand? Expansion::Expand : Expansion::None);
+	}
+
+	void HasExpand::setVerticalExpand(bool expand) {
+		setVerticalExpand(expand? Expansion::Expand : Expansion::None);
 	}
 
 	void HasExpand::setExpand(bool horizontal, bool vertical) {

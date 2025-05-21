@@ -23,12 +23,16 @@ namespace Game3 {
 			void setTextColor(const Color &);
 			const Color & getTextColor() const;
 
+			bool getMayWrap() const;
+			void setMayWrap(bool);
+
 		protected:
 			UString text;
 			Color textColor;
 			std::optional<UString> wrapped;
 			float lastTextHeight = -1;
 			float lastUnwrappedTextWidth = -1;
+			bool mayWrap = true;
 
 			float getTextScale() const;
 			float getPadding() const;
