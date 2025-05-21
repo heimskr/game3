@@ -26,7 +26,9 @@ namespace Game3 {
 
 	BaseDraggableDialog::BaseDraggableDialog(UIContext &ui, float selfScale, int width, int height):
 		Dialog(ui, selfScale),
-		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height) {}
+		position((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height),
+		dialogWidth(width),
+		dialogHeight(height) {}
 
 	void BaseDraggableDialog::render(const RendererContext &renderers) {
 		RectangleRenderer &rectangler = renderers.rectangle;

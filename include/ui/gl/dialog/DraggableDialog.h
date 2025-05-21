@@ -13,9 +13,6 @@ namespace Game3 {
 
 	class BaseDraggableDialog: public Dialog {
 		public:
-			static int getEffectiveWidth(int content_width, float scale);
-			static int getEffectiveHeight(int content_height, float scale);
-
 			sigc::signal<void()> signalDismiss;
 
 			BaseDraggableDialog(UIContext &, float selfScale, int width, int height);
@@ -35,12 +32,17 @@ namespace Game3 {
 
 			void recenter();
 
+			static int getEffectiveWidth(int content_width, float scale);
+			static int getEffectiveHeight(int content_height, float scale);
+
 		protected:
 			Rectangle position;
 			Rectangle titleRectangle;
 			Rectangle bodyRectangle;
 			std::shared_ptr<Icon> closeButton;
 			std::optional<std::pair<int, int>> dragOffset;
+			int dialogWidth{};
+			int dialogHeight{};
 	};
 
 	class DraggableDialog: public BaseDraggableDialog {
