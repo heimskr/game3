@@ -10,8 +10,8 @@
 #include <memory>
 
 namespace Game3 {
-	class Aligner;
 	class Box;
+	class Icon;
 	class Label;
 	class Scroller;
 
@@ -40,8 +40,10 @@ namespace Game3 {
 			/** Contains the current path header and the entry list. */
 			std::shared_ptr<Box> outerVbox;
 			std::shared_ptr<Box> entryList;
-			std::shared_ptr<Label> pathHeader;
-			std::shared_ptr<Aligner> aligner;
+			/** Contains the "up" button and the path label. */
+			std::shared_ptr<Box> header;
+			std::shared_ptr<Icon> upIcon;
+			std::shared_ptr<Label> pathLabel;
 			bool showHidden = true;
 	};
 }

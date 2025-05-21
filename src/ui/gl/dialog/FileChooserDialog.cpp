@@ -1,6 +1,5 @@
 #include "graphics/Texture.h"
 #include "ui/gl/dialog/FileChooserDialog.h"
-#include "ui/gl/widget/Aligner.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/Label.h"
@@ -39,14 +38,11 @@ namespace Game3 {
 					Row::init();
 					auto self = getSelf();
 					auto icon = make<Icon>(ui, selfScale);
-					std::string filename = path.filename().string();
 					icon->setIconTexture(iconTexture);
 					icon->insertAtEnd(self);
-					if (path.filename() != "..") {
-						auto label = make<Label>(ui, selfScale * 1.25, std::move(filename));
-						label->setVerticalAlignment(Alignment::Center);
-						label->insertAtEnd(self);
-					}
+					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
+					label->setVerticalAlignment(Alignment::Center);
+					label->insertAtEnd(self);
 				}
 
 				bool click(int button, int, int, Modifiers) final {
@@ -101,27 +97,36 @@ namespace Game3 {
 		scroller->setExpand(true, true);
 
 		outerVbox = make<Box>(ui, selfScale, Orientation::Vertical, 0);
-		outerVbox->setHorizontalExpand(true);
-		outerVbox->setVerticalExpand(true);
+		outerVbox->setExpand(true, true);
+
+		header = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
+		header->setExpand(true, false);
+
+		upIcon = make<Icon>(ui, selfScale);
+		upIcon->setIconTexture(getTexture(std::filesystem::directory_entry(currentPath / "..")));
+		upIcon->setFixedSize(8);
+		upIcon->setOnClick([this](Widget &) {
+			std::filesystem::path parent = currentPath.parent_path();
+			if (currentPath != parent) {
+				currentPath = std::move(parent);
+				populate();
+			}
+		});
 
 		pathScroller = make<Scroller>(ui, selfScale);
 		pathScroller->setExpand(Expansion::Expand, Expansion::Shrink);
 
-		aligner = make<Aligner>(ui, Orientation::Vertical, Alignment::Start);
-		aligner->setFixedHeight(ui.window.textRenderer.getIHeight() * ui.window.textRenderer.getLineHeight());
-		aligner->setExpand(true, false);
-
-		pathHeader = make<Label>(ui, selfScale, currentPath.string());
-		pathHeader->setMayWrap(false);
-		pathHeader->setExpand(true, false);
+		pathLabel = make<Label>(ui, selfScale, currentPath.string());
+		pathLabel->setMayWrap(false);
+		pathLabel->setExpand(true, false);
 
 		entryList = make<Box>(ui, selfScale, Orientation::Vertical, 0);
-		entryList->setHorizontalExpand(true);
-		entryList->setVerticalExpand(true);
+		entryList->setExpand(true, true);
 
-		pathHeader->insertAtEnd(pathScroller);
-		pathScroller->insertAtEnd(outerVbox);
-
+		upIcon->insertAtEnd(header);
+		pathLabel->insertAtEnd(pathScroller);
+		pathScroller->insertAtEnd(header);
+		header->insertAtEnd(outerVbox);
 		entryList->insertAtEnd(outerVbox);
 		outerVbox->insertAtEnd(scroller);
 		scroller->insertAtEnd(shared_from_this());
@@ -161,7 +166,7 @@ namespace Game3 {
 	void FileChooserDialog::populate() {
 		entryList->clearChildren();
 
-		pathHeader->setText(currentPath.string());
+		pathLabel->setText(currentPath.string());
 
 		std::set<std::filesystem::directory_entry> directories;
 		std::set<std::filesystem::directory_entry> worlds;
@@ -179,9 +184,6 @@ namespace Game3 {
 				}
 			}
 		}
-
-		std::filesystem::path parent = currentPath / "..";
-		make<FileChooser::DirectoryRow>(*this, parent, getTexture(std::filesystem::directory_entry(parent)))->insertAtEnd(entryList);
 
 		for (const std::filesystem::directory_entry &entry: directories) {
 			auto row = make<FileChooser::DirectoryRow>(*this, entry.path(), getTexture(entry));
