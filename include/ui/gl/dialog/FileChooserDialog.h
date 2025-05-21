@@ -33,6 +33,7 @@ namespace Game3 {
 			int baseHeight{};
 
 			virtual bool filter(const std::filesystem::directory_entry &) const;
+			virtual TexturePtr getTexture(const std::filesystem::directory_entry &) const;
 
 		private:
 			std::shared_ptr<Scroller> scroller;

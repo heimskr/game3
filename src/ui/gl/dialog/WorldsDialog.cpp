@@ -21,4 +21,15 @@ namespace Game3 {
 	bool WorldsDialog::filter(const std::filesystem::directory_entry &entry) const {
 		return entry.path().extension() == ".db";
 	}
+
+	TexturePtr WorldsDialog::getTexture(const std::filesystem::directory_entry &entry) const {
+		if (entry.is_regular_file()) {
+			if (entry.path().filename().extension() == ".db") {
+				return cacheTexture("resources/gui/picture.png");
+			}
+			return cacheTexture("resources/gui/file.png");
+		}
+
+		return FileChooserDialog::getTexture(entry);
+	}
 }

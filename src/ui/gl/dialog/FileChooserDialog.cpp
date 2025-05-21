@@ -13,10 +13,11 @@ namespace Game3 {
 	namespace FileChooser {
 		class Row: public Box {
 			public:
-				Row(FileChooserDialog &dialog, std::filesystem::path path):
+				Row(FileChooserDialog &dialog, std::filesystem::path path, TexturePtr iconTexture):
 					Box(dialog.getUI(), 0.6, Orientation::Horizontal, 5, 0, Color{}),
 					dialog(dialog),
-					path(std::move(path)) {}
+					path(std::move(path)),
+					iconTexture(std::move(iconTexture)) {}
 
 				void init() override {
 					Box::init();
@@ -26,6 +27,7 @@ namespace Game3 {
 			protected:
 				FileChooserDialog &dialog;
 				std::filesystem::path path;
+				TexturePtr iconTexture;
 		};
 
 		class DirectoryRow final: public Row {
@@ -37,12 +39,9 @@ namespace Game3 {
 					auto self = getSelf();
 					auto icon = make<Icon>(ui, selfScale);
 					std::string filename = path.filename().string();
-					if (filename == "..") {
-						icon->setIconTexture(cacheTexture("resources/gui/up.png"));
-						icon->insertAtEnd(self);
-					} else {
-						icon->setIconTexture(cacheTexture("resources/gui/folder.png"));
-						icon->insertAtEnd(self);
+					icon->setIconTexture(iconTexture);
+					icon->insertAtEnd(self);
+					if (path.filename() != "..") {
 						auto label = make<Label>(ui, selfScale * 1.25, std::move(filename));
 						label->setVerticalAlignment(Alignment::Center);
 						label->insertAtEnd(self);
@@ -68,7 +67,7 @@ namespace Game3 {
 					Row::init();
 					auto self = getSelf();
 					auto icon = make<Icon>(ui, selfScale);
-					icon->setIconTexture(cacheTexture("resources/gui/picture.png"));
+					icon->setIconTexture(iconTexture);
 					icon->insertAtEnd(self);
 
 					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
@@ -143,34 +142,33 @@ namespace Game3 {
 			currentPath = std::filesystem::current_path() / "worlds";
 		}
 
-		std::set<std::filesystem::path> directories;
-		std::set<std::filesystem::path> worlds;
+		std::set<std::filesystem::directory_entry> directories;
+		std::set<std::filesystem::directory_entry> worlds;
 
 		for (const auto &entry: std::filesystem::directory_iterator(currentPath, std::filesystem::directory_options::skip_permission_denied)) {
-			const std::filesystem::path &path = entry.path();
-
-			if (showHidden && path.filename().string().starts_with('.')) {
+			if (showHidden && entry.path().filename().string().starts_with('.')) {
 				continue;
 			}
 
 			if (entry.is_directory()) {
-				directories.emplace(path);
+				directories.emplace(entry);
 			} else if (entry.is_regular_file()) {
 				if (filter(entry)) {
-					worlds.emplace(path);
+					worlds.emplace(entry);
 				}
 			}
 		}
 
-		make<FileChooser::DirectoryRow>(*this, currentPath / "..")->insertAtEnd(vbox);
+		std::filesystem::path parent = currentPath / "..";
+		make<FileChooser::DirectoryRow>(*this, parent, getTexture(std::filesystem::directory_entry(parent)))->insertAtEnd(vbox);
 
-		for (const std::filesystem::path &path: directories) {
-			auto row = make<FileChooser::DirectoryRow>(*this, path);
+		for (const std::filesystem::directory_entry &entry: directories) {
+			auto row = make<FileChooser::DirectoryRow>(*this, entry.path(), getTexture(entry));
 			row->insertAtEnd(vbox);
 		}
 
-		for (const std::filesystem::path &path: worlds) {
-			auto row = make<FileChooser::FileRow>(*this, path);
+		for (const std::filesystem::directory_entry &entry: worlds) {
+			auto row = make<FileChooser::FileRow>(*this, entry.path(), getTexture(entry));
 			row->insertAtEnd(vbox);
 		}
 
@@ -179,5 +177,20 @@ namespace Game3 {
 
 	bool FileChooserDialog::filter(const std::filesystem::directory_entry &) const {
 		return true;
+	}
+
+	TexturePtr FileChooserDialog::getTexture(const std::filesystem::directory_entry &entry) const {
+		if (entry.is_regular_file()) {
+			return cacheTexture("resources/gui/file.png");
+		}
+
+		if (entry.is_directory()) {
+			if (entry.path().filename() == "..") {
+				return cacheTexture("resources/gui/up.png");
+			}
+			return cacheTexture("resources/gui/folder.png");
+		}
+
+		return cacheTexture("resources/gui/question_mark.png");
 	}
 }
