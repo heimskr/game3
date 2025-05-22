@@ -29,8 +29,7 @@ namespace Game3 {
 		DraggableDialog::init();
 
 		auto grid = make<Grid>(ui, 1);
-		grid->setRowSpacing(1);
-		grid->setColumnSpacing(1);
+		grid->setSpacing(1, 1);
 
 		auto make_label = [&](UString text, std::optional<UString> tooltip = {}) {
 			auto label = make<Label>(ui, selfScale, std::move(text));

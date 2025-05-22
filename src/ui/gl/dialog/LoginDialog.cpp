@@ -13,7 +13,7 @@
 namespace Game3 {
 	namespace {
 		constexpr float WIDTH = 75;
-		constexpr float HEIGHT = 48;
+		constexpr float HEIGHT = 45;
 	}
 
 	LoginDialog::LoginDialog(UIContext &ui, float selfScale):
@@ -27,7 +27,7 @@ namespace Game3 {
 		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
 
 		auto grid = make<Grid>(ui, selfScale);
-		grid->setRowSpacing(5);
+		grid->setRowSpacing(1);
 
 		auto make_label = [&](UString text) {
 			auto label = make<Label>(ui, selfScale, std::move(text));
