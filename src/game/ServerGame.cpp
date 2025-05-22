@@ -18,6 +18,8 @@
 #include "packet/TileEntityPacket.h"
 #include "packet/TileUpdatePacket.h"
 #include "packet/TimePacket.h"
+#include "realm/Overworld.h"
+#include "realm/ShadowRealm.h"
 #include "statuseffect/StatusEffectFactory.h"
 #include "threading/ThreadContext.h"
 #include "util/Cast.h"
@@ -26,6 +28,8 @@
 #include "util/Log.h"
 #include "util/Timer.h"
 #include "util/Util.h"
+#include "worldgen/Overworld.h"
+#include "worldgen/ShadowRealm.h"
 
 #include <iomanip>
 #include <random>
@@ -395,6 +399,27 @@ namespace Game3 {
 
 	Token ServerGame::getOmnitoken() const {
 		return omnitoken;
+	}
+
+	bool ServerGame::initialWorldgen(size_t overworld_seed) {
+		if (hasRealm(1)) {
+			return false;
+		}
+
+		auto self = getSelf();
+		RealmPtr realm = Realm::create<Overworld>(self, 1, Overworld::ID(), "base:tileset/monomap", overworld_seed);
+		realm->outdoors = true;
+		addRealm(realm->id, realm);
+		WorldGen::generateOverworld(realm, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
+
+		if (!hasRealm(-1)) {
+			RealmPtr shadow = Realm::create<ShadowRealm>(self, -1, ShadowRealm::ID(), "base:tileset/monomap", overworld_seed);
+			shadow->outdoors = false;
+			addRealm(shadow->id, shadow);
+			WorldGen::generateShadowRealm(shadow, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
+		}
+
+		return true;
 	}
 
 	void ServerGame::handlePacket(GenericClient &client, Packet &packet) {

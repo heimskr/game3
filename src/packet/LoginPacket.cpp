@@ -1,6 +1,7 @@
 #include "util/Log.h"
 #include "graphics/Tileset.h"
 #include "entity/ServerPlayer.h"
+#include "error/RealmMissingError.h"
 #include "game/ServerGame.h"
 #include "net/Server.h"
 #include "net/RemoteClient.h"
@@ -9,6 +10,7 @@
 #include "packet/RealmNoticePacket.h"
 #include "packet/RegistrationStatusPacket.h"
 #include "packet/PacketError.h"
+#include "realm/Overworld.h"
 
 namespace Game3 {
 	void LoginPacket::handle(const std::shared_ptr<ServerGame> &game, GenericClient &client) {
@@ -59,7 +61,25 @@ namespace Game3 {
 					return;
 				}
 
-				auto player = server->loadPlayer(username, *displayName);
+				ServerPlayerPtr player;
+
+				try {
+					player = server->loadPlayer(username, *displayName);
+				} catch (const RealmMissingError &error) {
+					if (error.realmID != 1) {
+						throw;
+					}
+
+					// Oopsie, we forgot to generate the overworld somehow.
+					if (!server->game->initialWorldgen(Overworld::getDefaultSeed())) {
+						ERR("Realm 1 is missing but initial worldgen didn't occur.");
+						throw;
+					}
+
+					// Let's try again.
+					player = server->loadPlayer(username, *displayName);
+				}
+
 				SUCCESS("Automatically registered user {} with token {}.", username, player->token);
 				client.send(make<RegistrationStatusPacket>(username, *displayName, player->token));
 				client.setPlayer(player);

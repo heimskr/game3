@@ -136,8 +136,9 @@ namespace Game3 {
 
 		{
 			Buffer buffer{game, Side::Server};
-			if (game->getDatabase().readUser(std::string(username), nullptr, &buffer, nullptr))
+			if (game->getDatabase().readUser(std::string(username), nullptr, &buffer, nullptr)) {
 				return ServerPlayer::fromBuffer(game, buffer);
+			}
 		}
 
 		RealmPtr overworld = game->getRealm(1);

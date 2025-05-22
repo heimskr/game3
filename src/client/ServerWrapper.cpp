@@ -6,15 +6,11 @@
 #include "net/DirectLocalClient.h"
 #include "net/DirectRemoteClient.h"
 #include "net/Server.h"
-#include "realm/Overworld.h"
-#include "realm/ShadowRealm.h"
 #include "threading/ThreadContext.h"
 #include "util/Crypto.h"
 #include "util/FS.h"
 #include "util/Log.h"
 #include "util/Timer.h"
-#include "worldgen/Overworld.h"
-#include "worldgen/ShadowRealm.h"
 
 #include <fstream>
 #include <random>
@@ -181,20 +177,9 @@ namespace Game3 {
 				Timer::summary();
 				Timer::clear();
 				INFO(2, "Finished reading all data from database.");
-			} else {
-				RealmPtr realm = Realm::create<Overworld>(game, 1, Overworld::ID(), "base:tileset/monomap", overworld_seed);
-				realm->outdoors = true;
-				game->addRealm(realm->id, realm);
-				WorldGen::generateOverworld(realm, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
 			}
 
-			if (!game->hasRealm(-1)) {
-				RealmPtr shadow = Realm::create<ShadowRealm>(game, -1, ShadowRealm::ID(), "base:tileset/monomap", overworld_seed);
-				shadow->outdoors = false;
-				game->addRealm(shadow->id, shadow);
-				WorldGen::generateShadowRealm(shadow, overworld_seed, {}, {{-1, -1}, {1, 1}}, true);
-			}
-
+			game->initialWorldgen(overworld_seed);
 			game->initEntities();
 			game->initInteractionSets();
 

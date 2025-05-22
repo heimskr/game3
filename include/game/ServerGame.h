@@ -63,6 +63,8 @@ namespace Game3 {
 			void removeRealm(RealmPtr) override;
 			bool compareToken(Token);
 			Token getOmnitoken() const;
+			/** Returns whether the initial worldgen happened (nothing happens if it's not needed). */
+			bool initialWorldgen(size_t overworld_seed);
 
 			std::shared_ptr<ServerGame> getSelf() { return std::static_pointer_cast<ServerGame>(shared_from_this()); }
 			std::shared_ptr<const ServerGame> getSelf() const { return std::static_pointer_cast<const ServerGame>(shared_from_this()); }

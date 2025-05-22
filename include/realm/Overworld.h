@@ -14,6 +14,8 @@ namespace Game3 {
 
 			void generateChunk(const ChunkPosition &) override;
 
+			static size_t getDefaultSeed();
+
 		protected:
 			void absorbJSON(const boost::json::value &, bool full_data) override;
 			void toJSON(boost::json::value &, bool full_data) const override;

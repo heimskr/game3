@@ -1,3 +1,4 @@
+#include "error/RealmMissingError.h"
 #include "game/Game.h"
 #include "realm/Cave.h"
 #include "realm/House.h"
@@ -43,7 +44,11 @@ namespace Game3 {
 
 	RealmPtr Game::getRealm(RealmID realm_id) const {
 		auto lock = realms.sharedLock();
-		return realms.at(realm_id);
+		if (auto iter = realms.find(realm_id); iter != realms.end()) {
+			return iter->second;
+		}
+
+		throw RealmMissingError(realm_id);
 	}
 
 	RealmPtr Game::getRealm(RealmID realm_id, const std::function<RealmPtr()> &creator) {
