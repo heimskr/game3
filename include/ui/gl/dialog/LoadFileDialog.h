@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ui/gl/dialog/DraggableDialog.h"
-#include "ui/gl/widget/Widget.h"
+#include "ui/gl/dialog/FileDialog.h"
 #include "ui/gl/Types.h"
 
 #include <sigc++/sigc++.h>
@@ -15,23 +14,15 @@ namespace Game3 {
 	class Label;
 	class Scroller;
 
-	class LoadFileDialog: public DraggableDialog {
+	class LoadFileDialog: public FileDialog {
 		public:
-			std::filesystem::path currentPath;
-			sigc::signal<void(const std::filesystem::path &)> signalSubmit;
-
-			LoadFileDialog(UIContext &, float selfScale, UString title, int width, int height);
+			using FileDialog::FileDialog;
 
 			void init() override;
-			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
-			void rescale(float new_scale) override;
-
-			void submit(const std::filesystem::path &path);
-			void populate();
-
-		protected:
-			virtual bool filter(const std::filesystem::directory_entry &) const;
-			virtual TexturePtr getTexture(const std::filesystem::directory_entry &) const;
+			void selectFile(const std::filesystem::path &path) override;
+			void selectDirectory(const std::filesystem::path &path) override;
+			void submit(const std::filesystem::path &path) override;
+			void populate() override;
 
 		private:
 			std::shared_ptr<Scroller> scroller;
