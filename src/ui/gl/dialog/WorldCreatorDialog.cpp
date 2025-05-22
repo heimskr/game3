@@ -61,6 +61,7 @@ namespace Game3 {
 					dialog->setPath(path);
 				} else {
 					dialog->setPath(std::filesystem::canonical(path).parent_path());
+					dialog->setFilename(path.filename().string());
 				}
 			} catch (const std::filesystem::filesystem_error &) {
 				dialog->setPath(std::filesystem::current_path());

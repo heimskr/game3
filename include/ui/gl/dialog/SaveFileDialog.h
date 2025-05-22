@@ -13,6 +13,8 @@ namespace Game3 {
 			void selectFile(const std::filesystem::path &path) override;
 			void submit(const std::filesystem::path &path) override;
 
+			void setFilename(UString);
+
 		private:
 			std::shared_ptr<TextInput> filenameInput;
 	};

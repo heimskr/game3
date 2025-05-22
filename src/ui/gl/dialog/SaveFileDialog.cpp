@@ -42,4 +42,8 @@ namespace Game3 {
 		ui.removeDialog(self);
 		signalSubmit(path);
 	}
+
+	void SaveFileDialog::setFilename(UString filename) {
+		filenameInput->setText(std::move(filename));
+	}
 }
