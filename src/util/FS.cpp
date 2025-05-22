@@ -69,4 +69,10 @@ namespace Game3 {
 		perms |= std::filesystem::perms::owner_exec;
 		std::filesystem::permissions(path, perms);
 	}
+
+	bool canListDirectory(const std::filesystem::path &path) {
+		std::error_code code{};
+		std::filesystem::directory_iterator(path, code);
+		return !code;
+	}
 }

@@ -7,6 +7,7 @@
 #include "ui/gl/widget/Scroller.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "util/FS.h"
 
 namespace Game3 {
 	namespace FileChooser {
@@ -136,8 +137,11 @@ namespace Game3 {
 	}
 
 	void FileDialog::setPath(const std::filesystem::path &path) {
-		currentPath = std::filesystem::canonical(path);
-		populate();
+		std::filesystem::path canonical = std::filesystem::canonical(path);
+		if (canListDirectory(canonical)) {
+			currentPath = std::move(canonical);
+			populate();
+		}
 	}
 
 	void FileDialog::populate() {
@@ -153,9 +157,11 @@ namespace Game3 {
 				continue;
 			}
 
-			if (entry.is_directory()) {
+			std::error_code code{};
+
+			if (entry.is_directory(code) && !code) {
 				directories.emplace(entry);
-			} else if (entry.is_regular_file()) {
+			} else if (entry.is_regular_file(code) && !code) {
 				if (filter(entry)) {
 					worlds.emplace(entry);
 				}
@@ -188,6 +194,9 @@ namespace Game3 {
 		if (entry.is_directory()) {
 			if (entry.path().filename() == "..") {
 				return cacheTexture("resources/gui/up.png");
+			}
+			if (!canListDirectory(entry.path())) {
+				return cacheTexture("resources/gui/no.png");
 			}
 			return cacheTexture("resources/gui/folder.png");
 		}
