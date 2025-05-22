@@ -13,7 +13,7 @@ namespace Game3 {
 
 	class MessageDialog: public DraggableDialog {
 		public:
-			sigc::signal<void(bool response)> onSubmit;
+			sigc::signal<void(bool response)> signalSubmit;
 
 			MessageDialog(UIContext &, float selfScale, int width, int height, ButtonsType = ButtonsType::Okay);
 

@@ -1170,7 +1170,18 @@ namespace Game3 {
 
 		if (std::filesystem::exists(path)) {
 			if (std::filesystem::is_regular_file(path)) {
-				error("TODO: confirm whether user wants to overwrite");
+				std::string message = std::format("Are you sure you want to overwrite {}?", path.c_str());
+				queue([path, message = std::move(message), go = std::move(go)](Window &window) mutable {
+					auto dialog = MessageDialog::create(window.uiContext, 1, std::move(message), ButtonsType::NoYes);
+					dialog->setTitle("Overwrite?");
+					dialog->signalSubmit.connect([path = std::move(path), go = std::move(go)](bool response) {
+						if (response) {
+							std::filesystem::remove(path);
+							go();
+						}
+					});
+					window.uiContext.addDialog(std::move(dialog));
+				});
 			} else {
 				error(std::format("Can't overwrite {}.", path.c_str()));
 			}

@@ -86,8 +86,9 @@ namespace Game3 {
 	}
 
 	void MessageDialog::submit(bool response) {
-		onSubmit(response);
-		ui.removeDialog(getSelf());
+		DialogPtr self = getSelf();
+		signalSubmit(response);
+		ui.removeDialog(self);
 	}
 
 	std::function<bool(Widget &, int, int, int)> MessageDialog::makeSubmit(bool response) {
