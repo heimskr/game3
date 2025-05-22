@@ -62,3 +62,4 @@ vgcore.*
 /*.stamp
 /worlds
 *.game3
+*.game3-journal
