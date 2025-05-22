@@ -158,11 +158,13 @@ namespace Game3 {
 			accumulated_natural += max_natural;
 		}
 
+		const float total_spacing = spacing * (outer_size - 1);
+
 		if (expand_count > 0) {
 			for (outer = 0; outer < outer_size; ++outer) {
 				float &size = (*sizes)->at(outer);
 				if (size == -1) {
-					size = (for_size - accumulated_nonexpanding_natural) / expand_count;
+					size = (for_size - accumulated_nonexpanding_natural - total_spacing) / expand_count;
 					for (inner = 0; inner < inner_size; ++inner) {
 						get_size_container() = size;
 					}
@@ -170,7 +172,6 @@ namespace Game3 {
 			}
 		}
 
-		const float total_spacing = spacing * (outer_size - 1);
 		minimum = total_spacing + accumulated_minimum;
 		natural = total_spacing + accumulated_natural;
 	}
