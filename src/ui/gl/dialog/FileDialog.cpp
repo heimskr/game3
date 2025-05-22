@@ -75,7 +75,7 @@ namespace Game3 {
 		scroller = make<Scroller>(ui, selfScale);
 		scroller->setExpand(true, true);
 
-		outerVbox = make<Box>(ui, selfScale, Orientation::Vertical, 1, 0.666);
+		outerVbox = make<Box>(ui, selfScale, Orientation::Vertical, 0.5, 0.666);
 		outerVbox->setExpand(true, true);
 
 		header = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
@@ -105,10 +105,10 @@ namespace Game3 {
 		upIcon->insertAtEnd(header);
 		pathLabel->insertAtEnd(pathScroller);
 		pathScroller->insertAtEnd(header);
+		scroller->setChild(entryList);
 		outerVbox->append(header);
-		outerVbox->append(entryList);
-		scroller->setChild(outerVbox);
-		scroller->insertAtEnd(shared_from_this());
+		outerVbox->append(scroller);
+		outerVbox->insertAtEnd(shared_from_this());
 
 		recenter();
 		populate();

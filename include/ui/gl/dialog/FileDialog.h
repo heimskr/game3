@@ -58,9 +58,10 @@ namespace Game3 {
 			virtual void populate();
 
 		protected:
+			/** Contains the entry list. */
 			std::shared_ptr<Scroller> scroller;
 			std::shared_ptr<Scroller> pathScroller;
-			/** Contains the current path header and the entry list. */
+			/** Contains the current path header and the scroller. */
 			std::shared_ptr<Box> outerVbox;
 			std::shared_ptr<Box> entryList;
 			/** Contains the "up" button and the path label. */

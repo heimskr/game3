@@ -8,8 +8,6 @@ namespace Game3 {
 	void SaveFileDialog::init() {
 		FileDialog::init();
 
-		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 0);
-
 		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 1, 0);
 
 		filenameInput = make<TextInput>(ui, selfScale);
@@ -26,11 +24,7 @@ namespace Game3 {
 
 		hbox->append(filenameInput);
 		hbox->append(std::move(ok_icon));
-
-		remove(scroller);
-		vbox->append(scroller);
-		vbox->append(std::move(hbox));
-		vbox->insertAtEnd(getSelf());
+		outerVbox->append(std::move(hbox));
 	}
 
 	void SaveFileDialog::selectFile(const std::filesystem::path &path) {
