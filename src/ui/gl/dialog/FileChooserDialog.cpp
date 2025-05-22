@@ -96,7 +96,7 @@ namespace Game3 {
 		scroller = make<Scroller>(ui, selfScale);
 		scroller->setExpand(true, true);
 
-		outerVbox = make<Box>(ui, selfScale, Orientation::Vertical, 0);
+		outerVbox = make<Box>(ui, selfScale, Orientation::Vertical, 1, 0.666);
 		outerVbox->setExpand(true, true);
 
 		header = make<Box>(ui, selfScale, Orientation::Horizontal, 0);

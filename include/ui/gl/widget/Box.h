@@ -11,6 +11,7 @@ namespace Game3 {
 			static constexpr Color DEFAULT_SEPARATOR_COLOR{"#49120060"};
 
 			Box(UIContext &, float selfScale, Orientation, float padding, float separator_thickness, Color separator_color);
+			Box(UIContext &, float selfScale, Orientation, float padding, float separator_thickness);
 			Box(UIContext &, float selfScale, Orientation, float padding);
 			Box(UIContext &, float selfScale, Orientation = Orientation::Vertical);
 

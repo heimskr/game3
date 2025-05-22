@@ -15,8 +15,11 @@ namespace Game3 {
 		separatorThickness(separator_thickness),
 		separatorColor(separator_color) {}
 
+	Box::Box(UIContext &ui, float selfScale, Orientation orientation, float padding, float separator_thickness):
+		Box(ui, selfScale, orientation, padding, separator_thickness, DEFAULT_SEPARATOR_COLOR) {}
+
 	Box::Box(UIContext &ui, float selfScale, Orientation orientation, float padding):
-		Box(ui, selfScale, orientation, padding, padding == 0? 0 : DEFAULT_SEPARATOR_THICKNESS, padding == 0? Color{} : DEFAULT_SEPARATOR_COLOR) {}
+		Box(ui, selfScale, orientation, padding, padding == 0? 0 : DEFAULT_SEPARATOR_THICKNESS) {}
 
 	Box::Box(UIContext &ui, float selfScale, Orientation orientation):
 		Box(ui, selfScale, orientation, DEFAULT_PADDING, DEFAULT_SEPARATOR_THICKNESS, DEFAULT_SEPARATOR_COLOR) {}
