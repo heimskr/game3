@@ -6,11 +6,6 @@ namespace Game3 {
 		submit(path);
 	}
 
-	void LoadFileDialog::selectDirectory(const std::filesystem::path &path) {
-		currentPath = std::filesystem::canonical(path);
-		populate();
-	}
-
 	void LoadFileDialog::submit(const std::filesystem::path &path) {
 		auto self = getSelf();
 		ui.removeDialog(self);

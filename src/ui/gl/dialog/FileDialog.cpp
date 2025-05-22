@@ -131,6 +131,11 @@ namespace Game3 {
 		DraggableDialog::rescale(new_scale);
 	}
 
+	void FileDialog::selectDirectory(const std::filesystem::path &path) {
+		currentPath = std::filesystem::canonical(path);
+		populate();
+	}
+
 	void FileDialog::populate() {
 		entryList->clearChildren();
 

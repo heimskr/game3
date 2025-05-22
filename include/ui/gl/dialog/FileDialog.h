@@ -51,7 +51,7 @@ namespace Game3 {
 			void rescale(float new_scale) override;
 
 			virtual void selectFile(const std::filesystem::path &path) = 0;
-			virtual void selectDirectory(const std::filesystem::path &path) = 0;
+			virtual void selectDirectory(const std::filesystem::path &path);
 
 			virtual void submit(const std::filesystem::path &path) = 0;
 			virtual void populate();

@@ -1,5 +1,6 @@
 #include "graphics/Texture.h"
 #include "threading/ThreadContext.h"
+#include "ui/gl/dialog/SaveFileDialog.h"
 #include "ui/gl/dialog/WorldCreatorDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Grid.h"
@@ -39,11 +40,26 @@ namespace Game3 {
 		grid->attach(make_label("Path"), 0, 0);
 		grid->attach(make_label("Seed"), 1, 0);
 
+		auto path_box = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
+
 		pathInput = make<TextInput>(ui, selfScale);
 		pathInput->setHorizontalExpand(true);
 		pathInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
 		pathInput->setText("worlds/");
-		grid->attach(pathInput, 0, 1);
+
+		auto path_icon = make<Icon>(ui, selfScale, "resources/gui/folder.png");
+		path_icon->setFixedSize(11);
+		path_icon->setOnClick([this](Widget &) {
+			auto dialog = ui.emplaceDialog<SaveFileDialog>(1, "World Path", 150, 100);
+			dialog->signalSubmit.connect([this](const std::filesystem::path &path) {
+				pathInput->setText(std::filesystem::relative(path).string());
+			});
+			ui.focusDialog(dialog);
+		});
+
+		path_box->append(pathInput);
+		path_box->append(path_icon);
+		grid->attach(std::move(path_box), 0, 1);
 
 		seedInput = make<TextInput>(ui, selfScale);
 		seedInput->setHorizontalExpand(true);
