@@ -48,7 +48,7 @@ namespace Game3 {
 		pathInput->onSubmit.connect([this](TextInput &, const UString &) {
 			submit();
 		});
-		pathInput->setText("worlds/");
+		pathInput->setText("worlds/world.game3");
 
 		auto path_icon = make<Icon>(ui, selfScale, "resources/gui/folder.png");
 		path_icon->setFixedSize(11);
