@@ -8,6 +8,7 @@
 namespace Game3 {
 	class FileDialog;
 	class Icon;
+	class Label;
 	class Scroller;
 
 	namespace FileChooser {
@@ -45,6 +46,7 @@ namespace Game3 {
 
 			FileDialog(UIContext &, float selfScale, UString title, int width, int height);
 
+			void init() override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 			void rescale(float new_scale) override;
 
@@ -52,9 +54,18 @@ namespace Game3 {
 			virtual void selectDirectory(const std::filesystem::path &path) = 0;
 
 			virtual void submit(const std::filesystem::path &path) = 0;
-			virtual void populate() = 0;
+			virtual void populate();
 
 		protected:
+			std::shared_ptr<Scroller> scroller;
+			std::shared_ptr<Scroller> pathScroller;
+			/** Contains the current path header and the entry list. */
+			std::shared_ptr<Box> outerVbox;
+			std::shared_ptr<Box> entryList;
+			/** Contains the "up" button and the path label. */
+			std::shared_ptr<Box> header;
+			std::shared_ptr<Icon> upIcon;
+			std::shared_ptr<Label> pathLabel;
 			bool showHidden = true;
 
 			virtual bool filter(const std::filesystem::directory_entry &) const;
