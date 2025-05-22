@@ -401,7 +401,7 @@ namespace Game3 {
 			}
 
 			if (modifiers.onlyCtrl() && action == GLFW_PRESS) {
-				if (key == GLFW_KEY_P) {
+				if (key == GLFW_KEY_O) {
 					showWorldSelector();
 					return;
 				} else if (key == GLFW_KEY_N) {
