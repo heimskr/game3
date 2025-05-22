@@ -67,7 +67,6 @@ namespace Game3 {
 					auto icon = make<Icon>(ui, selfScale);
 					icon->setIconTexture(iconTexture);
 					icon->insertAtEnd(self);
-
 					auto label = make<Label>(ui, selfScale * 1.25, path.filename().string());
 					label->setVerticalAlignment(Alignment::Center);
 					label->insertAtEnd(self);

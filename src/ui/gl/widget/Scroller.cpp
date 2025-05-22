@@ -185,7 +185,11 @@ namespace Game3 {
 		return firstChild && firstChild->dragEnd(x, y, displacement);
 	}
 
-	bool Scroller::scroll(float x_delta, float y_delta, int, int, Modifiers) {
+	bool Scroller::scroll(float x_delta, float y_delta, int, int, Modifiers modifiers) {
+		if (modifiers.onlyShift()) {
+			std::swap(x_delta, y_delta);
+		}
+
 		maybeRemeasureChildWidth();
 
 		if (ALLOW_HORIZONTAL_OVERSCROLL || lastChildWidth > lastRectangle.width) {
