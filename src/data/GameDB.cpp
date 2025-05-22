@@ -23,8 +23,12 @@ namespace Game3 {
 	GameDB::GameDB(const ServerGamePtr &game):
 		weakGame(game) {}
 
-	int64_t GameDB::currentFormatVersion() {
+	int64_t GameDB::getCurrentFormatVersion() {
 		return 3;
+	}
+
+	std::string GameDB::getFileExtension() {
+		return ".game3";
 	}
 
 	void GameDB::open(std::filesystem::path path_) {
@@ -79,7 +83,7 @@ namespace Game3 {
 		SQLite::Statement query{*database, "SELECT value FROM misc WHERE key = ?"};
 		query.bind(1, "formatVersion");
 		if (query.executeStep()) {
-			return parseNumber<int64_t>(query.getColumn(0).getString()) - currentFormatVersion();
+			return parseNumber<int64_t>(query.getColumn(0).getString()) - getCurrentFormatVersion();
 		}
 		return INT64_MIN;
 	}
@@ -103,7 +107,7 @@ namespace Game3 {
 		SQLite::Transaction transaction{*database};
 		SQLite::Statement statement{*database, "INSERT OR REPLACE INTO misc VALUES (?, ?)"};
 		statement.bind(1, "formatVersion");
-		statement.bind(2, currentFormatVersion());
+		statement.bind(2, getCurrentFormatVersion());
 		statement.exec();
 		statement.reset();
 		transaction.commit();

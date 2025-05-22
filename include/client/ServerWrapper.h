@@ -27,7 +27,7 @@ namespace Game3 {
 			std::function<void(std::string_view)> onLog;
 			std::function<void(const std::exception &)> onError;
 
-			ServerWrapper(std::filesystem::path worldPath = "localworld.db");
+			ServerWrapper(std::filesystem::path worldPath = "localworld.game3");
 			~ServerWrapper();
 
 			void runInThread(size_t overworld_seed = -1);

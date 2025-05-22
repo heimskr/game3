@@ -1,3 +1,4 @@
+#include "data/GameDB.h"
 #include "graphics/Texture.h"
 #include "ui/gl/dialog/WorldSelectorDialog.h"
 #include "ui/gl/widget/Box.h"
@@ -11,7 +12,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float WIDTH = 100;
+		constexpr float WIDTH = 150;
 		constexpr float HEIGHT = 100;
 	}
 
@@ -19,12 +20,12 @@ namespace Game3 {
 		LoadFileDialog(ui, selfScale, "Load World", WIDTH, HEIGHT) {}
 
 	bool WorldSelectorDialog::filter(const std::filesystem::directory_entry &entry) const {
-		return entry.path().extension() == ".db";
+		return entry.path().extension() == GameDB::getFileExtension();
 	}
 
 	TexturePtr WorldSelectorDialog::getTexture(const std::filesystem::directory_entry &entry) const {
 		if (entry.is_regular_file()) {
-			if (entry.path().filename().extension() == ".db") {
+			if (entry.path().filename().extension() == GameDB::getFileExtension()) {
 				return cacheTexture("resources/gui/picture.png");
 			}
 			return cacheTexture("resources/gui/file.png");

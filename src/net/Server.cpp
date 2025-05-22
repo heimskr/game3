@@ -257,7 +257,7 @@ namespace Game3 {
 			saveCV.notify_all();
 		};
 
-		const char *world_path = "world.db";
+		const char *world_path = "world.game3";
 		if (4 <= argc) {
 			world_path = argv[3];
 		}

@@ -36,7 +36,8 @@ namespace Game3 {
 
 			GameDB(const std::shared_ptr<ServerGame> &);
 
-			static int64_t currentFormatVersion();
+			static int64_t getCurrentFormatVersion();
+			static std::string getFileExtension();
 
 			void open(std::filesystem::path);
 			void close();

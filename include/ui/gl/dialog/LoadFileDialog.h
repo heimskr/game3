@@ -9,10 +9,7 @@
 #include <memory>
 
 namespace Game3 {
-	class Box;
-	class Icon;
 	class Label;
-	class Scroller;
 
 	class LoadFileDialog: public FileDialog {
 		public:

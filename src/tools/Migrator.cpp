@@ -16,7 +16,7 @@ namespace Game3 {
 		if (args.front() == "all") {
 			auto ssl_server = Server::create("::1", 40000, "private.crt", "private.key", readFile(".secret"), 2, 1024);
 			auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(ssl_server, size_t(1))));
-			game->openDatabase(1 < args.size()? args[1] : "world.db");
+			game->openDatabase(1 < args.size()? args[1] : "world.game3");
 			ssl_server->game = game;
 			INFO("Reading...");
 			GameDB &database = game->getDatabase();

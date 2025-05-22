@@ -61,3 +61,4 @@ vgcore.*
 /*.hash
 /*.stamp
 /worlds
+*.game3
