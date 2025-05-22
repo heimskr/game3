@@ -17,8 +17,6 @@ namespace Game3 {
 
 			MessageDialog(UIContext &, float selfScale, int width, int height, ButtonsType = ButtonsType::Okay);
 
-			void render(const RendererContext &) override;
-
 			void init() override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 

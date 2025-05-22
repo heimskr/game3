@@ -1169,7 +1169,11 @@ namespace Game3 {
 		};
 
 		if (std::filesystem::exists(path)) {
-			INFO("no");
+			if (std::filesystem::is_regular_file(path)) {
+				error("TODO: confirm whether user wants to overwrite");
+			} else {
+				error(std::format("Can't overwrite {}.", path.c_str()));
+			}
 		} else {
 			go();
 		}

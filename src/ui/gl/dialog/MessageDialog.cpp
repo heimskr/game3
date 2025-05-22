@@ -13,12 +13,6 @@ namespace Game3 {
 	MessageDialog::MessageDialog(UIContext &ui, float selfScale, int width, int height, ButtonsType buttons_type):
 		DraggableDialog(ui, selfScale, width, height), buttonsType(buttons_type) {}
 
-	void MessageDialog::render(const RendererContext &renderers) {
-		DraggableDialog::render(renderers);
-		INFO("width = {}, height = {}, body = {}", this->dialogWidth, this->dialogHeight, bodyRectangle);
-		// vbox->render(renderers, bodyRectangle);
-	}
-
 	void MessageDialog::init() {
 		DraggableDialog::init();
 

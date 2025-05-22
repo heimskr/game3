@@ -1,9 +1,11 @@
 #include "graphics/Texture.h"
+#include "threading/ThreadContext.h"
 #include "ui/gl/dialog/WorldCreatorDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Grid.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/Label.h"
+#include "ui/gl/widget/Spacer.h"
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
@@ -53,7 +55,13 @@ namespace Game3 {
 		vbox->append(std::move(grid));
 		vbox->insertAtEnd(getSelf());
 
+		randomizeSeed();
+		this->onFocus();
 		recenter();
+		ui.focusWidget(pathInput);
+	}
+
+	void WorldCreatorDialog::onFocus() {
 		ui.focusWidget(pathInput);
 	}
 
@@ -78,5 +86,30 @@ namespace Game3 {
 		}
 
 		signalSubmit(pathInput->getText().raw(), seed);
+	}
+
+	void WorldCreatorDialog::randomizeSeed() {
+		if (threadContext.random(1, 100) <= 42) {
+			static constexpr std::array strings{
+				"skr",
+				"s33d",
+				"1337",
+				"seedskr",
+				"hej",
+				"yo gurt",
+				"WHAT",
+				"bing chilling",
+				"huo heating",
+				"you irradiating",
+			};
+
+			seedInput->setText(choose(strings, threadContext.rng));
+			return;
+		}
+
+		const size_t length = threadContext.random(1, 10);
+		const size_t min = std::pow(10, length - 1);
+		const size_t max = std::pow(10, length) - 1;
+		seedInput->setText(std::to_string(threadContext.random(min, max)));
 	}
 }

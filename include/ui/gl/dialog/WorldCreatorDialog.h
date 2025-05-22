@@ -14,13 +14,14 @@ namespace Game3 {
 			WorldCreatorDialog(UIContext &, float selfScale);
 
 			void init() final;
+			void onFocus() final;
 			void rescale(float new_scale) final;
-
 
 		private:
 			std::shared_ptr<TextInput> pathInput;
 			std::shared_ptr<TextInput> seedInput;
 
 			void submit();
+			void randomizeSeed();
 	};
 }
