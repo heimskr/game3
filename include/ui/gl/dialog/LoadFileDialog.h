@@ -15,12 +15,12 @@ namespace Game3 {
 	class Label;
 	class Scroller;
 
-	class FileChooserDialog: public DraggableDialog {
+	class LoadFileDialog: public DraggableDialog {
 		public:
 			std::filesystem::path currentPath;
 			sigc::signal<void(const std::filesystem::path &)> signalSubmit;
 
-			FileChooserDialog(UIContext &, float selfScale, UString title, int width, int height);
+			LoadFileDialog(UIContext &, float selfScale, UString title, int width, int height);
 
 			void init() override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;

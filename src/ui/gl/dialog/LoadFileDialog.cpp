@@ -1,6 +1,6 @@
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
-#include "ui/gl/dialog/FileChooserDialog.h"
+#include "ui/gl/dialog/LoadFileDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/Label.h"
@@ -14,7 +14,7 @@ namespace Game3 {
 	namespace FileChooser {
 		class Row: public Box {
 			public:
-				Row(FileChooserDialog &dialog, std::filesystem::path path, TexturePtr iconTexture):
+				Row(LoadFileDialog &dialog, std::filesystem::path path, TexturePtr iconTexture):
 					Box(dialog.getUI(), 0.6, Orientation::Horizontal, 5, 0, Color{}),
 					dialog(dialog),
 					path(std::move(path)),
@@ -26,7 +26,7 @@ namespace Game3 {
 				}
 
 			protected:
-				FileChooserDialog &dialog;
+				LoadFileDialog &dialog;
 				std::filesystem::path path;
 				TexturePtr iconTexture;
 		};
@@ -83,12 +83,12 @@ namespace Game3 {
 		};
 	}
 
-	FileChooserDialog::FileChooserDialog(UIContext &ui, float selfScale, UString title, int width, int height):
+	LoadFileDialog::LoadFileDialog(UIContext &ui, float selfScale, UString title, int width, int height):
 		DraggableDialog(ui, selfScale, width, height) {
 			setTitle(std::move(title));
 		}
 
-	void FileChooserDialog::init() {
+	void LoadFileDialog::init() {
 		DraggableDialog::init();
 
 		currentPath = std::filesystem::current_path() / "worlds";
@@ -135,7 +135,7 @@ namespace Game3 {
 		populate();
 	}
 
-	bool FileChooserDialog::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
+	bool LoadFileDialog::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
 		if ((key == 'h' || key == 'H') && modifiers.onlyCtrl()) {
 			showHidden = !showHidden;
 			populate();
@@ -146,19 +146,19 @@ namespace Game3 {
 		return true;
 	}
 
-	void FileChooserDialog::rescale(float new_scale) {
+	void LoadFileDialog::rescale(float new_scale) {
 		position.width = dialogWidth * new_scale;
 		position.height = dialogHeight * new_scale;
 		DraggableDialog::rescale(new_scale);
 	}
 
-	void FileChooserDialog::submit(const std::filesystem::path &path) {
+	void LoadFileDialog::submit(const std::filesystem::path &path) {
 		auto self = getSelf();
 		ui.removeDialog(self);
 		signalSubmit(path);
 	}
 
-	void FileChooserDialog::populate() {
+	void LoadFileDialog::populate() {
 		entryList->clearChildren();
 
 		pathLabel->setText(currentPath.string());
@@ -194,11 +194,11 @@ namespace Game3 {
 		scroller->remeasure(ui.getRenderers(0));
 	}
 
-	bool FileChooserDialog::filter(const std::filesystem::directory_entry &) const {
+	bool LoadFileDialog::filter(const std::filesystem::directory_entry &) const {
 		return true;
 	}
 
-	TexturePtr FileChooserDialog::getTexture(const std::filesystem::directory_entry &entry) const {
+	TexturePtr LoadFileDialog::getTexture(const std::filesystem::directory_entry &entry) const {
 		if (entry.is_regular_file()) {
 			return cacheTexture("resources/gui/file.png");
 		}

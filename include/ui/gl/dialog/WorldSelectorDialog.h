@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ui/gl/dialog/FileChooserDialog.h"
+#include "ui/gl/dialog/LoadFileDialog.h"
 
 namespace Game3 {
-	class WorldSelectorDialog final: public FileChooserDialog {
+	class WorldSelectorDialog final: public LoadFileDialog {
 		public:
 			WorldSelectorDialog(UIContext &, float selfScale);
 

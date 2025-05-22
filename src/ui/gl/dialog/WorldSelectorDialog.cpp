@@ -16,7 +16,7 @@ namespace Game3 {
 	}
 
 	WorldSelectorDialog::WorldSelectorDialog(UIContext &ui, float selfScale):
-		FileChooserDialog(ui, selfScale, "Load World", WIDTH, HEIGHT) {}
+		LoadFileDialog(ui, selfScale, "Load World", WIDTH, HEIGHT) {}
 
 	bool WorldSelectorDialog::filter(const std::filesystem::directory_entry &entry) const {
 		return entry.path().extension() == ".db";
@@ -30,6 +30,6 @@ namespace Game3 {
 			return cacheTexture("resources/gui/file.png");
 		}
 
-		return FileChooserDialog::getTexture(entry);
+		return LoadFileDialog::getTexture(entry);
 	}
 }
