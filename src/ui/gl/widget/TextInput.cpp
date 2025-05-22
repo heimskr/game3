@@ -380,6 +380,20 @@ namespace Game3 {
 			.shadow{0, 0, 0, 0},
 			.ignoreNewline = !multiline,
 		});
+
+		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
+
+		if (const std::optional<UString> &tooltip_text = getTooltipText()) {
+			if (!ui.anyDragUpdaters() && ui.checkMouse(lastRectangle)) {
+				tooltip->setText(*tooltip_text);
+				tooltip->setRegion(std::nullopt);
+				tooltip->setPositionOverride(std::nullopt);
+				tooltip->show(*this);
+				return;
+			}
+		}
+
+		tooltip->hide(*this);
 	}
 
 	bool TextInput::click(int button, int x, int y, Modifiers modifiers) {

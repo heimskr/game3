@@ -36,7 +36,10 @@ namespace Game3 {
 		};
 
 		grid->attach(make_label("Username"), 0, 0);
-		grid->attach(make_label("Name"), 1, 0);
+		UString display_name_message = "Be sure to put something here if you're joining a new world";
+		auto name_label = make_label("Name");
+		name_label->setTooltipText(display_name_message);
+		grid->attach(std::move(name_label), 1, 0);
 
 		usernameInput = make<TextInput>(ui, selfScale);
 		usernameInput->setHorizontalExpand(true);
@@ -44,6 +47,7 @@ namespace Game3 {
 		grid->attach(usernameInput, 0, 1);
 
 		displayNameInput = make<TextInput>(ui, selfScale);
+		displayNameInput->setTooltipText(std::move(display_name_message));
 		displayNameInput->setHorizontalExpand(true);
 		displayNameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(displayNameInput, 1, 1);

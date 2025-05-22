@@ -7,6 +7,7 @@
 #include "ui/gl/Autocompleter.h"
 #include "ui/gl/HasAlignment.h"
 #include "ui/gl/HasFixedSize.h"
+#include "ui/gl/HasTooltipText.h"
 #include "util/Gradual.h"
 
 #include <sigc++/sigc++.h>
@@ -54,7 +55,7 @@ namespace Game3 {
 			TextInput &owner;
 	};
 
-	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public Autocompleter {
+	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public HasTooltipText, public Autocompleter {
 		public:
 			sigc::signal<void(TextInput &, const UString &)> onSubmit;
 			sigc::signal<void(TextInput &, const UString &)> onChange;
