@@ -13,7 +13,7 @@
 namespace Game3 {
 	namespace {
 		constexpr float WIDTH = 75;
-		constexpr float HEIGHT = 45;
+		constexpr float HEIGHT = 43;
 	}
 
 	LoginDialog::LoginDialog(UIContext &ui, float selfScale):
@@ -24,7 +24,7 @@ namespace Game3 {
 	void LoginDialog::init() {
 		DraggableDialog::init();
 
-		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
+		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 1, 0);
 
 		auto grid = make<Grid>(ui, selfScale);
 		grid->setRowSpacing(1);

@@ -19,10 +19,10 @@ namespace Game3 {
 		Dialog(ui, selfScale) {}
 
 	void ConnectionDialog::init() {
-		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0, Color{});
+		auto vbox = make<Box>(ui, selfScale, Orientation::Vertical, 1, 0);
 
 		auto grid = make<Grid>(ui, selfScale);
-		grid->setRowSpacing(5);
+		grid->setRowSpacing(1);
 
 		auto make_label = [&](UString text) {
 			auto label = make<Label>(ui, selfScale, std::move(text));
@@ -48,7 +48,7 @@ namespace Game3 {
 		vbox->append(std::move(grid));
 		vbox->insertAtEnd(shared_from_this());
 
-		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0, Color{});
+		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0);
 
 		auto spacer = make<Spacer>(ui, Orientation::Horizontal);
 
@@ -102,7 +102,7 @@ namespace Game3 {
 
 	Rectangle ConnectionDialog::getPosition() const {
 		int width = 600 * ui.scale / 8;
-		int height = 316 * ui.scale / 8;
+		int height = 276 * ui.scale / 8;
 
 		return Rectangle((ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height);
 	}
