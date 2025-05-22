@@ -17,7 +17,7 @@
 namespace Game3 {
 	namespace {
 		constexpr float WIDTH = 100;
-		constexpr float HEIGHT = 50;
+		constexpr float HEIGHT = 35;
 	}
 
 	WorldCreatorDialog::WorldCreatorDialog(UIContext &ui, float selfScale):
@@ -29,22 +29,26 @@ namespace Game3 {
 		DraggableDialog::init();
 
 		auto grid = make<Grid>(ui, 1);
-		grid->setRowSpacing(5);
+		grid->setRowSpacing(1);
+		grid->setColumnSpacing(1);
 
-		auto make_label = [&](UString text) {
+		auto make_label = [&](UString text, std::optional<UString> tooltip = {}) {
 			auto label = make<Label>(ui, selfScale, std::move(text));
 			label->setVerticalAlignment(Alignment::Center);
+			if (tooltip) {
+				label->setTooltipText(std::move(*tooltip));
+			}
 			return label;
 		};
 
 		grid->attach(make_label("Path"), 0, 0);
-		grid->attach(make_label("Seed"), 1, 0);
-
-		auto path_box = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
+		grid->attach(make_label("Seed", "Affects world generation"), 1, 0);
 
 		pathInput = make<TextInput>(ui, selfScale);
 		pathInput->setHorizontalExpand(true);
-		pathInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
+		pathInput->onSubmit.connect([this](TextInput &, const UString &) {
+			submit();
+		});
 		pathInput->setText("worlds/");
 
 		auto path_icon = make<Icon>(ui, selfScale, "resources/gui/folder.png");
@@ -57,14 +61,24 @@ namespace Game3 {
 			ui.focusDialog(dialog);
 		});
 
-		path_box->append(pathInput);
-		path_box->append(path_icon);
-		grid->attach(std::move(path_box), 0, 1);
+		grid->attach(pathInput, 0, 1);
+		grid->attach(std::move(path_icon), 0, 2);
 
 		seedInput = make<TextInput>(ui, selfScale);
+		seedInput->setTooltipText("Affects world generation");
 		seedInput->setHorizontalExpand(true);
-		seedInput->onSubmit.connect([this](TextInput &, const UString &) { submit(); });
+		seedInput->onSubmit.connect([this](TextInput &, const UString &) {
+			submit();
+		});
+
+		auto ok_icon = make<Icon>(ui, selfScale, "resources/gui/yes.png");
+		ok_icon->setFixedSize(11);
+		ok_icon->setOnClick([this](Widget &) {
+			submit();
+		});
+
 		grid->attach(seedInput, 1, 1);
+		grid->attach(std::move(ok_icon), 1, 2);
 
 		auto vbox = make<Box>(ui, 1, Orientation::Vertical, 0);
 
