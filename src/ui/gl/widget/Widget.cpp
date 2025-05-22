@@ -170,6 +170,12 @@ namespace Game3 {
 		}
 	}
 
+	void Widget::remeasure(const RendererContext &renderers) {
+		float minimum{}, natural{};
+		measure(renderers, Orientation::Horizontal, -1, -1, minimum, natural);
+		measure(renderers, Orientation::Vertical, -1, -1, minimum, natural);
+	}
+
 	bool Widget::contains(int x, int y) const {
 		return lastRectangle.contains(x, y);
 	}
@@ -408,19 +414,19 @@ namespace Game3 {
 
 	void Widget::setLastWidth(int new_width) {
 		if (lastRectangle.width != new_width) {
-			lastRectangle.width = new_width;
 			if (WidgetPtr parent = getParent()) {
 				parent->childResized(shared_from_this(), Orientation::Horizontal, new_width, lastRectangle.height);
 			}
+			lastRectangle.width = new_width;
 		}
 	}
 
 	void Widget::setLastHeight(int new_height) {
 		if (lastRectangle.height != new_height) {
-			lastRectangle.height = new_height;
 			if (WidgetPtr parent = getParent()) {
 				parent->childResized(shared_from_this(), Orientation::Vertical, lastRectangle.width, new_height);
 			}
+			lastRectangle.height = new_height;
 		}
 	}
 

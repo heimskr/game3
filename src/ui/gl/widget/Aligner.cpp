@@ -13,6 +13,7 @@ namespace Game3 {
 
 	void Aligner::render(const RendererContext &renderers, float x, float y, float width, float height) {
 		fixSizes(width, height);
+
 		Widget::render(renderers, x, y, width, height);
 
 		if (!firstChild) {

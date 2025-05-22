@@ -240,8 +240,9 @@ namespace Game3 {
 			return;
 		}
 
+		const float infinity = std::numeric_limits<float>::infinity();
 		float dummy{};
-		child->measure(renderers, orientation, for_width, for_height, minimum, dummy);
+		child->measure(renderers, orientation, infinity, infinity, minimum, dummy);
 		minimum = std::min(minimum, natural);
 	}
 

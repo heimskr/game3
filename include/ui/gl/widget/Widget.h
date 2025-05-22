@@ -60,6 +60,7 @@ namespace Game3 {
 			/** Calls horizontal `measure` if `width` isn't the same as the last recorded width.
 			 *  Calls vertical `measure` if `height` isn't the same as the last recorded height. */
 			virtual void maybeRemeasure(const RendererContext &, int width, int height);
+			virtual void remeasure(const RendererContext &);
 			/** Returns whether the given mouse coordinate is over this widget. */
 			virtual bool contains(int x, int y) const;
 			virtual void childResized(const WidgetPtr &child, Orientation, int new_width, int new_height);

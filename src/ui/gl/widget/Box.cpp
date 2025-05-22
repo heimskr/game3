@@ -132,6 +132,13 @@ namespace Game3 {
 		std::size_t i = 0;
 		childMeasurements.resize(childCount, {-1, -1});
 
+		const bool unconstrained = std::isinf(measure_orientation == Orientation::Horizontal? for_width : for_height);
+
+		auto is_finitely_expanding = [&](const WidgetPtr &child) {
+			const bool child_expansive = child->getExpand(measure_orientation) == Expansion::Expand;
+			return !unconstrained && child_expansive;
+		};
+
 		if (measure_orientation == orientation) {
 			minimum = natural = (childCount - 1) * getScale() * (0 < separatorThickness? 2 * padding + separatorThickness : padding);
 			const float original_minimum = minimum;
@@ -141,21 +148,18 @@ namespace Game3 {
 			std::size_t j = 0;
 			std::vector<float> naturals(childCount, -1);
 
-			// const bool vertical = measure_orientation == Orientation::Vertical;
-
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
-				if (child->getExpand(measure_orientation) == Expansion::Expand) {
+				float child_minimum{};
+				float child_natural{};
+				child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
+				naturals[j] = child_natural;
+
+				if (is_finitely_expanding(child)) {
 					++expand_count;
 				} else {
-					float child_minimum{};
-					float child_natural{};
-					// child->measure(renderers, measure_orientation, vertical? for_width : -1, vertical? -1 : for_height, child_minimum, child_natural);
-					// child->measure(renderers, measure_orientation, -1, -1, child_minimum, child_natural);
-					child->measure(renderers, measure_orientation, for_width, for_height, child_minimum, child_natural);
 					minimum += child_minimum;
 					natural += child_natural;
 					accumulated_nonexpanding_natural += child_natural;
-					naturals[j] = child_natural;
 				}
 
 				++j;
@@ -170,10 +174,10 @@ namespace Game3 {
 			}
 
 			for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
-				auto &pair = childMeasurements.at(j);
-				auto &item = measure_orientation == Orientation::Horizontal? pair.first : pair.second;
+				auto &[child_width, child_height] = childMeasurements.at(j);
+				float &item = measure_orientation == Orientation::Horizontal? child_width : child_height;
 
-				if (child->getExpand(measure_orientation) == Expansion::Expand) {
+				if (is_finitely_expanding(child) || naturals[j] < 0) {
 					item = (for_size - accumulated_nonexpanding_natural - original_minimum) / expand_count;
 				} else {
 					item = naturals[j];

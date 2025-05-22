@@ -1,3 +1,4 @@
+#include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "ui/gl/dialog/FileChooserDialog.h"
 #include "ui/gl/widget/Box.h"
@@ -196,6 +197,7 @@ namespace Game3 {
 		}
 
 		scroller->scrollToTop();
+		scroller->remeasure(ui.getRenderers(0));
 	}
 
 	bool FileChooserDialog::filter(const std::filesystem::directory_entry &) const {
