@@ -91,8 +91,9 @@ namespace Game3 {
 		closeButton->setFixedSize(3.5 * selfScale);
 		closeButton->init();
 		closeButton->setOnClick([this](Widget &) {
+			DialogPtr self = getSelf();
 			signalDismiss();
-			ui.removeDialog(getSelf());
+			ui.removeDialog(self);
 		});
 	}
 
@@ -130,8 +131,9 @@ namespace Game3 {
 
 	bool BaseDraggableDialog::keyPressed(uint32_t key, Modifiers, bool) {
 		if (key == GLFW_KEY_ESCAPE) {
+			DialogPtr self = getSelf();
 			signalDismiss();
-			ui.removeDialog(getSelf());
+			ui.removeDialog(self);
 			return true;
 		}
 

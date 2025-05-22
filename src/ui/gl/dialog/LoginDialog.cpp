@@ -86,13 +86,15 @@ namespace Game3 {
 	}
 
 	void LoginDialog::submit(bool go) {
+		DialogPtr self = getSelf();
+
 		if (go) {
 			signalSubmit(usernameInput->getText(), displayNameInput->getText());
 		} else {
 			signalDismiss();
 		}
 
-		ui.removeDialog(getSelf());
+		ui.removeDialog(self);
 	}
 
 	std::function<bool(Widget &, int, int, int)> LoginDialog::makeSubmit(bool go) {

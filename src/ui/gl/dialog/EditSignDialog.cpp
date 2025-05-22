@@ -59,13 +59,10 @@ namespace Game3 {
 
 		auto okay_button = make<Button>(ui, selfScale);
 		okay_button->setText("Okay");
-		okay_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON) {
-				return false;
-			}
+		okay_button->setOnClick([this](Widget &) {
+			DialogPtr self = getSelf();
 			onSubmit(tilenameInput->getText(), contentsInput->getText());
-			ui.removeDialog(getSelf());
-			return true;
+			ui.removeDialog(self);
 		});
 		buttonBox->append(std::move(okay_button));
 	}
