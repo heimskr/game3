@@ -74,6 +74,8 @@ namespace Game3 {
 		grid->attach(pathInput, 0, 1);
 		grid->attach(std::move(path_icon), 0, 2);
 
+		auto seed_box = make<Box>(ui, selfScale, Orientation::Horizontal, 1, 0);
+
 		seedInput = make<TextInput>(ui, selfScale);
 		seedInput->setTooltipText("Affects world generation");
 		seedInput->setHorizontalExpand(true);
@@ -81,13 +83,22 @@ namespace Game3 {
 			submit();
 		});
 
+		auto randomize_icon = make<Icon>(ui, selfScale, "resources/gui/refresh.png");
+		randomize_icon->setFixedSize(11);
+		randomize_icon->setOnClick([this](Widget &) {
+			randomizeSeed();
+		});
+
+		seed_box->append(seedInput);
+		seed_box->append(std::move(randomize_icon));
+
 		auto ok_icon = make<Icon>(ui, selfScale, "resources/gui/yes.png");
 		ok_icon->setFixedSize(11);
 		ok_icon->setOnClick([this](Widget &) {
 			submit();
 		});
 
-		grid->attach(seedInput, 1, 1);
+		grid->attach(std::move(seed_box), 1, 1);
 		grid->attach(std::move(ok_icon), 1, 2);
 
 		auto vbox = make<Box>(ui, 1, Orientation::Vertical, 0);
