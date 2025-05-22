@@ -55,6 +55,11 @@ namespace Game3 {
 		path_icon->setFixedSize(11);
 		path_icon->setOnClick([this](Widget &) {
 			auto dialog = ui.emplaceDialog<SaveFileDialog>(1, "World Path", 150, 100);
+			try {
+				dialog->setPath(std::filesystem::canonical(std::filesystem::path(pathInput->getText().raw())).parent_path());
+			} catch (const std::filesystem::filesystem_error &) {
+				dialog->setPath(std::filesystem::current_path());
+			}
 			dialog->signalSubmit.connect([this](const std::filesystem::path &path) {
 				pathInput->setText(std::filesystem::relative(path).string());
 			});

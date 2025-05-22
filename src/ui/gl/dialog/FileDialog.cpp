@@ -132,6 +132,10 @@ namespace Game3 {
 	}
 
 	void FileDialog::selectDirectory(const std::filesystem::path &path) {
+		setPath(path);
+	}
+
+	void FileDialog::setPath(const std::filesystem::path &path) {
 		currentPath = std::filesystem::canonical(path);
 		populate();
 	}

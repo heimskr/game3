@@ -54,6 +54,7 @@ namespace Game3 {
 			virtual void selectDirectory(const std::filesystem::path &path);
 
 			virtual void submit(const std::filesystem::path &path) = 0;
+			virtual void setPath(const std::filesystem::path &);
 			virtual void populate();
 
 		protected:
