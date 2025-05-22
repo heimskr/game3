@@ -130,13 +130,15 @@ namespace Game3 {
 	}
 
 	bool Scroller::dragUpdate(int x, int y) {
+		bool out = false;
+
 		if (lastHorizontalScrollMouse) {
 			maybeRemeasureChildWidth();
 
 			if (ALLOW_HORIZONTAL_OVERSCROLL || lastChildWidth > lastRectangle.width) {
 				const auto start_x = *lastHorizontalScrollMouse;
 				const float last_x = lastRectangle.x;
-				const float new_horizontal_offset = getHorizontalOffset() + (x - last_x - start_x) * (reverseScroll? -0.5 : 1.0);
+				const float new_horizontal_offset = getHorizontalOffset() + (x - last_x - start_x) * (reverseScroll? -(2 * lastRectangle.width / lastChildWidth.value()) : 1.0);
 				xOffset = fixXOffset(recalculateXOffset(new_horizontal_offset));
 				lastHorizontalScrollMouse = x - last_x;
 			} else {
@@ -145,7 +147,7 @@ namespace Game3 {
 			}
 
 			updateVerticalRectangle();
-			return true;
+			out = true;
 		}
 
 		if (lastVerticalScrollMouse) {
@@ -154,7 +156,7 @@ namespace Game3 {
 			if (ALLOW_VERTICAL_OVERSCROLL || lastChildHeight > lastRectangle.height) {
 				const auto start_y = *lastVerticalScrollMouse;
 				const float last_y = lastRectangle.y;
-				const float new_vertical_offset = getVerticalOffset() + (y - last_y - start_y) * (reverseScroll? -0.5 : 1.0);
+				const float new_vertical_offset = getVerticalOffset() + (y - last_y - start_y) * (reverseScroll? -(2 * lastRectangle.height / lastChildHeight.value()) : 1.0);
 				yOffset = fixYOffset(recalculateYOffset(new_vertical_offset));
 				lastVerticalScrollMouse = y - last_y;
 			} else {
@@ -166,7 +168,7 @@ namespace Game3 {
 			return true;
 		}
 
-		return firstChild && firstChild->dragUpdate(x, y);
+		return out || (firstChild && firstChild->dragUpdate(x, y));
 	}
 
 	bool Scroller::dragEnd(int x, int y, double displacement) {
