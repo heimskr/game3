@@ -1,8 +1,9 @@
-#include "util/Log.h"
+#include "graphics/Texture.h"
 #include "ui/gl/dialog/ConnectionDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Button.h"
 #include "ui/gl/widget/Grid.h"
+#include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/IntegerInput.h"
 #include "ui/gl/widget/Label.h"
 #include "ui/gl/widget/Spacer.h"
@@ -10,6 +11,7 @@
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
 #include "ui/Window.h"
+#include "util/Log.h"
 #include "util/Util.h"
 
 namespace Game3 {
@@ -50,28 +52,23 @@ namespace Game3 {
 
 		auto spacer = make<Spacer>(ui, Orientation::Horizontal);
 
-		auto local_button = make<Button>(ui, selfScale);
-		local_button->setText("Local Play");
-		local_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON) {
-				return false;
-			}
+		auto load_button = make<Icon>(ui, selfScale);
+		load_button->setIconTexture(cacheTexture("resources/gui/folder.png"));
+		load_button->setTooltipText("Load world");
+		load_button->setOnClick([this](Widget &) {
 			playLocally();
-			return true;
 		});
 
 		auto connect_button = make<Button>(ui, selfScale);
 		connect_button->setText("Connect");
-		connect_button->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON) {
-				return false;
-			}
+		connect_button->setOnClick([this](Widget &) {
 			submit();
-			return true;
 		});
 
+		load_button->setFixedSize(connect_button->getMinimumPreferredHeight() / ui.scale);
+
+		hbox->append(std::move(load_button));
 		hbox->append(std::move(spacer));
-		hbox->append(std::move(local_button));
 		hbox->append(std::move(connect_button));
 		vbox->append(std::move(hbox));
 

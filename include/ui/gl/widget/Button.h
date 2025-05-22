@@ -28,6 +28,8 @@ namespace Game3 {
 			const UString & getText() const;
 			void setText(UString);
 
+			virtual float getMinimumPreferredHeight() const;
+
 		protected:
 			virtual void renderLabel(const RendererContext &, const Rectangle &);
 			virtual float getWidth(const RendererContext &, float height) const;
@@ -48,6 +50,5 @@ namespace Game3 {
 			void setColors(Color top, Color bottom, Color text_color);
 
 			static TexturePtr getDefaultTexture();
-			virtual float getMinimumPreferredHeight() const;
 	};
 }
