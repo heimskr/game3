@@ -23,11 +23,10 @@ namespace Game3 {
 			FileChooserDialog(UIContext &, float selfScale, UString title, int width, int height);
 
 			void init() override;
-			void render(const RendererContext &) override;
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 			void rescale(float new_scale) override;
 
-			void submit(const std::filesystem::path &world_path);
+			void submit(const std::filesystem::path &path);
 			void populate();
 
 		protected:

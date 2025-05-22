@@ -15,7 +15,8 @@ namespace Game3 {
 
 	void MessageDialog::render(const RendererContext &renderers) {
 		DraggableDialog::render(renderers);
-		vbox->render(renderers, bodyRectangle);
+		INFO("width = {}, height = {}, body = {}", this->dialogWidth, this->dialogHeight, bodyRectangle);
+		// vbox->render(renderers, bodyRectangle);
 	}
 
 	void MessageDialog::init() {

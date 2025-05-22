@@ -15,6 +15,9 @@ namespace Game3 {
 		public:
 			using UI::UI;
 
+			static Identifier ID() { return {"base", "ui/title"}; }
+			Identifier getID() const final { return ID(); }
+
 			void init(Window &) final;
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;

@@ -3,9 +3,9 @@
 #include "ui/gl/dialog/FileChooserDialog.h"
 
 namespace Game3 {
-	class WorldsDialog final: public FileChooserDialog {
+	class WorldSelectorDialog final: public FileChooserDialog {
 		public:
-			WorldsDialog(UIContext &, float selfScale);
+			WorldSelectorDialog(UIContext &, float selfScale);
 
 		protected:
 			bool filter(const std::filesystem::directory_entry &) const override;

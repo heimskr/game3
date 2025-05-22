@@ -6,6 +6,16 @@
 #include "ui/gl/UIContext.h"
 
 namespace Game3 {
+	Icon::Icon(UIContext &ui, float selfScale, const std::filesystem::path &icon_path):
+		Widget(ui, selfScale) {
+			setIconTexture(cacheTexture(icon_path));
+		}
+
+	Icon::Icon(UIContext &ui, float selfScale, TexturePtr iconTexture):
+		Widget(ui, selfScale) {
+			setIconTexture(std::move(iconTexture));
+		}
+
 	Icon::Icon(UIContext &ui, float selfScale):
 		Widget(ui, selfScale) {}
 

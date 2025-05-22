@@ -16,14 +16,14 @@
 #include "util/Util.h"
 
 namespace Game3 {
+	GameUI::~GameUI() {
+		ui.removeDialog(topDialog);
+	}
+
 	void GameUI::init(Window &) {
 		Dialog::init();
 		fbo.init();
 		chatDialog = ui.emplaceDialog<ChatDialog>(selfScale);
-	}
-
-	GameUI::~GameUI() {
-		ui.removeDialog(topDialog);
 	}
 
 	void GameUI::render(const RendererContext &renderers) {

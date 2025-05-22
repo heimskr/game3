@@ -35,6 +35,9 @@ namespace Game3 {
 			GL::FBO fbo;
 			Rectangle realmBounds;
 
+			static Identifier ID() { return {"base", "ui/game"}; }
+			Identifier getID() const final { return ID(); }
+
 			using UI::UI;
 
 			~GameUI() final;

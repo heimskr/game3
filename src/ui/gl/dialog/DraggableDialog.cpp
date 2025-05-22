@@ -53,20 +53,26 @@ namespace Game3 {
 
 		closeButton->render(renderers, position + Rectangle(position.width - 5.75 * scale, 3 * scale, 3.5 * scale, 4 * scale));
 
-		auto saver = ui.scissorStack.pushRelative(titleRectangle, renderers);
-		const auto text_scale = static_cast<double>(getTitleScale()) * ui.scale;
+		{
+			auto saver = ui.scissorStack.pushRelative(titleRectangle, renderers);
+			const auto text_scale = static_cast<double>(getTitleScale()) * ui.scale;
 
-		texter.drawOnScreen(getTitle(), TextRenderOptions{
-			.x = static_cast<double>(titleRectangle.width) / 2.0,
-			.y = static_cast<double>(scale) * 1.5,
-			.scaleX = text_scale,
-			.scaleY = text_scale,
-			.wrapWidth = static_cast<double>(titleRectangle.width),
-			.color = TITLE_TEXT_COLOR,
-			.align = TextAlign::Center,
-			.alignTop = true,
-			.shadow{0, 0, 0, 0},
-		});
+			texter.drawOnScreen(getTitle(), TextRenderOptions{
+				.x = static_cast<double>(titleRectangle.width) / 2.0,
+				.y = static_cast<double>(scale) * 1.5,
+				.scaleX = text_scale,
+				.scaleY = text_scale,
+				.wrapWidth = static_cast<double>(titleRectangle.width),
+				.color = TITLE_TEXT_COLOR,
+				.align = TextAlign::Center,
+				.alignTop = true,
+				.shadow{0, 0, 0, 0},
+			});
+		}
+
+		if (WidgetPtr child = getFirstChild()) {
+			child->render(renderers, bodyRectangle);
+		}
 	}
 
 	Rectangle BaseDraggableDialog::getPosition() const {
@@ -84,13 +90,9 @@ namespace Game3 {
 		closeButton->setIconTexture(cacheTexture("resources/gui/x.png"));
 		closeButton->setFixedSize(3.5 * selfScale);
 		closeButton->init();
-		closeButton->setOnClick([this](Widget &, int button, int, int) {
-			if (button != LEFT_BUTTON)
-				return false;
-
+		closeButton->setOnClick([this](Widget &) {
 			signalDismiss();
 			ui.removeDialog(getSelf());
-			return true;
 		});
 	}
 

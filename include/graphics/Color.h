@@ -48,28 +48,65 @@ namespace Game3 {
 			blue(((packed >> 8) & 0xff) / 255.f),
 			alpha((packed & 0xff) / 255.f) {}
 
-		explicit constexpr Color(std::string_view str) {
-			if (str.empty())
+		constexpr Color(std::string_view string) {
+			if (string.empty()) {
 				throw std::invalid_argument("Color string must not be empty");
+			}
 
-			if (str[0] == '#')
-				str.remove_prefix(1);
+			if (string[0] == '#') {
+				string.remove_prefix(1);
+			}
 
-			if (str.empty()) {
+			if (string.empty()) {
 				// "#" -> transparent black
 				alpha = 0;
 				return;
 			}
 
-			if (str.size() != 6 && str.size() != 8)
-				throw std::invalid_argument("Invalid size for color string");
+			if (string.size() == 2) {
+				// "#xx" -> variable-opacity black
+				red = 0;
+				green = 0;
+				blue = 0;
+				alpha = fromHex(string) / 255.f;
+				return;
+			}
 
-			red = fromHex(str.substr(0, 2)) / 255.f;
-			green = fromHex(str.substr(2, 2)) / 255.f;
-			blue = fromHex(str.substr(4, 2)) / 255.f;
-			str.remove_prefix(6);
-			alpha = str.empty()? 1.f : fromHex(str) / 255.f;
+			if (string.size() == 3 || string.size() == 4) {
+				// #rgb -> #rrggbb, #rgba -> #rrggbbaa
+				auto get = [](char character) -> float {
+					const uint8_t hexed = fromHex(character);
+					return (hexed | (hexed << 4)) / 255.f;
+				};
+
+				red = get(string[0]);
+				green = get(string[1]);
+				blue = get(string[2]);
+
+				if (string.size() == 4) {
+					alpha = get(string[3]);
+				}
+
+				return;
+			}
+
+			if (string.size() != 6 && string.size() != 8) {
+				throw std::invalid_argument("Invalid size for color string");
+			}
+
+			auto get = [&](size_t offset) -> float {
+				return string.empty()? 1.f : fromHex(string.substr(offset, 2)) / 255.f;
+			};
+
+			red = get(0);
+			green = get(2);
+			blue = get(4);
+			string.remove_prefix(6);
+			alpha = get(0);
 		}
+
+		constexpr Color(const char *string):
+			Color(std::string_view(string)) {}
 
 		Color darken(float value_divisor = 3.f / 2.f) const;
 		Color multiplyValue(float multiplier) const;

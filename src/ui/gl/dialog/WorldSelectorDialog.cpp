@@ -1,5 +1,5 @@
 #include "graphics/Texture.h"
-#include "ui/gl/dialog/WorldsDialog.h"
+#include "ui/gl/dialog/WorldSelectorDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Icon.h"
 #include "ui/gl/widget/Label.h"
@@ -15,14 +15,14 @@ namespace Game3 {
 		constexpr float HEIGHT = 100;
 	}
 
-	WorldsDialog::WorldsDialog(UIContext &ui, float selfScale):
-		FileChooserDialog(ui, selfScale, "Worlds", WIDTH, HEIGHT) {}
+	WorldSelectorDialog::WorldSelectorDialog(UIContext &ui, float selfScale):
+		FileChooserDialog(ui, selfScale, "Load World", WIDTH, HEIGHT) {}
 
-	bool WorldsDialog::filter(const std::filesystem::directory_entry &entry) const {
+	bool WorldSelectorDialog::filter(const std::filesystem::directory_entry &entry) const {
 		return entry.path().extension() == ".db";
 	}
 
-	TexturePtr WorldsDialog::getTexture(const std::filesystem::directory_entry &entry) const {
+	TexturePtr WorldSelectorDialog::getTexture(const std::filesystem::directory_entry &entry) const {
 		if (entry.is_regular_file()) {
 			if (entry.path().filename().extension() == ".db") {
 				return cacheTexture("resources/gui/picture.png");

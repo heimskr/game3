@@ -21,7 +21,8 @@
 #include "ui/gl/dialog/MessageDialog.h"
 #include "ui/gl/dialog/MinigameDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
-#include "ui/gl/dialog/WorldsDialog.h"
+#include "ui/gl/dialog/WorldCreatorDialog.h"
+#include "ui/gl/dialog/WorldSelectorDialog.h"
 #include "ui/gl/module/FluidsModule.h"
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/module/ModuleFactory.h"
@@ -402,6 +403,11 @@ namespace Game3 {
 			if (modifiers.onlyCtrl() && action == GLFW_PRESS) {
 				if (key == GLFW_KEY_P) {
 					showWorldSelector();
+					return;
+				} else if (key == GLFW_KEY_N) {
+					if (uiContext.getUI<TitleUI>()) {
+						showWorldCreator();
+					}
 					return;
 				}
 			}
@@ -925,8 +931,8 @@ namespace Game3 {
 	}
 
 	void Window::showWorldSelector() {
-		if (!uiContext.hasDialog<WorldsDialog>()) {
-			auto dialog = uiContext.emplaceDialog<WorldsDialog>(1);
+		if (!uiContext.hasDialog<WorldSelectorDialog>()) {
+			auto dialog = uiContext.emplaceDialog<WorldSelectorDialog>(1);
 			uiContext.focusDialog(dialog);
 			dialog->signalSubmit.connect([this](const std::filesystem::path &world_path) {
 				playLocally(world_path);
@@ -934,20 +940,33 @@ namespace Game3 {
 		}
 	}
 
-	void Window::playLocally(std::filesystem::path world_path) {
+	void Window::showWorldCreator() {
+		if (!uiContext.hasDialog<WorldCreatorDialog>()) {
+			auto dialog = uiContext.emplaceDialog<WorldCreatorDialog>(1);
+			uiContext.focusDialog(dialog);
+			dialog->signalSubmit.connect([this](const std::filesystem::path &world_path, std::optional<size_t> seed) {
+				newWorld(world_path, seed);
+			});
+		}
+	}
+
+	void Window::playLocally(std::filesystem::path world_path, std::optional<size_t> seed) {
 		if (game) {
 			game->suppressDisconnectionMessage = true;
 		}
 
 		closeGame();
 
-		size_t seed = 1621;
-		if (std::filesystem::exists(".seed")) {
-			try {
-				seed = parseNumber<size_t>(trim(readFile(".seed")));
-				INFO("Using custom seed \e[1m{}\e[22m", seed);
-			} catch (const std::exception &err) {
-				ERR("Failed to load seed from .seed: {}", err.what());
+		if (!seed) {
+			if (std::filesystem::exists(".seed")) {
+				try {
+					seed = parseNumber<size_t>(trim(readFile(".seed")));
+					INFO("Using custom seed \e[1m{}\e[22m", *seed);
+				} catch (const std::exception &err) {
+					ERR("Failed to load seed from .seed: {}", err.what());
+				}
+			} else {
+				seed = 1000;
 			}
 		}
 
@@ -961,7 +980,7 @@ namespace Game3 {
 			closeGame();
 		};
 
-		serverWrapper.runInThread(seed);
+		serverWrapper.runInThread(*seed);
 
 		if (!serverWrapper.waitUntilRunning(std::chrono::milliseconds(10'000))) {
 			if (std::exception_ptr caught = serverWrapper.getFailure()) {
@@ -1136,11 +1155,23 @@ namespace Game3 {
 			.y = static_cast<double>(height - 10),
 			.scaleX = 0.5,
 			.scaleY = 0.5,
-			.color = Color{"#ffffff"},
+			.color = "#fff",
 			.align = TextAlign::Right,
 			.alignTop = false,
-			.shadow = Color{"#000000"},
+			.shadow = "#000",
 			.shadowOffset{6, 6},
 		});
+	}
+
+	void Window::newWorld(const std::filesystem::path &path, std::optional<size_t> seed) {
+		auto go = [=, this] {
+			playLocally(path, seed);
+		};
+
+		if (std::filesystem::exists(path)) {
+			INFO("no");
+		} else {
+			go();
+		}
 	}
 }

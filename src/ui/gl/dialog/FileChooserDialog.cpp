@@ -126,18 +126,13 @@ namespace Game3 {
 		upIcon->insertAtEnd(header);
 		pathLabel->insertAtEnd(pathScroller);
 		pathScroller->insertAtEnd(header);
-		header->insertAtEnd(outerVbox);
-		entryList->insertAtEnd(outerVbox);
-		outerVbox->insertAtEnd(scroller);
+		outerVbox->append(header);
+		outerVbox->append(entryList);
+		scroller->setChild(outerVbox);
 		scroller->insertAtEnd(shared_from_this());
 
 		recenter();
 		populate();
-	}
-
-	void FileChooserDialog::render(const RendererContext &renderers) {
-		DraggableDialog::render(renderers);
-		firstChild->render(renderers, bodyRectangle);
 	}
 
 	bool FileChooserDialog::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
@@ -147,20 +142,20 @@ namespace Game3 {
 			return true;
 		}
 
-		Dialog::keyPressed(key, modifiers, is_repeat);
+		DraggableDialog::keyPressed(key, modifiers, is_repeat);
 		return true;
 	}
 
 	void FileChooserDialog::rescale(float new_scale) {
 		position.width = dialogWidth * new_scale;
 		position.height = dialogHeight * new_scale;
-		Dialog::rescale(new_scale);
+		DraggableDialog::rescale(new_scale);
 	}
 
-	void FileChooserDialog::submit(const std::filesystem::path &world_path) {
+	void FileChooserDialog::submit(const std::filesystem::path &path) {
 		auto self = getSelf();
 		ui.removeDialog(self);
-		signalSubmit(world_path);
+		signalSubmit(path);
 	}
 
 	void FileChooserDialog::populate() {

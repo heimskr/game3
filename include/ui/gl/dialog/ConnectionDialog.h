@@ -21,5 +21,6 @@ namespace Game3 {
 			std::shared_ptr<IntegerInput> portInput;
 			void submit();
 			void loadWorld();
+			void newWorld();
 	};
 }

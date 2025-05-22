@@ -7,6 +7,8 @@
 namespace Game3 {
 	class Icon: public Widget, public HasFixedSize, public HasTooltipText {
 		public:
+			Icon(UIContext &, float scale, const std::filesystem::path &icon_path);
+			Icon(UIContext &, float scale, TexturePtr iconTexture);
 			Icon(UIContext &, float scale);
 
 			using Widget::render;

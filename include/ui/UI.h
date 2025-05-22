@@ -9,6 +9,8 @@ namespace Game3 {
 		public:
 			using Dialog::Dialog;
 
+			virtual Identifier getID() const = 0;
+
 			using Dialog::init;
 			virtual void init(Window &) = 0;
 	};
