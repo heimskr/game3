@@ -25,19 +25,19 @@ namespace Game3 {
 		inventoryModule = ui.makePlayerInventoryModule();
 		// Prevent shift clicking trying to move from the inventory to itself.
 		inventoryModule->setOnSlotClick([](Slot, Modifiers) { return true; });
-		hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 0);
+		hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 0, 1);
 		recipeList = make<Box>(ui, selfScale, Orientation::Vertical);
 
 		hbox->setHorizontalExpand(true);
 
 		auto inventory_scroller = make<Scroller>(ui, selfScale);
 		inventory_scroller->setChild(inventoryModule);
-		inventory_scroller->setHorizontalExpand(true);
+		inventory_scroller->setExpand(true, true);
 		hbox->append(inventory_scroller);
 
 		auto recipe_scroller = make<Scroller>(ui, selfScale);
 		recipe_scroller->setChild(recipeList);
-		recipe_scroller->setHorizontalExpand(true);
+		recipe_scroller->setExpand(true, true);
 		hbox->append(recipe_scroller);
 
 		hbox->insertAtEnd(shared_from_this());
