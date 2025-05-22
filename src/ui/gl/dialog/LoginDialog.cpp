@@ -12,8 +12,8 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float WIDTH = 75;
-		constexpr float HEIGHT = 43;
+		constexpr float WIDTH = 100;
+		constexpr float HEIGHT = 35;
 	}
 
 	LoginDialog::LoginDialog(UIContext &ui, float selfScale):
@@ -46,28 +46,27 @@ namespace Game3 {
 		usernameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
 		grid->attach(usernameInput, 0, 1);
 
+		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 1, 0);
+
 		displayNameInput = make<TextInput>(ui, selfScale);
 		displayNameInput->setTooltipText(std::move(display_name_message));
 		displayNameInput->setHorizontalExpand(true);
 		displayNameInput->onSubmit.connect([this](TextInput &, const UString &) { submit(true); });
-		grid->attach(displayNameInput, 1, 1);
+
+		auto yes_icon = make<Icon>(ui, selfScale);
+		yes_icon->setIconTexture(cacheTexture("resources/gui/yes.png"));
+		yes_icon->setFixedSize(10 * selfScale);
+		yes_icon->setOnClick(makeSubmit(true));
+
+		hbox->append(displayNameInput);
+		hbox->append(std::move(yes_icon));
+		grid->attach(std::move(hbox), 1, 1);
 
 		ui.window.settings.withShared([&](const ClientSettings &settings) {
 			usernameInput->setText(settings.username);
 		});
 
-		vbox->append(std::move(grid));
-
-		auto aligner = make<Aligner>(ui, Orientation::Horizontal, Alignment::End);
-
-		auto yes_icon = make<Icon>(ui, selfScale);
-		yes_icon->setIconTexture(cacheTexture("resources/gui/yes.png"));
-		yes_icon->setFixedSize(8 * selfScale, 8 * selfScale);
-		yes_icon->setOnClick(makeSubmit(true));
-
-		aligner->setChild(std::move(yes_icon));
-		vbox->append(std::move(aligner));
-		vbox->insertAtEnd(shared_from_this());
+		grid->insertAtEnd(getSelf());
 
 		ui.focusWidget(usernameInput);
 
