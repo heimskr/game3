@@ -8,7 +8,7 @@ namespace Game3 {
 	class TextInput;
 	class IntegerInput;
 
-	class ConnectionDialog: public Dialog {
+	class ConnectionDialog final: public Dialog {
 		public:
 			ConnectionDialog(UIContext &, float selfScale);
 
@@ -20,6 +20,6 @@ namespace Game3 {
 			std::shared_ptr<TextInput> hostInput;
 			std::shared_ptr<IntegerInput> portInput;
 			void submit();
-			void playLocally();
+			void loadWorld();
 	};
 }

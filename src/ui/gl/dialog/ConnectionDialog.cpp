@@ -52,11 +52,11 @@ namespace Game3 {
 
 		auto spacer = make<Spacer>(ui, Orientation::Horizontal);
 
-		auto load_button = make<Icon>(ui, selfScale);
-		load_button->setIconTexture(cacheTexture("resources/gui/folder.png"));
-		load_button->setTooltipText("Load world");
-		load_button->setOnClick([this](Widget &) {
-			playLocally();
+		auto load_icon = make<Icon>(ui, selfScale);
+		load_icon->setIconTexture(cacheTexture("resources/gui/folder.png"));
+		load_icon->setTooltipText("Load world");
+		load_icon->setOnClick([this](Widget &) {
+			loadWorld();
 		});
 
 		auto connect_button = make<Button>(ui, selfScale);
@@ -65,9 +65,10 @@ namespace Game3 {
 			submit();
 		});
 
-		load_button->setFixedSize(connect_button->getMinimumPreferredHeight() / ui.scale);
+		connect_button->setFixedHeight(connect_button->getMinimumPreferredHeight() / ui.scale);
+		load_icon->setFixedSize(11);
 
-		hbox->append(std::move(load_button));
+		hbox->append(std::move(load_icon));
 		hbox->append(std::move(spacer));
 		hbox->append(std::move(connect_button));
 		vbox->append(std::move(hbox));
@@ -124,7 +125,7 @@ namespace Game3 {
 		}
 	}
 
-	void ConnectionDialog::playLocally() {
+	void ConnectionDialog::loadWorld() {
 		ui.window.showWorldSelector();
 	}
 }
