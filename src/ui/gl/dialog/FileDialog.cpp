@@ -1,3 +1,4 @@
+#include "data/GameDB.h"
 #include "graphics/RendererContext.h"
 #include "graphics/Texture.h"
 #include "ui/gl/dialog/FileDialog.h"
@@ -188,6 +189,9 @@ namespace Game3 {
 
 	TexturePtr FileDialog::getTexture(const std::filesystem::directory_entry &entry) const {
 		if (entry.is_regular_file()) {
+			if (entry.path().filename().extension() == GameDB::getFileExtension()) {
+				return cacheTexture("resources/gui/picture.png");
+			}
 			return cacheTexture("resources/gui/file.png");
 		}
 
