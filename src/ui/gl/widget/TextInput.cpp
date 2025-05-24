@@ -710,6 +710,10 @@ namespace Game3 {
 			return;
 		}
 
+		if (hasSelection()) {
+			eraseCharacter();
+		}
+
 		if (anchor) {
 			if (anchor->position != cursor->position) {
 				auto [begin, end] = getIterators();
@@ -816,13 +820,9 @@ namespace Game3 {
 
 		if (hasSelection()) {
 			const auto [left, right] = getCursors();
+			TextCursor old_left = *left;
 			auto iterator = text.erase(left->iterator, right->iterator);
-
-			// Do compiler-generated implementations of T & T::operator=(const T &)
-			// do an address check and return early if the addresses are equal?
-			// If not, I might need to implement one myself. Otherwise this might be silly.
-			cursor.emplace(*left);
-
+			cursor.emplace(std::move(old_left));
 			cursor->iterator = iterator;
 			anchor.reset();
 			return;
