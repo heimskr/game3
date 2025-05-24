@@ -329,9 +329,6 @@ namespace Game3 {
 
 		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe", "Void Pickaxe", 1000, 0.f, -1, "base:attribute/void_pickaxe"));
 
-		add(Furniture::createSimple("base:item/pride_flag",       "Pride Flag",        80, Layer::Highest,   "base:tile/pride_flag"));
-		add(Furniture::createSimple("base:item/ace_flag",         "Asexual Flag",      80, Layer::Highest,   "base:tile/ace_flag"));
-		add(Furniture::createSimple("base:item/nb_flag",          "Nonbinary Flag",    80, Layer::Highest,   "base:tile/nb_flag"));
 		add(Furniture::createSimple("base:item/knives",           "Knives",            10, Layer::Highest,   "base:tile/knives"));
 		add(Furniture::createSimple("base:item/planks",           "Planks",           999, Layer::Terrain,   "base:tile/planks")); // TODO: cost
 		add(Furniture::createSimple("base:item/ship_wheel",       "Ship Wheel",       999, Layer::Objects,   "base:tile/ship_wheel")); // TODO: cost
@@ -350,6 +347,22 @@ namespace Game3 {
 		add(Furniture::createSimple("base:item/red_bed",          "Red Bed",           90, Layer::Objects,   "base:tile/bed2"));
 		add(Furniture::createSimple("base:item/purple_bed",       "Purple Bed",        90, Layer::Objects,   "base:tile/bed3"));
 		add(Furniture::createSimple("base:item/fence_gate",       "Fence Gate ",       10, Layer::Submerged, "base:tile/gate_horizontal"));
+		add(Furniture::createSimple("base:item/ace_flag",         "Asexual Flag",      80, Layer::Highest,   "base:tile/ace_flag"));
+		add(Furniture::createSimple("base:item/agender_flag",     "Agender Flag",      80, Layer::Highest,   "base:tile/agender_flag"));
+		add(Furniture::createSimple("base:item/aroace_flag",      "Aroace Flag",       80, Layer::Highest,   "base:tile/aroace_flag"));
+		add(Furniture::createSimple("base:item/bear_flag",        "Bear Flag",         80, Layer::Highest,   "base:tile/bear_flag"));
+		add(Furniture::createSimple("base:item/bi_flag",          "Bi Flag",           80, Layer::Highest,   "base:tile/bi_flag"));
+		add(Furniture::createSimple("base:item/genderfluid_flag", "Genderfluid Flag",  80, Layer::Highest,   "base:tile/genderfluid_flag"));
+		add(Furniture::createSimple("base:item/intersex_flag",    "Intersex Flag",     80, Layer::Highest,   "base:tile/intersex_flag"));
+		add(Furniture::createSimple("base:item/lesbian_flag",     "Lesbian Flag",      80, Layer::Highest,   "base:tile/lesbian_flag"));
+		add(Furniture::createSimple("base:item/men_flag",         "Men Flag",          80, Layer::Highest,   "base:tile/men_flag"));
+		add(Furniture::createSimple("base:item/nb_flag",          "Nonbinary Flag",    80, Layer::Highest,   "base:tile/nb_flag"));
+		add(Furniture::createSimple("base:item/omni_flag",        "Omni Flag",         80, Layer::Highest,   "base:tile/omni_flag"));
+		add(Furniture::createSimple("base:item/otter_flag",       "Otter Flag",        80, Layer::Highest,   "base:tile/otter_flag"));
+		add(Furniture::createSimple("base:item/pan_flag",         "Pan Flag",          80, Layer::Highest,   "base:tile/pan_flag"));
+		add(Furniture::createSimple("base:item/pride_flag",       "Pride Flag",        80, Layer::Highest,   "base:tile/pride_flag"));
+		add(Furniture::createSimple("base:item/trans_flag",       "Trans Flag",        80, Layer::Highest,   "base:tile/trans_flag"));
+		add(Furniture::createSimple("base:item/twink_flag",       "Twink Flag",        80, Layer::Highest,   "base:tile/twink_flag"));
 
 		add(Furniture::createMarchable("base:item/wooden_wall",      "Wooden Wall",       9, Layer::Objects,   "base:tile/wooden_wall",      "base:autotile/wooden_walls"));
 		add(Furniture::createMarchable("base:item/concrete_wall",    "Concrete Wall",     9, Layer::Objects,   "base:tile/concrete_wall",    "base:autotile/concrete_walls"));
