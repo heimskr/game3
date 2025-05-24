@@ -5,6 +5,7 @@
 
 #include <boost/json/fwd.hpp>
 
+#include <filesystem>
 #include <functional>
 #include <string>
 
@@ -15,7 +16,7 @@ namespace Game3 {
 	struct ClientSettings {
 		std::string hostname = "::1";
 		std::string username;
-		std::size_t fpsSmoothing = 200;
+		size_t fpsSmoothing = 200;
 		Tick tickFrequency = DEFAULT_CLIENT_TICK_FREQUENCY;
 		double mystery = 1;
 		float uiScale = 1;
@@ -29,6 +30,8 @@ namespace Game3 {
 		bool showFPS = true;
 		bool capFPS = true;
 		bool specialEffects = false;
+		/** Should be a relative path if it was in the current directory or any of its subdirectories, or an absolute path otherwise. */
+		std::string lastWorldPath;
 
 		ClientSettings();
 
@@ -40,6 +43,8 @@ namespace Game3 {
 
 		/** Applies global settings. */
 		void apply() const;
+
+		void setLastWorldPath(const std::filesystem::path &);
 	};
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ClientSettings &);

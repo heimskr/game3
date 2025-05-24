@@ -3,6 +3,7 @@
 #include "lib/JSON.h"
 #include "ui/Window.h"
 #include "ui/gl/Constants.h"
+#include "util/FS.h"
 #include "util/Log.h"
 #include "util/Timer.h"
 
@@ -24,6 +25,15 @@ namespace Game3 {
 	void ClientSettings::apply() const {
 		Timer::globalEnabled = !hideTimers;
 		Logger::level = logLevel;
+	}
+
+	void ClientSettings::setLastWorldPath(const std::filesystem::path &path) {
+		std::filesystem::path current = std::filesystem::current_path();
+		if (isSubpath(current, path)) {
+			lastWorldPath = std::filesystem::proximate(path, current);
+		} else {
+			lastWorldPath = std::filesystem::canonical(path);
+		}
 	}
 
 	ClientSettings tag_invoke(boost::json::value_to_tag<ClientSettings>, const boost::json::value &json) {
@@ -51,6 +61,7 @@ namespace Game3 {
 		get("specialEffects", &ClientSettings::specialEffects);
 		get("uiScale", &ClientSettings::uiScale);
 		get("dragThreshold", &ClientSettings::dragThreshold);
+		get("lastWorldPath", &ClientSettings::lastWorldPath);
 
 		return out;
 	}
@@ -73,5 +84,6 @@ namespace Game3 {
 		object["specialEffects"] = settings.specialEffects;
 		object["uiScale"] = settings.uiScale;
 		object["dragThreshold"] = settings.dragThreshold;
+		object["lastWorldPath"] = settings.lastWorldPath;
 	}
 }

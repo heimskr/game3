@@ -404,7 +404,14 @@ namespace Game3 {
 				if (key == GLFW_KEY_O) {
 					showWorldSelector();
 					return;
-				} else if (key == GLFW_KEY_N) {
+				}
+
+				if (key == GLFW_KEY_P) {
+					loadLastWorld();
+					return;
+				}
+
+				if (key == GLFW_KEY_N) {
 					if (uiContext.getUI<TitleUI>()) {
 						showWorldCreator();
 					}
@@ -950,6 +957,16 @@ namespace Game3 {
 		}
 	}
 
+	bool Window::loadLastWorld() {
+		std::string last_path = settings.withShared([](const ClientSettings &settings) { return settings.lastWorldPath; });
+		if (last_path.empty()) {
+			return false;
+		}
+
+		playLocally(last_path);
+		return true;
+	}
+
 	void Window::playLocally(std::filesystem::path world_path, std::optional<size_t> seed) {
 		if (game) {
 			game->suppressDisconnectionMessage = true;
@@ -971,7 +988,7 @@ namespace Game3 {
 		}
 
 		if (!world_path.empty()) {
-			serverWrapper.worldPath = std::move(world_path);
+			serverWrapper.worldPath = world_path;
 		}
 
 		serverWrapper.onError = [this](const std::exception &exception) {
@@ -997,6 +1014,7 @@ namespace Game3 {
 			return;
 		}
 
+		settings.setLastWorldPath(world_path);
 		serverWrapper.save();
 		continueLocalConnection();
 	}

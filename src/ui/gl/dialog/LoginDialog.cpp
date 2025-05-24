@@ -84,6 +84,11 @@ namespace Game3 {
 		Dialog::rescale(new_scale);
 	}
 
+	void LoginDialog::onFocus() {
+		DraggableDialog::onFocus();
+		ui.focusWidget(usernameInput);
+	}
+
 	void LoginDialog::submit(bool go) {
 		DialogPtr self = getSelf();
 
