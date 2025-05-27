@@ -4,6 +4,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/TextRenderer.h"
+#include "math/Range.h"
 #include "net/LocalClient.h"
 #include "packet/AgentMessagePacket.h"
 #include "packet/ChunkRequestPacket.h"
@@ -16,6 +17,7 @@
 #include "tile/Tile.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
+#include "util/Defer.h"
 
 #include <cmath>
 
@@ -378,5 +380,140 @@ namespace Game3 {
 				game_ui->openModule("base:module/text", text);
 			}
 		});
+	}
+
+	void ClientPlayer::doMovement(float delta) {
+		if (getRidden()) {
+			return;
+		}
+
+		const float speed = getMovementSpeed();
+
+		auto velocity_lock = velocity.uniqueLock();
+		const Vector3 old_velocity = velocity.getBase();
+		Defer restore_velocity{[&] {
+			velocity.getBase() = old_velocity;
+		}};
+
+		auto offset_lock = offset.uniqueLock();
+		const Vector3 old_offset = offset.getBase();
+		Defer restore_offset{[&] {
+			WARN("restoring offset");
+			offset.getBase() = old_offset;
+		}};
+
+		bool moved_x = false;
+		bool moved_y = false;
+
+		if (offset.z <= 0) {
+			if (movingRight && !movingLeft) {
+				velocity.x += speed;
+			} else if (movingLeft && !movingRight) {
+				velocity.x -= speed;
+			} else {
+				moved_x = false;
+			}
+
+			if (movingDown && !movingUp) {
+				velocity.y += speed;
+			} else if (movingUp && !movingDown) {
+				velocity.y -= speed;
+			} else {
+				moved_y = false;
+			}
+		}
+
+		const bool moved = moved_x || moved_y;
+
+		offset.x += delta * velocity.x;
+		offset.y += delta * velocity.y;
+		restore_velocity.trigger();
+
+		const bool old_grounded = offset.isGrounded();
+		offset.z = std::max(offset.z + delta * velocity.z, 0.0);
+
+		if (offset.z == 0.) {
+			velocity.z = 0;
+		} else {
+			velocity.z -= 32 * delta;
+		}
+
+		if (std::abs(offset.x) >= 1 || std::abs(offset.y) >= 1) {
+			auto position_lock = position.uniqueLock();
+
+			bool collision_failed = [&] -> bool {
+				using I = Position::IntType;
+				const I difference_x = offset.x < 0? -static_cast<I>(-offset.x) : static_cast<I>(offset.x);
+				const I difference_y = offset.y < 0? -static_cast<I>(-offset.y) : static_cast<I>(offset.y);
+
+				auto far_difference = [](double o, double threshold = 0.1) {
+					double intpart = 0;
+					double fractional = std::modf(o, &intpart);
+					if (o < 0) {
+						return fractional <= -threshold? intpart - 1 : intpart;
+					}
+
+					return threshold <= fractional? intpart + 1 : intpart;
+				};
+
+
+				const I far_difference_x = far_difference(offset.x);
+				const I far_difference_y = far_difference(offset.y);
+
+				Place place = getPlace();
+
+				const bool x_failed = Range<I>::closedOpen(position.column, position.column + far_difference_x).iterate([&](I column) {
+					place.position.column = column;
+					INFO("x: checking {} (player is at {} + {})", place.position, getPosition(), offset);
+					return !canMoveTo(place);
+				});
+
+				if (x_failed) {
+					WARN("x failed");
+					return true;
+				}
+
+				place.position.column = position.column;
+
+				const bool y_failed = Range<I>::closedOpen(position.row, position.row + far_difference_y).iterate([&](I row) {
+					place.position.row = row;
+					INFO("y: checking {} (player is at {} + {})", place.position, getPosition(), offset);
+					return !canMoveTo(place);
+				});
+
+				if (y_failed) {
+					WARN("y failed");
+					return true;
+				}
+
+				SUCCESS("collision check succeeded, adding ({}, {})", difference_x, difference_y);
+				position.column += difference_x;
+				position.row += difference_y;
+				offset.x -= difference_x;
+				offset.y -= difference_y;
+				return false;
+			}();
+
+			if (collision_failed) {
+				velocity.x = 0;
+				velocity.y = 0;
+				return;
+			}
+		}
+
+		restore_offset.release();
+
+		if (!old_grounded && offset.isGrounded()) {
+			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
+				tile_entity->onOverlap(getSelf());
+			}
+		}
+
+		// auto position_lock = position.uniqueLock();
+		// double intpart;
+		// offset.x = std::modf(offset.x, &intpart);
+		// position.column += intpart;
+		// offset.y = std::modf(offset.y, &intpart);
+		// position.row = intpart;
 	}
 }

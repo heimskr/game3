@@ -21,6 +21,15 @@ namespace Game3 {
 				return *this;
 			}
 
+			void trigger() {
+				function();
+				function = {};
+			}
+
+			void release() {
+				function = {};
+			}
+
 		private:
 			std::function<void()> function;
 	};

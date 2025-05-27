@@ -75,7 +75,6 @@ namespace Game3 {
 			 *  such that the sum of the new position and the offset is equal to the old offset. The offset is moved closer
 			 *  to zero each tick to achieve smooth movement instead of teleportation from one tile to the next. */
 			Lockable<Vector3> offset;
-			/** Only the z component is handled in the default Entity tick method. */
 			Lockable<Vector3> velocity;
 			Lockable<std::deque<Direction>> path;
 			Lockable<std::optional<Lockable<WeakSet<Entity>>>> visibleEntities;
@@ -275,13 +274,14 @@ namespace Game3 {
 			std::weak_ptr<Entity> weakRidden;
 			Held heldLeft {true};
 			Held heldRight{false};
+			/** A list of functions to call the next time the entity moves. Each function returns whether it should be removed from the queue. */
+			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &, bool)>>> moveQueue;
 
 			Entity() = delete;
 			Entity(EntityType type);
 
 			virtual bool canMoveTo(const Place &) const;
-			/** A list of functions to call the next time the entity moves. Each function returns whether it should be removed from the queue. */
-			Lockable<std::list<std::function<bool(const std::shared_ptr<Entity> &, bool)>>> moveQueue;
+			virtual void doMovement(float delta);
 			virtual std::shared_ptr<Texture> getTexture();
 			inline auto getHeldLeftTexture()  const { return heldLeft.texture;  }
 			inline auto getHeldRightTexture() const { return heldRight.texture; }

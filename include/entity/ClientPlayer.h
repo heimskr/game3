@@ -50,6 +50,9 @@ namespace Game3 {
 
 			using Agent::sendMessage;
 
+		protected:
+			void doMovement(float delta) override;
+
 		friend class Entity;
 	};
 }

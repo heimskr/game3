@@ -220,11 +220,8 @@ namespace Game3 {
 
 		bool path_drained = false;
 		{
-			auto shared_lock = path.sharedLock();
+			auto unique_lock = path.uniqueLock();
 			if (!path.empty() && move(path.front())) {
-				// Please no data race kthx.
-				shared_lock.unlock();
-				auto unique_lock = path.uniqueLock();
 				if (!path.empty()) {
 					path.pop_front();
 					path_drained = path.empty();
@@ -238,69 +235,7 @@ namespace Game3 {
 
 		const auto delta = args.delta;
 
-		if (!getRidden()) {
-			auto offset_lock = offset.uniqueLock();
-
-			auto &x = offset.x;
-			auto &y = offset.y;
-			auto &z = offset.z;
-			const auto speed = getMovementSpeed();
-
-			if (x < 0.) {
-				x = std::min(x + delta * speed, 0.);
-			} else if (0. < x) {
-				x = std::max(x - delta * speed, 0.);
-			}
-
-			if (y < 0.) {
-				y = std::min(y + delta * speed, 0.);
-			} else if (0. < y) {
-				y = std::max(y - delta * speed, 0.);
-			}
-
-			auto velocity_lock = velocity.uniqueLock();
-
-			bool old_grounded = offset.isGrounded();
-
-			z = std::max(z + delta * velocity.z, 0.);
-
-			if (z > 0) {
-				x += delta * velocity.x;
-				y += delta * velocity.y;
-			} else {
-				velocity.x = 0;
-				velocity.y = 0;
-			}
-
-			if (!old_grounded && offset.isGrounded()) {
-				if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
-					tile_entity->onOverlap(getSelf());
-				}
-
-				if (args.game->getSide() == Side::Server) {
-					args.game->toServer().entityTeleported(*this, MovementContext{
-						.excludePlayer = isPlayer()? getGID() : -1,
-						.clearOffset = false,
-					});
-				}
-			}
-
-			if (z == 0.) {
-				velocity.z = 0;
-			} else {
-				velocity.z -= 32 * delta;
-			}
-
-			position.withUnique([&offset = offset](Position &position) {
-				using I = Position::IntType;
-				position.column += offset.x < 0? -static_cast<I>(-offset.x) : static_cast<I>(offset.x);
-				position.row    += offset.y < 0? -static_cast<I>(-offset.y) : static_cast<I>(offset.y);
-			});
-
-			double dummy;
-			offset.x = std::modf(offset.x, &dummy);
-			offset.y = std::modf(offset.y, &dummy);
-		}
+		doMovement(args.delta);
 
 		// Not all platforms support std::atomic<float>::operator+=.
 		age = age + delta;
@@ -760,6 +695,75 @@ namespace Game3 {
 		});
 
 		return out;
+	}
+
+	void Entity::doMovement(float delta) {
+		if (getRidden()) {
+			return;
+		}
+
+		auto offset_lock = offset.uniqueLock();
+
+		auto &x = offset.x;
+		auto &y = offset.y;
+		auto &z = offset.z;
+		const auto speed = getMovementSpeed();
+
+		if (x < 0.) {
+			x = std::min(x + delta * speed, 0.);
+		} else if (0. < x) {
+			x = std::max(x - delta * speed, 0.);
+		}
+
+		if (y < 0.) {
+			y = std::min(y + delta * speed, 0.);
+		} else if (0. < y) {
+			y = std::max(y - delta * speed, 0.);
+		}
+
+		auto velocity_lock = velocity.uniqueLock();
+
+		bool old_grounded = offset.isGrounded();
+
+		z = std::max(z + delta * velocity.z, 0.);
+
+		if (z > 0) {
+			x += delta * velocity.x;
+			y += delta * velocity.y;
+		} else {
+			velocity.x = 0;
+			velocity.y = 0;
+		}
+
+		if (!old_grounded && offset.isGrounded()) {
+			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
+				tile_entity->onOverlap(getSelf());
+			}
+
+			GamePtr game = getGame();
+			if (game->getSide() == Side::Server) {
+				game->toServer().entityTeleported(*this, MovementContext{
+					.excludePlayer = isPlayer()? getGID() : -1,
+					.clearOffset = false,
+				});
+			}
+		}
+
+		if (z == 0.) {
+			velocity.z = 0;
+		} else {
+			velocity.z -= 32 * delta;
+		}
+
+		position.withUnique([&offset = offset](Position &position) {
+			using I = Position::IntType;
+			position.column += offset.x < 0? -static_cast<I>(-offset.x) : static_cast<I>(offset.x);
+			position.row    += offset.y < 0? -static_cast<I>(-offset.y) : static_cast<I>(offset.y);
+		});
+
+		double dummy{};
+		offset.x = std::modf(offset.x, &dummy);
+		offset.y = std::modf(offset.y, &dummy);
 	}
 
 	bool Entity::canSpawnAt(const Place &place) const {
