@@ -68,17 +68,18 @@ namespace Game3 {
 		}
 	}
 
-	void ItemEntity::tick(const TickArgs &) {
+	void ItemEntity::tick(const TickArgs &args) {
 		if (firstTick) {
 			firstTick = false;
 		} else {
-			--secondsLeft;
+			age += args.delta;
 		}
 
-		if (secondsLeft <= 0) {
+		if (age >= secondsLeft) {
 			remove();
 		} else {
-			enqueueTick(std::chrono::seconds(1));
+			applyMotion(args.delta);
+			enqueueTick();
 		}
 	}
 
@@ -99,7 +100,7 @@ namespace Game3 {
 		}
 
 		const float x = position.column + offset.x;
-		const float y = position.row + offset.y;
+		const float y = position.row + offset.y - offset.z;
 
 		sprite_renderer(texture, {
 			.x = x + .125f,

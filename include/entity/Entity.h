@@ -197,6 +197,7 @@ namespace Game3 {
 			Lockable<WeakSet<Entity>> & getVisibleEntities(std::unique_lock<DefaultMutex> &outer_lock, bool recalculate = false);
 			std::pair<std::unique_lock<DefaultMutex>, std::unique_lock<DefaultMutex>> getVisibleEntitiesLocks();
 			virtual bool shouldBroadcastDestruction() const;
+			virtual void applyMotion(float delta);
 
 			virtual void jump();
 			void clearOffset();

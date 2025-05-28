@@ -56,7 +56,8 @@ namespace Game3 {
 
 		place.set(layer, 0);
 		auto entity = place.realm->spawn<ItemEntity>(place.position, stack);
-		entity->velocity.z = 10;
+		entity->velocity.z = 8;
+		entity->offset.z = 0.42;
 
 		return true;
 	}
