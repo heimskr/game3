@@ -11,5 +11,6 @@ namespace Game3 {
 			static Identifier ID() { return {"base", "tile/void"}; }
 
 			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
+			bool damage(const Place &, Layer) override;
 	};
 }

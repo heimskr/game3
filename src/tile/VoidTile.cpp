@@ -17,4 +17,13 @@ namespace Game3 {
 		// Returning false even if the tile was mined to let the mineable tile below also get mined.
 		return false;
 	}
+
+	bool VoidTile::damage(const Place &place, Layer layer) {
+		if (layer == Layer::Terrain) {
+			return false;
+		}
+
+		place.set(layer, 0);
+		return true;
+	}
 }

@@ -4,13 +4,15 @@
 
 namespace Game3 {
 	class CaveTile: public MineableTile {
-		private:
-			ItemStackPtr stack;
-			Identifier floor;
-
 		public:
-			CaveTile(Identifier, ItemStackPtr, Identifier floor_);
+			CaveTile(Identifier identifier, ItemStackPtr stack, Identifier floor);
 
 			bool interact(const Place &, Layer, const ItemStackPtr &, Hand) override;
+			bool damage(const Place &, Layer) override;
+
+		private:
+			Identifier floor;
+
+			void reveal(const Place &) const;
 	};
 }

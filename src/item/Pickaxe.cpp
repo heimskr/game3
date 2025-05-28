@@ -19,8 +19,9 @@ namespace Game3 {
 			{
 				InventoryPtr inventory = place.player->getInventory(0);
 				auto lock = inventory->uniqueLock();
-				if (stack->reduceDurability())
+				if (stack->reduceDurability()) {
 					inventory->erase(slot);
+				}
 				inventory->notifyOwner({});
 			}
 			place.set(Layer::Terrain, findDirtTilename(place));
@@ -38,9 +39,11 @@ namespace Game3 {
 		const RealmPtr realm = place.realm;
 		const Tileset &tileset = realm->getTileset();
 
-		for (const Direction direction: ALL_DIRECTIONS)
-			if (auto tilename = (place + direction).getName(Layer::Terrain); tilename && tileset.isInCategory(*tilename, "base:category/tillable"))
+		for (const Direction direction: ALL_DIRECTIONS) {
+			if (auto tilename = (place + direction).getName(Layer::Terrain); tilename && tileset.isInCategory(*tilename, "base:category/tillable")) {
 				return *tilename;
+			}
+		}
 
 		return "base:tile/dirt";
 	}

@@ -26,8 +26,7 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Game::Game():
-		debugMode(false) {}
+	Game::Game() = default;
 
 	Game::~Game() {
 		dying = true;
