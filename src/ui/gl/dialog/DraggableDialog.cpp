@@ -140,6 +140,10 @@ namespace Game3 {
 		return false;
 	}
 
+	bool BaseDraggableDialog::blocksMouse(int, int, bool is_drag_update) const {
+		return !is_drag_update;
+	}
+
 	void BaseDraggableDialog::recenter() {
 		const auto [width, height] = position.size();
 		position = {(ui.getWidth() - width) / 2, (ui.getHeight() - height) / 2, width, height};
