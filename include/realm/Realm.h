@@ -25,7 +25,7 @@
 
 #include <boost/json/fwd.hpp>
 
-#include <climits>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -257,36 +257,40 @@ namespace Game3 {
 				std::shared_ptr<T> out;
 				for (const auto &[index, tile_entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
-						if (out)
+						if (out) {
 							throw MultipleFoundError("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
+						}
 						out = cast;
 					}
 				}
-				if (!out)
+				if (!out) {
 					throw NoneFoundError("No tile entities of type " + std::string(typeid(T).name()) + " found");
+				}
 				return out;
 			}
 
-			template <typename T, typename P>
-			std::shared_ptr<T> getTileEntity(const P &predicate) const {
+			template <typename T, std::predicate<std::shared_ptr<T>> P>
+			std::shared_ptr<T> getTileEntity(P &&predicate) const {
 				std::shared_ptr<T> out;
 				for (const auto &[index, tile_entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(tile_entity)) {
 						if (predicate(cast)) {
-							if (out)
+							if (out) {
 								throw MultipleFoundError("Multiple tile entities of type " + std::string(typeid(T).name()) + " found");
+							}
 							out = cast;
 						}
 					}
 				}
-				if (!out)
+				if (!out) {
 					throw NoneFoundError("No tile entities of type " + std::string(typeid(T).name()) + " found");
+				}
 				return out;
 			}
 
 			template <typename T>
 			std::shared_ptr<T> closestTileEntity(const Position &position) const {
-				double minimum_distance = INFINITY;
+				double minimum_distance = std::numeric_limits<double>::infinity();
 				std::shared_ptr<T> out;
 				for (const auto &[index, entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(entity)) {
@@ -297,14 +301,15 @@ namespace Game3 {
 						}
 					}
 				}
-				if (!out)
+				if (!out) {
 					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
+				}
 				return out;
 			}
 
-			template <typename T, typename P>
-			std::shared_ptr<T> closestTileEntity(const Position &position, const P &predicate) const {
-				double minimum_distance = INFINITY;
+			template <typename T, std::predicate<std::shared_ptr<T>> P>
+			std::shared_ptr<T> closestTileEntity(const Position &position, P &&predicate) const {
+				double minimum_distance = std::numeric_limits<double>::infinity();
 				std::shared_ptr<T> out;
 				for (const auto &[index, entity]: tileEntities) {
 					if (auto cast = std::dynamic_pointer_cast<T>(entity)) {
@@ -315,8 +320,9 @@ namespace Game3 {
 						}
 					}
 				}
-				if (!out)
+				if (!out) {
 					throw std::runtime_error("No tile entities of type " + std::string(typeid(T).name()) + " found");
+				}
 				return out;
 			}
 
@@ -373,7 +379,6 @@ namespace Game3 {
 			bool isActive() const;
 
 			static BiomeType getBiome(int64_t seed);
-
 
 		public:
 			using WeakEntitySet = decltype(entitiesByChunk)::Base::mapped_type;
