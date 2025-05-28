@@ -20,19 +20,29 @@ namespace {
 	constexpr float DEFAULT_THICKNESS = 1;
 	constexpr std::chrono::milliseconds KEY_REPEAT_DELAY{500};
 
+	template <bool Decrement = true>
 	bool isStopChar(Game3::UString::iterator cursor) {
-		const gunichar unicharacter = *--cursor;
+		if constexpr (Decrement) {
+			--cursor;
+		}
+
+		const gunichar unicharacter = *cursor;
 
 		if (unicharacter > std::numeric_limits<char>::max()) {
 			return false;
 		}
 
-		static const std::string_view stops = "_.,/-=+ \t\n";
+		static const std::string_view stops = ",./<>?;':\"[]{}+=`~!@#%^&*() \t\n";
 		return stops.find(static_cast<char>(unicharacter)) != std::string_view::npos;
 	}
 
+	template <bool Decrement = true>
 	bool isWhitespace(Game3::UString::iterator cursor) {
-		const gunichar unicharacter = *--cursor;
+		if constexpr (Decrement) {
+			--cursor;
+		}
+
+		const gunichar unicharacter = *cursor;
 
 		if (unicharacter > std::numeric_limits<char>::max()) {
 			return false;
@@ -912,10 +922,23 @@ namespace Game3 {
 	}
 
 	void TextInput::goLeft(Modifiers modifiers) {
-		if (!modifiers.onlyShift() && hasSelection()) {
+		if (!modifiers.shift && hasSelection()) {
 			auto [left, right] = getCursors();
 			cursor.emplace(*left);
 			anchor.reset();
+			return;
+		}
+
+		if (modifiers.ctrl) {
+			if (modifiers.shift) {
+				if (!anchor) {
+					anchor = cursor;
+				}
+			} else {
+				anchor.reset();
+			}
+
+			cursor = seekLeft();
 			return;
 		}
 
@@ -923,10 +946,23 @@ namespace Game3 {
 	}
 
 	void TextInput::goRight(Modifiers modifiers) {
-		if (!modifiers.onlyShift() && hasSelection()) {
+		if (!modifiers.shift && hasSelection()) {
 			auto [left, right] = getCursors();
 			cursor.emplace(*right);
 			anchor.reset();
+			return;
+		}
+
+		if (modifiers.ctrl) {
+			if (modifiers.shift) {
+				if (!anchor) {
+					anchor = cursor;
+				}
+			} else {
+				anchor.reset();
+			}
+
+			cursor = seekRight();
 			return;
 		}
 
@@ -946,13 +982,13 @@ namespace Game3 {
 
 		if (modifiers.onlyShift()) {
 			if (!anchor) {
-				anchor.emplace(*cursor);
+				anchor = cursor;
 			}
-			((*cursor).*function)(1);
 		} else {
 			anchor.reset();
-			((*cursor).*function)(1);
 		}
+
+		((*cursor).*function)(1);
 	}
 
 	float TextInput::getTextScale() const {
@@ -1394,5 +1430,84 @@ namespace Game3 {
 		}
 
 		cursor->goEnd(!modifiers.ctrl);
+	}
+
+	TextCursor TextInput::seekLeft() {
+		ensureCursor();
+		TextCursor out = *cursor;
+
+		if (out.atBeginning()) {
+			return out;
+		}
+
+		if (out.position == 1) {
+			out.goLeft(1);
+			return out;
+		}
+
+		size_t skipped = 0;
+		auto iterator = out.iterator;
+
+		if (isWhitespace(iterator)) {
+			do {
+				--iterator;
+				++skipped;
+			} while (iterator != text.begin() && isWhitespace(iterator));
+
+			while (iterator != text.begin() && !isStopChar(iterator)) {
+				--iterator;
+				++skipped;
+			}
+		} else if (isStopChar(iterator)) {
+			do {
+				--iterator;
+				++skipped;
+			} while (iterator != text.begin() && isStopChar(iterator));
+		} else {
+			do {
+				--iterator;
+				++skipped;
+			} while (iterator != text.begin() && !isStopChar(iterator));
+		}
+
+		out.goLeft(skipped);
+		return out;
+	}
+
+	TextCursor TextInput::seekRight() {
+		ensureCursor();
+		TextCursor out = *cursor;
+
+		if (out.atEnd()) {
+			return out;
+		}
+
+		size_t skipped = 0;
+		auto iterator = out.iterator;
+
+		if (isWhitespace<false>(iterator)) {
+			do {
+				++iterator;
+				++skipped;
+			} while (iterator != text.end() && isWhitespace<false>(iterator));
+
+			while (iterator != text.end() && !isStopChar<false>(iterator)) {
+				++iterator;
+				++skipped;
+			}
+		} else if (isStopChar<false>(iterator)) {
+			do {
+				++iterator;
+				++skipped;
+			} while (iterator != text.end() && isStopChar<false>(iterator) && !isWhitespace<false>(iterator));
+		} else {
+			do {
+				++iterator;
+				++skipped;
+			} while (iterator != text.end() && !isStopChar<false>(iterator));
+		}
+
+		out.goRight(skipped);
+		return out;
 	}
 }

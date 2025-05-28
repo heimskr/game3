@@ -174,6 +174,8 @@ namespace Game3 {
 			void setAnchorAt(int x, int y);
 			void home(Modifiers);
 			void end(Modifiers);
+			TextCursor seekLeft();
+			TextCursor seekRight();
 
 		friend class TextCursor;
 	};
