@@ -30,9 +30,9 @@ namespace Game3 {
 	void ClientSettings::setLastWorldPath(const std::filesystem::path &path) {
 		std::filesystem::path current = std::filesystem::current_path();
 		if (isSubpath(current, path)) {
-			lastWorldPath = std::filesystem::proximate(path, current);
+			lastWorldPath = std::filesystem::proximate(path, current).string();
 		} else {
-			lastWorldPath = std::filesystem::canonical(path);
+			lastWorldPath = std::filesystem::canonical(path).string();
 		}
 	}
 
