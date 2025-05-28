@@ -40,6 +40,7 @@ namespace Game3 {
 		});
 
 		messageInput = std::make_shared<TextInput>(ui, selfScale, Color{"#"}, Color{"#"}, CHAT_FOCUSED_TEXT_COLOR, CHAT_FOCUSED_TEXT_COLOR, 0);
+		messageInput->cursorColor = messageInput->focusedCursorColor = "#fffa";
 		messageInput->onSubmit.connect([this](TextInput &input, const UString &text) {
 			if (text.empty()) {
 				return;

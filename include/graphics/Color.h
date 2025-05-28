@@ -137,11 +137,41 @@ namespace Game3 {
 
 template <>
 struct std::formatter<Game3::Color> {
+	bool hash = false;
+
 	constexpr auto parse(auto &ctx) {
-		return ctx.begin();
+		auto iter = ctx.begin();
+		if (*iter == '#') {
+			hash = true;
+			++iter;
+		}
+		return iter;
 	}
 
 	auto format(const auto &color, auto &ctx) const {
+		if (hash) {
+			std::array<char, 10> buffer{'#'};
+
+			auto to_hex = [&](float f, char offset) {
+				auto to_char = [](uint8_t nybble) {
+					return nybble < 10? '0' + nybble : 'a' + (nybble - 10);
+				};
+
+				const uint8_t byte(f * 255);
+				buffer[offset] = to_char(byte >> 4);
+				buffer[offset + 1] = to_char(byte & 0xf);
+			};
+
+			to_hex(color.red,   1);
+			to_hex(color.green, 3);
+			to_hex(color.blue,  5);
+			if (color.alpha < 1.f) {
+				to_hex(color.alpha, 7);
+			}
+
+			return std::format_to(ctx.out(), "{}", buffer.data());
+		}
+
 		return std::format_to(ctx.out(), "({}, {}, {} @ {})", color.red, color.green, color.blue, color.alpha);
 	}
 };

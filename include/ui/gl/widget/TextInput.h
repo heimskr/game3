@@ -57,6 +57,11 @@ namespace Game3 {
 
 	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public HasTooltipText, public Autocompleter {
 		public:
+			Color borderColor;
+			Color interiorColor;
+			Color textColor;
+			Color cursorColor;
+			Color focusedCursorColor;
 			sigc::signal<void(TextInput &, const UString &)> onSubmit;
 			sigc::signal<void(TextInput &, const UString &)> onChange;
 			sigc::signal<void(TextInput &, const UString &)> onAcceptSuggestion;
@@ -115,11 +120,6 @@ namespace Game3 {
 			GradualFloat xOffset{0, 25};
 			GradualFloat yOffset{0, 25};
 			float thickness{};
-			Color borderColor;
-			Color interiorColor;
-			Color textColor;
-			Color cursorColor;
-			Color focusedCursorColor;
 			UString text;
 			/** The start position of selected text. Note that this may be after the cursor if the user selects text backwards. */
 			std::optional<TextCursor> anchor;

@@ -23,7 +23,7 @@ namespace Game3 {
 		}
 
 		if (rgb.red > 0.999 && rgb.green > 0.999 && rgb.blue > 0.999) {
-			return {1, 1, 1, rgb.alpha};
+			return {0, 0, 1, rgb.alpha};
 		}
 
 		ok_color::HSV hsv = ok_color::srgb_to_okhsv({rgb.red, rgb.green, rgb.blue});

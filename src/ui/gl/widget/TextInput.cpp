@@ -296,12 +296,12 @@ namespace Game3 {
 	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
 		Widget(ui, selfScale),
 		HasFixedSize(-1, selfScale * TEXT_INPUT_HEIGHT_FACTOR),
-		thickness(thickness),
 		borderColor(border_color),
 		interiorColor(interior_color),
 		textColor(text_color),
 		cursorColor(cursor_color),
 		focusedCursorColor(cursorColor.darken(3)),
+		thickness(thickness),
 		cursor(std::in_place, *this, true, text.begin()) {}
 
 	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color):
@@ -353,9 +353,14 @@ namespace Game3 {
 		// TODO: check for negative sizes
 		auto interior = Rectangle(x + start, y + start, width - 2 * start, height - 2 * start);
 
-		rectangler(borderColor, Rectangle(x, y, width, height * 0.6));
-		rectangler(borderColor.darken(), Rectangle(x, y + height * 0.6, width, height * 0.4));
-		rectangler(interiorColor, interior);
+		if (borderColor.alpha) {
+			rectangler(borderColor, Rectangle(x, y, width, height * 0.6));
+			rectangler(borderColor.darken(), Rectangle(x, y + height * 0.6, width, height * 0.4));
+		}
+
+		if (interiorColor.alpha) {
+			rectangler(interiorColor, interior);
+		}
 
 		auto saver = ui.scissorStack.pushRelative(interior, renderers);
 
@@ -363,8 +368,8 @@ namespace Game3 {
 			if (!anchor || *anchor == *cursor) {
 				Color color = focused? focusedCursorColor : cursorColor;
 				const float cursor_height = getCursorHeight();
-				const float pixel = start / 2;
-				rectangler(color, cursor->getXPosition(), multiline? cursor->getYPosition() : start, pixel, cursor_height);
+				const float pixel = scale / 2;
+				rectangler(color, cursor->getXPosition(), multiline? cursor->getYPosition() : 2 * pixel, pixel, cursor_height);
 			} else {
 				renderSelection(rectangler);
 			}
@@ -372,12 +377,12 @@ namespace Game3 {
 
 		texter(text, TextRenderOptions{
 			.x = start - xOffset * scale,
-			.y = 2 * start - yOffset * scale,
+			.y = scale + start - yOffset * scale,
 			.scaleX = getTextScale(),
 			.scaleY = getTextScale(),
 			.color = textColor,
 			.alignTop = true,
-			.shadow{0, 0, 0, 0},
+			.shadow{"#"},
 			.ignoreNewline = !multiline,
 		});
 
@@ -1242,7 +1247,7 @@ namespace Game3 {
 	void TextInput::renderSelection(RectangleRenderer &rectangler) {
 		const float cursor_height = getCursorHeight();
 		const float text_scale = getTextScale();
-		const float start = thickness * getScale();
+		const float start = getScale();
 		const float pixel = start / 2;
 
 		const Color fg = focused? focusedCursorColor : cursorColor;
