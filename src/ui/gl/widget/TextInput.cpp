@@ -460,8 +460,20 @@ namespace Game3 {
 				charPressed(key, modifiers);
 			}
 
-			if (key != GLFW_KEY_HOME && key != GLFW_KEY_END) {
-				return true;
+			switch (key) {
+				case GLFW_KEY_HOME:
+				case GLFW_KEY_END:
+				case GLFW_KEY_LEFT:
+				case GLFW_KEY_RIGHT:
+					break;
+
+				case GLFW_KEY_BACKSPACE:
+					eraseWord();
+					changed();
+					return true;
+
+				default:
+					return true;
 			}
 		}
 
