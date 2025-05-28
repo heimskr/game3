@@ -47,27 +47,27 @@ namespace Game3 {
 	TextCursor::TextCursor(TextInput &owner, bool primary, UString::iterator iterator):
 		iterator(iterator),
 		primary(primary),
-		owner(owner) {}
+		owner(&owner) {}
 
 	std::strong_ordering TextCursor::operator<=>(const TextCursor &other) const {
 		if (this == &other) {
 			return std::strong_ordering::equivalent;
 		}
 
-		assert(&owner == &other.owner);
+		assert(owner == other.owner);
 		return position <=> other.position;
 	}
 
 	bool TextCursor::operator==(const TextCursor &other) const {
-		return this == &other || (&owner == &other.owner && position == other.position);
+		return this == &other || (owner == other.owner && position == other.position);
 	}
 
 	bool TextCursor::operator!=(const TextCursor &other) const {
-		return this != &other && (&owner != &other.owner || position != other.position);
+		return this != &other && (owner != other.owner || position != other.position);
 	}
 
 	void TextCursor::reset() {
-		iterator = owner.text.begin();
+		iterator = owner->text.begin();
 		lineNumber = 0;
 		columnNumber = 0;
 		position = 0;
@@ -81,8 +81,8 @@ namespace Game3 {
 
 		if (position <= delta) {
 			reset();
-			owner.xOffset = 0;
-			owner.yOffset = 0;
+			owner->xOffset = 0;
+			owner->yOffset = 0;
 			return;
 		}
 
@@ -97,32 +97,32 @@ namespace Game3 {
 
 			assert(lineNumber != 0);
 			delta -= columnNumber + 1;
-			columnNumber = owner.getColumnCount(--lineNumber);
+			columnNumber = owner->getColumnCount(--lineNumber);
 		}
 
 		if (columnNumber == 0) {
 			xOffset = 0;
 		} else {
-			xOffset = owner.getTexter().textWidth(owner.getLineSpan(lineNumber, columnNumber));
+			xOffset = owner->getTexter().textWidth(owner->getLineSpan(lineNumber, columnNumber));
 		}
 
-		owner.fixXOffset(*this);
-		owner.fixYOffset(*this);
+		owner->fixXOffset(*this);
+		owner->fixYOffset(*this);
 	}
 
 	void TextCursor::goRight(size_t delta) {
-		const size_t text_size = owner.text.size();
+		const size_t text_size = owner->text.size();
 
 		if (text_size == 0) {
 			reset();
-			owner.xOffset = 0;
-			owner.yOffset = 0;
+			owner->xOffset = 0;
+			owner->yOffset = 0;
 			return;
 		}
 
 		if (position == text_size || delta == 0) {
-			owner.fixXOffset(*this);
-			owner.fixYOffset(*this);
+			owner->fixXOffset(*this);
+			owner->fixYOffset(*this);
 			return;
 		}
 
@@ -132,7 +132,7 @@ namespace Game3 {
 		std::advance(iterator, delta);
 
 		while (delta != 0) {
-			const size_t line_length = owner.getColumnCount(lineNumber);
+			const size_t line_length = owner->getColumnCount(lineNumber);
 
 			if (columnNumber + delta <= line_length) {
 				columnNumber += delta;
@@ -142,17 +142,17 @@ namespace Game3 {
 			delta -= line_length - columnNumber + 1;
 			columnNumber = 0;
 			++lineNumber;
-			assert(lineNumber < owner.getLineCount());
+			assert(lineNumber < owner->getLineCount());
 		}
 
 		if (columnNumber == 0) {
 			xOffset = 0;
 		} else {
-			xOffset = owner.getTexter().textWidth(owner.getLineSpan(lineNumber, columnNumber));
+			xOffset = owner->getTexter().textWidth(owner->getLineSpan(lineNumber, columnNumber));
 		}
 
-		owner.fixXOffset(*this);
-		owner.fixYOffset(*this);
+		owner->fixXOffset(*this);
+		owner->fixYOffset(*this);
 	}
 
 	void TextCursor::goStart(bool within_line) {
@@ -165,31 +165,31 @@ namespace Game3 {
 		} else {
 			lineNumber = 0;
 			columnNumber = 0;
-			iterator = owner.text.begin();
+			iterator = owner->text.begin();
 			position = 0;
 		}
 
 		xOffset = 0;
-		owner.xOffset = 0;
+		owner->xOffset = 0;
 	}
 
 	void TextCursor::goEnd(bool within_line) {
 		if (within_line) {
-			const size_t column_count = owner.getColumnCount(lineNumber);
+			const size_t column_count = owner->getColumnCount(lineNumber);
 			position += column_count - columnNumber;
 			while (columnNumber < column_count) {
 				++columnNumber;
 				++iterator;
 			}
 		} else {
-			lineNumber = owner.getLastLineNumber();
-			columnNumber = owner.getColumnCount(lineNumber);
-			iterator = owner.text.end();
-			position = owner.text.size();
+			lineNumber = owner->getLastLineNumber();
+			columnNumber = owner->getColumnCount(lineNumber);
+			iterator = owner->text.end();
+			position = owner->text.size();
 		}
 
-		xOffset = owner.getTexter().textWidth(owner.getLineSpan(lineNumber));
-		owner.fixXOffset(*this);
+		xOffset = owner->getTexter().textWidth(owner->getLineSpan(lineNumber));
+		owner->fixXOffset(*this);
 	}
 
 	void TextCursor::goUp(size_t delta) {
@@ -206,7 +206,7 @@ namespace Game3 {
 					}
 				}
 
-				const size_t old_column_number = std::exchange(columnNumber, owner.getColumnCount(--lineNumber));
+				const size_t old_column_number = std::exchange(columnNumber, owner->getColumnCount(--lineNumber));
 
 				while (columnNumber > old_column_number) {
 					--columnNumber;
@@ -217,9 +217,9 @@ namespace Game3 {
 				auto last = iterator;
 				auto start = std::prev(last, columnNumber);
 
-				xOffset = owner.getTexter().textWidth(UStringSpan(start, last));
-				owner.fixXOffset(*this);
-				owner.fixYOffset(*this);
+				xOffset = owner->getTexter().textWidth(UStringSpan(start, last));
+				owner->fixXOffset(*this);
+				owner->fixYOffset(*this);
 			}
 		}
 	}
@@ -228,12 +228,12 @@ namespace Game3 {
 		bool fix = false;
 
 		for (size_t i = 0; i < delta; ++i) {
-			if (lineNumber + 1 >= owner.getLineCount()) {
+			if (lineNumber + 1 >= owner->getLineCount()) {
 				if (!atEnd()) {
 					goEnd(false);
 				}
 			} else {
-				const size_t text_length = owner.text.length();
+				const size_t text_length = owner->text.length();
 
 				while (position < text_length) {
 					++position;
@@ -257,24 +257,24 @@ namespace Game3 {
 
 				columnNumber = i;
 				++lineNumber;
-				TextRenderer &texter = owner.getTexter();
+				TextRenderer &texter = owner->getTexter();
 				xOffset = texter.textWidth(UStringSpan(start, last));
 				fix = true;
 			}
 		}
 
 		if (fix) {
-			owner.fixXOffset(*this);
-			owner.fixYOffset(*this);
+			owner->fixXOffset(*this);
+			owner->fixYOffset(*this);
 		}
 	}
 
 	float TextCursor::getXPosition(bool use_target) const {
-		return owner.getPadding() - (use_target? owner.xOffset.getTarget() : owner.xOffset) * owner.getScale() + xOffset * owner.getTextScale();
+		return owner->getPadding() - (use_target? owner->xOffset.getTarget() : owner->xOffset) * owner->getScale() + xOffset * owner->getTextScale();
 	}
 
 	float TextCursor::getYPosition(bool use_target) const {
-		return owner.getPadding() - (use_target? owner.yOffset.getTarget() : owner.yOffset) * owner.getScale() + lineNumber * owner.getCursorHeight();
+		return owner->getPadding() - (use_target? owner->yOffset.getTarget() : owner->yOffset) * owner->getScale() + lineNumber * owner->getCursorHeight();
 	}
 
 	bool TextCursor::atBeginning() const {
@@ -282,7 +282,7 @@ namespace Game3 {
 	}
 
 	bool TextCursor::atEnd() const {
-		return iterator == owner.text.end();
+		return iterator == owner->text.end();
 	}
 
 	bool TextCursor::atLineBeginning() const {
@@ -290,7 +290,7 @@ namespace Game3 {
 	}
 
 	bool TextCursor::atLineEnd() const {
-		return columnNumber == owner.getColumnCount(lineNumber);
+		return columnNumber == owner->getColumnCount(lineNumber);
 	}
 
 	TextInput::TextInput(UIContext &ui, float selfScale, Color border_color, Color interior_color, Color text_color, Color cursor_color, float thickness):
@@ -456,18 +456,13 @@ namespace Game3 {
 		}
 
 		if (modifiers.onlyCtrl()) {
-			switch (key) {
-				case GLFW_KEY_BACKSPACE:
-					eraseWord();
-					changed();
-					break;
-
-				default:
-					break;
+			if (std::string_view("CVXA").contains(key)) {
+				charPressed(key, modifiers);
 			}
 
-			// Ignore other ctrl sequences.
-			return true;
+			if (key != GLFW_KEY_HOME && key != GLFW_KEY_END) {
+				return true;
+			}
 		}
 
 		switch (key) {
@@ -490,16 +485,11 @@ namespace Game3 {
 				return true;
 
 			case GLFW_KEY_HOME:
-				if (cursor) {
-					cursor->goStart(!modifiers.ctrl);
-					xOffset = 0;
-				}
+				home(modifiers);
 				return true;
 
 			case GLFW_KEY_END:
-				if (cursor) {
-					cursor->goEnd(!modifiers.ctrl);
-				}
+				end(modifiers);
 				return true;
 
 			case GLFW_KEY_UP:
@@ -541,18 +531,22 @@ namespace Game3 {
 		if (modifiers.onlyCtrl()) {
 			switch (codepoint) {
 				case 'c':
+				case 'C':
 					copy();
 					break;
 
 				case 'v':
+				case 'V':
 					paste();
 					break;
 
 				case 'x':
+				case 'X':
 					cut();
 					break;
 
 				case 'a':
+				case 'A':
 					selectAll();
 					break;
 
@@ -1353,5 +1347,34 @@ namespace Game3 {
 		anchor->goDown(line_number);
 		anchor->goRight(column);
 		cursor.emplace(*anchor);
+	}
+
+	void TextInput::home(Modifiers modifiers) {
+		ensureCursor();
+
+		if (modifiers.shift) {
+			if (!anchor) {
+				anchor = cursor;
+			}
+		} else {
+			anchor.reset();
+		}
+
+		xOffset = 0;
+		cursor->goStart(!modifiers.ctrl);
+	}
+
+	void TextInput::end(Modifiers modifiers) {
+		ensureCursor();
+
+		if (modifiers.shift) {
+			if (!anchor) {
+				anchor = cursor;
+			}
+		} else {
+			anchor.reset();
+		}
+
+		cursor->goEnd(!modifiers.ctrl);
 	}
 }

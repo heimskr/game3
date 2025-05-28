@@ -52,7 +52,7 @@ namespace Game3 {
 			bool atLineEnd() const;
 
 		private:
-			TextInput &owner;
+			TextInput *owner = nullptr;
 	};
 
 	class TextInput: public Widget, public HasFixedSize, public HasAlignment, public HasTooltipText, public Autocompleter {
@@ -172,6 +172,8 @@ namespace Game3 {
 			void renderSelection(RectangleRenderer &);
 			std::pair<int, int> getLineAndColumn(int x, int y) const;
 			void setAnchorAt(int x, int y);
+			void home(Modifiers);
+			void end(Modifiers);
 
 		friend class TextCursor;
 	};
