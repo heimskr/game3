@@ -819,9 +819,15 @@ namespace Game3 {
 
 		if (hasSelection()) {
 			const auto [left, right] = getCursors();
-			TextCursor old_left = *left;
+			if (cachedColumnCounts) {
+				if (left->lineNumber != right->lineNumber) {
+					cachedColumnCounts.reset();
+				} else {
+					cachedColumnCounts->at(left->lineNumber) -= right->columnNumber - left->columnNumber;
+				}
+			}
 			auto iterator = text.erase(left->iterator, right->iterator);
-			cursor.emplace(std::move(old_left));
+			cursor = *left;
 			cursor->iterator = iterator;
 			anchor.reset();
 			return;
