@@ -431,7 +431,8 @@ namespace Game3 {
 				std::string name = std::string(color) + " Flower";
 				name[0] = std::toupper(name[0]);
 				std::string post = std::format("flower{}_{}", i, color);
-				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10);
+				Identifier small(std::format("base:tile/small_flowers_{}", color));
+				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), std::move(small), "base:category/plant_soil", 10);
 				flower->addAttribute(Identifier("base:attribute/flower_" + std::string(color)));
 				add(flower);
 			}

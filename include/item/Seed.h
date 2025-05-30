@@ -11,6 +11,6 @@ namespace Game3 {
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
-			bool plant(InventoryPtr, Slot, const ItemStackPtr &, const Place &) override;
+			bool plant(InventoryPtr, Slot, const ItemStackPtr &, const Place &, Layer) override;
 	};
 }
