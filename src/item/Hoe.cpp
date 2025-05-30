@@ -14,11 +14,12 @@ namespace Game3 {
 		Realm &realm = *place.realm;
 		Tileset &tileset = realm.getTileset();
 
-		if (std::optional<TileID> tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/tillable"_id)) {
-			if (stack->reduceDurability())
+		if (std::optional<TileID> tile = realm.tryTile(Layer::Soil, place.position); tile && tileset.isInCategory(*tile, "base:category/tillable"_id)) {
+			if (stack->reduceDurability()) {
 				place.player->getInventory(0)->erase(slot);
+			}
 			place.player->getInventory(0)->notifyOwner({});
-			place.set(Layer::Terrain, "base:tile/farmland"_id);
+			place.set(Layer::Soil, "base:tile/farmland"_id);
 			return true;
 		}
 

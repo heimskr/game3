@@ -113,11 +113,24 @@ namespace Game3 {
 
 		for (Index row = range.rowMin(); row <= range.rowMax() - bottom_pad; ++row) {
 			for (Index column = range.columnMin(); column < range.columnMax() - right_pad; ++column) {
-				if (tileset->isLand(copyTileUnsafe(Layer::Terrain, Position(row, column), was_empty, TileMode::Throw))) {
-					if (auto fluid_tile = copyFluidTile(Position(row, column)); !fluid_tile || fluid_tile->level == 0) {
-						land_tiles[i++] = {row, column};
-					}
+				Position position{row, column};
+
+				if (tileset->isSolid(copyTileUnsafe(Layer::Submerged, position, was_empty, TileMode::ReturnEmpty))) {
+					// Villages shouldn't spawn over solid submerged tiles.
+					continue;
 				}
+
+				if (copyTileUnsafe(Layer::Objects, position, was_empty, TileMode::ReturnEmpty)) {
+					// Villages shouldn't spawn over objects.
+					continue;
+				}
+
+				if (auto fluid_tile = copyFluidTileUnsafe(position); fluid_tile && fluid_tile->level > 0) {
+					// Villages shouldn't spawn in fluids.
+					continue;
+				}
+
+				land_tiles[i++] = {row, column};
 			}
 		}
 
@@ -197,6 +210,16 @@ namespace Game3 {
 		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		std::shared_lock lock(fluidMutex);
+
+		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
+			return access(iter->second, remainder(position.row), remainder(position.column));
+		}
+
+		return std::nullopt;
+	}
+
+	std::optional<FluidTile> TileProvider::copyFluidTileUnsafe(Position position) const {
+		const ChunkPosition chunk_position{divide(position.column), divide(position.row)};
 
 		if (auto iter = fluidMap.find(chunk_position); iter != fluidMap.end()) {
 			return access(iter->second, remainder(position.row), remainder(position.column));
@@ -601,7 +624,7 @@ namespace Game3 {
 	}
 
 	void TileProvider::validateLayer(Layer layer) const {
-		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Terrain) || LAYER_COUNT < static_cast<uint8_t>(layer)) {
+		if (static_cast<uint8_t>(layer) < static_cast<uint8_t>(Layer::Bedrock) || LAYER_COUNT < static_cast<uint8_t>(layer)) {
 			throw std::out_of_range("Invalid layer: " + std::to_string(static_cast<uint8_t>(layer)));
 		}
 	}

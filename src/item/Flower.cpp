@@ -8,13 +8,13 @@
 
 namespace Game3 {
 	Flower::Flower(ItemID identifier, std::string name, Identifier tilename, Identifier smallTilename, Identifier validGround, MoneyCount basePrice, ItemCount maxCount):
-	Plantable(std::move(identifier), std::move(name), basePrice, maxCount),
-	tilename(std::move(tilename)),
-	smallTilename(std::move(smallTilename)),
-	validGround(std::move(validGround)) {
-		attributes.insert("base:attribute/plantable"_id);
-		attributes.insert("base:attribute/flower"_id);
-	}
+		Plantable(std::move(identifier), std::move(name), basePrice, maxCount),
+		tilename(std::move(tilename)),
+		smallTilename(std::move(smallTilename)),
+		validGround(std::move(validGround)) {
+			attributes.insert("base:attribute/plantable"_id);
+			attributes.insert("base:attribute/flower"_id);
+		}
 
 	bool Flower::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
@@ -22,13 +22,23 @@ namespace Game3 {
 		const auto &tileset = realm.getTileset();
 
 		if (modifiers.onlyShift()) {
-			if (smallTilename && tileset[realm.getTile(Layer::Terrain, position)] == "base:tile/grass") {
-				return plantTile(place.player->getInventory(0), slot, stack, place, Layer::Terrain, smallTilename);
+			return plantTile(place.player->getInventory(0), slot, stack, place, Layer::Submerged, smallTilename);
+		}
+
+		if (realm.isPathable(position) && realm.middleEmpty(position)) {
+			if (validGround) {
+				std::optional<TileID> vegetation = realm.tryTile(Layer::Vegetation, position);
+				if (vegetation && !tileset.isInCategory(*vegetation, validGround)) {
+					return false;
+				}
+
+				std::optional<TileID> soil = realm.tryTile(Layer::Soil, position);
+				if (soil && !tileset.isInCategory(*soil, validGround)) {
+					return false;
+				}
 			}
-		} else if (realm.isPathable(position) && realm.middleEmpty(position)) {
-			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround)) {
-				return plant(place.player->getInventory(0), slot, stack, place, Layer::Submerged);
-			}
+
+			return plant(place.player->getInventory(0), slot, stack, place, Layer::Submerged);
 		}
 
 		return false;

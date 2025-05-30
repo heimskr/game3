@@ -89,6 +89,7 @@ namespace Game3 {
 
 			/** Returns a copy of the fluid ID/amount at a given tile position. */
 			std::optional<FluidTile> copyFluidTile(Position) const;
+			std::optional<FluidTile> copyFluidTileUnsafe(Position) const;
 
 			ChunkSet getChunkSet(ChunkPosition) const;
 

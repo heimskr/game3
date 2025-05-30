@@ -28,8 +28,8 @@ namespace Game3 {
 	}
 
 	void CaveTile::reveal(const Place &place) const {
-		if (std::optional<TileID> terrain = place.get(Layer::Terrain); !terrain || *terrain == 0) {
-			place.set(Layer::Terrain, floor);
+		if (std::optional<TileID> terrain = place.get(Layer::Bedrock); !terrain || *terrain == 0) {
+			place.set(Layer::Bedrock, floor);
 		}
 
 		if (auto cave = std::dynamic_pointer_cast<Cave>(place.realm)) {

@@ -37,8 +37,9 @@ namespace Game3 {
 	}
 
 	TileID Tileset::getEmptyID() const {
-		if (!emptyID)
+		if (!emptyID) {
 			emptyID = (*this)[empty];
+		}
 		return *emptyID;
 	}
 

@@ -23,35 +23,52 @@ namespace Game3 {
 		const auto wetness    = params.wetness;
 		const auto stoneLevel = params.stoneLevel;
 
-		static const Identifier sand      = "base:tile/sand";
-		static const Identifier dark_ice  = "base:tile/dark_ice";
-		static const Identifier light_ice = "base:tile/light_ice";
-		static const Identifier snow      = "base:tile/snow";
-		static const Identifier stone     = "base:tile/stone";
-		static const Identifier water     = "base:fluid/water";
+		static const Identifier sand        = "base:tile/sand";
+		static const Identifier dark_ice    = "base:tile/dark_ice";
+		static const Identifier light_ice   = "base:tile/light_ice";
+		static const Identifier snow        = "base:tile/snow";
+		static const Identifier stone       = "base:tile/stone";
+		static const Identifier water       = "base:fluid/water";
+		static const Identifier dirt        = "base:tile/dirt";
+		static const Identifier light_grass = "base:tile/light_grass";
+		static const Identifier grass       = "base:tile/grass";
+
+		Position position{row, column};
+
+		realm->setTile(Layer::Bedrock, position, stone, false);
 
 		if (suggested_noise < wetness + 0.3) {
-			realm->setTile(Layer::Terrain, {row, column}, sand, false);
-			realm->setFluid({row, column}, water, params.getFluidLevel(suggested_noise, 0.3), true);
+			realm->setTile(Layer::Soil, position, sand, false);
+			realm->setFluid(position, water, params.getFluidLevel(suggested_noise, 0.3), true);
 		} else if (suggested_noise < wetness + 0.39) {
-			realm->setTile(Layer::Terrain, {row, column}, sand, false);
+			realm->setTile(Layer::Soil, position, sand, false);
 		} else if (suggested_noise < wetness + 0.42) {
-			realm->setTile(Layer::Terrain, {row, column}, dark_ice, false);
+			realm->setTile(Layer::Soil, position, dirt, false);
+			realm->setTile(Layer::Snow, position, dark_ice, false);
 		} else if (suggested_noise < wetness + 0.5) {
-			realm->setTile(Layer::Terrain, {row, column}, light_ice, false);
+			realm->setTile(Layer::Soil, position, dirt, false);
+			realm->setTile(Layer::Vegetation, position, light_grass, false);
+			realm->setTile(Layer::Snow, position, light_ice, false);
 		} else if (stoneLevel < suggested_noise) {
-			realm->setTile(Layer::Terrain, {row, column}, stone, false);
+			// Do nothing; there's stone on the bedrock layer already.
 		} else {
-			realm->setTile(Layer::Terrain, {row, column}, snow, false);
+			realm->setTile(Layer::Soil, position, dirt, false);
+			realm->setTile(Layer::Vegetation, position, grass, false);
+			realm->setTile(Layer::Snow, position, snow, false);
+
 			const double forest_noise = forestNoise(row / params.noiseZoom, column / params.noiseZoom, 0.5);
+
 			if (params.forestThreshold < forest_noise) {
-				uint8_t mod = abs(column) % 2;
+				uint8_t mod = std::abs(column) % 2;
+
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
+
 				if (std::uniform_int_distribution(0, 99)(tree_rng) < 50) {
 					mod = 1 - mod;
 				}
-				if ((abs(row) % 2) == mod) {
-					realm->setTile(Layer::Submerged, {row, column}, choose(trees, rng), false);
+
+				if ((std::abs(row) % 2) == mod) {
+					realm->setTile(Layer::Submerged, position, choose(trees, rng), false);
 				}
 			}
 		}

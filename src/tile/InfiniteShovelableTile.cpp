@@ -9,10 +9,6 @@ namespace Game3 {
 		itemID(std::move(itemID)) {}
 
 	bool InfiniteShovelableTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
-		if (layer != Layer::Terrain) {
-			return false;
-		}
-
 		PlayerPtr player = place.player;
 		InventoryPtr inventory = player->getInventory(0);
 		std::unique_lock inventory_lock = inventory->uniqueLock();

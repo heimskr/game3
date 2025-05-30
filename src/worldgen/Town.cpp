@@ -28,9 +28,9 @@ namespace Game3::WorldGen {
 			}
 		};
 
-		const auto set_terrain = [&](const Identifier &tilename, bool helper = false) {
+		const auto set_soil = [&](const Identifier &tilename, bool helper = false) {
 			cleanup(row, column);
-			realm->setTile(Layer::Terrain, {row, column}, tilename, helper);
+			realm->setTile(Layer::Soil, {row, column}, tilename, helper);
 		};
 
 		const auto set_submerged = [&](const Position &position, const Identifier &tilename) {
@@ -76,7 +76,7 @@ namespace Game3::WorldGen {
 		for (row = position.row + 1; row < position.row + height - 1; ++row) {
 			for (column = position.column + 1; column < position.column + width - 1; ++column) {
 				buildable_set.insert({row, column});
-				set_terrain("base:tile/town_dirt", true);
+				set_soil("base:tile/town_dirt", true);
 			}
 		}
 
@@ -84,10 +84,10 @@ namespace Game3::WorldGen {
 		for (column = position.column - pad; column < position.column + width + pad; ++column) {
 			buildable_set.erase({row, column});
 			buildable_set.erase({position.row + height - 2, column}); // Make sure no houses spawn on the bottom row of the town
-			set_terrain("base:tile/road");
+			set_soil("base:tile/road");
 			++row;
 			buildable_set.erase({row, column});
-			set_terrain("base:tile/road");
+			set_soil("base:tile/road");
 			--row;
 		}
 
@@ -113,10 +113,10 @@ namespace Game3::WorldGen {
 
 		for (row = position.row - pad; row < position.row + height + pad; ++row) {
 			buildable_set.erase({row, column});
-			set_terrain("base:tile/road");
+			set_soil("base:tile/road");
 			++column;
 			buildable_set.erase({row, column});
-			set_terrain("base:tile/road");
+			set_soil("base:tile/road");
 			--column;
 		}
 
@@ -132,7 +132,7 @@ namespace Game3::WorldGen {
 		for (row = position.row + 1; row < position.row + height / 2 - 1; ++row) {
 			for (column = position.column + 1; column < position.column + width / 2 - 1; ++column) {
 				buildable_set.erase({row, column});
-				set_terrain("base:tile/farmland");
+				set_soil("base:tile/farmland");
 				set_submerged({row, column}, choose(crops, rng)->getLastStage());
 			}
 		}

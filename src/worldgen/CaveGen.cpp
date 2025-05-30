@@ -23,17 +23,24 @@ namespace Game3::WorldGen {
 		const Index column_min = CHUNK_SIZE * range.topLeft.x;
 		const Index column_max = CHUNK_SIZE * (range.bottomRight.x + 1) - 1;
 
-		std::vector<Layer> layers;
-		layers.reserve((row_max - row_min + 1) * (column_max - column_min + 1));
+		std::vector<uint8_t> was_object;
+		was_object.reserve((row_max - row_min + 1) * (column_max - column_min + 1));
 
-		for (Index row = row_min; row <= row_max; ++row)
-			for (Index column = column_min; column <= column_max; ++column)
-				layers.push_back(generateCaveTile(realm, row, column, noisegen, rng)? Layer::Terrain : Layer::Objects);
+		for (Index row = row_min; row <= row_max; ++row) {
+			for (Index column = column_min; column <= column_max; ++column) {
+				was_object.push_back(generateCaveTile(realm, row, column, noisegen, rng)? 0 : 1);
+			}
+		}
 
 		for (Index row = row_max; row >= row_min; --row) {
 			for (Index column = column_max; column >= column_min; --column) {
-				realm->autotile(Position{row, column}, layers.back());
-				layers.pop_back();
+				if (was_object.back()) {
+					realm->autotile(Position{row, column}, Layer::Objects);
+				} else {
+					realm->autotile(Position{row, column}, Layer::Bedrock);
+					realm->autotile(Position{row, column}, Layer::Soil);
+				}
+				was_object.pop_back();
 			}
 		}
 	}
@@ -100,12 +107,15 @@ namespace Game3::WorldGen {
 			// TODO: move to mushroom caves
 			constexpr static double extra_zoom = 5.;
 			const double brine_noise = std::abs(noisegen(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 541713.));
+			realm->setTile(Layer::Bedrock, {row, column}, "base:tile/stone", false);
+
 			if (0.666 < noise && brine_noise < 0.05) {
-				realm->setTile(Layer::Terrain, {row, column}, "base:tile/stone", false);
-				if (brine_noise < 0.03)
+				if (brine_noise < 0.03) {
 					realm->setFluid({row, column}, "base:fluid/brine", FluidTile::FULL, true);
-			} else
-				realm->setTile(Layer::Terrain, {row, column}, "base:tile/cave_dirt", false);
+				}
+			} else {
+				realm->setTile(Layer::Soil, {row, column}, "base:tile/cave_dirt", false);
+			}
 
 			return true;
 		}
@@ -116,55 +126,58 @@ namespace Game3::WorldGen {
 	bool generateGrimCaveTile(const std::shared_ptr<Realm> &realm, Index row, Index column, const NoiseGenerator &noisegen) {
 		const double noise = noisegen(row / noise_zoom, column / noise_zoom, 0.1);
 
+		Position position{row, column};
+
 		if (noise < -.95) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.85) {
-		// 	realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-		// 	realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+		// 	realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+		// 	realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		// } else if (noise < -.825) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_diamond", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grim_diamond", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.725) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.7) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_fireopal", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grim_fireopal", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.6) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.55) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_uranium", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grim_uranium", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.45) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.375) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < -.1) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
-			realm->setTile(Layer::Highest, {row, column}, "base:tile/void", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
+			realm->setTile(Layer::Highest, position, "base:tile/void", false);
 		} else if (noise < .1) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
 		} else if (noise < .11) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
 		} else if (noise < .1125) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_diamond", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grim_diamond", false);
 		} else if (noise < .12) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_uranium", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grim_uranium", false);
 		} else if (noise < .1225) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grim_fireopal", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grim_fireopal", false);
 		} else if (noise < .13) {
-			realm->setTile(Layer::Objects, {row, column}, "base:tile/grimstone", false);
+			realm->setTile(Layer::Objects, position, "base:tile/grimstone", false);
 		} else {
-			realm->setTile(Layer::Terrain, {row, column}, "base:tile/grimdirt", false);
+			realm->setTile(Layer::Soil, position, "base:tile/grimdirt", false);
 
 			constexpr static double extra_zoom = 6.66;
 			const double lava_noise = std::abs(noisegen(row / (extra_zoom * noise_zoom), column / (extra_zoom * noise_zoom), 1474.));
-			if (lava_noise < 0.0666)
-				realm->setFluid({row, column}, "base:fluid/lava", FluidTile::FULL, true);
+			if (lava_noise < 0.0666) {
+				realm->setFluid(position, "base:fluid/lava", FluidTile::FULL, true);
+			}
 
 			return true;
 		}
@@ -176,8 +189,9 @@ namespace Game3::WorldGen {
 		constexpr static double biome_zoom = noise_zoom * 10.;
 		const double biome_noise = noisegen(row / biome_zoom, column / biome_zoom, 5.0);
 
-		if (biome_noise < -0.5)
+		if (biome_noise < -0.5) {
 			return generateGrimCaveTile(realm, row, column, noisegen);
+		}
 
 		return generateNormalCaveTile(realm, row, column, noisegen, rng);
 	}
@@ -198,23 +212,24 @@ namespace Game3::WorldGen {
 			realm->tileProvider.updateChunk(chunk_position);
 		});
 
-		std::vector<Layer> layers;
-		layers.reserve((row_max - row_min + 1) * (column_max - column_min + 1));
+		std::vector<uint8_t> was_object;
+		was_object.reserve((row_max - row_min + 1) * (column_max - column_min + 1));
 
 		for (Index row = row_min; row <= row_max; ++row) {
 			for (Index column = column_min; column <= column_max; ++column) {
-				if (generateCaveTile(realm, row, column, noisegen, rng)) {
-					layers.push_back(Layer::Terrain);
-				} else {
-					layers.push_back(Layer::Objects);
-				}
+				was_object.push_back(generateCaveTile(realm, row, column, noisegen, rng)? 0 : 1);
 			}
 		}
 
 		for (Index row = row_max; row >= row_min; --row) {
 			for (Index column = column_max; column >= column_min; --column) {
-				realm->autotile(Position{row, column}, layers.back());
-				layers.pop_back();
+				if (was_object.back()) {
+					realm->autotile(Position{row, column}, Layer::Objects);
+				} else {
+					realm->autotile(Position{row, column}, Layer::Bedrock);
+					realm->autotile(Position{row, column}, Layer::Soil);
+				}
+				was_object.pop_back();
 			}
 		}
 
@@ -223,8 +238,11 @@ namespace Game3::WorldGen {
 		for (const Position &position : {entrance, entrance + Position(1, 0)}) {
 			realm->setTile(Layer::Objects, position, 0);
 			realm->setTile(Layer::Highest, position, 0);
-			if (realm->tryTile(Layer::Terrain, position) == 0) {
-				realm->setTile(Layer::Terrain, position, "base:tile/cave_dirt");
+			if (realm->tryTile(Layer::Bedrock, position) == 0) {
+				realm->setTile(Layer::Bedrock, position, "base:tile/stone");
+			}
+			if (realm->tryTile(Layer::Soil, position) == 0) {
+				realm->setTile(Layer::Soil, position, "base:tile/cave_dirt");
 			}
 		}
 

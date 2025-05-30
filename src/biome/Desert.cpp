@@ -32,15 +32,19 @@ namespace Game3 {
 		static const Identifier stone = "base:tile/stone"_id;
 		static const Identifier water = "base:fluid/water"_id;
 
+		Position position{row, column};
+
+		realm->setTile(Layer::Bedrock, position, stone, false);
+
 		if (suggested_noise < wetness + 0.3) {
-			realm->setTile(Layer::Terrain, {row, column}, sand, false);
-			realm->setFluid({row, column}, water, params.getFluidLevel(suggested_noise, 0.3), true);
+			realm->setTile(Layer::Soil, position, sand, false);
+			realm->setFluid(position, water, params.getFluidLevel(suggested_noise, 0.3), true);
 		} else if (suggested_noise < wetness + 0.4) {
-			realm->setTile(Layer::Terrain, {row, column}, sand, false);
+			realm->setTile(Layer::Soil, position, sand, false);
 		} else if (stoneLevel < suggested_noise) {
-			realm->setTile(Layer::Terrain, {row, column}, stone, false);
+			// Do nothing; there's stone on the bedrock layer already.
 		} else {
-			realm->setTile(Layer::Terrain, {row, column}, sand, false);
+			realm->setTile(Layer::Soil, position, sand, false);
 			const double forest_noise = forestNoise(row / params.noiseZoom, column / params.noiseZoom, 0.5);
 			if (params.forestThreshold - 0.2 < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
@@ -53,7 +57,7 @@ namespace Game3 {
 					mod = 1 - mod;
 				}
 				if ((abs(row) % 2) == mod) {
-					realm->setTile(Layer::Submerged, {row, column}, choose(cactuses, rng), false);
+					realm->setTile(Layer::Submerged, position, choose(cactuses, rng), false);
 				}
 			}
 		}

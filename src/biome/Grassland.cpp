@@ -74,32 +74,41 @@ namespace Game3 {
 		const auto stoneLevel = params.stoneLevel;
 		Tileset &tileset = realm.getTileset();
 
-		static const Identifier sand          = "base:tile/sand";
-		static const Identifier light_grass   = "base:tile/light_grass";
-		static const Identifier stone         = "base:tile/stone";
-		static const Identifier forest_floor  = "base:tile/forest_floor";
-		static const Identifier water_fluid   = "base:fluid/water";
+		static const Identifier sand         = "base:tile/sand";
+		static const Identifier dirt         = "base:tile/dirt";
+		static const Identifier stone        = "base:tile/stone";
+		static const Identifier light_grass  = "base:tile/light_grass";
+		static const Identifier water_fluid  = "base:fluid/water";
+		static const Identifier forest_floor = "base:tile/forest_floor";
+
+		Position position{row, column};
+
+		realm.setTile(Layer::Bedrock, position, stone, false);
 
 		if (suggested_noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false);
-			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
+			realm.setTile(Layer::Soil, position, sand, false);
+			realm.setFluid(position, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
 		} else if (suggested_noise < wetness + 0.4) {
-			realm.setTile(Layer::Terrain, {row, column}, sand, false);
+			realm.setTile(Layer::Soil, position, sand, false);
 		} else if (suggested_noise < wetness + 0.5) {
-			realm.setTile(Layer::Terrain, {row, column}, light_grass, false);
+			realm.setTile(Layer::Soil, position, light_grass, false);
 		} else if (stoneLevel < suggested_noise) {
-			realm.setTile(Layer::Terrain, {row, column}, stone, false);
+			// Do nothing; there's stone on the bedrock layer already.
 		} else {
-			if (std::uniform_int_distribution{0, 15}(rng) == 0)
-				realm.setTile(Layer::Terrain, {row, column}, choose(tileset.getTilesByCategory("base:category/small_flowers"), rng), false);
-			else
-				realm.setTile(Layer::Terrain, {row, column}, choose(grasses, rng), false);
+			realm.setTile(Layer::Soil, position, dirt, false);
+			realm.setTile(Layer::Vegetation, position, choose(grasses, rng), false);
+			if (std::uniform_int_distribution{0, 15}(rng) == 0) {
+				realm.setTile(Layer::Submerged, position, choose(tileset.getTilesByCategory("base:category/small_flowers"), rng), false);
+			}
+
 			const double forest_noise = forestNoise(row / params.noiseZoom, column / params.noiseZoom, 0.5);
+
 			if (params.forestThreshold < forest_noise) {
 				std::default_random_engine tree_rng(static_cast<uint_fast32_t>(forest_noise * 1'000'000'000.));
-				if ((abs(row) % 2) == (std::uniform_int_distribution{0, 39}(tree_rng) < 20))
-					realm.setTile(Layer::Submerged, {row, column}, choose(trees, rng), false);
-				realm.setTile(Layer::Terrain, {row, column}, forest_floor, false);
+				if ((std::abs(row) % 2) == (std::uniform_int_distribution{0, 39}(tree_rng) < 20)) {
+					realm.setTile(Layer::Submerged, position, choose(trees, rng), false);
+				}
+				realm.setTile(Layer::Vegetation, position, forest_floor, false);
 			}
 		}
 
@@ -118,7 +127,7 @@ namespace Game3 {
 			}
 		}
 
-		const auto terrain_tile = tileset[realm->getTile(Layer::Terrain, position)];
+		const Identifier soil_tile = tileset[realm->getTile(Layer::Soil, position)];
 
 		if (water == FluidID(-1)) {
 			water = safeCast<FluidID>(realm->getGame()->registry<FluidRegistry>().at("base:fluid/water")->registryID);
@@ -136,7 +145,7 @@ namespace Game3 {
 			generateLilypad(Place(position, realm), lilypad_rand <= 2);
 		}
 
-		if (grassSet.contains(terrain_tile)) {
+		if (grassSet.contains(soil_tile)) {
 			if (realm->middleEmpty(position)) {
 				if constexpr (SPAWN_BIG_FLOWERS) {
 					if (std::uniform_int_distribution{1, 100}(rng) <= 2) {
@@ -170,7 +179,7 @@ namespace Game3 {
 					spawned_entity->direction = randomDirection();
 				}
 			}
-		} else if (terrain_tile == "base:tile/sand") {
+		} else if (soil_tile == "base:tile/sand") {
 			if (realm->middleEmpty(position) && !realm->hasFluid(position) && std::uniform_int_distribution{1, 100}(rng) == 1) {
 				std::shared_ptr<Crab> crab = realm->spawn<Crab>(position);
 				crab->direction = randomDirection();

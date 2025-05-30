@@ -16,7 +16,7 @@ namespace Game3 {
 
 		Tileset &tileset = realm.getTileset();
 
-		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, getSoilCategory())) {
+		if (auto tilename = place.getName(Layer::Soil); !tilename || !tileset.isInCategory(*tilename, getSoilCategory())) {
 			return false;
 		}
 

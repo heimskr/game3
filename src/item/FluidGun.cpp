@@ -145,9 +145,11 @@ namespace Game3 {
 		}
 
 		if (!fluid_tile || fluid_tile->level == 0) {
-			if (TilePtr tile = place.getTile(Layer::Terrain)) {
-				fluid_tile = tile->yieldFluid(place);
-				can_set = false;
+			for (Layer layer: reverse(terrainLayers)) {
+				if (TilePtr tile = place.getTile(layer)) {
+					fluid_tile = tile->yieldFluid(place);
+					can_set = false;
+				}
 			}
 		}
 

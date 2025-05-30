@@ -24,7 +24,7 @@ namespace Game3 {
 		weakGame(game) {}
 
 	int64_t GameDB::getCurrentFormatVersion() {
-		return 3;
+		return 4;
 	}
 
 	std::string GameDB::getFileExtension() {
@@ -37,7 +37,7 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 		database.getBase() = std::make_unique<SQLite::Database>(path.string(), SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 
-		static_assert(LAYER_COUNT * sizeof(TileID) * CHUNK_SIZE * CHUNK_SIZE < 65536);
+		static_assert(LAYER_COUNT * sizeof(TileID) * CHUNK_SIZE * CHUNK_SIZE < 131072);
 		static_assert(sizeof(BiomeType) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 		static_assert(sizeof(FluidInt) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 
@@ -51,7 +51,7 @@ namespace Game3 {
 				realmID INT,
 				x INT,
 				y INT,
-				terrain VARBINARY(65535),
+				terrain VARBINARY(131071),
 				biomes  VARBINARY(65535),
 				fluids  VARBINARY(65535),
 				pathmap VARBINARY(65535),

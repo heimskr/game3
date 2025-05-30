@@ -21,9 +21,11 @@ namespace Game3 {
 		Tileset &tileset = realm.getTileset();
 
 		for (const Direction direction: ALL_DIRECTIONS) {
-			if (auto tile = realm.tryTile(Layer::Terrain, place.position + direction); tile && tileset.isInCategory(*tile, "base:category/spreads_on_dirt")) {
-				place.set(Layer::Terrain, *tile);
-				break;
+			if (auto tile = realm.tryTile(Layer::Soil, place.position + direction); tile && tileset.isInCategory(*tile, "base:category/spreads_on_dirt")) {
+				if (!place.get(Layer::Vegetation)) {
+					place.set(Layer::Soil, *tile);
+					break;
+				}
 			}
 		}
 	}

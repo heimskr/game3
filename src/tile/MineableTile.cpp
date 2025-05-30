@@ -15,7 +15,7 @@ namespace Game3 {
 		consumable(consumable) {}
 
 	bool MineableTile::interact(const Place &place, Layer layer, const ItemStackPtr &held_item, Hand hand) {
-		if (layer == Layer::Terrain) {
+		if (isTerrain(layer)) {
 			// Terrain isn't mineable.
 			return false;
 		}
@@ -50,7 +50,7 @@ namespace Game3 {
 	}
 
 	bool MineableTile::damage(const Place &place, Layer layer) {
-		if (layer == Layer::Terrain || !consumable) {
+		if (isTerrain(layer) || !consumable) {
 			return false;
 		}
 

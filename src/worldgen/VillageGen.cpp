@@ -31,14 +31,16 @@ namespace Game3 {
 		int width  = 2 * width_distribution(prng);
 		int height = 2 * height_distribution(prng);
 
-		if (width < height)
+		if (width < height) {
 			std::swap(width, height);
+		}
 
 		const VillageOptions village_options{width, height, PADDING};
 
 		std::optional<Position> village_position = getVillagePosition(*realm, chunk_position, village_options, pool);
-		if (!village_position)
+		if (!village_position) {
 			return std::nullopt;
+		}
 
 		ServerGame &game = realm->getGame()->toServer();
 		VillagePtr village = game.addVillage(game, chunk_position, Place{*village_position, realm}, village_options);
@@ -63,13 +65,15 @@ namespace Game3 {
 	}
 
 	std::optional<Position> getVillagePosition(const Realm &realm, const ChunkPosition &chunk_position, const VillageOptions &options, ThreadPool &pool, std::optional<std::vector<Position>> starts) {
-		if (!chunkValidForVillage(chunk_position, realm.seed))
+		if (!chunkValidForVillage(chunk_position, realm.seed)) {
 			return std::nullopt;
+		}
 
 		std::vector<Position> candidates = getVillageCandidates(realm, chunk_position, options, pool, std::move(starts));
 
-		if (candidates.empty())
+		if (candidates.empty()) {
 			return std::nullopt;
+		}
 
 		std::sort(candidates.begin(), candidates.end());
 		std::mt19937 prng(-realm.seed ^ 0x1234);
@@ -86,11 +90,13 @@ namespace Game3 {
 
 		auto [x, y] = chunk_position;
 
-		if (x < 0)
+		if (x < 0) {
 			x -= SUPERCHUNK_SIZE - 1;
+		}
 
-		if (y < 0)
+		if (y < 0) {
 			y -= SUPERCHUNK_SIZE - 1;
+		}
 
 		auto super_x = x / SUPERCHUNK_SIZE;
 		auto super_y = y / SUPERCHUNK_SIZE;
@@ -113,8 +119,9 @@ namespace Game3 {
 
 		Timer timer{"VillageCandidates"};
 
-		if (!starts)
+		if (!starts) {
 			starts.emplace(provider.getLand(*realm.getGame(), ChunkRange(chunk_position, chunk_position), options.height + options.padding * 2, options.width + options.padding * 2));
+		}
 
 		std::vector<Position> candidates;
 		std::mutex candidates_mutex;
@@ -129,7 +136,7 @@ namespace Game3 {
 				std::vector<Position> thread_candidates;
 
 				for (size_t i = sector * SECTOR_SIZE, max = std::min((sector + 1) * SECTOR_SIZE, starts->size()); i < max; ++i) {
-					const auto position = (*starts)[i];
+					const Position position = (*starts)[i];
 					const Index row_start = position.row + options.padding;
 					const Index row_end = row_start + options.height;
 					const Index column_start = position.column + options.padding;
@@ -137,11 +144,11 @@ namespace Game3 {
 
 					for (Index row = row_start; row < row_end; row += 2) {
 						for (Index column = column_start; column < column_end; column += 2) {
-							if (auto tile = provider.tryTile(Layer::Terrain, {row, column}); !tile || !tileset.isLand(*tile))
-								goto failed;
+							// TODO: are any other conditions necessary here?
 
-							if (realm.hasFluid({row, column}))
+							if (realm.hasFluid({row, column})) {
 								goto failed;
+							}
 						}
 					}
 

@@ -1839,6 +1839,11 @@ namespace Game3 {
 	void Realm::autotile(const Position &position, Layer layer, TileUpdateContext context) {
 		const Tileset &tileset = getTileset();
 		const TileID tile = tileProvider.copyTile(layer, position, TileProvider::TileMode::ReturnEmpty);
+
+		if (tile == 0) {
+			return;
+		}
+
 		const Identifier &tilename = tileset[tile];
 
 		if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
@@ -1904,7 +1909,7 @@ namespace Game3 {
 				Place place{Position(row, column), shared, player};
 				for (const Layer layer: allLayers) {
 					if (std::optional<TileID> tile_id = tryTile(layer, place.position)) {
-						std::shared_ptr<Tile> tile = game.getTile(tileset[*tile_id]);
+						TilePtr tile = game.getTile(tileset[*tile_id]);
 						tile->renderStaticLighting(place, layer, context);
 					}
 				}

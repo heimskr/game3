@@ -11,15 +11,16 @@ namespace Game3 {
 		Tile(ID()) {}
 
 	bool VoidTile::interact(const Place &place, Layer layer, const ItemStackPtr &held_item, Hand) {
-		if (layer == Layer::Highest && held_item && held_item->hasAttribute("base:attribute/pickaxe"))
+		if (layer == Layer::Highest && held_item && held_item->hasAttribute("base:attribute/pickaxe")) {
 			place.set(layer, 0);
+		}
 
 		// Returning false even if the tile was mined to let the mineable tile below also get mined.
 		return false;
 	}
 
 	bool VoidTile::damage(const Place &place, Layer layer) {
-		if (layer == Layer::Terrain) {
+		if (isTerrain(layer)) {
 			return false;
 		}
 

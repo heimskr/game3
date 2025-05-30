@@ -45,7 +45,8 @@ namespace Game3::WorldGen {
 
 		range.iterate([&](ChunkPosition chunk_position) {
 			chunk_position.iterate([&](const Position &position) {
-				realm->setTile(Layer::Terrain, position, "base:tile/sand", false);
+				realm->setTile(Layer::Bedrock, position, "base:tile/stone", false);
+				realm->setTile(Layer::Soil, position, "base:tile/sand", false);
 				realm->setFluid(position, "base:fluid/water", FluidTile::FULL, true);
 			});
 

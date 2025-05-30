@@ -209,8 +209,9 @@ namespace Game3 {
 
 		const auto set_width = tileset_width / tilesize;
 
-		if (set_width == 0)
+		if (set_width == 0) {
 			return false;
+		}
 
 		const float divisor = set_width;
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
@@ -221,7 +222,7 @@ namespace Game3 {
 		GamePtr game = realm->getGame();
 
 		Timer timer{"BufferedVBOInit"};
-		vbo.init<float, 11>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, game, set_width, divisor, t_size, missing](size_t x, size_t y) {
+		vbo.init<float, 19>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, game, set_width, divisor, t_size, missing](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> tiles{};
@@ -253,10 +254,11 @@ namespace Game3 {
 			if (fluid_opt) {
 				if (auto tile_opt = game->getFluidTileID(fluid_opt->id)) {
 					fluid_tile = *tile_opt;
-					if (FluidTile::FULL <= fluid_opt->level)
+					if (FluidTile::FULL <= fluid_opt->level) {
 						fluid_opacity = 1.f;
-					else
-						fluid_opacity = float(fluid_opt->level) / FluidTile::FULL;
+					} else {
+						fluid_opacity = static_cast<float>(fluid_opt->level) / FluidTile::FULL;
+					}
 				}
 			}
 
@@ -266,14 +268,14 @@ namespace Game3 {
 				fluid_opacity = 0.f;
 			}
 
-			static_assert(LAYER_COUNT == 4);
+			static_assert(LAYER_COUNT == 8);
 
 			// Texture coordinates for the base tile
 #define T_DEFS(I) \
 			const float tx##I = (tiles[I] % set_width) / divisor + TILE_TEXTURE_PADDING; \
 			const float ty##I = (tiles[I] / set_width) / divisor + TILE_TEXTURE_PADDING;
 
-			T_DEFS(0); T_DEFS(1); T_DEFS(2); T_DEFS(3);
+			T_DEFS(0); T_DEFS(1); T_DEFS(2); T_DEFS(3); T_DEFS(4); T_DEFS(5); T_DEFS(6); T_DEFS(7);
 
 			const float fx0 = (fluid_tile % set_width) / divisor + TILE_TEXTURE_PADDING;
 			const float fy0 = (fluid_tile / set_width) / divisor + TILE_TEXTURE_PADDING;
@@ -282,7 +284,7 @@ namespace Game3 {
 #define T_ARR_1(I) tx##I + t_size, ty##I
 #define T_ARR_2(I) tx##I, ty##I + t_size
 #define T_ARR_3(I) tx##I + t_size, ty##I + t_size
-#define T_ARR_N(N) T_ARR_##N(0), T_ARR_##N(1), T_ARR_##N(2), T_ARR_##N(3)
+#define T_ARR_N(N) T_ARR_##N(0), T_ARR_##N(1), T_ARR_##N(2), T_ARR_##N(3), T_ARR_##N(4), T_ARR_##N(5), T_ARR_##N(6), T_ARR_##N(7)
 
 #define F_ARR_0 fx0, fy0
 #define F_ARR_1 fx0 + t_size, fy0
@@ -312,8 +314,10 @@ namespace Game3 {
 	}
 
 	bool ElementBufferedRenderer::generateVertexArrayObject() {
-		if (vbo.getHandle() != 0)
-			vao.init(vbo, {2, 2, 2, 2, 2, 2, 1});
+		if (vbo.getHandle() != 0) {
+			static_assert(LAYER_COUNT == 8);
+			vao.init(vbo, {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1});
+		}
 
 		return vao.getHandle() != 0;
 	}

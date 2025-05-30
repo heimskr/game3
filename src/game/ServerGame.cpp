@@ -590,7 +590,7 @@ namespace Game3 {
 				return {true, ss.str()};
 			}
 
-			if (first == "submerge" || first == "terrain" || first == "objects" || first == "obj") {
+			if (isAny(first, "submerge", "bedrock", "soil", "veg", "vegetation", "flooring", "snow", "objects", "obj")) {
 				if (words.size() != 2) {
 					return {false, "Invalid number of arguments."};
 				}
@@ -599,8 +599,16 @@ namespace Game3 {
 				Layer layer = Layer::Objects;
 				if (first == "submerge") {
 					layer = Layer::Submerged;
-				} else if (first == "terrain") {
-					layer = Layer::Terrain;
+				} else if (first == "bedrock") {
+					layer = Layer::Bedrock;
+				} else if (first == "soil") {
+					layer = Layer::Soil;
+				} else if (first == "veg" || first == "vegetation") {
+					layer = Layer::Vegetation;
+				} else if (first == "floor" || first == "flooring") {
+					layer = Layer::Flooring;
+				} else if (first == "snow") {
+					layer = Layer::Snow;
 				}
 				player->getRealm()->setTile(layer, player->getPosition(), identifier);
 				return {true, ""};

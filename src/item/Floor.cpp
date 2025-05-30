@@ -6,18 +6,18 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	Floor::Floor(ItemID identifier_, std::string name_, Identifier tilename_, MoneyCount base_price, ItemCount max_count):
-		Item(std::move(identifier_), std::move(name_), base_price, max_count),
-		tilename(std::move(tilename_)) {}
+	Floor::Floor(ItemID identifier, std::string name, Identifier tilename, MoneyCount basePrice, ItemCount maxCount):
+		Item(std::move(identifier), std::move(name), basePrice, maxCount),
+		tilename(std::move(tilename)) {}
 
 	bool Floor::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		auto &realm = *place.realm;
-		const auto &tileset = realm.getTileset();
+		Realm &realm = *place.realm;
+		const Tileset &tileset = realm.getTileset();
 
-		if (place.get(Layer::Terrain) == tileset.getEmptyID()) {
-			place.set(Layer::Terrain, tilename);
+		if (place.get(Layer::Flooring) == tileset.getEmptyID()) {
+			place.set(Layer::Flooring, tilename);
 			InventoryPtr inventory = place.player->getInventory(0);
-			assert(inventory);
+			assert(inventory != nullptr);
 			inventory->decrease(stack, slot, 1, true);
 			return true;
 		}

@@ -247,8 +247,8 @@ namespace Game3 {
 	}
 
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {
-		static std::unordered_set<Layer> main_layers{Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
-		return main_layers;
+		static std::unordered_set<Layer> visible_layers{mainLayers.begin(), mainLayers.end()};
+		return visible_layers;
 	}
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {
