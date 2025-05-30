@@ -11,7 +11,7 @@ typedef struct tagTHREADNAME_INFO {
 	DWORD dwFlags; // Reserved for future use, must be zero.
 } THREADNAME_INFO;
 #pragma pack(pop)
-void SetThreadName(DWORD dwThreadID, const char* threadName) {
+void SetThreadName(DWORD dwThreadID, const char *threadName) {
 	THREADNAME_INFO info;
 	info.dwType = 0x1000;
 	info.szName = threadName;
