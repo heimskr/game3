@@ -135,7 +135,7 @@ namespace Game3 {
 			ss << '/';
 		}
 
-		std::string combined = ss.str();
+		std::string combined = std::move(ss).str();
 		if (!combined.empty() && combined.back() == '/') {
 			combined.pop_back();
 		}

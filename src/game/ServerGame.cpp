@@ -587,7 +587,7 @@ namespace Game3 {
 				} else {
 					ss << "Player isn't moving. Offset: " << player->offset.x << ", " << player->offset.y << ", " << player->offset.z;
 				}
-				return {true, ss.str()};
+				return {true, std::move(ss).str()};
 			}
 
 			if (isAny(first, "submerge", "bedrock", "soil", "veg", "vegetation", "flooring", "snow", "objects", "obj")) {

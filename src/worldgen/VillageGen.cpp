@@ -115,7 +115,6 @@ namespace Game3 {
 		constexpr static size_t GUESS_FACTOR = 16;
 
 		const TileProvider &provider = realm.tileProvider;
-		const Tileset &tileset = realm.getTileset();
 
 		Timer timer{"VillageCandidates"};
 

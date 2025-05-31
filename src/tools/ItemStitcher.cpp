@@ -176,7 +176,7 @@ namespace Game3 {
 				ss << std::string_view(reinterpret_cast<const char *>(data), size);
 			}, &ss, dimension, dimension, 4, raw.get(), dimension * 4);
 
-			*png_out = ss.str();
+			*png_out = std::move(ss).str();
 		}
 
 		texture->init(std::move(raw), dimension, dimension);

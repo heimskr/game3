@@ -48,9 +48,19 @@ namespace Game3 {
 			}
 		};
 
-		for (int index = 0; index < 47; ++index) {
-			copy_tile(index, index);
-		}
+		int to_index = 0;
+
+		auto copy_tiles = [&](int start, int count) {
+			for (int i = 0; i < count; ++i) {
+				copy_tile(start + i, to_index++);
+			}
+		};
+
+		// This is the layout of the non-transparent tiles in what Tilesetter produces for Blob tiling.
+		copy_tiles(0, 10);
+		copy_tiles(11, 10);
+		copy_tiles(22, 22);
+		copy_tiles(48, 5);
 
 		return destination.toPNG();
 	}

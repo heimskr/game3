@@ -30,6 +30,11 @@
 namespace Game3 {
 	extern std::default_random_engine utilRNG;
 
+	template <typename... Ts>
+	void zeroOut(Ts &...things) {
+		((things = 0), ...);
+	}
+
 	template <typename T, typename... Us>
 	bool isAny(T &&thing, Us &&...possibilities) {
 		return (... || (std::forward<T>(thing) == std::forward<Us>(possibilities)));
@@ -54,7 +59,7 @@ namespace Game3 {
 				ss << delimiter;
 			ss << item;
 		}
-		return ss.str();
+		return std::move(ss).str();
 	}
 
 	template <typename S, typename T>
@@ -96,7 +101,7 @@ namespace Game3 {
 			else
 				ss << static_cast<std::make_unsigned_t<decltype(item)>>(item);
 		}
-		return ss.str();
+		return std::move(ss).str();
 	}
 
 	template <typename T>

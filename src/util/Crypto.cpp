@@ -153,6 +153,6 @@ namespace Game3 {
 		for (size_t i = 0; i < count; ++i) {
 			ss << std::hex << prng();
 		}
-		return ss.str();
+		return std::move(ss).str();
 	}
 }

@@ -29,10 +29,15 @@ namespace Game3 {
 		/** The set of possible neighbors. */
 		std::shared_ptr<AutotileSet> autotileSet;
 		bool tall = false;
+		/** Whether it's for 8-way autotiling instead of 4-way. */
+		bool eight = false;
 
 		MarchableInfo() = default;
-		MarchableInfo(Identifier start_, std::shared_ptr<AutotileSet> autotile_set, bool tall_):
-			start(std::move(start_)), autotileSet(std::move(autotile_set)), tall(tall_) {}
+		MarchableInfo(Identifier start, std::shared_ptr<AutotileSet> autotileSet, bool tall, bool eight):
+			start(std::move(start)),
+			autotileSet(std::move(autotileSet)),
+			tall(tall),
+			eight(eight) {}
 	};
 
 	class Tileset: public NamedRegisterable {
@@ -132,7 +137,8 @@ namespace Game3 {
 
 			void setAutotile(const Identifier &tilename, const Identifier &autotile_name);
 
-		friend Tileset tileStitcher(const std::filesystem::path &, Identifier, Side, std::string *);
+		friend Tileset tileStitcher1(const std::filesystem::path &, Identifier, Side, std::string *);
+		friend Tileset tileStitcher2(const std::filesystem::path &, Identifier, Side, std::string *);
 	};
 
 	using TilesetPtr = std::shared_ptr<Tileset>;
