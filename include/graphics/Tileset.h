@@ -137,8 +137,7 @@ namespace Game3 {
 
 			void setAutotile(const Identifier &tilename, const Identifier &autotile_name);
 
-		friend Tileset tileStitcher1(const std::filesystem::path &, Identifier, Side, std::string *);
-		friend Tileset tileStitcher2(const std::filesystem::path &, Identifier, Side, std::string *);
+		friend Tileset tileStitcher(const std::filesystem::path &, Identifier, Side, std::string *);
 	};
 
 	using TilesetPtr = std::shared_ptr<Tileset>;
