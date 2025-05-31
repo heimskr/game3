@@ -238,6 +238,8 @@ namespace Game3 {
 		};
 
 		auto place_48 = [&](const std::string &name) {
+			assert(x_index % 64 == 0);
+
 			// The 48-autotiles are arranged in source textures of 8 tiles by 8 tiles. The last two rows of 8 tiles are unused.
 			constexpr size_t row_tiles = 8;
 			hasher += json_map.at(name);
@@ -261,6 +263,8 @@ namespace Game3 {
 		};
 
 		auto place_32 = [&](const std::string &name) {
+			assert(x_index % 32 == 0);
+
 			hasher += json_map.at(name);
 			const auto &source = images.at(name);
 
@@ -270,9 +274,9 @@ namespace Game3 {
 					for (size_t y = 0; y < tilesize; ++y) {
 						for (size_t x = 0; x < tilesize; ++x) {
 							const size_t source_x = tilesize * column + x;
-							const size_t destination_y = y + y_index;
+							const size_t destination_y = y + y_pixels;
 							size_t source_y = tilesize * (2 * row) + y;
-							size_t destination_x = (8 * row + 2 * column + 1) * tilesize + x + x_index;
+							size_t destination_x = (8 * row + 2 * column + 1) * tilesize + x + x_pixels;
 							std::memcpy(&raw[4 * (destination_x + destination_y * dimension)], &source[4 * (source_x + 4 * tilesize * source_y)], 4 * sizeof(uint8_t));
 							source_y += tilesize;
 							destination_x -= tilesize;
@@ -295,6 +299,8 @@ namespace Game3 {
 		};
 
 		auto place_16 = [&](const std::string &name) {
+			assert(x_index % 16 == 0);
+
 			hasher += json_map.at(name);
 			const auto &source = images.at(name);
 
