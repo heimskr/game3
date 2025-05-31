@@ -123,7 +123,7 @@ namespace Game3 {
 			int desired_dimension = 16;
 
 			if (auto autotile_iter = out.autotileSetMap.find(tilename); autotile_iter != out.autotileSetMap.end()) {
-				if (width == 16 * 11 && height == 16 * 5) {
+				if (width == tilesize * 8 && height == tilesize * 8) {
 					autotile48.insert(name);
 					out.marchableMap[tilename] = MarchableInfo{tilename, autotile_iter->second, false, true};
 					desired_dimension = -1;
@@ -251,12 +251,13 @@ namespace Game3 {
 				out.names[tile_index + tile_offset] = tilename;
 			}
 
+			assert(dimension - x_pixels >= 48 * tilesize);
+
 			for (size_t i = 0; i < 48; i += row_tiles) {
-				assert(dimension - x_pixels >= 48 * tilesize);
 				size_t source_x = tilesize * (i % row_tiles);
 				for (size_t row = 0; row < tilesize; ++row) {
 					size_t source_y = tilesize * (i / row_tiles) + row;
-					std::memmove(&raw[4 * (x_pixels + y_pixels * dimension)], &source[4 * (source_x + source_y * row_tiles * tilesize)], 4 * row_tiles * tilesize * sizeof(uint8_t));
+					std::memmove(&raw[4 * (x_pixels + (y_pixels + row) * dimension)], &source[4 * (source_x + source_y * row_tiles * tilesize)], 4 * row_tiles * tilesize * sizeof(uint8_t));
 				}
 				next(row_tiles);
 			}

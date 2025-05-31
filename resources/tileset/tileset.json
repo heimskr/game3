@@ -19,7 +19,8 @@
 		"base:autotile/dining_tables":     "base:tile/dining_table",
 		"base:autotile/fences":            "base:tile/fence",
 		"base:autotile/carpets":           "base:category/autotiled_carpets",
-		"base:autotile/tall_wooden_walls": "base:tile/tall_wooden_wall"
+		"base:autotile/tall_wooden_walls": "base:tile/tall_wooden_wall",
+		"base:autotile/grass":             "base:tile/grass"
 	},
 	"omnitiles": [
 		"base:autotile/fences"
