@@ -205,8 +205,10 @@ namespace Game3::WorldGen {
 					threadContext = {uint_fast32_t(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
 					for (Index row = row_min; row < row_max; ++row) {
 						for (Index column = col_min; column < col_max; ++column) {
-							realm->autotile({row, column}, Layer::Bedrock);
-							realm->autotile({row, column}, Layer::Soil);
+							Position position{row, column};
+							for (Layer layer: terrainLayers) {
+								realm->autotile(position, layer);
+							}
 							get_biome(row, column).postgen(row, column, threadContext.rng, noisegen, params);
 						}
 					}
