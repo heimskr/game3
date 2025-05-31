@@ -1851,6 +1851,7 @@ namespace Game3 {
 			TileID march_result{};
 
 			if (info->autotileSet->omni) {
+				assert(!info->eight);
 				const TileID empty = tileset.getEmptyID();
 				march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 					const Position march_position = position + Position(march_row_offset, march_column_offset);
@@ -1863,7 +1864,8 @@ namespace Game3 {
 					return false;
 				});
 			} else {
-				march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+				const auto &march = info->eight? march8 : march4;
+				march_result = march([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 					const Position march_position = position + Position(march_row_offset, march_column_offset);
 					const TileID march_tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
 					return members.contains(tileset[march_tile]);
