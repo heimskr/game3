@@ -45,8 +45,8 @@ namespace Game3 {
 			}
 
 			if (options.affectsTileEntities) {
-				if (TileEntityPtr tile = realm.tileEntityAt(position); tile && tile->kill()) {
-					tile->destroy();
+				if (TileEntityPtr tile_entity = realm.tileEntityAt(position); tile_entity && tile_entity->kill()) {
+					tile_entity->destroy();
 				}
 			}
 		});
