@@ -95,6 +95,8 @@ namespace Game3 {
 			realm.setTile(Layer::Vegetation, position, light_grass, false);
 		} else if (stoneLevel < suggested_noise) {
 			// Do nothing; there's stone on the bedrock layer already.
+		} else if (stoneLevel< suggested_noise + 0.1) {
+			realm.setTile(Layer::Soil, position, dirt, false);
 		} else {
 			realm.setTile(Layer::Soil, position, dirt, false);
 			realm.setTile(Layer::Vegetation, position, choose(grasses, rng), false);
