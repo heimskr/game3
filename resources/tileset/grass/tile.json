@@ -1,1 +1,1 @@
-{"autotile":true,"categories":["base:category/tillable","base:category/spreads_on_dirt","base:category/plant_soil","base:category/grass","base:category/flower_spawners","base:category/dirt"],"land":true,"solid":false,"tilename":"base:tile/grass"}
+{"autotile":true,"categories":["base:category/autotiled_grass","base:category/tillable","base:category/spreads_on_dirt","base:category/plant_soil","base:category/grass","base:category/flower_spawners","base:category/dirt"],"land":true,"solid":false,"tilename":"base:tile/grass"}

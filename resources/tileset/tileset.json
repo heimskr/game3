@@ -20,7 +20,8 @@
 		"base:autotile/fences":            "base:tile/fence",
 		"base:autotile/carpets":           "base:category/autotiled_carpets",
 		"base:autotile/tall_wooden_walls": "base:tile/tall_wooden_wall",
-		"base:autotile/grass":             "base:tile/grass"
+		"base:autotile/grass":             "base:category/autotiled_grass",
+		"base:autotile/dirt":              "base:tile/dirt"
 	},
 	"omnitiles": [
 		"base:autotile/fences"

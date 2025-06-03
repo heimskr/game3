@@ -1847,7 +1847,6 @@ namespace Game3 {
 		const Identifier &tilename = tileset[tile];
 
 		if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
-			const std::unordered_set<Identifier> &members = info->autotileSet->members;
 			TileID march_result{};
 
 			if (info->autotileSet->omni) {
@@ -1864,6 +1863,7 @@ namespace Game3 {
 					return false;
 				});
 			} else {
+				const std::unordered_set<Identifier> &members = info->autotileSet->members;
 				const auto &march = info->eight? march8 : march4;
 				march_result = march([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 					const Position march_position = position + Position(march_row_offset, march_column_offset);

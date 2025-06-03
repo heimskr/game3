@@ -203,13 +203,17 @@ namespace Game3::WorldGen {
 				const Index col_max = col_min + CHUNK_SIZE;
 				pool.add([realm, &waiter, &get_biome, &noisegen, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {uint_fast32_t(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
-					for (Index row = row_min; row < row_max; ++row) {
-						for (Index column = col_min; column < col_max; ++column) {
+					for (Index row = row_min - 1; row <= row_max; ++row) {
+						for (Index column = col_min - 1; column <= col_max; ++column) {
 							Position position{row, column};
 							for (Layer layer: terrainLayers) {
 								realm->autotile(position, layer);
 							}
-							get_biome(row, column).postgen(row, column, threadContext.rng, noisegen, params);
+							if (row_min <= row && row < row_max) {
+								if (col_min <= column && column < col_max) {
+									get_biome(row, column).postgen(row, column, threadContext.rng, noisegen, params);
+								}
+							}
 						}
 					}
 					--waiter;

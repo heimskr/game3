@@ -1,1 +1,1 @@
-{"categories":["base:category/tillable","base:category/spreads_on_dirt","base:category/plant_soil"],"land":false,"solid":false,"tilename":"base:tile/forest_floor"}
+{"autotile":true,"categories":["base:category/autotiled_grass","base:category/tillable","base:category/spreads_on_dirt","base:category/plant_soil"],"land":true,"solid":false,"tilename":"base:tile/forest_floor"}

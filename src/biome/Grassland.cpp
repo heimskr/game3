@@ -91,7 +91,8 @@ namespace Game3 {
 		} else if (suggested_noise < wetness + 0.4) {
 			realm.setTile(Layer::Soil, position, sand, false);
 		} else if (suggested_noise < wetness + 0.5) {
-			realm.setTile(Layer::Soil, position, light_grass, false);
+			realm.setTile(Layer::Soil, position, sand, false);
+			realm.setTile(Layer::Vegetation, position, light_grass, false);
 		} else if (stoneLevel < suggested_noise) {
 			// Do nothing; there's stone on the bedrock layer already.
 		} else {
