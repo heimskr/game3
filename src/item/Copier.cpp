@@ -80,9 +80,9 @@ namespace Game3 {
 						if (!identifier_map.contains(identifier)) {
 							identifier_map[identifier] = identifier_map.size();
 							if (identifier.inSpace("base") && identifier.getPath() == "tile") {
-								identifiers.push_back(identifier.getPostPath());
+								identifiers.emplace_back(identifier.getPostPath());
 							} else {
-								identifiers.push_back(identifier.str());
+								identifiers.emplace_back(identifier);
 							}
 						}
 					}

@@ -3,28 +3,34 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
-	std::string Identifier::getPath() const {
+	std::string_view Identifier::getPath() const {
 		const size_t slash = name.find_last_of('/');
+
 		if (slash == std::string::npos) {
-			return "";
+			return {};
 		}
-		return name.substr(0, slash);
+
+		return std::string_view(name).substr(0, slash);
 	}
 
-	std::string Identifier::getPathStart() const {
+	std::string_view Identifier::getPathStart() const {
 		const size_t slash = name.find('/');
+
 		if (slash == std::string::npos) {
-			return "";
+			return {};
 		}
-		return name.substr(0, slash);
+
+		return std::string_view(name).substr(0, slash);
 	}
 
-	std::string Identifier::getPostPath() const {
+	std::string_view Identifier::getPostPath() const {
 		const size_t slash = name.find_last_of('/');
+
 		if (slash == std::string::npos) {
 			return name;
 		}
-		return name.substr(slash + 1);
+
+		return std::string_view(name).substr(slash + 1);
 	}
 
 	std::ostream & operator<<(std::ostream &os, const Identifier &identifier) {

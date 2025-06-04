@@ -82,7 +82,7 @@ namespace Game3 {
 						Identifier autotile_id{autotile};
 						Identifier member_id = JSON::value_to<Identifier>(member);
 
-						if (const std::string path_start = member_id.getPathStart(); path_start == "category") {
+						if (std::string_view path_start = member_id.getPathStart(); path_start == "category") {
 							for (const Identifier &tilename: out.getTilesByCategory(member_id)) {
 								out.setAutotile(tilename, autotile_id);
 							}
