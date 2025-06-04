@@ -4,10 +4,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <format>
+#include <string>
+#include <unordered_map>
 
 namespace Game3 {
 	/** Doesn't include the fluid layer between Submerged and Objects. */
 	enum class Layer: uint8_t {Invalid = 0, Bedrock, Soil, Vegetation, Flooring, Snow, Submerged, Objects, Highest};
+
+	const extern std::unordered_map<std::string, Layer> layerMap;
 
 	constexpr auto LAYER_COUNT = static_cast<size_t>(Layer::Highest);
 	constexpr std::array mainLayers     {Layer::Bedrock, Layer::Soil, Layer::Vegetation, Layer::Flooring, Layer::Snow, Layer::Submerged, Layer::Objects, Layer::Highest};
