@@ -296,8 +296,8 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--add-item" || arg1 == "--add-tile" || arg1 == "--add-sound") {
 			if (arg1 == "--add-tile") {
-				if (argc != 7) {
-					std::println("Usage: {} --add-tile <identifier> <credit> <image path> <land> <solid>", argv[0]);
+				if (argc != 6) {
+					std::println("Usage: {} --add-tile <identifier> <credit> <image path> <solid>", argv[0]);
 					return 1;
 				}
 			} else if (argc != 5) {
@@ -340,8 +340,7 @@ int main(int argc, char **argv) {
 					}
 				};
 
-				object["land"] = get_bool(argv[5]);
-				object["solid"] = get_bool(argv[6]);
+				object["solid"] = get_bool(argv[5]);
 			}
 			object[type == "tile"? "tilename" : "id"] = "base:" + type + "/" + id;
 			std::ofstream json(dir_path / (type +".json"));

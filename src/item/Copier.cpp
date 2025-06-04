@@ -41,8 +41,9 @@ namespace Game3 {
 
 		const std::set<Position> positions = getPositions<std::set>(*stack);
 
-		if (positions.empty())
+		if (positions.empty()) {
 			return {};
+		}
 
 		Tileset &tileset = realm->getTileset();
 		std::map<Position, size_t> spans;
