@@ -1,1 +1,1 @@
-{"autotile":true,"categories":["base:category/cave_walls"],"solid":true,"tilename":"base:tile/cave_copper"}
+{"autotiling":"base:autotile/cave_walls","categories":["base:category/cave_walls"],"solid":true,"tilename":"base:tile/cave_copper"}

@@ -1,1 +1,1 @@
-{"autotile":true,"categories":["base:category/cave_floors","base:category/tillable"],"solid":false,"tilename":"base:tile/cave_dirt"}
+{"autotiling":"base:autotile/cave_walls","categories":["base:category/cave_floors","base:category/tillable"],"solid":false,"tilename":"base:tile/cave_dirt"}
