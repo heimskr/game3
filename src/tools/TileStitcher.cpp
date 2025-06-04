@@ -140,10 +140,6 @@ namespace Game3 {
 				out.solid.insert(tilename);
 			}
 
-			if (json.at("land").as_bool()) {
-				out.land.insert(tilename);
-			}
-
 			if (channels != 3 && channels != 4) {
 				throw std::runtime_error("Invalid channel count for " + name + ": " + std::to_string(channels) + " (expected 3 or 4)");
 			}

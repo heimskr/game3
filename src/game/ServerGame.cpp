@@ -35,7 +35,7 @@
 #include <random>
 
 namespace Game3 {
-	ServerGame::ServerGame(const std::shared_ptr<Server> &server, std::size_t pool_size):
+	ServerGame::ServerGame(const std::shared_ptr<Server> &server, size_t pool_size):
 		weakServer(server),
 		pool(pool_size) {
 		pool.start();
@@ -91,13 +91,13 @@ namespace Game3 {
 			}
 		}
 
-		// const std::size_t max_jobs = realms.size() * 2;
+		// const size_t max_jobs = realms.size() * 2;
 
 		for (auto &[id, realm]: realms) {
 			// if (max_jobs <= pool.jobCount()) {
 			// 	break;
 			// }
-			// pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, std::size_t) {
+			// pool.add([weak_realm = std::weak_ptr(realm), delta = delta](ThreadPool &, size_t) {
 			// 	if (RealmPtr realm = weak_realm.lock()) {
 					realm->tick(delta);
 			// 	}
@@ -504,7 +504,7 @@ namespace Game3 {
 				}
 
 				std::string item_name(words.at(1));
-				const std::size_t colon = item_name.find(':');
+				const size_t colon = item_name.find(':');
 
 				if (colon == item_name.npos) {
 					item_name = "base:item/" + std::string(item_name);
@@ -638,9 +638,9 @@ namespace Game3 {
 				TileProvider &provider = player->getRealm()->tileProvider;
 				auto &path_chunk = provider.getPathChunk(player->getChunk());
 				auto lock = path_chunk.sharedLock();
-				std::size_t walkables = 0;
-				for (std::size_t y = 0; y < CHUNK_SIZE; ++y) {
-					for (std::size_t x = 0; x < CHUNK_SIZE; ++x) {
+				size_t walkables = 0;
+				for (size_t y = 0; y < CHUNK_SIZE; ++y) {
+					for (size_t x = 0; x < CHUNK_SIZE; ++x) {
 						const auto walkable = path_chunk[y * CHUNK_SIZE + x];
 						std::cerr << (walkable? "\u2588" : "\u2591");
 						walkables += walkable;

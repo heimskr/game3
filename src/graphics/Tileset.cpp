@@ -8,16 +8,8 @@ namespace Game3 {
 	Tileset::Tileset(Identifier identifier_):
 		NamedRegisterable(std::move(identifier_)) {}
 
-	bool Tileset::isLand(const Identifier &id) const {
-		return land.contains(id);
-	}
-
-	bool Tileset::isLand(TileID id) const {
-		return isLand(names.at(id));
-	}
-
 	bool Tileset::isWalkable(const Identifier &id) const {
-		return land.contains(id) || walkable.contains(id) || !solid.contains(id);
+		return !solid.contains(id);
 	}
 
 	bool Tileset::isWalkable(TileID id) const {

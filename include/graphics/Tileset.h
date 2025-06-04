@@ -42,8 +42,6 @@ namespace Game3 {
 
 	class Tileset: public NamedRegisterable {
 		public:
-			bool isLand(const Identifier &) const;
-			bool isLand(TileID) const;
 			bool isWalkable(const Identifier &) const;
 			bool isWalkable(TileID) const;
 			bool isSolid(const Identifier &) const;
@@ -78,8 +76,6 @@ namespace Game3 {
 
 			const auto & getIDs()          const { return ids;          }
 			const auto & getNames()        const { return names;        }
-			const auto & getLand()         const { return land;         }
-			const auto & getWalkable()     const { return walkable;     }
 			const auto & getSolid()        const { return solid;        }
 			const auto & getMarchable()    const { return marchableMap; }
 			const auto & getHash()         const { return hash;         }
@@ -109,8 +105,6 @@ namespace Game3 {
 
 			std::shared_ptr<Texture> cachedTexture;
 			// TODO: consider making the sets store TileIDs instead, for performance perhaps
-			std::unordered_set<Identifier> land;
-			std::unordered_set<Identifier> walkable;
 			std::unordered_set<Identifier> solid;
 			std::unordered_set<Identifier> bright;
 			std::unordered_set<Identifier> marchable;
