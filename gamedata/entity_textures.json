@@ -33,6 +33,7 @@
 		"base:entity/quarter":            ["base:texture/quarter",     0],
 		"base:entity/voidbug":            ["base:texture/voidbug",     3],
 		"base:entity/goneblanc":          ["base:texture/goneblanc",   1],
-		"base:entity/explosion_particle": ["base:texture/explosion",   0]
+		"base:entity/explosion_particle": ["base:texture/explosion",   0],
+		"base:entity/otter":              ["base:texture/otter",       3]
 	}]]
 }
