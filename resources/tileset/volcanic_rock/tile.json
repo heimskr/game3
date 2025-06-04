@@ -1,1 +1,1 @@
-{"categories":["base:category/orespawns"],"land":true,"solid":false,"tilename":"base:tile/volcanic_rock"}
+{"autotile":true,"categories":["base:category/autotiled_stone","base:category/orespawns"],"land":true,"solid":false,"tilename":"base:tile/volcanic_rock"}

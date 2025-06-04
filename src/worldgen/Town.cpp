@@ -82,7 +82,7 @@ namespace Game3::WorldGen {
 			for (column = position.column + 1; column < position.column + width - 1; ++column) {
 				buildable_set.insert({row, column});
 				set_vegetation(0);
-				set_soil("base:tile/town_dirt", true);
+				set_soil("base:tile/dirt", true);
 			}
 		}
 

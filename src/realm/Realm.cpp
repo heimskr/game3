@@ -1266,9 +1266,8 @@ namespace Game3 {
 	bool Realm::middleEmpty(const Position &position) const {
 		const auto submerged = tryTile(Layer::Submerged, position);
 		const auto object = tryTile(Layer::Objects, position);
-		const auto empty = getTileset().getEmptyID();
 		assert(submerged.has_value() == object.has_value());
-		return (!submerged && !object) || (submerged && *submerged == empty && *object == empty);
+		return (!submerged && !object) || (submerged == 0 && object == 0);
 	}
 
 	std::optional<TileID> Realm::tryTile(Layer layer, const Position &position) const {
