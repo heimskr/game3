@@ -413,6 +413,9 @@ namespace Game3 {
 		if (offset_x != 0. || offset_y != 0.) {
 			// Choose an animation frame based on the time.
 			switch (variety) {
+				case 4:
+					texture_x_offset = 8. * (1 + ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 2));
+					break;
 				case 3:
 					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
 					break;
@@ -424,6 +427,7 @@ namespace Game3 {
 		switch (variety) {
 			case 1:
 			case 3:
+			case 4:
 				texture_y_offset = 8. * (int(direction.load()) - 1);
 				break;
 			case 2:
