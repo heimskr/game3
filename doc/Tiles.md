@@ -31,7 +31,11 @@ It contains an object with these fields:
 - `credit`: a string crediting the artist of the texture data.
 - `solid`: a boolean indicating whether the tile should prevent entities from moving to its position.
 - `categories`: a list of identifier strings of all the categories that apply to the tile.
-- `autotile`: a boolean indicating whether the tile participates in autotiling. This is false by default.
-  It should be `true` if the tile isn't a single tile or tall single tile.
 - `land`: a vestigial boolean indicating whether the tile is a "land" tile.
   This categorization is no longer useful, so it's not required anymore.
+- `autotiling`: contains the data the engine needs to determine which kinds of neighbors count for autotiling purposes.
+  Not present for non-autotiled tiles. It's a map of layer names to arrays of identifier strings. The identifiers can be
+  names of individual tiles or names of tile categories. Alternatively, the `autotiling` field can contain an identifier
+  string of the form `<space>:autotile/<name>`, where `<space>` is `base` for vanilla assets or something else for mod assets.
+  The identifier serves as a key to an entry in `tileset.json`'s `autotiles` map, which maps `*:autotile/*` keys to
+  autotiling data (namely, the map of layer names to identifier arrays).
