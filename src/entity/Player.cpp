@@ -422,6 +422,30 @@ namespace Game3 {
 		firing = value;
 	}
 
+	Direction Player::getSecondaryDirection() const {
+		using enum Direction;
+
+		if (movingUp) {
+			if (movingLeft) {
+				return direction == Up? Left : Up;
+			}
+
+			if (movingRight) {
+				return direction == Up? Right : Up;
+			}
+		} else if (movingDown) {
+			if (movingLeft) {
+				return direction == Down? Left : Down;
+			}
+
+			if (movingRight) {
+				return direction == Down? Right : Down;
+			}
+		}
+
+		return Invalid;
+	}
+
 	void Player::resetEphemeral() {
 		stopMoving();
 		continuousInteraction = false;

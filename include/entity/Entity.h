@@ -198,6 +198,8 @@ namespace Game3 {
 			std::pair<std::unique_lock<DefaultMutex>, std::unique_lock<DefaultMutex>> getVisibleEntitiesLocks();
 			virtual bool shouldBroadcastDestruction() const;
 			virtual void applyMotion(float delta);
+			/** For players, this will return a valid direction if the player is moving diagonally. In any other case, it returns Direction::Invalid. */
+			virtual Direction getSecondaryDirection() const;
 
 			virtual void jump();
 			void clearOffset();

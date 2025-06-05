@@ -37,7 +37,8 @@
 			"base:texture/voidbug":     ["resources/animals/voidbug.png"],
 			"base:texture/goneblanc":   ["resources/characters/goneblanc.png"],
 			"base:texture/explosion":   ["resources/explosion.png"],
-			"base:texture/otter":       ["resources/animals/otter.png"]
+			"base:texture/otter":       ["resources/animals/otter.png"],
+			"base:texture/gurt":        ["resources/characters/gurt.png"]
 		}]
 	]
 }

@@ -360,6 +360,13 @@ int main(int argc, char **argv) {
 			std::cout << std::string_view(reinterpret_cast<const char *>(raw_out.data()), raw_out.size());
 			return 0;
 		}
+
+		if (arg1 == "--reshape-e2" && argc == 3) {
+			std::string raw_in = readFile(argv[2]);
+			std::vector<uint8_t> raw_out = reshapeEntityVariant2(raw_in);
+			std::cout << std::string_view(reinterpret_cast<const char *>(raw_out.data()), raw_out.size());
+			return 0;
+		}
 	}
 
 	richPresence.init();

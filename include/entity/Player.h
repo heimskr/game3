@@ -93,6 +93,7 @@ namespace Game3 {
 			void setKnownItems(std::set<Identifier>);
 			bool hasKnownItem(const Identifier &) const;
 			virtual void setFiring(bool);
+			Direction getSecondaryDirection() const override;
 
 			inline std::string getUsername() const { return username.copyBase(); }
 			inline const auto & getKnownItems() const { return knownItems; }
