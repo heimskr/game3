@@ -1,5 +1,6 @@
 #pragma once
 
+#include "client/ClientSettings.h"
 #include "game/Game.h"
 #include "graphics/Omniatlas.h"
 #include "math/Rectangle.h"
@@ -18,13 +19,13 @@
 #include <thread>
 
 namespace Game3 {
-	class Window;
 	class HasEnergy;
 	class HasFluids;
 	class HasInventory;
 	class LocalClient;
 	class Packet;
 	class UIContext;
+	class Window;
 
 	class ClientGame: public Game {
 		public:
@@ -97,6 +98,7 @@ namespace Game3 {
 			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
 
 			std::shared_ptr<Window> getWindow() const;
+			Lockable<ClientSettings> & getSettings() const;
 
 			bool isConnectedLocally() const;
 

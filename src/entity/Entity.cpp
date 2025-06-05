@@ -420,7 +420,7 @@ namespace Game3 {
 					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
 					break;
 				case 2:
-					texture_x_offset = 8. * (1 + (std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 4);
+					texture_x_offset = 8. * (1 + (std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
 					break;
 				default:
 					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 5);

@@ -21,7 +21,8 @@
 
 namespace Game3 {
 	Player::Player():
-		Entity(ID()), LivingEntity() {}
+		Entity(ID()),
+		LivingTitledEntity() {}
 
 	Player::~Player() {
 		if (spawning) {
@@ -444,6 +445,10 @@ namespace Game3 {
 		}
 
 		return Invalid;
+	}
+
+	UString Player::getDisplayName() {
+		return displayName;
 	}
 
 	void Player::resetEphemeral() {

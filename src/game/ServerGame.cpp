@@ -947,7 +947,7 @@ namespace Game3 {
 				return {true, ""};
 			}
 
-			if (first == "infinifluid") {
+			if (first == "infinifluid" || first == "inff") {
 				if (words.size() != 2) {
 					return {false, "Incorrect parameter count."};
 				}

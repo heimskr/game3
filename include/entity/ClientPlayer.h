@@ -13,8 +13,6 @@ namespace Game3 {
 
 	class ClientPlayer: public Player {
 		private:
-			Lockable<std::string> lastMessage;
-			Atomic<Tick> lastMessageAge = std::numeric_limits<Tick>::max();
 			std::optional<ItemFilter> copiedItemFilter;
 
 			ClientPlayer();
