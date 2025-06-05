@@ -8,7 +8,8 @@ namespace Game3 {
 		stbi_write_png_to_func(+[](void *context, void *data, int size) {
 			auto &out = *reinterpret_cast<std::vector<uint8_t> *>(context);
 			auto *chars = reinterpret_cast<const uint8_t *>(data);
-			out.append_range(std::span(chars, size));
+			std::span span(chars, size);
+			out.insert(out.end(), span.begin(), span.end());
 		}, &out, width, height, channels, pixels.data(), width * channels);
 
 		return out;
