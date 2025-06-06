@@ -98,22 +98,13 @@ namespace Game3 {
 			return;
 		}
 
-		TextRenderer &text = renderers.text;
-
-		const auto [row, column] = getPosition();
-		const auto [x, y, z] = offset.copyBase();
-
-		GamePtr game = getGame();
-		const bool show_message = lastMessageAge.load() < getMaxMessageAge(game->toClient());
-		const float health_offset = canShowHealthBar()? -.5 : 0;
-		const float name_offset = health_offset + (show_message? -1 : 0);
-
 		LivingTitledEntity::render(renderers);
+
+		ClientGamePtr client_game = getGame()->toClientPointer();
 
 #if 0
 		constexpr double thickness = 5 / 16.;
 		constexpr double shrink = 16 / 16.;
-		ClientGamePtr client_game = game->toClientPointer();
 		const auto [mouse_x, mouse_y] = client_game->getWindow()->getMouseCoordinates<double>();
 		double x_offset{}, y_offset{};
 		Position mouse_position = client_game->translateCanvasCoordinates(mouse_x, mouse_y, &x_offset, &y_offset);
@@ -140,8 +131,6 @@ namespace Game3 {
 			.angle = degrees,
 		});
 #endif
-
-		ClientGamePtr client_game = getGame()->toClientPointer();
 
 		if (client_game->getPlayer().get() == this) {
 			if (InventoryPtr inventory = getInventory(0)) {
