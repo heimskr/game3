@@ -3,3 +3,4 @@ option('vcpkg_triplet', type: 'string', value: '', description: 'The vcpkg tripl
 option('discord_rich_presence', type: 'boolean', value: false, description: 'Whether to enable Discord rich presence support')
 option('enable_scripting', type: 'boolean', value: false, description: 'Whether scripting support is enabled (requires V8)')
 option('enable_zip8', type: 'boolean', value: false, description: 'Whether to enable Zip8 support')
+option('external_fastnoise2', type: 'boolean', value: false, description: 'Whether to assume FastNoise2 is already built')

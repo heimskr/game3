@@ -79,17 +79,19 @@ if build_machine.system() == 'linux'
 	link_args += '-lX11'
 endif
 
+if get_option('external_fastnoise2')
+	link_args += '../subprojects/FastNoise2/build/Release/lib/libFastNoise.a'
+else
+	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
+endif
+
 if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
 elif build_machine.system() == 'linux'
-	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 	link_args += '-lnoise'
-elif build_machine.system() == 'darwin'
-	link_args += '../subprojects/FastNoise2/build/src/libFastNoise.a'
 elif build_machine.system() == 'windows'
-	link_args += '../subprojects/FastNoise2/build2/lib/libFastNoise.a'
 	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
 	link_args += '-lws2_32'
 	link_args += '-lopengl32'
