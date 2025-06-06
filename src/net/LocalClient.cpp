@@ -62,23 +62,32 @@ namespace Game3 {
 		asio::ip::tcp::resolver resolver(io_context);
 
 		asio::ip::basic_resolver_results<asio::ip::tcp> resolved = resolver.resolve(hostname, "");
-		if (resolved.size() != 1)
+
+		if (resolved.size() != 1) {
 			throw std::runtime_error(std::format("Too {} resolution results: {}", resolved.empty()? "few" : "many", resolved.size()));
+		}
+
 		lastHostname = hostname;
 		auto endpoint = resolved.begin()->endpoint();
 		endpoint.port(port);
 
 		asio::post(strand, [this, endpoint, shared = shared_from_this()] {
 			sslSock.lowest_layer().async_connect(endpoint, asio::bind_executor(strand, [this, shared](const asio::error_code &errc) {
-				if (reportError(errc))
+				if (reportError(errc)) {
 					return;
+				}
 
 				sslSock.async_handshake(asio::ssl::stream_base::client, [this](const asio::error_code &errc) {
-					if (reportError(errc))
+					if (reportError(errc)) {
 						return;
+					}
+
 					sslReady = true;
-					for (const std::function<void()> &action: connectionActions.steal())
+
+					for (std::function<void()> &action: connectionActions.steal()) {
 						action();
+					}
+
 					doRead();
 				});
 			}));
@@ -86,11 +95,6 @@ namespace Game3 {
 
 		sslThread = std::thread([weak = weak_from_this()] {
 			threadContext.rename("ClientSSL");
-#ifdef __APPLE__
-			pthread_setname_np("LocalClient ioContext");
-#elif defined(__linux__)
-			pthread_setname_np(pthread_self(), "LocalClient ioContext");
-#endif
 			if (LocalClientPtr client = weak.lock()) {
 				client->ioContext.run();
 				--client->sslWaiter;
@@ -104,9 +108,11 @@ namespace Game3 {
 	}
 
 	void LocalClient::read() {
-		if (buffer.context.expired())
-			if (ClientGamePtr game = getGame())
+		if (buffer.context.expired()) {
+			if (ClientGamePtr game = getGame()) {
 				buffer.context = game;
+			}
+		}
 
 #ifndef USE_TLS
 		assert(!reading.exchange(true));
@@ -156,8 +162,9 @@ namespace Game3 {
 	std::optional<Token> LocalClient::getToken(const std::string &hostname, const std::string &username) const {
 		if (auto hostname_iter = tokenDatabase.find(hostname); hostname_iter != tokenDatabase.end()) {
 			const auto &users = hostname_iter->second;
-			if (auto username_iter = users.find(username); username_iter != users.end())
+			if (auto username_iter = users.find(username); username_iter != users.end()) {
 				return username_iter->second;
+			}
 		}
 		return std::nullopt;
 	}
@@ -188,12 +195,14 @@ namespace Game3 {
 
 	const std::string & LocalClient::getHostname() const {
 #ifdef USE_TLS
-		if (!isConnected())
+		if (!isConnected()) {
 			throw std::runtime_error("Client not connected");
+		}
 		return lastHostname;
 #else
-		if (!sock)
+		if (!sock) {
 			throw std::runtime_error("Client not connected");
+		}
 		return sock->hostname;
 #endif
 	}
@@ -203,10 +212,11 @@ namespace Game3 {
 		(void) new_value;
 #else
 		assert(sock);
-		if (new_value)
+		if (new_value) {
 			sock->startBuffering();
-		else
+		} else {
 			sock->stopBuffering();
+		}
 #endif
 	}
 
@@ -252,8 +262,9 @@ namespace Game3 {
 
 	bool LocalClient::reportError(const asio::error_code &errc) {
 		if (errc) {
-			if (onError)
+			if (onError) {
 				onError(errc);
+			}
 			return true;
 		}
 
@@ -267,8 +278,9 @@ namespace Game3 {
 		{
 			auto lock = outbox.uniqueLock();
 			outbox.emplace_back(reinterpret_cast<const char *>(data), size);
-			if (1 < outbox.size())
+			if (1 < outbox.size()) {
 				return;
+			}
 		}
 		write();
 #else
@@ -282,8 +294,9 @@ namespace Game3 {
 		{
 			auto lock = outbox.uniqueLock();
 			outbox.emplace_back(std::move(message));
-			if (1 < outbox.size())
+			if (1 < outbox.size()) {
 				return;
+			}
 		}
 		write();
 #else
@@ -361,40 +374,48 @@ namespace Game3 {
 
 					headerBytes.erase(headerBytes.begin(), headerBytes.begin() + HEADER_SIZE);
 					state = State::Data;
-				} else
+				} else {
 					break;
+				}
 			}
 
 			if (state == State::Data) {
-				if (headerBytes.empty())
+				if (headerBytes.empty()) {
 					break;
+				}
 
-				if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size())
+				if (MAX_PACKET_SIZE < buffer.size() + headerBytes.size()) {
 					throw PacketError("Packet too large");
+				}
 
 				const size_t to_append = std::min(payloadSize - buffer.size(), headerBytes.size());
 
 				buffer.append(headerBytes.begin(), headerBytes.begin() + to_append);
 				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
 
-				if (payloadSize < buffer.size())
-					throw std::logic_error("Buffer grew too large");
+				if (payloadSize < buffer.size()) {
+					throw PacketError("Buffer grew too large");
+				}
 
 				if (payloadSize == buffer.size()) {
 					ClientGamePtr game = getGame();
-					std::shared_ptr<Packet> packet = (*game->registry<PacketFactoryRegistry>().at(packetType))();
+					auto factory = game->registry<PacketFactoryRegistry>().at(packetType);
+					if (!factory) {
+						throw PacketError("Unknown packet type: " + std::to_string(packetType));
+					}
+
+					std::shared_ptr<Packet> packet = (*factory)();
 					packet->decode(*game, buffer);
 
 					if (!buffer.empty()) {
 						INFO("Bytes left in buffer: {} / {}", buffer.bytes.size() - buffer.skip, buffer.bytes.size());
-						assert(buffer.empty());
+						throw PacketError("Bytes left in buffer");
 					}
 
-					buffer.clear();
-
 					// In case a packet like TileEntityPacket moves the buffer.
-					if (buffer.context.expired())
+					if (buffer.context.expired()) {
 						buffer.context = game;
+					}
 
 					state = State::Begin;
 					{

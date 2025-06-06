@@ -405,6 +405,14 @@ namespace Game3 {
 				return at(number);
 			}
 
+			inline std::shared_ptr<T> maybe(NumericRegisterable::Type number) const {
+				if (auto iter = items.find(number); iter != items.end()) {
+					return iter->second;
+				}
+
+				return {};
+			}
+
 			inline std::shared_ptr<T> at(NumericRegisterable::Type number) const {
 				try {
 					return items.at(number);

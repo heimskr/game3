@@ -103,7 +103,14 @@ namespace Game3 {
 					receiveBuffer.context = server->game;
 				}
 
-				auto packet = (*server->game->registry<PacketFactoryRegistry>()[packetType])();
+				auto factory = server->game->registry<PacketFactoryRegistry>().maybe(packetType);
+				if (!factory) {
+					ERR("Unknown packet type: {}", packetType);
+					mock();
+					return;
+				}
+
+				auto packet = (*factory)();
 
 				try {
 					packet->decode(*server->game, receiveBuffer);
