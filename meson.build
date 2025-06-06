@@ -22,6 +22,10 @@ if build_machine.system() == 'windows'
 	project_cpp_args += '-D_POSIX_C_SOURCE'
 endif
 
+if get_option('time_trace')
+	project_cpp_args += '-ftime-trace'
+endif
+
 test_cpp_args = [
 	'-Wall',
 	'-Wextra',
