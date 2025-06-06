@@ -22,7 +22,7 @@ namespace Game3 {
 
 			GameDB &database = game->getDatabase();
 
-			if (game->hasPlayer(username)) {
+			if (!database.hasUsername(username)) {
 				client.send(make<LoginStatusPacket>("User doesn't exist."));
 				return;
 			}

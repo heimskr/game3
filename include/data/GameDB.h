@@ -76,6 +76,7 @@ namespace Game3 {
 			void writeUser(const std::string &username, const std::string &display_name, const Buffer &, const std::optional<Place> &release_place);
 			void writeUser(Player &);
 			void writeReleasePlace(const std::string &username, const std::optional<Place> &release_place);
+			bool hasUsername(const std::string &username);
 			bool hasName(const std::string &username, const std::string &display_name);
 			std::optional<Place> readReleasePlace(const std::string &username);
 

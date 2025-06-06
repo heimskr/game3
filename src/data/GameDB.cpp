@@ -634,7 +634,7 @@ namespace Game3 {
 			return true;
 		}
 
-		ERR("Couldn't read user: {}", query.getErrorMsg());
+		ERR("Couldn't read user \"{}\": {}", username, query.getErrorMsg());
 
 		return false;
 	}
@@ -685,6 +685,17 @@ namespace Game3 {
 
 		statement.exec();
 		transaction.commit();
+	}
+
+	bool GameDB::hasUsername(const std::string &username) {
+		assert(database);
+		auto db_lock = database.uniqueLock();
+
+		SQLite::Statement query{*database, "SELECT NULL FROM users WHERE username = ? LIMIT 1"};
+
+		query.bind(1, username);
+
+		return query.executeStep();
 	}
 
 	bool GameDB::hasName(const std::string &username, const std::string &display_name) {
