@@ -63,3 +63,6 @@ vgcore.*
 /worlds
 *.game3
 *.game3-journal
+/subprojects/packagecache
+/subprojects/sqlite-amalgamation-*
+/subprojects/sqlite3.wrap
