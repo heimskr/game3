@@ -412,18 +412,19 @@ namespace Game3 {
 		// Animate if the offset is nonzero.
 		if (offset_x != 0. || offset_y != 0.) {
 			// Choose an animation frame based on the time.
+			int64_t milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count();
 			switch (variety) {
 				case 4:
-					texture_x_offset = 8. * (1 + ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 2));
+					texture_x_offset = 8. * (1 + ((milliseconds / 200) % 2));
 					break;
 				case 3:
-					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
+					texture_x_offset = 8. * ((milliseconds / 200) % 4);
 					break;
 				case 2:
-					texture_x_offset = 8. * (1 + (std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
+					texture_x_offset = 8. * (1 + (milliseconds / 200) % 4);
 					break;
 				default:
-					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 5);
+					texture_x_offset = 8. * ((milliseconds / 100) % 5);
 			}
 		}
 
