@@ -8,16 +8,8 @@ namespace Game3 {
 	Tileset::Tileset(Identifier identifier_):
 		NamedRegisterable(std::move(identifier_)) {}
 
-	bool Tileset::isLand(const Identifier &id) const {
-		return land.contains(id);
-	}
-
-	bool Tileset::isLand(TileID id) const {
-		return isLand(names.at(id));
-	}
-
 	bool Tileset::isWalkable(const Identifier &id) const {
-		return land.contains(id) || walkable.contains(id) || !solid.contains(id);
+		return !solid.contains(id);
 	}
 
 	bool Tileset::isWalkable(TileID id) const {
@@ -37,8 +29,10 @@ namespace Game3 {
 	}
 
 	TileID Tileset::getEmptyID() const {
-		if (!emptyID)
+		if (!emptyID) {
 			emptyID = (*this)[empty];
+		}
+
 		return *emptyID;
 	}
 
@@ -51,13 +45,15 @@ namespace Game3 {
 	}
 
 	std::vector<TileID> Tileset::getBrightIDs() {
-		if (brightCache)
+		if (brightCache) {
 			return *brightCache;
+		}
 
 		std::vector<TileID> out;
 		out.reserve(bright.size());
-		for (const auto &tilename: bright)
+		for (const auto &tilename: bright) {
 			out.push_back(ids.at(tilename));
+		}
 		brightCache = out;
 		return out;
 	}
@@ -67,8 +63,10 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<Texture> Tileset::getTexture(const Game &game) {
-		if (cachedTexture)
+		if (cachedTexture) {
 			return cachedTexture;
+		}
+
 		return cachedTexture = game.registry<TextureRegistry>()[textureName];
 	}
 
@@ -92,11 +90,13 @@ namespace Game3 {
 	}
 
 	bool Tileset::isMarchable(TileID id) {
-		if (marchableCache.contains(id))
+		if (marchableCache.contains(id)) {
 			return true;
+		}
 
-		if (unmarchableCache.contains(id))
+		if (unmarchableCache.contains(id)) {
 			return false;
+		}
 
 		const auto &tilename = names.at(id);
 
@@ -121,8 +121,10 @@ namespace Game3 {
 	}
 
 	const MarchableInfo * Tileset::getMarchableInfo(const Identifier &tilename) const {
-		if (auto iter = marchableMap.find(tilename); iter != marchableMap.end())
+		if (auto iter = marchableMap.find(tilename); iter != marchableMap.end()) {
 			return &iter->second;
+		}
+
 		return nullptr;
 	}
 
@@ -138,8 +140,11 @@ namespace Game3 {
 
 	const std::unordered_set<TileID> Tileset::getCategoryIDs(const Identifier &category) const {
 		std::unordered_set<TileID> out;
-		for (const auto &tilename: categories.at(category))
+
+		for (const auto &tilename: categories.at(category)) {
 			out.insert((*this)[tilename]);
+		}
+
 		return out;
 	}
 
@@ -148,8 +153,10 @@ namespace Game3 {
 	}
 
 	bool Tileset::isInCategory(const Identifier &tilename, const Identifier &category) const {
-		if (auto iter = inverseCategories.find(tilename); iter != inverseCategories.end())
+		if (auto iter = inverseCategories.find(tilename); iter != inverseCategories.end()) {
 			return iter->second.contains(category);
+		}
+
 		return false;
 	}
 
@@ -179,16 +186,20 @@ namespace Game3 {
 
 	std::shared_ptr<AutotileSet> Tileset::getAutotileSet(const Identifier &id) const {
 		if (id.getPathStart() == "tile") {
-			if (auto iter = autotileSetMap.find(id); iter != autotileSetMap.end())
+			if (auto iter = autotileSetMap.find(id); iter != autotileSetMap.end()) {
 				return iter->second;
-		} else if (auto iter = autotileSets.find(id); iter != autotileSets.end())
+			}
+		} else if (auto iter = autotileSets.find(id); iter != autotileSets.end()) {
 			return iter->second;
+		}
+
 		return {};
 	}
 
 	TileID Tileset::getUpper(TileID id) const {
-		if (auto iter = uppers.find(id); iter != uppers.end())
+		if (auto iter = uppers.find(id); iter != uppers.end()) {
 			return iter->second;
+		}
 		return 0;
 	}
 
@@ -205,14 +216,18 @@ namespace Game3 {
 	}
 
 	std::optional<TileID> Tileset::maybe(const Identifier &id) const {
-		if (auto iter = ids.find(id); iter != ids.end())
+		if (auto iter = ids.find(id); iter != ids.end()) {
 			return iter->second;
+		}
+
 		return std::nullopt;
 	}
 
 	std::optional<std::reference_wrapper<const Identifier>> Tileset::maybe(TileID id) const {
-		if (auto iter = names.find(id); iter != names.end())
+		if (auto iter = names.find(id); iter != names.end()) {
 			return std::ref(iter->second);
+		}
+
 		return std::nullopt;
 	}
 

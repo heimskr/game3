@@ -65,13 +65,10 @@ namespace Game3 {
 		TileProvider &provider = realm->tileProvider;
 
 		for (const Layer layer: allLayers) {
-			auto &chunk = provider.getTileChunk(layer, chunkPosition);
+			TileChunk &chunk = provider.getTileChunk(layer, chunkPosition);
 			const size_t offset = getIndex(layer) * CHUNK_SIZE * CHUNK_SIZE;
 			auto lock = chunk.uniqueLock();
 			chunk.assign(tiles.begin() + offset, tiles.begin() + offset + CHUNK_SIZE * CHUNK_SIZE);
-			if (layer == Layer::Terrain) {
-				std::unordered_set<TileID> set(chunk.begin(), chunk.end());
-			}
 		}
 
 		provider.getFluidChunk(chunkPosition) = std::move(fluids);

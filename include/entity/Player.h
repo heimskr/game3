@@ -2,7 +2,7 @@
 
 #include "data/Identifier.h"
 #include "entity/Entity.h"
-#include "entity/LivingEntity.h"
+#include "entity/LivingTitledEntity.h"
 #include "game/CraftingManager.h"
 #include "types/UString.h"
 #include "ui/Modifiers.h"
@@ -15,7 +15,7 @@ namespace Game3 {
 	class ServerPlayer;
 	class TileEntity;
 
-	class Player: public LivingEntity {
+	class Player: public LivingTitledEntity {
 		public:
 			static Identifier ID() { return {"base", "entity/player"}; }
 			constexpr static HitPoints MAX_HEALTH = 64;
@@ -93,6 +93,8 @@ namespace Game3 {
 			void setKnownItems(std::set<Identifier>);
 			bool hasKnownItem(const Identifier &) const;
 			virtual void setFiring(bool);
+			Direction getSecondaryDirection() const override;
+			UString getDisplayName() override;
 
 			inline std::string getUsername() const { return username.copyBase(); }
 			inline const auto & getKnownItems() const { return knownItems; }

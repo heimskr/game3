@@ -18,10 +18,9 @@ namespace Game3 {
 		InventoryPtr inventory = player->getInventory(0);
 
 		Tileset &tileset = realm->getTileset();
-		const auto terrain_tile   = place.getName(Layer::Terrain);
 		const auto submerged_tile = place.getName(Layer::Submerged);
 
-		if (!terrain_tile || !submerged_tile) {
+		if (!submerged_tile) {
 			return false;
 		}
 

@@ -399,6 +399,10 @@ namespace Game3 {
 		return window;
 	}
 
+	Lockable<ClientSettings> & ClientGame::getSettings() const {
+		return getWindow()->settings;
+	}
+
 	bool ClientGame::isConnectedLocally() const {
 		if (!cachedIsConnectedLocally) {
 			cachedIsConnectedLocally = getWindow()->isConnectedLocally();

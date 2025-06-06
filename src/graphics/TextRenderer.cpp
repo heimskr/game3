@@ -151,7 +151,7 @@ namespace Game3 {
 		}
 	}
 
-	void TextRenderer::drawOnMap(const UString &text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
+	void TextRenderer::drawOnMap(const UStringSpan &text, float x, float y, TextAlign align, float scale, float angle, float alpha) {
 		drawOnMap(text, TextRenderOptions {
 			.x = x,
 			.y = y,
@@ -163,7 +163,7 @@ namespace Game3 {
 		});
 	}
 
-	void TextRenderer::drawOnMap(const UString &text, TextRenderOptions options) {
+	void TextRenderer::drawOnMap(const UStringSpan &text, TextRenderOptions options) {
 		if (!initialized) {
 			initRenderData();
 		}

@@ -21,7 +21,8 @@
 
 namespace Game3 {
 	Player::Player():
-		Entity(ID()), LivingEntity() {}
+		Entity(ID()),
+		LivingTitledEntity() {}
 
 	Player::~Player() {
 		if (spawning) {
@@ -420,6 +421,34 @@ namespace Game3 {
 
 	void Player::setFiring(bool value) {
 		firing = value;
+	}
+
+	Direction Player::getSecondaryDirection() const {
+		using enum Direction;
+
+		if (movingUp) {
+			if (movingLeft) {
+				return direction == Up? Left : Up;
+			}
+
+			if (movingRight) {
+				return direction == Up? Right : Up;
+			}
+		} else if (movingDown) {
+			if (movingLeft) {
+				return direction == Down? Left : Down;
+			}
+
+			if (movingRight) {
+				return direction == Down? Right : Down;
+			}
+		}
+
+		return Invalid;
+	}
+
+	UString Player::getDisplayName() {
+		return displayName;
 	}
 
 	void Player::resetEphemeral() {

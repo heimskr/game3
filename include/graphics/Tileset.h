@@ -29,16 +29,19 @@ namespace Game3 {
 		/** The set of possible neighbors. */
 		std::shared_ptr<AutotileSet> autotileSet;
 		bool tall = false;
+		/** Whether it's for 8-way autotiling instead of 4-way. */
+		bool eight = false;
 
 		MarchableInfo() = default;
-		MarchableInfo(Identifier start_, std::shared_ptr<AutotileSet> autotile_set, bool tall_):
-			start(std::move(start_)), autotileSet(std::move(autotile_set)), tall(tall_) {}
+		MarchableInfo(Identifier start, std::shared_ptr<AutotileSet> autotileSet, bool tall, bool eight):
+			start(std::move(start)),
+			autotileSet(std::move(autotileSet)),
+			tall(tall),
+			eight(eight) {}
 	};
 
 	class Tileset: public NamedRegisterable {
 		public:
-			bool isLand(const Identifier &) const;
-			bool isLand(TileID) const;
 			bool isWalkable(const Identifier &) const;
 			bool isWalkable(TileID) const;
 			bool isSolid(const Identifier &) const;
@@ -73,8 +76,6 @@ namespace Game3 {
 
 			const auto & getIDs()          const { return ids;          }
 			const auto & getNames()        const { return names;        }
-			const auto & getLand()         const { return land;         }
-			const auto & getWalkable()     const { return walkable;     }
 			const auto & getSolid()        const { return solid;        }
 			const auto & getMarchable()    const { return marchableMap; }
 			const auto & getHash()         const { return hash;         }
@@ -104,8 +105,6 @@ namespace Game3 {
 
 			std::shared_ptr<Texture> cachedTexture;
 			// TODO: consider making the sets store TileIDs instead, for performance perhaps
-			std::unordered_set<Identifier> land;
-			std::unordered_set<Identifier> walkable;
 			std::unordered_set<Identifier> solid;
 			std::unordered_set<Identifier> bright;
 			std::unordered_set<Identifier> marchable;

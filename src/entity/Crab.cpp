@@ -73,12 +73,12 @@ namespace Game3 {
 							threadContext.random(int64_t(column - crab->wanderRadius), int64_t(column + crab->wanderRadius))
 						};
 
-						// The goal position has to have sand on the terrain layer, and crabs can move either:
+						// The goal position has to have sand on the soil layer, and crabs can move either:
 						// - from sand to sand,
 						// - from sand to water,
 						// or
 						// - from water to sand.
-						if (realm->tryTile(Layer::Terrain, goal) == sand && (!in_water || !realm->hasFluid(goal))) {
+						if (realm->tryTile(Layer::Soil, goal) == sand && (!in_water || !realm->hasFluid(goal))) {
 							crab->pathfind(goal, PATHFIND_MAX);
 							break;
 						}

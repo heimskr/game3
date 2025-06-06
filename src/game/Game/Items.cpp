@@ -255,11 +255,11 @@ namespace Game3 {
 
 		add(std::make_shared<LampItem>("base:item/lamp", "Lamp", 999, 64)); // TODO: cost
 
-		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, "base:tile/sand"));
-		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, "base:tile/volcanic_sand"));
-		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, "base:tile/stone", "base:tile/cave_wall"));
-		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, "base:tile/grimstone"));
-		add(std::make_shared<Landfill>("base:item/dirt",          "Dirt",          1, 64, "base:tile/dirt"));
+		add(std::make_shared<Landfill>("base:item/sand",          "Sand",          1, 64, Layer::Soil,    "base:tile/sand"));
+		add(std::make_shared<Landfill>("base:item/volcanic_sand", "Volcanic Sand", 3, 64, Layer::Soil,    "base:tile/volcanic_sand"));
+		add(std::make_shared<Landfill>("base:item/stone",         "Stone",         1, 64, Layer::Bedrock, "base:tile/stone", "base:tile/cave_wall"));
+		add(std::make_shared<Landfill>("base:item/grimstone",     "Grimstone",     2, 64, Layer::Bedrock, "base:tile/grimstone"));
+		add(std::make_shared<Landfill>("base:item/dirt",          "Dirt",          1, 64, Layer::Soil,    "base:tile/dirt"));
 
 		add(std::make_shared<LiquefierItem>("base:item/liquefier", "Liquefier", 999, 64)); // TODO: cost
 
@@ -315,7 +315,7 @@ namespace Game3 {
 
 		add(std::make_shared<TankItem>("base:item/tank", "Tank", 999, 64)); // TODO: cost
 
-		add(std::make_shared<TerrainSeed>("base:item/moss", "Moss", "base:tile/dirt", "base:tile/forest_floor", 2));
+		add(std::make_shared<TerrainSeed>("base:item/moss", "Moss", Layer::Soil, "base:tile/dirt", Layer::Vegetation, "base:tile/forest_floor", 2));
 
 		add(std::make_shared<Tool>("base:item/iron_shovel",    "Iron Shovel",     20,  3.f,  64, "base:attribute/shovel"));
 		add(std::make_shared<Tool>("base:item/iron_axe",       "Iron Axe",        40,  3.f, 128, "base:attribute/axe"));
@@ -330,7 +330,7 @@ namespace Game3 {
 		add(std::make_shared<VoidPickaxe>("base:item/void_pickaxe", "Void Pickaxe", 1000, 0.f, -1, "base:attribute/void_pickaxe"));
 
 		add(Furniture::createSimple("base:item/knives",           "Knives",            10, Layer::Highest,   "base:tile/knives"));
-		add(Furniture::createSimple("base:item/planks",           "Planks",           999, Layer::Terrain,   "base:tile/planks")); // TODO: cost
+		add(Furniture::createSimple("base:item/planks",           "Planks",           999, Layer::Flooring,  "base:tile/planks")); // TODO: cost
 		add(Furniture::createSimple("base:item/ship_wheel",       "Ship Wheel",       999, Layer::Objects,   "base:tile/ship_wheel")); // TODO: cost
 		add(Furniture::createSimple("base:item/kitchen_utensils", "Kitchen Utensils",  10, Layer::Highest,   "base:tile/kitchen_utensils"));
 		add(Furniture::createSimple("base:item/plant_pot1",       "Plant Pot",         32, Layer::Submerged, "base:tile/plant1"));
@@ -431,7 +431,8 @@ namespace Game3 {
 				std::string name = std::string(color) + " Flower";
 				name[0] = std::toupper(name[0]);
 				std::string post = std::format("flower{}_{}", i, color);
-				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), "base:category/plant_soil", 10);
+				Identifier small(std::format("base:tile/small_flowers_{}", color));
+				auto flower = std::make_shared<Flower>(Identifier("base:item/" + post), std::move(name), Identifier("base:tile/" + post), std::move(small), "base:category/plant_soil", 10);
 				flower->addAttribute(Identifier("base:attribute/flower_" + std::string(color)));
 				add(flower);
 			}

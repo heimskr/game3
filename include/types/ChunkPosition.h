@@ -41,11 +41,13 @@ namespace Game3 {
 
 		explicit operator std::string() const;
 
-		template <typename Fn>
-		void iterate(const Fn &fn) const {
-			for (int64_t row = y * CHUNK_SIZE, row_max = (y + 1) * CHUNK_SIZE; row < row_max; ++row)
-				for (int64_t column = x * CHUNK_SIZE, column_max = (x + 1) * CHUNK_SIZE; column < column_max; ++column)
+		template <std::invocable<Position> Fn>
+		void iterate(Fn &&fn) const {
+			for (int64_t row = y * CHUNK_SIZE, row_max = (y + 1) * CHUNK_SIZE; row < row_max; ++row) {
+				for (int64_t column = x * CHUNK_SIZE, column_max = (x + 1) * CHUNK_SIZE; column < column_max; ++column) {
 					fn(Position{row, column});
+				}
+			}
 		}
 
 		Position topLeft() const {

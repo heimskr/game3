@@ -20,8 +20,9 @@ namespace Game3 {
 
 		constexpr Identifier(std::string_view combined) {
 			const size_t colon = combined.find(':');
-			if (colon == std::string_view::npos)
+			if (colon == std::string_view::npos) {
 				throw std::invalid_argument("Not a valid identifier: " + std::string(combined));
+			}
 			space = std::string(combined.substr(0, colon));
 			name  = std::string(combined.substr(colon + 1));
 		}
@@ -52,13 +53,13 @@ namespace Game3 {
 		}
 
 		/** Returns "foo/bar" for "base:foo/bar/baz". */
-		std::string getPath() const;
+		std::string_view getPath() const;
 
 		/** Returns "foo" for "base:foo/bar/baz". */
-		std::string getPathStart() const;
+		std::string_view getPathStart() const;
 
 		/** Returns "baz" for "base:foo/bar/baz". */
-		std::string getPostPath() const;
+		std::string_view getPostPath() const;
 
 		constexpr inline bool operator==(const char *combined) const {
 			return *this == std::string_view(combined);
@@ -66,8 +67,11 @@ namespace Game3 {
 
 		constexpr bool operator==(std::string_view combined) const {
 			const size_t colon = combined.find(':');
-			if (colon == std::string_view::npos)
+
+			if (colon == std::string_view::npos) {
 				return false;
+			}
+
 			return space == combined.substr(0, colon) && name == combined.substr(colon + 1);
 		}
 
@@ -76,14 +80,17 @@ namespace Game3 {
 		}
 
 		constexpr bool operator<(const Identifier &other) const {
-			if (this == &other)
+			if (this == &other) {
 				return false;
+			}
 
-			if (space < other.space)
+			if (space < other.space) {
 				return true;
+			}
 
-			if (space > other.space)
+			if (space > other.space) {
 				return false;
+			}
 
 			return name < other.name;
 		}

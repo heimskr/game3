@@ -14,7 +14,7 @@ namespace Game3 {
 	}
 
 	double Volcanic::generate(Index row, Index column, std::default_random_engine &, const NoiseGenerator &, const WorldGenParams &params, double suggested_noise) {
-		Realm &realm = *getRealm();
+		RealmPtr realm = getRealm();
 		const auto wetness = params.wetness;
 
 		static const Identifier volcanic_sand = "base:tile/volcanic_sand"_id;
@@ -22,16 +22,17 @@ namespace Game3 {
 		static const Identifier water_fluid   = "base:fluid/water"_id;
 		static const Identifier lava_fluid    = "base:fluid/lava"_id;
 
+		Position position{row, column};
+
+		realm->setTile(Layer::Bedrock, position, volcanic_rock, false);
+
 		if (suggested_noise < wetness + 0.3) {
-			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false);
-			realm.setFluid({row, column}, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
+			realm->setTile(Layer::Soil, position, volcanic_sand, false);
+			realm->setFluid(position, water_fluid, params.getFluidLevel(suggested_noise, 0.3), true);
 		} else if (suggested_noise < wetness + 0.4) {
-			realm.setTile(Layer::Terrain, {row, column}, volcanic_sand, false);
+			realm->setTile(Layer::Soil, position, volcanic_sand, false);
 		} else if (0.85 < suggested_noise) {
-			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false);
-			realm.setFluid({row, column}, lava_fluid, FluidTile::FULL, true);
-		} else {
-			realm.setTile(Layer::Terrain, {row, column}, volcanic_rock, false);
+			realm->setFluid(position, lava_fluid, FluidTile::FULL, true);
 		}
 
 		return suggested_noise;
@@ -41,10 +42,10 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		std::uniform_int_distribution distribution{0, 199};
 
-		if (realm->getTile(Layer::Terrain, {row, column}) == realm->getTileset()["base:tile/volcanic_sand"_id]) {
+		if (realm->getTile(Layer::Soil, {row, column}) == realm->getTileset()["base:tile/volcanic_sand"_id]) {
 			if (distribution(rng) < 1) {
 				std::shared_ptr<Game> game = realm->getGame();
-				static std::vector<Identifier> mushrooms {
+				static std::vector<Identifier> mushrooms{
 					"base:item/indigo_milkcap",
 					"base:item/black_trumpet",
 					"base:item/grey_knight",

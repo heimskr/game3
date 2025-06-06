@@ -22,9 +22,11 @@ namespace Game3::WorldGen {
 			realm->setTile(Layer::Objects, {row, width - 1}, wall, true);
 		}
 
-		for (int row = 0; row < height; ++row)
-			for (int column = 0; column < width; ++column)
-				realm->setTile(Layer::Terrain, {row, column}, floor, false);
+		for (int row = 0; row < height; ++row) {
+			for (int column = 0; column < width; ++column) {
+				realm->setTile(Layer::Flooring, {row, column}, floor, false);
+			}
+		}
 
 		realm->setTile(Layer::Objects, {0, 0},                  wall, true);
 		realm->setTile(Layer::Objects, {0, width - 1},          wall, true);

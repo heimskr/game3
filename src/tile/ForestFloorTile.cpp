@@ -13,7 +13,7 @@ namespace Game3 {
 		Tile(ID()) {}
 
 	bool ForestFloorTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
-		if (layer != Layer::Terrain) {
+		if (layer != Layer::Vegetation) {
 			return false;
 		}
 

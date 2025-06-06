@@ -15,7 +15,7 @@ namespace Game3 {
 		const RealmPtr realm = place.realm;
 		const Tileset &tileset = realm->getTileset();
 
-		if (auto tile = realm->tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmable")) {
+		if (auto tile = realm->tryTile(Layer::Soil, place.position); tile && tileset.isInCategory(*tile, "base:category/farmable")) {
 			{
 				InventoryPtr inventory = place.player->getInventory(0);
 				auto lock = inventory->uniqueLock();
@@ -24,7 +24,7 @@ namespace Game3 {
 				}
 				inventory->notifyOwner({});
 			}
-			place.set(Layer::Terrain, findDirtTilename(place));
+			place.set(Layer::Soil, findDirtTilename(place));
 			return true;
 		}
 
@@ -40,7 +40,7 @@ namespace Game3 {
 		const Tileset &tileset = realm->getTileset();
 
 		for (const Direction direction: ALL_DIRECTIONS) {
-			if (auto tilename = (place + direction).getName(Layer::Terrain); tilename && tileset.isInCategory(*tilename, "base:category/tillable")) {
+			if (auto tilename = (place + direction).getName(Layer::Soil); tilename && tileset.isInCategory(*tilename, "base:category/tillable")) {
 				return *tilename;
 			}
 		}

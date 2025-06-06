@@ -14,12 +14,14 @@
 		"base:autotile/wooden_walls":      "base:category/wooden_walls",
 		"base:autotile/concrete_walls":    "base:category/concrete_walls",
 		"base:autotile/town_dirt":         "base:tile/town_dirt",
-		"base:autotile/stone":             "base:tile/stone",
+		"base:autotile/stone":             "base:category/autotiled_stone",
 		"base:autotile/kitchen_counters":  "base:tile/kitchen_counter",
 		"base:autotile/dining_tables":     "base:tile/dining_table",
 		"base:autotile/fences":            "base:tile/fence",
 		"base:autotile/carpets":           "base:category/autotiled_carpets",
-		"base:autotile/tall_wooden_walls": "base:tile/tall_wooden_wall"
+		"base:autotile/tall_wooden_walls": "base:tile/tall_wooden_wall",
+		"base:autotile/grass":             "base:category/autotiled_grass",
+		"base:autotile/soil":              "base:category/autotiled_soil"
 	},
 	"omnitiles": [
 		"base:autotile/fences"

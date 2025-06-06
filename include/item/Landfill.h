@@ -12,7 +12,7 @@ namespace Game3 {
 		public:
 			constexpr static ItemCount DEFAULT_COUNT = 1;
 
-			Landfill(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count, Identifier terrain_name, Identifier objects_name = {}, ItemCount required_count = DEFAULT_COUNT);
+			Landfill(ItemID id, std::string name, MoneyCount basePrice, ItemCount maxCount, Layer terrainLayer, Identifier terrainName, Identifier objectsName = {}, ItemCount requiredCount = DEFAULT_COUNT);
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
@@ -21,7 +21,8 @@ namespace Game3 {
 		private:
 			Identifier terrainName;
 			Identifier objectsName;
-			ItemCount  requiredCount = -1;
+			ItemCount requiredCount = -1;
+			Layer terrainLayer;
 
 			bool fixRequirement();
 	};

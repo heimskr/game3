@@ -206,7 +206,7 @@ namespace Game3 {
 		const float t_size = 1.f / divisor - TILE_TEXTURE_PADDING * 2;
 
 		Timer timer{"UpperVBOInit"};
-		vbo.init<float, 8>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
+		vbo.init<float, 16>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [this, &tileset, set_width, divisor, t_size](size_t x, size_t y) {
 			const auto [chunk_x, chunk_y] = chunkPosition.copyBase();
 
 			std::array<TileID, LAYER_COUNT> uppers{};
@@ -217,26 +217,27 @@ namespace Game3 {
 					static_cast<Index>(x)     + CHUNK_SIZE * (chunk_x + 1)
 				});
 
-				if (upper_opt)
+				if (upper_opt) {
 					uppers[layer_index - 1] = tileset.getUpper(*upper_opt);
-				else
+				} else {
 					uppers[layer_index - 1] = 0;
+				}
 			}
 
-			static_assert(LAYER_COUNT == 4);
+			static_assert(LAYER_COUNT == 8);
 
 			// Texture coordinates for the upper portion of the below tile
 #define U_DEFS(I) \
 			const float ux##I((uppers[I] % set_width) / divisor + TILE_TEXTURE_PADDING); \
 			const float uy##I((uppers[I] / set_width) / divisor + TILE_TEXTURE_PADDING);
 
-			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3);
+			U_DEFS(0); U_DEFS(1); U_DEFS(2); U_DEFS(3); U_DEFS(4); U_DEFS(5); U_DEFS(6); U_DEFS(7);
 
 #define U_ARR_0(I) ux##I, uy##I
 #define U_ARR_1(I) ux##I + t_size, uy##I
 #define U_ARR_2(I) ux##I, uy##I + t_size
 #define U_ARR_3(I) ux##I + t_size, uy##I + t_size
-#define U_ARR_N(N) U_ARR_##N(0), U_ARR_##N(1), U_ARR_##N(2), U_ARR_##N(3)
+#define U_ARR_N(N) U_ARR_##N(0), U_ARR_##N(1), U_ARR_##N(2), U_ARR_##N(3), U_ARR_##N(4), U_ARR_##N(5), U_ARR_##N(6), U_ARR_##N(7)
 
 			return std::array{
 				std::array{U_ARR_N(0)},
@@ -251,16 +252,21 @@ namespace Game3 {
 
 	bool UpperRenderer::generateElementBufferObject() {
 		uint32_t i = 0;
+
 		ebo.init<uint32_t, 6>(CHUNK_SIZE, CHUNK_SIZE, GL_STATIC_DRAW, [&i](size_t, size_t) {
 			i += 4;
 			return std::array{i - 4, i - 3, i - 2, i - 3, i - 2, i - 1};
 		});
+
 		return ebo.getHandle() != 0;
 	}
 
 	bool UpperRenderer::generateVertexArrayObject() {
-		if (vbo.getHandle() != 0)
-			vao.init(vbo, {2, 2, 2, 2, 2});
+		if (vbo.getHandle() != 0) {
+			static_assert(LAYER_COUNT == 8);
+			vao.init(vbo, {2, 2, 2, 2, 2, 2, 2, 2, 2});
+		}
+
 		return vao.getHandle() != 0;
 	}
 

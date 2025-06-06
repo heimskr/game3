@@ -1,1 +1,1 @@
-{"autotile":true,"categories":["base:category/cave_walls"],"land":false,"solid":true,"tilename":"base:tile/cave_iron"}
+{"autotiling":"base:autotile/cave_walls","categories":["base:category/cave_walls"],"solid":true,"tilename":"base:tile/cave_iron"}

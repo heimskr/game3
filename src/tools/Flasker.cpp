@@ -175,7 +175,7 @@ namespace Game3 {
 			ss << std::string_view(reinterpret_cast<const char *>(data), size);
 		}, &ss, width, height, 4, raw.get(), width * 4);
 
-		return ss.str();
+		return std::move(ss).str();
 	}
 
 	std::string generateFlask(const std::filesystem::path &base_filename, const std::filesystem::path &mask_filename, std::string_view hue, std::string_view saturation, std::string_view value_diff) {

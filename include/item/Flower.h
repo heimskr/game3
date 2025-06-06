@@ -3,14 +3,19 @@
 #include "item/Plantable.h"
 
 namespace Game3 {
-	struct Flower: Plantable {
-		Identifier tilename;
-		/** Can be empty to indicate that the flower can be planted on any walkable tile. */
-		Identifier validGround;
+	class Flower: public Plantable {
+		public:
+			Identifier tilename;
+			Identifier smallTilename;
+			/** Can be empty to indicate that the flower can be planted on any walkable tile. */
+			Identifier validGround;
 
-		Flower(ItemID, std::string name_, Identifier tilename_, Identifier valid_ground, MoneyCount base_price, ItemCount max_count = 64);
+			Flower(ItemID, std::string name, Identifier tilename, Identifier smallTilename, Identifier validGround, MoneyCount basePrice, ItemCount maxCount = 64);
 
-		bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
-		bool plant(InventoryPtr, Slot, const ItemStackPtr &, const Place &) override;
+			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool plant(InventoryPtr, Slot, const ItemStackPtr &, const Place &, Layer) override;
+
+		private:
+			bool plantTile(InventoryPtr, Slot, const ItemStackPtr &, const Place &, Layer, const Identifier &);
 	};
 }

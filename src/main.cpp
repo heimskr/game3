@@ -15,6 +15,7 @@
 #include "tools/ItemStitcher.h"
 #include "tools/Mazer.h"
 #include "tools/Migrator.h"
+#include "tools/Reshape.h"
 #include "tools/TileStitcher.h"
 #include "tools/Updater.h"
 #include "ui/gl/Constants.h"
@@ -295,8 +296,8 @@ int main(int argc, char **argv) {
 
 		if (arg1 == "--add-item" || arg1 == "--add-tile" || arg1 == "--add-sound") {
 			if (arg1 == "--add-tile") {
-				if (argc != 7) {
-					std::println("Usage: {} --add-tile <identifier> <credit> <image path> <land> <solid>", argv[0]);
+				if (argc != 6) {
+					std::println("Usage: {} --add-tile <identifier> <credit> <image path> <solid>", argv[0]);
 					return 1;
 				}
 			} else if (argc != 5) {
@@ -339,8 +340,7 @@ int main(int argc, char **argv) {
 					}
 				};
 
-				object["land"] = get_bool(argv[5]);
-				object["solid"] = get_bool(argv[6]);
+				object["solid"] = get_bool(argv[5]);
 			}
 			object[type == "tile"? "tilename" : "id"] = "base:" + type + "/" + id;
 			std::ofstream json(dir_path / (type +".json"));
@@ -351,6 +351,20 @@ int main(int argc, char **argv) {
 			if (type == "item") {
 				INFO("Items.cpp: add(std::make_shared<Item>(\"base:item/{}\", \"{}{}\", 999, 64)); // TODO: cost", id, char(std::toupper(id[0])), id.substr(1));
 			}
+			return 0;
+		}
+
+		if (arg1 == "--reshape" && argc == 3) {
+			std::string raw_in = readFile(argv[2]);
+			std::vector<uint8_t> raw_out = reshape47(raw_in, 16);
+			std::cout << std::string_view(reinterpret_cast<const char *>(raw_out.data()), raw_out.size());
+			return 0;
+		}
+
+		if (arg1 == "--reshape-e2" && argc == 3) {
+			std::string raw_in = readFile(argv[2]);
+			std::vector<uint8_t> raw_out = reshapeEntityVariant2(raw_in);
+			std::cout << std::string_view(reinterpret_cast<const char *>(raw_out.data()), raw_out.size());
 			return 0;
 		}
 	}

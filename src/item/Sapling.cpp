@@ -16,7 +16,7 @@ namespace Game3 {
 
 		Tileset &tileset = realm.getTileset();
 
-		if (auto tilename = place.getName(Layer::Terrain); !tilename || !tileset.isInCategory(*tilename, getSoilCategory())) {
+		if (auto tilename = place.getName(Layer::Soil); !tilename || !tileset.isInCategory(*tilename, getSoilCategory())) {
 			return false;
 		}
 
@@ -26,14 +26,14 @@ namespace Game3 {
 
 		const InventoryPtr inventory = player.getInventory(0);
 		auto inventory_lock = inventory->uniqueLock();
-		return plant(inventory, slot, stack, place);
+		return plant(inventory, slot, stack, place, Layer::Submerged);
 	}
 
 	bool Sapling::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction) {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 
-	bool Sapling::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {
+	bool Sapling::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place, Layer layer) {
 		if (stack->count == 0) {
 			auto lock = inventory->uniqueLock();
 			inventory->erase(slot);
@@ -41,7 +41,7 @@ namespace Game3 {
 			return false;
 		}
 
-		place.set(Layer::Submerged, choose(getTreeTypes()));
+		place.set(layer, choose(getTreeTypes()));
 		place.realm->setPathable(place.position, false);
 
 		inventory->decrease(stack, slot, 1, true);

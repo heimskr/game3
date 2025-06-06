@@ -70,6 +70,7 @@ namespace Game3 {
 			iterator right;
 
 			UStringSpan(iterator left, iterator right);
+			UStringSpan(const std::string &);
 
 			explicit operator UString() const;
 			explicit operator std::string() const;

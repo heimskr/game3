@@ -5,3 +5,6 @@
 
 3: As of f000003.
 	- Appended `string soundSet` field to `base:te/teleporter`.
+
+4: As of 5f24956.
+	- Added more layers.

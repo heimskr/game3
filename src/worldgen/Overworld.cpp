@@ -146,10 +146,13 @@ namespace Game3::WorldGen {
 
 					const auto ore_set = tileset.getCategoryIDs("base:category/orespawns"_id);
 
-					for (auto row = row_min; row < row_max; ++row)
-						for (auto column = col_min; column < col_max; ++column)
-							if (ore_set.contains(realm->getTile(Layer::Terrain, {row, column})) && !realm->hasFluid({row, column}))
+					for (auto row = row_min; row < row_max; ++row) {
+						for (auto column = col_min; column < col_max; ++column) {
+							if (ore_set.contains(realm->getTile(Layer::Bedrock, {row, column})) && !realm->hasFluid({row, column})) {
 								resource_starts.push_back({row, column});
+							}
+						}
+					}
 
 					std::shuffle(resource_starts.begin(), resource_starts.end(), threadContext.rng);
 					GamePtr game = realm->getGame();
@@ -160,8 +163,9 @@ namespace Game3::WorldGen {
 						for (size_t i = 0, max = resource_starts.size() / 1000; i < max; ++i) {
 							const Position &position = resource_starts.back();
 							const Index index = (position.row - row_min) * CHUNK_SIZE + (position.column - col_min);
-							if (Grassland::THRESHOLD + threshold <= saved_noise[index])
+							if (Grassland::THRESHOLD + threshold <= saved_noise[index]) {
 								TileEntity::spawn<OreDeposit>(realm, *ore, position);
+							}
 							resource_starts.pop_back();
 						}
 					};
@@ -199,10 +203,17 @@ namespace Game3::WorldGen {
 				const Index col_max = col_min + CHUNK_SIZE;
 				pool.add([realm, &waiter, &get_biome, &noisegen, &params, noise_seed, row_min, row_max, col_min, col_max](ThreadPool &, size_t) {
 					threadContext = {uint_fast32_t(noise_seed - 1'000'000ul * row_min + col_min), row_min, row_max, col_min, col_max};
-					for (Index row = row_min; row < row_max; ++row) {
-						for (Index column = col_min; column < col_max; ++column) {
-							realm->autotile({row, column}, Layer::Terrain);
-							get_biome(row, column).postgen(row, column, threadContext.rng, noisegen, params);
+					for (Index row = row_min - 1; row <= row_max; ++row) {
+						for (Index column = col_min - 1; column <= col_max; ++column) {
+							Position position{row, column};
+							for (Layer layer: terrainLayers) {
+								realm->autotile(position, layer);
+							}
+							if (row_min <= row && row < row_max) {
+								if (col_min <= column && column < col_max) {
+									get_biome(row, column).postgen(row, column, threadContext.rng, noisegen, params);
+								}
+							}
 						}
 					}
 					--waiter;

@@ -64,8 +64,8 @@ namespace Game3 {
 			void update(const Window &) override;
 			void update(int width, int height) override;
 
-			void drawOnMap(const UString &text, float x, float y, TextAlign align, float scale, float angle, float alpha);
-			void drawOnMap(const UString &text, TextRenderOptions = {});
+			void drawOnMap(const UStringSpan &text, float x, float y, TextAlign align, float scale, float angle, float alpha);
+			void drawOnMap(const UStringSpan &text, TextRenderOptions = {});
 			void drawOnScreen(const UString &text, TextRenderOptions = {});
 			void operator()(const UString &text, const TextRenderOptions & = {});
 			float textWidth(uint32_t character, float scale = 1.f) const;

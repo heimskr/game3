@@ -7,27 +7,48 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	Flower::Flower(ItemID identifier_, std::string name_, Identifier tilename_, Identifier valid_ground, MoneyCount base_price, ItemCount max_count):
-	Plantable(std::move(identifier_), std::move(name_), base_price, max_count),
-	tilename(std::move(tilename_)),
-	validGround(std::move(valid_ground)) {
-		attributes.insert("base:attribute/plantable"_id);
-		attributes.insert("base:attribute/flower"_id);
-	}
+	Flower::Flower(ItemID identifier, std::string name, Identifier tilename, Identifier smallTilename, Identifier validGround, MoneyCount basePrice, ItemCount maxCount):
+		Plantable(std::move(identifier), std::move(name), basePrice, maxCount),
+		tilename(std::move(tilename)),
+		smallTilename(std::move(smallTilename)),
+		validGround(std::move(validGround)) {
+			attributes.insert("base:attribute/plantable"_id);
+			attributes.insert("base:attribute/flower"_id);
+		}
 
-	bool Flower::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
+	bool Flower::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		auto &realm = *place.realm;
 		const auto &position = place.position;
 		const auto &tileset = realm.getTileset();
 
-		if (realm.isPathable(position) && realm.middleEmpty(position))
-			if (!validGround || tileset.isInCategory(tileset[realm.getTile(Layer::Terrain, position)], validGround))
-				return plant(place.player->getInventory(0), slot, stack, place);
+		if (modifiers.onlyShift()) {
+			return plantTile(place.player->getInventory(0), slot, stack, place, Layer::Submerged, smallTilename);
+		}
+
+		if (realm.isPathable(position) && realm.middleEmpty(position)) {
+			if (validGround) {
+				std::optional<TileID> vegetation = realm.tryTile(Layer::Vegetation, position);
+				if (vegetation && !tileset.isInCategory(*vegetation, validGround)) {
+					return false;
+				}
+
+				std::optional<TileID> soil = realm.tryTile(Layer::Soil, position);
+				if (soil && !tileset.isInCategory(*soil, validGround)) {
+					return false;
+				}
+			}
+
+			return plant(place.player->getInventory(0), slot, stack, place, Layer::Submerged);
+		}
 
 		return false;
 	}
 
-	bool Flower::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {
+	bool Flower::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place, Layer layer) {
+		return plantTile(std::move(inventory), slot, stack, place, layer, tilename);
+	}
+
+	bool Flower::plantTile(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place, Layer layer, const Identifier &tile) {
 		if (stack->count == 0) {
 			auto lock = inventory->uniqueLock();
 			inventory->erase(slot);
@@ -35,7 +56,7 @@ namespace Game3 {
 			return false;
 		}
 
-		place.set(Layer::Submerged, tilename);
+		place.set(layer, tile);
 
 		inventory->decrease(stack, slot, 1, true);
 		return true;

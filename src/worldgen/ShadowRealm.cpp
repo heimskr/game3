@@ -38,7 +38,7 @@ namespace Game3::WorldGen {
 			const Position top_left = chunk_position.topLeft();
 
 			chunk_position.iterate([&](Position position) {
-				realm->setTile(Layer::Terrain, position, "base:tile/void", false);
+				realm->setTile(Layer::Bedrock, position, "base:tile/void", false);
 			});
 
 			std::default_random_engine rng;

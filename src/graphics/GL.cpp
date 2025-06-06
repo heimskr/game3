@@ -36,8 +36,9 @@ namespace GL {
 		GLuint vao = -1;
 
 		glGenVertexArrays(1, &vao); CHECKGL
-		if (vao == static_cast<GLuint>(-1))
+		if (vao == static_cast<GLuint>(-1)) {
 			throw std::runtime_error("Couldn't generate float VAO");
+		}
 
 		glBindVertexArray(vao); CHECKGL
 		glBindBuffer(GL_ARRAY_BUFFER, vbo); CHECKGL

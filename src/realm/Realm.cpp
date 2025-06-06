@@ -1266,9 +1266,8 @@ namespace Game3 {
 	bool Realm::middleEmpty(const Position &position) const {
 		const auto submerged = tryTile(Layer::Submerged, position);
 		const auto object = tryTile(Layer::Objects, position);
-		const auto empty = getTileset().getEmptyID();
 		assert(submerged.has_value() == object.has_value());
-		return (!submerged && !object) || (submerged && *submerged == empty && *object == empty);
+		return (!submerged && !object) || (submerged == 0 && object == 0);
 	}
 
 	std::optional<TileID> Realm::tryTile(Layer layer, const Position &position) const {
@@ -1839,13 +1838,18 @@ namespace Game3 {
 	void Realm::autotile(const Position &position, Layer layer, TileUpdateContext context) {
 		const Tileset &tileset = getTileset();
 		const TileID tile = tileProvider.copyTile(layer, position, TileProvider::TileMode::ReturnEmpty);
+
+		if (tile == 0) {
+			return;
+		}
+
 		const Identifier &tilename = tileset[tile];
 
 		if (const MarchableInfo *info = tileset.getMarchableInfo(tilename)) {
-			const std::unordered_set<Identifier> &members = info->autotileSet->members;
 			TileID march_result{};
 
 			if (info->autotileSet->omni) {
+				assert(!info->eight);
 				const TileID empty = tileset.getEmptyID();
 				march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 					const Position march_position = position + Position(march_row_offset, march_column_offset);
@@ -1858,7 +1862,9 @@ namespace Game3 {
 					return false;
 				});
 			} else {
-				march_result = march4([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
+				const std::unordered_set<Identifier> &members = info->autotileSet->members;
+				const auto &march = info->eight? march8 : march4;
+				march_result = march([&](int8_t march_row_offset, int8_t march_column_offset) -> bool {
 					const Position march_position = position + Position(march_row_offset, march_column_offset);
 					const TileID march_tile = tileProvider.copyTile(layer, march_position, TileProvider::TileMode::ReturnEmpty);
 					return members.contains(tileset[march_tile]);
@@ -1904,7 +1910,7 @@ namespace Game3 {
 				Place place{Position(row, column), shared, player};
 				for (const Layer layer: allLayers) {
 					if (std::optional<TileID> tile_id = tryTile(layer, place.position)) {
-						std::shared_ptr<Tile> tile = game.getTile(tileset[*tile_id]);
+						TilePtr tile = game.getTile(tileset[*tile_id]);
 						tile->renderStaticLighting(place, layer, context);
 					}
 				}

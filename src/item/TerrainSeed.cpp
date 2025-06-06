@@ -7,27 +7,37 @@
 #include "realm/Realm.h"
 
 namespace Game3 {
-	TerrainSeed::TerrainSeed(ItemID id_, std::string name_, Identifier target_tilename, Identifier replacement_tilename, MoneyCount base_price, ItemCount max_count):
-		Item(id_, std::move(name_), base_price, max_count), targetTilename(std::move(target_tilename)), replacementTilename(std::move(replacement_tilename)) {}
+	TerrainSeed::TerrainSeed(ItemID id, std::string name, Layer targetLayer, Identifier targetTilename, Layer replacementLayer, Identifier replacementTilename, MoneyCount basePrice, ItemCount maxCount):
+		Item(id, std::move(name), basePrice, maxCount),
+		targetTilename(std::move(targetTilename)),
+		replacementTilename(std::move(replacementTilename)),
+		targetLayer(targetLayer),
+		replacementLayer(replacementLayer) {}
 
 	bool TerrainSeed::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
 		Realm &realm = *place.realm;
 		Tileset &tileset = realm.getTileset();
 
-		std::optional<TileID> tile = realm.tryTile(Layer::Terrain, place.position);
-		if (!tile)
+		std::optional<TileID> tile = realm.tryTile(targetLayer, place.position);
+		if (!tile) {
 			return false;
+		}
+
+		if (replacementLayer != targetLayer && place.get(replacementLayer)) {
+			return false;
+		}
 
 		bool match{};
 
-		if (targetTilename.getPathStart() == "category")
+		if (targetTilename.getPathStart() == "category") {
 			match = tileset.isInCategory(*tile, targetTilename);
-		else
+		} else {
 			match = tileset[*tile] == targetTilename;
+		}
 
 		if (match) {
 			place.player->getInventory(0)->decrease(stack, slot, 1, true);
-			place.set(Layer::Terrain, replacementTilename);
+			place.set(replacementLayer, replacementTilename);
 			return true;
 		}
 

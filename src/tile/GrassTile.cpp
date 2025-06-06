@@ -51,14 +51,18 @@ namespace Game3 {
 			return;
 		}
 
-		if (std::optional<TileID> tile_id = place.get(Layer::Terrain); tile_id && tileset.isInCategory(*tile_id, "base:category/small_flowers")) {
+		if (std::optional<TileID> tile_id = place.get(Layer::Submerged); tile_id && tileset.isInCategory(*tile_id, "base:category/small_flowers")) {
 			constexpr Index spawn_radius = 3;
 			row += threadContext.random<Index>(0, spawn_radius + 1);
 			column += threadContext.random<Index>(0, spawn_radius + 1);
 
 			Place spawn_place = place.withPosition({row, column});
 
-			if (spawn_place.position == place.position || spawn_place.get(Layer::Terrain) != tileset["base:tile/grass"]) {
+			if (spawn_place.position == place.position) {
+				return;
+			}
+
+			if (std::optional<TileID> vegetation = spawn_place.get(Layer::Vegetation); !vegetation || !tileset.isInCategory(*vegetation, "base:category/grass")) {
 				return;
 			}
 
@@ -66,12 +70,12 @@ namespace Game3 {
 				return;
 			}
 
-			spawn_place.set(Layer::Terrain, *tile_id);
+			spawn_place.set(Layer::Submerged, *tile_id);
 		}
 	}
 
 	bool GrassTile::interact(const Place &place, Layer layer, const ItemStackPtr &, Hand) {
-		if (layer != Layer::Terrain) {
+		if (layer != Layer::Submerged) {
 			return false;
 		}
 
@@ -103,7 +107,7 @@ namespace Game3 {
 
 		Identifier result{"base", std::format("item/flower{}_{}", threadContext.random(2, 4), color)};
 		place.player->give(ItemStack::create(place.getGame(), result));
-		place.set(layer, "base:tile/grass");
+		place.set(layer, 0);
 		return true;
 	}
 }

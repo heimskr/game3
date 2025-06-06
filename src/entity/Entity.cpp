@@ -412,22 +412,36 @@ namespace Game3 {
 		// Animate if the offset is nonzero.
 		if (offset_x != 0. || offset_y != 0.) {
 			// Choose an animation frame based on the time.
+			int64_t milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count();
 			switch (variety) {
+				case 4:
+					texture_x_offset = 8. * (1 + ((milliseconds / 200) % 2));
+					break;
 				case 3:
-					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 200) % 4);
+					texture_x_offset = 8. * ((milliseconds / 200) % 4);
+					break;
+				case 2:
+					texture_x_offset = 8. * (1 + (milliseconds / 200) % 4);
 					break;
 				default:
-					texture_x_offset = 8. * ((std::chrono::duration_cast<std::chrono::milliseconds>(getTime() - game->startTime).count() / 100) % 5);
+					texture_x_offset = 8. * ((milliseconds / 100) % 5);
 			}
 		}
 
 		switch (variety) {
 			case 1:
 			case 3:
+			case 4:
 				texture_y_offset = 8. * (int(direction.load()) - 1);
 				break;
 			case 2:
-				texture_y_offset = 16. * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
+				if (Direction secondary = getSecondaryDirection(); secondary == Direction::Invalid) {
+					texture_y_offset = 16. * (static_cast<int>(remapDirection(direction, 0x1324)) - 1);
+				} else {
+					constexpr std::array rows{0, 0, 1, 7, 4, 4, 3, 5, 1, 3, 2, 2, 7, 5, 6, 6};
+					const int row = rows.at(((static_cast<int>(secondary) - 1) << 2) | (static_cast<int>(direction.load()) - 1));
+					texture_y_offset = 8. * row;
+				}
 				break;
 			default:
 				break;
@@ -1567,6 +1581,10 @@ namespace Game3 {
 		double dummy;
 		offset.x = std::modf(offset.x, &dummy);
 		offset.y = std::modf(offset.y, &dummy);
+	}
+
+	Direction Entity::getSecondaryDirection() const {
+		return Direction::Invalid;
 	}
 
 	void Entity::jump() {

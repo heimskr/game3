@@ -258,6 +258,10 @@ namespace Game3 {
 		left(left),
 		right(right) {}
 
+	UStringSpan::UStringSpan(const std::string &string):
+		left(string.begin()),
+		right(string.end()) {}
+
 	UStringSpan::operator UString() const {
 		auto iter = left;
 		UString string;

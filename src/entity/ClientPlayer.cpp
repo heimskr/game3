@@ -20,12 +20,6 @@
 #include <cmath>
 
 namespace Game3 {
-	namespace {
-		inline Tick getMaxMessageAge(ClientGame &game) {
-			return 7 * game.getWindow()->settings.tickFrequency;
-		}
-	}
-
 	ClientPlayer::ClientPlayer():
 		Entity(ID()),
 		Player() {}
@@ -114,17 +108,7 @@ namespace Game3 {
 		const float health_offset = canShowHealthBar()? -.5 : 0;
 		const float name_offset = health_offset + (show_message? -1 : 0);
 
-		LivingEntity::render(renderers);
-
-		if (show_message) {
-			text.drawOnMap(lastMessage, {
-				.x = static_cast<float>(column) + x + .5,
-				.y = static_cast<float>(row) + y - z + health_offset - .25,
-				.scaleX = .75,
-				.scaleY = .75,
-				.align = TextAlign::Center,
-			});
-		}
+		LivingTitledEntity::render(renderers);
 
 #if 0
 		constexpr double thickness = 5 / 16.;
@@ -156,12 +140,6 @@ namespace Game3 {
 			.angle = degrees,
 		});
 #endif
-
-		text.drawOnMap(displayName, {
-			.x = float(column) + x + .5,
-			.y = float(row) + y - z + name_offset,
-			.align = TextAlign::Center,
-		});
 
 		ClientGamePtr client_game = getGame()->toClientPointer();
 
@@ -247,8 +225,8 @@ namespace Game3 {
 	}
 
 	const std::unordered_set<Layer> & ClientPlayer::getVisibleLayers() const {
-		static std::unordered_set<Layer> main_layers{Layer::Terrain, Layer::Submerged, Layer::Objects, Layer::Highest};
-		return main_layers;
+		static std::unordered_set<Layer> visible_layers{mainLayers.begin(), mainLayers.end()};
+		return visible_layers;
 	}
 
 	bool ClientPlayer::move(Direction direction, MovementContext context) {

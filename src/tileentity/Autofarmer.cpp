@@ -182,10 +182,11 @@ namespace Game3 {
 
 		TileID tile_id{};
 
-		if (std::optional<TileID> maybe = place.get(Layer::Terrain); maybe && *maybe != 0)
+		if (std::optional<TileID> maybe = place.get(Layer::Soil); maybe && *maybe != 0) {
 			tile_id = *maybe;
-		else
+		} else {
 			return false;
+		}
 
 		bool operated = false;
 
@@ -205,7 +206,7 @@ namespace Game3 {
 				return false;
 			}
 
-			place.set(Layer::Terrain, *farmlands.begin());
+			place.set(Layer::Soil, *farmlands.begin());
 			is_farmland = true;
 			operated = true;
 		}
@@ -287,7 +288,7 @@ namespace Game3 {
 				return operated;
 			}
 
-			plantable->plant(input_span, slot, stack, place);
+			plantable->plant(input_span, slot, stack, place, Layer::Submerged);
 			return true;
 		}
 

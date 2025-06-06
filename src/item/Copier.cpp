@@ -41,8 +41,9 @@ namespace Game3 {
 
 		const std::set<Position> positions = getPositions<std::set>(*stack);
 
-		if (positions.empty())
+		if (positions.empty()) {
 			return {};
+		}
 
 		Tileset &tileset = realm->getTileset();
 		std::map<Position, size_t> spans;
@@ -80,9 +81,9 @@ namespace Game3 {
 						if (!identifier_map.contains(identifier)) {
 							identifier_map[identifier] = identifier_map.size();
 							if (identifier.inSpace("base") && identifier.getPath() == "tile") {
-								identifiers.push_back(identifier.getPostPath());
+								identifiers.emplace_back(identifier.getPostPath());
 							} else {
-								identifiers.push_back(identifier.str());
+								identifiers.emplace_back(identifier);
 							}
 						}
 					}
@@ -135,7 +136,7 @@ namespace Game3 {
 			ss << '/';
 		}
 
-		std::string combined = ss.str();
+		std::string combined = std::move(ss).str();
 		if (!combined.empty() && combined.back() == '/') {
 			combined.pop_back();
 		}

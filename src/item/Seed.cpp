@@ -14,11 +14,11 @@ namespace Game3 {
 		auto &realm = *place.realm;
 		auto &tileset = realm.getTileset();
 
-		if (auto tile = realm.tryTile(Layer::Terrain, place.position); tile && tileset.isInCategory(*tile, "base:category/farmland"_id)) {
-			if (auto submerged = realm.tryTile(Layer::Submerged, place.position); !submerged || *submerged == tileset.getEmptyID()) {
+		if (std::optional<TileID> tile = realm.tryTile(Layer::Soil, place.position); tile && tileset.isInCategory(*tile, "base:category/farmland"_id)) {
+			if (std::optional<TileID> submerged = realm.tryTile(Layer::Submerged, place.position); !submerged || *submerged == tileset.getEmptyID()) {
 				const InventoryPtr inventory = place.player->getInventory(0);
 				auto inventory_lock = inventory->uniqueLock();
-				return plant(inventory, slot, stack, place);
+				return plant(inventory, slot, stack, place, Layer::Submerged);
 			}
 		}
 
@@ -29,14 +29,14 @@ namespace Game3 {
 		return use(slot, stack, place, modifiers, offsets);
 	}
 
-	bool Seed::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place) {
+	bool Seed::plant(InventoryPtr inventory, Slot slot, const ItemStackPtr &stack, const Place &place, Layer layer) {
 		if (stack->count == 0) {
 			inventory->erase(slot);
 			inventory->notifyOwner({});
 			return false;
 		}
 
-		place.set(Layer::Submerged, cropTilename);
+		place.set(layer, cropTilename);
 
 		inventory->decrease(stack, slot, 1, false);
 

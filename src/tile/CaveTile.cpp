@@ -5,9 +5,10 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	CaveTile::CaveTile(Identifier identifier, ItemStackPtr stack, Identifier floor):
+	CaveTile::CaveTile(Identifier identifier, ItemStackPtr stack, Layer floorLayer, Identifier floor):
 		MineableTile(std::move(identifier), std::move(stack), true),
-		floor(std::move(floor)) {}
+		floor(std::move(floor)),
+		floorLayer(floorLayer) {}
 
 	bool CaveTile::interact(const Place &place, Layer layer, const ItemStackPtr &used_item, Hand hand) {
 		if (!MineableTile::interact(place, layer, used_item, hand)) {
@@ -28,8 +29,8 @@ namespace Game3 {
 	}
 
 	void CaveTile::reveal(const Place &place) const {
-		if (std::optional<TileID> terrain = place.get(Layer::Terrain); !terrain || *terrain == 0) {
-			place.set(Layer::Terrain, floor);
+		if (std::optional<TileID> terrain = place.get(floorLayer); !terrain || *terrain == 0) {
+			place.set(floorLayer, floor);
 		}
 
 		if (auto cave = std::dynamic_pointer_cast<Cave>(place.realm)) {

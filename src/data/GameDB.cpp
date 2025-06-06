@@ -24,7 +24,7 @@ namespace Game3 {
 		weakGame(game) {}
 
 	int64_t GameDB::getCurrentFormatVersion() {
-		return 3;
+		return 4;
 	}
 
 	std::string GameDB::getFileExtension() {
@@ -37,7 +37,7 @@ namespace Game3 {
 		auto db_lock = database.uniqueLock();
 		database.getBase() = std::make_unique<SQLite::Database>(path.string(), SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 
-		static_assert(LAYER_COUNT * sizeof(TileID) * CHUNK_SIZE * CHUNK_SIZE < 65536);
+		static_assert(LAYER_COUNT * sizeof(TileID) * CHUNK_SIZE * CHUNK_SIZE < 131072);
 		static_assert(sizeof(BiomeType) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 		static_assert(sizeof(FluidInt) * CHUNK_SIZE * CHUNK_SIZE < 65536);
 
@@ -51,7 +51,7 @@ namespace Game3 {
 				realmID INT,
 				x INT,
 				y INT,
-				terrain VARBINARY(65535),
+				terrain VARBINARY(131071),
 				biomes  VARBINARY(65535),
 				fluids  VARBINARY(65535),
 				pathmap VARBINARY(65535),
@@ -410,7 +410,7 @@ namespace Game3 {
 			std::unordered_set<TileID> covered;
 			std::unordered_set<TileID> warned;
 
-			for (const Layer layer: allLayers) {
+			for (Layer layer: allLayers) {
 				std::unique_lock chunk_map_lock{provider.chunkMutexes.at(getIndex(layer))};
 				TileProvider::ChunkMap &chunk_map = provider.chunkMaps.at(getIndex(layer));
 				for (auto &[chunk_position, chunk]: chunk_map) {
@@ -419,12 +419,6 @@ namespace Game3 {
 						const TileID old_tile = tile_id;
 						if (auto iter = migration_map.find(tile_id); iter != migration_map.end()) {
 							TileID new_tile = iter->second;
-
-							// We don't want to automigrate old autotiles to the base of the new autotile.
-							// Take the autotile offset of the old autotile and add it to the new autotile.
-							if (autotiles.contains(old_map.at(old_tile))) {
-								new_tile += old_tile % 16;
-							}
 
 							tile_id = new_tile;
 							if (new_tile != old_tile && covered.insert(old_tile).second) {
@@ -441,6 +435,24 @@ namespace Game3 {
 							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old_tile) + ')');
 						}
 					}
+				}
+			}
+
+			for (Layer layer: allLayers) {
+				std::vector<ChunkPosition> all_chunk_positions;
+				{
+					std::shared_lock chunk_map_lock{provider.chunkMutexes.at(getIndex(layer))};
+					const TileProvider::ChunkMap &chunk_map = provider.chunkMaps.at(getIndex(layer));
+					all_chunk_positions.reserve(chunk_map.size());
+					for (const auto &[chunk_position, chunk]: chunk_map) {
+						all_chunk_positions.emplace_back(chunk_position);
+					}
+				}
+
+				for (ChunkPosition chunk_position: all_chunk_positions) {
+					chunk_position.iterate([&](Position position) {
+						realm->autotile(position, layer, TileUpdateContext{9});
+					});
 				}
 			}
 
