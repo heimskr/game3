@@ -64,14 +64,18 @@ namespace Game3 {
 			if (errc) {
 				ERR("Server accept: {}", errc.message());
 			} else {
-				std::string ip = socket.remote_endpoint().address().to_string();
-				auto client = std::make_shared<RemoteClient>(shared_from_this(), ip, ++lastID, std::move(socket));
-				allClients.withUnique([&](auto &) {
-					allClients.insert(client);
-				});
-				client->start();
-				if (onAdd) {
-					onAdd(*client);
+				try {
+					std::string ip = socket.remote_endpoint().address().to_string();
+					auto client = std::make_shared<RemoteClient>(shared_from_this(), ip, ++lastID, std::move(socket));
+					allClients.withUnique([&](auto &) {
+						allClients.insert(client);
+					});
+					client->start();
+					if (onAdd) {
+						onAdd(*client);
+					}
+				} catch (const asio::system_error &err) {
+					ERR("Server accept: {}", err.what());
 				}
 			}
 
