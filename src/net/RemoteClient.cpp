@@ -31,8 +31,9 @@ namespace Game3 {
 		{
 			auto lock = outbox.uniqueLock();
 			outbox.push_back(std::move(message));
-			if (1 < outbox.size())
+			if (1 < outbox.size()) {
 				return;
+			}
 		}
 
 		write();
@@ -43,15 +44,14 @@ namespace Game3 {
 	}
 
 	void RemoteClient::handleInput(std::string_view string) {
-		if (string.empty())
+		if (string.empty()) {
 			return;
+		}
 
 		std::stringstream ss;
-		for (const uint8_t byte: string)
+		for (const uint8_t byte: string) {
 			ss << ' ' << std::hex << std::setfill('0') << std::setw(2) << std::right << static_cast<uint16_t>(byte) << std::dec;
-		auto str = std::string(string);
-		while (!str.empty() && (str.back() == '\r' || str.back() == '\n'))
-			str.pop_back();
+		}
 
 		headerBytes.insert(headerBytes.end(), string.begin(), string.end());
 
@@ -76,16 +76,19 @@ namespace Game3 {
 		}
 
 		if (state == State::Data) {
-			if (MAX_PACKET_SIZE < receiveBuffer.size() + headerBytes.size())
+			if (MAX_PACKET_SIZE < receiveBuffer.size() + headerBytes.size()) {
+				mock();
 				throw PacketError("Packet too large");
+			}
 
 			const size_t to_append = std::min(payloadSize - receiveBuffer.size(), headerBytes.size());
 
 			receiveBuffer.append(headerBytes.begin(), headerBytes.begin() + to_append);
-			if (to_append == headerBytes.size())
+			if (to_append == headerBytes.size()) {
 				headerBytes.clear();
-			else
+			} else {
 				headerBytes.erase(headerBytes.begin(), headerBytes.begin() + to_append);
+			}
 
 			if (payloadSize < receiveBuffer.size()) {
 				mock();
@@ -96,8 +99,9 @@ namespace Game3 {
 			assert(server != nullptr);
 
 			if (payloadSize == receiveBuffer.size()) {
-				if (receiveBuffer.context.expired())
+				if (receiveBuffer.context.expired()) {
 					receiveBuffer.context = server->game;
+				}
 
 				auto packet = (*server->game->registry<PacketFactoryRegistry>()[packetType])();
 
@@ -113,8 +117,11 @@ namespace Game3 {
 					return;
 				}
 
-				assert(receiveBuffer.empty());
-				receiveBuffer.clear();
+				if (!receiveBuffer.empty()) {
+					mock();
+					throw std::runtime_error("Client sent extra data");
+				}
+
 				server->game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
 				state = State::Begin;
 			}
@@ -161,8 +168,9 @@ namespace Game3 {
 	}
 
 	void RemoteClient::send(std::string message, bool force) {
-		if (message.empty())
+		if (message.empty()) {
 			return;
+		}
 
 		if (!force && isBuffering()) {
 			SendBuffer &buffer = sendBuffer;
@@ -183,21 +191,25 @@ namespace Game3 {
 	}
 
 	void RemoteClient::flushBuffer(bool force) {
-		if (!force && !sendBuffer.active())
+		if (!force && !sendBuffer.active()) {
 			return;
+		}
+
 		std::string moved_buffer;
 		{
 			auto buffer_lock = sendBuffer.uniqueLock();
-			if (sendBuffer.bytes.empty())
+			if (sendBuffer.bytes.empty()) {
 				return;
+			}
 			moved_buffer = std::move(sendBuffer.bytes);
 		}
 		send(std::move(moved_buffer), true);
 	}
 
 	void RemoteClient::stopBuffering() {
-		if (!(--sendBuffer).active())
+		if (!(--sendBuffer).active()) {
 			flushBuffer(true);
+		}
 	}
 
 	bool RemoteClient::isBuffering() const {
@@ -272,20 +284,20 @@ namespace Game3 {
 	}
 
 	void RemoteClient::writeHandler(const asio::error_code &errc, size_t) {
-		bool empty{};
-		{
+		bool empty = [&] {
 			auto lock = outbox.uniqueLock();
 			outbox.pop_front();
-			empty = outbox.empty();
-		}
+			return outbox.empty();
+		}();
 
 		if (errc) {
 			ERR("Client write ({}): {} ({})", ip, errc.message(), errc.value());
 			return;
 		}
 
-		if (!empty)
+		if (!empty) {
 			write();
+		}
 	}
 
 	void RemoteClient::doHandshake() {
@@ -304,8 +316,9 @@ namespace Game3 {
 		asio::post(strand, [this] {
 			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, size_t length) {
 				if (errc) {
-					if (errc.value() != 1) // "stream truncated"
+					if (errc.value() != 1) { // "stream truncated"
 						ERR("Client read ({}): {} ({})", ip, errc.message(), errc.value());
+					}
 					removeSelf();
 					return;
 				}
