@@ -29,8 +29,7 @@
 *.db-journal
 /.flatpak-builder
 /vcpkg_installed
-/build
-/builddir
+/build*
 /src/resgen
 *~
 /*.flatpak
