@@ -217,25 +217,25 @@ namespace Game3 {
 	}
 
 	void RemoteClient::close() {
-		try {
-			asio::error_code errc;
-			socket.shutdown(errc);
-			if (errc) {
-				if (errc.value() == 1 ) {
-					// 1 corresponds to stream truncated, a very common error that I don't really consider an error
-					SUCCESS("Mostly managed to shut down client {}.", id);
+		socket.async_shutdown([this, self = shared_from_this()](const asio::error_code &errc) {
+			try {
+				if (errc) {
+					if (errc.value() == 1 ) {
+						// 1 corresponds to stream truncated, a very common error that I don't really consider an error
+						SUCCESS("Mostly managed to shut down client {}.", id);
+					} else {
+						ERR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
+					}
 				} else {
-					ERR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
+					socket.lowest_layer().close();
+					SUCCESS("Managed to shut down client {}.", id);
 				}
-			} else {
-				socket.lowest_layer().close();
-				SUCCESS("Managed to shut down client {}.", id);
+			} catch (const asio::system_error &err) {
+				// Who really cares if SSL doesn't shut down properly?
+				// Who decided that the client is worthy of a proper shutdown?
+				ERR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
 			}
-		} catch (const asio::system_error &err) {
-			// Who really cares if SSL doesn't shut down properly?
-			// Who decided that the client is worthy of a proper shutdown?
-			ERR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
-		}
+		});
 	}
 
 	void RemoteClient::removeSelf() {
