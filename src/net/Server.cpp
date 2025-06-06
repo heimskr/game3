@@ -324,11 +324,9 @@ namespace Game3 {
 				});
 
 				if (running && save_period <= std::chrono::system_clock::now() - last_save) {
-					INFO("Autosaving...");
 					game->tickingPaused = true;
 					game->getDatabase().writeAll();
 					game->tickingPaused = false;
-					INFO("Autosaved.");
 					last_save = std::chrono::system_clock::now();
 				}
 			}
