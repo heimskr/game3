@@ -214,7 +214,7 @@ winja:
 	cp builddir/src/game3.exe .
 
 linzip:
-	- cp builddir/src/game3 ./game3_stripped
+	- cp build_release/src/game3 ./game3_stripped
 	strip game3_stripped
 	rm -f game3-linux-x86_64.zip
 	mkdir -p game3_zip/Game3
