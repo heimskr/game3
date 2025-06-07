@@ -5,3 +5,6 @@ option('enable_scripting', type: 'boolean', value: false, description: 'Whether 
 option('enable_zip8', type: 'boolean', value: false, description: 'Whether to enable Zip8 support')
 option('external_fastnoise2', type: 'boolean', value: false, description: 'Whether to assume FastNoise2 is already built')
 option('time_trace', type: 'boolean', value: false, description: 'Whether to use -ftime-trace while compiling')
+option('zlib_path', type: 'string', value: '', description: 'An optional explicit path for zlib in curlpp')
+option('use_unwind', type: 'boolean', value: false, description: 'Whether to use libunwind')
+option('quasi_msys2', type: 'string', value: '', description: 'The quasi-msys2 root (optional)')

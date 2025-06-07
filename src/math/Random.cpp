@@ -9,8 +9,8 @@ namespace Game3 {
 		std::uniform_real_distribution distribution(0.0, 1.0);
 		const double u1 = distribution(rng);
 		const double u2 = distribution(rng);
-		const double phi = std::acos(2 * u1 - 1) - M_PI_2;
-		const double lambda = 2.0 * M_PI * u2;
+		const double phi = std::acos(2 * u1 - 1) - 3.14159265358979323846 / 2;
+		const double lambda = 2.0 * 3.14159265358979323846 * u2;
 		const double cos_phi = std::cos(phi);
 		return {
 			cos_phi * std::cos(lambda),

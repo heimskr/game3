@@ -57,7 +57,7 @@ namespace Game3 {
 			Position position{y, x};
 			if (lifetime) {
 				float distance = position.distance(origin);
-				entity->age = -distance / radius * *lifetime / M_PI;
+				entity->age = -distance / radius * *lifetime / 3.14159265358979323846;
 			}
 
 			realm->spawn(entity, position);

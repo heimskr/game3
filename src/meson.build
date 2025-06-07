@@ -1,5 +1,9 @@
 game3_sources = run_command('grabber.sh', check: true).stdout().strip().split('\n')
 
+quasi_msys2 = get_option('quasi_msys2')
+sorta_windows = build_machine.system() == 'windows' or quasi_msys2 != ''
+actually_linux = build_machine.system() == 'linux' and quasi_msys2 == ''
+
 if get_option('discord_rich_presence') == true
 	game3_sources += run_command('discord-grabber.sh', check: true).stdout().strip().split('\n')
 endif
@@ -10,13 +14,26 @@ chemskr = subproject('chemskr')
 namegen = subproject('namegen')
 sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
-curlpp = cmake.subproject('curlpp')
 clip = cmake.subproject('clip')
 
 zipios_options = cmake.subproject_options()
+curlpp_options = cmake.subproject_options()
+
+zlib_path = get_option('zlib_path')
+if zlib_path != ''
+	curlpp_options.add_cmake_defines({'ZLIB_LIBRARY:FILEPATH': zlib_path})
+	zipios_options.add_cmake_defines({'ZLIB_LIBRARY:FILEPATH': zlib_path})
+endif
+
+if quasi_msys2 != ''
+	zipios_options.append_compile_args('cpp', '-I' + quasi_msys2 + '/include')
+endif
+
 zipios_options.add_cmake_defines({'BUILD_SHARED_LIBS': false, 'BUILD_DOCUMENTATION': false, 'BUILD_ZIPIOS_TESTS': false})
 zipios_options.set_override_option('cpp_std', 'c++23')
 zipios = cmake.subproject('Zipios', options: zipios_options)
+
+curlpp = cmake.subproject('curlpp', options: curlpp_options)
 
 game3_deps = [
 	dependency('glibmm-2.68'),
@@ -41,8 +58,11 @@ game3_deps = [
 	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
-if build_machine.system() == 'linux'
+if get_option('use_unwind')
 	game3_deps += dependency('libunwind')
+endif
+
+if actually_linux
 	game3_deps += dependency('xcb')
 endif
 
@@ -74,13 +94,17 @@ if get_option('enable_scripting')
 	]
 endif
 
-if build_machine.system() == 'linux'
+if actually_linux
 	game3_deps += dependency('glu')
 	link_args += '-lX11'
 endif
 
 if get_option('external_fastnoise2')
-	link_args += '../subprojects/FastNoise2/build/Release/lib/libFastNoise.a'
+	if sorta_windows
+		link_args += '../subprojects/FastNoise2/build_windows/src/libFastNoise.a'
+	else
+		link_args += '../subprojects/FastNoise2/build/Release/lib/libFastNoise.a'
+	endif
 else
 	game3_deps += dependency('FastNoise2', modules: ['FastNoise2::FastNoise'])
 endif
@@ -89,9 +113,7 @@ if get_option('vcpkg_triplet') != ''
 	vcpkg_root = 'vcpkg_installed' / get_option('vcpkg_triplet')
 	inc_dirs += include_directories('..' / vcpkg_root / 'include')
 	link_args += '../' + vcpkg_root + '/lib/libnoise-static.a'
-elif build_machine.system() == 'linux'
-	link_args += '-lnoise'
-elif build_machine.system() == 'windows'
+elif sorta_windows
 	link_args += '../subprojects/libnoise/build/src/libnoise-static.a'
 	link_args += '-lws2_32'
 	link_args += '-lopengl32'
@@ -101,9 +123,10 @@ elif build_machine.system() == 'windows'
 	# link_args += '-lgcc'
 	link_args += '-lglew32'
 	link_args += '-lglu32'
-	link_args += '-lunwind'
 	link_args += '-ldbghelp'
 	inc_dirs += include_directories('..' / 'subprojects' / 'libnoise' / 'src')
+elif actually_linux
+	link_args += '-lnoise'
 endif
 
 if build_machine.system() == 'darwin'

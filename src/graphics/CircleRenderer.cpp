@@ -170,8 +170,8 @@ namespace Game3 {
 
 		std::vector<float> &vertices = vertexMap[sides];
 		for (int i = 0; i < sides; ++i) {
-			const float rad1 = 2. * M_PI * i / sides;
-			const float rad2 = 2. * M_PI * (i + 1) / sides;
+			const float rad1 = 2. * 3.14159265358979323846 * i / sides;
+			const float rad2 = 2. * 3.14159265358979323846 * (i + 1) / sides;
 			const float x1 = std::cos(rad1);
 			const float y1 = std::sin(rad1);
 			const float x2 = std::cos(rad2);

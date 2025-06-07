@@ -138,7 +138,7 @@ namespace Game3 {
 	}
 
 	double Game::getDivisor() const {
-		return 3. - 2. * std::sin(getHour() * M_PI / 24.);
+		return 3. - 2. * std::sin(getHour() * 3.14159265358979323846 / 24.);
 	}
 
 	std::optional<TileID> Game::getFluidTileID(FluidID fluid_id) {

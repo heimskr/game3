@@ -1,15 +1,16 @@
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <random>
-
-#include <boost/json/fwd.hpp>
-
 #include "types/Types.h"
 #include "types/ChunkPosition.h"
 #include "fluid/Fluid.h"
 #include "threading/ThreadPool.h"
+
+#include <boost/json/fwd.hpp>
+
+#include <cmath>
+#include <functional>
+#include <memory>
+#include <random>
 
 namespace Game3 {
 	class Realm;
@@ -30,7 +31,7 @@ namespace Game3 {
 		/** noise ∈ [-1, 1] */
 		FluidLevel getFluidLevel(double noise, double threshold = 0.3) const {
 			const double level = (1. + noise) / ((1. + threshold) + wetness);
-			return FluidTile::FULL * std::max(0., std::cos(level * M_PI / 4.));
+			return FluidTile::FULL * std::max(0., std::cos(level * 3.14159265358979323846 / 4.));
 		}
 	};
 

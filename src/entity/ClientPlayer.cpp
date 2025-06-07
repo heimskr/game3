@@ -111,7 +111,7 @@ namespace Game3 {
 		Vector2d target(mouse_position.column - x_offset + 1, mouse_position.row - y_offset + 1);
 		Vector2d diff = Vector2d(getPosition()) + Vector2d(offset.x + 0.5, offset.y - offset.z + 0.5) - target;
 		Vector2d midpoint = target + diff / 2.0;
-		double degrees = diff.atan2() * 180 / M_PI;
+		double degrees = diff.atan2() * 180 / 3.14159265358979323846;
 		double distance = diff.magnitude();
 
 		renderers.rectangle.drawOnMap(RenderOptions{

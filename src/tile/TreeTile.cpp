@@ -52,7 +52,7 @@ namespace Game3 {
 			return CropTile::damage(place, layer);
 		}
 
-		if (threadContext.random(0.0, 1.0) < M_PI / 10.) {
+		if (threadContext.random(0.0, 1.0) < 3.14159265358979323846 / 10.) {
 			place.set(Layer::Submerged, "base:tile/charred_stump");
 		} else {
 			ItemStack::spawn(place, place.getGame(), "base:item/wood");

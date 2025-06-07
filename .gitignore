@@ -65,3 +65,4 @@ vgcore.*
 /subprojects/packagecache
 /subprojects/sqlite-amalgamation-*
 /subprojects/sqlite3.wrap
+/dlls
