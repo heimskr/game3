@@ -13,3 +13,11 @@ zip -r ../game3-linux-x86_64.zip Game3 &&
 cd .. &&
 rm -r game3_zip &&
 rm -f game3_stripped
+
+if [ "$3" = "publish" ]; then
+	echo Publishing.
+	./publish.sh linux
+	exit $?
+else
+	echo Not publishing.
+fi
