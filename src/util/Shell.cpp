@@ -62,17 +62,20 @@ namespace Game3 {
 
 		std::stringstream stdout_stream, stderr_stream;
 
-		if (waitpid(child, nullptr, 0) == -1)
+		if (waitpid(child, nullptr, 0) == -1) {
 			throw std::runtime_error("waitpid failed: " + std::to_string(errno));
+		}
 
 		std::array<char, 4096> buffer{};
 		ssize_t bytes_read{};
 
-		while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size())))
+		while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size()))) {
 			stdout_stream.write(buffer.data(), bytes_read);
+		}
 
-		while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size())))
+		while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size()))) {
 			stderr_stream.write(buffer.data(), bytes_read);
+		}
 
 		return {stdout_stream.str(), stderr_stream.str()};
 #endif
@@ -101,11 +104,13 @@ namespace Game3 {
 				if (until <= std::chrono::system_clock::now()) {
 					char dummy{};
 
-					if (write(control_pipe[1], &dummy, 1) == -1)
+					if (write(control_pipe[1], &dummy, 1) == -1) {
 						throw std::runtime_error("Couldn't write to control pipe");
+					}
 
-					if (!child_quit && signal_on_timeout != 0 && child != -1)
+					if (!child_quit && signal_on_timeout != 0 && child != -1) {
 						kill(child, signal_on_timeout);
+					}
 
 					return;
 				}
@@ -130,8 +135,9 @@ namespace Game3 {
 
 		child = fork();
 
-		if (child == -1)
+		if (child == -1) {
 			throw std::runtime_error("Couldn't fork");
+		}
 
 		if (child == 0) {
 			std::vector<char *> cstrings{const_cast<char *>(path.c_str())};
@@ -190,13 +196,15 @@ namespace Game3 {
 			}
 
 			if (FD_ISSET(stdout_pipe[0], &fds_copy)) {
-				while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size())))
+				while (0 < (bytes_read = read(stdout_pipe[0], buffer.data(), buffer.size()))) {
 					stdout_stream.write(buffer.data(), bytes_read);
+				}
 			}
 
 			if (FD_ISSET(stderr_pipe[0], &fds_copy)) {
-				while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size())))
+				while (0 < (bytes_read = read(stderr_pipe[0], buffer.data(), buffer.size()))) {
 					stderr_stream.write(buffer.data(), bytes_read);
+				}
 			}
 
 			if (int wait_result = waitpid(child, &status, WNOHANG); wait_result != -1) {
