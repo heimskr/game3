@@ -26,6 +26,10 @@ if get_option('time_trace')
 	project_cpp_args += '-ftime-trace'
 endif
 
+if get_option('quasi_msys2') != ''
+	project_cpp_args += '-D_TIME_BITS=64'
+endif
+
 test_cpp_args = [
 	'-Wall',
 	'-Wextra',
