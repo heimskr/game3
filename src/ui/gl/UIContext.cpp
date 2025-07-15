@@ -459,6 +459,7 @@ namespace Game3 {
 		contextMenu = std::move(new_context_menu);
 		if (contextMenu) {
 			contextMenu->maybeRemeasure(getRenderers(0), -2, -2);
+			contextMenu->adjustPosition();
 		}
 	}
 

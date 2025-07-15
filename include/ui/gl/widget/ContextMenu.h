@@ -25,6 +25,17 @@ namespace Game3 {
 
 			void addItem(std::shared_ptr<ContextMenuItem>);
 
+			WidgetPtr getAnchor() const;
+
+			/** If the bottom edge and/or right edge of this context menu extends past that of the game UI, this moves the offset up and/or left. */
+			void adjustPosition();
+
+			float getXOffset() const;
+			float getYOffset() const;
+
+			void setXOffset(float);
+			void setYOffset(float);
+
 		private:
 			std::vector<std::shared_ptr<ContextMenuItem>> items;
 			WidgetPtr anchor;

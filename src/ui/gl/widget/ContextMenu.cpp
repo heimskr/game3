@@ -24,6 +24,9 @@ namespace Game3 {
 			ui.drawFrame(renderers, frame_scale, true, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
 		}
 
+		lastRectangle.x = x;
+		lastRectangle.y = y;
+
 		Box::render(renderers, x, y, lastWidth, lastHeight);
 	}
 
@@ -37,7 +40,7 @@ namespace Game3 {
 		}
 	}
 
-	bool ContextMenu::blocksMouse(int x, int y, bool is_drag_update) const {
+	bool ContextMenu::blocksMouse(int, int, bool is_drag_update) const {
 		return !is_drag_update;
 	}
 
@@ -53,6 +56,47 @@ namespace Game3 {
 	void ContextMenu::addItem(std::shared_ptr<ContextMenuItem> item) {
 		append(item);
 		items.emplace_back(std::move(item));
+	}
+
+	WidgetPtr ContextMenu::getAnchor() const {
+		return anchor;
+	}
+
+	float ContextMenu::getXOffset() const {
+		return xOffset;
+	}
+
+	float ContextMenu::getYOffset() const {
+		return yOffset;
+	}
+
+	void ContextMenu::setXOffset(float offset) {
+		xOffset = offset;
+	}
+
+	void ContextMenu::setYOffset(float offset) {
+		yOffset = offset;
+	}
+
+	void ContextMenu::adjustPosition() {
+		Rectangle bounds = getLastRectangle();
+
+		if (anchor) {
+			Rectangle anchor_position = anchor->getLastRectangle();
+			bounds.x = getXOffset() + anchor_position.x;
+			bounds.y = getYOffset() + anchor_position.y;
+		} else {
+			bounds.x = getXOffset();
+			bounds.y = getYOffset();
+		}
+
+		if (bounds.x + bounds.width > ui.getWidth()) {
+			xOffset -= bounds.width;
+		}
+
+		if (bounds.y + bounds.height > ui.getHeight()) {
+			yOffset -= bounds.height;
+		}
 	}
 
 	ContextMenuItem::ContextMenuItem(UIContext &ui, float scale, UString text, std::function<void()> onSelect):
