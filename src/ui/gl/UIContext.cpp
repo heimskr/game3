@@ -457,6 +457,9 @@ namespace Game3 {
 
 	void UIContext::setContextMenu(std::shared_ptr<ContextMenu> new_context_menu) {
 		contextMenu = std::move(new_context_menu);
+		if (contextMenu) {
+			contextMenu->maybeRemeasure(getRenderers(0), -2, -2);
+		}
 	}
 
 	int UIContext::getWidth() const {

@@ -8,12 +8,15 @@
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
 #include "item/Item.h"
+#include "packet/DropItemPacket.h"
 #include "packet/SetActiveSlotPacket.h"
 #include "packet/UseItemPacket.h"
+#include "ui/gl/widget/ContextMenu.h"
 #include "ui/gl/widget/ItemSlot.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	ItemSlot::ItemSlot(UIContext &ui, InventoryPtr inventory, ItemStackPtr stack, Slot slot, float size, float selfScale, bool active):
@@ -101,8 +104,10 @@ namespace Game3 {
 	}
 
 	bool ItemSlot::click(int button, int x, int y, Modifiers modifiers) {
-		if (button == LEFT_BUTTON && slot >= 0) {
-			if (inventory && inventory->getOwner() == ui.getPlayer()) {
+		bool is_player = inventory && inventory->getOwner() == ui.getPlayer();
+
+		if (button == LEFT_BUTTON) {
+			if (slot >= 0 && is_player) {
 				if (modifiers.onlyCtrl()) {
 					if (stack) {
 						ui.getGame()->getPlayer()->send(make<UseItemPacket>(slot, modifiers));
@@ -112,6 +117,21 @@ namespace Game3 {
 				}
 
 				return true;
+			}
+		} else if (button == RIGHT_BUTTON) {
+			if (is_player) {
+				auto menu = make<ContextMenu>(ui, selfScale, getSelf(), x - lastRectangle.x, y - lastRectangle.y);
+				menu->addItem(make<ContextMenuItem>(ui, selfScale, "Use", [this] {
+					ui.getPlayer()->send(make<UseItemPacket>(getSlot(), ui.window.getModifiers()));
+				}));
+				menu->addItem(make<ContextMenuItem>(ui, selfScale, "Drop", [this] {
+					ui.getPlayer()->send(make<DropItemPacket>(getSlot(), false));
+				}));
+				menu->addItem(make<ContextMenuItem>(ui, selfScale, "Discard", [this] {
+					ui.getPlayer()->send(make<DropItemPacket>(getSlot(), true));
+				}));
+				ui.setContextMenu(menu);
+				ui.focusWidget(menu);
 			}
 		}
 

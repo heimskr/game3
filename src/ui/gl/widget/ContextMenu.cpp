@@ -5,12 +5,12 @@
 
 namespace Game3 {
 	ContextMenu::ContextMenu(UIContext &ui, float scale, WidgetPtr anchor, float x_offset, float y_offset):
-		Box(ui, scale, Orientation::Vertical),
+		Box(ui, scale, Orientation::Vertical, 1, 0.5),
 		anchor(std::move(anchor)),
 		xOffset(x_offset),
 		yOffset(y_offset) {}
 
-	void ContextMenu::render(const RendererContext &renderers, float x, float y, float width, float height) {
+	void ContextMenu::render(const RendererContext &renderers, float x, float y, float, float) {
 		const Rectangle anchor_rectangle = anchor->getLastRectangle();
 
 		x = anchor_rectangle.x + xOffset;
@@ -24,7 +24,7 @@ namespace Game3 {
 			ui.drawFrame(renderers, frame_scale, true, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
 		}
 
-		Box::render(renderers, x, y, width, height);
+		Box::render(renderers, x, y, lastWidth, lastHeight);
 	}
 
 	void ContextMenu::measure(const RendererContext &renderers, Orientation measure_orientation, float for_width, float for_height, float &minimum, float &natural) {
@@ -35,6 +35,10 @@ namespace Game3 {
 		} else {
 			lastWidth = natural;
 		}
+	}
+
+	bool ContextMenu::blocksMouse(int x, int y, bool is_drag_update) const {
+		return !is_drag_update;
 	}
 
 	bool ContextMenu::keyPressed(uint32_t key, Modifiers, bool) {
@@ -51,14 +55,15 @@ namespace Game3 {
 		items.emplace_back(std::move(item));
 	}
 
-	ContextMenuItem::ContextMenuItem(UIContext &ui, float scale, UString text, std::function<void()> on_select):
+	ContextMenuItem::ContextMenuItem(UIContext &ui, float scale, UString text, std::function<void()> onSelect):
 		Label(ui, scale),
-		onSelect(std::move(on_select)) {
+		onSelect(std::move(onSelect)) {
 			setText(std::move(text));
 			setOnClick([this](Widget &, int button, int, int) {
-				if (button != LEFT_BUTTON)
+				if (button != LEFT_BUTTON) {
 					return false;
-				onSelect();
+				}
+				this->onSelect();
 				this->ui.setContextMenu(nullptr); // TODO: is this safe?
 				return true;
 			});

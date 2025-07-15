@@ -11,8 +11,8 @@ namespace Game3 {
 		bool discard = false;
 
 		DropItemPacket() = default;
-		DropItemPacket(Slot slot_, bool discard_):
-			slot(slot_), discard(discard_) {}
+		DropItemPacket(Slot slot, bool discard):
+			slot(slot), discard(discard) {}
 
 		PacketID getID() const override { return ID(); }
 

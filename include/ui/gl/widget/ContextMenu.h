@@ -9,7 +9,7 @@ namespace Game3 {
 		public:
 			std::function<void()> onSelect;
 
-			ContextMenuItem(UIContext &, float scale, UString text, std::function<void()> on_select = {});
+			ContextMenuItem(UIContext &, float scale, UString text, std::function<void()> onSelect = {});
 	};
 
 	class ContextMenu: public Box, public HasFixedWidth {
@@ -19,6 +19,7 @@ namespace Game3 {
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
 			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
+			bool blocksMouse(int x, int y, bool is_drag_update) const final;
 
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 

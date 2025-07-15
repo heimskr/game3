@@ -13,8 +13,8 @@ namespace Game3 {
 		Modifiers modifiers;
 
 		UseItemPacket() = default;
-		UseItemPacket(Slot slot_, Modifiers modifiers_):
-			slot(slot_), modifiers(modifiers_) {}
+		UseItemPacket(Slot slot, Modifiers modifiers):
+			slot(slot), modifiers(modifiers) {}
 
 		PacketID getID() const override { return ID(); }
 
