@@ -83,11 +83,11 @@ namespace Game3 {
 
 		if (anchor) {
 			Rectangle anchor_position = anchor->getLastRectangle();
-			bounds.x = getXOffset() + anchor_position.x;
-			bounds.y = getYOffset() + anchor_position.y;
+			bounds.x = xOffset + anchor_position.x;
+			bounds.y = yOffset + anchor_position.y;
 		} else {
-			bounds.x = getXOffset();
-			bounds.y = getYOffset();
+			bounds.x = xOffset;
+			bounds.y = yOffset;
 		}
 
 		if (bounds.x + bounds.width > ui.getWidth()) {

@@ -128,6 +128,10 @@ namespace Game3 {
 	}
 
 	bool UIContext::mouseDown(int button, int x, int y, Modifiers modifiers) {
+		if (contextMenu && !contextMenu->contains(x, y)) {
+			setContextMenu(nullptr);
+		}
+
 		return dispatch(&Widget::mouseDown, button, x, y, modifiers);
 	}
 
