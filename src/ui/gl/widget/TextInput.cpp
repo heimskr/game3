@@ -440,6 +440,10 @@ namespace Game3 {
 	}
 
 	bool TextInput::dragUpdate(int x, int y) {
+		if (!ui.hasDragUpdater(getSelf())) {
+			return false;
+		}
+
 		if (Widget::dragUpdate(x, y)) {
 			return true;
 		}

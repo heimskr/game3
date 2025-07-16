@@ -76,6 +76,7 @@ namespace Game3 {
 			std::shared_ptr<Tooltip> getTooltip() const;
 			void addDragUpdater(WidgetPtr);
 			bool anyDragUpdaters() const;
+			bool hasDragUpdater(const WidgetPtr &) const;
 			void setContextMenu(std::shared_ptr<ContextMenu>);
 			int getWidth() const;
 			int getHeight() const;

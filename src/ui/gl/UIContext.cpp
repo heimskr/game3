@@ -459,6 +459,10 @@ namespace Game3 {
 		return !extraDragUpdaters.empty();
 	}
 
+	bool UIContext::hasDragUpdater(const WidgetPtr &widget) const {
+		return extraDragUpdaters.contains(widget);
+	}
+
 	void UIContext::setContextMenu(std::shared_ptr<ContextMenu> new_context_menu) {
 		contextMenu = std::move(new_context_menu);
 		if (contextMenu) {

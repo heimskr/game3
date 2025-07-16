@@ -124,12 +124,16 @@ namespace Game3 {
 
 		lastHorizontalScrollMouse = x - last_x;
 		lastVerticalScrollMouse = y - last_y;
-		ui.addDragUpdater(shared_from_this());
+		ui.addDragUpdater(getSelf());
 		reverseScroll = true;
 		return true;
 	}
 
 	bool Scroller::dragUpdate(int x, int y) {
+		if (!ui.hasDragUpdater(getSelf())) {
+			return false;
+		}
+
 		bool out = false;
 
 		if (lastHorizontalScrollMouse) {
