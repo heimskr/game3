@@ -24,7 +24,7 @@ namespace Game3 {
 	void CraftingTab::init() {
 		inventoryModule = ui.makePlayerInventoryModule();
 		// Prevent shift clicking trying to move from the inventory to itself.
-		inventoryModule->setOnSlotClick([](Slot, Modifiers) { return true; });
+		inventoryModule->setOnSlotClick([](Slot, Modifiers modifiers) { return modifiers.shift; });
 		hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 0, 1);
 		recipeList = make<Box>(ui, selfScale, Orientation::Vertical);
 
