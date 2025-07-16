@@ -214,7 +214,7 @@ namespace Game3 {
 		ItemCount inventory_count = game->getPlayer()->getInventory(0)->count(stack);
 
 		if (inventory_count <= sell_count) {
-			sellSlot.reset();
+			sellSlot->setStack(nullptr);
 			hideSell();
 		} else {
 			// If the inventory count is less than the displayed stack count, update the displayed stack count.
