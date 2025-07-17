@@ -139,6 +139,10 @@ namespace Game3 {
 	}
 
 	bool ItemSlot::dragStart(int x, int y) {
+		if (!inventory) {
+			return true;
+		}
+
 		WidgetPtr dragged_widget = getDragStartWidget();
 		const bool out = dragged_widget != nullptr;
 		ui.setDraggedWidget(std::move(dragged_widget));
