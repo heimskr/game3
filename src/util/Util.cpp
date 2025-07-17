@@ -16,12 +16,14 @@ namespace Game3 {
 
 	template <>
 	std::vector<std::string_view> split<std::string_view>(std::string_view str, std::string_view delimiter, bool condense) {
-		if (str.empty())
+		if (str.empty()) {
 			return {};
+		}
 
 		size_t next = str.find(delimiter);
-		if (next == std::string::npos)
+		if (next == std::string::npos) {
 			return {str};
+		}
 
 		std::vector<std::string_view> out;
 		const size_t delimiter_length = delimiter.size();
@@ -33,8 +35,9 @@ namespace Game3 {
 			last = next;
 			next = str.find(delimiter, last + delimiter_length);
 			std::string_view sub = str.substr(last + delimiter_length, next - last - delimiter_length);
-			if (!sub.empty() || !condense)
+			if (!sub.empty() || !condense) {
 				out.push_back(sub);
+			}
 		}
 
 		return out;
@@ -45,8 +48,9 @@ namespace Game3 {
 		const auto pieces = split<std::string_view>(str, delimiter, condense);
 		std::vector<std::string> out;
 		out.reserve(pieces.size());
-		for (const auto &piece: pieces)
+		for (const auto &piece: pieces) {
 			out.emplace_back(piece);
+		}
 		return out;
 	}
 

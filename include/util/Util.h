@@ -49,14 +49,14 @@ namespace Game3 {
 	std::string_view trim(std::string_view, std::string_view to_remove = " \t\r\n");
 
 	template <typename C>
-	std::string join(const C &container, std::string_view delimiter = " ") {
+	std::string join(C &&container, std::string_view delimiter = " ") {
 		std::stringstream ss;
-		bool first = true;
-		for (const auto &item: container) {
-			if (first)
+		for (bool first = true; const auto &item: container) {
+			if (first) {
 				first = false;
-			else
+			} else {
 				ss << delimiter;
+			}
 			ss << item;
 		}
 		return std::move(ss).str();
@@ -152,8 +152,9 @@ namespace Game3 {
 	I parseNumber(std::string_view view, int base = 10) {
 		I out{};
 		std::from_chars_result result = std::from_chars(view.begin(), view.end(), out, base);
-		if (result.ec != std::errc{} || result.ptr - view.begin() != std::ssize(view))
+		if (result.ec != std::errc{} || result.ptr - view.begin() != std::ssize(view)) {
 			throw std::invalid_argument("Not an integer: \"" + std::string(view) + "\"");
+		}
 		return out;
 	}
 
@@ -164,14 +165,16 @@ namespace Game3 {
 		std::string str(view);
 		char *endptr = nullptr;
 		double out = strtod(str.c_str(), &endptr);
-		if (str.c_str() + str.size() != endptr)
+		if (str.c_str() + str.size() != endptr) {
 			throw std::invalid_argument("Not a floating point: \"" + str + "\"");
+		}
 		return out;
 #else
 		F out{};
 		std::from_chars_result result = std::from_chars(view.begin(), view.end(), out);
-		if (result.ec != std::errc{} || result.ptr - view.begin() != std::ssize(view))
+		if (result.ec != std::errc{} || result.ptr - view.begin() != std::ssize(view)) {
 			throw std::invalid_argument("Not a floating point: \"" + std::string(view) + "\"");
+		}
 		return out;
 #endif
 	}
