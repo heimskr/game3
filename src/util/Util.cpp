@@ -55,15 +55,17 @@ namespace Game3 {
 	}
 
 	std::string_view trimLeft(std::string_view str, std::string_view to_remove) {
-		while (!str.empty() && str.find_first_of(to_remove) == 0)
+		while (!str.empty() && str.find_first_of(to_remove) == 0) {
 			str.remove_prefix(1);
+		}
 
 		return str;
 	}
 
 	std::string_view trimRight(std::string_view str, std::string_view to_remove) {
-		while (!str.empty() && str.find_last_of(to_remove) == str.size() - 1)
+		while (!str.empty() && str.find_last_of(to_remove) == str.size() - 1) {
 			str.remove_suffix(1);
+		}
 
 		return str;
 	}
@@ -76,24 +78,27 @@ namespace Game3 {
 		const char *c_str = str.c_str();
 		char *end = nullptr;
 		const long parsed = strtol(c_str, &end, base);
-		if (c_str + str.length() != end)
+		if (c_str + str.length() != end) {
 			throw std::invalid_argument("Not an integer: \"" + str + "\"");
+		}
 		return parsed;
 	}
 
 	long parseLong(const char *str, int base) {
 		char *end = nullptr;
 		const long parsed = strtol(str, &end, base);
-		if (str + strlen(str) != end)
+		if (str + strlen(str) != end) {
 			throw std::invalid_argument("Not an integer: \"" + std::string(str) + "\"");
+		}
 		return parsed;
 	}
 
 	long parseLong(std::string_view view, int base) {
 		long out = 0;
 		auto result = std::from_chars(view.begin(), view.end(), out, base);
-		if (result.ec == std::errc::invalid_argument)
+		if (result.ec == std::errc::invalid_argument) {
 			throw std::invalid_argument("Not an integer: \"" + std::string(view) + "\"");
+		}
 		return out;
 	}
 
@@ -101,24 +106,27 @@ namespace Game3 {
 		const char *c_str = str.c_str();
 		char *end = nullptr;
 		const unsigned long parsed = strtoul(c_str, &end, base);
-		if (c_str + str.length() != end)
+		if (c_str + str.length() != end) {
 			throw std::invalid_argument("Not an integer: \"" + str + "\"");
+		}
 		return parsed;
 	}
 
 	unsigned long parseUlong(const char *str, int base) {
 		char *end = nullptr;
 		const unsigned long parsed = strtoul(str, &end, base);
-		if (str + strlen(str) != end)
+		if (str + strlen(str) != end) {
 			throw std::invalid_argument("Not an integer: \"" + std::string(str) + "\"");
+		}
 		return parsed;
 	}
 
 	unsigned long parseUlong(std::string_view view, int base) {
 		unsigned long out = 0;
 		auto result = std::from_chars(view.begin(), view.end(), out, base);
-		if (result.ec == std::errc::invalid_argument)
+		if (result.ec == std::errc::invalid_argument) {
 			throw std::invalid_argument("Not an integer: \"" + std::string(view) + "\"");
+		}
 		return out;
 	}
 

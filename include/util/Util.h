@@ -71,35 +71,39 @@ namespace Game3 {
 			std::memcpy(&raw[start], source.data(), byte_count);
 		} else {
 			raw.reserve(raw.size() + byte_count);
-			for (const auto item: source)
-				for (size_t i = 0; i < sizeof(item); ++i)
+			for (const auto item: source) {
+				for (size_t i = 0; i < sizeof(item); ++i) {
 					raw.push_back((item >> (8 * i)) & 0xff);
+				}
+			}
 		}
 	}
 
 	template <typename S, typename T>
 	void appendBytes(S &raw, T item) {
-		for (size_t i = 0; i < sizeof(item); ++i)
+		for (size_t i = 0; i < sizeof(item); ++i) {
 			raw.push_back((item >> (8 * i)) & 0xff);
+		}
 	}
 
 	template <typename C>
 	std::string hexString(const C &container, bool spaces) {
 		std::stringstream ss;
 		ss.imbue(std::locale("C"));
-		bool first = true;
-		for (const auto item: container) {
+		for (bool first = true; const auto item: container) {
 			if (spaces) {
-				if (first)
+				if (first) {
 					first = false;
-				else
+				} else {
 					ss << ' ';
+				}
 			}
 			ss << std::hex << std::setw(2 * sizeof(item)) << std::setfill('0') << std::right;
-			if constexpr (sizeof(item) == 1)
+			if constexpr (sizeof(item) == 1) {
 				ss << static_cast<uint16_t>(static_cast<std::make_unsigned_t<decltype(item)>>(item));
-			else
+			} else {
 				ss << static_cast<std::make_unsigned_t<decltype(item)>>(item);
+			}
 		}
 		return std::move(ss).str();
 	}
@@ -111,8 +115,9 @@ namespace Game3 {
 		bool buffered = false;
 
 		for (const char ch: str) {
-			if (ch == ' ')
+			if (ch == ' ') {
 				continue;
+			}
 			if (buffered) {
 				out.emplace_back((buffer << 4) | fromHex(ch));
 				buffered = false;
@@ -122,8 +127,9 @@ namespace Game3 {
 			}
 		}
 
-		if (buffered)
+		if (buffered) {
 			throw std::invalid_argument("Invalid hex string length");
+		}
 
 		return out;
 	}
@@ -131,9 +137,11 @@ namespace Game3 {
 	template <typename T, template <typename...> typename C, typename... Args>
 	std::unordered_set<std::shared_ptr<T>> filterWeak(const C<std::weak_ptr<T>, Args...> &container) {
 		std::unordered_set<std::shared_ptr<T>> out;
-		for (const auto &weak: container)
-			if (auto locked = weak.lock())
+		for (const auto &weak: container) {
+			if (auto locked = weak.lock()) {
 				out.insert(locked);
+			}
+		}
 		return out;
 	}
 
@@ -191,8 +199,9 @@ namespace Game3 {
 	}
 
 	static inline std::default_random_engine::result_type getRandom(std::default_random_engine::result_type seed = 0) {
-		if (seed == 0)
+		if (seed == 0) {
 			return utilRNG();
+		}
 		std::default_random_engine rng;
 		rng.seed(seed);
 		return rng();
@@ -211,22 +220,25 @@ namespace Game3 {
 
 	template <typename T>
 	typename T::value_type & choose(T &container, typename std::default_random_engine::result_type seed = 0) {
-		if (container.empty())
+		if (container.empty()) {
 			throw std::invalid_argument("Container is empty");
+		}
 		return container.at(getRandom(seed) % container.size());
 	}
 
 	template <typename T>
 	const typename T::value_type & choose(const T &container, typename std::default_random_engine::result_type seed = 0) {
-		if (container.empty())
+		if (container.empty()) {
 			throw std::invalid_argument("Container is empty");
+		}
 		return container.at(getRandom(seed) % container.size());
 	}
 
 	template <typename T, typename R>
 	typename T::value_type & choose(T &container, R &&rng) {
-		if (container.empty())
+		if (container.empty()) {
 			throw std::invalid_argument("Container is empty");
+		}
 		return container.at(std::uniform_int_distribution<size_t>(0, container.size() - 1)(rng));
 	}
 
@@ -234,50 +246,57 @@ namespace Game3 {
 
 	template <typename T, typename R>
 	T & choose(std::list<T> &container, R &&rng) {
-		if (container.empty())
+		if (container.empty()) {
 			throw std::invalid_argument("Container is empty");
+		}
 		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	T & choose(std::set<T> &set, R &&rng) {
-		if (set.empty())
+		if (set.empty()) {
 			throw std::invalid_argument("Set is empty");
+		}
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	T & choose(std::unordered_set<T> &set, R &&rng) {
-		if (set.empty())
+		if (set.empty()) {
 			throw std::invalid_argument("Set is empty");
+		}
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	const typename T::value_type & choose(const T &container, R &&rng) {
-		if (container.empty())
+		if (container.empty()) {
 			throw std::invalid_argument("Container is empty");
+		}
 		return container.at(std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	const T & choose(const std::list<T> &container, R &&rng) {
-		if (container.empty())
+		if (container.empty()) {
 			throw std::invalid_argument("Container is empty");
+		}
 		return *std::next(container.begin(), std::uniform_int_distribution(static_cast<size_t>(0), container.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	const T & choose(const std::unordered_set<T> &set, R &&rng) {
-		if (set.empty())
+		if (set.empty()) {
 			throw std::invalid_argument("Set is empty");
+		}
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
 	template <typename T, typename R>
 	const T & choose(const std::set<T> &set, R &&rng) {
-		if (set.empty())
+		if (set.empty()) {
 			throw std::invalid_argument("Set is empty");
+		}
 		return *std::next(set.begin(), std::uniform_int_distribution(static_cast<size_t>(0), set.size() - 1)(rng));
 	}
 
@@ -285,8 +304,9 @@ namespace Game3 {
 	struct Hash {
 		size_t operator()(const T &data, size_t start = 0xcbf29ce484222325ul) const {
 			const auto *base = reinterpret_cast<const uint8_t *>(&data);
-			for (size_t i = 0; i < sizeof(T); ++i)
+			for (size_t i = 0; i < sizeof(T); ++i) {
 				start = (start * 0x00000100000001b3) ^ base[i];
+			}
 			return start;
 		}
 	};
@@ -307,13 +327,15 @@ namespace Game3 {
 	template <typename T, typename R, template <typename...> typename M = std::map, std::floating_point F = double, typename... E>
 	const T & weightedChoice(const M<T, F, E...> &map, R &rng) {
 		F sum{};
-		for (const auto &[item, weight]: map)
+		for (const auto &[item, weight]: map) {
 			sum += weight;
+		}
 		F choice = std::uniform_real_distribution<F>(0, sum)(rng);
 		F so_far{};
 		for (const auto &[item, weight]: map) {
-			if (choice < so_far + weight)
+			if (choice < so_far + weight) {
 				return item;
+			}
 			so_far += weight;
 		}
 		throw std::logic_error("Unable to select item from map of weights");
@@ -321,12 +343,15 @@ namespace Game3 {
 
 	template <typename O, typename I>
 	O safeCast(I input) {
-		if (static_cast<I>(std::numeric_limits<O>::max()) < input)
+		if (static_cast<I>(std::numeric_limits<O>::max()) < input) {
 			throw std::invalid_argument("Input number too high: " + std::to_string(input) + " > " + std::to_string(static_cast<I>(std::numeric_limits<O>::max())));
+		}
 
-		if constexpr (std::is_signed_v<I> && std::is_signed_v<O>)
-			if (static_cast<I>(std::numeric_limits<O>::min()) > input)
+		if constexpr (std::is_signed_v<I> && std::is_signed_v<O>) {
+			if (static_cast<I>(std::numeric_limits<O>::min()) > input) {
 				throw std::invalid_argument("Input number too low");
+			}
+		}
 
 		return static_cast<O>(input);
 	}
