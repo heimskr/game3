@@ -4,8 +4,8 @@
 #include "game/ClientInventory.h"
 #include "graphics/RealmRenderer.h"
 #include "graphics/RendererContext.h"
-#include "graphics/Tileset.h"
 #include "graphics/Util.h"
+#include "lib/PNG.h"
 #include "net/DirectLocalClient.h"
 #include "net/LocalClient.h"
 #include "packet/ContinuousInteractionPacket.h"
@@ -119,6 +119,16 @@ namespace Game3 {
 			});
 
 			glfwGetWindowContentScale(glfwWindow, &xScale, &yScale);
+
+			png::image<png::rgba_pixel> icon_png("resources/game3.png");
+			std::shared_ptr<uint8_t[]> icon = getRaw(icon_png);
+			GLFWimage image{
+				.width  = static_cast<int>(icon_png.get_width()),
+				.height = static_cast<int>(icon_png.get_height()),
+				.pixels = icon.get(),
+			};
+
+			glfwSetWindowIcon(glfwWindow, 1, &image);
 
 #ifdef __MINGW32__
 			xScale = 1;
