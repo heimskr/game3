@@ -369,7 +369,7 @@ namespace Game3 {
 	void LivingEntity::applyGenes() {}
 
 	bool LivingEntity::canMutate() const {
-		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastMutation) >= MUTATION_PERIOD;
+		return lastMutation.age() >= MUTATION_PERIOD;
 	}
 
 	void LivingEntity::mutate(float strength) {
@@ -383,7 +383,7 @@ namespace Game3 {
 
 		applyGenes();
 		broadcastPacket(make<EntityPacket>(getSelf()));
-		lastMutation = std::chrono::system_clock::now();
+		lastMutation.update();
 	}
 
 	void LivingEntity::inflictStatusEffect(std::unique_ptr<StatusEffect> &&effect, bool can_overwrite) {

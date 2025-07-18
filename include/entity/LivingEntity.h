@@ -2,6 +2,7 @@
 
 #include "entity/Entity.h"
 #include "statuseffect/StatusEffectMap.h"
+#include "util/Time.h"
 
 #include <functional>
 
@@ -74,7 +75,7 @@ namespace Game3 {
 			int defenseStat = 0;
 			/** Not synchronized. */
 			int kills = 0;
-			std::chrono::system_clock::time_point lastMutation{};
+			Time lastMutation = Time::zero();
 
 			LivingEntity();
 
