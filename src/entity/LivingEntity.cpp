@@ -16,7 +16,7 @@
 
 namespace {
 	constexpr float BASE_EXPLOSION_DAMAGE = 10;
-	constexpr std::chrono::milliseconds MUTATION_PERIOD{500};
+	constexpr std::chrono::milliseconds MUTATION_PERIOD{200};
 }
 
 namespace Game3 {
