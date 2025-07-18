@@ -6,7 +6,7 @@ source "$2"/env/all.src &&
 source "$2"/init.sh &&
 cd "$1"/build_windows &&
 sed -i 's/-I\/usr\/include //' build.ninja &&
-ninja &&
+ninja || { sed -i 's/-I\/usr\/include //' build.ninja && ninja; } &&
 cp src/game3.exe ../game3.exe &&
 cd .. &&
 strip ./game3.exe &&
