@@ -131,6 +131,7 @@ namespace Game3 {
 		}
 
 		const Identifier soil_tile = tileset[realm->getTile(Layer::Soil, position)];
+		const Identifier vegetation_tile = tileset[realm->getTile(Layer::Vegetation, position)];
 
 		if (water == FluidID(-1)) {
 			water = safeCast<FluidID>(realm->getGame()->registry<FluidRegistry>().at("base:fluid/water")->registryID);
@@ -148,7 +149,7 @@ namespace Game3 {
 			generateLilypad(Place(position, realm), lilypad_rand <= 2);
 		}
 
-		if (grassSet.contains(soil_tile)) {
+		if (grassSet.contains(vegetation_tile)) {
 			if (realm->middleEmpty(position)) {
 				if constexpr (SPAWN_BIG_FLOWERS) {
 					if (std::uniform_int_distribution{1, 100}(rng) <= 2) {
