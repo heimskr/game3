@@ -22,11 +22,6 @@ namespace Game3 {
 
 			GameDB &database = game->getDatabase();
 
-			if (!database.hasUsername(username)) {
-				client.send(make<LoginStatusPacket>("User doesn't exist."));
-				return;
-			}
-
 			const bool was_omnitoken = server->game->compareToken(token);
 
 			if (!was_omnitoken && server->generateToken(username) != token) {
@@ -90,6 +85,11 @@ namespace Game3 {
 				client.send(make<LoginStatusPacket>(true, player->globalID, username, *displayName, player));
 				server->setupPlayer(client);
 				realm->addPlayer(player);
+				return;
+			}
+
+			if (!database.hasUsername(username)) {
+				client.send(make<LoginStatusPacket>("User doesn't exist."));
 				return;
 			}
 		} else {
