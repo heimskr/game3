@@ -7,7 +7,7 @@
 #include "types/Position.h"
 
 namespace Game3 {
-	bool Mutagen::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
+	bool MutagenItem::use(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets) {
 		RealmPtr realm = place.realm;
 		assert(realm->getSide() == Side::Server);
 

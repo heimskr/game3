@@ -118,8 +118,9 @@ namespace Game3 {
 	}
 
 	void Sheep::renderBody(const RendererContext &renderers, const RenderOptions &options) {
-		if (!mask)
+		if (!mask) {
 			mask = getGame()->registry<TextureRegistry>().at("base:texture/sheep_mask");
+		}
 		renderers.recolor.drawOnMap(texture, mask, options, hue.getValue(), saturation.getValue(), valueMultiplier.getValue());
 	}
 

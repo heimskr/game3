@@ -274,7 +274,7 @@ namespace Game3 {
 
 		add(std::make_shared<MilkDrink>("base:item/milk_flask", "Milk", 4, 64));
 
-		add(std::make_shared<Mutagen>("base:item/mutagen", "Mutagen", 999, "base:fluid/mutagen", 64)); // TODO: cost
+		add(std::make_shared<MutagenItem>("base:item/mutagen", "Mutagen", 999, "base:fluid/mutagen", 64)); // TODO: cost
 
 		add(std::make_shared<MutatorItem>("base:item/mutator", "Mutator", 999, 64)); // TODO: cost
 

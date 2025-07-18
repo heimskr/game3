@@ -1,3 +1,5 @@
+#pragma once
+
 #include "fluid/Fluid.h"
 
 namespace Game3 {

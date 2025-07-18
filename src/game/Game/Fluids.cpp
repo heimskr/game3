@@ -1,6 +1,7 @@
 #include "fluid/Brine.h"
 #include "fluid/Lava.h"
 #include "fluid/Milk.h"
+#include "fluid/Mutagen.h"
 #include "fluid/PowderedSnow.h"
 #include "fluid/Radon.h"
 #include "fluid/SulfuricAcid.h"
@@ -25,6 +26,7 @@ namespace Game3 {
 		replaceFluid<Brine>(reg);
 		replaceFluid<Lava>(reg);
 		replaceFluid<Milk>(reg);
+		replaceFluid<Mutagen>(reg);
 		replaceFluid<PowderedSnow>(reg);
 		replaceFluid<Radon>(reg);
 		replaceFluid<SulfuricAcid>(reg);

@@ -48,8 +48,9 @@ namespace Game3 {
 
 // FluidStack
 
-	FluidStack::FluidStack(FluidID id_, FluidAmount amount_):
-		id(id_), amount(amount_) {}
+	FluidStack::FluidStack(FluidID id, FluidAmount amount):
+		id(id),
+		amount(amount) {}
 
 	FluidStack::operator std::string() const {
 		std::string out = "FluidStack(";

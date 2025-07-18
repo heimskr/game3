@@ -51,6 +51,10 @@ namespace Game3 {
 			virtual void absorbGenes(const boost::json::value &);
 			virtual void iterateGenes(const std::function<void(Gene &)> &);
 			virtual void iterateGenes(const std::function<void(const Gene &)> &) const;
+			virtual Gene * selectGene();
+			virtual void applyGenes();
+			virtual bool canMutate() const;
+			virtual void mutate(float strength);
 			virtual void inflictStatusEffect(std::unique_ptr<StatusEffect> &&, bool can_overwrite);
 			virtual void removeStatusEffect(const Identifier &);
 			virtual void setStatusEffects(StatusEffectMap);
@@ -70,6 +74,7 @@ namespace Game3 {
 			int defenseStat = 0;
 			/** Not synchronized. */
 			int kills = 0;
+			std::chrono::system_clock::time_point lastMutation{};
 
 			LivingEntity();
 
