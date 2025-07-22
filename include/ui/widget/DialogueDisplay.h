@@ -1,18 +1,43 @@
 #pragma once
 
+#include "game/Dialogue.h"
 #include "ui/widget/Box.h"
+
+#include <memory>
 
 namespace Game3 {
 	class Label;
 
-	class DialogueDisplay: public Box {
+	class DialogueRow: public Box {
 		public:
-			DialogueDisplay(UIContext &, float selfScale);
+			DialogueRow(UIContext &, float selfScale, DialogueOption);
 
-			void init() final;
+			void init() override;
+
+			void setActive(bool);
 
 		private:
+			DialogueOption option;
+			std::shared_ptr<Label> indicator;
+			std::shared_ptr<Label> text;
+	};
+
+	class DialogueDisplay: public Box {
+		public:
+			DialogueDisplay(UIContext &, float selfScale, DialogueGraphPtr graph);
+
+			void init() final;
+			void render(const RendererContext &, float x, float y, float width, float height) final;
+
+			bool getStillOpen() const;
+
+		private:
+			DialogueGraphPtr graph;
+			DialogueNodePtr lastNode;
 			std::shared_ptr<Label> mainText;
 			std::shared_ptr<Box> optionBox;
+			size_t selectedOptionIndex = 0;
+
+			void resetOptions(const DialogueNodePtr &);
 	};
 }

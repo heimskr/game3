@@ -1,3 +1,4 @@
+#include "entity/ClientPlayer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/TextRenderer.h"
@@ -8,19 +9,33 @@
 #include "ui/widget/Scroller.h"
 #include "ui/Constants.h"
 #include "ui/UIContext.h"
+#include "ui/Window.h"
 
 namespace Game3 {
 	DialogueDialog::DialogueDialog(UIContext &ui, float selfScale):
 		Dialog(ui, selfScale) {}
 
 	void DialogueDialog::init() {
-		dialogueDisplay = make<DialogueDisplay>(ui, selfScale);
+		auto graph = std::make_shared<DialogueGraph>(ui.getPlayer());
+
+		graph->addNode("entry", "Hey there.", {{"What's up?", "whats_up"}, {"No.", "oh_ok"}});
+		graph->addNode("whats_up", "Just chillin.", {{"Ok.", "!exit"}, {"Wait a second", "entry"}});
+		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}});
+
+		dialogueDisplay = make<DialogueDisplay>(ui, selfScale, std::move(graph));
 		dialogueScroller = make<Scroller>(ui, selfScale);
 		dialogueScroller->setChild(dialogueDisplay);
 		dialogueScroller->insertAtEnd(getSelf());
 	}
 
 	void DialogueDialog::render(const RendererContext &renderers) {
+		if (!dialogueDisplay->getStillOpen()) {
+			ui.window.queue([](Window &window) {
+				window.uiContext.removeDialogs<DialogueDialog>();
+			});
+			return;
+		}
+
 		Rectangle position = getPosition();
 
 		{

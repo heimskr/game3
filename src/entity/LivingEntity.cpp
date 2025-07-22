@@ -20,7 +20,6 @@ namespace {
 }
 
 namespace Game3 {
-
 	LivingEntity::LivingEntity():
 		Entity("base:invalid/LivingEntity") {}
 
