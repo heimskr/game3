@@ -12,6 +12,7 @@
 #include <string>
 
 namespace Game3 {
+	class BottomDialog;
 	class ChatDialog;
 	class ClientInventory;
 	class HasFluids;
@@ -21,6 +22,7 @@ namespace Game3 {
 
 	class GameUI final: public UI {
 		public:
+			std::shared_ptr<BottomDialog> bottomDialog;
 			std::shared_ptr<ChatDialog> chatDialog;
 			std::shared_ptr<OmniDialog> omniDialog;
 			std::shared_ptr<TopDialog> topDialog;
@@ -49,6 +51,7 @@ namespace Game3 {
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();
 			const std::shared_ptr<TopDialog> & getTopDialog();
+			const std::shared_ptr<BottomDialog> & getBottomDialog();
 
 			void showOmniDialog();
 			void hideOmniDialog();

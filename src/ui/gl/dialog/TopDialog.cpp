@@ -24,7 +24,7 @@ namespace Game3 {
 		});
 		hbox->append(abscond);
 
-		hbox->insertAtEnd(shared_from_this());
+		hbox->insertAtEnd(getSelf());
 	}
 
 	void TopDialog::render(const RendererContext &renderers) {

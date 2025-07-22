@@ -13,5 +13,11 @@ namespace Game3 {
 
 			using Dialog::init;
 			virtual void init(Window &) = 0;
+
+			/** Called if nothing else handled the key press. */
+			virtual bool keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat);
+
+			/** Called if nothing else handled the char press. */
+			virtual bool charPressed(uint32_t codepoint, Modifiers modifiers);
 	};
 }

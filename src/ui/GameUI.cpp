@@ -4,6 +4,7 @@
 #include "graphics/Texture.h"
 #include "graphics/Tileset.h"
 #include "realm/Realm.h"
+#include "ui/gl/dialog/BottomDialog.h"
 #include "ui/gl/dialog/ChatDialog.h"
 #include "ui/gl/dialog/OmniDialog.h"
 #include "ui/gl/dialog/TopDialog.h"
@@ -17,12 +18,13 @@
 
 namespace Game3 {
 	GameUI::~GameUI() {
-		ui.removeDialog(topDialog);
+		ui.removeDialogs<BottomDialog, OmniDialog, TopDialog>();
 	}
 
 	void GameUI::init(Window &) {
 		Dialog::init();
 		fbo.init();
+		bottomDialog = ui.emplaceDialog<BottomDialog>(selfScale);
 		chatDialog = ui.emplaceDialog<ChatDialog>(selfScale);
 	}
 
@@ -154,6 +156,13 @@ namespace Game3 {
 			topDialog = make<TopDialog>(ui, selfScale);
 		}
 		return topDialog;
+	}
+
+	const std::shared_ptr<BottomDialog> & GameUI::getBottomDialog() {
+		if (!bottomDialog) {
+			bottomDialog = make<BottomDialog>(ui, selfScale);
+		}
+		return bottomDialog;
 	}
 
 	void GameUI::showOmniDialog() {

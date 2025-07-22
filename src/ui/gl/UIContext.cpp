@@ -10,7 +10,6 @@
 #include "ui/gl/module/InventoryModule.h"
 #include "ui/gl/widget/AutocompleteDropdown.h"
 #include "ui/gl/widget/ContextMenu.h"
-#include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/StatusEffectsDisplay.h"
 #include "ui/gl/widget/Tooltip.h"
 #include "ui/gl/Constants.h"
@@ -28,10 +27,7 @@ namespace Game3 {
 	UIContext::UIContext(Window &window, float scale):
 		window(window),
 		scale(scale),
-		hotbar(std::make_shared<Hotbar>(*this, 0.75)),
 		tooltip(std::make_shared<Tooltip>(*this, 1)) {
-			hotbar->setName("Hotbar");
-			hotbar->init();
 			tooltip->init();
 		}
 
@@ -46,16 +42,7 @@ namespace Game3 {
 		}
 
 		if (ClientGamePtr game = getGame(); game != nullptr && game->getActiveRealm() != nullptr) {
-			if (std::ranges::none_of(dialogs, +[](const DialogPtr &dialog) { return dialog->hidesHotbar(); })) {
-				scissorStack = internalScissorStack;
-				float dummy{};
-				float natural_width{};
-				float natural_height{};
-				hotbar->measure(context, Orientation::Horizontal, window.getWidth(), window.getHeight(), dummy, natural_width);
-				hotbar->measure(context, Orientation::Vertical, window.getWidth(), window.getHeight(), dummy, natural_height);
-				hotbar->render(context, (window.getWidth() - natural_width) / 2, window.getHeight() - natural_height - hotbar->getScale(), natural_width, natural_height);
-			}
-
+			scissorStack = internalScissorStack;
 			StatusEffectsDisplay(*this, 1).render(context, internalScissorStack.getTop().rectangle);
 		}
 
@@ -108,7 +95,6 @@ namespace Game3 {
 			dialog->onClose();
 		}
 		dialogs.clear();
-		hotbar->reset();
 		tooltip->hide();
 	}
 
@@ -163,10 +149,6 @@ namespace Game3 {
 			}
 		}
 
-		if (hotbar->contains(x, y)) {
-			return dragging = hotbar->dragStart(x, y);
-		}
-
 		if (ClientGamePtr game = getGame()) {
 			game->dragStart(x, y, window.getModifiers());
 			return dragging = true;
@@ -202,10 +184,6 @@ namespace Game3 {
 			if (dialog->dragUpdate(x, y)) {
 				return true;
 			}
-		}
-
-		if (hotbar->contains(x, y)) {
-			return hotbar->dragUpdate(x, y);
 		}
 
 		if (ClientGamePtr game = getGame()) {
@@ -257,17 +235,10 @@ namespace Game3 {
 			}
 		}
 
-		Defer defer;
-
 		if (draggedWidget != nullptr && draggedWidgetActive) {
 			draggedWidget->dragEnd(x, y, displacement);
 			draggedWidgetActive = false;
-			defer = [this] { setDraggedWidget(nullptr); };
-		}
-
-		if (!out && hotbar->contains(x, y)) {
-			hotbar->dragEnd(x, y, displacement);
-			return true;
+			setDraggedWidget(nullptr);
 		}
 
 		return true;
@@ -298,7 +269,11 @@ namespace Game3 {
 			}
 		}
 
-		return hotbar->keyPressed(key, modifiers, is_repeat);
+		if (currentUI) {
+			return currentUI->keyPressed(key, modifiers, is_repeat);
+		}
+
+		return false;
 	}
 
 	bool UIContext::charPressed(uint32_t codepoint, Modifiers modifiers) {
@@ -322,7 +297,11 @@ namespace Game3 {
 			}
 		}
 
-		return hotbar->charPressed(codepoint, modifiers);
+		if (currentUI) {
+			return currentUI->charPressed(codepoint, modifiers);
+		}
+
+		return false;
 	}
 
 	void UIContext::setDraggedWidget(WidgetPtr new_dragged_widget) {
@@ -502,10 +481,6 @@ namespace Game3 {
 		return contextMenu;
 	}
 
-	std::shared_ptr<Hotbar> UIContext::getHotbar() const {
-		return hotbar;
-	}
-
 	std::shared_ptr<InventoryModule> UIContext::makePlayerInventoryModule() {
 		if (ClientPlayerPtr player = getPlayer()) {
 			return make<InventoryModule>(*this, 1, std::static_pointer_cast<ClientInventory>(player->getInventory(0)));
@@ -533,7 +508,6 @@ namespace Game3 {
 		};
 
 		visit(draggedWidget);
-		visit(hotbar);
 		visit(tooltip);
 		visit(autocompleteDropdown);
 		visit(contextMenu);

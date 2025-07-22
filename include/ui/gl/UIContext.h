@@ -84,13 +84,14 @@ namespace Game3 {
 			void addDialog(const DialogPtr &);
 			const std::optional<std::pair<int, int>> & getDragOrigin() const;
 			std::shared_ptr<ContextMenu> getContextMenu() const;
-			std::shared_ptr<Hotbar> getHotbar() const;
 			std::shared_ptr<InventoryModule> makePlayerInventoryModule();
 			void setScale(float);
 			void iterateChildren(const std::function<void(const WidgetPtr &)> &) const;
 
 			/** Order: clockwise starting at top left. */
 			void drawFrame(const RendererContext &, double scale, bool alpha, const std::array<std::string_view, 8> &, const Color &interior = {0, 0, 0, 0});
+
+			const auto & getDialogs() const { return dialogs; }
 
 			template <typename... Ts>
 			size_t removeDialogs() {
@@ -126,7 +127,6 @@ namespace Game3 {
 			std::vector<std::shared_ptr<Dialog>> dialogs;
 			ScissorStack internalScissorStack; // TODO: remove this
 			WidgetPtr draggedWidget;
-			std::shared_ptr<Hotbar> hotbar;
 			std::shared_ptr<Tooltip> tooltip;
 			std::shared_ptr<AutocompleteDropdown> autocompleteDropdown;
 			std::shared_ptr<ContextMenu> contextMenu;
@@ -165,10 +165,6 @@ namespace Game3 {
 					if (((*dialog).*function)(args...)) {
 						return true;
 					}
-				}
-
-				if (((*hotbar).*function)(args...)) {
-					return true;
 				}
 
 				return currentUI && ((*currentUI).*function)(args...);

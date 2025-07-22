@@ -15,9 +15,11 @@
 #include "tileentity/FluidHoldingTileEntity.h"
 #include "types/PackedTime.h"
 #include "types/Position.h"
+#include "ui/gl/dialog/BottomDialog.h"
 #include "ui/gl/widget/Hotbar.h"
 #include "ui/gl/widget/ProgressBar.h"
 #include "ui/gl/Constants.h"
+#include "ui/GameUI.h"
 #include "ui/Window.h"
 #include "util/Explosion.h"
 
@@ -226,13 +228,15 @@ namespace Game3 {
 	void FluidGun::renderEffects(Window &window, const RendererContext &renderers, const Position &, Modifiers, const ItemStackPtr &stack) const {
 		const auto [fluid, amount, last_slurp] = getFluidGunData(window.game, stack);
 		UIContext &ui = window.uiContext;
-		Rectangle rectangle = ui.getHotbar()->getLastRectangle();
-		rectangle.y -= rectangle.height + 8;
-		constexpr static double shrinkage = 3.0;
-		rectangle.y += rectangle.height * (1.0 - 1.0 / shrinkage);
-		rectangle.height /= shrinkage;
-		Color color = fluid? fluid->color : Color{};
-		ProgressBar(ui, 1, color, amount / capacity).render(renderers, rectangle);
+		if (auto game_ui = ui.getUI<GameUI>()) {
+			Rectangle rectangle = game_ui->getBottomDialog()->getHotbar()->getLastRectangle();
+			rectangle.y -= rectangle.height + 8;
+			constexpr static double shrinkage = 3.0;
+			rectangle.y += rectangle.height * (1.0 - 1.0 / shrinkage);
+			rectangle.height /= shrinkage;
+			Color color = fluid? fluid->color : Color{};
+			ProgressBar(ui, 1, color, amount / capacity).render(renderers, rectangle);
+		}
 	}
 
 	bool FluidGun::fireGun(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, uint16_t tick_frequency) {

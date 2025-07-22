@@ -3,6 +3,7 @@
 #include "graphics/RendererContext.h"
 #include "net/LocalClient.h"
 #include "packet/SendChatMessagePacket.h"
+#include "ui/gl/dialog/BottomDialog.h"
 #include "ui/gl/dialog/ChatDialog.h"
 #include "ui/gl/widget/Box.h"
 #include "ui/gl/widget/Hotbar.h"
@@ -11,6 +12,7 @@
 #include "ui/gl/widget/TextInput.h"
 #include "ui/gl/Constants.h"
 #include "ui/gl/UIContext.h"
+#include "ui/GameUI.h"
 
 namespace Game3 {
 	namespace {
@@ -106,15 +108,17 @@ namespace Game3 {
 	}
 
 	Rectangle ChatDialog::getPosition() const {
-		if (std::optional<float> last_y = ui.getHotbar()->getLastY()) {
-			constexpr int height = 400;
-			const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
-			Rectangle out(0, *last_y - height - 64, isHidden? toggler_size : ui.getWidth() / 2, height);
-			if (isHidden) {
-				out.y += out.height - toggler_size;
-				out.height = toggler_size;
+		if (auto game_ui = ui.getUI<GameUI>()) {
+			if (std::optional<float> last_y = game_ui->getBottomDialog()->getHotbar()->getLastY()) {
+				constexpr int height = 400;
+				const int toggler_size = CHAT_TOGGLER_SIZE * getScale();
+				Rectangle out(0, *last_y - height - 64, isHidden? toggler_size : ui.getWidth() / 2, height);
+				if (isHidden) {
+					out.y += out.height - toggler_size;
+					out.height = toggler_size;
+				}
+				return out;
 			}
-			return out;
 		}
 
 		return {0, 0, -1, -1};
