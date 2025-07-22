@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 #include "recipe/BiomassLiquefierRecipe.h"
 #include "tileentity/BiomassLiquefier.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/gl/widget/Widget.h"
+#include "ui/widget/Widget.h"
 
 #include <cstddef>
 #include <string>

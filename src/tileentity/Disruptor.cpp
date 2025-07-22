@@ -10,7 +10,7 @@
 #include "realm/Realm.h"
 #include "tileentity/Disruptor.h"
 #include "types/SlotRange.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 #include <cassert>
 

@@ -6,7 +6,7 @@
 #include "packet/SetTileEntityEnergyPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/EnergeticTileEntity.h"
-#include "ui/gl/module/EnergyModule.h"
+#include "ui/module/EnergyModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {

@@ -2,7 +2,7 @@
 #include "game/ClientGame.h"
 #include "lib/JSON.h"
 #include "ui/Window.h"
-#include "ui/gl/Constants.h"
+#include "ui/Constants.h"
 #include "util/FS.h"
 #include "util/Log.h"
 #include "util/Timer.h"

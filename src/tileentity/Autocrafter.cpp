@@ -11,7 +11,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "recipe/CraftingRecipe.h"
 #include "tileentity/Autocrafter.h"
-#include "ui/gl/module/AutocrafterModule.h"
+#include "ui/module/AutocrafterModule.h"
 
 namespace Game3 {
 	namespace {

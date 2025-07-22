@@ -1,0 +1,36 @@
+#pragma once
+
+#include "ui/dialog/DraggableDialog.h"
+#include "ui/widget/Widget.h"
+#include "ui/Types.h"
+
+#include <sigc++/sigc++.h>
+
+#include <memory>
+
+namespace Game3 {
+	class Box;
+
+	class MessageDialog: public DraggableDialog {
+		public:
+			sigc::signal<void(bool response)> signalSubmit;
+
+			MessageDialog(UIContext &, float selfScale, int width, int height, ButtonsType = ButtonsType::Okay);
+
+			void init() override;
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
+
+			void setChild(WidgetPtr);
+
+			static std::shared_ptr<MessageDialog> create(UIContext &, float selfScale, UString text, ButtonsType = ButtonsType::Okay);
+
+		private:
+			ButtonsType buttonsType = ButtonsType::Okay;
+			WidgetPtr child;
+			std::shared_ptr<Box> vbox;
+			std::shared_ptr<Box> buttonBox;
+
+			void submit(bool);
+			std::function<bool(Widget &, int, int, int)> makeSubmit(bool);
+	};
+}

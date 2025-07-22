@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "tileentity/ChemicalReactor.h"
 #include "types/SlotRange.h"
-#include "ui/gl/module/ChemicalReactorModule.h"
+#include "ui/module/ChemicalReactorModule.h"
 
 #include <cassert>
 

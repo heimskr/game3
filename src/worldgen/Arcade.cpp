@@ -4,7 +4,7 @@
 #include "tileentity/ArcadeMachine.h"
 #include "tileentity/Building.h"
 #include "tileentity/Teleporter.h"
-#include "ui/gl/Constants.h"
+#include "ui/Constants.h"
 #include "util/Timer.h"
 #include "util/Util.h"
 #include "worldgen/Arcade.h"

@@ -6,7 +6,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/EternalFountain.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {

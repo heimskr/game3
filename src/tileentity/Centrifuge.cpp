@@ -7,7 +7,7 @@
 #include "realm/Realm.h"
 #include "recipe/CentrifugeRecipe.h"
 #include "tileentity/Centrifuge.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {

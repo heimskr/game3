@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "tileentity/Sign.h"
 #include "ui/Window.h"
-#include "ui/gl/dialog/EditSignDialog.h"
+#include "ui/dialog/EditSignDialog.h"
 #include "util/ConstexprHash.h"
 
 namespace Game3 {

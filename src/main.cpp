@@ -18,7 +18,7 @@
 #include "tools/Reshape.h"
 #include "tools/TileStitcher.h"
 #include "tools/Updater.h"
-#include "ui/gl/Constants.h"
+#include "ui/Constants.h"
 #include "ui/UI.h"
 #include "ui/Window.h"
 #include "util/Crypto.h"

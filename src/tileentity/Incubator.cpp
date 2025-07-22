@@ -9,7 +9,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Incubator.h"
-#include "ui/gl/module/MicroscopeModule.h"
+#include "ui/module/MicroscopeModule.h"
 
 namespace Game3 {
 	namespace {

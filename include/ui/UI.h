@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/gl/dialog/Dialog.h"
+#include "ui/dialog/Dialog.h"
 
 namespace Game3 {
 	class Window;

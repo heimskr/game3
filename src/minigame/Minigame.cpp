@@ -1,5 +1,5 @@
 #include "minigame/Minigame.h"
-#include "ui/gl/Constants.h"
+#include "ui/Constants.h"
 
 namespace Game3 {
 	Minigame::Minigame(UIContext &ui, float selfScale):

@@ -9,7 +9,7 @@
 #include "realm/Realm.h"
 #include "recipe/GeothermalRecipe.h"
 #include "tileentity/GeothermalGenerator.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {

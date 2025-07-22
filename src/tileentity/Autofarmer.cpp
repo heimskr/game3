@@ -12,7 +12,7 @@
 #include "realm/Realm.h"
 #include "tile/CropTile.h"
 #include "tileentity/Autofarmer.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {

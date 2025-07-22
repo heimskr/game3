@@ -8,7 +8,7 @@
 #include "realm/Realm.h"
 #include "recipe/LiquefierRecipe.h"
 #include "tileentity/Liquefier.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {

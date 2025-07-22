@@ -4,8 +4,8 @@
 #include "graphics/RendererContext.h"
 #include "minigame/Breakout.h"
 #include "packet/SubmitScorePacket.h"
-#include "ui/gl/Constants.h"
-#include "ui/gl/UIContext.h"
+#include "ui/Constants.h"
+#include "ui/UIContext.h"
 #include "ui/Window.h"
 #include "util/Math.h"
 

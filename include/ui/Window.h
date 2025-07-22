@@ -18,7 +18,7 @@
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
 #include "types/UString.h"
-#include "ui/gl/UIContext.h"
+#include "ui/UIContext.h"
 #include "util/Concepts.h"
 
 #include <any>

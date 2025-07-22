@@ -10,7 +10,7 @@
 #include "realm/Realm.h"
 #include "recipe/CombinerRecipe.h"
 #include "tileentity/Combiner.h"
-#include "ui/gl/module/CombinerModule.h"
+#include "ui/module/CombinerModule.h"
 
 #include <cassert>
 #include <numeric>

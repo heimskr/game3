@@ -7,7 +7,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Mutator.h"
-#include "ui/gl/module/MutatorModule.h"
+#include "ui/module/MutatorModule.h"
 
 namespace Game3 {
 	namespace {

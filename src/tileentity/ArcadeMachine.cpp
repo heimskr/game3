@@ -8,8 +8,8 @@
 #include "packet/OpenMinigamePacket.h"
 #include "realm/Realm.h"
 #include "tileentity/ArcadeMachine.h"
-#include "ui/gl/dialog/MinigameDialog.h"
-#include "ui/gl/widget/Tooltip.h"
+#include "ui/dialog/MinigameDialog.h"
+#include "ui/widget/Tooltip.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
 

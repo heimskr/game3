@@ -2,7 +2,7 @@
 #include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "packet/DisplayTextPacket.h"
-#include "ui/gl/module/TextModule.h"
+#include "ui/module/TextModule.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
 

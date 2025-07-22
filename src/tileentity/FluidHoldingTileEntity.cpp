@@ -5,7 +5,7 @@
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/FluidHoldingTileEntity.h"
-#include "ui/gl/module/FluidsModule.h"
+#include "ui/module/FluidsModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {

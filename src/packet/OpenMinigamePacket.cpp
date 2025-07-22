@@ -1,7 +1,7 @@
 #include "game/ClientGame.h"
 #include "minigame/MinigameFactory.h"
 #include "packet/OpenMinigamePacket.h"
-#include "ui/gl/dialog/MinigameDialog.h"
+#include "ui/dialog/MinigameDialog.h"
 #include "ui/Window.h"
 
 namespace Game3 {

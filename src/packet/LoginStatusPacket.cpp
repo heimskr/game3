@@ -5,7 +5,7 @@
 #include "game/Inventory.h"
 #include "packet/LoginStatusPacket.h"
 #include "packet/PacketError.h"
-#include "ui/gl/dialog/ConnectionDialog.h"
+#include "ui/dialog/ConnectionDialog.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
 

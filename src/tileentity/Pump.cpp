@@ -7,7 +7,7 @@
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Pump.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {

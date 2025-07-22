@@ -10,7 +10,7 @@
 #include "realm/Realm.h"
 #include "recipe/DissolverRecipe.h"
 #include "tileentity/Dissolver.h"
-#include "ui/gl/module/MultiModule.h"
+#include "ui/module/MultiModule.h"
 
 #include <cassert>
 #include <numeric>

@@ -6,7 +6,7 @@
 #include "packet/TileEntityPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/InventoriedTileEntity.h"
-#include "ui/gl/module/InventoryModule.h"
+#include "ui/module/InventoryModule.h"
 #include "util/Cast.h"
 
 namespace Game3 {

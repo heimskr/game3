@@ -11,7 +11,7 @@
 #include "realm/Realm.h"
 #include "threading/ThreadContext.h"
 #include "tileentity/Recombinator.h"
-#include "ui/gl/module/MicroscopeModule.h"
+#include "ui/module/MicroscopeModule.h"
 #include "util/Util.h"
 
 namespace Game3 {

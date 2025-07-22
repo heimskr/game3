@@ -2,9 +2,9 @@
 #include "game/ClientGame.h"
 #include "entity/ClientPlayer.h"
 #include "packet/SetPlayerStationTypesPacket.h"
-#include "ui/gl/dialog/OmniDialog.h"
-#include "ui/gl/tab/CraftingTab.h"
-#include "ui/gl/tab/InventoryTab.h"
+#include "ui/dialog/OmniDialog.h"
+#include "ui/tab/CraftingTab.h"
+#include "ui/tab/InventoryTab.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
 

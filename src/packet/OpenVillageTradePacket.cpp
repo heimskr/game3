@@ -6,7 +6,7 @@
 #include "types/DirectedPlace.h"
 #include "ui/GameUI.h"
 #include "ui/Window.h"
-#include "ui/gl/module/VillageTradeModule.h"
+#include "ui/module/VillageTradeModule.h"
 
 namespace Game3 {
 	void OpenVillageTradePacket::handle(const ClientGamePtr &game) {
