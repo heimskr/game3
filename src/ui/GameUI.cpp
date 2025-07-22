@@ -17,10 +17,6 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	GameUI::~GameUI() {
-		ui.removeDialogs<BottomDialog, OmniDialog, TopDialog>();
-	}
-
 	void GameUI::init(Window &) {
 		Dialog::init();
 		fbo.init();

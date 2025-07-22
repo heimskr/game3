@@ -42,8 +42,6 @@ namespace Game3 {
 
 			using UI::UI;
 
-			~GameUI() final;
-
 			void init(Window &) final;
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;
