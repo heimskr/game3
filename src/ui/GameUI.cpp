@@ -6,6 +6,7 @@
 #include "realm/Realm.h"
 #include "ui/dialog/BottomDialog.h"
 #include "ui/dialog/ChatDialog.h"
+#include "ui/dialog/DialogueDialog.h"
 #include "ui/dialog/OmniDialog.h"
 #include "ui/dialog/TopDialog.h"
 #include "ui/module/FluidsModule.h"
@@ -22,6 +23,7 @@ namespace Game3 {
 		fbo.init();
 		bottomDialog = ui.emplaceDialog<BottomDialog>(selfScale);
 		chatDialog = ui.emplaceDialog<ChatDialog>(selfScale);
+		ui.emplaceDialog<DialogueDialog>(selfScale);
 	}
 
 	void GameUI::render(const RendererContext &renderers) {

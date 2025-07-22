@@ -19,19 +19,22 @@ namespace Game3 {
 		const std::string & spriteVert() { static auto out = readFile("resources/sprite.vert"); return out; }
 	}
 
-	SingleSpriteRenderer::SingleSpriteRenderer(Window &window): SpriteRenderer(window), shader("SingleSpriteRenderer") {
-		shader.init(spriteVert(), spriteFrag());
-		initRenderData();
-	}
+	SingleSpriteRenderer::SingleSpriteRenderer(Window &window):
+		SpriteRenderer(window),
+		shader("SingleSpriteRenderer") {
+			shader.init(spriteVert(), spriteFrag());
+			initRenderData();
+		}
 
-	SingleSpriteRenderer::SingleSpriteRenderer(SingleSpriteRenderer &&other) noexcept: SingleSpriteRenderer(*other.window) {
-		other.window = nullptr;
-		shader = std::move(other.shader);
-		quadVAO = std::exchange(other.quadVAO, 0);
-		initialized = std::exchange(other.initialized, false);
-		backbufferWidth = std::exchange(other.backbufferWidth, -1);
-		backbufferHeight = std::exchange(other.backbufferHeight, -1);
-	}
+	SingleSpriteRenderer::SingleSpriteRenderer(SingleSpriteRenderer &&other) noexcept:
+		SingleSpriteRenderer(*other.window) {
+			other.window = nullptr;
+			shader = std::move(other.shader);
+			quadVAO = std::exchange(other.quadVAO, 0);
+			initialized = std::exchange(other.initialized, false);
+			backbufferWidth = std::exchange(other.backbufferWidth, -1);
+			backbufferHeight = std::exchange(other.backbufferHeight, -1);
+		}
 
 	SingleSpriteRenderer::~SingleSpriteRenderer() {
 		remove();
@@ -92,10 +95,13 @@ namespace Game3 {
 		auto size_x = options.sizeX;
 		auto size_y = options.sizeY;
 
-		if (size_x < 0)
-			size_x = texture->width;
-		if (size_y < 0)
-			size_y = texture->height;
+		if (size_x < 0) {
+			size_x *= -texture->width;
+		}
+
+		if (size_y < 0) {
+			size_y *= -texture->height;
+		}
 
 		assert(window != nullptr);
 		RealmPtr realm = window->game->getActiveRealm();
@@ -129,10 +135,13 @@ namespace Game3 {
 		const GLsizei texture_width = texture.getWidth();
 		const GLsizei texture_height = texture.getHeight();
 
-		if (size_x < 0)
-			size_x = texture_width;
-		if (size_y < 0)
-			size_y = texture_height;
+		if (size_x < 0) {
+			size_x *= -texture_width;
+		}
+
+		if (size_y < 0) {
+			size_y *= -texture_height;
+		}
 
 		assert(window != nullptr);
 		RealmPtr realm = window->game->getActiveRealm();
@@ -190,8 +199,9 @@ namespace Game3 {
 	}
 
 	void SingleSpriteRenderer::drawOnScreen(GL::Texture &texture, const RenderOptions &options_ref) {
-		if (!initialized)
+		if (!initialized) {
 			return;
+		}
 
 		const auto texture_width  = texture.getWidth();
 		const auto texture_height = texture.getHeight();
@@ -216,8 +226,9 @@ namespace Game3 {
 	void SingleSpriteRenderer::drawOnScreen(const TexturePtr &texture, const RenderOptions &options_ref) {
 		assert(texture);
 
-		if (!initialized)
+		if (!initialized) {
 			return;
+		}
 
 		const auto texture_width  = texture->width;
 		const auto texture_height = texture->height;
@@ -268,13 +279,17 @@ namespace Game3 {
 		glm::mat4 model = glm::mat4(1.);
 		// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 		model = glm::translate(model, glm::vec3(options.x - options.offsetX * options.scaleX, options.y - options.offsetY * options.scaleY, 0.f));
-		if (options.invertY)
+
+		if (options.invertY) {
 			model = glm::scale(model, glm::vec3(1., -1., 1.));
+		}
+
 		if (options.angle != 0)  {
 			model = glm::translate(model, glm::vec3(.5 * texture_width, .5 * texture_height, 0.f));
 			model = glm::rotate   (model, static_cast<float>(glm::radians(options.angle)), glm::vec3(0.f, 0.f, 1.f));
 			model = glm::translate(model, glm::vec3(-.5 * texture_width, -.5 * texture_height, 0.f));
 		}
+
 		model = glm::scale(model, glm::vec3(texture_width * options.scaleX, texture_height * options.scaleY, 1.f));
 
 		shader.bind();
