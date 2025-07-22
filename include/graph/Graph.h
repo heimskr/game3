@@ -22,7 +22,7 @@ namespace Game3 {
 			using Label = std::string;
 
 			class Node {
-			friend class Graph;
+				friend class Graph;
 
 				public:
 					struct NodeLess {
@@ -36,7 +36,7 @@ namespace Game3 {
 					using Set = std::unordered_set<Node *>;
 
 				private:
-					Graph *owner;
+					Graph *owner = nullptr;
 					std::string label;
 					Set out;
 					Set in;
@@ -54,12 +54,14 @@ namespace Game3 {
 					Node() = delete;
 					Node(Node &&) = delete;
 					Node(const Node &) = delete;
+
 					Node & operator=(Node &&) = delete;
 					Node & operator=(const Node &) = delete;
 
 					/** Creates a node with a parent graph and a given label. */
-					Node(Graph &owner_, Label label_):
-						owner(&owner_), label(std::move(label_)) {}
+					Node(Graph &owner, Label label):
+						owner(&owner),
+						label(std::move(label)) {}
 
 					/** Returns a const reference to the node's label. */
 					const auto & getLabel() const {
@@ -79,13 +81,15 @@ namespace Game3 {
 					/** Adds an edge (unidirectional by default) to another node. Returns true if the edge already existed. */
 					bool link(Node &other, bool bidirectional = false) {
 						const bool already_linked = out.contains(&other);
+
 						if (!already_linked) {
 							out.insert(&other);
 							other.in.insert(this);
 						}
 
-						if (bidirectional && &other != this)
+						if (bidirectional && &other != this) {
 							other.link(*this);
+						}
 
 						return already_linked;
 					}
@@ -95,22 +99,27 @@ namespace Game3 {
 					bool unlink(Node &other, bool bidirectional = false) {
 						const auto iter = out.find(&other);
 						const bool exists = iter != out.end();
-						if (exists)
+
+						if (exists) {
 							out.erase(iter);
+						}
 
 						other.in.erase(this);
 						reachability.erase(&other);
 
-						if (bidirectional && &other != this)
+						if (bidirectional && &other != this) {
 							other.unlink(*this, false);
+						}
 
 						return exists;
 					}
 
 					/** Removes all edges from this node. */
 					void unlink() {
-						for (Node *other: out)
+						for (Node *other: out) {
 							other->in.erase(this);
+						}
+
 						out.clear();
 					}
 
@@ -126,13 +135,15 @@ namespace Game3 {
 
 					/** Returns the node's index in the parent graph. */
 					int getIndex() {
-						if (index != -1)
+						if (index != -1) {
 							return index;
+						}
 
 						for (const Node *node: owner->getNodes()) {
 							++index;
-							if (node == this)
+							if (node == this) {
 								return index;
+							}
 						}
 
 						throw std::runtime_error("Node not found in parent graph");
@@ -157,17 +168,21 @@ namespace Game3 {
 
 					/** Returns whether there exists a path from this node to another. */
 					bool canReach(Node &other) {
-						if (other.owner != owner)
+						if (other.owner != owner) {
 							return false;
+						}
 
-						if (auto iter = reachability.find(&other); iter != reachability.end())
+						if (auto iter = reachability.find(&other); iter != reachability.end()) {
 							return *iter;
+						}
 
 						std::unordered_set<Node *> visited;
 						std::list<Node *> queue{this};
+
 						while (!queue.empty()) {
 							Node *node = queue.front();
 							queue.pop_front();
+
 							for (Node *outnode: node->out) {
 								if (outnode == &other) {
 									reachability.emplace(&other, true);
@@ -189,19 +204,25 @@ namespace Game3 {
 						reachability.clear();
 					}
 
-					/** Returns the number of edges connected to this node. */
+					/** Returns the number of edges connected to this node. Reflexive edges are counted twice. */
 					size_t degree() const {
 						size_t deg = out.size();
-						for (Node *neighbor: in)
-							if (!out.contains(neighbor))
+
+						for (Node *neighbor: in) {
+							if (!out.contains(neighbor)) {
 								++deg;
+							}
+						}
+
 						return deg;
 					}
 
 					/** If the node has only one inward edge, this function returns the other node. Otherwise, it throws an exception. */
 					Node * parent() const {
-						if (in.size() != 1)
+						if (in.size() != 1) {
 							throw std::runtime_error("Cannot find parent of node with " + std::to_string(in.size()) + " inward edges");
+						}
+
 						return *in.begin();
 					}
 
@@ -220,25 +241,28 @@ namespace Game3 {
 
 					/** Removes a neighbor with a given label. */
 					Node & operator-=(const std::string &label) {
-						for (Node *node: out)
-							if (node->label == label)
+						for (Node *node: out) {
+							if (node->label == label) {
 								return *this -= *node;
+							}
+						}
+
 						throw std::out_of_range("Can't remove: no neighbor with label \"" + label + "\" found");
 					}
 
-					typename decltype(out)::iterator begin() {
+					auto begin() {
 						return out.begin();
 					}
 
-					typename decltype(out)::iterator end() {
+					auto end() {
 						return out.end();
 					}
 
-					typename decltype(in)::iterator ibegin() {
+					auto ibegin() {
 						return in.begin();
 					}
 
-					typename decltype(in)::iterator iend() {
+					auto iend() {
 						return in.end();
 					}
 			};
@@ -251,42 +275,57 @@ namespace Game3 {
 				ParentMap parents;
 				TimeMap discovered, finished;
 
-				DFSResult(const Graph &graph_, ParentMap parents_, TimeMap discovered_, TimeMap finished_):
-					graph(&graph_), parents(std::move(parents_)), discovered(std::move(discovered_)), finished(std::move(finished_)) {}
+				DFSResult(const Graph &graph, ParentMap parents, TimeMap discovered, TimeMap finished):
+					graph(&graph),
+					parents(std::move(parents)),
+					discovered(std::move(discovered)),
+					finished(std::move(finished)) {}
 
-				DFSResult(const Graph &graph_, const std::vector<Node *> &parents_, const std::vector<int> &discovered_, const std::vector<int> &finished_):
-				graph(&graph_) {
-					for (int i = 0, len = parents_.size(); i < len; ++i)
-						parents[&(*graph)[i]] = parents_[i];
-					for (int i = 0, len = discovered_.size(); i < len; ++i)
-						discovered[&(*graph)[i]] = discovered_[i];
-					for (int i = 0, len = finished_.size(); i < len; ++i)
-						finished[&(*graph)[i]] = finished_[i];
-				}
+				DFSResult(const Graph &graph, const std::vector<Node *> &parents, const std::vector<int> &discovered, const std::vector<int> &finished):
+					graph(&graph) {
+						for (size_t i = 0, len = parents.size(); i < len; ++i) {
+							this->parents[&graph[i]] = parents[i];
+						}
+
+						for (size_t i = 0, len = discovered.size(); i < len; ++i) {
+							this->discovered[&graph[i]] = discovered[i];
+						}
+
+						for (size_t i = 0, len = finished.size(); i < len; ++i) {
+							this->finished[&graph[i]] = finished[i];
+						}
+					}
 			};
 
 		private:
 			std::list<Node *> nodes;
 			std::unordered_map<std::string, Node *> labelMap;
 
-			void bridgeTraverse(const Node &node, std::unordered_map<const Node *, bool> &visited,
+			void bridgeTraverse(const Node &node,
+			                    std::unordered_map<const Node *, bool> &visited,
 			                    std::unordered_map<const Node *, size_t> &discovered,
 			                    std::unordered_map<const Node *, size_t> &low,
 			                    std::unordered_map<const Node *, const Node *> &parents,
-			                    std::vector<std::pair<Label, Label>> &out) const {
-				static size_t time = 0;
+			                    std::vector<std::pair<Label, Label>> &out,
+			                    size_t time = 0) const {
 				visited[&node] = true;
 				discovered[&node] = low[&node] = ++time;
+
 				for (const Node *adjacent: node.allEdges()) {
 					if (!visited[adjacent]) {
 						parents[adjacent] = &node;
-						bridgeTraverse(*adjacent, visited, discovered, low, parents, out);
-						if (low[adjacent] < low[&node])
+						bridgeTraverse(*adjacent, visited, discovered, low, parents, out, time);
+
+						if (low[adjacent] < low[&node]) {
 							low[&node] = low[adjacent];
-						if (discovered[&node] < low[adjacent])
+						}
+
+						if (discovered[&node] < low[adjacent]) {
 							out.emplace_back(node.getLabel(), adjacent->getLabel());
-					} else if (adjacent != parents[&node] && discovered[adjacent] < low[&node])
+						}
+					} else if (adjacent != parents[&node] && discovered[adjacent] < low[&node]) {
 						low[&node] = discovered[adjacent];
+					}
 				}
 			}
 
@@ -300,29 +339,36 @@ namespace Game3 {
 			Graph() = default;
 
 			/** Constructs a graph with a name and no nodes. */
-			Graph(std::string name_):
-				name(std::move(name_)) {}
+			Graph(std::string name):
+				name(std::move(name)) {}
 
 			/** Constructs a graph with a number n of nodes with labels 0, 1, ..., n. */
 			Graph(size_t node_count) {
-				for (size_t i = 0; i < node_count; ++i)
+				for (size_t i = 0; i < node_count; ++i) {
 					*this += std::to_string(i);
+				}
 			}
 
 			/** Constructs a graph with nodes with given labels. */
 			Graph(std::initializer_list<Label> labels) {
-				for (const Label &label: labels)
+				for (const Label &label: labels) {
 					*this += label;
+				}
 			}
 
 			Graph(const Graph &other) {
-				for (const auto &[label, node]: other)
-					addNode(label);
 				for (const auto &[label, node]: other) {
-					for (Node *in: node->in)
+					addNode(label);
+				}
+
+				for (const auto &[label, node]: other) {
+					for (Node *in: node->in) {
 						link(in->label, node->label);
-					for (Node *out: node->out)
+					}
+
+					for (Node *out: node->out) {
 						link(node->label, out->label);
+					}
 				}
 			}
 
@@ -331,44 +377,60 @@ namespace Game3 {
 				labelMap = std::move(other.labelMap);
 				name = std::move(other.name);
 				colors = std::move(other.colors);
-				for (Node *node: nodes)
+				for (Node *node: nodes) {
 					node->owner = this;
+				}
 			}
 
 			Graph & operator=(const Graph &other) {
 				clear();
-				for (const auto &[label, node]: other)
-					addNode(label);
+
 				for (const auto &[label, node]: other) {
-					for (const Node *in: node->in)
-						link(in->label, node->label);
-					for (const Node *out: node->out)
-						link(node->label, out->label);
+					addNode(label);
 				}
+
+				for (const auto &[label, node]: other) {
+					for (const Node *in: node->in) {
+						link(in->label, node->label);
+					}
+
+					for (const Node *out: node->out) {
+						link(node->label, out->label);
+					}
+				}
+
 				return *this;
 			}
 
 			Graph & operator=(Graph &&other) noexcept {
 				clear();
+
 				nodes = std::move(other.nodes);
 				labelMap = std::move(other.labelMap);
 				name = std::move(other.name);
 				colors = std::move(other.colors);
-				for (Node *node: nodes)
+
+				for (Node *node: nodes) {
 					node->owner = this;
+				}
+
 				return *this;
 			}
 
 			virtual ~Graph() {
-				for (Node *node: nodes)
+				for (Node *node: nodes) {
 					delete node;
+				}
 			}
 
 			/** Clears the graph and frees up all node resources. */
 			void clear() {
 				labelMap.clear();
-				for (Node *node: nodes)
+
+				for (Node *node: nodes) {
 					delete node;
+				}
+
 				nodes.clear();
 			}
 
@@ -394,18 +456,25 @@ namespace Game3 {
 
 			/** Returns the node at a given index. Throws an exception if no node exists at the index. */
 			Node & operator[](size_t index) const {
-				if (nodes.size() <= index)
+				if (nodes.size() <= index) {
 					throw std::out_of_range("Invalid node index: " + std::to_string(index));
+				}
+
 				Node *node = *std::next(nodes.begin(), index);
-				if (!node)
+
+				if (!node) {
 					throw std::runtime_error("Node at index " + std::to_string(index) + " is null");
+				}
+
 				return *node;
 			}
 
 			/** Returns the node with a given label. Creates a node if no such node exists. */
 			Node & operator[](const Label &label) {
-				if (auto iter = labelMap.find(label); iter != labelMap.end())
+				if (auto iter = labelMap.find(label); iter != labelMap.end()) {
 					return *iter->second;
+				}
+
 				return addNode(label);
 			}
 
@@ -420,8 +489,10 @@ namespace Game3 {
 			}
 
 			Node * maybe(const Label &label) {
-				if (auto iter = labelMap.find(label); iter != labelMap.end())
+				if (auto iter = labelMap.find(label); iter != labelMap.end()) {
 					return iter->second;
+				}
+
 				return nullptr;
 			}
 
@@ -446,8 +517,9 @@ namespace Game3 {
 			Graph & operator-=(Node &to_remove) {
 				auto iter = std::find(nodes.begin(), nodes.end(), &to_remove);
 
-				if (iter == nodes.end())
+				if (iter == nodes.end()) {
 					throw std::out_of_range("Can't remove: node is not in graph");
+				}
 
 				for (Node *node: nodes) {
 					node->unlink(to_remove, true);
@@ -457,24 +529,37 @@ namespace Game3 {
 				nodes.erase(iter);
 				labelMap.erase(to_remove.label);
 				delete &to_remove;
+
 				return *this;
 			}
 
 			/** Removes and deletes a node with a given label. */
 			Graph & operator-=(const Label &label) {
-				for (Node *node: nodes)
-					if (node->getLabel() == label)
+				for (Node *node: nodes) {
+					if (node->getLabel() == label) {
 						return *this -= *node;
+					}
+				}
+
 				throw std::out_of_range("Can't remove: no node with label \"" + label + "\" found");
 			}
 
 			/** Adds a node with a given label. */
 			Node & addNode(const Label &label) {
-				if (hasLabel(label))
+				if (hasLabel(label)) {
 					throw std::runtime_error("Can't add: a node with label \"" + label + "\" already exists");
+				}
+
 				Node *node = new Node(*this, label);
-				labelMap.insert({label, node});
-				nodes.push_back(node);
+
+				try {
+					labelMap.insert({label, node});
+					nodes.push_back(node);
+				} catch (...) {
+					delete node;
+					throw;
+				}
+
 				return *node;
 			}
 
@@ -491,10 +576,14 @@ namespace Game3 {
 
 			/** Assigns a new label to a node and returns the node. */
 			void rename(Node &node, const Label &new_label) {
-				if (node.getLabel() == new_label)
+				if (node.getLabel() == new_label) {
 					return;
-				if (hasLabel(new_label))
+				}
+
+				if (hasLabel(new_label)) {
 					throw std::runtime_error("Can't rename: a node with label \"" + new_label + "\" already exists");
+				}
+
 				labelMap.erase(node.getLabel());
 				node.label = new_label;
 				labelMap.emplace(new_label, &node);
@@ -512,8 +601,9 @@ namespace Game3 {
 
 			/** Removes all edges in the graph. */
 			void unlink() {
-				for (auto &[label, node]: *this)
+				for (auto &[label, node]: *this) {
 					node->unlink();
+				}
 			}
 
 			/** Clones the graph into another graph. */
@@ -525,17 +615,25 @@ namespace Game3 {
 
 				for (Node *node: nodes) {
 					Node *new_node = new Node(&out, node->getLabel());
-					node_map.insert({node, new_node});
-					out.nodes.push_back(new_node);
-					out.labelMap.insert({node->getLabel(), new_node});
+					try {
+						node_map.insert({node, new_node});
+						out.nodes.push_back(new_node);
+						out.labelMap.insert({node->getLabel(), new_node});
+					} catch (...) {
+						delete new_node;
+						throw;
+					}
 				}
 
-				for (const auto &[old_node, new_node]: node_map)
-					for (Node *old_link: old_node->out)
+				for (const auto &[old_node, new_node]: node_map) {
+					for (Node *old_link: old_node->out) {
 						new_node->link(node_map.at(old_link), false);
+					}
+				}
 
-				if (rename_map != nullptr)
+				if (rename_map != nullptr) {
 					*rename_map = std::move(node_map);
+				}
 			}
 
 			/** Returns a clone of the graph. */
@@ -547,10 +645,7 @@ namespace Game3 {
 
 			/** Takes a space-separated list of colon-separated pairs of labels and links each pair of nodes. */
 			void addEdges(const std::string &pairs) {
-				size_t last = 0;
-				size_t space{};
-
-				while (last != std::string::npos) {
+				for (size_t last = 0, space = 0; last != std::string::npos; last = space) {
 					space = pairs.find(' ', last + 1);
 					const std::string sub = pairs.substr(last? last + 1 : 0, space - (last + (last? 1 : 0)));
 					const size_t colon = sub.find(':');
@@ -563,15 +658,18 @@ namespace Game3 {
 
 			/** Removes all nodes from the graph. */
 			void reset() {
-				while (!nodes.empty())
+				while (!nodes.empty()) {
 					*this -= *nodes.front();
+				}
 			}
 
 			/** Attempts to find the first node matching a predicate function. */
 			Node * find(const std::function<bool(Node &)> &predicate) {
-				for (Node *node: nodes)
-					if (predicate(*node))
+				for (Node *node: nodes) {
+					if (predicate(*node)) {
 						return node;
+					}
+				}
 				return nullptr;
 			}
 
@@ -611,12 +709,12 @@ namespace Game3 {
 				while (!queue.empty()) {
 					Node *next = queue.front();
 					queue.pop_front();
-					for (Node *out: next->out)
-						if (!visited.contains(out)) {
-							visited.insert(out);
+					for (Node *out: next->out) {
+						if (visited.emplace(out).second) {
 							order.push_back(out);
 							queue.push_back(out);
 						}
+					}
 				}
 
 				return order;
@@ -637,13 +735,15 @@ namespace Game3 {
 				while (!queue.empty()) {
 					Node *next = queue.front();
 					queue.pop_front();
-					for (const auto *set: {&next->in, &next->out})
-						for (Node *adjacent: *set)
+					for (const auto *set: {&next->in, &next->out}) {
+						for (Node *adjacent: *set) {
 							if (!visited.contains(adjacent)) {
 								visited.insert(adjacent);
 								out.insert(adjacent);
 								queue.push_back(adjacent);
 							}
+						}
+					}
 				}
 
 				return out;
@@ -663,9 +763,11 @@ namespace Game3 {
 				std::function<void(Node *)> visit = [&](Node *node) {
 					visited.insert(node);
 					out.push_back(node);
-					for (Node *successor: node->out)
-						if (!visited.contains(successor))
+					for (Node *successor: node->out) {
+						if (!visited.contains(successor)) {
 							visit(successor);
+						}
+					}
 				};
 
 				visit(&start);
@@ -704,13 +806,16 @@ namespace Game3 {
 						component_graph.addNode(node->label);
 						remaining.erase(node);
 					}
-					if (!component_graph.hasLabel(front->label))
+					if (!component_graph.hasLabel(front->label)) {
 						component_graph.addNode(front->label);
+					}
 					for (Node *node: component_nodes) {
-						for (const Node *in: node->in)
+						for (const Node *in: node->in) {
 							component_graph.link(in->label, node->label);
-						for (const Node *out: node->out)
+						}
+						for (const Node *out: node->out) {
 							component_graph.link(node->label, out->label);
+						}
 					}
 					out_list.push_back(std::move(component_graph));
 				}
@@ -721,9 +826,11 @@ namespace Game3 {
 			/** Returns a map of nodes to sets of their predecessors. */
 			std::unordered_map<Node *, std::unordered_set<Node *>> predecessors() const {
 				std::unordered_map<Node *, std::unordered_set<Node *>> out;
-				for (Node *node: nodes)
-					for (Node *successor: node->out)
+				for (Node *node: nodes) {
+					for (Node *successor: node->out) {
 						out[successor].insert(node);
+					}
+				}
 				return out;
 			}
 
@@ -732,35 +839,43 @@ namespace Game3 {
 			void color(ColoringAlgorithm algorithm, int color_min = -1, int color_max = -1) {
 				const int total_colors = color_max != -1? color_max - color_min + 1 : -1;
 				if (algorithm == Graph::ColoringAlgorithm::Bad) {
-					if (color_max != -1 && total_colors < static_cast<int>(nodes.size()))
+					if (color_max != -1 && total_colors < static_cast<int>(nodes.size())) {
 						throw UncolorableError();
+					}
 					int color = color_min - 1;
 					for (Node *node: nodes) {
 						node->colors.clear();
-						for (int i = 0; i < node->colorsNeeded; ++i)
+						for (int i = 0; i < node->colorsNeeded; ++i) {
 							node->colors.insert(++color);
+						}
 					}
 				} else if (algorithm == Graph::ColoringAlgorithm::Greedy) {
 					std::set<int> all_colors;
 					const int max = color_max == -1? static_cast<int>(color_min + size() - 1) : color_max;
-					for (int i = color_min; i <= max; ++i)
+					for (int i = color_min; i <= max; ++i) {
 						all_colors.insert(i);
+					}
 
 					for (Node *node: nodes) {
 						std::set<int> available = all_colors;
-						for (Node *neighbor: node->out)
-							for (const int color: neighbor->colors)
+						for (Node *neighbor: node->out) {
+							for (const int color: neighbor->colors) {
 								available.erase(color);
-						for (Node *neighbor: node->in)
-							for (const int color: neighbor->colors)
+							}
+						}
+						for (Node *neighbor: node->in) {
+							for (const int color: neighbor->colors) {
 								available.erase(color);
+							}
+						}
 						if (available.size() < static_cast<size_t>(node->colorsNeeded)) {
 							// error() << available.size() << " < " << static_cast<size_t>(node->colorsNeeded) << "\n";
 							throw UncolorableError();
 						}
 						auto iter = available.begin();
-						for (int i = 0; i < node->colorsNeeded; ++i)
+						for (int i = 0; i < node->colorsNeeded; ++i) {
 							node->colors.insert(*iter++);
+						}
 					}
 				} else {
 					throw std::invalid_argument("Unknown graph coloring algorithm: " + std::to_string(static_cast<int>(algorithm)));
@@ -770,15 +885,18 @@ namespace Game3 {
 			/** Returns a vectors of all edges represented as a pair of the start node and the end node. */
 			std::vector<std::pair<Node *, Node *>> allEdges() const {
 				std::vector<std::pair<Node *, Node *>> out;
-				for (Node *node: nodes)
-					for (Node *successor: *node)
+				for (Node *node: nodes) {
+					for (Node *successor: *node) {
 						out.push_back({node, successor});
+					}
+				}
 				return out;
 			}
 
 			std::vector<Node *> reverseTopoSort() {
-				if (empty())
+				if (empty()) {
 					return {};
+				}
 
 				std::vector<Node *> out;
 				out.reserve(size());
@@ -788,21 +906,25 @@ namespace Game3 {
 				std::unordered_set<Node *> nonpermanent(nodes.begin(), nodes.end());
 
 				std::function<void(Node *)> visit = [&](Node *node) {
-					if (permanent.contains(node))
+					if (permanent.contains(node)) {
 						return;
-					if (temporary.contains(node))
+					}
+					if (temporary.contains(node)) {
 						throw std::runtime_error("Can't topologically sort a cyclic graph");
+					}
 					temporary.insert(node);
-					for (Node *out_node: node->out)
+					for (Node *out_node: node->out) {
 						visit(out_node);
+					}
 					temporary.erase(node);
 					permanent.insert(node);
 					nonpermanent.erase(node);
 					out.push_back(node);
 				};
 
-				while (!nonpermanent.empty())
+				while (!nonpermanent.empty()) {
 					visit(*nonpermanent.begin());
+				}
 
 				return out;
 			}
@@ -819,8 +941,9 @@ namespace Game3 {
 				for (Node *node: nodes) {
 					// node->rename("\"" + node->getLabel() + "_i" + std::to_string(node->in.size()) + "_o" +
 					// 	std::to_string(node->out.size()) + "\"");
-					if (node->reflexive())
+					if (node->reflexive()) {
 						reflexives.push_back(node);
+					}
 				}
 
 				std::ostringstream out;
@@ -831,31 +954,43 @@ namespace Game3 {
 				out << "\trankdir=" << direction << ";\n";
 				if (!reflexives.empty()) {
 					out << "\tnode [shape = doublecircle];";
-					for (Node *node: reflexives)
+
+					for (Node *node: reflexives) {
 						out << " " << node->getLabel();
+					}
+
 					out << ";\n";
 				}
 
 				out << "\tnode [shape = circle];";
 				bool any_added = false;
-				for (Node *node: nodes)
+
+				for (Node *node: nodes) {
 					if (node->isIsolated()) {
 						out << " " << node->getLabel();
 						any_added = true;
 					}
+				}
 
-				if (any_added)
+				if (any_added) {
 					out << ";";
+				}
+
 				out << "\n";
 
-				for (const Node *node: nodes)
-					if (node->colors.size() == 1 && static_cast<size_t>(*node->colors.begin()) < colors.size())
+				for (const Node *node: nodes) {
+					if (node->colors.size() == 1 && static_cast<size_t>(*node->colors.begin()) < colors.size()) {
 						out << "\t\"" << node->getLabel() << "\" [fillcolor=" << colors.at(*node->colors.begin()) << "];\n";
+					}
+				}
 
-				for (const Node *node: nodes)
-					for (const Node *neighbor: node->out)
-						if (neighbor != node)
+				for (const Node *node: nodes) {
+					for (const Node *neighbor: node->out) {
+						if (neighbor != node) {
 							out << "\t\"" << node->getLabel() << "\" -> \"" << neighbor->getLabel() << "\";\n";
+						}
+					}
+				}
 				out << "}\n";
 				return out.str();
 			}
@@ -864,26 +999,30 @@ namespace Game3 {
 			void renderTo(std::string out_path, const std::string &direction = "TB") {
 				std::ofstream out;
 				std::string path = "/tmp/ll2w_graph_";
-				for (const char ch: out_path)
-					if (std::isdigit(ch) || std::isalpha(ch) || ch == '_')
+				for (char ch: out_path) {
+					if (std::isdigit(ch) || std::isalpha(ch) || ch == '_') {
 						path += ch;
+					}
+				}
 				path += ".dot";
 				out.open(path);
 				out << toDot(direction);
 				out.close();
 
-				if (std::string_view(out_path).substr(0, 2) == "./")
+				if (std::string_view(out_path).substr(0, 2) == "./") {
 					out_path = (std::filesystem::current_path() / out_path.substr(2)).string();
+				}
 
 				std::string type = "png";
 				const size_t pos = out_path.find_last_of('.');
 				if (pos != std::string::npos && pos != out_path.size() - 1) {
 					type = out_path.substr(pos + 1);
-					for (const char ch: type)
+					for (char ch: type) {
 						if (!std::isalpha(ch)) {
 							type = "png";
 							break;
 						}
+					}
 				}
 
 				type.insert(0, "-T");
@@ -893,27 +1032,28 @@ namespace Game3 {
 				WARN("You don't get nice graphs on Windows. Get yourself a real operating system.");
 #else
 				if (fork() == 0) {
-					if (4096 <= allEdges().size())
+					if (4096 <= allEdges().size()) {
 						execlp("dot", "dot", typearg, path.c_str(), "-o", out_path.c_str(), nullptr);
-					else
+					} else {
 						execlp("sfdp", "sfdp", "-x", "-Goverlap=scale", typearg, path.c_str(), "-o", out_path.c_str(), nullptr);
+					}
 				}
 #endif
 			}
 
-			typename decltype(labelMap)::iterator begin() {
+			auto begin() {
 				return labelMap.begin();
 			}
 
-			typename decltype(labelMap)::iterator end() {
+			auto end() {
 				return labelMap.end();
 			}
 
-			typename decltype(labelMap)::const_iterator begin() const {
+			auto begin() const {
 				return labelMap.cbegin();
 			}
 
-			typename decltype(labelMap)::const_iterator end() const {
+			auto end() const {
 				return labelMap.cend();
 			}
 	};
