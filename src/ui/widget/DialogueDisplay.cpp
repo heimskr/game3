@@ -1,5 +1,8 @@
+#include "entity/Speaker.h"
 #include "game/Dialogue.h"
 #include "graphics/RendererContext.h"
+#include "graphics/SingleSpriteRenderer.h"
+#include "graphics/Texture.h"
 #include "ui/widget/DialogueDisplay.h"
 #include "ui/widget/Label.h"
 #include "ui/UIContext.h"
@@ -43,6 +46,14 @@ namespace Game3 {
 
 	void DialogueDisplay::init() {
 		WidgetPtr self = getSelf();
+
+		if (auto speaker = graph->getSpeaker()) {
+			faceTexture = speaker->getFaceTexture();
+		}
+
+		if (!faceTexture) {
+			faceTexture = graph->getActiveNode()->faceOverride;
+		}
 
 		mainText = make<Label>(ui, selfScale, "");
 		mainText->insertAtEnd(self);
@@ -91,10 +102,18 @@ namespace Game3 {
 		return graph && graph->getStillOpen();
 	}
 
+	TexturePtr DialogueDisplay::getFaceTexture() const {
+		return faceTexture;
+	}
+
 	void DialogueDisplay::resetOptions(const std::shared_ptr<DialogueNode> &node) {
 		selectedOptionIndex = 0;
 		mainText->setText(node->getDisplay());
 		optionBox->clearChildren();
+
+		if (node->faceOverride) {
+			faceTexture = node->faceOverride;
+		}
 
 		for (const DialogueOption &option: node->options) {
 			auto row = make<DialogueRow>(ui, selfScale, option);

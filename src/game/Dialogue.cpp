@@ -2,10 +2,11 @@
 #include "game/Dialogue.h"
 
 namespace Game3 {
-	DialogueNode::DialogueNode(DialogueGraph &parent, std::string name, std::vector<DialogueOption> options):
+	DialogueNode::DialogueNode(DialogueGraph &parent, std::string name, std::vector<DialogueOption> options, TexturePtr faceOverride):
 		parent(parent),
 		name(std::move(name)),
-		options(std::move(options)) {}
+		options(std::move(options)),
+		faceOverride(std::move(faceOverride)) {}
 
 	void DialogueNode::select() {
 		auto self = shared_from_this();
@@ -24,8 +25,8 @@ namespace Game3 {
 
 	DialogueGraph::~DialogueGraph() = default;
 
-	DialogueNodePtr DialogueGraph::addNode(std::string name, UString display, std::vector<DialogueOption> options) {
-		auto node = std::make_shared<DialogueNode>(*this, name, std::move(options));
+	DialogueNodePtr DialogueGraph::addNode(std::string name, UString display, std::vector<DialogueOption> options, TexturePtr faceOverride) {
+		auto node = std::make_shared<DialogueNode>(*this, name, std::move(options), std::move(faceOverride));
 		node->display = std::move(display);
 		nodes[std::move(name)] = node;
 
@@ -34,6 +35,10 @@ namespace Game3 {
 		}
 
 		return node;
+	}
+
+	DialogueNodePtr DialogueGraph::addNode(std::string name, UString display, std::vector<DialogueOption> options, const std::filesystem::path &texturePath) {
+		return addNode(std::move(name), std::move(display), std::move(options), cacheTexture(texturePath));
 	}
 
 	void DialogueGraph::selectNode(const std::string &name) {

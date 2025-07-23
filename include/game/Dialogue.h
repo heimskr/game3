@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "graphics/Forward.h"
 #include "types/UString.h"
 
 namespace Game3 {
@@ -25,8 +26,9 @@ namespace Game3 {
 			std::string name;
 			UString display;
 			std::vector<DialogueOption> options;
+			TexturePtr faceOverride;
 
-			DialogueNode(DialogueGraph &parent, std::string name, std::vector<DialogueOption> options = {});
+			DialogueNode(DialogueGraph &parent, std::string name, std::vector<DialogueOption> options = {}, TexturePtr faceOverride = {});
 
 			virtual ~DialogueNode() = default;
 
@@ -42,7 +44,8 @@ namespace Game3 {
 
 			virtual ~DialogueGraph();
 
-			DialogueNodePtr addNode(std::string name, UString display, std::vector<DialogueOption> options = {});
+			DialogueNodePtr addNode(std::string name, UString display, std::vector<DialogueOption> options = {}, TexturePtr faceOverride = {});
+			DialogueNodePtr addNode(std::string name, UString display, std::vector<DialogueOption> options, const std::filesystem::path &texturePath);
 
 			virtual void selectNode(const std::string &name);
 			virtual void close();

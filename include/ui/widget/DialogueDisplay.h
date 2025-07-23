@@ -2,6 +2,7 @@
 
 #include "game/Dialogue.h"
 #include "ui/widget/Box.h"
+#include "ui/widget/Forward.h"
 
 #include <memory>
 
@@ -18,8 +19,8 @@ namespace Game3 {
 
 		private:
 			DialogueOption option;
-			std::shared_ptr<Label> indicator;
-			std::shared_ptr<Label> text;
+			LabelPtr indicator;
+			LabelPtr text;
 	};
 
 	class DialogueDisplay: public Box {
@@ -31,12 +32,14 @@ namespace Game3 {
 			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 
 			bool getStillOpen() const;
+			TexturePtr getFaceTexture() const;
 
 		private:
 			DialogueGraphPtr graph;
 			DialogueNodePtr lastNode;
-			std::shared_ptr<Label> mainText;
-			std::shared_ptr<Box> optionBox;
+			LabelPtr mainText;
+			BoxPtr optionBox;
+			TexturePtr faceTexture;
 			size_t selectedOptionIndex = 0;
 
 			void resetOptions(const DialogueNodePtr &);

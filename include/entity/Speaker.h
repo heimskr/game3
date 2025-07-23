@@ -8,6 +8,7 @@ namespace Game3 {
 	class Speaker: public virtual Entity {
 		public:
 			virtual void dialogueSelected(const std::shared_ptr<DialogueNode> &) = 0;
+			virtual TexturePtr getFaceTexture() = 0;
 
 		protected:
 			Speaker();

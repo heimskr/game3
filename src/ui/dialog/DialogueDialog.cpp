@@ -18,9 +18,9 @@ namespace Game3 {
 	void DialogueDialog::init() {
 		auto graph = std::make_shared<DialogueGraph>(ui.getPlayer());
 
-		graph->addNode("entry", "Hey there.", {{"What's up?", "whats_up"}, {"No.", "oh_ok"}});
-		graph->addNode("whats_up", "Just chillin.", {{"Ok.", "!exit"}, {"Wait a second", "entry"}});
-		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}});
+		graph->addNode("entry", "Hey there.", {{"What's up?", "whats_up"}, {"No.", "oh_ok"}}, "resources/gui/inventory.png");
+		graph->addNode("whats_up", "Just chillin.", {{"Ok.", "!exit"}, {"Wait a second", "entry"}}, "resources/gui/yes.png");
+		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}}, "resources/gui/no.png");
 
 		dialogueDisplay = make<DialogueDisplay>(ui, selfScale, std::move(graph));
 		dialogueScroller = make<Scroller>(ui, selfScale);
@@ -47,15 +47,11 @@ namespace Game3 {
 		dialogueScroller->maybeRemeasure(renderers, scroller_position.width, scroller_position.height);
 		dialogueScroller->render(renderers, scroller_position);
 
-		if (!faceSprite) {
-			faceSprite = cacheTexture("resources/orebase.png");
-		}
-
-		if (faceSprite) {
+		if (TexturePtr face_texture = dialogueDisplay->getFaceTexture()) {
 			float face_scale = getScale();
-			renderers.singleSprite.drawOnScreen(faceSprite, RenderOptions{
-				.x = position.x + position.width - face_scale * faceSprite->width,
-				.y = position.y - face_scale * faceSprite->height,
+			renderers.singleSprite.drawOnScreen(face_texture, RenderOptions{
+				.x = position.x + position.width - face_scale * face_texture->width,
+				.y = position.y - face_scale * face_texture->height,
 				.sizeX = -1 / face_scale,
 				.sizeY = -1 / face_scale,
 				.scaleX = face_scale,

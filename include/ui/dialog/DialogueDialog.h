@@ -19,6 +19,5 @@ namespace Game3 {
 		private:
 			std::shared_ptr<Scroller> dialogueScroller;
 			std::shared_ptr<DialogueDisplay> dialogueDisplay;
-			TexturePtr faceSprite;
 	};
 }
