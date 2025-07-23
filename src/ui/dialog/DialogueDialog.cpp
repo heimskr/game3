@@ -79,4 +79,8 @@ namespace Game3 {
 	bool DialogueDialog::hidesHotbar() const {
 		return true;
 	}
+
+	bool DialogueDialog::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
+		return dialogueDisplay->keyPressed(key, modifiers, is_repeat);
+	}
 }

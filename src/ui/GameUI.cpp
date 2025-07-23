@@ -1,3 +1,4 @@
+#include "entity/ClientPlayer.h"
 #include "game/ClientGame.h"
 #include "graphics/RealmRenderer.h"
 #include "graphics/RendererContext.h"
@@ -136,6 +137,32 @@ namespace Game3 {
 
 	Rectangle GameUI::getPosition() const {
 		return ui.window.inset(0);
+	}
+
+	bool GameUI::keyPressed(uint32_t key, Modifiers, bool) {
+		ClientPlayerPtr player = ui.getPlayer();
+
+		if (key == GLFW_KEY_UP) {
+			player->face(Direction::Up);
+			return true;
+		}
+
+		if (key == GLFW_KEY_RIGHT) {
+			player->face(Direction::Right);
+			return true;
+		}
+
+		if (key == GLFW_KEY_DOWN) {
+			player->face(Direction::Down);
+			return true;
+		}
+
+		if (key == GLFW_KEY_LEFT) {
+			player->face(Direction::Left);
+			return true;
+		}
+
+		return false;
 	}
 
 	const std::shared_ptr<OmniDialog> & GameUI::getOmniDialog() {

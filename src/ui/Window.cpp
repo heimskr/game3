@@ -543,26 +543,6 @@ namespace Game3 {
 					return;
 				}
 
-				if (key == GLFW_KEY_UP) {
-					player->face(Direction::Up);
-					return;
-				}
-
-				if (key == GLFW_KEY_RIGHT) {
-					player->face(Direction::Right);
-					return;
-				}
-
-				if (key == GLFW_KEY_DOWN) {
-					player->face(Direction::Down);
-					return;
-				}
-
-				if (key == GLFW_KEY_LEFT) {
-					player->face(Direction::Left);
-					return;
-				}
-
 				if (key == GLFW_KEY_SLASH) {
 					queue([](Window &window) {
 						if (auto game_ui = window.uiContext.getUI<GameUI>()) {

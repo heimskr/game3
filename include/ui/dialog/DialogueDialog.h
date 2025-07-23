@@ -14,6 +14,7 @@ namespace Game3 {
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;
 			bool hidesHotbar() const final;
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 
 		private:
 			std::shared_ptr<Scroller> dialogueScroller;

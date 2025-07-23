@@ -28,6 +28,7 @@ namespace Game3 {
 
 			void init() final;
 			void render(const RendererContext &, float x, float y, float width, float height) final;
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 
 			bool getStillOpen() const;
 
@@ -39,5 +40,7 @@ namespace Game3 {
 			size_t selectedOptionIndex = 0;
 
 			void resetOptions(const DialogueNodePtr &);
+			void selectOption(size_t index);
+			void activateOption();
 	};
 }

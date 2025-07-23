@@ -46,6 +46,8 @@ namespace Game3 {
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;
 
+			bool keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) final;
+
 			const std::shared_ptr<OmniDialog> & getOmniDialog();
 			const std::shared_ptr<ChatDialog> & getChatDialog();
 			const std::shared_ptr<TopDialog> & getTopDialog();
