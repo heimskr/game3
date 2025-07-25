@@ -56,7 +56,6 @@ namespace Game3 {
 				.sizeY = -1 / face_scale,
 				.scaleX = face_scale,
 				.scaleY = face_scale,
-				.invertY = false,
 			});
 		}
 	}

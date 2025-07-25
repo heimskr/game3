@@ -207,6 +207,7 @@ namespace Game3 {
 		const auto texture_height = texture.getHeight();
 
 		RenderOptions options = options_ref;
+		options.invertY = false;
 		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  : options.sizeX;
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height : options.sizeY;
 		setupShader(texture_width, texture_height, options);
@@ -234,6 +235,7 @@ namespace Game3 {
 		const auto texture_height = texture->height;
 
 		RenderOptions options = options_ref;
+		options.invertY = false;
 		options.sizeX = options.sizeX < 0.f? -options.sizeX * texture_width  * options.scaleX : options.sizeX;
 		options.sizeY = options.sizeY < 0.f? -options.sizeY * texture_height * options.scaleY : options.sizeY;
 		setupShader(texture_width, texture_height, options);
