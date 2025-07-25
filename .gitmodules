@@ -46,3 +46,6 @@
 [submodule "subprojects/clip"]
 	path = subprojects/clip
 	url = https://github.com/dacap/clip.git
+[submodule "subprojects/TileDB"]
+	path = subprojects/TileDB
+	url = https://github.com/TileDB-Inc/TileDB.git

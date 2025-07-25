@@ -35,6 +35,15 @@ zipios = cmake.subproject('Zipios', options: zipios_options)
 
 curlpp = cmake.subproject('curlpp', options: curlpp_options)
 
+tiledb_options = cmake.subproject_options()
+tiledb_options.add_cmake_defines({
+	'libmagic_DICTIONARY': '/usr/share/file/misc/magic.mgc',
+	'TILEDB_TESTS': false,
+	'TILEDB_STATS': false,
+	'TILEDB_STATIC': true,
+})
+tiledb = cmake.subproject('TileDB', options: tiledb_options)
+
 game3_deps = [
 	dependency('glibmm-2.68'),
 	dependency('threads'),
@@ -52,6 +61,7 @@ game3_deps = [
 	dependency('libcurl'),
 	zipios.dependency('zipios'),
 	clip.dependency('clip'),
+	tiledb.dependency('tile'),
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
@@ -73,7 +83,10 @@ inc_dirs = [
 	include_directories('..' / 'subprojects' / 'backward-cpp'),
 ]
 
-link_with = [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_lib')]
+link_with = [
+	chemskr.get_variable('chemskr_lib'),
+	namegen.get_variable('namegen_lib'),
+]
 
 link_args = [
 	'-lbfd',
