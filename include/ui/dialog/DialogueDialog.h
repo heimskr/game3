@@ -5,6 +5,7 @@
 namespace Game3 {
 	class DialogueDisplay;
 	class DialogueGraph;
+	class DialogueNode;
 	class Scroller;
 
 	class DialogueDialog: public Dialog {
@@ -15,11 +16,12 @@ namespace Game3 {
 			void render(const RendererContext &) final;
 			Rectangle getPosition() const final;
 			bool hidesHotbar() const final;
-			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
 
 		private:
-			std::shared_ptr<Scroller> dialogueScroller;
-			std::shared_ptr<DialogueDisplay> dialogueDisplay;
-			std::shared_ptr<DialogueGraph> dialogueGraph;
+			std::shared_ptr<DialogueGraph> graph;
+			std::shared_ptr<DialogueNode> lastNode;
+			WidgetPtr dialogueWidget;
+
+			void setDialogueWidget(WidgetPtr);
 	};
 }

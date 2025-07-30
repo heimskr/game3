@@ -12,20 +12,20 @@ namespace Game3 {
 			Scroller(UIContext &, float selfScale);
 
 			using Widget::render;
-			void render(const RendererContext &, float x, float y, float width, float height) final;
+			void render(const RendererContext &, float x, float y, float width, float height) override;
 
-			bool click(int button, int x, int y, Modifiers) final;
-			bool dragStart(int x, int y) final;
-			bool dragUpdate(int x, int y) final;
-			bool dragEnd(int x, int y, double) final;
-			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) final;
+			bool click(int button, int x, int y, Modifiers) override;
+			bool dragStart(int x, int y) override;
+			bool dragUpdate(int x, int y) override;
+			bool dragEnd(int x, int y, double) override;
+			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) override;
 
-			SizeRequestMode getRequestMode() const final;
-			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) final;
+			SizeRequestMode getRequestMode() const override;
+			void measure(const RendererContext &, Orientation, float for_width, float for_height, float &minimum, float &natural) override;
 
-			void clearChildren() final;
-			bool onChildrenUpdated() final;
-			void childResized(const WidgetPtr &, Orientation, int, int) final;
+			void clearChildren() override;
+			bool onChildrenUpdated() override;
+			void childResized(const WidgetPtr &, Orientation, int, int) override;
 
 			void setChild(WidgetPtr);
 			float getVerticalOffset() const;

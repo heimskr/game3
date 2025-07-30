@@ -27,6 +27,9 @@ namespace Game3 {
 	class DialogueDisplay;
 	using DialogueDisplayPtr = std::shared_ptr<DialogueDisplay>;
 
+	class FullscreenWidget;
+	using FullscreenWidgetPtr = std::shared_ptr<FullscreenWidget>;
+
 	class Grid;
 	using GridPtr = std::shared_ptr<Grid>;
 

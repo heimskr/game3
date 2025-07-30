@@ -5,6 +5,7 @@
 #include "graphics/Texture.h"
 #include "ui/widget/DialogueDisplay.h"
 #include "ui/widget/Label.h"
+#include "ui/Constants.h"
 #include "ui/UIContext.h"
 #include "util/Log.h"
 
@@ -40,35 +41,60 @@ namespace Game3 {
 		}
 	}
 
-	DialogueDisplay::DialogueDisplay(UIContext &ui, float selfScale, DialogueGraphPtr graph):
-		Box(ui, selfScale, Orientation::Vertical, 2, 0.5),
-		graph(std::move(graph)) {}
+	DialogueDisplay::DialogueDisplay(UIContext &ui, float selfScale, DialogueNodePtr node):
+		Scroller(ui, selfScale),
+		node(std::move(node)) {}
 
 	void DialogueDisplay::init() {
-		WidgetPtr self = getSelf();
+		mainBox = make<Box>(ui, selfScale, Orientation::Vertical, 2, 0.5);
 
-		if (auto speaker = graph->getSpeaker()) {
+		if (auto speaker = getGraph()->getSpeaker()) {
 			faceTexture = speaker->getFaceTexture();
 		}
 
 		if (!faceTexture) {
-			faceTexture = graph->getActiveNode()->faceOverride;
+			faceTexture = node->faceOverride;
 		}
 
 		mainText = make<Label>(ui, selfScale, "");
-		mainText->insertAtEnd(self);
+		mainText->insertAtEnd(mainBox);
 
 		optionBox = make<Box>(ui, selfScale, Orientation::Vertical, 0, 0);
-		optionBox->insertAtEnd(self);
-	}
+		optionBox->insertAtEnd(mainBox);
 
-	void DialogueDisplay::render(const RendererContext &renderers, float x, float y, float width, float height) {
-		if (auto current_node = graph->getActiveNode(); current_node != lastNode) {
-			resetOptions(current_node);
-			lastNode = std::move(current_node);
+		setChild(mainBox);
+
+		mainText->setText(node->getDisplay());
+
+		if (node->faceOverride) {
+			faceTexture = node->faceOverride;
 		}
 
-		Box::render(renderers, x, y, width, height);
+		for (const DialogueOption &option: node->options) {
+			auto row = make<DialogueRow>(ui, selfScale, option);
+			row->setActive(optionBox->getChildCount() == selectedOptionIndex);
+			optionBox->append(row);
+		}
+	}
+
+	void DialogueDisplay::render(const RendererContext &renderers, float, float, float, float) {
+		Rectangle position = getPosition();
+
+		{
+			auto saver = ui.scissorStack.pushAbsolute(position, renderers);
+			ui.drawFrame(renderers, getScale(), false, FRAME_PIECES, DEFAULT_BACKGROUND_COLOR);
+		}
+
+		Rectangle scroller_position = position.shrinkAll(7 * getScale());
+		maybeRemeasure(renderers, scroller_position.width, scroller_position.height);
+		Scroller::render(renderers, scroller_position.x, scroller_position.y, scroller_position.width, scroller_position.height);
+
+		if (TexturePtr face_texture = getFaceTexture()) {
+			float face_scale = getScale();
+			position.x += position.width - face_scale * face_texture->width;
+			position.y -= face_scale * face_texture->height;
+			renderers.singleSprite.drawOnScreen(face_texture, RenderOptions::simple(position.x, position.y, face_scale, -1.0 / face_scale, -1.0 / face_scale));
+		}
 	}
 
 	bool DialogueDisplay::keyPressed(uint32_t key, Modifiers, bool is_repeat) {
@@ -98,34 +124,16 @@ namespace Game3 {
 		return true;
 	}
 
-	bool DialogueDisplay::getStillOpen() const {
-		return graph && graph->getStillOpen();
-	}
-
 	TexturePtr DialogueDisplay::getFaceTexture() const {
 		return faceTexture;
 	}
 
-	void DialogueDisplay::resetOptions(const std::shared_ptr<DialogueNode> &node) {
-		selectedOptionIndex = 0;
-		mainText->setText(node->getDisplay());
-		optionBox->clearChildren();
-
-		if (node->faceOverride) {
-			faceTexture = node->faceOverride;
-		}
-
-		for (const DialogueOption &option: node->options) {
-			auto row = make<DialogueRow>(ui, selfScale, option);
-			row->setActive(optionBox->getChildCount() == selectedOptionIndex);
-			optionBox->append(row);
-		}
-
-		maybeRemeasure(ui.getRenderers(0), -1, -1);
+	DialogueGraphPtr DialogueDisplay::getGraph() const {
+		return node->getParent();
 	}
 
 	void DialogueDisplay::selectOption(size_t index) {
-		assert(index < lastNode->options.size());
+		assert(index < node->options.size());
 
 		if (index == selectedOptionIndex) {
 			return;
@@ -155,7 +163,18 @@ namespace Game3 {
 	}
 
 	void DialogueDisplay::activateOption() {
-		assert(lastNode != nullptr);
-		graph->selectNode(lastNode->options.at(selectedOptionIndex).nodeTarget);
+		assert(node != nullptr);
+		getGraph()->selectNode(node->options.at(selectedOptionIndex).nodeTarget);
+	}
+
+	Rectangle DialogueDisplay::getPosition() const {
+		int ui_width = ui.getWidth();
+		int ui_height = ui.getHeight();
+
+		constexpr float x_leftover = 0.2;
+		constexpr int height = 500;
+		constexpr int y_gap = 32;
+
+		return Rectangle(ui_width * x_leftover, ui_height - height - y_gap, ui_width * (1.0 - 2 * x_leftover), height);
 	}
 }

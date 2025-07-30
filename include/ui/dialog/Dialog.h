@@ -47,6 +47,8 @@ namespace Game3 {
 			bool dragUpdate(int x, int y) override;
 			bool dragEnd(int x, int y, double) override;
 			bool scroll(float x_delta, float y_delta, int x, int y, Modifiers) override;
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
+			bool charPressed(uint32_t character, Modifiers) override;
 			bool contains(int x, int y) const override;
 
 			bool isFocused() const;

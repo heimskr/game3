@@ -3,6 +3,7 @@
 #include "dialogue/Dialogue.h"
 #include "ui/widget/Box.h"
 #include "ui/widget/Forward.h"
+#include "ui/widget/Scroller.h"
 
 #include <memory>
 
@@ -23,29 +24,27 @@ namespace Game3 {
 			LabelPtr text;
 	};
 
-	class DialogueDisplay: public Box {
+	class DialogueDisplay: public Scroller {
 		public:
-			DialogueDisplay(UIContext &, float selfScale, DialogueGraphPtr graph);
+			DialogueDisplay(UIContext &, float selfScale, DialogueNodePtr node);
 
-			void init() final;
-			void render(const RendererContext &, float x, float y, float width, float height) final;
-			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) final;
+			void init() override;
+			void render(const RendererContext &, float x, float y, float width, float height) override;
+			bool keyPressed(uint32_t key, Modifiers, bool is_repeat) override;
 
-			bool getStillOpen() const;
 			TexturePtr getFaceTexture() const;
-
-			DialogueGraphPtr getGraph() const { return graph; }
+			DialogueGraphPtr getGraph() const;
 
 		private:
-			DialogueGraphPtr graph;
-			DialogueNodePtr lastNode;
+			DialogueNodePtr node;
+			BoxPtr mainBox;
 			LabelPtr mainText;
 			BoxPtr optionBox;
 			TexturePtr faceTexture;
 			size_t selectedOptionIndex = 0;
 
-			void resetOptions(const DialogueNodePtr &);
 			void selectOption(size_t index);
 			void activateOption();
+			Rectangle getPosition() const;
 	};
 }

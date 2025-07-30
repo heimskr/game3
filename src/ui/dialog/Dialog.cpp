@@ -83,6 +83,26 @@ namespace Game3 {
 		return false;
 	}
 
+	bool Dialog::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
+		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
+			if (child->keyPressed(key, modifiers, is_repeat)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool Dialog::charPressed(uint32_t character, Modifiers modifiers) {
+		for (WidgetPtr child = firstChild; child; child = child->getNextSibling()) {
+			if (child->charPressed(character, modifiers)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	bool Dialog::contains(int x, int y) const {
 		return getPosition().contains(x, y);
 	}
