@@ -1,5 +1,7 @@
+#include "entity/Player.h"
 #include "entity/Speaker.h"
-#include "game/Dialogue.h"
+#include "dialogue/Dialogue.h"
+#include "game/ClientGame.h"
 
 namespace Game3 {
 	DialogueNode::DialogueNode(DialogueGraph &parent, std::string name, std::vector<DialogueOption> options, TexturePtr faceOverride):
@@ -20,6 +22,14 @@ namespace Game3 {
 		return display;
 	}
 
+	bool DialogueNode::render(UIContext &, const RendererContext &) {
+		return false;
+	}
+
+	bool DialogueNode::keyPressed(uint32_t, Modifiers, bool) {
+		return false;
+	}
+
 	DialogueGraph::DialogueGraph(std::shared_ptr<Player> player):
 		player(std::move(player)) {}
 
@@ -37,8 +47,20 @@ namespace Game3 {
 		return node;
 	}
 
+	void DialogueGraph::addNode(DialogueNodePtr node) {
+		nodes[node->name] = node;
+
+		if (activeNode == nullptr || nodes.size() == 1) {
+			activeNode = node;
+		}
+	}
+
 	DialogueNodePtr DialogueGraph::addNode(std::string name, UString display, std::vector<DialogueOption> options, const std::filesystem::path &texturePath) {
 		return addNode(std::move(name), std::move(display), std::move(options), cacheTexture(texturePath));
+	}
+
+	ClientGamePtr DialogueGraph::getGame() const {
+		return std::static_pointer_cast<ClientGame>(player->getGame());
 	}
 
 	void DialogueGraph::selectNode(const std::string &name) {

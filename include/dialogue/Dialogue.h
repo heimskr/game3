@@ -1,10 +1,12 @@
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "game/Forward.h"
 #include "graphics/Forward.h"
 #include "types/UString.h"
 
@@ -12,6 +14,9 @@ namespace Game3 {
 	class DialogueGraph;
 	class Player;
 	class Speaker;
+	class UIContext;
+	struct Modifiers;
+	struct RendererContext;
 
 	struct DialogueOption {
 		/** The text to display as the option. */
@@ -34,6 +39,9 @@ namespace Game3 {
 
 			virtual void select();
 			virtual UString getDisplay();
+			/** Returns false if the dialogue dialog should instead default to DialogueDisplay for rendering. */
+			virtual bool render(UIContext &, const RendererContext &);
+			virtual bool keyPressed(uint32_t key, Modifiers, bool is_repeat);
 	};
 
 	using DialogueNodePtr = std::shared_ptr<DialogueNode>;
@@ -46,6 +54,8 @@ namespace Game3 {
 
 			DialogueNodePtr addNode(std::string name, UString display, std::vector<DialogueOption> options = {}, TexturePtr faceOverride = {});
 			DialogueNodePtr addNode(std::string name, UString display, std::vector<DialogueOption> options, const std::filesystem::path &texturePath);
+			void addNode(DialogueNodePtr);
+			ClientGamePtr getGame() const;
 
 			virtual void selectNode(const std::string &name);
 			virtual void close();

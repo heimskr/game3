@@ -8,8 +8,8 @@
 #include <optional>
 
 namespace Game3 {
+	class Container;
 	class Game;
-	struct Container;
 
 	template <typename I, typename O, typename R = Registerable>
 	struct Recipe: R {

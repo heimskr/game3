@@ -1,3 +1,4 @@
+#include "dialogue/RhosumShopNode.h"
 #include "entity/ClientPlayer.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
@@ -16,13 +17,14 @@ namespace Game3 {
 		Dialog(ui, selfScale) {}
 
 	void DialogueDialog::init() {
-		auto graph = std::make_shared<DialogueGraph>(ui.getPlayer());
+		dialogueGraph = std::make_shared<DialogueGraph>(ui.getPlayer());
 
-		graph->addNode("entry", "Hey there.", {{"What's up?", "whats_up"}, {"No.", "oh_ok"}}, "resources/gui/inventory.png");
-		graph->addNode("whats_up", "Just chillin.", {{"Ok.", "!exit"}, {"Wait a second", "entry"}}, "resources/gui/yes.png");
-		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}}, "resources/gui/no.png");
+		dialogueGraph->addNode("entry", "Hey there.", {{"SHOPPE.", "shop"}, {"What's up?", "whats_up"}, {"No.", "oh_ok"}}, "resources/talksprites/rhosum_neutral.png");
+		dialogueGraph->addNode("whats_up", "Just chillin.", {{"Wait a second", "entry"}, {"Ok.", "!exit"}}, "resources/talksprites/rhosum_surprised.png");
+		dialogueGraph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}}, "resources/talksprites/rhosum_surprised.png");
+		dialogueGraph->addNode(std::make_shared<RhosumShopNode>(*dialogueGraph, "shop"));
 
-		dialogueDisplay = make<DialogueDisplay>(ui, selfScale, std::move(graph));
+		dialogueDisplay = make<DialogueDisplay>(ui, selfScale, dialogueGraph);
 		dialogueScroller = make<Scroller>(ui, selfScale);
 		dialogueScroller->setChild(dialogueDisplay);
 		dialogueScroller->insertAtEnd(getSelf());
@@ -33,6 +35,10 @@ namespace Game3 {
 			ui.window.queue([](Window &window) {
 				window.uiContext.removeDialogs<DialogueDialog>();
 			});
+			return;
+		}
+
+		if (dialogueDisplay->getGraph()->getActiveNode()->render(ui, renderers)) {
 			return;
 		}
 
@@ -49,14 +55,9 @@ namespace Game3 {
 
 		if (TexturePtr face_texture = dialogueDisplay->getFaceTexture()) {
 			float face_scale = getScale();
-			renderers.singleSprite.drawOnScreen(face_texture, RenderOptions{
-				.x = position.x + position.width - face_scale * face_texture->width,
-				.y = position.y - face_scale * face_texture->height,
-				.sizeX = -1 / face_scale,
-				.sizeY = -1 / face_scale,
-				.scaleX = face_scale,
-				.scaleY = face_scale,
-			});
+			position.x += position.width - face_scale * face_texture->width;
+			position.y -= face_scale * face_texture->height;
+			renderers.singleSprite.drawOnScreen(face_texture, RenderOptions::simple(position.x, position.y, face_scale, -1.0 / face_scale, -1.0 / face_scale));
 		}
 	}
 
@@ -76,6 +77,10 @@ namespace Game3 {
 	}
 
 	bool DialogueDialog::keyPressed(uint32_t key, Modifiers modifiers, bool is_repeat) {
+		if (dialogueGraph->getActiveNode()->keyPressed(key, modifiers, is_repeat)) {
+			return true;
+		}
+
 		return dialogueDisplay->keyPressed(key, modifiers, is_repeat);
 	}
 }

@@ -21,5 +21,16 @@ namespace Game3 {
 		double viewportX = -1.;
 		double viewportY = -1.;
 		GLint wrapMode = GL_CLAMP_TO_EDGE;
+
+		static RenderOptions simple(double x, double y, double scale = 1, double size_x = -1, double size_y = -1) {
+			return {
+				.x = x,
+				.y = y,
+				.sizeX = size_x,
+				.sizeY = size_y,
+				.scaleX = scale,
+				.scaleY = scale,
+			};
+		}
 	};
 }

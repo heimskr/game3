@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Dialogue.h"
+#include "dialogue/Dialogue.h"
 #include "ui/widget/Box.h"
 #include "ui/widget/Forward.h"
 
@@ -33,6 +33,8 @@ namespace Game3 {
 
 			bool getStillOpen() const;
 			TexturePtr getFaceTexture() const;
+
+			DialogueGraphPtr getGraph() const { return graph; }
 
 		private:
 			DialogueGraphPtr graph;

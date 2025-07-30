@@ -1,5 +1,5 @@
 #include "entity/Speaker.h"
-#include "game/Dialogue.h"
+#include "dialogue/Dialogue.h"
 #include "graphics/RendererContext.h"
 #include "graphics/SingleSpriteRenderer.h"
 #include "graphics/Texture.h"

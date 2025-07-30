@@ -4,6 +4,7 @@
 
 namespace Game3 {
 	class DialogueDisplay;
+	class DialogueGraph;
 	class Scroller;
 
 	class DialogueDialog: public Dialog {
@@ -19,5 +20,6 @@ namespace Game3 {
 		private:
 			std::shared_ptr<Scroller> dialogueScroller;
 			std::shared_ptr<DialogueDisplay> dialogueDisplay;
+			std::shared_ptr<DialogueGraph> dialogueGraph;
 	};
 }
