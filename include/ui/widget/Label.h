@@ -9,7 +9,7 @@
 namespace Game3 {
 	class Label: public Widget, public HasAlignment, public HasFixedSize, public HasTooltipText {
 		public:
-			Label(UIContext &, float selfScale, UString text = {}, Color = {0, 0, 0, 1});
+			Label(UIContext &, float selfScale, UString text = {}, Color textColor = {0, 0, 0, 1}, Color shadowColor = {0, 0, 0, 0}, Vector2d shadowOffset = {0, 0});
 
 			using Widget::render;
 			void render(const RendererContext &, float x, float y, float width, float height) override;
@@ -29,6 +29,8 @@ namespace Game3 {
 		protected:
 			UString text;
 			Color textColor;
+			Color shadowColor;
+			Vector2d shadowOffset{0, 0};
 			std::optional<UString> wrapped;
 			float lastTextHeight = -1;
 			float lastUnwrappedTextWidth = -1;

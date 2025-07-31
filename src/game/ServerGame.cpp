@@ -931,7 +931,11 @@ namespace Game3 {
 				return {true, ""};
 			}
 
-			if (first == "set_money") {
+			if (first == "money") {
+				if (words.size() == 1) {
+					return {true, std::format("Money: {}", player->getMoney())};
+				}
+
 				if (words.size() != 2) {
 					return {false, "Incorrect parameter count."};
 				}
@@ -944,7 +948,7 @@ namespace Game3 {
 				}
 
 				player->setMoney(value);
-				return {true, ""};
+				return {true, std::format("Set money to {}", value)};
 			}
 
 			if (first == "infinifluid" || first == "inff") {

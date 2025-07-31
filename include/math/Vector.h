@@ -91,7 +91,7 @@ namespace Game3 {
 
 		Vector2d() = default;
 
-		Vector2d(double x, double y):
+		constexpr Vector2d(double x, double y):
 			x(x),
 			y(y) {}
 

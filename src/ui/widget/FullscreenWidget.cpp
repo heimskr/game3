@@ -5,7 +5,7 @@ namespace Game3 {
 		return SizeRequestMode::ConstantSize;
 	}
 
-	void FullscreenWidget::measure(const RendererContext &renderers, Orientation, float for_width, float for_height, float &minimum, float &natural) {
+	void FullscreenWidget::measure(const RendererContext &, Orientation, float, float, float &minimum, float &natural) {
 		minimum = natural = -1;
 	}
 }

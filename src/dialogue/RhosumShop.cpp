@@ -23,7 +23,7 @@ namespace Game3 {
 
 		talksprite = cacheTexture("resources/talksprites/rhosum_surprised.png");
 
-		moneyLabel = make<Label>(ui, selfScale);
+		moneyLabel = make<Label>(ui, selfScale, "", "#fff", "#000", Vector2d{getScale(), getScale()});
 		moneyNoticer.setFunction([this](const MoneyCount *, const MoneyCount &money) {
 			moneyLabel->setText(std::format("{} Q", money));
 		});
@@ -80,7 +80,7 @@ namespace Game3 {
 			exitIcon->render(renderers, Rectangle(ui.scale * 68, ui.scale * 10, ui.scale * 14, ui.scale * 14));
 		}
 
-		moneyLabel->render(renderers, 0, 0, window_width, window_height);
+		moneyLabel->render(renderers, ui.scale * 2, 0, window_width - ui.scale * 2, window_height);
 
 		Widget::render(renderers, position.x, position.y, position.width, position.height);
 

@@ -8,9 +8,11 @@
 #include "ui/UIContext.h"
 
 namespace Game3 {
-	Label::Label(UIContext &ui, float selfScale, UString text, Color text_color):
+	Label::Label(UIContext &ui, float selfScale, UString text, Color textColor, Color shadowColor, Vector2d shadowOffset):
 		Widget(ui, selfScale),
-		textColor(text_color) {
+		textColor(textColor),
+		shadowColor(shadowColor),
+		shadowOffset(shadowOffset) {
 			setText(std::move(text));
 		}
 
@@ -62,7 +64,8 @@ namespace Game3 {
 			.wrapWidth = wrapped || !mayWrap? 0 : getWrapWidth(width),
 			.color = textColor,
 			.alignTop = align_top,
-			.shadow{0, 0, 0, 0},
+			.shadow = shadowColor,
+			.shadowOffset = shadowOffset,
 		});
 
 		std::shared_ptr<Tooltip> tooltip = ui.getTooltip();
