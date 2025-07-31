@@ -2,6 +2,7 @@
 
 #include "game/Forward.h"
 #include "graphics/Forward.h"
+#include "threading/HasMutex.h"
 #include "types/UString.h"
 #include "ui/widget/Forward.h"
 
@@ -55,7 +56,7 @@ namespace Game3 {
 
 	using DialogueNodePtr = std::shared_ptr<DialogueNode>;
 
-	class DialogueGraph: public std::enable_shared_from_this<DialogueGraph> {
+	class DialogueGraph: public HasMutex<DialogueGraph>, public std::enable_shared_from_this<DialogueGraph> {
 		public:
 			static DialogueGraphPtr create(std::shared_ptr<Player> player);
 

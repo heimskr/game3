@@ -491,6 +491,15 @@ Packets are encoded as a little-endian 2-byte integer representing the packet ty
 	- `optional<f32>` Sound effect pitch variance
 	- `...` Particle randomization parameters
 
+73. **Buy From Rhosum**: tells the server to buy an item from Rhosum.
+
+	- `u64` Global ID (of Rhosum)
+	- `i32` Item index
+
+74. **Purchase Result**: tells a client the result of its attempt to buy something.
+
+	- `bool` Success
+
 # Message Format
 
 All values are little endian. Strings are not null-terminated.

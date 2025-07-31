@@ -1,6 +1,7 @@
 #include "game/Game.h"
 #include "packet/AddKnownItemPacket.h"
 #include "packet/AgentMessagePacket.h"
+#include "packet/BuyFromRhosumPacket.h"
 #include "packet/ChatMessageSentPacket.h"
 #include "packet/ChunkRequestPacket.h"
 #include "packet/ChunkTilesPacket.h"
@@ -43,6 +44,7 @@
 #include "packet/PacketFactory.h"
 #include "packet/PlaySoundPacket.h"
 #include "packet/ProtocolVersionPacket.h"
+#include "packet/PurchaseResultPacket.h"
 #include "packet/RealmNoticePacket.h"
 #include "packet/RecipeListPacket.h"
 #include "packet/RegisterPlayerPacket.h"
@@ -152,5 +154,7 @@ namespace Game3 {
 		add(PacketFactory::create<StatusEffectsPacket>());
 		add(PacketFactory::create<UpdateAgentFieldPacket>());
 		add(PacketFactory::create<ExplosionPacket>());
+		add(PacketFactory::create<BuyFromRhosumPacket>());
+		add(PacketFactory::create<PurchaseResultPacket>());
 	}
 }

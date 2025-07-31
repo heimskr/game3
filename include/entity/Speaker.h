@@ -13,4 +13,6 @@ namespace Game3 {
 		protected:
 			Speaker();
 	};
+
+	using SpeakerPtr = std::shared_ptr<Speaker>;
 }

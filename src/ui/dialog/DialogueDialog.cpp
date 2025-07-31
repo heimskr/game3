@@ -25,16 +25,29 @@ namespace Game3 {
 		graph->addNode("entry", "You want it?", {{"Yeah!", "shop"}, {"What's up?", "whats_up"}, {"No.", "oh_ok"}}, neutral);
 		graph->addNode("whats_up", "Just chillin.", {{"Wait a second", "entry"}, {"Ok.", "!exit"}}, surprised);
 		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}}, surprised);
-		graph->addNode("no_credit", "Sorry, I can't give credit. Come back when you're a little, mmm, richer!", {{"Sure.", "!exit"}, {"Hold up.", "shop"}}, neutral);
-		graph->addNode("purchased", "It's yours, my friend.", {{"More.", "shop"}, {"Ok bye.", "!exit"}});
+		graph->addNode("purchase_failed", "Sorry, I can't give credit. Come back when you're a little, mmm, richer!", {{"Hold up.", "shop"}, {"Sure.", "!exit"}}, neutral);
+		graph->addNode("purchase_successful", "It's yours, my friend.", {{"More.", "shop"}, {"Ok bye.", "!exit"}});
 		graph->addNode(std::make_shared<RhosumShopNode>(graph, "shop", DialogueOptions{{"", "!exit"}, {"", "no_credit"}, {"", "purchased"}}));
+
+		ui.getPlayer()->dialogueGraph = graph;
 	}
 
 	void DialogueDialog::render(const RendererContext &renderers) {
-		if (!graph || !graph->getStillOpen()) {
+		auto fail = [&] {
 			ui.window.queue([](Window &window) {
 				window.uiContext.removeDialogs<DialogueDialog>();
 			});
+		};
+
+		if (!graph) {
+			fail();
+			return;
+		}
+
+		auto lock = graph->uniqueLock();
+
+		if (!graph->getStillOpen()) {
+			fail();
 			return;
 		}
 

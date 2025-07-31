@@ -11,8 +11,8 @@ namespace Game3 {
 		std::string error;
 
 		ErrorPacket() = default;
-		ErrorPacket(std::string_view error_):
-			error(error_) {}
+		ErrorPacket(std::string_view error):
+			error(error) {}
 
 		PacketID getID() const override { return ID(); }
 

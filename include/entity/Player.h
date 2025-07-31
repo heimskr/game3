@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data/Identifier.h"
+#include "dialogue/Forward.h"
 #include "entity/Entity.h"
 #include "entity/LivingTitledEntity.h"
 #include "game/CraftingManager.h"
@@ -42,6 +43,7 @@ namespace Game3 {
 			std::optional<Place> lastContinuousInteraction;
 			Modifiers continuousInteractionModifiers;
 			CraftingManager craftingManager{*this};
+			Lockable<DialogueGraphPtr> dialogueGraph;
 
 			~Player() override = 0;
 			void destroy() override;

@@ -5,6 +5,7 @@
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RendererContext.h"
 #include "item/Item.h"
+#include "packet/BuyFromRhosumPacket.h"
 #include "ui/widget/Icon.h"
 #include "ui/widget/ItemSlot.h"
 #include "ui/widget/Label.h"
@@ -41,12 +42,12 @@ namespace Game3 {
 		rope = make<ItemSlot>(ui, nullptr, ItemStack::create(game, "base:item/rope", -1), -1, INNER_SLOT_SIZE, 1);
 		bomb = make<ItemSlot>(ui, nullptr, ItemStack::create(game, "base:item/bomb", -1), -1, INNER_SLOT_SIZE, 1);
 
+		uint8_t index = 0;
+
 		auto configure = [&](const ItemSlotPtr &item_slot) {
-			item_slot->setOnClick([this](Widget &widget) {
-				ItemSlotPtr item_slot = std::static_pointer_cast<ItemSlot>(widget.getSelf());
-				ItemStackPtr stack = item_slot->getStack();
-				bool success = ui.getPlayer()->removeMoney(stack->item->basePrice);
-				weakParent.lock()->selectOption(success? 2 : 1);
+			item_slot->setOnClick([this, index = index++](Widget &) {
+				SpeakerPtr speaker = weakParent.lock()->getParent()->getSpeaker();
+				ui.getPlayer()->send(make<BuyFromRhosumPacket>(speaker? speaker->getGID() : -1, index));
 			});
 			item_slot->insertAtEnd(self);
 		};
