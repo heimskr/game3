@@ -28,6 +28,8 @@ namespace Game3 {
 		std::string nodeTarget;
 	};
 
+	using DialogueOptions = std::vector<DialogueOption>;
+
 	class DialogueNode: public std::enable_shared_from_this<DialogueNode> {
 		public:
 			std::string name;
@@ -38,6 +40,8 @@ namespace Game3 {
 			DialogueNode(const DialogueGraphPtr &parent, std::string name, std::vector<DialogueOption> options = {}, TexturePtr faceOverride = {});
 
 			virtual ~DialogueNode();
+
+			void selectOption(size_t) const;
 
 			DialogueGraphPtr getParent() const;
 			virtual void select();

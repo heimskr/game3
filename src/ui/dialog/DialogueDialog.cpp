@@ -19,10 +19,15 @@ namespace Game3 {
 	void DialogueDialog::init() {
 		graph = DialogueGraph::create(ui.getPlayer());
 
-		graph->addNode("entry", "Hey there.", {{"SHOPPE.", "shop"}, {"What's up?", "whats_up"}, {"No.", "oh_ok"}}, "resources/talksprites/rhosum_neutral.png");
-		graph->addNode("whats_up", "Just chillin.", {{"Wait a second", "entry"}, {"Ok.", "!exit"}}, "resources/talksprites/rhosum_surprised.png");
-		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}}, "resources/talksprites/rhosum_surprised.png");
-		graph->addNode(std::make_shared<RhosumShopNode>(graph, "shop"));
+		std::filesystem::path neutral = "resources/talksprites/rhosum_neutral.png";
+		std::filesystem::path surprised = "resources/talksprites/rhosum_surprised.png";
+
+		graph->addNode("entry", "You want it?", {{"Yeah!", "shop"}, {"What's up?", "whats_up"}, {"No.", "oh_ok"}}, neutral);
+		graph->addNode("whats_up", "Just chillin.", {{"Wait a second", "entry"}, {"Ok.", "!exit"}}, surprised);
+		graph->addNode("oh_ok", "Oh, ok.", {{"Ok.", "!exit"}}, surprised);
+		graph->addNode("no_credit", "Sorry, I can't give credit. Come back when you're a little, mmm, richer!", {{"Sure.", "!exit"}, {"Hold up.", "shop"}}, neutral);
+		graph->addNode("purchased", "It's yours, my friend.", {{"More.", "shop"}, {"Ok bye.", "!exit"}});
+		graph->addNode(std::make_shared<RhosumShopNode>(graph, "shop", DialogueOptions{{"", "!exit"}, {"", "no_credit"}, {"", "purchased"}}));
 	}
 
 	void DialogueDialog::render(const RendererContext &renderers) {

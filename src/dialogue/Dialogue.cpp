@@ -13,6 +13,10 @@ namespace Game3 {
 
 	DialogueNode::~DialogueNode() = default;
 
+	void DialogueNode::selectOption(size_t index) const {
+		getParent()->selectNode(options.at(index).nodeTarget);
+	}
+
 	DialogueGraphPtr DialogueNode::getParent() const {
 		return weakParent.lock();
 	}
