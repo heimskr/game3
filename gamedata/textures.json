@@ -38,7 +38,9 @@
 			"base:texture/goneblanc":   ["resources/characters/goneblanc.png"],
 			"base:texture/explosion":   ["resources/explosion.png"],
 			"base:texture/otter":       ["resources/animals/otter.png"],
-			"base:texture/gurt":        ["resources/characters/gurt.png"]
+			"base:texture/gurt":        ["resources/characters/gurt.png"],
+			"base:texture/rhosum":      ["resources/characters/rhosum.png"],
+			"base:texture/parrot":      ["resources/animals/parrot.png"]
 		}]
 	]
 }

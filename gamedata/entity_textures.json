@@ -35,6 +35,8 @@
 		"base:entity/goneblanc":          ["base:texture/goneblanc",   1],
 		"base:entity/explosion_particle": ["base:texture/explosion",   0],
 		"base:entity/otter":              ["base:texture/otter",       4],
-		"base:entity/gurt":               ["base:texture/gurt",        2]
+		"base:entity/gurt":               ["base:texture/gurt",        2],
+		"base:entity/rhosum":             ["base:texture/rhosum",      5],
+		"base:entity/parrot":             ["base:texture/parrot",      6]
 	}]]
 }
