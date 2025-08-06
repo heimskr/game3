@@ -422,8 +422,10 @@ namespace Game3 {
 					break;
 				case 3:
 				case 5:
-				case 6:
 					texture_x_offset = 8. * ((milliseconds / 200) % 4);
+					break;
+				case 6:
+					texture_x_offset = 8. * ((milliseconds / 150) % 4);
 					break;
 				case 2:
 					texture_x_offset = 8. * (1 + (milliseconds / 200) % 4);
@@ -444,8 +446,10 @@ namespace Game3 {
 				texture_y_offset = 8. * (int(direction.load()) - 1);
 				if (!idle) {
 					texture_y_offset += 32;
-				} else {
-					texture_x_offset += 8. * ((milliseconds / 400) % (variety == 5? 3 : 22));
+				} else if (variety == 5) {
+					texture_x_offset += 8. * ((milliseconds / 400) % 3);
+				} else if (variety == 6) {
+					texture_x_offset += 8. * ((milliseconds / 100) % 64);
 				}
 				break;
 			case 2:
