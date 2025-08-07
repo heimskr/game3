@@ -124,9 +124,11 @@ namespace Game3 {
 	}
 
 	bool Player::interactOn(Modifiers modifiers, const ItemStackPtr &used_item, Hand hand) {
-		auto realm = getRealm();
-		auto player = getShared();
-		auto entity = realm->findEntity(position, player);
+		RealmPtr realm = getRealm();
+		PlayerPtr player = getShared();
+		EntityPtr entity = realm->findEntity(position, [&](const EntityPtr &entity) {
+			return entity != player && entity->interactable(player, modifiers, used_item, hand);
+		}, true);
 		if (!entity) {
 			return false;
 		}
@@ -137,7 +139,9 @@ namespace Game3 {
 		RealmPtr realm = getRealm();
 		Position next_to = nextTo();
 		PlayerPtr player = getShared();
-		EntityPtr entity = realm->findEntity(next_to, player);
+		EntityPtr entity = realm->findEntity(next_to, [&](const EntityPtr &entity) {
+			return entity != player && entity->interactable(player, modifiers, used_item, hand);
+		}, true);
 		bool interesting = false;
 
 		if (hand != Hand::None && used_item && used_item->item->use(getHeldSlot(hand), used_item, getPlace(), modifiers, hand)) {

@@ -993,6 +993,38 @@ namespace Game3 {
 		return {};
 	}
 
+	EntityPtr Realm::findEntity(const Position &position, const std::function<bool(const EntityPtr &)> &filter, bool single_chunk) {
+		if (!single_chunk) {
+			auto lock = entities.sharedLock();
+			for (const EntityPtr &entity: entities) {
+				if (entity->occupies(position) && filter(entity)) {
+					return entity;
+				}
+			}
+			return {};
+		}
+
+		auto by_chunk_lock = entitiesByChunk.sharedLock();
+		auto iter = entitiesByChunk.find(position.getChunk());
+		if (iter == entitiesByChunk.end()) {
+			return {};
+		}
+		auto found_entities = iter->second;
+		if (!found_entities) {
+			return {};
+		}
+		by_chunk_lock.unlock();
+
+		auto found_lock = found_entities->sharedLock();
+		for (const WeakEntityPtr &weak_entity: *found_entities) {
+			EntityPtr entity = weak_entity.lock();
+			if (entity && entity->occupies(position) && filter(entity)) {
+				return entity;
+			}
+		}
+		return {};
+	}
+
 	TileEntityPtr Realm::tileEntityAt(Position position) {
 		auto lock = tileEntities.sharedLock();
 		if (auto iter = tileEntities.find(position); iter != tileEntities.end()) {

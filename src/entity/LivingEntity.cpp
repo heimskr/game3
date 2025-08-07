@@ -81,6 +81,10 @@ namespace Game3 {
 		}
 	}
 
+	bool LivingEntity::interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) {
+		return true;
+	}
+
 	void LivingEntity::renderUpper(const RendererContext &renderers) {
 		Entity::renderUpper(renderers);
 

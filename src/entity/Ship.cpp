@@ -106,6 +106,10 @@ namespace Game3 {
 		return true;
 	}
 
+	bool Ship::interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) {
+		return true;
+	}
+
 	void Ship::render(const RendererContext &context) {
 		if (!texture || !isVisible())
 			return;

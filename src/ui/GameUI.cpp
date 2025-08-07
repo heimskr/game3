@@ -24,7 +24,7 @@ namespace Game3 {
 		fbo.init();
 		bottomDialog = ui.emplaceDialog<BottomDialog>(selfScale);
 		chatDialog = ui.emplaceDialog<ChatDialog>(selfScale);
-		ui.focusDialog(ui.emplaceDialog<DialogueDialog>(selfScale));
+		// ui.focusDialog(ui.emplaceDialog<DialogueDialog>(selfScale));
 	}
 
 	void GameUI::render(const RendererContext &renderers) {

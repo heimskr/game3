@@ -17,6 +17,8 @@ namespace Game3 {
 				return Entity::create<SquareParticle>(std::forward<Args>(args)...);
 			}
 
+			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) override;
+			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) override;
 			void renderShadow(const RendererContext &) override;
 			void render(const RendererContext &) override;
 			void tick(const TickArgs &) override;

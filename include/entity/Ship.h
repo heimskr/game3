@@ -23,6 +23,7 @@ namespace Game3 {
 			bool canMoveTo(const Place &) const override;
 			bool onInteractOn(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
+			bool interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) override;
 			void render(const RendererContext &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

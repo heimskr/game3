@@ -26,6 +26,7 @@ namespace Game3 {
 			void render(const RendererContext &) override;
 			bool onInteractOn    (const PlayerPtr &player, Modifiers, const ItemStackPtr &, Hand) override { return interact(player); }
 			bool onInteractNextTo(const PlayerPtr &player, Modifiers, const ItemStackPtr &, Hand) override { return interact(player); }
+			bool interactable(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) override { return true; }
 			std::string getName() const override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;

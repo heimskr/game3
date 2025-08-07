@@ -23,6 +23,7 @@ namespace Game3 {
 			void onSpawn() override;
 			void toJSON(boost::json::value &) const override;
 			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
+			bool interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) override;
 			void renderUpper(const RendererContext &) override;
 			void encode(Buffer &) override;
 			void decode(Buffer &) override;
