@@ -470,6 +470,11 @@
 				"input":  [["base:item/bean", 42], ["base:item/chili", 64]],
 				"output": [["base:item/bing", 1]]
 			}],
+			["base:registry/crafting_recipe", {
+				"input":  [["base:item/dough", 1], ["base:item/milk_flask", 1], ["base:item/egg", 1]],
+				"output": [["base:item/cake", 1], ["base:item/flask", 1]],
+				"station": "base:station/oven"
+			}],
 			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/lava", 1000],
 				"output": [
