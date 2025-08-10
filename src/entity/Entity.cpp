@@ -280,7 +280,11 @@ namespace Game3 {
 
 	void Entity::setRider(const EntityPtr &rider) {
 		if (EntityPtr current_rider = getRider()) {
-			current_rider->setRidden(nullptr);
+			if (current_rider == rider) {
+				return;
+			}
+
+			current_rider->weakRidden.reset();
 		}
 
 		weakRider = rider;
@@ -297,7 +301,27 @@ namespace Game3 {
 	}
 
 	void Entity::setRidden(const EntityPtr &ridden) {
+		if (EntityPtr current_ridden = weakRidden.lock()) {
+			if (current_ridden == ridden) {
+				return;
+			}
+
+			current_ridden->weakRider.reset();
+		}
+
 		weakRidden = ridden;
+
+		EntityPtr self = getSelf();
+
+		if (ridden) {
+			ridden->weakRider = self;
+		}
+
+		GamePtr game = getGame();
+
+		if (game->getSide() == Side::Server) {
+			game->toServer().broadcast(make<EntityRiddenPacket>(self, *ridden));
+		}
 	}
 
 	void Entity::init(const std::shared_ptr<Game> &game) {
