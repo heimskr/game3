@@ -44,7 +44,7 @@ namespace Game3 {
 	Realm::Realm(const GamePtr &game):
 		weakGame(game) {
 			if (game->getSide() == Side::Client) {
-				game->toClient().getWindow()->queue([this](Window &) { // TODO: use weak_ptr
+				game->toClient().getWindow()->queue([this](Window &) {
 					createRenderers();
 					initRendererRealms();
 					initRendererTileProviders();
@@ -61,7 +61,7 @@ namespace Game3 {
 		seed(seed),
 		weakGame(game) {
 			if (game->getSide() == Side::Client) {
-				game->toClient().getWindow()->queue([this](Window &) { // TODO: use weak_ptr
+				game->toClient().getWindow()->queue([this](Window &) {
 					createRenderers();
 					initRendererRealms();
 					initTexture();
