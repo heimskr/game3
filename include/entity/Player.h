@@ -116,4 +116,5 @@ namespace Game3 {
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Player &);
 
 	using PlayerPtr = std::shared_ptr<Player>;
+	using WeakPlayerPtr = std::weak_ptr<Player>;
 }

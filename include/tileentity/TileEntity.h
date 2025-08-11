@@ -153,4 +153,5 @@ namespace Game3 {
 	};
 
 	using TileEntityPtr = std::shared_ptr<TileEntity>;
+	using WeakTileEntityPtr = std::weak_ptr<TileEntity>;
 }

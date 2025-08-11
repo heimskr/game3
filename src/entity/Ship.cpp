@@ -106,7 +106,7 @@ namespace Game3 {
 		return true;
 	}
 
-	bool Ship::interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) {
+	bool Ship::interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) {
 		return true;
 	}
 

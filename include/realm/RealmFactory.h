@@ -28,4 +28,6 @@ namespace Game3 {
 				}};
 			}
 	};
+
+	using RealmFactoryPtr = std::shared_ptr<RealmFactory>;
 }
