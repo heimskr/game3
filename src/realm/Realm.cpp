@@ -1857,9 +1857,9 @@ namespace Game3 {
 		assert(getSide() == Side::Client);
 		if (!reuploadPending.exchange(true)) {
 			getGame()->toClient().getWindow()->queue([weak = std::weak_ptr(shared_from_this())](Window &) {
-				if (auto shared = weak.lock()) {
-					shared->reupload();
-					shared->reuploadPending = false;
+				if (RealmPtr realm = weak.lock()) {
+					realm->reupload();
+					realm->reuploadPending = false;
 				} else {
 					ERR("Expired in {}:{}", __FILE__, __LINE__);
 				}
@@ -1916,7 +1916,7 @@ namespace Game3 {
 		ClientGame &game = getGame()->toClient();
 		PlayerPtr player = game.getPlayer();
 
-		if (!player) {
+		if (!player || !game.getSettings().renderLighting) {
 			return;
 		}
 
