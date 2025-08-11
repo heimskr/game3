@@ -1606,7 +1606,7 @@ namespace Game3 {
 					std::uniform_real_distribution distribution(0.8, 1.2);
 					spawnSquares(4, [&] {
 						return fluid->color.darken(distribution(threadContext.rng));
-					});
+					}, 0.2);
 				}
 			}
 		}
@@ -1641,7 +1641,7 @@ namespace Game3 {
 		offset.y = std::modf(offset.y, &dummy);
 	}
 
-	void Entity::spawnSquares(size_t count, std::function<Color()> &&color_function) {
+	void Entity::spawnSquares(size_t count, std::function<Color()> &&color_function, double linger_time) {
 		RealmPtr realm = getRealm();
 		Position position = getPosition();
 
@@ -1658,7 +1658,7 @@ namespace Game3 {
 					z_distribution(threadContext.rng),
 				};
 				double depth = depth_distribution(threadContext.rng);
-				realm->spawn<SquareParticle>(position, velocity, 0.2, color_function(), depth, 4)->offset.withUnique([](Vector3 &offset) {
+				realm->spawn<SquareParticle>(position, velocity, 0.2, color_function(), depth, linger_time)->offset.withUnique([](Vector3 &offset) {
 					offset.y += 0.5;
 				});
 			}

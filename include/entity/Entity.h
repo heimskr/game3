@@ -198,7 +198,7 @@ namespace Game3 {
 			std::pair<std::unique_lock<DefaultMutex>, std::unique_lock<DefaultMutex>> getVisibleEntitiesLocks();
 			virtual bool shouldBroadcastDestruction() const;
 			virtual void applyMotion(float delta);
-			virtual void spawnSquares(size_t count, std::function<Color()> &&);
+			virtual void spawnSquares(size_t count, std::function<Color()> &&color_function, double linger_time);
 			/** For players, this will return a valid direction if the player is moving diagonally. In any other case, it returns Direction::Invalid. */
 			virtual Direction getSecondaryDirection() const;
 
