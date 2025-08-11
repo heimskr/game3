@@ -314,7 +314,7 @@ namespace Game3 {
 		std::uniform_real_distribution<float> red_distribution(0.333, 1.0);
 		spawnSquares(*this, count, [&] {
 			return Color{red_distribution(threadContext.rng), 0, 0, 1};
-		}, 4);
+		}, 4, 0.2);
 	}
 
 	void LivingEntity::onAttack(const std::shared_ptr<LivingEntity> &) {}

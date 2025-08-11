@@ -1769,7 +1769,7 @@ namespace Game3 {
 
 		spawnSquares(entity, 4, [&] {
 			return color.darken(distribution(threadContext.rng));
-		}, 0.2);
+		}, 0.2, 0.15);
 
 		if (play_sound) {
 			if (entity.getSide() == Side::Client) {

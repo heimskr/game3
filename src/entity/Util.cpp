@@ -5,7 +5,7 @@
 #include "threading/ThreadContext.h"
 
 namespace Game3 {
-	void spawnSquares(Entity &entity, size_t count, std::function<Color()> &&color_function, double linger_time) {
+	void spawnSquares(Entity &entity, size_t count, std::function<Color()> &&color_function, double linger_time, float size) {
 		RealmPtr realm = entity.getRealm();
 		Position position = entity.getPosition();
 
@@ -22,7 +22,7 @@ namespace Game3 {
 					z_distribution(threadContext.rng),
 				};
 				double depth = depth_distribution(threadContext.rng);
-				realm->spawn<SquareParticle>(position, velocity, 0.2, color_function(), depth, linger_time)->offset.withUnique([](Vector3 &offset) {
+				realm->spawn<SquareParticle>(position, velocity, size, color_function(), depth, linger_time)->offset.withUnique([](Vector3 &offset) {
 					offset.y += 0.5;
 				});
 			}

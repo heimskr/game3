@@ -7,5 +7,5 @@
 namespace Game3 {
 	class Entity;
 
-	void spawnSquares(Entity &, size_t count, std::function<Color()> &&color_function, double linger_time);
+	void spawnSquares(Entity &, size_t count, std::function<Color()> &&color_function, double linger_time, float size);
 }
