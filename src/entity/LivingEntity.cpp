@@ -1,6 +1,5 @@
 #include "biology/Gene.h"
 #include "entity/LivingEntity.h"
-#include "entity/SquareParticle.h"
 #include "entity/TextParticle.h"
 #include "game/ServerGame.h"
 #include "graphics/RectangleRenderer.h"
@@ -311,29 +310,10 @@ namespace Game3 {
 	}
 
 	void LivingEntity::spawnBlood(size_t count) {
-		RealmPtr realm = getRealm();
-		Position position = getPosition();
-
-		std::uniform_real_distribution y_distribution(-0.15, 0.15);
-		std::uniform_real_distribution z_distribution(6., 10.);
-		std::uniform_real_distribution depth_distribution(-0.5, 0.0);
-		std::uniform_real_distribution red_distribution(0.333, 1.0);
-
-		for (double x: {-1, +1}) {
-			std::uniform_real_distribution x_distribution(x - 1.0, x + 1.0);
-			for (size_t i = 0; i < count; ++i) {
-				Vector3 velocity{
-					x_distribution(threadContext.rng),
-					y_distribution(threadContext.rng),
-					z_distribution(threadContext.rng),
-				};
-				float red = red_distribution(threadContext.rng);
-				double depth = depth_distribution(threadContext.rng);
-				realm->spawn<SquareParticle>(position, velocity, 0.2, Color{red, 0, 0, 1}, depth, 4)->offset.withUnique([](Vector3 &offset) {
-					offset.y += 0.5;
-				});
-			}
-		}
+		std::uniform_real_distribution<float> red_distribution(0.333, 1.0);
+		spawnSquares(count, [&] {
+			return Color{red_distribution(threadContext.rng), 0, 0, 1};
+		});
 	}
 
 	void LivingEntity::onAttack(const std::shared_ptr<LivingEntity> &) {}

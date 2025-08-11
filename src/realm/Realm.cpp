@@ -91,7 +91,10 @@ namespace Game3 {
 	}
 
 	void Realm::initRendererTileProviders() {
-		assert(isClient());
+		if (!isClient()) {
+			return;
+		}
+
 		assert(baseRenderers.has_value());
 		assert(upperRenderers.has_value());
 

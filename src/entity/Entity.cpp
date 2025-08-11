@@ -4,6 +4,7 @@
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
+#include "entity/SquareParticle.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/Game.h"
@@ -24,6 +25,7 @@
 #include "packet/UpdateAgentFieldPacket.h"
 #include "realm/Realm.h"
 #include "registry/Registries.h"
+#include "threading/ThreadContext.h"
 #include "tile/Tile.h"
 #include "types/Position.h"
 #include "ui/Window.h"
@@ -1593,12 +1595,26 @@ namespace Game3 {
 			velocity.y = 0;
 		}
 
-		if (!old_grounded && offset.isGrounded()) {
+		bool new_grounded = offset.isGrounded();
+
+		GamePtr game = getGame();
+
+		if (old_grounded != new_grounded) {
+			RealmPtr realm = getRealm();
+			if (std::optional<FluidTile> fluid_tile = realm->tryFluid(getPosition()); fluid_tile && 0 < fluid_tile->level) {
+				if (FluidPtr fluid = game->getFluid(fluid_tile->id)) {
+					std::uniform_real_distribution distribution(0.8, 1.2);
+					spawnSquares(4, [&] {
+						return fluid->color.darken(distribution(threadContext.rng));
+					});
+				}
+			}
+		}
+
+		if (!old_grounded && new_grounded) {
 			if (TileEntityPtr tile_entity = getRealm()->tileEntityAt(getPosition())) {
 				tile_entity->onOverlap(getSelf());
 			}
-
-			GamePtr game = getGame();
 
 			if (game->getSide() == Side::Server) {
 				game->toServer().entityTeleported(*this, MovementContext{
@@ -1623,6 +1639,30 @@ namespace Game3 {
 		double dummy;
 		offset.x = std::modf(offset.x, &dummy);
 		offset.y = std::modf(offset.y, &dummy);
+	}
+
+	void Entity::spawnSquares(size_t count, std::function<Color()> &&color_function) {
+		RealmPtr realm = getRealm();
+		Position position = getPosition();
+
+		std::uniform_real_distribution y_distribution(-0.15, 0.15);
+		std::uniform_real_distribution z_distribution(6., 10.);
+		std::uniform_real_distribution depth_distribution(-0.5, 0.0);
+
+		for (double x: {-1, +1}) {
+			std::uniform_real_distribution x_distribution(x - 1.0, x + 1.0);
+			for (size_t i = 0; i < count; ++i) {
+				Vector3 velocity{
+					x_distribution(threadContext.rng),
+					y_distribution(threadContext.rng),
+					z_distribution(threadContext.rng),
+				};
+				double depth = depth_distribution(threadContext.rng);
+				realm->spawn<SquareParticle>(position, velocity, 0.2, color_function(), depth, 4)->offset.withUnique([](Vector3 &offset) {
+					offset.y += 0.5;
+				});
+			}
+		}
 	}
 
 	Direction Entity::getSecondaryDirection() const {
