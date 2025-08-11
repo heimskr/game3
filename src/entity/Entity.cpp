@@ -5,6 +5,7 @@
 #include "entity/EntityFactory.h"
 #include "entity/ServerPlayer.h"
 #include "entity/SquareParticle.h"
+#include "entity/Util.h"
 #include "game/ClientGame.h"
 #include "game/ClientInventory.h"
 #include "game/Game.h"
@@ -39,6 +40,8 @@
 #include <sstream>
 
 namespace Game3 {
+	static void splash(Entity &entity, Color color, bool play_sound);
+
 	EntityTexture::EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_):
 		NamedRegisterable(std::move(identifier_)),
 		textureID(std::move(texture_id)),
@@ -1603,10 +1606,7 @@ namespace Game3 {
 			RealmPtr realm = getRealm();
 			if (std::optional<FluidTile> fluid_tile = realm->tryFluid(getPosition()); fluid_tile && 0 < fluid_tile->level) {
 				if (FluidPtr fluid = game->getFluid(fluid_tile->id)) {
-					std::uniform_real_distribution distribution(0.8, 1.2);
-					spawnSquares(4, [&] {
-						return fluid->color.darken(distribution(threadContext.rng));
-					}, 0.2);
+					splash(*this, fluid->color, true);
 				}
 			}
 		}
@@ -1639,30 +1639,6 @@ namespace Game3 {
 		double dummy;
 		offset.x = std::modf(offset.x, &dummy);
 		offset.y = std::modf(offset.y, &dummy);
-	}
-
-	void Entity::spawnSquares(size_t count, std::function<Color()> &&color_function, double linger_time) {
-		RealmPtr realm = getRealm();
-		Position position = getPosition();
-
-		std::uniform_real_distribution y_distribution(-0.15, 0.15);
-		std::uniform_real_distribution z_distribution(6., 10.);
-		std::uniform_real_distribution depth_distribution(-0.5, 0.0);
-
-		for (double x: {-1, +1}) {
-			std::uniform_real_distribution x_distribution(x - 1.0, x + 1.0);
-			for (size_t i = 0; i < count; ++i) {
-				Vector3 velocity{
-					x_distribution(threadContext.rng),
-					y_distribution(threadContext.rng),
-					z_distribution(threadContext.rng),
-				};
-				double depth = depth_distribution(threadContext.rng);
-				realm->spawn<SquareParticle>(position, velocity, 0.2, color_function(), depth, linger_time)->offset.withUnique([](Vector3 &offset) {
-					offset.y += 0.5;
-				});
-			}
-		}
 	}
 
 	Direction Entity::getSecondaryDirection() const {
@@ -1786,5 +1762,21 @@ namespace Game3 {
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const Entity &entity) {
 		entity.toJSON(json);
+	}
+
+	static void splash(Entity &entity, Color color, bool play_sound) {
+		std::uniform_real_distribution distribution(0.8, 1.2);
+
+		spawnSquares(entity, 4, [&] {
+			return color.darken(distribution(threadContext.rng));
+		}, 0.2);
+
+		if (play_sound) {
+			if (entity.getSide() == Side::Client) {
+				entity.getGame()->toClient().playSound("base:sound/splash", threadContext.getPitch(1.25f));
+			} else {
+				entity.getRealm()->playSound(entity.getPosition(), "base:sound/splash", threadContext.getPitch(1.25f));
+			}
+		}
 	}
 }

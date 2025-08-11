@@ -1,6 +1,7 @@
 #include "biology/Gene.h"
 #include "entity/LivingEntity.h"
 #include "entity/TextParticle.h"
+#include "entity/Util.h"
 #include "game/ServerGame.h"
 #include "graphics/RectangleRenderer.h"
 #include "graphics/RenderOptions.h"
@@ -311,7 +312,7 @@ namespace Game3 {
 
 	void LivingEntity::spawnBlood(size_t count) {
 		std::uniform_real_distribution<float> red_distribution(0.333, 1.0);
-		spawnSquares(count, [&] {
+		spawnSquares(*this, count, [&] {
 			return Color{red_distribution(threadContext.rng), 0, 0, 1};
 		}, 4);
 	}
