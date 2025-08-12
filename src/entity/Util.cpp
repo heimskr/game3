@@ -22,8 +22,10 @@ namespace Game3 {
 					z_distribution(threadContext.rng),
 				};
 				double depth = depth_distribution(threadContext.rng);
-				realm->spawn<SquareParticle>(position, velocity, size, color_function(), depth, linger_time)->offset.withUnique([](Vector3 &offset) {
-					offset.y += 0.5;
+				realm->spawn<SquareParticle>(position, velocity, size, color_function(), depth, linger_time)->offset.withUnique([&](Vector3 &offset) {
+					offset.x = entity.offset.x;
+					offset.y = entity.offset.y + 0.5;
+					offset.z = entity.offset.z;
 				});
 			}
 		}
