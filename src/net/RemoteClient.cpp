@@ -298,7 +298,6 @@ namespace Game3 {
 		}();
 
 		if (errc) {
-			ERR("Client write ({}): {} ({})", ip, errc.message(), errc.value());
 			return;
 		}
 
@@ -309,13 +308,9 @@ namespace Game3 {
 
 	void RemoteClient::doHandshake() {
 		socket.async_handshake(asio::ssl::stream_base::server, [this, shared = shared_from_this()](const asio::error_code &errc) {
-			if (errc) {
-				ERR("Client handshake ({}): {}", ip, errc.message());
-				return;
+			if (!errc) {
+				doRead();
 			}
-
-			INFO("Handshake succeeded for {}", ip);
-			doRead();
 		});
 	}
 
@@ -323,9 +318,6 @@ namespace Game3 {
 		asio::post(strand, [this] {
 			socket.async_read_some(asio::buffer(buffer.get(), bufferSize), asio::bind_executor(strand, [this, shared = shared_from_this()](const asio::error_code &errc, size_t length) {
 				if (errc) {
-					if (errc.value() != 1) { // "stream truncated"
-						ERR("Client read ({}): {} ({})", ip, errc.message(), errc.value());
-					}
 					removeSelf();
 					return;
 				}
