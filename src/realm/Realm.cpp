@@ -922,6 +922,40 @@ namespace Game3 {
 		return out;
 	}
 
+	EntityPtr Realm::findEntitySquare(const Position &position, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const {
+		if (radius == 1) {
+			return findEntity(position, filter);
+		}
+
+		if (radius == 0) {
+			return {};
+		}
+
+		EntityPtr out;
+
+		const Position offset(radius - 1, radius - 1);
+		ChunkRange((position - offset).getChunk(), (position + offset).getChunk()).iterate([this, &out, &filter, position, radius](ChunkPosition chunk_position) {
+			WeakEntitySet entity_set = getEntities(chunk_position);
+			if (!entity_set) {
+				return false;
+			}
+
+			auto lock = entity_set->sharedLock();
+			for (const WeakEntityPtr &weak_entity: *entity_set) {
+				if (EntityPtr entity = weak_entity.lock()) {
+					if (entity->position.copyBase().maximumAxisDistance(position) < radius && filter(entity)) {
+						out = entity;
+						return true;
+					}
+				}
+			}
+
+			return false;
+		});
+
+		return out;
+	}
+
 	bool Realm::hasEntitiesSquare(const Position &position, uint64_t radius, const std::function<bool(const EntityPtr &)> &predicate) const {
 		if (radius == 0) {
 			return false;
@@ -963,7 +997,7 @@ namespace Game3 {
 		return out;
 	}
 
-	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except, bool single_chunk) {
+	EntityPtr Realm::findEntity(const Position &position, const EntityPtr &except, bool single_chunk) const {
 		if (!single_chunk) {
 			auto lock = entities.sharedLock();
 			for (const EntityPtr &entity: entities) {
@@ -999,7 +1033,7 @@ namespace Game3 {
 		return {};
 	}
 
-	EntityPtr Realm::findEntity(const Position &position, const std::function<bool(const EntityPtr &)> &filter, bool single_chunk) {
+	EntityPtr Realm::findEntity(const Position &position, const std::function<bool(const EntityPtr &)> &filter, bool single_chunk) const {
 		if (!single_chunk) {
 			auto lock = entities.sharedLock();
 			for (const EntityPtr &entity: entities) {

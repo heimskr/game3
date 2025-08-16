@@ -40,6 +40,7 @@
 #include "item/LiquefierItem.h"
 #include "item/MeleeWeapon.h"
 #include "item/MicroscopeItem.h"
+#include "item/MilkerItem.h"
 #include "item/Mushroom.h"
 #include "item/Mutagen.h"
 #include "item/MutatorItem.h"
@@ -273,6 +274,8 @@ namespace Game3 {
 		add(std::make_shared<MeleeWeapon>("base:item/copper_sword",  "Copper Sword",   32, 6, 2, 256));
 
 		add(std::make_shared<MicroscopeItem>("base:item/microscope", "Microscope", 999, 64)); // TODO: cost
+
+		add(std::make_shared<MilkerItem>("base:item/milker", "Milker", 999, 64)); // TODO: cost
 
 		add(std::make_shared<MilkDrink>("base:item/milk_flask", "Milk", 4, 64));
 

@@ -140,10 +140,11 @@ namespace Game3 {
 			/** The side length of the square is equal to 2*radius-1; i.e., a radius of 1 corresponds to a single tile. */
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius) const;
 			std::vector<EntityPtr> findEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const;
+			EntityPtr findEntitySquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &filter) const;
 			bool hasEntitiesSquare(const Position &, uint64_t radius, const std::function<bool(const EntityPtr &)> &predicate) const;
 			std::vector<EntityPtr> findEntities(const Position &, const EntityPtr &except);
-			EntityPtr findEntity(const Position &, const EntityPtr &except = {}, bool single_chunk = false);
-			EntityPtr findEntity(const Position &, const std::function<bool(const EntityPtr &)> &filter, bool single_chunk = false);
+			EntityPtr findEntity(const Position &, const EntityPtr &except = {}, bool single_chunk = false) const;
+			EntityPtr findEntity(const Position &, const std::function<bool(const EntityPtr &)> &filter, bool single_chunk = false) const;
 			TileEntityPtr tileEntityAt(Position);
 			void remove(const EntityPtr &);
 			void removeSafe(const EntityPtr &);

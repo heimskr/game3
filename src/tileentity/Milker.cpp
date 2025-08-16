@@ -6,28 +6,29 @@
 #include "graphics/SpriteRenderer.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
-#include "tileentity/Pump.h"
+#include "tileentity/Milker.h"
 #include "ui/module/MultiModule.h"
 
 namespace Game3 {
 	namespace {
-		constexpr float PERIOD = 0.25;
+		constexpr float PERIOD = 1.0;
 	}
 
-	Pump::Pump():
+	Milker::Milker():
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	Pump::Pump(Identifier tile_id, Position position_):
-		TileEntity(std::move(tile_id), ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
+	Milker::Milker(Identifier tile_id, Position position):
+		TileEntity(std::move(tile_id), ID(), position, true),
+		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	Pump::Pump(Position position_):
-		Pump("base:tile/pump_s"_id, position_) {}
+	Milker::Milker(Position position_):
+		Milker("base:tile/milker_s"_id, position_) {}
 
-	FluidAmount Pump::getMaxLevel(FluidID) {
+	FluidAmount Milker::getMaxLevel(FluidID) {
 		return 64 * FluidTile::FULL;
 	}
 
-	void Pump::tick(const TickArgs &args) {
+	void Milker::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
 
 		if (!realm || realm->getSide() != Side::Server) {
@@ -37,66 +38,62 @@ namespace Game3 {
 		Ticker ticker{*this, args};
 		enqueueTick(std::chrono::milliseconds(int64_t(1000 * PERIOD)));
 
-		const FluidAmount amount = std::min<FluidAmount>(std::numeric_limits<FluidLevel>::max(), extractionRate * PERIOD);
+		Position center = getPosition() + (Position{} + getDirection()) * static_cast<Index>(getRadius());
 
-		if (amount == 0) {
+		INFO("I'm at {}, center is at {}", getPosition(), center);
+		Identifier milk_id;
+
+		realm->findEntitySquare(center, radius, [&](const EntityPtr &entity) {
+			milk_id = entity->getMilk();
+			return !milk_id.empty();
+		});
+
+		INFO("Milk ID: {}", milk_id);
+
+		if (!milk_id) {
 			return;
 		}
 
-		std::optional<FluidTile> fluid = realm->tryFluid(position + tileDirection);
-		if (!fluid) {
-			return;
+		GamePtr game = getGame();
+		FluidPtr milk = game->getFluid(milk_id);
+		assert(milk != nullptr);
+
+		FluidLevel to_extract = FluidTile::FULL;
+
+		{
+			auto energy_lock = energyContainer->uniqueLock();
+
+			if (ENERGY_PER_UNIT > 0.) {
+				to_extract = std::min<FluidLevel>(energyContainer->energy / ENERGY_PER_UNIT, to_extract);
+				if (to_extract == 0) {
+					return;
+				}
+			}
+
+			const EnergyAmount consumed_energy = to_extract * ENERGY_PER_UNIT;
+			assert(consumed_energy <= energyContainer->energy);
+			energyContainer->energy -= consumed_energy;
 		}
 
-		auto energy_lock = energyContainer->uniqueLock();
-
-		FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
-
-		if (ENERGY_PER_UNIT > 0.) {
-			to_remove = std::min<FluidLevel>(energyContainer->energy / ENERGY_PER_UNIT, to_remove);
-		}
-
-		if (to_remove == 0) {
-			return;
-		}
-
-		FluidAmount not_added{};
 		{
 			auto fluid_lock = fluidContainer->levels.uniqueLock();
-			not_added = addFluid(FluidStack(fluid->id, to_remove));
-		}
-		const FluidAmount removed = to_remove - not_added;
-
-		const EnergyAmount consumed_energy = removed * ENERGY_PER_UNIT;
-		assert(consumed_energy <= energyContainer->energy);
-		energyContainer->energy -= consumed_energy;
-		energy_lock.unlock();
-
-		if (removed == 0) {
-			return;
-		}
-
-		assert(removed <= std::numeric_limits<FluidLevel>::max());
-
-		if (!fluid->isInfinite()) {
-			fluid->level -= FluidLevel(removed);
-			realm->setFluid(position + tileDirection, *fluid);
+			addFluid(FluidStack(milk->registryID, to_extract));
 		}
 	}
 
-	void Pump::toJSON(boost::json::value &json) const {
+	void Milker::toJSON(boost::json::value &json) const {
 		TileEntity::toJSON(json);
 		FluidHoldingTileEntity::toJSON(json);
 		EnergeticTileEntity::toJSON(json);
 		DirectedTileEntity::toJSON(json);
 	}
 
-	bool Pump::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
+	bool Milker::onInteractNextTo(const PlayerPtr &player, Modifiers modifiers, const ItemStackPtr &, Hand) {
 		RealmPtr realm = getRealm();
 
 		if (modifiers.onlyAlt()) {
 			realm->queueDestruction(getSelf());
-			player->give(ItemStack::create(realm->getGame(), "base:item/pump"_id));
+			player->give(ItemStack::create(realm->getGame(), "base:item/milker"_id));
 			return true;
 		}
 
@@ -112,28 +109,28 @@ namespace Game3 {
 		return true;
 	}
 
-	void Pump::absorbJSON(const GamePtr &game, const boost::json::value &json) {
+	void Milker::absorbJSON(const GamePtr &game, const boost::json::value &json) {
 		TileEntity::absorbJSON(game, json);
 		FluidHoldingTileEntity::absorbJSON(game, json);
 		EnergeticTileEntity::absorbJSON(game, json);
 		DirectedTileEntity::absorbJSON(game, json);
 	}
 
-	void Pump::encode(Game &game, Buffer &buffer) {
+	void Milker::encode(Game &game, Buffer &buffer) {
 		TileEntity::encode(game, buffer);
 		FluidHoldingTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
 		DirectedTileEntity::encode(game, buffer);
 	}
 
-	void Pump::decode(Game &game, Buffer &buffer) {
+	void Milker::decode(Game &game, Buffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 		DirectedTileEntity::decode(game, buffer);
 	}
 
-	void Pump::broadcast(bool force) {
+	void Milker::broadcast(bool force) {
 		assert(getSide() == Side::Server);
 
 		if (force) {
@@ -157,9 +154,8 @@ namespace Game3 {
 
 		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
 			if (PlayerPtr player = weak_player.lock()) {
-				if (!EnergeticTileEntity::observers.contains(player)) {
+				if (!EnergeticTileEntity::observers.contains(player))
 					player->send(packet);
-				}
 				return false;
 			}
 
@@ -167,7 +163,11 @@ namespace Game3 {
 		});
 	}
 
-	GamePtr Pump::getGame() const {
+	GamePtr Milker::getGame() const {
 		return TileEntity::getGame();
+	}
+
+	void Milker::setRadius(Index new_radius) {
+		radius = new_radius;
 	}
 }

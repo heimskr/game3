@@ -23,6 +23,7 @@
 #include "tileentity/Lamp.h"
 #include "tileentity/Liquefier.h"
 #include "tileentity/Microscope.h"
+#include "tileentity/Milker.h"
 #include "tileentity/Mutator.h"
 #include "tileentity/OreDeposit.h"
 #include "tileentity/Pipe.h"
@@ -70,6 +71,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Lamp>());
 		add(TileEntityFactory::create<Liquefier>());
 		add(TileEntityFactory::create<Microscope>());
+		add(TileEntityFactory::create<Milker>());
 		add(TileEntityFactory::create<Mutator>());
 		add(TileEntityFactory::create<OreDeposit>());
 		add(TileEntityFactory::create<Pipe>());
