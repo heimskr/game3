@@ -1166,9 +1166,12 @@ namespace Game3 {
 		}
 
 		if (run_helper) {
-			setLayerHelper(position.row, position.column, Layer::Submerged);
-			setLayerHelper(position.row, position.column, Layer::Objects);
-			queueStaticLightingTexture();
+			if (isServer()) {
+				setLayerHelper(position.row, position.column, Layer::Submerged);
+				setLayerHelper(position.row, position.column, Layer::Objects);
+			} else {
+				queueStaticLightingTexture();
+			}
 		}
 
 		updateNeighbors(position, Layer::Submerged);
