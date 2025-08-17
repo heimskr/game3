@@ -16,6 +16,7 @@
 #include "tileentity/Dissolver.h"
 #include "tileentity/EntityBuilding.h"
 #include "tileentity/EternalFountain.h"
+#include "tileentity/FlaskFiller.h"
 #include "tileentity/GeothermalGenerator.h"
 #include "tileentity/Incinerator.h"
 #include "tileentity/Incubator.h"
@@ -64,6 +65,7 @@ namespace Game3 {
 		add(TileEntityFactory::create<Dissolver>());
 		add(TileEntityFactory::create<EntityBuilding>());
 		add(TileEntityFactory::create<EternalFountain>());
+		add(TileEntityFactory::create<FlaskFiller>());
 		add(TileEntityFactory::create<GeothermalGenerator>());
 		add(TileEntityFactory::create<Incinerator>());
 		add(TileEntityFactory::create<Incubator>());

@@ -25,6 +25,7 @@
 #include "item/EntitySpawnItem.h"
 #include "item/EternalFountainItem.h"
 #include "item/FilledFlask.h"
+#include "item/FlaskFillerItem.h"
 #include "item/Floor.h"
 #include "item/Flower.h"
 #include "item/FluidGun.h"
@@ -138,6 +139,8 @@ namespace Game3 {
 		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
 		add(std::make_shared<FilledFlask>("base:item/liquid_biomass_flask", "Liquid Biomass Flask", 32, "base:fluid/liquid_biomass"));
 		add(std::make_shared<FilledFlask>("base:item/mutagen_flask", "Mutagen Flask", 32, "base:fluid/mutagen"));
+
+		add(std::make_shared<FlaskFillerItem>("base:item/flask_filler", "Flask Filler", 999, 64)); // TODO: cost
 
 		add(std::make_shared<Floor>("base:item/floor",       "Floor",       "base:tile/floor",       4, 64));
 		add(std::make_shared<Floor>("base:item/stone_tiles", "Stone Tiles", "base:tile/stone_tiles", 4, 64));

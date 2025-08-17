@@ -1,9 +1,7 @@
-#include "graphics/Tileset.h"
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
 #include "game/ServerInventory.h"
-#include "graphics/SpriteRenderer.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Milker.h"
@@ -39,16 +37,12 @@ namespace Game3 {
 		enqueueTick(std::chrono::milliseconds(int64_t(1000 * PERIOD)));
 
 		Position center = getPosition() + (Position{} + getDirection()) * static_cast<Index>(getRadius());
-
-		INFO("I'm at {}, center is at {}", getPosition(), center);
 		Identifier milk_id;
 
 		realm->findEntitySquare(center, radius, [&](const EntityPtr &entity) {
 			milk_id = entity->getMilk();
 			return !milk_id.empty();
 		});
-
-		INFO("Milk ID: {}", milk_id);
 
 		if (!milk_id) {
 			return;
@@ -154,8 +148,9 @@ namespace Game3 {
 
 		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
 			if (PlayerPtr player = weak_player.lock()) {
-				if (!EnergeticTileEntity::observers.contains(player))
+				if (!EnergeticTileEntity::observers.contains(player)) {
 					player->send(packet);
+				}
 				return false;
 			}
 
