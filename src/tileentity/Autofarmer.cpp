@@ -211,8 +211,14 @@ namespace Game3 {
 			operated = true;
 		}
 
-		if (!is_farmland)
+		place.set(Layer::Vegetation, 0);
+		if (auto tile = place.get(Layer::Submerged); tile && tileset.isInCategory(*tile, "base:category/autofarmer_removable")) {
+			place.set(Layer::Submerged, 0);
+		}
+
+		if (!is_farmland) {
 			return false;
+		}
 
 		bool submerged_empty = true;
 		TileID submerged{};
