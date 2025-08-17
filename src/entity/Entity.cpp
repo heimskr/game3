@@ -1771,12 +1771,8 @@ namespace Game3 {
 			return color.darken(distribution(threadContext.rng));
 		}, 0.2, 0.15);
 
-		if (play_sound) {
-			if (entity.getSide() == Side::Client) {
-				entity.getGame()->toClient().playSound("base:sound/splash", threadContext.getPitch(1.25f));
-			} else {
-				entity.getRealm()->playSound(entity.getPosition(), "base:sound/splash", threadContext.getPitch(1.25f));
-			}
+		if (play_sound && entity.getSide() == Side::Server) {
+			entity.getRealm()->playSound(entity.getPosition(), "base:sound/splash", threadContext.getPitch(1.25f));
 		}
 	}
 }
