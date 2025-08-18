@@ -66,7 +66,7 @@ namespace Game3 {
 			entity->setRealm(realm);
 			realm->queueEntityInit(std::move(entity), place.position);
 		}
-		object.clear();
+		stack->data.emplace_null();
 		player->getInventory(0)->notifyOwner(stack);
 		return true;
 	}
@@ -115,19 +115,21 @@ namespace Game3 {
 
 	void ContainmentOrb::saveToJSON(const EntityPtr &entity, boost::json::value &json, bool can_modify) {
 		auto &object = ensureObject(json);
-		object["type"] = boost::json::value_from(entity->type);
-		object["containedName"] = entity->getName();
 
 		if (entity->isPlayer()) {
 			auto player = safeDynamicCast<ServerPlayer>(entity);
 			object["containedUsername"] = player->username;
-			if (can_modify)
+			if (can_modify) {
 				player->teleport({32, 32}, entity->getGame()->getRealm(-1), MovementContext{.isTeleport = true});
+			}
 		} else {
 			entity->toJSON(json);
 			if (can_modify) {
 				entity->queueDestruction();
 			}
 		}
+
+		object["type"] = boost::json::value_from(entity->type);
+		object["containedName"] = entity->getName();
 	}
 }
