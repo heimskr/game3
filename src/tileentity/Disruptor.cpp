@@ -17,7 +17,7 @@
 namespace Game3 {
 	namespace {
 		constexpr std::chrono::milliseconds PERIOD{250};
-		constexpr float ENERGY_CAPACITY = 100'000;
+		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
 		constexpr Slot INPUT_CAPACITY  = 5;
 		constexpr Slot OUTPUT_CAPACITY = 10;
 		constexpr EnergyAmount ENERGY_PER_ATOM = 100;
@@ -184,8 +184,9 @@ namespace Game3 {
 			}
 		}
 
-		if (inventory->empty())
+		if (inventory->empty()) {
 			return false;
+		}
 
 		GamePtr game = getGame();
 

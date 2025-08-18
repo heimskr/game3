@@ -36,6 +36,7 @@
 #include "item/IncineratorItem.h"
 #include "item/IncubatorItem.h"
 #include "item/Item.h"
+#include "item/ItemVacuumItem.h"
 #include "item/LampItem.h"
 #include "item/Landfill.h"
 #include "item/LiquefierItem.h"
@@ -258,6 +259,8 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/lamp_oil", "Lamp Oil", 999, 64)); // TODO: cost
 
 		add(std::make_shared<ItemPipeItem>(4));
+
+		add(std::make_shared<ItemVacuumItem>("base:item/item_vacuum", "Item Vacuum", 999, 64)); // TODO: cost
 
 		add(std::make_shared<LampItem>("base:item/lamp", "Lamp", 999, 64)); // TODO: cost
 

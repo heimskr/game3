@@ -115,6 +115,7 @@ namespace Game3 {
 		FluidHoldingTileEntity::encode(game, buffer);
 		EnergeticTileEntity::encode(game, buffer);
 		DirectedTileEntity::encode(game, buffer);
+		buffer << radius;
 	}
 
 	void Milker::decode(Game &game, Buffer &buffer) {
@@ -122,6 +123,7 @@ namespace Game3 {
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 		DirectedTileEntity::decode(game, buffer);
+		buffer >> radius;
 	}
 
 	void Milker::broadcast(bool force) {
