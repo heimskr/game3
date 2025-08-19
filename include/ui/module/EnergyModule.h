@@ -33,4 +33,6 @@ namespace Game3 {
 			std::shared_ptr<ProgressBar> bar;
 			bool showHeader{};
 	};
+
+	using EnergyModulePtr = std::shared_ptr<EnergyModule>;
 }

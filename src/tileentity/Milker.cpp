@@ -1,11 +1,14 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
+#include "game/ServerGame.h"
 #include "game/ServerInventory.h"
 #include "packet/OpenModuleForAgentPacket.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/Milker.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/RadiusMachineModule.h"
+#include "util/ConstexprHash.h"
 
 namespace Game3 {
 	namespace {
@@ -99,7 +102,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(make<OpenModuleForAgentPacket>(MultiModule<Substance::Energy, Substance::Fluid>::ID(), getGID()));
+		player->send(make<OpenModuleForAgentPacket>(RadiusMachineModule::ID(), getGID()));
 		FluidHoldingTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 
@@ -127,6 +130,14 @@ namespace Game3 {
 		EnergeticTileEntity::decode(game, buffer);
 		DirectedTileEntity::decode(game, buffer);
 		buffer >> radius;
+	}
+
+	bool Milker::setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) {
+		switch (field_name) {
+			AGENT_FIELD(radius, true);
+			default:
+				return TileEntity::setField(field_name, field_value, updater);
+		}
 	}
 
 	void Milker::broadcast(bool force) {

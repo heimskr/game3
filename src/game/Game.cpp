@@ -19,6 +19,7 @@
 #include "ui/module/ModuleFactory.h"
 #include "ui/module/MultiModule.h"
 #include "ui/module/MutatorModule.h"
+#include "ui/module/RadiusMachineModule.h"
 #include "ui/module/TextModule.h"
 #include "ui/module/VillageTradeModule.h"
 #include "util/FS.h"
@@ -54,11 +55,12 @@ namespace Game3 {
 		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy>>());
 		add(ModuleFactory::create<MicroscopeModule<1, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MicroscopeModule<2, Substance::Energy>>());
-		add(ModuleFactory::create<MutatorModule>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Fluid>>());
 		add(ModuleFactory::create<MultiModule<Substance::Item, Substance::Energy>>());
 		add(ModuleFactory::create<MultiModule<Substance::Energy, Substance::Fluid>>());
+		add(ModuleFactory::create<MutatorModule>());
+		add(ModuleFactory::create<RadiusMachineModule>());
 		add(ModuleFactory::create<TextModule>());
 		add(ModuleFactory::create<VillageTradeModule>());
 #ifdef GAME3_ENABLE_SCRIPTING

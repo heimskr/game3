@@ -24,6 +24,7 @@ namespace Game3 {
 
 			void encode(Game &, Buffer &) override;
 			void decode(Game &, Buffer &) override;
+			bool setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) override;
 			void broadcast(bool force) override;
 
 			GamePtr getGame() const final;

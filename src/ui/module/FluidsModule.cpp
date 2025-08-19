@@ -112,8 +112,9 @@ namespace Game3 {
 
 		lock.unlock();
 
-		if (!should_regrid)
+		if (!should_regrid) {
 			return;
+		}
 
 		grid->clearChildren();
 		std::size_t row = 0;

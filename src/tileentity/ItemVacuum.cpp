@@ -2,10 +2,14 @@
 #include "entity/Player.h"
 #include "game/ClientGame.h"
 #include "game/EnergyContainer.h"
+#include "game/Inventory.h"
+#include "game/ServerGame.h"
 #include "packet/OpenModuleForAgentPacket.h"
+#include "packet/UpdateAgentFieldPacket.h"
 #include "realm/Realm.h"
 #include "tileentity/ItemVacuum.h"
-#include "ui/module/MultiModule.h"
+#include "ui/module/RadiusMachineModule.h"
+#include "util/ConstexprHash.h"
 #include "util/Log.h"
 
 #include <cassert>
@@ -86,7 +90,7 @@ namespace Game3 {
 			return true;
 		}
 
-		player->send(make<OpenModuleForAgentPacket>(MultiModule<Substance::Item, Substance::Energy>::ID(), getGID()));
+		player->send(make<OpenModuleForAgentPacket>(RadiusMachineModule::ID(), getGID()));
 		InventoriedTileEntity::addObserver(player, true);
 		EnergeticTileEntity::addObserver(player, true);
 
@@ -111,6 +115,14 @@ namespace Game3 {
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 		buffer >> radius;
+	}
+
+	bool ItemVacuum::setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) {
+		switch (field_name) {
+			AGENT_FIELD(radius, true);
+			default:
+				return TileEntity::setField(field_name, field_value, updater);
+		}
 	}
 
 	void ItemVacuum::broadcast(bool force) {

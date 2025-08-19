@@ -56,4 +56,6 @@ namespace Game3 {
 
 			bool clickSlot(Slot, Modifiers);
 	};
+
+	using InventoryModulePtr = std::shared_ptr<InventoryModule>;
 }
