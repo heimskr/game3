@@ -58,14 +58,20 @@ namespace Game3 {
 		}
 
 		auto slider = make<Slider>(ui, selfScale);
+		auto hbox = make<Box>(ui, selfScale, Orientation::Horizontal, 2, 0);
+		hbox->append(make<Label>(ui, selfScale, "Radius"));
 		slider->setRange(1, 100);
 		slider->setDisplayDigits(0);
 		slider->setStep(1);
 		slider->setValue(has_radius->getRadius());
+		slider->setHorizontalExpand(true);
+		slider->setVerticalExpand(false);
+		slider->setFixedHeight(8 * selfScale);
 		slider->onRelease.connect([this](Slider &, double value) {
 			getGame()->send(make<UpdateAgentFieldPacket>(*machine, "radius"_fnv, static_cast<uint64_t>(value)));
 		});
-		slider->insertAtEnd(vbox);
+		hbox->append(slider);
+		vbox->append(hbox);
 
 		if (energyModule) {
 			energyModule->insertAtEnd(vbox);
