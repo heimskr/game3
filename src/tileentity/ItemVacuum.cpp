@@ -16,14 +16,17 @@ namespace Game3 {
 		constexpr EnergyAmount ENERGY_CAPACITY = 100'000;
 		constexpr Slot INVENTORY_CAPACITY = 10;
 		constexpr EnergyAmount ENERGY_PER_ACTION = 500;
+		constexpr Radius DEFAULT_RADIUS = 2;
 	}
 
 	ItemVacuum::ItemVacuum():
-		EnergeticTileEntity(ENERGY_CAPACITY) {}
+		EnergeticTileEntity(ENERGY_CAPACITY),
+		HasRadius(DEFAULT_RADIUS) {}
 
 	ItemVacuum::ItemVacuum(Identifier tile_id, Position position):
 		TileEntity(std::move(tile_id), ID(), position, true),
-		EnergeticTileEntity(ENERGY_CAPACITY) {}
+		EnergeticTileEntity(ENERGY_CAPACITY),
+		HasRadius(DEFAULT_RADIUS) {}
 
 	ItemVacuum::ItemVacuum(Position position):
 		ItemVacuum("base:tile/item_vacuum"_id, position) {}

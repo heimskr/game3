@@ -1,11 +1,12 @@
 #pragma once
 
+#include "mixin/HasRadius.h"
 #include "tileentity/DirectedTileEntity.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/FluidHoldingTileEntity.h"
 
 namespace Game3 {
-	class Milker: public FluidHoldingTileEntity, public EnergeticTileEntity, public DirectedTileEntity {
+	class Milker: public FluidHoldingTileEntity, public EnergeticTileEntity, public DirectedTileEntity, public HasRadius {
 		public:
 			static Identifier ID() { return {"base", "te/milker"}; }
 
@@ -27,15 +28,10 @@ namespace Game3 {
 
 			GamePtr getGame() const final;
 
-			inline auto getRadius() const { return radius; }
-			void setRadius(Index);
-
 		protected:
 			std::string getDirectedTileBase() const override { return "base:tile/milker_"; }
 
 		private:
-			uint64_t radius = 1;
-
 			Milker();
 			Milker(Identifier tile_id, Position);
 			Milker(Position);

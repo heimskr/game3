@@ -1,11 +1,11 @@
 #pragma once
 
-#include "chemskr/Chemskr.h"
+#include "mixin/HasRadius.h"
 #include "tileentity/EnergeticTileEntity.h"
 #include "tileentity/InventoriedTileEntity.h"
 
 namespace Game3 {
-	class ItemVacuum: public InventoriedTileEntity, public EnergeticTileEntity {
+	class ItemVacuum: public InventoriedTileEntity, public EnergeticTileEntity, public HasRadius {
 		public:
 			static Identifier ID() { return {"base", "te/item_vacuum"}; }
 
@@ -26,8 +26,6 @@ namespace Game3 {
 			GamePtr getGame() const final;
 
 		private:
-			uint64_t radius = 2;
-
 			ItemVacuum();
 			ItemVacuum(Identifier tile_id, Position);
 			ItemVacuum(Position);

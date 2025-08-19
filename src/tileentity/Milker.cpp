@@ -10,14 +10,17 @@
 namespace Game3 {
 	namespace {
 		constexpr float PERIOD = 1.0;
+		constexpr Radius DEFAULT_RADIUS = 1;
 	}
 
 	Milker::Milker():
-		EnergeticTileEntity(ENERGY_CAPACITY) {}
+		EnergeticTileEntity(ENERGY_CAPACITY),
+		HasRadius(DEFAULT_RADIUS) {}
 
 	Milker::Milker(Identifier tile_id, Position position):
 		TileEntity(std::move(tile_id), ID(), position, true),
-		EnergeticTileEntity(ENERGY_CAPACITY) {}
+		EnergeticTileEntity(ENERGY_CAPACITY),
+		HasRadius(DEFAULT_RADIUS) {}
 
 	Milker::Milker(Position position_):
 		Milker("base:tile/milker_s"_id, position_) {}
@@ -162,9 +165,5 @@ namespace Game3 {
 
 	GamePtr Milker::getGame() const {
 		return TileEntity::getGame();
-	}
-
-	void Milker::setRadius(Index new_radius) {
-		radius = new_radius;
 	}
 }
