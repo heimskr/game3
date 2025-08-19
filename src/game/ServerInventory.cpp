@@ -407,12 +407,10 @@ namespace Game3 {
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &json, const ServerInventory &inventory) {
 		auto &object = json.emplace_object();
-
-		auto &storage = object["storage"].as_object();
+		auto &storage = object["storage"].emplace_object();
 		for (const auto &[key, val]: inventory.getStorage()) {
 			storage[std::to_string(key)] = boost::json::value_from(*val);
 		}
-
 		object["slotCount"] = inventory.getSlotCount();
 		object["activeSlot"] = inventory.activeSlot.load();
 	}
