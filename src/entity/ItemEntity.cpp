@@ -136,20 +136,26 @@ namespace Game3 {
 	void ItemEntity::encode(Buffer &buffer) {
 		Entity::encode(buffer);
 		GamePtr game = getGame();
-		if (!stack) {
-			stack = ItemStack::create(game);
+		if (stack) {
+			stack->encode(*game, buffer);
+		} else {
+			buffer << false;
 		}
-		stack->encode(*game, buffer);
 		buffer << secondsLeft;
 	}
 
 	void ItemEntity::decode(Buffer &buffer) {
 		Entity::decode(buffer);
 		GamePtr game = getGame();
-		if (!stack) {
-			stack = ItemStack::create(game);
+		if (buffer.peekType() == buffer.getType(false, false)) {
+			stack.reset();
+			buffer.take<bool>();
+		} else {
+			if (!stack) {
+				stack = ItemStack::create(game);
+			}
+			stack->decode(*game, buffer);
 		}
-		stack->decode(*game, buffer);
 		buffer >> secondsLeft;
 	}
 

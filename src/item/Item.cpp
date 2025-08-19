@@ -316,6 +316,7 @@ namespace Game3 {
 	}
 
 	void ItemStack::encode(Game &game, Buffer &buffer) {
+		assert(item != nullptr);
 		absorbGame(game);
 		buffer << item->identifier;
 		buffer << count;
