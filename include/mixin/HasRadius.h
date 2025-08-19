@@ -9,6 +9,7 @@ namespace Game3 {
 		public:
 			HasRadius() = default;
 			HasRadius(Radius radius): radius(radius) {}
+			virtual ~HasRadius() = default;
 			virtual Radius getRadius() const { return radius; }
 			virtual void setRadius(Radius new_radius) { radius = new_radius; }
 
