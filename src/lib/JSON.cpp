@@ -17,6 +17,14 @@ namespace Game3 {
 		return json.emplace_object();
 	}
 
+	boost::json::array & ensureArray(boost::json::value &json) {
+		if (auto *array = json.if_array()) {
+			return *array;
+		}
+
+		return json.emplace_array();
+	}
+
 	void serializeJSON(const JSON::value &json, std::ostream &stream) {
 		boost::json::serializer serializer;
 		serializer.reset(&json);

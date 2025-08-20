@@ -24,7 +24,7 @@ namespace Game3 {
 		weakGame(game) {}
 
 	int64_t GameDB::getCurrentFormatVersion() {
-		return 4;
+		return 5;
 	}
 
 	std::string GameDB::getFileExtension() {

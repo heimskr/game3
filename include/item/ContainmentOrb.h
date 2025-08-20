@@ -12,8 +12,8 @@
 namespace Game3 {
 	class ContainmentOrb: public Item {
 		public:
-			ContainmentOrb(ItemID id_, std::string name_, MoneyCount base_price, ItemCount max_count = 64):
-				Item(std::move(id_), std::move(name_), base_price, max_count) {}
+			ContainmentOrb(ItemID id, std::string name, MoneyCount basePrice, ItemCount maxCount = 64):
+				Item(std::move(id), std::move(name), basePrice, maxCount) {}
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			std::string getTooltip(const ConstItemStackPtr &) override;
@@ -25,5 +25,13 @@ namespace Game3 {
 			static bool validate(const ItemStackPtr &);
 			static bool isEmpty(const ItemStackPtr &);
 			static void saveToJSON(const EntityPtr &, boost::json::value &, bool can_modify = false);
+
+		private:
+			/** Returns whether the data was updated. */
+			static bool denseClick(const Place &, boost::json::object &, bool release);
+			static bool regularClick(const Place &, boost::json::object &);
+
+			static EntityPtr takeEntity(const Place &);
+			static bool releaseEntity(const Place &, boost::json::value &);
 	};
 }

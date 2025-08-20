@@ -149,4 +149,16 @@ namespace Game3 {
 
 		return true;
 	}
+
+	bool & boolifyKey(boost::json::object &object, std::string_view key, bool default_value) {
+		if (boost::json::value *value = object.if_contains(key)) {
+			if (bool *maybe = value->if_bool()) {
+				return *maybe;
+			}
+
+			return value->emplace_bool() = default_value;
+		}
+
+		return (object[key] = default_value).as_bool();
+	}
 }

@@ -9,65 +9,25 @@
 #include "realm/Realm.h"
 #include "types/Position.h"
 #include "util/Cast.h"
+#include "util/JSON.h"
 
 namespace Game3 {
-	bool ContainmentOrb::use(Slot, const ItemStackPtr &stack, const Place &place, Modifiers, std::pair<float, float>) {
-		RealmPtr realm = place.realm;
-		assert(realm->getSide() == Side::Server);
-		GamePtr game = realm->getGame();
-		PlayerPtr player = place.player;
+	bool ContainmentOrb::use(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
+		assert(place.realm->getSide() == Side::Server);
 
 		if (place.realm->type == "base:realm/shadow") {
 			return true;
 		}
 
-		if (!stack->data.is_object()) {
-			auto entities = realm->getEntities(place.position.getChunk());
-			if (!entities) {
-				WARN("No entities found in chunk {}", place.position.getChunk());
-				return true;
-			}
+		auto &data = stack->data;
+		auto data_lock = data.uniqueLock();
+		boost::json::object &object = ensureObject(data);
+		bool dense = boolifyKey(object, "dense", false);
 
-			EntityPtr selected;
-
-			{
-				auto lock = entities->sharedLock();
-				for (const WeakEntityPtr &weak_entity: *entities) {
-					if (EntityPtr entity = weak_entity.lock(); entity && entity->getPosition() == place.position && entity != player) {
-						selected = entity;
-						break;
-					}
-				}
-			}
-
-			if (!selected) {
-				return true;
-			}
-
-			saveToJSON(selected, stack->data, true);
-			player->getInventory(0)->notifyOwner(stack);
-
-			return true;
+		if (dense? denseClick(place, object, modifiers.onlyShift()) : regularClick(place, object)) {
+			place.player->getInventory(0)->notifyOwner(stack);
 		}
 
-		if (!place.realm->isPathable(place.position)) {
-			return true;
-		}
-
-		auto &object = stack->data.as_object();
-
-		Identifier type = boost::json::value_to<Identifier>(object.at("type"));
-		if (type == "base:entity/player") {
-			game->toServer().releasePlayer(std::string(object.at("containedUsername").as_string()), place);
-		} else {
-			const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
-			EntityPtr entity = (*factory)(game, stack->data);
-			entity->spawning = true;
-			entity->setRealm(realm);
-			realm->queueEntityInit(std::move(entity), place.position);
-		}
-		stack->data.emplace_null();
-		player->getInventory(0)->notifyOwner(stack);
 		return true;
 	}
 
@@ -113,8 +73,8 @@ namespace Game3 {
 		return true;
 	}
 
-	void ContainmentOrb::saveToJSON(const EntityPtr &entity, boost::json::value &json, bool can_modify) {
-		auto &object = ensureObject(json);
+	void ContainmentOrb::saveToJSON(const EntityPtr &entity, boost::json::value &value, bool can_modify) {
+		boost::json::object &object = ensureObject(value);
 
 		if (entity->isPlayer()) {
 			auto player = safeDynamicCast<ServerPlayer>(entity);
@@ -123,7 +83,7 @@ namespace Game3 {
 				player->teleport({32, 32}, entity->getGame()->getRealm(-1), MovementContext{.isTeleport = true});
 			}
 		} else {
-			entity->toJSON(json);
+			entity->toJSON(value);
 			if (can_modify) {
 				entity->queueDestruction();
 			}
@@ -131,5 +91,89 @@ namespace Game3 {
 
 		object["type"] = boost::json::value_from(entity->type);
 		object["containedName"] = entity->getName();
+	}
+
+	bool ContainmentOrb::denseClick(const Place &place, boost::json::object &object, bool release) {
+		boost::json::array &entities = ensureArray(object["entities"]);
+
+		if (release) {
+			if (entities.empty()) {
+				return false;
+			}
+
+			ensureObject(entities.back());
+
+			if (releaseEntity(place, entities.back())) {
+				entities.pop_back();
+				return true;
+			}
+
+			return false;
+		}
+
+		if (EntityPtr taken = takeEntity(place)) {
+			boost::json::value value;
+			saveToJSON(taken, value, true);
+			entities.push_back(std::move(value));
+			return true;
+		}
+
+		return false;
+	}
+
+	bool ContainmentOrb::regularClick(const Place &place, boost::json::object &object) {
+		RealmPtr realm = place.realm;
+
+		if (boost::json::value *entity_value = object.if_contains("entity")) {
+			if (releaseEntity(place, *entity_value)) {
+				object.erase("entity");
+				return true;
+			}
+			return false;
+		}
+
+		if (EntityPtr taken = takeEntity(place)) {
+			saveToJSON(taken, object["entity"], true);
+			return true;
+		}
+
+		return false;
+	}
+
+	EntityPtr ContainmentOrb::takeEntity(const Place &place) {
+		if (auto entities = place.realm->getEntities(place.position.getChunk())) {
+			auto lock = entities->sharedLock();
+			for (const WeakEntityPtr &weak_entity: *entities) {
+				if (EntityPtr entity = weak_entity.lock(); entity && entity->getPosition() == place.position && entity != place.player) {
+					return entity;
+				}
+			}
+		} else {
+			WARN("No entities found in chunk {}", place.position.getChunk());
+		}
+
+		return nullptr;
+	}
+
+	bool ContainmentOrb::releaseEntity(const Place &place, boost::json::value &value) {
+		if (!place.realm->isPathable(place.position)) {
+			return false;
+		}
+
+		boost::json::object &object = ensureObject(value);
+
+		Identifier type = boost::json::value_to<Identifier>(object.at("type"));
+		GamePtr game = place.getGame();
+		if (type == "base:entity/player") {
+			game->toServer().releasePlayer(std::string(object.at("containedUsername").as_string()), place);
+		} else {
+			const std::shared_ptr<EntityFactory> &factory = game->registry<EntityFactoryRegistry>()[type];
+			EntityPtr entity = (*factory)(game, value);
+			entity->spawning = true;
+			entity->setRealm(place.realm);
+			place.realm->queueEntityInit(std::move(entity), place.position);
+		}
+
+		return true;
 	}
 }

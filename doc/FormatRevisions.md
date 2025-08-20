@@ -8,3 +8,7 @@
 
 4: As of 5f24956.
 	- Added more layers.
+
+5: As of f000005.
+	- Changed containment orbs.
+	- Changed how empty ItemEntities are encoded.

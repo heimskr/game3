@@ -77,6 +77,7 @@ namespace Game3 {
 	std::filesystem::path tag_invoke(JSON::value_to_tag<std::filesystem::path>, const JSON::value &);
 
 	JSON::object & ensureObject(JSON::value &);
+	JSON::array & ensureArray(JSON::value &);
 	void serializeJSON(const JSON::value &, std::ostream &);
 
 	template <typename T>
