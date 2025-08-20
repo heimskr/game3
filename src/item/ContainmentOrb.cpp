@@ -22,9 +22,14 @@ namespace Game3 {
 		auto &data = stack->data;
 		auto data_lock = data.uniqueLock();
 		boost::json::object &object = ensureObject(data);
-		bool dense = boolifyKey(object, "dense", false);
 
-		if (dense? denseClick(place, object, modifiers.onlyShift()) : regularClick(place, object)) {
+		bool &dense = boolifyKey(object, "dense", false);
+
+		// Shift-ctrl click to toggle density
+		if (modifiers == Modifiers(true, true, false, false)) {
+			dense = !dense;
+			place.player->getInventory(0)->notifyOwner(stack);
+		} else if (dense? denseClick(place, object, modifiers.onlyShift()) : regularClick(place, object)) {
 			place.player->getInventory(0)->notifyOwner(stack);
 		}
 
@@ -41,7 +46,29 @@ namespace Game3 {
 	}
 
 	Identifier ContainmentOrb::getTextureIdentifier(const ConstItemStackPtr &stack) const {
-		return stack->data.is_null()? "base:item/contorb" : "base:item/contorb_full";
+		auto lock = stack->data.sharedLock();
+		bool empty = true;
+
+		if (const boost::json::object *object = stack->data.if_object()) {
+			bool dense = false;
+			if (const boost::json::value *maybe_value = object->if_contains("dense")) {
+				if (const bool *maybe_dense = maybe_value->if_bool()) {
+					dense = *maybe_dense;
+				}
+			}
+
+			if (dense) {
+				if (const boost::json::value *entities_value = object->if_contains("entities")) {
+					if (const boost::json::array *entities = entities_value->if_array()) {
+						empty = entities->empty();
+					}
+				}
+			} else if (const boost::json::value *entity_value = object->if_contains("entity")) {
+				empty = entity_value->is_object();
+			}
+		}
+
+		return empty? "base:item/contorb" : "base:item/contorb_full";
 	}
 
 	EntityPtr ContainmentOrb::makeEntity(const ItemStackPtr &stack) {
