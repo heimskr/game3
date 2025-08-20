@@ -11,6 +11,8 @@
 #include "util/Cast.h"
 #include "util/JSON.h"
 
+#include "FastNoise2/src/FastNoise/Base64.h"
+
 namespace Game3 {
 	bool ContainmentOrb::use(Slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float>) {
 		assert(place.realm->getSide() == Side::Server);
@@ -136,8 +138,11 @@ namespace Game3 {
 			}
 		}
 
+		Buffer buffer(entity->getGame(), Side::Server);
+		entity->encode(buffer);
 		object["type"] = boost::json::value_from(entity->type);
 		object["containedName"] = entity->getName();
+		object["buffer"] = FastNoise::Base64::Encode(buffer.bytes);
 	}
 
 	bool ContainmentOrb::denseClick(const Place &place, boost::json::object &object, bool release) {
@@ -218,6 +223,10 @@ namespace Game3 {
 			EntityPtr entity = (*factory)(game, value);
 			entity->spawning = true;
 			entity->setRealm(place.realm);
+			const boost::json::string &base64 = object.at("buffer").as_string();
+			std::vector<uint8_t> bytes = FastNoise::Base64::Decode(base64.c_str());
+			Buffer buffer(std::move(bytes), game, Side::Server);
+			entity->decode(buffer);
 			place.realm->queueEntityInit(std::move(entity), place.position);
 		}
 
