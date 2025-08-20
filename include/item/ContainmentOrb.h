@@ -16,6 +16,7 @@ namespace Game3 {
 				Item(std::move(id), std::move(name), basePrice, maxCount) {}
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
+			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
 			std::string getTooltip(const ConstItemStackPtr &) override;
 			Identifier getTextureIdentifier(const ConstItemStackPtr &) const override;
 			bool isTextureCacheable() const override { return false; }

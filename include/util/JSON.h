@@ -18,4 +18,5 @@ namespace Game3 {
 	}
 
 	bool & boolifyKey(boost::json::object &, std::string_view key, bool default_value);
+	bool getBoolKey(const boost::json::object &, std::string_view key, bool default_value);
 }

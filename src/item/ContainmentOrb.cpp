@@ -36,12 +36,39 @@ namespace Game3 {
 		return true;
 	}
 
+	bool ContainmentOrb::drag(Slot slot, const ItemStackPtr &stack, const Place &place, Modifiers modifiers, std::pair<float, float> offsets, DragAction action) {
+		if (action == DragAction::Update) {
+			return use(slot, stack, place, modifiers, offsets);
+		}
+
+		return false;
+	}
+
 	std::string ContainmentOrb::getTooltip(const ConstItemStackPtr &stack) {
-		if (const auto *object = stack->data.if_object()) {
-			if (auto *name = object->if_contains("containedName")) {
-				return std::format("Containment Orb ({})", name->as_string());
+		auto lock = stack->data.sharedLock();
+
+		if (const boost::json::object *object = stack->data.if_object()) {
+			if (getBoolKey(*object, "dense", false)) {
+				if (const boost::json::value *entities_value = object->if_contains("entities")) {
+					if (const boost::json::array *entities = entities_value->if_array()) {
+						if (!entities->empty()) {
+							return std::format("Dense Containment Orb ({})", entities->size());
+						}
+					}
+				}
+
+				return "Dense Containment Orb";
+			}
+
+			if (const boost::json::value *entity_value = object->if_contains("entity")) {
+				if (const boost::json::object *entity = entity_value->if_object()) {
+					if (const boost::json::value *name = entity->if_contains("containedName")) {
+						return std::format("Containment Orb ({})", name->as_string());
+					}
+				}
 			}
 		}
+
 		return "Containment Orb";
 	}
 
@@ -50,14 +77,7 @@ namespace Game3 {
 		bool empty = true;
 
 		if (const boost::json::object *object = stack->data.if_object()) {
-			bool dense = false;
-			if (const boost::json::value *maybe_value = object->if_contains("dense")) {
-				if (const bool *maybe_dense = maybe_value->if_bool()) {
-					dense = *maybe_dense;
-				}
-			}
-
-			if (dense) {
+			if (getBoolKey(*object, "dense", false)) {
 				if (const boost::json::value *entities_value = object->if_contains("entities")) {
 					if (const boost::json::array *entities = entities_value->if_array()) {
 						empty = entities->empty();
