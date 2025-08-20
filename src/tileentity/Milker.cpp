@@ -12,7 +12,7 @@
 
 namespace Game3 {
 	namespace {
-		constexpr float PERIOD = 1.0;
+		constexpr float PERIOD = 0.5;
 		constexpr Radius DEFAULT_RADIUS = 1;
 	}
 
