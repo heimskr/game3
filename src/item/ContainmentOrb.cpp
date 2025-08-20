@@ -227,7 +227,7 @@ namespace Game3 {
 			std::vector<uint8_t> bytes = FastNoise::Base64::Decode(base64.c_str());
 			Buffer buffer(std::move(bytes), game, Side::Server);
 			entity->decode(buffer);
-			place.realm->queueEntityInit(std::move(entity), place.position);
+			place.realm->queueAddition(entity, place.position);
 		}
 
 		return true;
