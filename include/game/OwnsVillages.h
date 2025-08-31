@@ -30,6 +30,7 @@ namespace Game3 {
 			VillagePtr addVillage(Game &, VillageID, std::string name, RealmID, ChunkPosition, const Position &, Resources = {});
 			void saveVillages(SQLite::Database &, bool use_transaction = true);
 			void loadVillages(const std::shared_ptr<Game> &, SQLite::Database &);
+			inline const auto & getVillageMap() { return villageMap; }
 
 		protected:
 			virtual void associateWithRealm(const VillagePtr &, RealmID) = 0;

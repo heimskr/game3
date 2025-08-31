@@ -1,10 +1,12 @@
 #pragma once
 
-#include "types/Types.h"
 #include "data/ChunkSet.h"
 #include "game/Chunk.h"
-#include "types/ChunkPosition.h"
+#include "math/Concepts.h"
 #include "threading/Lockable.h"
+#include "types/ChunkPosition.h"
+#include "types/Types.h"
+#include "util/Math.h"
 
 #include <filesystem>
 #include <functional>
@@ -14,33 +16,142 @@
 #include <string>
 #include <vector>
 
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <leveldb/db.h>
 
 namespace Game3 {
+	class Buffer;
 	class Entity;
+	class GameDB;
 	class Player;
 	class Realm;
 	class ServerGame;
 	class Tileset;
 	class TileEntity;
 
+	struct DBStatus {
+		leveldb::Status status;
+
+		DBStatus(leveldb::Status status):
+			status(status) {}
+
+		void assertOK();
+
+		inline operator std::string() const {
+			return status.ToString();
+		}
+	};
+
+	struct DBError: std::runtime_error {
+		DBStatus status;
+
+		DBError(DBStatus status):
+			std::runtime_error(std::string(status)),
+			status(status) {}
+	};
+
+	struct GameDBScope {
+		GameDBScope(GameDB &);
+	};
+
+	template <typename T>
+	struct RawSlice {
+		T data;
+
+		RawSlice(T &&data):
+			data(std::forward<T>(data)) {}
+
+		inline operator leveldb::Slice() const {
+			return leveldb::Slice(reinterpret_cast<const char *>(&data), sizeof(data));
+		}
+	};
+
+	template <std::integral T>
+	struct RawSlice<T> {
+		T data;
+
+		RawSlice(T data):
+			data(toLittle(data)) {}
+
+		inline operator leveldb::Slice() const {
+			return leveldb::Slice(reinterpret_cast<const char *>(&data), sizeof(data));
+		}
+	};
+
+	template <std::integral T, size_t S>
+	struct RawSlice<std::array<T, S>> {
+		std::array<T, S> data;
+
+		RawSlice(const std::array<T, S> &data) {
+			for (size_t i = 0; T datum: data) {
+				this->data[i] = toLittle(datum);
+			}
+		}
+
+		inline operator leveldb::Slice() const {
+			return leveldb::Slice(reinterpret_cast<const char *>(&data), S * sizeof(T));
+		}
+	};
+
 	class GameDB {
 		private:
 			std::weak_ptr<ServerGame> weakGame;
 			std::filesystem::path path;
 
-			void bind(SQLite::Statement &, const std::shared_ptr<Player> &);
-
 		public:
-			Lockable<std::unique_ptr<SQLite::Database>, std::recursive_mutex> database;
+			Lockable<std::unique_ptr<leveldb::DB>, std::recursive_mutex> database;
 
 			GameDB(const std::shared_ptr<ServerGame> &);
+
+			~GameDB();
 
 			static int64_t getCurrentFormatVersion();
 			static std::string getFileExtension();
 
 			void open(std::filesystem::path);
 			void close();
+
+			template <typename T = std::string>
+			T read(const leveldb::Slice &key);
+
+			template <typename T>
+			void readTo(const leveldb::Slice &key, T &out) {
+				std::string raw = read(key);
+				if (raw.size() != sizeof(T)) {
+					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(T), raw.size(), sizeof(T)));
+				}
+				std::memcpy(&out, raw.data(), sizeof(T));
+			}
+
+			template <Numeric T, size_t S>
+			std::array<T, S> readNumbers(const leveldb::Slice &key) {
+				using Array = std::array<T, S>;
+				std::string raw = read(key);
+				if (raw.size() != S * sizeof(T)) {
+					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(Array), raw.size(), sizeof(Array)));
+				}
+				Array out;
+				for (size_t i = 0; i < S; ++i) {
+					T little;
+					std::memcpy(&little, &raw[sizeof(T) * i], sizeof(T));
+					out[i] = toNative(little);
+				}
+				return out;
+			}
+
+			void write(const leveldb::Slice &key, const leveldb::Slice &value);
+
+			template <Numeric T, size_t S>
+			void writeNumbers(const leveldb::Slice &key, const std::array<T, S> &numbers) {
+				std::string raw(sizeof(T) * S, '\0');
+				for (size_t i = 0; T number: numbers) {
+					number = toLittle(number);
+					std::memcpy(&raw[i], &number, sizeof(T));
+					i += sizeof(T);
+				}
+				write(key, raw);
+			}
+
+			void erase(const leveldb::Slice &key);
 
 			/** <  0: this save is too old
 			 *  == 0: this save is compatible
@@ -61,14 +172,16 @@ namespace Game3 {
 			void writeRealm(const std::shared_ptr<Realm> &);
 			void deleteRealm(std::shared_ptr<Realm>);
 
-			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition, bool use_transaction = true);
+			void writeVillages();
+
+			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition);
 
 			void readAllRealms();
 
 			/** Reads metadata from the database and returns an empty realm based on the metadata. */
-			std::shared_ptr<Realm> loadRealm(RealmID, bool do_lock);
+			std::shared_ptr<Realm> loadRealm(RealmID);
 
-			void writeRealmMeta(const std::shared_ptr<Realm> &, bool use_transaction = true);
+			void writeRealmMeta(const std::shared_ptr<Realm> &);
 
 			std::optional<ChunkSet> getChunk(RealmID, ChunkPosition);
 
@@ -80,24 +193,22 @@ namespace Game3 {
 			bool hasName(const std::string &username, const std::string &display_name);
 			std::optional<Place> readReleasePlace(const std::string &username);
 
-			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &, bool use_transaction = true);
-			void writeTileEntities(const std::shared_ptr<Realm> &, bool use_transaction = true);
+			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &);
+			void writeTileEntities(const std::shared_ptr<Realm> &);
 			void deleteTileEntity(const std::shared_ptr<TileEntity> &);
 
-			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &, bool use_transaction = true);
-			void writeEntities(const std::shared_ptr<Realm> &, bool use_transaction = true);
+			void writeEntities(const std::function<bool(std::shared_ptr<Entity> &)> &);
+			void writeEntities(const std::shared_ptr<Realm> &);
 			void deleteEntity(const std::shared_ptr<Entity> &);
 
-			std::string readRealmTilesetHash(RealmID, bool do_lock = true);
-			bool hasTileset(const std::string &hash, bool do_lock = true);
+			std::string readRealmTilesetHash(RealmID);
+			bool hasTileset(const std::string &hash);
 
-			void writeTilesetMeta(const Tileset &, bool use_transaction = true);
+			void writeTilesetMeta(const Tileset &);
 			/** Returns whether anything was found. */
-			bool readTilesetMeta(const std::string &hash, boost::json::value &, bool do_lock = true);
+			bool readTilesetMeta(const std::string &hash, boost::json::value &);
 
-			inline bool isOpen() {
-				return database != nullptr;
-			}
+			bool isOpen();
 
 			inline std::shared_ptr<ServerGame> getGame() const {
 				auto game = weakGame.lock();
@@ -105,24 +216,31 @@ namespace Game3 {
 				return game;
 			}
 
+			template <typename T>
+			void writeRaw(const leveldb::Slice &key, const T &value) {
+				write(key, RawSlice<T>{value});
+			}
+
+			template <Numeric T>
+			T readNumber(const leveldb::Slice &key) {
+				T out;
+				std::string data = read(key);
+				if (data.size() != sizeof(T)) {
+					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(T), data.size(), sizeof(T)));
+				}
+				std::memcpy(&out, data.data(), sizeof(T));
+				return toNative(out);
+			}
+
 			template <typename C>
 			void writeUsers(const C &container) {
-				if (container.empty())
-					return;
-
-				assert(database);
-				auto db_lock = database.uniqueLock();
-
-				SQLite::Transaction transaction{*database};
-				SQLite::Statement statement{*database, "INSERT OR REPLACE INTO users VALUES (?, ?, ?, ?, ?)"};
-
-				for (const std::shared_ptr<Player> player: container) {
-					bind(statement, player);
-					statement.exec();
-					statement.reset();
+				for (const auto &player: container) {
+					writeUser(*player);
 				}
-
-				transaction.commit();
 			}
+
+			void write(const leveldb::Slice &key, ChunkPosition);
+			void write(const leveldb::Slice &key, Position);
+			void write(const leveldb::Slice &key, const Buffer &);
 	};
 }

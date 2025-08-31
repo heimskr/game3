@@ -54,9 +54,20 @@ namespace Game3 {
 
 	template <typename T>
 	inline T toLittle(T in) {
-		if constexpr (std::endian::native == std::endian::little)
+		if constexpr (std::endian::native == std::endian::little) {
 			return in;
-		return swapBytes(in);
+		} else {
+			return swapBytes(in);
+		}
+	}
+
+	template <typename T>
+	inline T toNative(T in) {
+		if constexpr (std::endian::native == std::endian::little) {
+			return in;
+		} else {
+			return swapBytes(in);
+		}
 	}
 
 	constexpr float lerp(float from, float to, float progress) {

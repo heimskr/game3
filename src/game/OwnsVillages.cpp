@@ -4,6 +4,7 @@
 #include "realm/Realm.h"
 
 #include <SQLiteCpp/SQLiteCpp.h>
+#include <leveldb/db.h>
 
 #include <optional>
 
@@ -50,7 +51,7 @@ namespace Game3 {
 			statement.bind(2, village->getRealmID());
 			statement.bind(3, std::string(village->getChunkPosition()));
 			statement.bind(4, std::string(village->getPosition()));
-			statement.bind(5, boost::json::serialize(boost::json::value_from(village->options)));
+			statement.bind(5, boost::json::serialize(boost::json::value_from(village->getOptions())));
 			statement.bind(6, boost::json::serialize(boost::json::value_from(village->getRichness())));
 			statement.bind(7, boost::json::serialize(boost::json::value_from(village->getResources())));
 			statement.bind(8, village->getName());

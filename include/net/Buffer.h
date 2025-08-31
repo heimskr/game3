@@ -208,9 +208,7 @@ namespace Game3 {
 
 			template <typename... Args>
 			explicit Buffer(Side target, Args &&...args): target(target) {
-				(void) std::initializer_list<int> {
-					((void) (*this << std::forward<Args>(args)), 0)...
-				};
+				((*this << std::forward<Args>(args)), ...);
 			}
 
 			inline auto size() const { return bytes.size() - skip; }

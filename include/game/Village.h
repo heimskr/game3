@@ -14,6 +14,7 @@
 #include <string>
 
 namespace Game3 {
+	class Buffer;
 	class ConsumptionRule;
 	class Game;
 	class ProductionRule;
@@ -53,6 +54,9 @@ namespace Game3 {
 
 			std::shared_ptr<Game> getGame() const override;
 
+			void encode(Buffer &) const;
+			void decode(Buffer &);
+
 			void addSubscriber(PlayerPtr);
 			void removeSubscriber(const PlayerPtr &);
 			size_t getSubscriberCount() const;
@@ -88,6 +92,10 @@ namespace Game3 {
 	};
 
 	using VillagePtr = std::shared_ptr<Village>;
+
+	Buffer & operator+=(Buffer &, const Village &);
+	Buffer & operator<<(Buffer &, const Village &);
+	Buffer & operator>>(Buffer &, Village &);
 }
 
 template <>

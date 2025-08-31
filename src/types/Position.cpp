@@ -252,7 +252,11 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &buffer, const Position &position) {
 		buffer.appendType(position, false);
-		return (buffer += position.row) += position.column;
+		if constexpr (Position::ROW_FIRST) {
+			return (buffer += position.row) += position.column;
+		} else {
+			return (buffer += position.column) += position.row;
+		}
 	}
 
 	Buffer & operator<<(Buffer &buffer, const Position &position) {
@@ -265,8 +269,13 @@ namespace Game3 {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected e9 for Position)");
 		}
-		position.row = popBuffer<Position::IntType>(buffer);
-		position.column = popBuffer<Position::IntType>(buffer);
+		if constexpr (Position::ROW_FIRST) {
+			position.row = popBuffer<Position::IntType>(buffer);
+			position.column = popBuffer<Position::IntType>(buffer);
+		} else {
+			position.column = popBuffer<Position::IntType>(buffer);
+			position.row = popBuffer<Position::IntType>(buffer);
+		}
 		return buffer;
 	}
 }

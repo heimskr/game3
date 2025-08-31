@@ -232,6 +232,34 @@ namespace Game3 {
 		return HasGame::getGame();
 	}
 
+	void Village::encode(Buffer &buffer) const {
+		buffer << getID();
+		buffer << getRealmID();
+		buffer << getChunkPosition();
+		buffer << getPosition();
+		buffer << boost::json::serialize(boost::json::value_from(getOptions()));
+		buffer << boost::json::serialize(boost::json::value_from(getRichness()));
+		buffer << boost::json::serialize(boost::json::value_from(getResources()));
+		buffer << getName();
+		buffer << getLabor();
+		buffer << getRandomValue();
+		buffer << getGreed();
+	}
+
+	void Village::decode(Buffer &buffer) {
+		buffer >> id;
+		buffer >> realmID;
+		buffer >> chunkPosition;
+		buffer >> position;
+		options = boost::json::value_to<VillageOptions>(boost::json::parse(buffer.take<std::string>()));
+		richness = boost::json::value_to<Richness>(boost::json::parse(buffer.take<std::string>()));
+		resources = boost::json::value_to<Resources>(boost::json::parse(buffer.take<std::string>()));
+		buffer >> name;
+		buffer >> labor;
+		buffer >> randomValue;
+		buffer >> greed;
+	}
+
 	void Village::addSubscriber(PlayerPtr player) {
 		auto lock = subscribedPlayers.uniqueLock();
 		subscribedPlayers.insert(std::move(player));
@@ -279,5 +307,30 @@ namespace Game3 {
 				PRIMARY KEY(realmID, id)
 			);
 		)";
+	}
+
+	template <>
+	std::string Buffer::getType(const Village &, bool) {
+		return std::string{'\xeb'};
+	}
+
+	Buffer & operator+=(Buffer &buffer, const Village &village) {
+		buffer.appendType(village, false);
+		village.encode(buffer);
+		return buffer;
+	}
+
+	Buffer & operator<<(Buffer &buffer, const Village &village) {
+		return buffer += village;
+	}
+
+	Buffer & operator>>(Buffer &buffer, Village &village) {
+		const auto type = buffer.popType();
+		if (!Buffer::typesMatch(type, buffer.getType(village, false))) {
+			buffer.debug();
+			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected eb for Village)");
+		}
+		village.decode(buffer);
+		return buffer;
 	}
 }

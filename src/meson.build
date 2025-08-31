@@ -50,6 +50,7 @@ game3_deps = [
 	dependency('sigc++-3.0'),
 	dependency('libpng'),
 	dependency('libcurl'),
+	dependency('leveldb'),
 	zipios.dependency('zipios'),
 	clip.dependency('clip'),
 	chemskr.get_variable('chemskr'),

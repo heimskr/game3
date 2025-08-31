@@ -537,6 +537,7 @@ All values are little endian. Strings are not null-terminated.
 | `0xe8`                           | StringGene                   |
 | `0xe9`                           | Position                     |
 | `0xea`                           | StatusEffectMap              |
+| `0xeb`                           | Village                      |
 
 Note that string types are always encoded as `0x1f` when used as a subtype of a list or a map, and optional types are always encoded as `0x0b` followed by the subtype in the same scenario.
 
@@ -614,6 +615,10 @@ To send a map, send `0x21`, followed by the type encoding of the key type, follo
 TODO
 
 ### StatusEffectMap (`0xea`)
+
+TODO
+
+### Village (`0xeb`)
 
 TODO
 

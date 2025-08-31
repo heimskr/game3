@@ -12,3 +12,6 @@
 5: As of f000005.
 	- Changed containment orbs.
 	- Changed how empty ItemEntities are encoded.
+
+6: As of f000006.
+	- Switched from Sqlite to LevelDB.

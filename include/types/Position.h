@@ -24,6 +24,7 @@ namespace Game3 {
 	struct FluidTile;
 
 	struct Position {
+		constexpr static bool ROW_FIRST = true;
 		using IntType = Index;
 		IntType row = 0;
 		IntType column = 0;
