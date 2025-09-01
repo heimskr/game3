@@ -32,6 +32,11 @@ namespace Game3 {
 			static auto sharedLock() { return std::shared_lock(mutex); }
 			static auto uniqueLock() { return std::unique_lock(mutex); }
 
+			template <typename Fn>
+			decltype(auto) operator()(Fn &&function) {
+				return function();
+			}
+
 		private:
 			bool stopped = false;
 	};

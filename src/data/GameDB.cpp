@@ -1,22 +1,28 @@
 #include "data/GameDB.h"
+#include "error/FailedMigrationError.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
+#include "util/JSON.h"
 #include "util/Timer.h"
 
 #include <leveldb/write_batch.h>
 
 namespace Game3 {
 	namespace {
-		const std::string FORMAT_VERSION_KEY{"M::formatVersion"};
-		const std::string GAME_RULES_KEY{"M::gameRules"};
+		const std::string CHUNK_PREFIX{"C::"};
+		const std::string META_PREFIX{"M::"};
+		const std::string REALM_PREFIX{"R::"};
+		const std::string VILLAGE_PREFIX{"V::"};
+		const std::string FORMAT_VERSION_KEY{META_PREFIX + "formatVersion"};
+		const std::string GAME_RULES_KEY{META_PREFIX + "gameRules"};
 
 		std::string getKey(const Village &village) {
-			return std::format("V::{}", village.getID());
+			return std::format("{}{}", VILLAGE_PREFIX, village.getID());
 		}
 
 		std::string getKey(RealmID realm_id, ChunkPosition chunk_position) {
-			return std::format("C::{}::{},{}", realm_id, chunk_position.x, chunk_position.y);
+			return std::format("{}{}::{},{}", CHUNK_PREFIX, realm_id, chunk_position.x, chunk_position.y);
 		}
 
 		inline leveldb::Options getOpenOptions() {
@@ -65,7 +71,6 @@ namespace Game3 {
 		close();
 		path = std::move(path_);
 		leveldb::DB *db = nullptr;
-		leveldb::Options options = getOpenOptions();
 		auto db_lock = database.uniqueLock();
 		DBStatus status = leveldb::DB::Open(getOpenOptions(), path.string(), &db);
 		status.assertOK();
@@ -164,7 +169,7 @@ namespace Game3 {
 		GameDBScope scope{*this};
 
 		realm->tileEntities.withShared([&](const auto &tile_entities) {
-			for (const auto &[position, tile_entity]: realm->tileEntities) {
+			for (const auto &[position, tile_entity]: tile_entities) {
 				deleteTileEntity(tile_entity);
 			}
 		});
@@ -181,10 +186,10 @@ namespace Game3 {
 		// Delete all chunks associated with the realm
 
 		std::vector<std::string> keys;
-		std::string start = std::format("C::{}::", realm->getID());
-		std::unique_ptr<leveldb::Iterator> it(database->NewIterator(getReadOptions()));
+		std::string start = std::format("{}{}::", CHUNK_PREFIX, realm->getID());
+		auto it = getStartIterator();
 
-		for (it->SeekToFirst(); it->Valid(); it->Next()) {
+		for (; it->Valid(); it->Next()) {
 			if (it->key().starts_with(start)) {
 				keys.emplace_back(it->key().ToString());
 			}
@@ -210,6 +215,187 @@ namespace Game3 {
 		for (const auto &[id, village]: village_map) {
 			write(getKey(*village), Buffer{Side::Server, *village});
 		}
+	}
+
+	void GameDB::writeChunk(const RealmPtr &realm, ChunkPosition chunk_position) {
+		Timer timer{"WriteChunk"};
+		GameDBScope scope{*this};
+
+		TileProvider &provider = realm->tileProvider;
+
+		Buffer buffer{Side::Server,
+			realm->getID(),
+			chunk_position,
+			Timer{"GetRawTerrain"}([&] { return provider.getRawTerrain(chunk_position); }),
+			Timer{"GetRawBiomes" }([&] { return provider.getRawBiomes(chunk_position);  }),
+			Timer{"GetRawFluids" }([&] { return provider.getRawFluids(chunk_position);  }),
+			Timer{"GetRawPathmap"}([&] { return provider.getRawPathmap(chunk_position); }),
+		};
+
+		auto db_lock = database.uniqueLock();
+		write(getKey(realm->getID(), chunk_position), buffer);
+	}
+
+	void GameDB::readAllRealms() {
+		assert(database);
+		ServerGamePtr game = getGame();
+		auto db_lock = database.uniqueLock();
+
+		iterate(CHUNK_PREFIX, [&](std::string_view, std::string_view value) {
+			Timer iteration_timer{"ChunkLoad"};
+			const auto *start = reinterpret_cast<const uint8_t *>(value.data());
+			Buffer buffer(std::vector<uint8_t>(start, start + value.size()), Side::Server);
+
+			RealmID realm_id;
+			ChunkPosition chunk_position;
+			std::span<const char> raw_terrain;
+			std::span<const char> raw_biomes;
+			std::span<const char> raw_fluids;
+			std::span<const char> raw_pathmap;
+
+			buffer >> realm_id >> chunk_position >> raw_terrain >> raw_biomes >> raw_fluids >> raw_pathmap;
+
+			auto chunk_set = Timer{"ChunkSet"}([&] {
+				return ChunkSet{
+					raw_terrain,
+					raw_biomes,
+					raw_fluids,
+					raw_pathmap,
+				};
+			});
+
+			RealmPtr realm = Timer{"GetRealm"}([&] {
+				return game->getRealm(realm_id, [&] {
+					return loadRealm(realm_id);
+				});
+			});
+
+			Timer{"Absorb"}([&] {
+				realm->tileProvider.absorb(chunk_position, std::move(chunk_set));
+			});
+		});
+
+		// If a realm has no chunks, it won't get loaded above, so we have to go through all realms
+		// and load the ones that haven't been loaded yet.
+
+		iterate(REALM_PREFIX, [&](std::string_view, std::string_view value) {
+			const auto *start = reinterpret_cast<const uint8_t *>(value.data());
+			size_t realm_id_size = 1 + sizeof(RealmID);
+			assert(value.size() >= realm_id_size);
+			std::vector<uint8_t> bytes(start, start + realm_id_size); // type indicator for RealmID is 1 byte in size
+			RealmID realm_id = Buffer(std::move(bytes), Side::Server).take<RealmID>();
+			game->getRealm(realm_id, [&] { return loadRealm(realm_id); });
+		});
+
+		Timer{"LoadVillages"}([&] {
+			readVillages();
+		});
+
+		const bool force_migrate = std::filesystem::exists(".force-migrate");
+		if (force_migrate) {
+			std::filesystem::remove(".force-migrate");
+		}
+
+		std::unordered_map<std::string, boost::json::value> meta_cache;
+
+		auto get_meta = [&](const std::string &hash) -> const boost::json::value & {
+			if (auto iter = meta_cache.find(hash); iter != meta_cache.end()) {
+				return iter->second;
+			}
+			boost::json::value json;
+			readTilesetMeta(hash, json);
+			return meta_cache[hash] = std::move(json);
+		};
+
+		game->iterateRealms([&](const RealmPtr &realm) {
+			Tileset &tileset = realm->getTileset();
+
+			const std::string realm_tileset_hash = readRealmTilesetHash(realm->id);
+			if (tileset.getHash() == realm_tileset_hash) {
+				return;
+			}
+
+			const boost::json::value &meta = get_meta(realm_tileset_hash);
+
+			std::unordered_map<TileID, Identifier> old_map;
+			try {
+				old_map = boost::json::value_to<std::unordered_map<TileID, Identifier>>(meta.at("names"));
+			} catch (const boost::system::system_error &) {
+				old_map = loadKeyValuePairs<std::unordered_map, TileID, Identifier>(meta.at("names"));
+			}
+
+			std::unordered_map<Identifier, Identifier> autotiles;
+			try {
+				autotiles = boost::json::value_to<std::unordered_map<Identifier, Identifier>>(meta.at("autotiles"));
+			} catch (const boost::system::system_error &) {
+				autotiles = loadKeyValuePairs<std::unordered_map, Identifier, Identifier>(meta.at("autotiles"));
+			}
+
+			INFO("Auto-migrating tiles for realm {}", realm->id);
+
+			Timer migration_timer{"TileMigration"};
+			std::unordered_map<TileID, TileID> migration_map;
+
+			const std::unordered_map<Identifier, TileID> new_map = tileset.getIDs();
+
+			for (const auto &[numeric, identifier]: old_map) {
+				if (auto new_tile_iter = new_map.find(identifier); new_tile_iter != new_map.end()) {
+					migration_map[numeric] = new_tile_iter->second;
+				}
+			}
+
+			TileProvider &provider = realm->tileProvider;
+			std::unordered_set<TileID> covered;
+			std::unordered_set<TileID> warned;
+
+			for (Layer layer: allLayers) {
+				std::unique_lock chunk_map_lock{provider.chunkMutexes.at(getIndex(layer))};
+				TileProvider::ChunkMap &chunk_map = provider.chunkMaps.at(getIndex(layer));
+				for (auto &[chunk_position, chunk]: chunk_map) {
+					std::unique_lock chunk_lock = chunk.uniqueLock();
+					for (TileID &tile_id: chunk) {
+						const TileID old_tile = tile_id;
+						if (auto iter = migration_map.find(tile_id); iter != migration_map.end()) {
+							TileID new_tile = iter->second;
+
+							tile_id = new_tile;
+							if (new_tile != old_tile && covered.insert(old_tile).second) {
+								INFO("{} ({}) → {} ({})", old_map.at(old_tile), old_tile, tileset.getNames().at(new_tile), new_tile);
+							}
+						} else if (force_migrate) {
+							if (warned.insert(old_tile).second) {
+								WARN("Replacing tile {} ({}) with nothing.", old_map.at(old_tile), old_tile);
+							}
+							tile_id = 0;
+						} else {
+							Identifier tilename = old_map.at(old_tile);
+							ERR("Canceling tile migration; tile {} ({}) is missing from the new tileset. Create .force-migrate to force migration.", tilename, old_tile);
+							throw FailedMigrationError("Migration failed due to missing tile " + tilename.str() + " (" + std::to_string(old_tile) + ')');
+						}
+					}
+				}
+			}
+
+			for (Layer layer: allLayers) {
+				std::vector<ChunkPosition> all_chunk_positions;
+				{
+					std::shared_lock chunk_map_lock{provider.chunkMutexes.at(getIndex(layer))};
+					const TileProvider::ChunkMap &chunk_map = provider.chunkMaps.at(getIndex(layer));
+					all_chunk_positions.reserve(chunk_map.size());
+					for (const auto &[chunk_position, chunk]: chunk_map) {
+						all_chunk_positions.emplace_back(chunk_position);
+					}
+				}
+
+				for (ChunkPosition chunk_position: all_chunk_positions) {
+					chunk_position.iterate([&](Position position) {
+						realm->autotile(position, layer, TileUpdateContext{9});
+					});
+				}
+			}
+
+			SUCCESS("Finished tile migration for realm {}", realm->getID());
+		});
 	}
 
 	template <>
@@ -240,5 +426,15 @@ namespace Game3 {
 		std::span<const uint8_t> span = buffer.getSpan();
 		leveldb::Slice slice(reinterpret_cast<const char *>(span.data()), span.size_bytes());
 		write(key, slice);
+	}
+
+	std::unique_ptr<leveldb::Iterator> GameDB::getIterator() {
+		return std::unique_ptr<leveldb::Iterator>(database->NewIterator(getReadOptions()));
+	}
+
+	std::unique_ptr<leveldb::Iterator> GameDB::getStartIterator() {
+		auto it = getIterator();
+		it->SeekToFirst();
+		return it;
 	}
 }

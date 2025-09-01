@@ -97,6 +97,9 @@ namespace Game3 {
 			std::weak_ptr<ServerGame> weakGame;
 			std::filesystem::path path;
 
+			std::unique_ptr<leveldb::Iterator> getIterator();
+			std::unique_ptr<leveldb::Iterator> getStartIterator();
+
 		public:
 			Lockable<std::unique_ptr<leveldb::DB>, std::recursive_mutex> database;
 
@@ -172,6 +175,7 @@ namespace Game3 {
 			void writeRealm(const std::shared_ptr<Realm> &);
 			void deleteRealm(std::shared_ptr<Realm>);
 
+			void readVillages();
 			void writeVillages();
 
 			void writeChunk(const std::shared_ptr<Realm> &, ChunkPosition);
@@ -237,6 +241,42 @@ namespace Game3 {
 				for (const auto &player: container) {
 					writeUser(*player);
 				}
+			}
+
+			template <Returns<void, std::string_view, std::string_view> Fn>
+			void iterate(std::string_view prefix, Fn &&function) {
+				auto it = getIterator();
+				leveldb::Slice slice{prefix.data(), prefix.size()};
+				for (it->Seek(slice); it->Valid(); it->Next()) {
+					if (!it->key().starts_with(slice)) {
+						break;
+					}
+
+					function(std::string_view(it->key().data(), it->key().size()), std::string_view(it->value().data(), it->value().size()));
+				}
+
+				DBStatus(it->status()).assertOK();
+			}
+
+			/** Iterates until the function returns true. Returns whether iteration was canceled. */
+			template <Returns<bool, std::string_view, std::string_view> Fn>
+			bool iterate(std::string_view prefix, Fn &&function) {
+				bool canceled = false;
+				auto it = getIterator();
+				leveldb::Slice slice{prefix.data(), prefix.size()};
+				for (it->Seek(slice); it->Valid(); it->Next()) {
+					if (!it->key().starts_with(slice)) {
+						break;
+					}
+
+					if (function(std::string_view(it->key().data(), it->key().size()), std::string_view(it->value().data(), it->value().size()))) {
+						canceled = true;
+						break;
+					}
+				}
+
+				DBStatus(it->status()).assertOK();
+				return canceled;
 			}
 
 			void write(const leveldb::Slice &key, ChunkPosition);

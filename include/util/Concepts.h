@@ -40,7 +40,19 @@ namespace Game3 {
 	};
 
 	template <typename T>
+	concept MutableLinear = requires(T t) {
+		requires Linear<T>;
+		t.push_back(typename T::value_type{});
+	};
+
+	template <typename T>
 	concept LinearOrSet = Set<T> || Linear<T>;
+
+	template <typename T>
+	concept MutableLinearOrSet = requires {
+		requires LinearOrSet<T>;
+		requires !std::same_as<T, std::string_view>;
+	};
 
 	template <typename T>
 	concept Reservable = requires(T t) {

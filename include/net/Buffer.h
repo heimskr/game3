@@ -297,6 +297,9 @@ namespace Game3 {
 			friend T popBuffer(Buffer &);
 	};
 
+	template <>
+	std::string_view popBuffer<std::string_view>(Buffer &);
+
 	template <typename T>
 	Buffer & operator>>(Buffer &, T &);
 
@@ -395,15 +398,18 @@ namespace Game3 {
 		return out;
 	}
 
-	template <Linear C>
+	template <MutableLinear C>
 	C popBuffer(Buffer &buffer) {
 		const auto size = popBuffer<uint32_t>(buffer);
 		C out;
-		if constexpr (Reservable<C>)
-			out.reserve(size);
 
-		for (uint32_t i = 0; i < size; ++i)
+		if constexpr (Reservable<C>) {
+			out.reserve(size);
+		}
+
+		for (uint32_t i = 0; i < size; ++i) {
 			out.push_back(popBuffer<typename C::value_type>(buffer));
+		}
 
 		return out;
 	}
@@ -412,8 +418,9 @@ namespace Game3 {
 	S popBuffer(Buffer &buffer) {
 		const auto size = popBuffer<uint32_t>(buffer);
 		S out;
-		for (uint32_t i = 0; i < size; ++i)
+		for (uint32_t i = 0; i < size; ++i) {
 			out.insert(popBuffer<typename S::value_type>(buffer));
+		}
 		return out;
 	}
 
@@ -439,6 +446,9 @@ namespace Game3 {
 
 	template <>
 	Buffer & operator>>(Buffer &, boost::json::value &);
+
+	template <>
+	Buffer & operator>>(Buffer &, std::string_view &);
 }
 
 template <>

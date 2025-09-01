@@ -649,7 +649,7 @@ namespace Game3 {
 	}
 
 	template <>
-	Buffer & operator>>(Buffer &buffer, std::string &out) {
+	Buffer & operator>>(Buffer &buffer, std::string_view &out) {
 		const std::string type = buffer.popType();
 		const char front = type.front();
 		uint32_t size{};
@@ -661,10 +661,35 @@ namespace Game3 {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type in buffer (expected string): " + hexString(std::string_view(&front, 1), true));
 		}
-		out.clear();
-		out.reserve(size);
-		for (uint32_t i = 0; i < size; ++i)
-			out.push_back(popBuffer<char>(buffer));
+
+		std::span span = buffer.getSpan();
+
+		if (span.size() < size) {
+			ERR("Buffer size: {:L}", buffer.bytes.size());
+			ERR("Skip: {:L}", buffer.skip);
+			ERR("Span size: {:L}", span.size());
+			ERR("Span size_bytes: {:L}", span.size_bytes());
+			INFO("{}", hexString(buffer.bytes, true));
+			throw std::out_of_range("Buffer is too small");
+		}
+
+		out = {reinterpret_cast<const char *>(span.data()), span.size()};
+		return buffer;
+	}
+
+	template <>
+	Buffer & operator>>(Buffer &buffer, std::string &out) {
+		std::string_view view;
+		buffer >> view;
+		out = view;
+		return buffer;
+	}
+
+	template <>
+	Buffer & operator>>(Buffer &buffer, std::span<const char> &out) {
+		std::string_view view;
+		buffer >> view;
+		out = view;
 		return buffer;
 	}
 
