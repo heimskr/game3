@@ -1,6 +1,7 @@
 #include "data/GameDB.h"
 #include "entity/Entity.h"
 #include "entity/EntityFactory.h"
+#include "entity/Player.h"
 #include "error/FailedMigrationError.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
@@ -19,19 +20,20 @@ namespace Game3 {
 		const std::string META_PREFIX{"M::"};
 		const std::string REALM_PREFIX{"R::"};
 		const std::string TILE_ENTITY_PREFIX{"T::"};
+		const std::string USER_PREFIX{"U::"};
 		const std::string VILLAGE_PREFIX{"V::"};
 		const std::string FORMAT_VERSION_KEY{META_PREFIX + "formatVersion"};
 		const std::string GAME_RULES_KEY{META_PREFIX + "gameRules"};
 
-		std::string getKey(const Village &village) {
+		inline std::string getKey(const Village &village) {
 			return std::format("{}{}", VILLAGE_PREFIX, village.getID());
 		}
 
-		std::string getKey(RealmID realm_id, ChunkPosition chunk_position) {
+		inline std::string getKey(RealmID realm_id, ChunkPosition chunk_position) {
 			return std::format("{}{}::{},{}", CHUNK_PREFIX, realm_id, chunk_position.x, chunk_position.y);
 		}
 
-		std::string getKey(RealmID realm_id) {
+		inline std::string getKey(RealmID realm_id) {
 			return std::format("{}{}", REALM_PREFIX, realm_id);
 		}
 
@@ -507,6 +509,42 @@ namespace Game3 {
 		return Timer{"ChunkSet"}([&] {
 			return std::make_optional<ChunkSet>(raw_terrain, raw_biomes, raw_fluids, raw_pathmap);
 		});
+	}
+
+	bool GameDB::readUser(const std::string &username, std::string *display_name_out, Buffer *buffer_out, std::optional<Place> *release_place) {
+		GameDBScope scope{*this};
+
+		std::optional<std::string> raw = tryRead(USER_PREFIX + username);
+
+		if (!raw) {
+			return false;
+		}
+
+		ViewBuffer buffer{*raw, Side::Server};
+
+		assert(username == buffer.take<std::string_view>());
+
+		if (display_name_out) {
+			buffer >> *display_name_out;
+		} else {
+			buffer.take<std::string_view>();
+		}
+
+		if (release_place != nullptr) {
+			auto position = buffer.take<std::optional<Position>>();
+			auto realm_id = buffer.take<std::optional<RealmID>>();
+			if (!position || !realm_id) {
+				*release_place = std::nullopt;
+			} else {
+				*release_place = std::make_optional<Place>(*position, getGame()->getRealm(*realm_id), nullptr);
+			}
+		}
+
+		if (buffer_out != nullptr) {
+			*buffer_out << buffer;
+		}
+
+		return true;
 	}
 
 	template <>
