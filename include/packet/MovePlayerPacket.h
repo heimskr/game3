@@ -20,7 +20,7 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << position << movementDirection << facingDirection << offset; }
-		void decode(Game &, BasicBuffer &buffer)       override { buffer >> position >> movementDirection >> facingDirection >> offset; }
+		void decode(Game &, BasicBuffer &buffer)  override { buffer >> position >> movementDirection >> facingDirection >> offset; }
 
 		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
 	};

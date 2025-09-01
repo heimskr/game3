@@ -22,7 +22,7 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << soundID << soundOrigin << pitch << maximumDistance; }
-		void decode(Game &, BasicBuffer &buffer)       override { buffer >> soundID >> soundOrigin >> pitch >> maximumDistance; }
+		void decode(Game &, BasicBuffer &buffer)  override { buffer >> soundID >> soundOrigin >> pitch >> maximumDistance; }
 
 		void handle(const std::shared_ptr<ClientGame> &) override;
 	};

@@ -25,7 +25,7 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << globalID << realmRequirement; }
-		void decode(Game &, BasicBuffer &buffer)       override { buffer >> globalID >> realmRequirement; }
+		void decode(Game &, BasicBuffer &buffer)  override { buffer >> globalID >> realmRequirement; }
 
 		void handle(const std::shared_ptr<ClientGame> &) override;
 	};
