@@ -119,7 +119,16 @@ namespace Game3 {
 			void close();
 
 			template <typename T = std::string>
-			T read(const leveldb::Slice &key);
+			std::optional<T> tryRead(const leveldb::Slice &key);
+
+			template <typename T = std::string>
+			T read(const leveldb::Slice &key) {
+				if (std::optional<T> value = tryRead<T>(key)) {
+					return std::move(*value);
+				} else {
+					throw std::out_of_range("GameDB::read: " + key.ToString());
+				}
+			}
 
 			template <typename T>
 			void readTo(const leveldb::Slice &key, T &out) {
@@ -131,17 +140,20 @@ namespace Game3 {
 			}
 
 			template <Numeric T, size_t S>
-			std::array<T, S> readNumbers(const leveldb::Slice &key) {
+			std::optional<std::array<T, S>> tryReadNumbers(const leveldb::Slice &key) {
 				using Array = std::array<T, S>;
-				std::string raw = read(key);
-				if (raw.size() != S * sizeof(T)) {
-					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(Array), raw.size(), sizeof(Array)));
+				std::optional<std::string> raw = tryRead(key);
+				if (!raw) {
+					return std::nullopt;
 				}
-				Array out;
+				if (raw->size() != S * sizeof(T)) {
+					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(Array), raw->size(), sizeof(Array)));
+				}
+				auto out = std::make_optional<Array>();
 				for (size_t i = 0; i < S; ++i) {
 					T little;
-					std::memcpy(&little, &raw[sizeof(T) * i], sizeof(T));
-					out[i] = toNative(little);
+					std::memcpy(&little, &(*raw)[sizeof(T) * i], sizeof(T));
+					(*out)[i] = toNative(little);
 				}
 				return out;
 			}

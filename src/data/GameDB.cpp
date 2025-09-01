@@ -253,8 +253,7 @@ namespace Game3 {
 
 		iterate(CHUNK_PREFIX, [&](std::string_view, std::string_view value) {
 			Timer iteration_timer{"ChunkLoad"};
-			const auto *start = reinterpret_cast<const uint8_t *>(value.data());
-			Buffer buffer(std::vector<uint8_t>(start, start + value.size()), Side::Server);
+			ViewBuffer buffer(value, Side::Server);
 
 			RealmID realm_id;
 			ChunkPosition chunk_position;
@@ -480,16 +479,50 @@ namespace Game3 {
 		return realm;
 	}
 
-	template <>
-	ChunkPosition GameDB::read<ChunkPosition>(const leveldb::Slice &key) {
-		auto pair = readNumbers<ChunkPosition::IntType, 2>(key);
-		return {pair[0], pair[1]};
+	void GameDB::writeRealmMeta(const RealmPtr &realm) {
+		GameDBScope scope{*this};
+		boost::json::value json;
+		realm->toJSON(json, false);
+		write(getKey(realm->id), Buffer{Side::Server,
+			realm->id,
+			json,
+			realm->getTileset().getHash(),
+		});
+	}
+
+	std::optional<ChunkSet> GameDB::getChunk(RealmID realm_id, ChunkPosition chunk_position) {
+		GameDBScope scope{*this};
+
+		std::optional<std::string> raw = tryRead(getKey(realm_id, chunk_position));
+		if (!raw) {
+			return std::nullopt;
+		}
+
+		ViewBuffer buffer(*raw, Side::Server);
+		std::span<const char> raw_terrain, raw_biomes, raw_fluids, raw_pathmap;
+		assert(realm_id == buffer.take<RealmID>());
+		buffer.take<ChunkPosition>();
+		buffer >> chunk_position >> raw_terrain >> raw_biomes >> raw_fluids >> raw_pathmap;
+
+		return Timer{"ChunkSet"}([&] {
+			return std::make_optional<ChunkSet>(raw_terrain, raw_biomes, raw_fluids, raw_pathmap);
+		});
 	}
 
 	template <>
-	Position GameDB::read<Position>(const leveldb::Slice &key) {
-		auto pair = readNumbers<Position::IntType, 2>(key);
-		return {pair[0], pair[1]};
+	std::optional<ChunkPosition> GameDB::tryRead<ChunkPosition>(const leveldb::Slice &key) {
+		if (auto pair = tryReadNumbers<ChunkPosition::IntType, 2>(key)) {
+			return std::make_optional<ChunkPosition>((*pair)[0], (*pair)[1]);
+		}
+		return std::nullopt;
+	}
+
+	template <>
+	std::optional<Position> GameDB::tryRead<Position>(const leveldb::Slice &key) {
+		if (auto pair = tryReadNumbers<Position::IntType, 2>(key)) {
+			return std::make_optional<Position>((*pair)[0], (*pair)[1]);
+		}
+		return std::nullopt;
 	}
 
 	void GameDB::write(const leveldb::Slice &key, ChunkPosition value) {
