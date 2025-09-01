@@ -69,7 +69,7 @@ namespace Game3 {
 		buffer << spawnables;
 	}
 
-	void ItemSpawner::decode(Game &game, Buffer &buffer) {
+	void ItemSpawner::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> minimumTime;
 		buffer >> maximumTime;

@@ -56,7 +56,7 @@ namespace Game3 {
 		buffer << gameHeight;
 	}
 
-	void ArcadeMachine::decode(Game &game, Buffer &buffer) {
+	void ArcadeMachine::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> minigameName;
 		buffer >> gameWidth;

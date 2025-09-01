@@ -17,7 +17,7 @@ namespace Game3 {
 			void mouseOut() final;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			ArcadeMachine() = default;

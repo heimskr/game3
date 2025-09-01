@@ -17,7 +17,7 @@ namespace Game3 {
 			void teleport(const std::shared_ptr<Entity> &);
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			EntityBuilding() = default;

@@ -35,7 +35,7 @@ namespace Game3 {
 			const Ore & getOre(const Game &) const;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			OreDeposit() = default;

@@ -97,7 +97,7 @@ namespace Game3 {
 		InventoriedTileEntity::encode(game, buffer);
 	}
 
-	void Centrifuge::decode(Game &game, Buffer &buffer) {
+	void Centrifuge::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);

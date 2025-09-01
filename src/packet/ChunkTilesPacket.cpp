@@ -45,7 +45,7 @@ namespace Game3 {
 		buffer << compressed;
 	}
 
-	void ChunkTilesPacket::decode(Game &, Buffer &buffer) {
+	void ChunkTilesPacket::decode(Game &, BasicBuffer &buffer) {
 		Buffer secondary{buffer.target};
 		buffer >> secondary.bytes;
 		auto span = secondary.getSpan();

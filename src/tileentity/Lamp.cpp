@@ -87,7 +87,7 @@ namespace Game3 {
 		buffer << on;
 	}
 
-	void Lamp::decode(Game &game, Buffer &buffer) {
+	void Lamp::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		setOn(buffer.take<bool>());
 	}

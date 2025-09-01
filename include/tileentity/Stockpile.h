@@ -11,7 +11,7 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			VillageID villageID{};

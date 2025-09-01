@@ -151,7 +151,7 @@ namespace Game3 {
 		buffer << equation_text;
 	}
 
-	void ChemicalReactor::decode(Game &game, Buffer &buffer) {
+	void ChemicalReactor::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

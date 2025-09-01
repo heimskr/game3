@@ -124,7 +124,7 @@ namespace Game3 {
 		buffer << radius;
 	}
 
-	void Milker::decode(Game &game, Buffer &buffer) {
+	void Milker::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

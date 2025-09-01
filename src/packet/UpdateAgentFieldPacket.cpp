@@ -9,7 +9,7 @@ namespace Game3 {
 		buffer << globalID << fieldNameHash << fieldValue;
 	}
 
-	void UpdateAgentFieldPacket::decode(Game &game, Buffer &buffer) {
+	void UpdateAgentFieldPacket::decode(Game &game, BasicBuffer &buffer) {
 		fieldValue.context = game.shared_from_this();
 		buffer >> globalID >> fieldNameHash >> fieldValue;
 	}

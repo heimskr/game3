@@ -20,7 +20,7 @@ namespace Game3 {
 			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 			bool setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) override;
 			void broadcast(bool force) override;
 

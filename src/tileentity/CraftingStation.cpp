@@ -55,7 +55,7 @@ namespace Game3 {
 		buffer << itemName;
 	}
 
-	void CraftingStation::decode(Game &game, Buffer &buffer) {
+	void CraftingStation::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> stationType;
 		buffer >> itemName;

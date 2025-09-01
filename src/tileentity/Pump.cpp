@@ -126,7 +126,7 @@ namespace Game3 {
 		DirectedTileEntity::encode(game, buffer);
 	}
 
-	void Pump::decode(Game &game, Buffer &buffer) {
+	void Pump::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

@@ -59,6 +59,15 @@ namespace Game3 {
 		EntityTexture(Identifier identifier_, Identifier texture_id, uint8_t variety_);
 	};
 
+	/**
+	 * GameDB layout:
+	 *     `u64` Global ID
+	 *     `i32` Realm ID
+	 *     `Position` Position
+	 *     `u8` Direction
+	 *     `string` Entity type
+	 *     `...` Encoded
+	 */
 	class Entity: public Agent, public HasDimensions, public HasInventory, public Tickable, public HasMutex<Entity> {
 		public:
 			constexpr static Slot DEFAULT_INVENTORY_SIZE = 30;

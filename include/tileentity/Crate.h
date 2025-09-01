@@ -29,7 +29,7 @@ namespace Game3 {
 			void setInventory(Slot slot_count) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			Crate() = default;

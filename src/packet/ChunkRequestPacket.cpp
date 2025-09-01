@@ -27,7 +27,7 @@ namespace Game3 {
 		buffer << realmID << generateMissing << data;
 	}
 
-	void ChunkRequestPacket::decode(Game &, Buffer &buffer) {
+	void ChunkRequestPacket::decode(Game &, BasicBuffer &buffer) {
 		std::vector<uint32_t> data;
 
 		buffer >> realmID >> generateMissing >> data;

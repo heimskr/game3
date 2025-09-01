@@ -126,7 +126,7 @@ namespace Game3 {
 		InventoriedTileEntity::encode(game, buffer);
 	}
 
-	void FlaskFiller::decode(Game &game, Buffer &buffer) {
+	void FlaskFiller::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

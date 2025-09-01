@@ -20,7 +20,7 @@ namespace Game3 {
 			void render(SpriteRenderer &) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			ItemSpawner() = default;

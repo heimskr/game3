@@ -142,7 +142,7 @@ namespace Game3 {
 		buffer << target;
 	}
 
-	void Combiner::decode(Game &game, Buffer &buffer) {
+	void Combiner::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

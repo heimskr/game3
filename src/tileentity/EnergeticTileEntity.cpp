@@ -80,7 +80,7 @@ namespace Game3 {
 		HasEnergy::encode(buffer);
 	}
 
-	void EnergeticTileEntity::decode(Game &, Buffer &buffer) {
+	void EnergeticTileEntity::decode(Game &, BasicBuffer &buffer) {
 		EnergyAmount old_amount{};
 		{
 			auto lock = energyContainer->sharedLock();

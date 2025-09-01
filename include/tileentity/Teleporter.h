@@ -18,7 +18,7 @@ namespace Game3 {
 			void onOverlap(const std::shared_ptr<Entity> &) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			Teleporter() = default;

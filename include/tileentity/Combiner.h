@@ -27,7 +27,7 @@ namespace Game3 {
 			const auto & getTarget() const { return target; }
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 			void broadcast(bool force) override;
 
 			GamePtr getGame() const final;

@@ -173,7 +173,7 @@ namespace Game3 {
 		HasInventory::encode(buffer, 0);
 	}
 
-	void InventoriedTileEntity::decode(Game &, Buffer &buffer) {
+	void InventoriedTileEntity::decode(Game &, BasicBuffer &buffer) {
 		HasInventory::decode(buffer, 0);
 	}
 

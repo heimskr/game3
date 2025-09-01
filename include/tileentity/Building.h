@@ -22,7 +22,7 @@ namespace Game3 {
 			std::shared_ptr<Realm> getInnerRealm() const;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			Building() = default;

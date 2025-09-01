@@ -35,7 +35,7 @@ namespace Game3 {
 		buffer << realmID << data;
 	}
 
-	void EntityRequestPacket::decode(Game &, Buffer &buffer) {
+	void EntityRequestPacket::decode(Game &, BasicBuffer &buffer) {
 		std::vector<uint64_t> data;
 
 		buffer >> realmID >> data;

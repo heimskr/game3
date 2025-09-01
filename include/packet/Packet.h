@@ -26,7 +26,7 @@ namespace Game3 {
 			bool valid = true;
 
 			virtual void encode(Game &, Buffer &) const = 0;
-			virtual void decode(Game &, Buffer &) = 0;
+			virtual void decode(Game &, BasicBuffer &) = 0;
 			virtual PacketID getID() const = 0;
 
 			virtual void handle(const std::shared_ptr<ServerGame> &, GenericClient &) {

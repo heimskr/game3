@@ -66,7 +66,7 @@ namespace Game3 {
 		buffer << name;
 	}
 
-	void Crate::decode(Game &game, Buffer &buffer) {
+	void Crate::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		setInventory(1);
 		if (getSharedAgent()->getSide() == Side::Client)

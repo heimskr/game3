@@ -24,7 +24,7 @@ namespace Game3 {
 		}
 	}
 
-	void HasSoundSet::decodeSoundSet(Buffer &buffer) {
+	void HasSoundSet::decodeSoundSet(BasicBuffer &buffer) {
 		buffer >> soundSetID;
 		soundSet.reset();
 	}

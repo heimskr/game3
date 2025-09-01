@@ -19,7 +19,7 @@ namespace Game3 {
 			bool mayInsertItem(const ItemStackPtr &, Direction, Slot) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 			void broadcast(bool force) override;
 
 			GamePtr getGame() const final;

@@ -26,6 +26,15 @@ namespace Game3 {
 	struct Place;
 	struct RendererContext;
 
+	/**
+	 * GameDB layout:
+	 *     `u64` Global ID
+	 *     `i32` Realm ID
+	 *     `string` Tile entity ID
+	 *     `Position` Position
+	 *     `string` Tile ID
+	 *     `...` Encoded
+	 */
 	class TileEntity: public Agent, public Broadcastable, public Tickable {
 		public:
 			RealmID realmID = 0;
@@ -86,7 +95,7 @@ namespace Game3 {
 
 			virtual void encode(Game &, Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
-			virtual void decode(Game &, Buffer &);
+			virtual void decode(Game &, BasicBuffer &);
 
 			void sendTo(GenericClient &, UpdateCounter threshold = 0);
 			using Broadcastable::queueBroadcast;

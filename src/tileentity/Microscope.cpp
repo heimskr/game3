@@ -51,7 +51,7 @@ namespace Game3 {
 		InventoriedTileEntity::encode(game, buffer);
 	}
 
-	void Microscope::decode(Game &game, Buffer &buffer) {
+	void Microscope::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 	}

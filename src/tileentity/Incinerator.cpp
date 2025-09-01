@@ -81,7 +81,7 @@ namespace Game3 {
 		// No need to encode inventory/fluid contents—they're supposed to be discarded immediately anyway.
 	}
 
-	void Incinerator::decode(Game &game, Buffer &buffer) {
+	void Incinerator::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		// Same as above.
 	}

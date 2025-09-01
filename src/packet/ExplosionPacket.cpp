@@ -25,7 +25,7 @@ namespace Game3 {
 		buffer << realmID << origin << radius << particleType << soundEffect << pitchVariance << randomizationParameters;
 	}
 
-	void ExplosionPacket::decode(Game &game, Buffer &buffer) {
+	void ExplosionPacket::decode(Game &game, BasicBuffer &buffer) {
 		randomizationParameters.context = game.shared_from_this();
 		buffer >> realmID >> origin >> radius >> particleType >> soundEffect >> pitchVariance >> randomizationParameters;
 	}

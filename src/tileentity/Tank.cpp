@@ -56,7 +56,7 @@ namespace Game3 {
 		FluidHoldingTileEntity::encode(game, buffer);
 	}
 
-	void Tank::decode(Game &game, Buffer &buffer) {
+	void Tank::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 	}

@@ -165,7 +165,7 @@ namespace Game3 {
 		buffer << itemFilters;
 	}
 
-	void Pipe::decode(Game &game, Buffer &buffer) {
+	void Pipe::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> directions;
 		buffer >> extractors;

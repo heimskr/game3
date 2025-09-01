@@ -143,7 +143,7 @@ namespace Game3 {
 		buffer << uses;
 	}
 
-	void OreDeposit::decode(Game &game, Buffer &buffer) {
+	void OreDeposit::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> oreType;
 		buffer >> ready;

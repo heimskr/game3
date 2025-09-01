@@ -54,7 +54,7 @@ namespace Game3 {
 		encodeSoundSet(buffer);
 	}
 
-	void Teleporter::decode(Game &game, Buffer &buffer) {
+	void Teleporter::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> targetRealm;
 		buffer >> targetPosition;

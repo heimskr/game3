@@ -34,7 +34,7 @@ namespace Game3 {
 		buffer << realmID << data;
 	}
 
-	void TileEntityRequestPacket::decode(Game &, Buffer &buffer) {
+	void TileEntityRequestPacket::decode(Game &, BasicBuffer &buffer) {
 		std::vector<uint64_t> data;
 
 		buffer >> realmID >> data;

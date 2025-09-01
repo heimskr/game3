@@ -47,7 +47,7 @@ namespace Game3 {
 
 			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 			void broadcast(bool force) override;
 
 		protected:

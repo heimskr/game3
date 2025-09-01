@@ -16,7 +16,7 @@ namespace Game3 {
 			void setDown(bool);
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			bool down = false;

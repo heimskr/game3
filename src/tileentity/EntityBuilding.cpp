@@ -52,7 +52,7 @@ namespace Game3 {
 		buffer << targetEntity;
 	}
 
-	void EntityBuilding::decode(Game &game, Buffer &buffer) {
+	void EntityBuilding::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> targetEntity;
 	}

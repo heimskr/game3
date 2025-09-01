@@ -177,7 +177,7 @@ namespace Game3 {
 		InventoriedTileEntity::encode(game, buffer);
 	}
 
-	void Mutator::decode(Game &game, Buffer &buffer) {
+	void Mutator::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);

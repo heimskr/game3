@@ -1,9 +1,12 @@
 #include "data/GameDB.h"
+#include "entity/Entity.h"
+#include "entity/EntityFactory.h"
 #include "error/FailedMigrationError.h"
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
 #include "tileentity/TileEntity.h"
+#include "tileentity/TileEntityFactory.h"
 #include "util/JSON.h"
 #include "util/Timer.h"
 
@@ -12,6 +15,7 @@
 namespace Game3 {
 	namespace {
 		const std::string CHUNK_PREFIX{"C::"};
+		const std::string ENTITY_PREFIX{"E::"};
 		const std::string META_PREFIX{"M::"};
 		const std::string REALM_PREFIX{"R::"};
 		const std::string TILE_ENTITY_PREFIX{"T::"};
@@ -29,10 +33,6 @@ namespace Game3 {
 
 		std::string getKey(RealmID realm_id) {
 			return std::format("{}{}", REALM_PREFIX, realm_id);
-		}
-
-		std::string getKey(const TileEntityPtr &tile_entity) {
-			return std::format("{}{}", TILE_ENTITY_PREFIX, tile_entity->getGID());
 		}
 
 		inline leveldb::Options getOpenOptions() {
@@ -427,80 +427,57 @@ namespace Game3 {
 
 		RealmPtr realm = Realm::fromJSON(game, json, false);
 
-		iterate(TILE_ENTITY_PREFIX, [&](std::string_view key, std::string_view value) {
-			// ViewBuffer buffer
+		iterate(TILE_ENTITY_PREFIX, [&](std::string_view, std::string_view value) {
+			ViewBuffer buffer{value, Side::Server};
+			auto gid = buffer.take<GlobalID>();
+			if (buffer.take<RealmID>() != realm_id) {
+				return;
+			}
+			auto tile_entity_id = buffer.take<Identifier>();
+			buffer.take<Position>();
+			buffer.take<Identifier>(); // tileID
+			auto factory = game->registry<TileEntityFactoryRegistry>().at(tile_entity_id);
+			assert(factory);
+			TileEntityPtr tile_entity = (*factory)();
+			tile_entity->setGID(gid);
+			tile_entity->setRealm(realm);
+			buffer.context = game;
+			tile_entity->init(*game);
+			tile_entity->decode(*game, buffer);
+			realm->addToMaps(tile_entity);
+			realm->attach(tile_entity);
+			tile_entity->onSpawn();
 		});
 
-		/*
-
-		RealmPtr realm = Realm::fromJSON(game, boost::json::parse(raw_json), false);
-
-		{
-			SQLite::Statement query{*database, "SELECT tileEntityID, encoded, globalID FROM tileEntities WHERE realmID = ?"};
-
-			query.bind(1, realm_id);
-
-			while (query.executeStep()) {
-				const Identifier tile_entity_id{query.getColumn(0).getString()};
-				auto factory = game->registry<TileEntityFactoryRegistry>().at(tile_entity_id);
-				assert(factory);
-				TileEntityPtr tile_entity = (*factory)();
-				tile_entity->setGID(GlobalID(query.getColumn(2).getInt64()));
-
-				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
-				const size_t buffer_size = query.getColumn(1).getBytes();
-
-				tile_entity->setRealm(realm);
-
-				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size), Side::Server);
-				buffer.context = game;
-				tile_entity->init(*game);
-				tile_entity->decode(*game, buffer);
-				realm->addToMaps(tile_entity);
-				realm->attach(tile_entity);
-				tile_entity->onSpawn();
+		iterate(ENTITY_PREFIX, [&](std::string_view, std::string_view value) {
+			ViewBuffer buffer{value, Side::Server};
+			auto gid = buffer.take<GlobalID>();
+			if (buffer.take<RealmID>() != realm_id) {
+				return;
 			}
-		}
-
-		{
-			SQLite::Statement query{*database, "SELECT entityType, encoded FROM entities WHERE realmID = ?"};
-
-			query.bind(1, realm_id);
-
-			while (query.executeStep()) {
-				const Identifier entity_id{query.getColumn(0).getString()};
-
-				auto factory = game->registry<EntityFactoryRegistry>().at(entity_id);
-				assert(factory);
-				EntityPtr entity = (*factory)(game);
-
-				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
-				const size_t buffer_size = query.getColumn(1).getBytes();
-
-				entity->setRealm(realm);
-
-				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size), game, Side::Server);
-				entity->decode(buffer);
-				entity->init(game);
-
-				{
-					auto lock = realm->entities.uniqueLock();
-					realm->entities.insert(entity);
-				}
-
-				{
-					auto lock = realm->entitiesByGID.uniqueLock();
-					realm->entitiesByGID[entity->globalID] = entity;
-				}
-
-				realm->attach(entity);
+			buffer.take<Position>();
+			buffer.take<Direction>();
+			auto entity_id = buffer.take<Identifier>();
+			auto factory = game->registry<EntityFactoryRegistry>().at(entity_id);
+			assert(factory);
+			EntityPtr entity = (*factory)(game);
+			entity->setGID(gid);
+			entity->setRealm(realm);
+			buffer.context = game;
+			entity->decode(buffer);
+			entity->init(game);
+			{
+				auto lock = realm->entities.uniqueLock();
+				realm->entities.insert(entity);
 			}
-		}
-
+			{
+				auto lock = realm->entitiesByGID.uniqueLock();
+				realm->entitiesByGID[entity->globalID] = entity;
+			}
+			realm->attach(entity);
+		});
 
 		return realm;
-		*/
-		return nullptr;
 	}
 
 	template <>

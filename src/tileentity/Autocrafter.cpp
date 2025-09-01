@@ -245,7 +245,7 @@ namespace Game3 {
 		buffer << target;
 	}
 
-	void Autocrafter::decode(Game &game, Buffer &buffer) {
+	void Autocrafter::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		HasInventory::decode(buffer, 0);
 		HasInventory::decode(buffer, 1);

@@ -115,7 +115,7 @@ namespace Game3 {
 		EnergeticTileEntity::encode(game, buffer);
 	}
 
-	void BiomassLiquefier::decode(Game &game, Buffer &buffer) {
+	void BiomassLiquefier::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		FluidHoldingTileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);

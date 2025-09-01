@@ -64,7 +64,7 @@ namespace Game3 {
 		buffer << name;
 	}
 
-	void Sign::decode(Game &game, Buffer &buffer) {
+	void Sign::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> text;
 		buffer >> name;

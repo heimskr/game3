@@ -21,11 +21,17 @@ namespace Game3 {
 			tileEntity->encode(*tileEntity->getGame(), storedBuffer);
 		}
 
-	void TileEntityPacket::decode(Game &game, Buffer &buffer) {
+	void TileEntityPacket::decode(Game &game, BasicBuffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
 		assert(globalID != GlobalID(-1));
 		assert(globalID != GlobalID(0));
-		storedBuffer = std::move(buffer);
+		if (auto *mutable_buffer = dynamic_cast<Buffer *>(&buffer)) {
+			storedBuffer = std::move(*mutable_buffer);
+		} else {
+			storedBuffer.clear();
+			storedBuffer << buffer;
+			buffer.clear();
+		}
 		storedBuffer.context = game.weak_from_this();
 		buffer.context = storedBuffer.context;
 	}

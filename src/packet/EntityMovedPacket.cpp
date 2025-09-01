@@ -11,7 +11,7 @@ namespace Game3 {
 		buffer << arguments.globalID << arguments.realmID << arguments.position << arguments.facing << arguments.offset << arguments.velocity << arguments.adjustOffset << arguments.isTeleport;
 	}
 
-	void EntityMovedPacket::decode(Game &, Buffer &buffer) {
+	void EntityMovedPacket::decode(Game &, BasicBuffer &buffer) {
 		buffer >> arguments.globalID >> arguments.realmID >> arguments.position >> arguments.facing >> arguments.offset >> arguments.velocity >> arguments.adjustOffset >> arguments.isTeleport;
 	}
 

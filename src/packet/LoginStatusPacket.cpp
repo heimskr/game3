@@ -27,7 +27,7 @@ namespace Game3 {
 		buffer << success << globalID << username << displayName << message << playerDataBuffer;
 	}
 
-	void LoginStatusPacket::decode(Game &game, Buffer &buffer) {
+	void LoginStatusPacket::decode(Game &game, BasicBuffer &buffer) {
 		playerDataBuffer.context = game.shared_from_this();
 		buffer >> success >> globalID >> username >> displayName >> message >> playerDataBuffer;
 	}

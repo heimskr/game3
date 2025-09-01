@@ -65,7 +65,7 @@ namespace Game3 {
 		buffer << down;
 	}
 
-	void PressurePlate::decode(Game &game, Buffer &buffer) {
+	void PressurePlate::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		setDown(buffer.take<bool>());
 	}

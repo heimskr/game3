@@ -22,7 +22,7 @@ namespace Game3 {
 		PacketID getID() const final { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const final { buffer << position << offsetX << offsetY << modifiers << tickFrequency; }
-		void decode(Game &, Buffer &buffer)       final { buffer >> position >> offsetX >> offsetY >> modifiers >> tickFrequency; }
+		void decode(Game &, BasicBuffer &buffer)       final { buffer >> position >> offsetX >> offsetY >> modifiers >> tickFrequency; }
 
 		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) final;
 	};

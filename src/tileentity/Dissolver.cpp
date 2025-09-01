@@ -109,7 +109,7 @@ namespace Game3 {
 		EnergeticTileEntity::encode(game, buffer);
 	}
 
-	void Dissolver::decode(Game &game, Buffer &buffer) {
+	void Dissolver::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

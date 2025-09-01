@@ -44,7 +44,7 @@ namespace Game3 {
 		buffer << getDirection();
 	}
 
-	void DirectedTileEntity::decode(Game &, Buffer &buffer) {
+	void DirectedTileEntity::decode(Game &, BasicBuffer &buffer) {
 		setDirection(buffer.take<Direction>());
 	}
 }

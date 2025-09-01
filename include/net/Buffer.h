@@ -370,6 +370,8 @@ namespace Game3 {
 		public:
 			std::string_view bytes;
 
+			ViewBuffer(std::string_view bytes, Side target);
+
 			ViewBuffer(const ViewBuffer &) = default;
 			ViewBuffer(ViewBuffer &&) noexcept;
 

@@ -11,7 +11,7 @@ namespace Game3 {
 		buffer << *std::dynamic_pointer_cast<ServerInventory>(inventory);
 	}
 
-	void InventoryPacket::decode(Game &, Buffer &buffer) {
+	void InventoryPacket::decode(Game &, BasicBuffer &buffer) {
 		inventory = std::make_shared<ClientInventory>(buffer.take<ClientInventory>());
 	}
 

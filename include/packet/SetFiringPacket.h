@@ -18,7 +18,7 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << firing; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> firing; }
+		void decode(Game &, BasicBuffer &buffer)       override { buffer >> firing; }
 
 		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) override;
 	};

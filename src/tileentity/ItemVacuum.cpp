@@ -110,7 +110,7 @@ namespace Game3 {
 		buffer << radius;
 	}
 
-	void ItemVacuum::decode(Game &game, Buffer &buffer) {
+	void ItemVacuum::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);

@@ -263,7 +263,7 @@ namespace Game3 {
 		buffer << extraData;
 	}
 
-	void TileEntity::decode(Game &, Buffer &buffer) {
+	void TileEntity::decode(Game &, BasicBuffer &buffer) {
 		buffer >> tileEntityID;
 		buffer >> tileID;
 		buffer >> position;

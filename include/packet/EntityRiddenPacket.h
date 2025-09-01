@@ -22,7 +22,7 @@ namespace Game3 {
 		PacketID getID() const override { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const override { buffer << riderID << riddenID; }
-		void decode(Game &, Buffer &buffer)       override { buffer >> riderID >> riddenID; }
+		void decode(Game &, BasicBuffer &buffer)       override { buffer >> riderID >> riddenID; }
 
 		void handle(const std::shared_ptr<ClientGame> &) override;
 	};

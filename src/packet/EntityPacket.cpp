@@ -19,11 +19,17 @@ namespace Game3 {
 			entity->encode(storedBuffer);
 		}
 
-	void EntityPacket::decode(Game &game, Buffer &buffer) {
+	void EntityPacket::decode(Game &game, BasicBuffer &buffer) {
 		buffer >> globalID >> identifier >> realmID;
 		assert(globalID != static_cast<GlobalID>(-1));
 		assert(globalID != static_cast<GlobalID>(0));
-		storedBuffer = std::move(buffer);
+		if (auto *mutable_buffer = dynamic_cast<Buffer *>(&buffer)) {
+			storedBuffer = std::move(*mutable_buffer);
+		} else {
+			storedBuffer.clear();
+			storedBuffer << buffer;
+			buffer.clear();
+		}
 		storedBuffer.context = game.weak_from_this();
 		buffer.context = storedBuffer.context;
 	}

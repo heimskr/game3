@@ -111,7 +111,7 @@ namespace Game3 {
 			bool reachable(Substance, const std::shared_ptr<Pipe> &);
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 			/** Implicitly marks the pipe as loaded. */
 			void setNetwork(Substance, const std::shared_ptr<PipeNetwork> &);

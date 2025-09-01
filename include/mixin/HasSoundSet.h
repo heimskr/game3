@@ -23,7 +23,7 @@ namespace Game3 {
 			virtual std::shared_ptr<Game> getGame() const = 0;
 			const std::shared_ptr<SoundSet> & getSoundSet();
 			void encodeSoundSet(Buffer &) const;
-			void decodeSoundSet(Buffer &);
+			void decodeSoundSet(BasicBuffer &);
 			void playSound(const Place &);
 	};
 }

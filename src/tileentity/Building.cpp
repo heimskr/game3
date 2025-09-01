@@ -68,7 +68,7 @@ namespace Game3 {
 		encodeSoundSet(buffer);
 	}
 
-	void Building::decode(Game &game, Buffer &buffer) {
+	void Building::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> innerRealmID;
 		buffer >> entrance;

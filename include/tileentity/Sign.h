@@ -17,7 +17,7 @@ namespace Game3 {
 			bool setField(uint32_t field_name, Buffer &field_value, const PlayerPtr &updater) override;
 
 			void encode(Game &, Buffer &) override;
-			void decode(Game &, Buffer &) override;
+			void decode(Game &, BasicBuffer &) override;
 
 		protected:
 			Sign() = default;

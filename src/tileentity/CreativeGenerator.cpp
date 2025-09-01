@@ -73,7 +73,7 @@ namespace Game3 {
 		EnergeticTileEntity::encode(game, buffer);
 	}
 
-	void CreativeGenerator::decode(Game &game, Buffer &buffer) {
+	void CreativeGenerator::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		EnergeticTileEntity::decode(game, buffer);
 	}

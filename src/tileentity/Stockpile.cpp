@@ -39,7 +39,7 @@ namespace Game3 {
 		buffer << villageID;
 	}
 
-	void Stockpile::decode(Game &game, Buffer &buffer) {
+	void Stockpile::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		buffer >> villageID;
 	}

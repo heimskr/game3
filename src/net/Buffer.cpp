@@ -61,6 +61,10 @@ namespace Game3 {
 		return *this;
 	}
 
+	ViewBuffer::ViewBuffer(std::string_view bytes, Side target):
+		BasicBuffer(target),
+		bytes(bytes) {}
+
 	template <> std::string BasicBuffer::getType<bool>    (const bool     &, bool) { return {'\x01'}; }
 	template <> std::string BasicBuffer::getType<uint8_t> (const uint8_t  &, bool) { return {'\x01'}; }
 	template <> std::string BasicBuffer::getType<uint16_t>(const uint16_t &, bool) { return {'\x02'}; }

@@ -120,7 +120,7 @@ namespace Game3 {
 		HasFluids::encode(buffer);
 	}
 
-	void FluidHoldingTileEntity::decode(Game &, Buffer &buffer) {
+	void FluidHoldingTileEntity::decode(Game &, BasicBuffer &buffer) {
 		HasFluids::decode(buffer);
 		fluidsUpdated();
 	}

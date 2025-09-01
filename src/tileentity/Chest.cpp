@@ -63,7 +63,7 @@ namespace Game3 {
 		buffer << itemName;
 	}
 
-	void Chest::decode(Game &game, Buffer &buffer) {
+	void Chest::decode(Game &game, BasicBuffer &buffer) {
 		TileEntity::decode(game, buffer);
 		InventoriedTileEntity::decode(game, buffer);
 		buffer >> name;

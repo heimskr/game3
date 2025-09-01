@@ -19,7 +19,7 @@ namespace Game3 {
 		PacketID getID() const final { return ID(); }
 
 		void encode(Game &, Buffer &buffer) const final { buffer << globalID << index; }
-		void decode(Game &, Buffer &buffer)       final { buffer >> globalID >> index; }
+		void decode(Game &, BasicBuffer &buffer)       final { buffer >> globalID >> index; }
 
 		void handle(const std::shared_ptr<ServerGame> &, GenericClient &) final;
 	};
