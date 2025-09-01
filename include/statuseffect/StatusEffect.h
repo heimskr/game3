@@ -6,6 +6,7 @@
 #include <string>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class ClientGame;
 	class LivingEntity;
@@ -33,7 +34,7 @@ namespace Game3 {
 
 			virtual void encode(Buffer &) = 0;
 
-			virtual void decode(Buffer &) = 0;
+			virtual void decode(BasicBuffer &) = 0;
 
 			virtual std::unique_ptr<StatusEffect> copy() const = 0;
 

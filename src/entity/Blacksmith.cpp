@@ -145,7 +145,7 @@ namespace Game3 {
 		buffer << diamondOreNeeded;
 	}
 
-	void Blacksmith::decode(Buffer &buffer) {
+	void Blacksmith::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		Worker::decode(buffer);
 		Merchant::decode(buffer);

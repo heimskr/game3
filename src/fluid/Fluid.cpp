@@ -77,12 +77,12 @@ namespace Game3 {
 // Buffer specializations
 
 	template <>
-	std::string Buffer::getType(const FluidTile &, bool) {
+	std::string BasicBuffer::getType(const FluidTile &, bool) {
 		return getType(FluidInt{}, false);
 	}
 
 	template <>
-	std::string Buffer::getType(const FluidStack &, bool) {
+	std::string BasicBuffer::getType(const FluidStack &, bool) {
 		return {'\xe2'};
 	}
 
@@ -106,7 +106,7 @@ namespace Game3 {
 		return buffer << static_cast<FluidInt>(fluid_tile);
 	}
 
-	Buffer & operator>>(Buffer &buffer, FluidTile &fluid_tile) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, FluidTile &fluid_tile) {
 		fluid_tile = FluidTile(buffer.take<FluidInt>());
 		return buffer;
 	}
@@ -122,7 +122,7 @@ namespace Game3 {
 		return buffer += fluid_stack;
 	}
 
-	Buffer & operator>>(Buffer &buffer, FluidStack &fluid_stack) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, FluidStack &fluid_stack) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(fluid_stack, false))) {
 			buffer.debug();

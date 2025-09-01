@@ -15,6 +15,7 @@
 #include <boost/json/fwd.hpp>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Game;
 	class Realm;
@@ -71,7 +72,7 @@ namespace Game3 {
 	Position tag_invoke(boost::json::value_to_tag<Position>, const boost::json::value &);
 	Buffer & operator+=(Buffer &, const Position &);
 	Buffer & operator<<(Buffer &, const Position &);
-	Buffer & operator>>(Buffer &, Position &);
+	BasicBuffer & operator>>(BasicBuffer &, Position &);
 
 	/** Silly naming, perhaps. */
 	struct Place {

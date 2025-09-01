@@ -84,7 +84,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ExpandedServerInventory &, bool) {
+	std::string BasicBuffer::getType(const ExpandedServerInventory &, bool) {
 		return "\xe1";
 	}
 
@@ -96,7 +96,7 @@ namespace Game3 {
 		return buffer += static_cast<const ServerInventory &>(inventory);
 	}
 
-	Buffer & operator>>(Buffer &buffer, ExpandedServerInventory &inventory) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, ExpandedServerInventory &inventory) {
 		return buffer >> static_cast<ServerInventory &>(inventory);
 	}
 }

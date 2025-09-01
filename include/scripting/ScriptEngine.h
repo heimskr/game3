@@ -18,6 +18,7 @@
 #include <variant>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Game;
 

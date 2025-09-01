@@ -41,7 +41,7 @@ namespace Game3 {
 
 			void render(const RendererContext &) override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			void setBreed(LongGene::ValueType);
 

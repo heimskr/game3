@@ -96,7 +96,7 @@ namespace Game3 {
 		buffer << fluidContainer->levels;
 	}
 
-	void HasFluids::decode(Buffer &buffer) {
+	void HasFluids::decode(BasicBuffer &buffer) {
 		assert(fluidContainer);
 		buffer >> fluidContainer->levels;
 		fluidsUpdated();

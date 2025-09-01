@@ -138,7 +138,7 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	Buffer & operator>>(Buffer &buffer, PipeTuple<T> &tuple) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, PipeTuple<T> &tuple) {
 		return buffer >> tuple.item >> tuple.fluid >> tuple.energy >> tuple.data;
 	}
 }

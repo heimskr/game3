@@ -144,7 +144,7 @@ namespace Game3 {
 		buffer << secondsLeft;
 	}
 
-	void ItemEntity::decode(Buffer &buffer) {
+	void ItemEntity::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		GamePtr game = getGame();
 		if (buffer.peekType() == buffer.getType(false, false)) {

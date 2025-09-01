@@ -5,10 +5,10 @@
 #include <format>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	struct Position;
 
-	// TODO: basically a duplicate of Quadrant
 	enum class Direction: uint8_t {Invalid = 0, Down, Up, Right, Left};
 
 	constexpr std::array<Direction, 4> ALL_DIRECTIONS{Direction::Up, Direction::Right, Direction::Down, Direction::Left};

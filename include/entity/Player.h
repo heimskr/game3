@@ -71,7 +71,7 @@ namespace Game3 {
 			bool isMoving(Direction) const;
 			void setupRealm(const Game &);
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 			void startMoving(Direction);
 			void stopMoving();
 			void stopMoving(Direction);

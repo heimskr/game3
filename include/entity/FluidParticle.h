@@ -27,7 +27,7 @@ namespace Game3 {
 			void applyKnockback(const EntityPtr &, float factor) final;
 
 			void encode(Buffer &) final;
-			void decode(Buffer &) final;
+			void decode(BasicBuffer &) final;
 
 		private:
 			double depth = 0;

@@ -4,6 +4,7 @@
 
 namespace Game3 {
 	class Agent;
+	class BasicBuffer;
 	class Buffer;
 	class Packet;
 	struct CraftingRecipe;
@@ -58,7 +59,7 @@ namespace Game3 {
 	ClientInventory popBuffer<ClientInventory>(Buffer &);
 	Buffer & operator+=(Buffer &, const ClientInventory &);
 	Buffer & operator<<(Buffer &, const ClientInventory &);
-	Buffer & operator>>(Buffer &, ClientInventory &);
+	BasicBuffer & operator>>(BasicBuffer &, ClientInventory &);
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const ClientInventory &);
 }

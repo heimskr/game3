@@ -139,7 +139,7 @@ namespace Game3 {
 		buffer << statusEffects;
 	}
 
-	void LivingEntity::decode(Buffer &buffer) {
+	void LivingEntity::decode(BasicBuffer &buffer) {
 		auto this_lock = uniqueLock();
 		buffer >> health;
 		buffer >> defenseStat;

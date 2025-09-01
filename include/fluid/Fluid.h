@@ -11,6 +11,7 @@
 #include <string>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Game;
 	class LivingEntity;
@@ -77,11 +78,11 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const FluidTile &);
 	Buffer & operator<<(Buffer &, const FluidTile &);
-	Buffer & operator>>(Buffer &, FluidTile &);
+	BasicBuffer & operator>>(BasicBuffer &, FluidTile &);
 
 	Buffer & operator+=(Buffer &, const FluidStack &);
 	Buffer & operator<<(Buffer &, const FluidStack &);
-	Buffer & operator>>(Buffer &, FluidStack &);
+	BasicBuffer & operator>>(BasicBuffer &, FluidStack &);
 
 	using FluidChunk = Chunk<FluidTile>;
 }

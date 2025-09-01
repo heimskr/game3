@@ -8,6 +8,7 @@
 
 namespace Game3 {
 	class Agent;
+	class BasicBuffer;
 	class Buffer;
 	class FluidContainer;
 	class Game;
@@ -41,7 +42,7 @@ namespace Game3 {
 			virtual void fluidsUpdated();
 
 			void encode(Buffer &);
-			void decode(Buffer &);
+			void decode(BasicBuffer &);
 
 		protected:
 			virtual std::shared_ptr<Game> getGame() const = 0;

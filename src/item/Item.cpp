@@ -325,7 +325,7 @@ namespace Game3 {
 		});
 	}
 
-	void ItemStack::decode(Game &game, Buffer &buffer) {
+	void ItemStack::decode(Game &game, BasicBuffer &buffer) {
 		absorbGame(game);
 		item = (*game.itemRegistry)[buffer.take<Identifier>()];
 		buffer >> count;
@@ -346,12 +346,12 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType<ItemStack>(const ItemStack &, bool) {
+	std::string BasicBuffer::getType<ItemStack>(BufferTag<ItemStack>, bool) {
 		return {'\xe0'};
 	}
 
 	template <>
-	std::string Buffer::getType<ItemStackPtr>(const ItemStackPtr &, bool) {
+	std::string BasicBuffer::getType<ItemStackPtr>(BufferTag<ItemStackPtr>, bool) {
 		return {'\xe0'};
 	}
 
@@ -378,7 +378,7 @@ namespace Game3 {
 		return buffer += stack;
 	}
 
-	Buffer & operator>>(Buffer &buffer, ItemStackPtr &stack) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, ItemStackPtr &stack) {
 		if (!stack) {
 			stack = ItemStack::create(safeDynamicCast<Game>(buffer.context.lock()));
 		}

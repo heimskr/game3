@@ -17,23 +17,41 @@ namespace Game3 {
 	constexpr static char SIMPLE_TYPES_MIN = '\xe0';
 	constexpr static char SIMPLE_TYPES_MAX = '\xea';
 
-	Buffer::Buffer(Side target):
-		target(target) {}
+	BasicBuffer::BasicBuffer(Side target, std::weak_ptr<BufferContext> context, size_t skip):
+		skip(skip),
+		target(target),
+		context(std::move(context)) {}
 
-	Buffer::Buffer(std::vector<uint8_t> bytes, std::weak_ptr<BufferContext> context, Side target):
-		bytes(std::move(bytes)), target(target), context(std::move(context)) {}
+	BasicBuffer::BasicBuffer(BasicBuffer &&other) noexcept:
+		BasicBuffer(other.target, std::move(other.context), std::exchange(other.skip, 0)) {}
+
+	BasicBuffer & BasicBuffer::operator=(BasicBuffer &&other) noexcept {
+		target = other.target;
+		context = std::move(other.context);
+		skip = std::exchange(other.skip, 0);
+		return *this;
+	}
+
+	Buffer::Buffer(Side target):
+		BasicBuffer(target) {}
+
+	Buffer::Buffer(const std::vector<uint8_t> &bytes, std::weak_ptr<BufferContext> context, Side target):
+		BasicBuffer(target, std::move(context)),
+		bytes(bytes.begin(), bytes.end()) {}
 
 	Buffer::Buffer(std::weak_ptr<BufferContext> context, Side target):
-		target(target), context(std::move(context)) {}
+		BasicBuffer(target, std::move(context)) {}
 
-	Buffer::Buffer(std::vector<uint8_t> bytes, Side target):
-		bytes(std::move(bytes)), target(target) {}
+	Buffer::Buffer(const std::vector<uint8_t> &bytes, Side target):
+		Buffer(bytes, {}, target) {}
+
+	Buffer::Buffer(std::string bytes, Side target):
+		BasicBuffer(target),
+		bytes(std::move(bytes)) {}
 
 	Buffer::Buffer(Buffer &&other) noexcept:
-		bytes(std::move(other.bytes)),
-		skip(std::exchange(other.skip, 0)),
-		target(other.target),
-		context(std::move(other.context)) {}
+		BasicBuffer(other.target, std::move(other.context), std::exchange(other.skip, 0)),
+		bytes(std::move(other.bytes)) {}
 
 	Buffer & Buffer::operator=(Buffer &&other) noexcept {
 		bytes = std::move(other.bytes);
@@ -43,19 +61,19 @@ namespace Game3 {
 		return *this;
 	}
 
-	template <> std::string Buffer::getType<bool>    (const bool     &, bool) { return {'\x01'}; }
-	template <> std::string Buffer::getType<uint8_t> (const uint8_t  &, bool) { return {'\x01'}; }
-	template <> std::string Buffer::getType<uint16_t>(const uint16_t &, bool) { return {'\x02'}; }
-	template <> std::string Buffer::getType<uint32_t>(const uint32_t &, bool) { return {'\x03'}; }
-	template <> std::string Buffer::getType<uint64_t>(const uint64_t &, bool) { return {'\x04'}; }
-	template <> std::string Buffer::getType<char>    (const char     &, bool) { return {'\x05'}; }
-	template <> std::string Buffer::getType<int8_t>  (const int8_t   &, bool) { return {'\x05'}; }
-	template <> std::string Buffer::getType<int16_t> (const int16_t  &, bool) { return {'\x06'}; }
-	template <> std::string Buffer::getType<int32_t> (const int32_t  &, bool) { return {'\x07'}; }
-	template <> std::string Buffer::getType<int64_t> (const int64_t  &, bool) { return {'\x08'}; }
-	template <> std::string Buffer::getType<float>   (const float    &, bool) { return {'\x09'}; }
-	template <> std::string Buffer::getType<double>  (const double   &, bool) { return {'\x0a'}; }
-	template <> std::string Buffer::getType<std::nullopt_t>(const std::nullopt_t &, bool in_container) { assert(!in_container); return {'\x0c'}; }
+	template <> std::string BasicBuffer::getType<bool>    (const bool     &, bool) { return {'\x01'}; }
+	template <> std::string BasicBuffer::getType<uint8_t> (const uint8_t  &, bool) { return {'\x01'}; }
+	template <> std::string BasicBuffer::getType<uint16_t>(const uint16_t &, bool) { return {'\x02'}; }
+	template <> std::string BasicBuffer::getType<uint32_t>(const uint32_t &, bool) { return {'\x03'}; }
+	template <> std::string BasicBuffer::getType<uint64_t>(const uint64_t &, bool) { return {'\x04'}; }
+	template <> std::string BasicBuffer::getType<char>    (const char     &, bool) { return {'\x05'}; }
+	template <> std::string BasicBuffer::getType<int8_t>  (const int8_t   &, bool) { return {'\x05'}; }
+	template <> std::string BasicBuffer::getType<int16_t> (const int16_t  &, bool) { return {'\x06'}; }
+	template <> std::string BasicBuffer::getType<int32_t> (const int32_t  &, bool) { return {'\x07'}; }
+	template <> std::string BasicBuffer::getType<int64_t> (const int64_t  &, bool) { return {'\x08'}; }
+	template <> std::string BasicBuffer::getType<float>   (const float    &, bool) { return {'\x09'}; }
+	template <> std::string BasicBuffer::getType<double>  (const double   &, bool) { return {'\x0a'}; }
+	template <> std::string BasicBuffer::getType<std::nullopt_t>(const std::nullopt_t &, bool in_container) { assert(!in_container); return {'\x0c'}; }
 
 #ifndef __MINGW32__
 	template <> Buffer & Buffer::appendType<bool>    (const bool     &, bool) { return *this += '\x01'; }
@@ -74,15 +92,17 @@ namespace Game3 {
 #endif
 
 	template <>
-	std::string Buffer::getType<std::string_view>(const std::string_view &string, bool in_container) {
+	std::string BasicBuffer::getType<std::string_view>(const std::string_view &string, bool in_container) {
 		if (!in_container) {
 			const auto size = string.size();
 
-			if (size == 0)
+			if (size == 0) {
 				return {'\x10'};
+			}
 
-			if (size < 0xf)
+			if (size < 0xf) {
 				return {static_cast<char>('\x10' + size)};
+			}
 
 			assert(size <= UINT32_MAX);
 		}
@@ -91,68 +111,70 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType<std::string>(const std::string &string, bool in_container) {
+	std::string BasicBuffer::getType<std::string>(const std::string &string, bool in_container) {
 		return getType(std::string_view(string), in_container);
 	}
 
 	template <>
-	std::string Buffer::getType<boost::json::value>(const boost::json::value &, bool in_container) {
+	std::string BasicBuffer::getType<boost::json::value>(const boost::json::value &, bool in_container) {
 		return getType(std::string{}, in_container);
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(bool item) {
 		bytes.insert(bytes.end(), static_cast<uint8_t>(item));
 		return *this;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(uint8_t item) {
 		bytes.insert(bytes.end(), item);
 		return *this;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(uint16_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
-			const auto *raw = reinterpret_cast<uint8_t *>(&item);
+			const auto *raw = reinterpret_cast<char *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
-		} else
-			bytes.insert(bytes.end(), {static_cast<uint8_t>(item), static_cast<uint8_t>(item >> 8)});
+		} else {
+			bytes.insert(bytes.end(), {static_cast<char>(item), static_cast<char>(item >> 8)});
+		}
 		return *this;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(uint32_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
-		} else
-			bytes.insert(bytes.end(), {static_cast<uint8_t>(item), static_cast<uint8_t>(item >> 8), static_cast<uint8_t>(item >> 16), static_cast<uint8_t>(item >> 24)});
+		} else {
+			bytes.insert(bytes.end(), {static_cast<char>(item), static_cast<char>(item >> 8), static_cast<char>(item >> 16), static_cast<char>(item >> 24)});
+		}
 		return *this;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(uint64_t item) {
 		if constexpr (std::endian::native == std::endian::little) {
 			const auto *raw = reinterpret_cast<uint8_t *>(&item);
 			bytes.insert(bytes.end(), raw, raw + sizeof(item));
 		} else {
 			bytes.insert(bytes.end(), {
-				static_cast<uint8_t>(item),
-				static_cast<uint8_t>(item >> 8),
-				static_cast<uint8_t>(item >> 16),
-				static_cast<uint8_t>(item >> 24),
-				static_cast<uint8_t>(item >> 32),
-				static_cast<uint8_t>(item >> 40),
-				static_cast<uint8_t>(item >> 48),
-				static_cast<uint8_t>(item >> 56),
+				static_cast<char>(item),
+				static_cast<char>(item >> 8),
+				static_cast<char>(item >> 16),
+				static_cast<char>(item >> 24),
+				static_cast<char>(item >> 32),
+				static_cast<char>(item >> 40),
+				static_cast<char>(item >> 48),
+				static_cast<char>(item >> 56),
 			});
 		}
 		return *this;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(float item) {
 		static_assert(sizeof(item) == 4 && sizeof(item) == sizeof(uint32_t));
 		uint32_t to_add{};
@@ -160,7 +182,7 @@ namespace Game3 {
 		return *this += to_add;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(double item) {
 		static_assert(sizeof(item) == 8 && sizeof(item) == sizeof(uint64_t));
 		uint64_t to_add{};
@@ -168,14 +190,15 @@ namespace Game3 {
 		return *this += to_add;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(std::string_view string) {
 		const auto type = getType(string, false);
 		bytes.insert(bytes.end(), type.begin(), type.end());
 		const auto first = type[0];
 
-		if (first == '\x10')
+		if (first == '\x10') {
 			return *this;
+		}
 
 		if ('\x11' <= first && first < '\x1f') {
 			bytes.insert(bytes.end(), string.begin(), string.end());
@@ -188,25 +211,25 @@ namespace Game3 {
 		return *this;
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(const std::string &string) {
 		return *this += std::string_view(string);
 	}
 
-	template<>
+	template <>
 	Buffer & Buffer::operator+=(const boost::json::value &json) {
 		return *this += boost::json::serialize(json);
 	}
 
 	template <>
-	char popBuffer<char>(Buffer &buffer) {
+	char popBuffer<char>(BasicBuffer &buffer) {
 		std::span span = buffer.getSpan();
 		if (span.empty()) {
-			ERR("Buffer size: {:L}", buffer.bytes.size());
+			ERR("Buffer size: {:L}", buffer.getView().size());
 			ERR("Skip: {:L}", buffer.skip);
 			ERR("Span size: {:L}", span.size());
 			ERR("Span size_bytes: {:L}", span.size_bytes());
-			INFO("{}", hexString(buffer.bytes, true));
+			INFO("{}", hexString(buffer.getView(), true));
 			throw std::out_of_range("Buffer is empty");
 		}
 		const char out = span[0];
@@ -215,12 +238,12 @@ namespace Game3 {
 	}
 
 	template <>
-	bool popBuffer<bool>(Buffer &buffer) {
+	bool popBuffer<bool>(BasicBuffer &buffer) {
 		return static_cast<bool>(popBuffer<char>(buffer));
 	}
 
 	template <>
-	float popBuffer<float>(Buffer &buffer) {
+	float popBuffer<float>(BasicBuffer &buffer) {
 		static_assert(sizeof(float) == sizeof(uint32_t));
 		const auto raw = popBuffer<uint32_t>(buffer);
 		float out{};
@@ -229,7 +252,7 @@ namespace Game3 {
 	}
 
 	template <>
-	double popBuffer<double>(Buffer &buffer) {
+	double popBuffer<double>(BasicBuffer &buffer) {
 		static_assert(sizeof(double) == sizeof(uint64_t));
 		const auto raw = popBuffer<uint64_t>(buffer);
 		double out{};
@@ -238,21 +261,23 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string popBuffer<std::string>(Buffer &buffer) {
+	std::string popBuffer<std::string>(BasicBuffer &buffer) {
 		return buffer.take<std::string>();
 	}
 
 	template <>
-	boost::json::value popBuffer<boost::json::value>(Buffer &buffer) {
+	boost::json::value popBuffer<boost::json::value>(BasicBuffer &buffer) {
 		return buffer.take<boost::json::value>();
 	}
 
-	std::string Buffer::popType() {
+	std::string BasicBuffer::popType() {
 		const char first = popBuffer<char>(*this);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX)) {
 			return {first};
-		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
+		}
+		if (first == '\x20' || ('\x30' <= first && first <= '\x3f')) {
 			return first + popType();
+		}
 		if (first == '\x21') {
 			std::string key_type = popType();
 			std::string value_type = popType();
@@ -262,12 +287,14 @@ namespace Game3 {
 		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1), true));
 	}
 
-	std::string Buffer::peekType(size_t to_skip) {
+	std::string BasicBuffer::peekType(size_t to_skip) {
 		const char first = peek<char>(to_skip);
-		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX))
+		if (('\x01' <= first && first <= '\x0c') || ('\x10' <= first && first <= '\x1f') || (SIMPLE_TYPES_MIN <= first && first <= SIMPLE_TYPES_MAX)) {
 			return {first};
-		if (first == '\x20' || ('\x30' <= first && first <= '\x3f'))
+		}
+		if (first == '\x20' || ('\x30' <= first && first <= '\x3f')) {
 			return first + peekType(to_skip + 1);
+		}
 		if (first == '\x21') {
 			std::string key_type = peekType(to_skip + 1);
 			std::string value_type = peekType(to_skip + 1 + key_type.size());
@@ -277,42 +304,47 @@ namespace Game3 {
 		throw std::invalid_argument("Invalid type byte: " + hexString(std::string_view(&first, 1), true));
 	}
 
-	bool Buffer::typesMatch(std::string_view one, std::string_view two) {
+	bool BasicBuffer::typesMatch(std::string_view one, std::string_view two) {
 		assert(!one.empty());
 		assert(!two.empty());
 		const auto one0 = one[0];
 		const auto two0 = two[0];
-		if (('\x10' <= one0 && one0 <= '\x1f') && ('\x10' <= two0 && two0 <= '\x1f'))
+		if (('\x10' <= one0 && one0 <= '\x1f') && ('\x10' <= two0 && two0 <= '\x1f')) {
 			return true;
-		if ((one0 == '\x0b' && two0 == '\x0c') || (one0 == '\x0c' && two0 == '\x0b'))
+		}
+		if ((one0 == '\x0b' && two0 == '\x0c') || (one0 == '\x0c' && two0 == '\x0b')) {
 			return true;
+		}
 		return one == two;
 	}
 
-	void Buffer::popMany(size_t count) {
+	void BasicBuffer::popMany(size_t count) {
 		assert(count <= size() - skip);
 		skip += count;
 	}
 
-	void Buffer::limitTo(size_t count) {
-		if (count < bytes.size() - skip)
+	void BasicBuffer::limitTo(size_t count) {
+		if (count < getView().size() - skip) {
 			skip += count;
+		}
 	}
 
-	void Buffer::debug() const {
-		if (skip == 0)
+	void BasicBuffer::debug() const {
+		std::string_view bytes = getView();
+		if (skip == 0) {
 			INFO("Buffer: {}", hexString(bytes, true));
-		else
+		} else {
 			INFO("Buffer: \e[2m{}\e[22m {}", hexString(std::span(bytes.begin(), bytes.begin() + skip), true), hexString(std::span(bytes.begin() + skip, bytes.end()), true));
+		}
 	}
 
-	size_t Buffer::getSkip() const {
+	size_t BasicBuffer::getSkip() const {
 		return skip;
 	}
 
-	void Buffer::setSkip(size_t new_skip) {
-		if (new_skip > bytes.size()) {
-			throw std::out_of_range(std::format("New skip value {} too high (must not exceed {})", new_skip, bytes.size()));
+	void BasicBuffer::setSkip(size_t new_skip) {
+		if (new_skip > getView().size()) {
+			throw std::out_of_range(std::format("New skip value {} too high (must not exceed {})", new_skip, getView().size()));
 		}
 
 		skip = new_skip;
@@ -383,7 +415,7 @@ namespace Game3 {
 			throw std::invalid_argument("Invalid type byte: " + hexString(type.substr(0, 1), true));
 		}
 
-		boost::json::value popJSON(Buffer &buffer, std::string_view type, bool in_container) {
+		boost::json::value popJSON(BasicBuffer &buffer, std::string_view type, bool in_container) {
 			assert(!type.empty());
 
 			if (!in_container) {
@@ -551,11 +583,11 @@ namespace Game3 {
 		}
 	}
 
-	boost::json::value Buffer::popJSON() {
+	boost::json::value BasicBuffer::popJSON() {
 		return Game3::popJSON(*this, peekType(0), false);
 	}
 
-	boost::json::value Buffer::popAllJSON() {
+	boost::json::value BasicBuffer::popAllJSON() {
 		boost::json::value out;
 		auto &array = out.emplace_array();
 		while (!empty()) {
@@ -565,12 +597,12 @@ namespace Game3 {
 	}
 
 	template <>
-	bool Buffer::peek<bool>(size_t to_skip) const {
+	bool BasicBuffer::peek<bool>(size_t to_skip) const {
 		return static_cast<bool>(peek<char>(to_skip));
 	}
 
 	template <>
-	float Buffer::peek<float>(size_t to_skip) const {
+	float BasicBuffer::peek<float>(size_t to_skip) const {
 		static_assert(sizeof(float) == sizeof(uint32_t));
 		const auto raw = peek<uint32_t>(to_skip);
 		float out{};
@@ -579,7 +611,7 @@ namespace Game3 {
 	}
 
 	template <>
-	double Buffer::peek<double>(size_t to_skip) const {
+	double BasicBuffer::peek<double>(size_t to_skip) const {
 		static_assert(sizeof(double) == sizeof(uint64_t));
 		const auto raw = peek<uint64_t>(to_skip);
 		double out{};
@@ -643,13 +675,14 @@ namespace Game3 {
 		return *this << std::string_view(string);
 	}
 
-	Buffer & Buffer::operator<<(const Buffer &other) {
-		append(other.bytes.begin(), other.bytes.end());
+	Buffer & Buffer::operator<<(const BasicBuffer &other) {
+		std::span view = other.getSpan(); // TODO!: this was originally just `bytes`, including skipped data. Verify that getSpan() is correct.
+		append(view.begin(), view.end());
 		return *this;
 	}
 
 	template <>
-	Buffer & operator>>(Buffer &buffer, std::string_view &out) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, std::string_view &out) {
 		const std::string type = buffer.popType();
 		const char front = type.front();
 		uint32_t size{};
@@ -665,11 +698,11 @@ namespace Game3 {
 		std::span span = buffer.getSpan();
 
 		if (span.size() < size) {
-			ERR("Buffer size: {:L}", buffer.bytes.size());
+			ERR("Buffer size: {:L}", buffer.getView().size());
 			ERR("Skip: {:L}", buffer.skip);
 			ERR("Span size: {:L}", span.size());
 			ERR("Span size_bytes: {:L}", span.size_bytes());
-			INFO("{}", hexString(buffer.bytes, true));
+			INFO("{}", hexString(buffer.getView(), true));
 			throw std::out_of_range("Buffer is too small");
 		}
 
@@ -678,7 +711,7 @@ namespace Game3 {
 	}
 
 	template <>
-	Buffer & operator>>(Buffer &buffer, std::string &out) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, std::string &out) {
 		std::string_view view;
 		buffer >> view;
 		out = view;
@@ -686,7 +719,7 @@ namespace Game3 {
 	}
 
 	template <>
-	Buffer & operator>>(Buffer &buffer, std::span<const char> &out) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, std::span<const char> &out) {
 		std::string_view view;
 		buffer >> view;
 		out = view;
@@ -694,21 +727,20 @@ namespace Game3 {
 	}
 
 	template <>
-	Buffer & operator>>(Buffer &buffer, Buffer &other) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Buffer &other) {
 		const std::span<const uint8_t> span = buffer.getSpan();
 		other.append(span.begin(), span.end());
-		buffer.bytes.clear();
-		buffer.skip = 0;
+		buffer.clear();
 		return buffer;
 	}
 
-	template<>
+	template <>
 	Buffer & operator<<(Buffer &buffer, const boost::json::value &json) {
 		return buffer << boost::json::serialize(json);
 	}
 
-	template<>
-	Buffer & operator>>(Buffer &buffer, boost::json::value &json) {
+	template <>
+	BasicBuffer & operator>>(BasicBuffer &buffer, boost::json::value &json) {
 		json = boost::json::parse(buffer.take<std::string>());
 		return buffer;
 	}

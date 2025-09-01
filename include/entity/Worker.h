@@ -27,7 +27,7 @@ namespace Game3 {
 			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;
 			void initAfterLoad(Game &) override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		friend class Entity;
 

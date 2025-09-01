@@ -100,7 +100,7 @@ namespace Game3 {
 		buffer << lingerTime;
 	}
 
-	void SquareParticle::decode(Buffer &buffer) {
+	void SquareParticle::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> size;
 		buffer >> color;
@@ -112,7 +112,7 @@ namespace Game3 {
 		buffer << sizeMin << sizeMax << hueMin << hueMax << saturationMin << saturationMax << valueMin << valueMax;
 	}
 
-	void SquareParticle::RandomizationOptions::decode(Buffer &buffer) {
+	void SquareParticle::RandomizationOptions::decode(BasicBuffer &buffer) {
 		buffer >> sizeMin >> sizeMax >> hueMin >> hueMax >> saturationMin >> saturationMax >> valueMin >> valueMax;
 	}
 }

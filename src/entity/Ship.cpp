@@ -140,7 +140,7 @@ namespace Game3 {
 		buffer << realmOrigin;
 	}
 
-	void Ship::decode(Buffer &buffer) {
+	void Ship::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> internalRealmID;
 		buffer >> realmOrigin;

@@ -66,7 +66,7 @@ namespace Game3 {
 		buffer << stuckTime;
 	}
 
-	void Worker::decode(Buffer &buffer) {
+	void Worker::decode(BasicBuffer &buffer) {
 		LivingEntity::decode(buffer);
 		buffer >> phase;
 		buffer >> overworldRealm;

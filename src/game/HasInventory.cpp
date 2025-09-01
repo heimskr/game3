@@ -32,7 +32,7 @@ namespace Game3 {
 		buffer << server_inventory;
 	}
 
-	void HasInventory::decode(Buffer &buffer, InventoryID index) {
+	void HasInventory::decode(BasicBuffer &buffer, InventoryID index) {
 		if (getSharedAgent()->getSide() == Side::Client) {
 			decodeSpecific<ClientInventory>(buffer, index);
 		} else {

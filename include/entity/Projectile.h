@@ -25,7 +25,7 @@ namespace Game3 {
 			int getZIndex() const override;
 
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			const Identifier & getItemID() const;
 			virtual void onHit(const EntityPtr &target);

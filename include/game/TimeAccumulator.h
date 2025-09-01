@@ -25,7 +25,7 @@ namespace Game3 {
 			addToBuffer<T>(accumulatedTime.load());
 		}
 
-		void decode(Buffer &buffer) {
+		void decode(BasicBuffer &buffer) {
 			accumulatedTime = getFromBuffer<T>(buffer);
 		}
 	};

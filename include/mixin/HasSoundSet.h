@@ -5,6 +5,7 @@
 #include <memory>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Game;
 	struct Place;

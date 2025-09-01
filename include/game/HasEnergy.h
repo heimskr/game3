@@ -6,6 +6,7 @@
 #include <shared_mutex>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class EnergyContainer;
 
@@ -29,6 +30,6 @@ namespace Game3 {
 			virtual void energyUpdated() {}
 
 			void encode(Buffer &);
-			void decode(Buffer &);
+			void decode(BasicBuffer &);
 	};
 }

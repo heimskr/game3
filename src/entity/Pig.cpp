@@ -60,7 +60,7 @@ namespace Game3 {
 		buffer << variant;
 	}
 
-	void Pig::decode(Buffer &buffer) {
+	void Pig::decode(BasicBuffer &buffer) {
 		Animal::decode(buffer);
 		buffer >> variant;
 		texture = nullptr;

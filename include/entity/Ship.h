@@ -26,7 +26,7 @@ namespace Game3 {
 			bool interactable(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &used_item, Hand) override;
 			void render(const RendererContext &) override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			Vector2i getDimensions() const override { return {2, 2}; }
 

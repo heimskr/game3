@@ -27,7 +27,7 @@ namespace Game3 {
 			void tick(const TickArgs &) override;
 			std::string getName() const override { return "Miner"; }
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		friend class Entity;
 

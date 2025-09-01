@@ -29,5 +29,5 @@ namespace Game3 {
 	ExpandedServerInventory popBuffer<ExpandedServerInventory>(Buffer &);
 	Buffer & operator+=(Buffer &, const ExpandedServerInventory &);
 	Buffer & operator<<(Buffer &, const ExpandedServerInventory &);
-	Buffer & operator>>(Buffer &, ExpandedServerInventory &);
+	BasicBuffer & operator>>(BasicBuffer &, ExpandedServerInventory &);
 }

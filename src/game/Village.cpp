@@ -246,7 +246,7 @@ namespace Game3 {
 		buffer << getGreed();
 	}
 
-	void Village::decode(Buffer &buffer) {
+	void Village::decode(BasicBuffer &buffer) {
 		buffer >> id;
 		buffer >> realmID;
 		buffer >> chunkPosition;
@@ -310,7 +310,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Village &, bool) {
+	std::string BasicBuffer::getType(const Village &, bool) {
 		return std::string{'\xeb'};
 	}
 
@@ -324,7 +324,7 @@ namespace Game3 {
 		return buffer += village;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Village &village) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Village &village) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(village, false))) {
 			buffer.debug();

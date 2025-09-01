@@ -229,7 +229,7 @@ namespace Game3 {
 
 			virtual void encode(Buffer &);
 			/** More work needs to be done after this to initialize weakRealm. */
-			virtual void decode(Buffer &);
+			virtual void decode(BasicBuffer &);
 
 			inline MoneyCount getMoney() const { return money; }
 			virtual void setMoney(MoneyCount);

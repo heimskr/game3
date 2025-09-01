@@ -16,7 +16,7 @@ namespace Game3 {
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			std::string getName() const override { return "Blacksmith"; }
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		friend class Entity;
 

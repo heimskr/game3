@@ -232,7 +232,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType<UString>(const UString &string, bool in_container) {
+	std::string BasicBuffer::getType<UString>(const UString &string, bool in_container) {
 		if (in_container) {
 			return getType(std::string{}, true);
 		}
@@ -247,7 +247,7 @@ namespace Game3 {
 		return buffer << string.raw();
 	}
 
-	Buffer & operator>>(Buffer &buffer, UString &string) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, UString &string) {
 		std::string raw;
 		buffer >> raw;
 		string = std::move(raw);

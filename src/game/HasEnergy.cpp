@@ -37,7 +37,7 @@ namespace Game3 {
 		buffer << energyContainer->energy;
 	}
 
-	void HasEnergy::decode(Buffer &buffer) {
+	void HasEnergy::decode(BasicBuffer &buffer) {
 		buffer >> energyContainer->energy;
 	}
 }

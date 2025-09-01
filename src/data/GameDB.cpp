@@ -3,6 +3,7 @@
 #include "game/ServerGame.h"
 #include "graphics/Tileset.h"
 #include "net/Buffer.h"
+#include "tileentity/TileEntity.h"
 #include "util/JSON.h"
 #include "util/Timer.h"
 
@@ -13,6 +14,7 @@ namespace Game3 {
 		const std::string CHUNK_PREFIX{"C::"};
 		const std::string META_PREFIX{"M::"};
 		const std::string REALM_PREFIX{"R::"};
+		const std::string TILE_ENTITY_PREFIX{"T::"};
 		const std::string VILLAGE_PREFIX{"V::"};
 		const std::string FORMAT_VERSION_KEY{META_PREFIX + "formatVersion"};
 		const std::string GAME_RULES_KEY{META_PREFIX + "gameRules"};
@@ -23,6 +25,14 @@ namespace Game3 {
 
 		std::string getKey(RealmID realm_id, ChunkPosition chunk_position) {
 			return std::format("{}{}::{},{}", CHUNK_PREFIX, realm_id, chunk_position.x, chunk_position.y);
+		}
+
+		std::string getKey(RealmID realm_id) {
+			return std::format("{}{}", REALM_PREFIX, realm_id);
+		}
+
+		std::string getKey(const TileEntityPtr &tile_entity) {
+			return std::format("{}{}", TILE_ENTITY_PREFIX, tile_entity->getGID());
 		}
 
 		inline leveldb::Options getOpenOptions() {
@@ -396,6 +406,101 @@ namespace Game3 {
 
 			SUCCESS("Finished tile migration for realm {}", realm->getID());
 		});
+	}
+
+	RealmPtr GameDB::loadRealm(RealmID realm_id) {
+		GameDBScope scope{*this};
+		ServerGamePtr game = getGame();
+
+		std::string raw;
+		DBStatus status = database->Get(getReadOptions(), getKey(realm_id), &raw);
+
+		if (!status) {
+			throw std::out_of_range(std::format("Couldn't find realm {} in database", realm_id));
+		}
+
+		Buffer buffer(raw, Side::Server);
+
+		assert(realm_id == buffer.take<RealmID>());
+		auto json = buffer.take<boost::json::value>();
+		auto tileset_hash = buffer.take<std::string>();
+
+		RealmPtr realm = Realm::fromJSON(game, json, false);
+
+		iterate(TILE_ENTITY_PREFIX, [&](std::string_view key, std::string_view value) {
+			// ViewBuffer buffer
+		});
+
+		/*
+
+		RealmPtr realm = Realm::fromJSON(game, boost::json::parse(raw_json), false);
+
+		{
+			SQLite::Statement query{*database, "SELECT tileEntityID, encoded, globalID FROM tileEntities WHERE realmID = ?"};
+
+			query.bind(1, realm_id);
+
+			while (query.executeStep()) {
+				const Identifier tile_entity_id{query.getColumn(0).getString()};
+				auto factory = game->registry<TileEntityFactoryRegistry>().at(tile_entity_id);
+				assert(factory);
+				TileEntityPtr tile_entity = (*factory)();
+				tile_entity->setGID(GlobalID(query.getColumn(2).getInt64()));
+
+				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
+				const size_t buffer_size = query.getColumn(1).getBytes();
+
+				tile_entity->setRealm(realm);
+
+				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size), Side::Server);
+				buffer.context = game;
+				tile_entity->init(*game);
+				tile_entity->decode(*game, buffer);
+				realm->addToMaps(tile_entity);
+				realm->attach(tile_entity);
+				tile_entity->onSpawn();
+			}
+		}
+
+		{
+			SQLite::Statement query{*database, "SELECT entityType, encoded FROM entities WHERE realmID = ?"};
+
+			query.bind(1, realm_id);
+
+			while (query.executeStep()) {
+				const Identifier entity_id{query.getColumn(0).getString()};
+
+				auto factory = game->registry<EntityFactoryRegistry>().at(entity_id);
+				assert(factory);
+				EntityPtr entity = (*factory)(game);
+
+				const auto *buffer_bytes = reinterpret_cast<const uint8_t *>(query.getColumn(1).getBlob());
+				const size_t buffer_size = query.getColumn(1).getBytes();
+
+				entity->setRealm(realm);
+
+				Buffer buffer(std::vector<uint8_t>(buffer_bytes, buffer_bytes + buffer_size), game, Side::Server);
+				entity->decode(buffer);
+				entity->init(game);
+
+				{
+					auto lock = realm->entities.uniqueLock();
+					realm->entities.insert(entity);
+				}
+
+				{
+					auto lock = realm->entitiesByGID.uniqueLock();
+					realm->entitiesByGID[entity->globalID] = entity;
+				}
+
+				realm->attach(entity);
+			}
+		}
+
+
+		return realm;
+		*/
+		return nullptr;
 	}
 
 	template <>

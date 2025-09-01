@@ -13,6 +13,7 @@
 #include <unordered_set>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Inventory;
 
@@ -79,7 +80,7 @@ namespace Game3 {
 
 		friend Buffer & operator+=(Buffer &, const ItemFilter &);
 		friend Buffer & operator<<(Buffer &, const ItemFilter &);
-		friend Buffer & operator>>(Buffer &, ItemFilter &);
+		friend BasicBuffer & operator>>(BasicBuffer &, ItemFilter &);
 	};
 
 	using ItemFilterPtr = std::shared_ptr<ItemFilter>;
@@ -91,11 +92,11 @@ namespace Game3 {
 	ItemStack popBuffer<ItemStack>(Buffer &);
 	Buffer & operator+=(Buffer &, const ItemFilter::Config &);
 	Buffer & operator<<(Buffer &, const ItemFilter::Config &);
-	Buffer & operator>>(Buffer &, ItemFilter::Config &);
+	BasicBuffer & operator>>(BasicBuffer &, ItemFilter::Config &);
 
 	Buffer & operator+=(Buffer &, const ItemFilter &);
 	Buffer & operator<<(Buffer &, const ItemFilter &);
-	Buffer & operator>>(Buffer &, ItemFilter &);
+	BasicBuffer & operator>>(BasicBuffer &, ItemFilter &);
 }
 
 template <>

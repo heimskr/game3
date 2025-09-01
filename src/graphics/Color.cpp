@@ -79,7 +79,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Color &, bool) {
+	std::string BasicBuffer::getType(const Color &, bool) {
 		return std::string{'\x33'} + getType(float{}, false);
 	}
 
@@ -91,7 +91,7 @@ namespace Game3 {
 		return buffer += color;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Color &color) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Color &color) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(color, false))) {
 			buffer.debug();

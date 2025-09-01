@@ -29,7 +29,7 @@ namespace Game3 {
 			bool interactable(const PlayerPtr &, Modifiers, const ItemStackPtr &, Hand) override { return true; }
 			std::string getName() const override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 			int getZIndex() const override { return -1; }
 
 		private:

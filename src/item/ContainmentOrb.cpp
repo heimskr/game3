@@ -138,7 +138,8 @@ namespace Game3 {
 		entity->encode(buffer);
 		object["type"] = boost::json::value_from(entity->type);
 		object["containedName"] = entity->getName();
-		object["buffer"] = FastNoise::Base64::Encode(buffer.bytes);
+		auto span = buffer.getSpan();
+		object["buffer"] = FastNoise::Base64::Encode({span.begin(), span.end()});
 	}
 
 	bool ContainmentOrb::denseClick(const Place &place, boost::json::object &object, bool release) {

@@ -88,7 +88,7 @@ namespace Game3 {
 		return buffer << static_cast<uint8_t>(direction);
 	}
 
-	Buffer & operator>>(Buffer &buffer, Direction &direction) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Direction &direction) {
 		direction = static_cast<Direction>(buffer.take<uint8_t>());
 		return buffer;
 	}

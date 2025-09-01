@@ -136,19 +136,22 @@ namespace Game3 {
 	template <typename T, typename M>
 	Buffer & operator+=(Buffer &buffer, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
-		return buffer += lockable.getBase();
+		buffer += lockable.getBase();
+		return buffer;
 	}
 
 	template <typename T, typename M>
 	Buffer & operator<<(Buffer &buffer, const Lockable<T, M> &lockable) {
 		auto lock = lockable.sharedLock();
-		return buffer << lockable.getBase();
+		buffer << lockable.getBase();
+		return buffer;
 	}
 
 	template <typename T, typename M>
-	Buffer & operator>>(Buffer &buffer, Lockable<T, M> &lockable) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Lockable<T, M> &lockable) {
 		auto lock = lockable.uniqueLock();
-		return buffer >> lockable.getBase();
+		buffer >> lockable.getBase();
+		return buffer;
 	}
 }
 

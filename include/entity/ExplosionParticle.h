@@ -19,7 +19,7 @@ namespace Game3 {
 			bool isVisible() const override;
 			bool visibilityMatters() const override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			static float getLifetime();
 

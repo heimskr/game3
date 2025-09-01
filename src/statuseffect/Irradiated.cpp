@@ -40,7 +40,7 @@ namespace Game3 {
 		buffer << severity << accumulatedDamage;
 	}
 
-	void Irradiated::decode(Buffer &buffer) {
+	void Irradiated::decode(BasicBuffer &buffer) {
 		TimedStatusEffect::decode(buffer);
 		buffer >> severity >> accumulatedDamage;
 	}

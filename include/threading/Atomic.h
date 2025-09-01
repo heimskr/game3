@@ -53,7 +53,7 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	Buffer & operator>>(Buffer &buffer, Atomic<T> &atomic) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Atomic<T> &atomic) {
 		atomic = buffer.take<T>();
 		return buffer;
 	}

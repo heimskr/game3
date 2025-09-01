@@ -28,7 +28,7 @@ namespace Game3 {
 			int getZIndex() const override;
 
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		private:
 			UString text;

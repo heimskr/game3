@@ -47,7 +47,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Modifiers &, bool) {
+	std::string BasicBuffer::getType(const Modifiers &, bool) {
 		return getType(uint8_t{}, false);
 	}
 
@@ -64,7 +64,7 @@ namespace Game3 {
 		return buffer.appendType(modifiers, false) += modifiers;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Modifiers &modifiers) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Modifiers &modifiers) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(modifiers, false))) {
 			buffer.debug();

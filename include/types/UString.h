@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class TextRenderer;
 	class UStringSpan;
@@ -60,7 +61,7 @@ namespace Game3 {
 	UString popBuffer<UString>(Buffer &);
 	Buffer & operator+=(Buffer &, const UString &);
 	Buffer & operator<<(Buffer &, const UString &);
-	Buffer & operator>>(Buffer &, UString &);
+	BasicBuffer & operator>>(BasicBuffer &, UString &);
 
 	class UStringSpan {
 		public:

@@ -136,7 +136,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ClientInventory &, bool) {
+	std::string BasicBuffer::getType(const ClientInventory &, bool) {
 		return "\xe1";
 	}
 
@@ -162,7 +162,7 @@ namespace Game3 {
 		return buffer += inventory;
 	}
 
-	Buffer & operator>>(Buffer &buffer, ClientInventory &inventory) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, ClientInventory &inventory) {
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(inventory, false))) {
 			buffer.debug();

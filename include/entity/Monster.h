@@ -10,7 +10,7 @@ namespace Game3 {
 		public:
 			void tick(const TickArgs &) override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			HitPoints getMaxHealth() const override;
 			void onAttack(const std::shared_ptr<LivingEntity> &) override;

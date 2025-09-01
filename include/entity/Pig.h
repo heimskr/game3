@@ -33,7 +33,7 @@ namespace Game3 {
 
 			void render(const RendererContext &) override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		friend class Entity;
 

@@ -128,7 +128,7 @@ namespace Game3 {
 		buffer << wanderRadius;
 	}
 
-	void Animal::decode(Buffer &buffer) {
+	void Animal::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		LivingEntity::decode(buffer);
 		buffer >> wanderRadius;

@@ -123,7 +123,7 @@ namespace Game3 {
 		return buffer << directions.north << directions.east << directions.south << directions.west << directions.middle;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Directions &directions) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Directions &directions) {
 		return buffer >> directions.north >> directions.east >> directions.south >> directions.west >> directions.middle;
 	}
 }

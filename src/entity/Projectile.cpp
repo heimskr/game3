@@ -122,7 +122,7 @@ namespace Game3 {
 		buffer << intendedTarget;
 	}
 
-	void Projectile::decode(Buffer &buffer) {
+	void Projectile::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> lingerTime;
 		buffer >> angularVelocity;

@@ -62,7 +62,7 @@ namespace Game3 {
 		buffer << age;
 	}
 
-	void ExplosionParticle::decode(Buffer &buffer) {
+	void ExplosionParticle::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> age;
 	}

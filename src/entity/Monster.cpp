@@ -68,7 +68,7 @@ namespace Game3 {
 		buffer << targetGID;
 	}
 
-	void Monster::decode(Buffer &buffer) {
+	void Monster::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		LivingEntity::decode(buffer);
 		buffer >> targetGID;

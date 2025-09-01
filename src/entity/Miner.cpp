@@ -143,7 +143,7 @@ namespace Game3 {
 		buffer << sellTime;
 	}
 
-	void Miner::decode(Buffer &buffer) {
+	void Miner::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		Worker::decode(buffer);
 		buffer >> chosenResource;

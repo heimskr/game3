@@ -13,6 +13,7 @@
 #include "util/Concepts.h"
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 
 	struct ChunkPosition {
@@ -61,7 +62,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const ChunkPosition &);
 	Buffer & operator<<(Buffer &, const ChunkPosition &);
-	Buffer & operator>>(Buffer &, ChunkPosition &);
+	BasicBuffer & operator>>(BasicBuffer &, ChunkPosition &);
 
 	struct ChunkRequest {
 		ChunkPosition position;

@@ -50,7 +50,7 @@ namespace Game3 {
 		buffer << greed;
 	}
 
-	void Merchant::decode(Buffer &buffer) {
+	void Merchant::decode(BasicBuffer &buffer) {
 		buffer >> greed;
 	}
 

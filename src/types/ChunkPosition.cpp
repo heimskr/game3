@@ -47,7 +47,7 @@ namespace Game3 {
 		return buffer << chunk_position.x << chunk_position.y;
 	}
 
-	Buffer & operator>>(Buffer &buffer, ChunkPosition &chunk_position) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, ChunkPosition &chunk_position) {
 		return buffer >> chunk_position.x >> chunk_position.y;
 	}
 

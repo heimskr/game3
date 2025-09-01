@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 
 	class Gene {
@@ -29,7 +30,7 @@ namespace Game3 {
 			virtual std::string describeShort() const = 0;
 			virtual std::vector<std::string> describeLong() const = 0;
 			virtual void encode(Buffer &) const = 0;
-			virtual void decode(Buffer &) = 0;
+			virtual void decode(BasicBuffer &) = 0;
 
 			inline const auto & getName() const { return name; }
 
@@ -56,7 +57,7 @@ namespace Game3 {
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
-			void decode(Buffer &) final;
+			void decode(BasicBuffer &) final;
 
 			explicit inline operator float() const { return value; }
 			inline auto getValue() const { return value; }
@@ -84,7 +85,7 @@ namespace Game3 {
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
-			void decode(Buffer &) final;
+			void decode(BasicBuffer &) final;
 
 			explicit inline operator ValueType() const { return value; }
 			inline auto getValue() const { return value; }
@@ -110,7 +111,7 @@ namespace Game3 {
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
-			void decode(Buffer &) final;
+			void decode(BasicBuffer &) final;
 
 			explicit inline operator float() const { return value; }
 			inline auto getValue() const { return value; }
@@ -134,7 +135,7 @@ namespace Game3 {
 			std::string describeShort() const final;
 			std::vector<std::string> describeLong() const final;
 			void encode(Buffer &) const final;
-			void decode(Buffer &) final;
+			void decode(BasicBuffer &) final;
 
 			explicit inline operator const std::string &() const { return value; }
 			inline const auto & getValue() const { return value; }
@@ -146,19 +147,19 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const FloatGene &);
 	Buffer & operator<<(Buffer &, const FloatGene &);
-	Buffer & operator>>(Buffer &, FloatGene &);
+	BasicBuffer & operator>>(BasicBuffer &, FloatGene &);
 
 	Buffer & operator+=(Buffer &, const LongGene &);
 	Buffer & operator<<(Buffer &, const LongGene &);
-	Buffer & operator>>(Buffer &, LongGene &);
+	BasicBuffer & operator>>(BasicBuffer &, LongGene &);
 
 	Buffer & operator+=(Buffer &, const CircularGene &);
 	Buffer & operator<<(Buffer &, const CircularGene &);
-	Buffer & operator>>(Buffer &, CircularGene &);
+	BasicBuffer & operator>>(BasicBuffer &, CircularGene &);
 
 	Buffer & operator+=(Buffer &, const StringGene &);
 	Buffer & operator<<(Buffer &, const StringGene &);
-	Buffer & operator>>(Buffer &, StringGene &);
+	BasicBuffer & operator>>(BasicBuffer &, StringGene &);
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Gene &);
 }

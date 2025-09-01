@@ -85,7 +85,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemFilter::Config &, bool) {
+	std::string BasicBuffer::getType(const ItemFilter::Config &, bool) {
 		return {'\xe4'};
 	}
 
@@ -105,17 +105,18 @@ namespace Game3 {
 		return buffer << config.data << config.comparator << config.count;
 	}
 
-	Buffer & operator>>(Buffer &buffer, ItemFilter::Config &config) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, ItemFilter::Config &config) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(config, false))) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type (" + hexString(type, true) + ") in buffer (expected ItemFilter::Config)");
 		}
-		return buffer >> config.data >> config.comparator >> config.count;
+		buffer >> config.data >> config.comparator >> config.count;
+		return buffer;
 	}
 
 	template <>
-	std::string Buffer::getType(const ItemFilter &, bool) {
+	std::string BasicBuffer::getType(const ItemFilter &, bool) {
 		return {'\xe3'};
 	}
 
@@ -128,7 +129,7 @@ namespace Game3 {
 		return buffer << filter.allowMode << filter.strict << filter.items << filter.configsByItem;
 	}
 
-	Buffer & operator>>(Buffer &buffer, ItemFilter &filter) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, ItemFilter &filter) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(filter, false))) {
 			buffer.debug();

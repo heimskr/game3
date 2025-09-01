@@ -6,6 +6,7 @@
 
 namespace Game3 {
 	class Agent;
+	class BasicBuffer;
 	class Buffer;
 	class Game;
 	class Inventory;
@@ -22,13 +23,13 @@ namespace Game3 {
 			virtual InventoryID getInventoryCount() const { return 1; }
 
 			void encode(Buffer &, InventoryID);
-			void decode(Buffer &, InventoryID);
+			void decode(BasicBuffer &, InventoryID);
 
 			virtual void inventoryUpdated(InventoryID) {}
 			virtual std::shared_ptr<Agent> getSharedAgent() = 0;
 
 			template <typename T>
-			void decodeSpecific(Buffer &buffer, InventoryID index) {
+			void decodeSpecific(BasicBuffer &buffer, InventoryID index) {
 				Slot slot_count = -1;
 				buffer >> slot_count;
 				std::shared_ptr<T> inventory;

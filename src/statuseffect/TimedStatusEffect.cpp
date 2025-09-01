@@ -20,7 +20,7 @@ namespace Game3 {
 		buffer << originalDuration << duration;
 	}
 
-	void TimedStatusEffect::decode(Buffer &buffer) {
+	void TimedStatusEffect::decode(BasicBuffer &buffer) {
 		buffer >> originalDuration >> duration;
 	}
 }

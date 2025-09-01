@@ -12,7 +12,7 @@ namespace Game3 {
 			bool apply(const std::shared_ptr<LivingEntity> &, float delta) override;
 			void replenish(const std::shared_ptr<LivingEntity> &) override;
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		private:
 			float originalDuration{};

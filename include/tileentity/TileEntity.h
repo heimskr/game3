@@ -15,6 +15,7 @@
 #include <random>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Entity;
 	class Game;

@@ -43,7 +43,7 @@ namespace Game3 {
 		buffer << severity << accumulatedDamage;
 	}
 
-	void Burning::decode(Buffer &buffer) {
+	void Burning::decode(BasicBuffer &buffer) {
 		TimedStatusEffect::decode(buffer);
 		buffer >> severity >> accumulatedDamage;
 	}

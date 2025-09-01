@@ -81,7 +81,7 @@ namespace Game3 {
 		buffer << value;
 	}
 
-	void FloatGene::decode(Buffer &buffer) {
+	void FloatGene::decode(BasicBuffer &buffer) {
 		buffer >> name;
 		buffer >> minimum;
 		buffer >> maximum;
@@ -94,8 +94,11 @@ namespace Game3 {
 
 // LongGene
 
-	LongGene::LongGene(std::string name_, ValueType minimum_, ValueType maximum_, ValueType value_):
-		Gene(std::move(name_)), minimum(minimum_), maximum(maximum_), value(clamp(value_)) {}
+	LongGene::LongGene(std::string name, ValueType minimum, ValueType maximum, ValueType value):
+		Gene(std::move(name)),
+		minimum(minimum),
+		maximum(maximum),
+		value(clamp(value)) {}
 
 	LongGene LongGene::fromJSON(const boost::json::value &json) {
 		return LongGene(getString(json.at("name")), getDouble(json.at("minimum")), getDouble(json.at("maximum")), getDouble(json.at("value")));
@@ -138,7 +141,7 @@ namespace Game3 {
 		buffer << value;
 	}
 
-	void LongGene::decode(Buffer &buffer) {
+	void LongGene::decode(BasicBuffer &buffer) {
 		buffer >> name;
 		buffer >> minimum;
 		buffer >> maximum;
@@ -189,7 +192,7 @@ namespace Game3 {
 		buffer << value;
 	}
 
-	void CircularGene::decode(Buffer &buffer) {
+	void CircularGene::decode(BasicBuffer &buffer) {
 		buffer >> name;
 		buffer >> value;
 	}
@@ -241,7 +244,7 @@ namespace Game3 {
 		buffer << value;
 	}
 
-	void StringGene::decode(Buffer &buffer) {
+	void StringGene::decode(BasicBuffer &buffer) {
 		buffer >> name;
 		buffer >> value;
 	}
@@ -255,7 +258,7 @@ namespace Game3 {
 // Buffer methods
 
 	template <>
-	std::string Buffer::getType(const FloatGene &, bool) {
+	std::string BasicBuffer::getType(BufferTag<FloatGene>, bool) {
 		return std::string{'\xe5'};
 	}
 
@@ -269,7 +272,7 @@ namespace Game3 {
 		return buffer += gene;
 	}
 
-	Buffer & operator>>(Buffer &buffer, FloatGene &gene) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, FloatGene &gene) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
@@ -280,7 +283,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const LongGene &, bool) {
+	std::string BasicBuffer::getType(BufferTag<LongGene>, bool) {
 		return std::string{'\xe6'};
 	}
 
@@ -294,7 +297,7 @@ namespace Game3 {
 		return buffer += gene;
 	}
 
-	Buffer & operator>>(Buffer &buffer, LongGene &gene) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, LongGene &gene) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
@@ -305,7 +308,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const CircularGene &, bool) {
+	std::string BasicBuffer::getType(BufferTag<CircularGene>, bool) {
 		return std::string{'\xe7'};
 	}
 
@@ -319,7 +322,7 @@ namespace Game3 {
 		return buffer += gene;
 	}
 
-	Buffer & operator>>(Buffer &buffer, CircularGene &gene) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, CircularGene &gene) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();
@@ -330,7 +333,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const StringGene &, bool) {
+	std::string BasicBuffer::getType(BufferTag<StringGene>, bool) {
 		return std::string{'\xe8'};
 	}
 
@@ -344,7 +347,7 @@ namespace Game3 {
 		return buffer += gene;
 	}
 
-	Buffer & operator>>(Buffer &buffer, StringGene &gene) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, StringGene &gene) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(gene, false))) {
 			buffer.debug();

@@ -44,7 +44,7 @@ namespace Game3 {
 		buffer << severity << accumulatedDamage;
 	}
 
-	void Corroded::decode(Buffer &buffer) {
+	void Corroded::decode(BasicBuffer &buffer) {
 		TimedStatusEffect::decode(buffer);
 		buffer >> severity >> accumulatedDamage;
 	}

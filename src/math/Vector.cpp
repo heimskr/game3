@@ -4,7 +4,7 @@
 
 namespace Game3 {
 	template <>
-	std::string Buffer::getType(const Vector3 &, bool) {
+	std::string BasicBuffer::getType(const Vector3 &, bool) {
 		return std::string{'\x32'} + getType(float{}, false);
 	}
 
@@ -16,7 +16,7 @@ namespace Game3 {
 		return buffer += vector;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Vector3 &vector) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Vector3 &vector) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(vector, false))) {
 			buffer.debug();
@@ -32,7 +32,7 @@ namespace Game3 {
 		x(position.column), y(position.row) {}
 
 	template <>
-	std::string Buffer::getType(const Vector2d &, bool) {
+	std::string BasicBuffer::getType(const Vector2d &, bool) {
 		return std::string{'\x31'} + getType(double{}, false);
 	}
 
@@ -44,7 +44,7 @@ namespace Game3 {
 		return buffer += vector;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Vector2d &vector) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Vector2d &vector) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(vector, false))) {
 			buffer.debug();
@@ -56,7 +56,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Vector2i &, bool) {
+	std::string BasicBuffer::getType(const Vector2i &, bool) {
 		return std::string{'\x31'} + getType(decltype(Vector2i::x){}, false);
 	}
 
@@ -68,7 +68,7 @@ namespace Game3 {
 		return buffer += vector;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Vector2i &vector) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Vector2i &vector) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(vector, false))) {
 			buffer.debug();

@@ -19,6 +19,7 @@
 #include <leveldb/db.h>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class Entity;
 	class GameDB;
@@ -35,6 +36,10 @@ namespace Game3 {
 			status(status) {}
 
 		void assertOK();
+
+		inline explicit operator bool() const {
+			return status.ok();
+		}
 
 		inline operator std::string() const {
 			return status.ToString();

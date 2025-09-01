@@ -6,6 +6,7 @@
 #include <format>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	struct Position;
 
@@ -83,7 +84,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const Vector3 &);
 	Buffer & operator<<(Buffer &, const Vector3 &);
-	Buffer & operator>>(Buffer &, Vector3 &);
+	BasicBuffer & operator>>(BasicBuffer &, Vector3 &);
 
 	struct Vector2d {
 		double x = 0;
@@ -157,7 +158,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const Vector2d &);
 	Buffer & operator<<(Buffer &, const Vector2d &);
-	Buffer & operator>>(Buffer &, Vector2d &);
+	BasicBuffer & operator>>(BasicBuffer &, Vector2d &);
 
 	struct Vector2i {
 		int32_t x = 0;
@@ -178,7 +179,7 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const Vector2i &);
 	Buffer & operator<<(Buffer &, const Vector2i &);
-	Buffer & operator>>(Buffer &, Vector2i &);
+	BasicBuffer & operator>>(BasicBuffer &, Vector2i &);
 }
 
 template <>

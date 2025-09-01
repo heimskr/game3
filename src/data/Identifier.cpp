@@ -55,9 +55,9 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType<Identifier>(const Identifier &identifier, bool in_container) {
+	std::string BasicBuffer::getType(const Identifier &identifier, bool in_container) {
 		if (in_container) {
-			return getType(std::string{}, true);
+			return getType(BufferTag<std::string>{}, true);
 		}
 		return getType(identifier.str(), false);
 	}
@@ -70,7 +70,7 @@ namespace Game3 {
 		return buffer << identifier.str();
 	}
 
-	Buffer & operator>>(Buffer &buffer, Identifier &identifier) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Identifier &identifier) {
 		std::string str;
 		buffer >> str;
 		identifier = std::string_view(str);

@@ -5,7 +5,7 @@
 
 namespace Game3 {
 	template <>
-	std::string Buffer::getType(const StatusEffectMap &, bool) {
+	std::string BasicBuffer::getType(const StatusEffectMap &, bool) {
 		return {'\xea'};
 	}
 
@@ -23,7 +23,7 @@ namespace Game3 {
 		return buffer += map;
 	}
 
-	Buffer & operator>>(Buffer &buffer, StatusEffectMap &map) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, StatusEffectMap &map) {
 		GamePtr game = std::dynamic_pointer_cast<Game>(buffer.context.lock());
 		assert(game != nullptr);
 		auto &registry = game->registry<StatusEffectFactoryRegistry>();

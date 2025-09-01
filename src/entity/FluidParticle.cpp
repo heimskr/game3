@@ -96,7 +96,7 @@ namespace Game3 {
 		buffer << fluidID;
 	}
 
-	void FluidParticle::decode(Buffer &buffer) {
+	void FluidParticle::decode(BasicBuffer &buffer) {
 		Projectile::decode(buffer);
 		buffer >> size;
 		buffer >> color;

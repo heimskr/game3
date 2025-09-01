@@ -268,7 +268,7 @@ namespace Game3 {
 		}
 	}
 
-	void Player::decode(Buffer &buffer) {
+	void Player::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		LivingEntity::decode(buffer);
 		auto this_lock = uniqueLock();

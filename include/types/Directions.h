@@ -10,6 +10,7 @@
 #include "types/Quadrant.h"
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 
 	struct Directions {
@@ -82,5 +83,5 @@ namespace Game3 {
 
 	Buffer & operator+=(Buffer &, const Directions &);
 	Buffer & operator<<(Buffer &, const Directions &);
-	Buffer & operator>>(Buffer &, Directions &);
+	BasicBuffer & operator>>(BasicBuffer &, Directions &);
 }

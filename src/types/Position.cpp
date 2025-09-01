@@ -246,7 +246,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string Buffer::getType(const Position &, bool) {
+	std::string BasicBuffer::getType(const Position &, bool) {
 		return std::string{'\xe9'};
 	}
 
@@ -263,7 +263,7 @@ namespace Game3 {
 		return buffer += position;
 	}
 
-	Buffer & operator>>(Buffer &buffer, Position &position) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, Position &position) {
 		const auto type = buffer.popType();
 		if (!Buffer::typesMatch(type, buffer.getType(position, false))) {
 			buffer.debug();

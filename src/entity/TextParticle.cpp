@@ -75,7 +75,7 @@ namespace Game3 {
 		buffer << align;
 	}
 
-	void TextParticle::decode(Buffer &buffer) {
+	void TextParticle::decode(BasicBuffer &buffer) {
 		Entity::decode(buffer);
 		buffer >> text;
 		buffer >> color;

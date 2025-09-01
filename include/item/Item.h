@@ -156,7 +156,7 @@ namespace Game3 {
 			void renderEffects(Window &, const RendererContext &, const Position &, Modifiers);
 
 			void encode(Game &, Buffer &);
-			void decode(Game &, Buffer &);
+			void decode(Game &, BasicBuffer &);
 
 			std::shared_ptr<ItemStack> copy() const;
 
@@ -188,7 +188,7 @@ namespace Game3 {
 	ItemStackPtr popBuffer<ItemStackPtr>(Buffer &);
 	Buffer & operator+=(Buffer &, const ItemStackPtr &);
 	Buffer & operator<<(Buffer &, const ItemStackPtr &);
-	Buffer & operator>>(Buffer &, ItemStackPtr &);
+	BasicBuffer & operator>>(BasicBuffer &, ItemStackPtr &);
 	template <typename T>
 	T makeForBuffer(Buffer &);
 	template <>

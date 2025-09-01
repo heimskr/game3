@@ -1301,7 +1301,7 @@ namespace Game3 {
 		buffer << speedMultiplier;
 	}
 
-	void Entity::decode(Buffer &buffer) {
+	void Entity::decode(BasicBuffer &buffer) {
 		auto lock = uniqueLock();
 		buffer >> type;
 		setGID(buffer.take<GlobalID>());

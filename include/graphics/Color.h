@@ -126,11 +126,12 @@ namespace Game3 {
 		};
 	}
 
+	class BasicBuffer;
 	class Buffer;
 
 	Buffer & operator+=(Buffer &, const Color &);
 	Buffer & operator<<(Buffer &, const Color &);
-	Buffer & operator>>(Buffer &, Color &);
+	BasicBuffer & operator>>(BasicBuffer &, Color &);
 
 	Color tag_invoke(boost::json::value_to_tag<Color>, const boost::json::value &);
 }

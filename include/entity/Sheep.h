@@ -38,7 +38,7 @@ namespace Game3 {
 			void iterateGenes(const std::function<void(const Gene &)> &) const override;
 
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			std::vector<ItemStackPtr> getDrops() override {
 				std::vector<ItemStackPtr> out = Animal::getDrops();

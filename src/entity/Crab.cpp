@@ -97,7 +97,7 @@ namespace Game3 {
 		buffer << breed;
 	}
 
-	void Crab::decode(Buffer &buffer) {
+	void Crab::decode(BasicBuffer &buffer) {
 		Animal::decode(buffer);
 		buffer >> breed;
 		texture = nullptr;

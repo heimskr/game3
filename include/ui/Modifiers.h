@@ -4,6 +4,7 @@
 #include <string>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 
 	struct Modifiers {
@@ -35,7 +36,7 @@ namespace Game3 {
 	Modifiers popBuffer<Modifiers>(Buffer &);
 	Buffer & operator+=(Buffer &, const Modifiers &);
 	Buffer & operator<<(Buffer &, const Modifiers &);
-	Buffer & operator>>(Buffer &, Modifiers &);
+	BasicBuffer & operator>>(BasicBuffer &, Modifiers &);
 }
 
 template <>

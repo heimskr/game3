@@ -30,7 +30,7 @@ namespace Game3 {
 			int getZIndex() const override;
 
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 			struct RandomizationOptions {
 				float sizeMin = 0.5;
@@ -45,7 +45,7 @@ namespace Game3 {
 				float alphaMax = 1.0;
 
 				void encode(Buffer &);
-				void decode(Buffer &);
+				void decode(BasicBuffer &);
 			};
 
 		private:

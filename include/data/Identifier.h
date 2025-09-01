@@ -8,6 +8,7 @@
 #include <boost/json/fwd.hpp>
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 
 	struct Identifier {
@@ -108,7 +109,7 @@ namespace Game3 {
 	Identifier popBuffer<Identifier>(Buffer &);
 	Buffer & operator+=(Buffer &, const Identifier &);
 	Buffer & operator<<(Buffer &, const Identifier &);
-	Buffer & operator>>(Buffer &, Identifier &);
+	BasicBuffer & operator>>(BasicBuffer &, Identifier &);
 }
 
 template <>

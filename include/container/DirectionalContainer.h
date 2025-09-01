@@ -5,6 +5,7 @@
 #include "net/Buffer.h"
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 
 	template <typename T>
@@ -97,7 +98,7 @@ namespace Game3 {
 	}
 
 	template <typename T>
-	Buffer & operator>>(Buffer &buffer, DirectionalContainer<T> &container) {
+	BasicBuffer & operator>>(BasicBuffer &buffer, DirectionalContainer<T> &container) {
 		return buffer >> container.north >> container.east >> container.south >> container.west;
 	}
 }

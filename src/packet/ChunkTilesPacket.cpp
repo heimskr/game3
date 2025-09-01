@@ -48,7 +48,9 @@ namespace Game3 {
 	void ChunkTilesPacket::decode(Game &, Buffer &buffer) {
 		Buffer secondary{buffer.target};
 		buffer >> secondary.bytes;
-		secondary.bytes = LZ4::decompress(secondary.getSpan());
+		auto span = secondary.getSpan();
+		auto decompressed = LZ4::decompress({span.begin(), span.end()});
+		secondary.bytes = {decompressed.begin(), decompressed.end()};
 		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids >> pathmap;
 	}
 

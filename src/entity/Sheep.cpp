@@ -155,7 +155,7 @@ namespace Game3 {
 		buffer << valueMultiplier;
 	}
 
-	void Sheep::decode(Buffer &buffer) {
+	void Sheep::decode(BasicBuffer &buffer) {
 		Animal::decode(buffer);
 		buffer >> hue;
 		buffer >> saturation;

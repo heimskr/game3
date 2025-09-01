@@ -30,7 +30,7 @@ namespace Game3 {
 			HitPoints getMaxHealth() const override;
 			virtual bool wander();
 			void encode(Buffer &) override;
-			void decode(Buffer &) override;
+			void decode(BasicBuffer &) override;
 
 		protected:
 			Animal();

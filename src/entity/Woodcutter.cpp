@@ -143,9 +143,9 @@ namespace Game3 {
 		buffer << chosenResource << harvestingTime;
 	}
 
-	void Woodcutter::decode(Buffer &buffer) {
+	void Woodcutter::decode(BasicBuffer &buffer) {
 		Worker::decode(buffer);
-		buffer >> chosenResource << harvestingTime;
+		buffer >> chosenResource >> harvestingTime;
 	}
 
 	void Woodcutter::wakeUp() {

@@ -4,6 +4,7 @@
 #include "util/Concepts.h"
 
 namespace Game3 {
+	class BasicBuffer;
 	class Buffer;
 	class ClientGame;
 	class Game;
