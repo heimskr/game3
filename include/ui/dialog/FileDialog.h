@@ -72,5 +72,6 @@ namespace Game3 {
 
 			virtual bool filter(const std::filesystem::directory_entry &) const;
 			virtual TexturePtr getTexture(const std::filesystem::directory_entry &) const;
+			virtual bool isFile(const std::filesystem::directory_entry &) const;
 	};
 }

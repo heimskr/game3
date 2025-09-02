@@ -160,12 +160,12 @@ namespace Game3 {
 
 			std::error_code code{};
 
-			if (entry.is_directory(code) && !code) {
-				directories.emplace(entry);
-			} else if (entry.is_regular_file(code) && !code) {
+			if (isFile(entry)) {
 				if (filter(entry)) {
 					worlds.emplace(entry);
 				}
+			} else if (entry.is_directory(code) && !code) {
+				directories.emplace(entry);
 			}
 		}
 
@@ -188,7 +188,7 @@ namespace Game3 {
 	}
 
 	TexturePtr FileDialog::getTexture(const std::filesystem::directory_entry &entry) const {
-		if (entry.is_regular_file()) {
+		if (isFile(entry)) {
 			if (entry.path().filename().extension() == GameDB::getFileExtension()) {
 				return cacheTexture("resources/gui/picture.png");
 			}
@@ -206,5 +206,10 @@ namespace Game3 {
 		}
 
 		return cacheTexture("resources/gui/question_mark.png");
+	}
+
+	bool FileDialog::isFile(const std::filesystem::directory_entry &entry) const {
+		std::error_code code{};
+		return entry.is_regular_file(code) && !code;
 	}
 }

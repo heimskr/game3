@@ -578,7 +578,7 @@ namespace Game3 {
 			buffer.take<std::string_view>();
 		}
 
-		if (release_place != nullptr) {
+		if (release_place) {
 			auto position = buffer.take<std::optional<Position>>();
 			auto realm_id = buffer.take<std::optional<RealmID>>();
 			if (!position || !realm_id) {
@@ -588,7 +588,7 @@ namespace Game3 {
 			}
 		}
 
-		if (buffer_out != nullptr) {
+		if (buffer_out) {
 			*buffer_out << buffer;
 		}
 

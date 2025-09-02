@@ -22,4 +22,9 @@ namespace Game3 {
 	bool WorldSelectorDialog::filter(const std::filesystem::directory_entry &entry) const {
 		return entry.path().extension() == GameDB::getFileExtension();
 	}
+
+	bool WorldSelectorDialog::isFile(const std::filesystem::directory_entry &entry) const {
+		std::error_code code{};
+		return (entry.is_regular_file(code) && !code) || entry.path().extension() == GameDB::getFileExtension();
+	}
 }

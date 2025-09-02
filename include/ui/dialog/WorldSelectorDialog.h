@@ -9,5 +9,6 @@ namespace Game3 {
 
 		protected:
 			bool filter(const std::filesystem::directory_entry &) const override;
+			bool isFile(const std::filesystem::directory_entry &) const override;
 	};
 }
