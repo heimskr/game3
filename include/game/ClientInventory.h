@@ -54,9 +54,9 @@ namespace Game3 {
 	using ClientInventoryPtr = std::shared_ptr<ClientInventory>;
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	ClientInventory popBuffer<ClientInventory>(Buffer &);
+	ClientInventory popBuffer<ClientInventory>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const ClientInventory &);
 	Buffer & operator<<(Buffer &, const ClientInventory &);
 	BasicBuffer & operator>>(BasicBuffer &, ClientInventory &);

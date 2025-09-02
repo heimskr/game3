@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <span>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -17,6 +18,17 @@
 #include <boost/json/fwd.hpp>
 
 namespace Game3 {
+	template <typename T, template <typename...> typename U>
+	concept IsSpecializationOf = requires(std::remove_cvref_t<T> t) {
+		// https://www.reddit.com/r/cpp/comments/1hw6a29/a_concept_for_is_specialization_of/m61d6wv/
+		[]<typename... Args>(U<Args...> &){}(t);
+	};
+
+	template <typename T>
+	concept IsDynamicSpan = requires(std::remove_cvref_t<T> t) {
+		[]<typename U>(std::span<U, std::dynamic_extent> &){}(t);
+	};
+
 	template <typename T>
 	concept Map =
 		std::derived_from<T, std::map<typename T::key_type, typename T::mapped_type, typename T::key_compare, typename T::allocator_type>> ||
@@ -37,6 +49,7 @@ namespace Game3 {
 		requires !std::same_as<T, std::string>;
 		requires !std::same_as<T, std::string_view>;
 		requires !std::same_as<T, boost::json::value>;
+		requires !IsDynamicSpan<T>;
 	};
 
 	template <typename T>
@@ -82,10 +95,4 @@ namespace Game3 {
 
 	template <typename T>
 	concept EnumClass = !std::is_convertible_v<T, int> && std::is_enum_v<T>;
-
-	template <typename T, template <typename...> typename U>
-	concept IsSpecializationOf = requires(std::remove_cvref_t<T> t) {
-		// https://www.reddit.com/r/cpp/comments/1hw6a29/a_concept_for_is_specialization_of/m61d6wv/
-		[]<typename... Args>(U<Args...> &){}(t);
-	};
 }

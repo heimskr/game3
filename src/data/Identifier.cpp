@@ -50,14 +50,14 @@ namespace Game3 {
 	}
 
 	template <>
-	Identifier popBuffer<Identifier>(Buffer &buffer) {
+	Identifier popBuffer<Identifier>(BasicBuffer &buffer) {
 		return {popBuffer<std::string>(buffer)};
 	}
 
 	template <>
 	std::string BasicBuffer::getType(const Identifier &identifier, bool in_container) {
 		if (in_container) {
-			return getType(BufferTag<std::string>{}, true);
+			return getType(std::string{}, true);
 		}
 		return getType(identifier.str(), false);
 	}

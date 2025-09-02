@@ -56,9 +56,9 @@ namespace Game3 {
 	};
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	UString popBuffer<UString>(Buffer &);
+	UString popBuffer<UString>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const UString &);
 	Buffer & operator<<(Buffer &, const UString &);
 	BasicBuffer & operator>>(BasicBuffer &, UString &);

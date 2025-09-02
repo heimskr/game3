@@ -175,6 +175,8 @@ namespace Game3 {
 				for (const auto &[realm_id, realm]: realms)
 					function(realm);
 			}
+
+		friend class GameDB;
 	};
 
 	void tag_invoke(boost::json::value_from_tag, boost::json::value &, const Game &);

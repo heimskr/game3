@@ -44,9 +44,9 @@ namespace Game3 {
 	ServerInventory tag_invoke(boost::json::value_to_tag<ServerInventory>, const boost::json::value &, const std::pair<GamePtr, AgentPtr> &);
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	ServerInventory popBuffer<ServerInventory>(Buffer &);
+	ServerInventory popBuffer<ServerInventory>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const ServerInventory &);
 	Buffer & operator<<(Buffer &, const ServerInventory &);
 	BasicBuffer & operator>>(BasicBuffer &, ServerInventory &);

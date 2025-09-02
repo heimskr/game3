@@ -80,6 +80,18 @@ namespace Game3 {
 		close();
 	}
 
+	template <>
+	std::optional<std::string> GameDB::tryRead<std::string>(const leveldb::Slice &key) {
+		GameDBScope scope{*this};
+		std::string out;
+		DBStatus status(database->Get(getReadOptions(), key, &out));
+		if (status.status.IsNotFound()) {
+			return std::nullopt;
+		}
+		status.assertOK();
+		return std::move(out);
+	}
+
 	int64_t GameDB::getCurrentFormatVersion() {
 		return 6;
 	}
@@ -226,6 +238,27 @@ namespace Game3 {
 		}
 
 		DBStatus(database->Write(getWriteOptions(), &batch)).assertOK();
+	}
+
+	void GameDB::readVillages() {
+		GameDBScope scope{*this};
+		ServerGamePtr game = getGame();
+
+		auto &village_map = game->villageMap;
+		auto lock = village_map.uniqueLock();
+		village_map.clear();
+		game->lastVillageID = 0;
+
+		iterate(VILLAGE_PREFIX, [&](std::string_view, std::string_view value) {
+			ViewBuffer buffer{value, Side::Server};
+			auto village = std::make_shared<Village>();
+			village->decode(buffer);
+
+			village_map[village->getID()] = village;
+			game->lastVillageID = std::max(game->lastVillageID.load(), village->getID()); // TODO: fetch_max when C++26 is a thing
+			village->setGame(game);
+			game->associateWithRealm(village, village->getRealmID());
+		});
 	}
 
 	void GameDB::writeVillages() {
@@ -762,6 +795,10 @@ namespace Game3 {
 
 		json = boost::json::parse(ViewBuffer{*raw, Side::Server}.take<std::string_view>());
 		return true;
+	}
+
+	bool GameDB::isOpen() {
+		return database != nullptr;
 	}
 
 	template <>

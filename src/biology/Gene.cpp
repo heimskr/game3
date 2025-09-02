@@ -258,7 +258,7 @@ namespace Game3 {
 // Buffer methods
 
 	template <>
-	std::string BasicBuffer::getType(BufferTag<FloatGene>, bool) {
+	std::string BasicBuffer::getType(const FloatGene &, bool) {
 		return std::string{'\xe5'};
 	}
 
@@ -283,7 +283,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string BasicBuffer::getType(BufferTag<LongGene>, bool) {
+	std::string BasicBuffer::getType(const LongGene &, bool) {
 		return std::string{'\xe6'};
 	}
 
@@ -308,7 +308,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string BasicBuffer::getType(BufferTag<CircularGene>, bool) {
+	std::string BasicBuffer::getType(const CircularGene &, bool) {
 		return std::string{'\xe7'};
 	}
 
@@ -333,7 +333,7 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string BasicBuffer::getType(BufferTag<StringGene>, bool) {
+	std::string BasicBuffer::getType(const StringGene &, bool) {
 		return std::string{'\xe8'};
 	}
 

@@ -176,16 +176,16 @@ namespace Game3 {
 
 			void absorbGame(Game &);
 
-		friend class Buffer;
+		friend class BasicBuffer;
 	};
 
 	using ItemStackPtr = std::shared_ptr<ItemStack>;
 	using ConstItemStackPtr = std::shared_ptr<const ItemStack>;
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	ItemStackPtr popBuffer<ItemStackPtr>(Buffer &);
+	ItemStackPtr popBuffer<ItemStackPtr>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const ItemStackPtr &);
 	Buffer & operator<<(Buffer &, const ItemStackPtr &);
 	BasicBuffer & operator>>(BasicBuffer &, ItemStackPtr &);

@@ -90,7 +90,7 @@ namespace Game3 {
 	}
 
 	template <>
-	ItemFilter::Config popBuffer<ItemFilter::Config>(Buffer &buffer) {
+	ItemFilter::Config popBuffer<ItemFilter::Config>(BasicBuffer &buffer) {
 		ItemFilter::Config out;
 		buffer >> out;
 		return out;

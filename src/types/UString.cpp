@@ -227,7 +227,7 @@ namespace Game3 {
 	}
 
 	template <>
-	UString popBuffer<UString>(Buffer &buffer) {
+	UString popBuffer<UString>(BasicBuffer &buffer) {
 		return {popBuffer<std::string>(buffer)};
 	}
 

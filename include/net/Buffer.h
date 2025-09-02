@@ -48,9 +48,6 @@ namespace Game3 {
 		virtual ~BufferContext() = default;
 	};
 
-	template <typename T>
-	struct BufferTag {};
-
 	class BasicBuffer {
 		protected:
 			BasicBuffer(Side target, std::weak_ptr<BufferContext> context = {}, size_t skip = 0);
@@ -62,50 +59,33 @@ namespace Game3 {
 
 			/* See doc/Protocol.md for a list of standard types. */
 			template <typename T>
-			std::string getType(BufferTag<T>, bool in_container);
+			std::string getType(const T &, bool in_container);
 
 			template <Map M>
-			inline std::string getType(BufferTag<M>, bool) {
-				return '\x21' + getType(BufferTag<typename M::key_type>{}, true) + getType(BufferTag<typename M::mapped_type>{}, true);
+			inline std::string getType(const M &, bool) {
+				return '\x21' + getType(typename M::key_type{}, true) + getType(typename M::mapped_type{}, true);
 			}
 
 			template <LinearOrSet T>
-			inline std::string getType(BufferTag<T>, bool) {
-				return '\x20' + getType(BufferTag<typename T::value_type>{}, true);
+			inline std::string getType(const T &, bool) {
+				return '\x20' + getType(typename T::value_type{}, true);
 			}
 
 			template <typename T>
 			requires std::is_enum_v<T>
 			inline std::string getType(const T &, bool in_container) {
-				return getType(BufferTag<std::underlying_type_t<T>>{}, in_container);
+				return getType(std::underlying_type_t<T>{}, in_container);
 			}
 
 			template <typename T>
-			requires (!IsSpecializationOf<T, BufferTag>)
-			inline std::string getType(const T &, bool in_container) {
-				return getType(BufferTag<T>{}, in_container);
-			}
-
-			template <typename T>
-			inline std::string getType(BufferTag<std::optional<T>>, bool in_container) {
+			inline std::string getType(const std::optional<T> &optional, bool in_container) {
 				if (in_container) {
-					return '\x0b' + getType(BufferTag<T>{}, true);
-				} else {
-					assert(!"Cannot use getType for BufferTag<std::optional>");
+					if (optional) {
+						return '\x0b' + getType(*optional, true);
+					}
+					return '\x0b' + getType(T{}, true);
 				}
-			}
-
-			template <typename T>
-			inline std::string getType(const std::optional<T> &item, bool in_container) {
-				if (in_container) {
-					return '\x0b' + getType(BufferTag<T>{}, true);
-				}
-				return item.has_value()? "\x0b" : "\x0c";
-			}
-
-			template <typename T>
-			inline std::string getType(BufferTag<std::shared_ptr<T>>, bool in_container) {
-				return getType(BufferTag<T>{}, in_container);
+				return optional.has_value()? "\x0b" : "\x0c";
 			}
 
 			template <typename T>
@@ -113,7 +93,7 @@ namespace Game3 {
 				if (pointer) {
 					return getType(*pointer, in_container);
 				}
-				return getType(BufferTag<T>{}, in_container);
+				return getType(T{}, in_container);
 			}
 
 			std::string popType();
@@ -238,17 +218,11 @@ namespace Game3 {
 				skip = 0;
 			}
 
-			inline void reserve(size_t to_reserve) { bytes.reserve(to_reserve); }
-
-			template <typename T>
-			inline Buffer & appendType(BufferTag<T> tag, bool in_container) {
-				const auto type = getType(tag, in_container);
-				bytes.insert(bytes.end(), type.begin(), type.end());
-				return *this;
+			inline void reserve(size_t to_reserve) {
+				bytes.reserve(to_reserve);
 			}
 
 			template <typename T>
-			requires (!IsSpecializationOf<T, BufferTag>)
 			inline Buffer & appendType(const T &item, bool in_container) {
 				const auto type = getType(item, in_container);
 				bytes.insert(bytes.end(), type.begin(), type.end());
@@ -286,7 +260,7 @@ namespace Game3 {
 			requires std::is_enum_v<T>
 			Buffer & operator<<(T item) {
 				using underlying = std::underlying_type_t<T>;
-				return appendType(BufferTag<underlying>{}, false) += static_cast<underlying>(item);
+				return appendType(underlying{}, false) += static_cast<underlying>(item);
 			}
 
 			template <typename T>
@@ -414,7 +388,7 @@ namespace Game3 {
 	template <LinearOrSet T>
 	inline BasicBuffer & operator>>(BasicBuffer &buffer, T &out) {
 		const auto type = buffer.popType();
-		if (std::string expected = buffer.getType(BufferTag<T>{}, false); !buffer.typesMatch(type, expected)) {
+		if (std::string expected = buffer.getType(out, false); !buffer.typesMatch(type, expected)) {
 			buffer.debug();
 			throw std::invalid_argument("Invalid type in buffer (expected list: " + hexString(expected, true) + "): " + hexString(type, true));
 		}

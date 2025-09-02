@@ -38,5 +38,7 @@ namespace Game3 {
 		private:
 			Lockable<std::map<VillageID, VillagePtr>> villageMap;
 			Atomic<VillageID> lastVillageID = 0;
+
+		friend class GameDB;
 	};
 }

@@ -104,9 +104,9 @@ namespace Game3 {
 
 	Identifier operator""_id(const char *string, size_t);
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	Identifier popBuffer<Identifier>(Buffer &);
+	Identifier popBuffer<Identifier>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const Identifier &);
 	Buffer & operator<<(Buffer &, const Identifier &);
 	BasicBuffer & operator>>(BasicBuffer &, Identifier &);

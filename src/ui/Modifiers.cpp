@@ -52,7 +52,7 @@ namespace Game3 {
 	}
 
 	template <>
-	Modifiers popBuffer<Modifiers>(Buffer &buffer) {
+	Modifiers popBuffer<Modifiers>(BasicBuffer &buffer) {
 		return {popBuffer<uint8_t>(buffer)};
 	}
 

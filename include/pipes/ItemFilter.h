@@ -86,10 +86,10 @@ namespace Game3 {
 	using ItemFilterPtr = std::shared_ptr<ItemFilter>;
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 
 	template <>
-	ItemStack popBuffer<ItemStack>(Buffer &);
+	ItemStack popBuffer<ItemStack>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const ItemFilter::Config &);
 	Buffer & operator<<(Buffer &, const ItemFilter::Config &);
 	BasicBuffer & operator>>(BasicBuffer &, ItemFilter::Config &);

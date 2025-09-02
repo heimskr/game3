@@ -31,9 +31,9 @@ namespace Game3 {
 	};
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	Modifiers popBuffer<Modifiers>(Buffer &);
+	Modifiers popBuffer<Modifiers>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const Modifiers &);
 	Buffer & operator<<(Buffer &, const Modifiers &);
 	BasicBuffer & operator>>(BasicBuffer &, Modifiers &);

@@ -70,11 +70,11 @@ namespace Game3 {
 	FluidStack tag_invoke(boost::json::value_to_tag<FluidStack>, const boost::json::value &, const GamePtr &);
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	FluidTile popBuffer<FluidTile>(Buffer &);
+	FluidTile popBuffer<FluidTile>(BasicBuffer &);
 	template <>
-	FluidStack popBuffer<FluidStack>(Buffer &);
+	FluidStack popBuffer<FluidStack>(BasicBuffer &);
 
 	Buffer & operator+=(Buffer &, const FluidTile &);
 	Buffer & operator<<(Buffer &, const FluidTile &);

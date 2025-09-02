@@ -346,17 +346,17 @@ namespace Game3 {
 	}
 
 	template <>
-	std::string BasicBuffer::getType<ItemStack>(BufferTag<ItemStack>, bool) {
+	std::string BasicBuffer::getType<ItemStack>(const ItemStack &, bool) {
 		return {'\xe0'};
 	}
 
 	template <>
-	std::string BasicBuffer::getType<ItemStackPtr>(BufferTag<ItemStackPtr>, bool) {
+	std::string BasicBuffer::getType<ItemStackPtr>(const ItemStackPtr &, bool) {
 		return {'\xe0'};
 	}
 
 	template <>
-	ItemStackPtr popBuffer<ItemStackPtr>(Buffer &buffer) {
+	ItemStackPtr popBuffer<ItemStackPtr>(BasicBuffer &buffer) {
 		auto context = buffer.context.lock();
 		assert(context);
 		auto &game = dynamic_cast<Game &>(*context);

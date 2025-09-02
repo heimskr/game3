@@ -24,9 +24,9 @@ namespace Game3 {
 	};
 
 	template <typename T>
-	T popBuffer(Buffer &);
+	T popBuffer(BasicBuffer &);
 	template <>
-	ExpandedServerInventory popBuffer<ExpandedServerInventory>(Buffer &);
+	ExpandedServerInventory popBuffer<ExpandedServerInventory>(BasicBuffer &);
 	Buffer & operator+=(Buffer &, const ExpandedServerInventory &);
 	Buffer & operator<<(Buffer &, const ExpandedServerInventory &);
 	BasicBuffer & operator>>(BasicBuffer &, ExpandedServerInventory &);

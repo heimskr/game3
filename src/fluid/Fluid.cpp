@@ -87,12 +87,12 @@ namespace Game3 {
 	}
 
 	template <>
-	FluidTile popBuffer<FluidTile>(Buffer &buffer) {
+	FluidTile popBuffer<FluidTile>(BasicBuffer &buffer) {
 		return FluidTile(popBuffer<FluidInt>(buffer));
 	}
 
 	template <>
-	FluidStack popBuffer<FluidStack>(Buffer &buffer) {
+	FluidStack popBuffer<FluidStack>(BasicBuffer &buffer) {
 		FluidStack out;
 		buffer >> out;
 		return out;
