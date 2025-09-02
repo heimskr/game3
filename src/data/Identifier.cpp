@@ -71,9 +71,7 @@ namespace Game3 {
 	}
 
 	BasicBuffer & operator>>(BasicBuffer &buffer, Identifier &identifier) {
-		std::string str;
-		buffer >> str;
-		identifier = std::string_view(str);
+		identifier = buffer.take<std::string_view>();
 		return buffer;
 	}
 }

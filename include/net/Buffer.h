@@ -123,9 +123,11 @@ namespace Game3 {
 				T out{};
 				std::memmove(reinterpret_cast<char *>(&out), span.data(), sizeof(T));
 
-				if constexpr (std::endian::native == std::endian::big)
+				if constexpr (std::endian::native == std::endian::big) {
 					return swapBytes(out);
-				return out;
+				} else {
+					return out;
+				}
 			}
 
 			static bool typesMatch(std::string_view, std::string_view);
@@ -312,8 +314,9 @@ namespace Game3 {
 			Buffer & operator+=(const T &container) {
 				assert(container.size() <= UINT32_MAX);
 				*this += static_cast<uint32_t>(container.size());
-				for (const auto &item: container)
+				for (const auto &item: container) {
 					*this += item;
+				}
 				return *this;
 			}
 
@@ -330,8 +333,9 @@ namespace Game3 {
 
 			template <typename T>
 			Buffer & operator+=(const std::optional<T> &item) {
-				if (item.has_value())
+				if (item.has_value()) {
 					return (*this += '\x0b') << *item;
+				}
 				return *this += '\x0c';
 			}
 
@@ -443,18 +447,20 @@ namespace Game3 {
 
 	template <typename T>
 	inline BasicBuffer & operator>>(BasicBuffer &buffer, std::shared_ptr<T> &out) {
+		if (out) {
+			return buffer >> *out;
+		}
+
 		const auto type = buffer.popType();
 		if (!buffer.typesMatch(type, buffer.getType(std::optional<T>(), false))) {
+			buffer.debug();
 			throw std::invalid_argument("Invalid type in buffer (expected optional<" + DEMANGLE(T) + ">: " + hexString(buffer.getType(std::optional<T>(), true), true) + "): " + hexString(type, true));
 		}
 		if (type == "\x0c") {
 			out = {};
 		} else {
-			if (!out) {
-				out = buffer.take<std::shared_ptr<T>>();
-			} else {
-				buffer >> *out;
-			}
+			out = std::make_shared<T>();
+			buffer >> *out;
 		}
 		return buffer;
 	}
@@ -480,9 +486,11 @@ namespace Game3 {
 
 		buffer.skip += sizeof(T);
 
-		if constexpr (std::endian::native == std::endian::big)
+		if constexpr (std::endian::native == std::endian::big) {
 			return swapBytes(out);
-		return out;
+		} else {
+			return out;
+		}
 	}
 
 	template <MutableLinear C>

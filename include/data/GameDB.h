@@ -245,13 +245,16 @@ namespace Game3 {
 			}
 
 			template <Numeric T>
-			T readNumber(const leveldb::Slice &key) {
-				T out;
-				std::string data = read(key);
-				if (data.size() != sizeof(T)) {
-					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(T), data.size(), sizeof(T)));
+			std::optional<T> tryReadNumber(const leveldb::Slice &key) {
+				std::optional<std::string> data = tryRead(key);
+				if (!data) {
+					return std::nullopt;
 				}
-				std::memcpy(&out, data.data(), sizeof(T));
+				T out;
+				if (data->size() != sizeof(T)) {
+					throw std::runtime_error(std::format("Invalid size for {}: {} (expected {})", DEMANGLE(T), data->size(), sizeof(T)));
+				}
+				std::memcpy(&out, data->data(), sizeof(T));
 				return toNative(out);
 			}
 

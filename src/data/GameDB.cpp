@@ -134,7 +134,11 @@ namespace Game3 {
 	}
 
 	int64_t GameDB::getCompatibility() {
-		return readNumber<int64_t>(FORMAT_VERSION_KEY) - getCurrentFormatVersion();
+		if (auto version = tryReadNumber<int64_t>(FORMAT_VERSION_KEY)) {
+			return *version - getCurrentFormatVersion();
+		}
+
+		return INT64_MIN;
 	}
 
 	void GameDB::writeAll() {

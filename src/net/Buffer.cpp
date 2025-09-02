@@ -715,7 +715,8 @@ namespace Game3 {
 			throw std::out_of_range("Buffer is too small");
 		}
 
-		out = {reinterpret_cast<const char *>(span.data()), span.size()};
+		out = {reinterpret_cast<const char *>(span.data()), size};
+		buffer.skip += size;
 		return buffer;
 	}
 
