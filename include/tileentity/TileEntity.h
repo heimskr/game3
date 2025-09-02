@@ -30,8 +30,8 @@ namespace Game3 {
 	 * GameDB layout:
 	 *     `u64` Global ID
 	 *     `i32` Realm ID
-	 *     `string` Tile entity ID
 	 *     `Position` Position
+	 *     `string` Tile entity ID
 	 *     `string` Tile ID
 	 *     `...` Encoded
 	 */

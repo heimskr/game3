@@ -101,9 +101,11 @@ namespace Game3 {
 		private:
 			std::weak_ptr<ServerGame> weakGame;
 			std::filesystem::path path;
+			Lockable<std::unordered_set<std::string>> displayNames;
 
 			std::unique_ptr<leveldb::Iterator> getIterator();
 			std::unique_ptr<leveldb::Iterator> getStartIterator();
+			bool hasKey(std::string_view);
 
 		public:
 			Lockable<std::unique_ptr<leveldb::DB>, std::recursive_mutex> database;
@@ -211,7 +213,7 @@ namespace Game3 {
 			void writeUser(Player &);
 			void writeReleasePlace(const std::string &username, const std::optional<Place> &release_place);
 			bool hasUsername(const std::string &username);
-			bool hasName(const std::string &username, const std::string &display_name);
+			bool hasDisplayName(const std::string &display_name);
 			std::optional<Place> readReleasePlace(const std::string &username);
 
 			void writeTileEntities(const std::function<bool(std::shared_ptr<TileEntity> &)> &);

@@ -37,6 +37,14 @@ namespace Game3 {
 			return std::format("{}{}", REALM_PREFIX, realm_id);
 		}
 
+		inline std::string getKey(const TileEntity &tile_entity) {
+			return std::format("{}{}", TILE_ENTITY_PREFIX, tile_entity.getGID());
+		}
+
+		inline std::string getKey(const Entity &entity) {
+			return std::format("{}{}", ENTITY_PREFIX, entity.getGID());
+		}
+
 		inline leveldb::Options getOpenOptions() {
 			leveldb::Options options;
 			options.create_if_missing = true;
@@ -290,11 +298,7 @@ namespace Game3 {
 		// and load the ones that haven't been loaded yet.
 
 		iterate(REALM_PREFIX, [&](std::string_view, std::string_view value) {
-			const auto *start = reinterpret_cast<const uint8_t *>(value.data());
-			size_t realm_id_size = 1 + sizeof(RealmID);
-			assert(value.size() >= realm_id_size);
-			std::vector<uint8_t> bytes(start, start + realm_id_size); // type indicator for RealmID is 1 byte in size
-			RealmID realm_id = Buffer(std::move(bytes), Side::Server).take<RealmID>();
+			RealmID realm_id = ViewBuffer{value, Side::Server}.take<RealmID>();
 			game->getRealm(realm_id, [&] { return loadRealm(realm_id); });
 		});
 
@@ -434,8 +438,8 @@ namespace Game3 {
 			if (buffer.take<RealmID>() != realm_id) {
 				return;
 			}
-			auto tile_entity_id = buffer.take<Identifier>();
 			buffer.take<Position>();
+			auto tile_entity_id = buffer.take<Identifier>();
 			buffer.take<Identifier>(); // tileID
 			auto factory = game->registry<TileEntityFactoryRegistry>().at(tile_entity_id);
 			assert(factory);
@@ -550,6 +554,10 @@ namespace Game3 {
 	void GameDB::writeUser(const std::string &username, const std::string &display_name, const Buffer &buffer, const std::optional<Place> &release_place) {
 		GameDBScope scope{*this};
 
+		displayNames.withUnique([&](auto &) {
+			displayNames.emplace(display_name);
+		});
+
 		Buffer data{Side::Server};
 		data << username << display_name;
 		if (release_place) {
@@ -595,6 +603,117 @@ namespace Game3 {
 		write(key, buffer);
 	}
 
+	bool GameDB::hasUsername(const std::string &username) {
+		GameDBScope scope{*this};
+		return hasKey(USER_PREFIX + username);
+	}
+
+	bool GameDB::hasDisplayName(const std::string &display_name) {
+		GameDBScope scope{*this};
+		return displayNames.withShared([&](const auto &) {
+			return displayNames.contains(display_name);
+		});
+	}
+
+	std::optional<Place> GameDB::readReleasePlace(const std::string &username) {
+		GameDBScope scope{*this};
+
+		std::string key = USER_PREFIX + username;
+		std::optional<std::string> raw = tryRead(key);
+
+		if (!raw) {
+			return std::nullopt;
+		}
+
+		ViewBuffer buffer{*raw, Side::Server};
+
+		buffer.take<std::string_view>(); // username
+		buffer.take<std::string_view>(); // display name
+
+		auto position = buffer.take<std::optional<Position>>();
+		auto realm_id = buffer.take<std::optional<RealmID>>();
+
+		if (!position || !realm_id) {
+			return std::nullopt;
+		}
+
+		return std::make_optional<Place>(*position, getGame()->getRealm(*realm_id), nullptr);
+	}
+
+	void GameDB::writeTileEntities(const std::function<bool(TileEntityPtr &)> &getter) {
+		GameDBScope scope{*this};
+
+		for (TileEntityPtr tile_entity; getter(tile_entity);) {
+			Buffer buffer{Side::Server,
+				tile_entity->getGID(),
+				tile_entity->getRealm()->getID(),
+				tile_entity->getPosition(),
+				tile_entity->tileEntityID,
+				tile_entity->tileID,
+			};
+			tile_entity->encode(*getGame(), buffer);
+
+			write(getKey(*tile_entity), buffer);
+		}
+	}
+
+	void GameDB::writeTileEntities(const RealmPtr &realm) {
+		realm->tileEntities.withShared([&](const auto &tile_entities) {
+			auto iter = tile_entities.begin();
+			writeTileEntities([&](TileEntityPtr &out) {
+				if (iter == tile_entities.end()) {
+					return false;
+				}
+				out = iter++->second;
+				return true;
+			});
+		});
+	}
+
+	void GameDB::deleteTileEntity(const TileEntityPtr &tile_entity) {
+		GameDBScope scope{*this};
+		erase(getKey(*tile_entity));
+	}
+
+	void GameDB::writeEntities(const std::function<bool(EntityPtr &)> &getter) {
+		GameDBScope scope{*this};
+
+		for (EntityPtr entity; getter(entity);) {
+			if (!entity->shouldPersist() || entity->isPlayer()) {
+				continue;
+			}
+
+			Buffer buffer{Side::Server,
+				entity->getGID(),
+				entity->getRealm()->getID(),
+				entity->getPosition(),
+				entity->getDirection(),
+				entity->type,
+			};
+			entity->encode(buffer);
+
+			write(getKey(*entity), buffer);
+		}
+	}
+
+	void GameDB::writeEntities(const RealmPtr &realm) {
+		realm->entities.withShared([&](const auto &entities) {
+			auto iter = entities.begin();
+			writeEntities([&](EntityPtr &out) {
+				if (iter == entities.end()) {
+					return false;
+				}
+				out = *iter++;
+				return true;
+			});
+		});
+	}
+
+	void GameDB::deleteEntity(const EntityPtr &entity) {
+		GameDBScope scope{*this};
+		erase(getKey(*entity));
+	}
+
 	template <>
 	std::optional<ChunkPosition> GameDB::tryRead<ChunkPosition>(const leveldb::Slice &key) {
 		if (auto pair = tryReadNumbers<ChunkPosition::IntType, 2>(key)) {
@@ -637,5 +756,12 @@ namespace Game3 {
 		auto it = getIterator();
 		it->SeekToFirst();
 		return it;
+	}
+
+	bool GameDB::hasKey(std::string_view key) {
+		auto it = getIterator();
+		leveldb::Slice slice(key.data(), key.size());
+		it->Seek(slice);
+		return it->Valid() && it->key() == slice;
 	}
 }
