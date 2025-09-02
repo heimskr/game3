@@ -156,7 +156,7 @@ namespace Game3 {
 
 			try {
 				game->openDatabase(worldPath);
-			} catch (const IncompatibleError &) {
+			} catch (...) {
 				failure = std::current_exception();
 				stop();
 				stop_thread.join();
