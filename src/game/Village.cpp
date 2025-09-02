@@ -253,7 +253,11 @@ namespace Game3 {
 		buffer >> position;
 		options = boost::json::value_to<VillageOptions>(boost::json::parse(buffer.take<std::string>()));
 		richness = boost::json::value_to<Richness>(boost::json::parse(buffer.take<std::string>()));
-		resources = boost::json::value_to<Resources>(boost::json::parse(buffer.take<std::string>()));
+		resources.clear();
+		boost::json::value resources_json = boost::json::parse(buffer.take<std::string>());
+		for (const auto &[resource, amount]: resources_json.as_object()) {
+			resources.emplace(resource, amount.as_double());
+		}
 		buffer >> name;
 		buffer >> labor;
 		buffer >> randomValue;

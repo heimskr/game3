@@ -15,7 +15,7 @@
 
 namespace Game3 {
 	constexpr static char SIMPLE_TYPES_MIN = '\xe0';
-	constexpr static char SIMPLE_TYPES_MAX = '\xea';
+	constexpr static char SIMPLE_TYPES_MAX = '\xeb';
 
 	BasicBuffer::BasicBuffer(Side target, std::weak_ptr<BufferContext> context, size_t skip):
 		skip(skip),

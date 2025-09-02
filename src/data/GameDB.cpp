@@ -157,6 +157,7 @@ namespace Game3 {
 
 	void GameDB::writeMisc() {
 		writeRaw(FORMAT_VERSION_KEY, getCurrentFormatVersion());
+		writeRules();
 	}
 
 	void GameDB::writeRules() {
@@ -173,7 +174,12 @@ namespace Game3 {
 		ServerGamePtr game = getGame();
 		auto lock = database.uniqueLock();
 		auto rules_lock = game->gameRules.uniqueLock();
-		boost::json::parse_into(game->gameRules.getBase(), read(GAME_RULES_KEY));
+		std::optional<std::string> raw = tryRead(GAME_RULES_KEY);
+		if (!raw) {
+			game->gameRules.clear();
+		} else {
+			boost::json::parse_into(game->gameRules.getBase(), *raw);
+		}
 	}
 
 	void GameDB::writeAllRealms() {
@@ -256,7 +262,7 @@ namespace Game3 {
 		iterate(VILLAGE_PREFIX, [&](std::string_view, std::string_view value) {
 			ViewBuffer buffer{value, Side::Server};
 			auto village = std::make_shared<Village>();
-			village->decode(buffer);
+			buffer >> *village;
 
 			village_map[village->getID()] = village;
 			game->lastVillageID = std::max(game->lastVillageID.load(), village->getID()); // TODO: fetch_max when C++26 is a thing
