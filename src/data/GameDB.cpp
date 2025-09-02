@@ -19,6 +19,7 @@ namespace Game3 {
 		const std::string ENTITY_PREFIX{"E::"};
 		const std::string META_PREFIX{"M::"};
 		const std::string REALM_PREFIX{"R::"};
+		const std::string TILESET_PREFIX{"S::"};
 		const std::string TILE_ENTITY_PREFIX{"T::"};
 		const std::string USER_PREFIX{"U::"};
 		const std::string VILLAGE_PREFIX{"V::"};
@@ -714,12 +715,53 @@ namespace Game3 {
 		erase(getKey(*entity));
 	}
 
+	std::string GameDB::readRealmTilesetHash(RealmID realm_id) {
+		GameDBScope scope{*this};
+
+		std::optional<std::string> raw = tryRead(getKey(realm_id));
+
+		if (!raw) {
+			throw std::out_of_range("Can't find tileset hash for realm " + std::to_string(realm_id));
+		}
+
+		ViewBuffer buffer{*raw, Side::Server};
+
+		buffer.take<RealmID>();
+		buffer.take<std::string_view>();
+		return buffer.take<std::string>();
+	}
+
+	bool GameDB::hasTileset(const std::string &hash) {
+		GameDBScope scope{*this};
+		return hasKey(TILESET_PREFIX + hash);
+	}
+
+	void GameDB::writeTilesetMeta(const Tileset &tileset) {
+		GameDBScope scope{*this};
+		boost::json::value json;
+		tileset.getMeta(json);
+		write(TILESET_PREFIX + tileset.getHash(), Buffer{Side::Server, json});
+	}
+
 	template <>
 	std::optional<ChunkPosition> GameDB::tryRead<ChunkPosition>(const leveldb::Slice &key) {
 		if (auto pair = tryReadNumbers<ChunkPosition::IntType, 2>(key)) {
 			return std::make_optional<ChunkPosition>((*pair)[0], (*pair)[1]);
 		}
 		return std::nullopt;
+	}
+
+	bool GameDB::readTilesetMeta(const std::string &hash, boost::json::value &json) {
+		GameDBScope scope{*this};
+
+		std::optional<std::string> raw = tryRead(TILESET_PREFIX + hash);
+
+		if (!raw) {
+			return false;
+		}
+
+		json = boost::json::parse(ViewBuffer{*raw, Side::Server}.take<std::string_view>());
+		return true;
 	}
 
 	template <>
