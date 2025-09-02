@@ -547,6 +547,54 @@ namespace Game3 {
 		return true;
 	}
 
+	void GameDB::writeUser(const std::string &username, const std::string &display_name, const Buffer &buffer, const std::optional<Place> &release_place) {
+		GameDBScope scope{*this};
+
+		Buffer data{Side::Server};
+		data << username << display_name;
+		if (release_place) {
+			data << std::optional<Position>(release_place->position);
+			data << std::optional<RealmID>(release_place->realm->getID());
+		} else {
+			data << std::nullopt;
+			data << std::nullopt;
+		}
+		data << buffer;
+
+		write(USER_PREFIX + username, data);
+	}
+
+	void GameDB::writeUser(Player &player) {
+		Buffer buffer{Side::Server};
+		player.encode(buffer);
+		writeUser(player.username.copyBase(), player.displayName, buffer, std::nullopt);
+	}
+
+	void GameDB::writeReleasePlace(const std::string &username, const std::optional<Place> &release_place) {
+		GameDBScope scope{*this};
+
+		std::string key = USER_PREFIX + username;
+		std::string raw = read(key);
+
+		ViewBuffer old_buffer{raw, Side::Server};
+		Buffer buffer{Side::Server};
+
+		buffer << old_buffer.take<std::string_view>(); // username
+		buffer << old_buffer.take<std::string_view>(); // display name
+		if (release_place) {
+			buffer << std::optional<Position>(release_place->position);
+			buffer << std::optional<RealmID>(release_place->realm->getID());
+		} else {
+			buffer << std::nullopt;
+			buffer << std::nullopt;
+		}
+		old_buffer.take<std::optional<Position>>();
+		old_buffer.take<std::optional<RealmID>>();
+		buffer << old_buffer;
+
+		write(key, buffer);
+	}
+
 	template <>
 	std::optional<ChunkPosition> GameDB::tryRead<ChunkPosition>(const leveldb::Slice &key) {
 		if (auto pair = tryReadNumbers<ChunkPosition::IntType, 2>(key)) {

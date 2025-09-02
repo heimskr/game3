@@ -685,6 +685,11 @@ namespace Game3 {
 		return *this;
 	}
 
+	Buffer & Buffer::operator<<(std::nullopt_t) {
+		appendType(std::nullopt, false);
+		return *this;
+	}
+
 	template <>
 	BasicBuffer & operator>>(BasicBuffer &buffer, std::string_view &out) {
 		const std::string type = buffer.popType();

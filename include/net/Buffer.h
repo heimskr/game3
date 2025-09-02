@@ -270,6 +270,7 @@ namespace Game3 {
 			Buffer & operator<<(const std::string &);
 			Buffer & operator<<(const char *);
 			Buffer & operator<<(const BasicBuffer &);
+			Buffer & operator<<(std::nullopt_t);
 
 			template <LinearOrSet T>
 			Buffer & operator<<(const T &container) {
