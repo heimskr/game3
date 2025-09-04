@@ -109,8 +109,15 @@ namespace std {
 	requires (std::same_as<C<K, V>, std::map<K, V>> || std::same_as<C<K, V>, std::unordered_map<K, V>>)
 	auto tag_invoke(boost::json::value_to_tag<C<K, V>>, const boost::json::value &value) {
 		C<K, V> out;
-		for (const auto &[key, value]: value.as_object()) {
-			out[Game3::fromString<K>(std::string_view(key))] = boost::json::value_to<V>(value);
+		if (const boost::json::object *object = value.if_object()) {
+			for (const auto &[key, value]: *object) {
+				out[Game3::fromString<K>(std::string_view(key))] = boost::json::value_to<V>(value);
+			}
+		} else {
+			for (const boost::json::value &pair: value.as_array()) {
+				const boost::json::array &array = pair.as_array();
+				out[Game3::fromString<K>(std::string_view(array[0].as_string()))] = boost::json::value_to<V>(array[1]);
+			}
 		}
 		return out;
 	}

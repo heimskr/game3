@@ -5,6 +5,7 @@
 #include "game/Game.h"
 #include "game/Resource.h"
 #include "game/Village.h"
+#include "lib/JSON.h"
 #include "packet/VillageUpdatePacket.h"
 #include "threading/ThreadContext.h"
 #include "util/Util.h"
@@ -251,13 +252,9 @@ namespace Game3 {
 		buffer >> realmID;
 		buffer >> chunkPosition;
 		buffer >> position;
-		options = boost::json::value_to<VillageOptions>(boost::json::parse(buffer.take<std::string>()));
-		richness = boost::json::value_to<Richness>(boost::json::parse(buffer.take<std::string>()));
-		resources.clear();
-		boost::json::value resources_json = boost::json::parse(buffer.take<std::string>());
-		for (const auto &[resource, amount]: resources_json.as_object()) {
-			resources.emplace(resource, amount.as_double());
-		}
+		options = boost::json::value_to<VillageOptions>(boost::json::parse(buffer.take<std::string_view>()));
+		richness = boost::json::value_to<Richness>(boost::json::parse(buffer.take<std::string_view>()));
+		resources = boost::json::value_to<Resources>(boost::json::parse(buffer.take<std::string_view>()));
 		buffer >> name;
 		buffer >> labor;
 		buffer >> randomValue;

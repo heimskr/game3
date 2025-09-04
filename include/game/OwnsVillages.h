@@ -7,10 +7,6 @@
 #include <atomic>
 #include <map>
 
-namespace SQLite {
-	class Database;
-}
-
 namespace Game3 {
 	class Game;
 	class Village;
@@ -28,8 +24,6 @@ namespace Game3 {
 			VillagePtr getVillage(VillageID id) const;
 			VillagePtr addVillage(Game &, ChunkPosition, const Place &, const VillageOptions &);
 			VillagePtr addVillage(Game &, VillageID, std::string name, RealmID, ChunkPosition, const Position &, Resources = {});
-			void saveVillages(SQLite::Database &, bool use_transaction = true);
-			void loadVillages(const std::shared_ptr<Game> &, SQLite::Database &);
 			inline const auto & getVillageMap() { return villageMap; }
 
 		protected:

@@ -12,7 +12,6 @@ cmake = import('cmake')
 
 chemskr = subproject('chemskr')
 namegen = subproject('namegen')
-sqlitecpp = subproject('sqlitecpp', default_options: 'default_library=static')
 miniaudio = subproject('miniaudio')
 clip = cmake.subproject('clip')
 
@@ -56,7 +55,6 @@ game3_deps = [
 	chemskr.get_variable('chemskr'),
 	namegen.get_variable('namegen'),
 	miniaudio.get_variable('miniaudio'),
-	sqlitecpp.get_variable('sqlitecpp_dep'),
 ]
 
 if get_option('use_unwind')
