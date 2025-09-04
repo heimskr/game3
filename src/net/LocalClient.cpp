@@ -107,6 +107,10 @@ namespace Game3 {
 #endif
 	}
 
+	void LocalClient::disconnect() {
+		close();
+	}
+
 	void LocalClient::read() {
 		if (buffer.context.expired()) {
 			if (ClientGamePtr game = getGame()) {

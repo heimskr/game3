@@ -13,6 +13,7 @@ namespace Game3 {
 
 			void send(const PacketPtr &) final;
 			void connect(std::string_view hostname, uint16_t port) final;
+			void disconnect() final;
 			bool isConnected() const final;
 
 			void receive(const PacketPtr &);

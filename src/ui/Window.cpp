@@ -721,6 +721,10 @@ namespace Game3 {
 
 		// richPresence.setActivityDetails("Idling");
 
+		if (LocalClientPtr client = game->getClient()) {
+			client->disconnect();
+		}
+
 		connected = false;
 		if (auto game_ui = uiContext.getUI<GameUI>()) {
 			game_ui->removeModule();

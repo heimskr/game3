@@ -45,6 +45,7 @@ namespace Game3 {
 			virtual void send(const PacketPtr &);
 
 			virtual void connect(std::string_view hostname, uint16_t port);
+			virtual void disconnect();
 			void read();
 			virtual bool isConnected() const;
 			std::shared_ptr<ClientGame> getGame() const;

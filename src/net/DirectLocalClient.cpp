@@ -24,6 +24,10 @@ namespace Game3 {
 		// Connection requests go into a black hole. We're effectively already connected through shared memory.
 	}
 
+	void DirectLocalClient::disconnect() {
+		// Same here.
+	}
+
 	bool DirectLocalClient::isConnected() const {
 		return getRemote() != nullptr;
 	}
