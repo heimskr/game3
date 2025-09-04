@@ -680,8 +680,7 @@ namespace Game3 {
 	}
 
 	Buffer & Buffer::operator<<(const BasicBuffer &other) {
-		std::span<const uint8_t> view = other.getSpan(); // TODO!: this was originally just `bytes`, including skipped data. Verify that getSpan() is correct.
-		append(view.begin(), view.end());
+		append(other.getSpan()); // TODO!: this was originally just `bytes`, including skipped data. Verify that getSpan() is correct.
 		return *this;
 	}
 
