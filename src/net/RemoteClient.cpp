@@ -231,7 +231,7 @@ namespace Game3 {
 						// 1 corresponds to stream truncated, a very common error that I don't really consider an error
 						SUCCESS("Mostly managed to shut down client {}.", id);
 					} else {
-						ERR("SSL client shutdown failed: {} ({})", errc.message(), errc.value());
+						ERR("Remote client SSL shutdown failed: {} ({})", errc.message(), errc.value());
 					}
 				} else {
 					socket.lowest_layer().close();
@@ -240,7 +240,7 @@ namespace Game3 {
 			} catch (const asio::system_error &err) {
 				// Who really cares if SSL doesn't shut down properly?
 				// Who decided that the client is worthy of a proper shutdown?
-				ERR("Shutdown ({}): {} ({})", ip, err.what(), err.code().value());
+				ERR("Remote client SSL shutdown ({}): {} ({})", ip, err.what(), err.code().value());
 			}
 		});
 	}

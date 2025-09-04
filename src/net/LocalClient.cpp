@@ -311,7 +311,15 @@ namespace Game3 {
 	void LocalClient::close() {
 #ifdef USE_TLS
 		if (sslReady) {
-			sslSock.shutdown();
+			asio::error_code errc;
+			sslSock.shutdown(errc);
+			if (errc) {
+				if (errc.value() == 1) {
+					// Stream truncated. Who cares?
+				} else {
+					ERR("Local client SSL shutdown failed: {} ({})", errc.message(), errc.value());
+				}
+			}
 			sslReady = false;
 		}
 
