@@ -95,4 +95,16 @@ namespace Game3 {
 
 	template <typename T>
 	concept EnumClass = !std::is_convertible_v<T, int> && std::is_enum_v<T>;
+
+	template <typename T>
+	concept RandomAccessContainer = requires(T t) {
+		requires std::random_access_iterator<decltype(t.begin())>;
+		requires std::random_access_iterator<decltype(t.end())>;
+	};
+
+	template <typename T>
+	concept RandomAccessByteContainer = requires(T t) {
+		requires RandomAccessContainer<T>;
+		requires (sizeof(t[0]) == 1);
+	};
 }

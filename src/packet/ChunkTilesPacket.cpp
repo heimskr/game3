@@ -46,12 +46,9 @@ namespace Game3 {
 	}
 
 	void ChunkTilesPacket::decode(Game &, BasicBuffer &buffer) {
-		Buffer secondary{buffer.target};
-		buffer >> secondary.bytes;
-		auto span = secondary.getSpan();
-		auto decompressed = LZ4::decompress({span.begin(), span.end()});
-		secondary.bytes = {decompressed.begin(), decompressed.end()};
-		secondary >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids >> pathmap;
+		auto decompressed = LZ4::decompress(buffer.take<std::span<const uint8_t>>());
+		ViewBuffer view{decompressed, buffer.target};
+		view >> realmID >> chunkPosition >> updateCounter >> tiles >> fluids >> pathmap;
 	}
 
 	void ChunkTilesPacket::handle(const ClientGamePtr &game) {

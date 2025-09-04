@@ -680,7 +680,7 @@ namespace Game3 {
 	}
 
 	Buffer & Buffer::operator<<(const BasicBuffer &other) {
-		std::span view = other.getSpan(); // TODO!: this was originally just `bytes`, including skipped data. Verify that getSpan() is correct.
+		std::span<const uint8_t> view = other.getSpan(); // TODO!: this was originally just `bytes`, including skipped data. Verify that getSpan() is correct.
 		append(view.begin(), view.end());
 		return *this;
 	}
@@ -733,6 +733,14 @@ namespace Game3 {
 		std::string_view view;
 		buffer >> view;
 		out = view;
+		return buffer;
+	}
+
+	template <>
+	BasicBuffer & operator>>(BasicBuffer &buffer, std::span<const uint8_t> &out) {
+		std::string_view view;
+		buffer >> view;
+		out = {reinterpret_cast<const uint8_t *>(out.data()), out.size_bytes()};
 		return buffer;
 	}
 

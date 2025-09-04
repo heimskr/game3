@@ -351,6 +351,11 @@ namespace Game3 {
 
 			ViewBuffer(std::string_view bytes, Side target);
 
+			template <RandomAccessByteContainer C>
+			ViewBuffer(const C &container, Side target):
+				BasicBuffer(target),
+				bytes(reinterpret_cast<const char *>(&*container.begin()), reinterpret_cast<const char *>(&*container.end())) {}
+
 			ViewBuffer(const ViewBuffer &) = default;
 			ViewBuffer(ViewBuffer &&) noexcept;
 
