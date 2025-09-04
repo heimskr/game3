@@ -691,8 +691,8 @@ namespace Game3 {
 
 	template <>
 	BasicBuffer & operator>>(BasicBuffer &buffer, std::string_view &out) {
-		const std::string type = buffer.popType();
-		const char front = type.front();
+		std::string type = buffer.popType();
+		char front = type.front();
 		uint32_t size{};
 		if (front == '\x1f') {
 			size = popBuffer<uint32_t>(buffer);
@@ -737,9 +737,13 @@ namespace Game3 {
 
 	template <>
 	BasicBuffer & operator>>(BasicBuffer &buffer, std::span<const uint8_t> &out) {
-		std::string_view view;
-		buffer >> view;
-		out = {reinterpret_cast<const uint8_t *>(out.data()), out.size_bytes()};
+		std::string type = buffer.popType();
+		if (type != "\x20\x01") {
+			throw std::invalid_argument("Invalid type in buffer (expected list<u8>): " + hexString(type, true));
+		}
+		size_t size = popBuffer<uint32_t>(buffer);
+		out = buffer.getSpan().subspan(0, size);
+		buffer.skip += size;
 		return buffer;
 	}
 
