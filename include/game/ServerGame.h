@@ -6,7 +6,6 @@
 #include "game/Game.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
-#include "threading/ThreadPool.h"
 
 #include <filesystem>
 #include <memory>
@@ -88,7 +87,6 @@ namespace Game3 {
 			MTQueue<std::pair<std::weak_ptr<GenericClient>, std::shared_ptr<Packet>>> packetQueue;
 			MTQueue<std::weak_ptr<ServerPlayer>> playerRemovalQueue;
 			double timeSinceTimeUpdate = 0;
-			ThreadPool pool;
 			std::unique_ptr<GameDB> database;
 			Token omnitoken = generateRandomToken();
 			bool databaseValid = false;

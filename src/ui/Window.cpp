@@ -726,13 +726,25 @@ namespace Game3 {
 		}
 
 		connected = false;
+
 		if (auto game_ui = uiContext.getUI<GameUI>()) {
 			game_ui->removeModule();
 		}
-		game->stopThread();
-		setGame({});
-		serverWrapper.stop();
-		goToTitle();
+
+		uiContext.removeDialogs<OmniDialog>();
+
+		game->asyncStopThread(std::chrono::milliseconds(666))->then([self = shared_from_this()] {
+			self->queue([](Window &window) {
+				window.setGame(nullptr);
+				window.serverWrapper.stop();
+				window.goToTitle();
+			});
+		})->oops([self = shared_from_this()](auto) {
+			self->queue([](Window &window) {
+				window.setGame(nullptr);
+				window.serverWrapper.stop();
+			});
+		});
 	}
 
 	void Window::goToTitle() {
@@ -751,7 +763,6 @@ namespace Game3 {
 
 		connected = true;
 		uiContext.reset();
-		/// uiContext.addDialog(getChatDialog());
 
 		game->initInteractionSets();
 		settings.apply(*game);
@@ -852,7 +863,7 @@ namespace Game3 {
 		game->startThread();
 	}
 
-	bool Window::connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> client) {
+	Ref<Promise<void>> Window::connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> client) {
 		closeGame();
 
 		setGame(std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this())));
@@ -870,37 +881,32 @@ namespace Game3 {
 
 		game->setClient(client);
 
-		try {
+		return Promise<void>::now([self = shared_from_this(), hostname, port, client](auto resolve) {
 			client->connect(hostname, port);
-		} catch (const std::exception &err) {
-			closeGame();
-			error(err.what(), true, false, [this] { goToTitle(); });
-			return false;
-		}
+			client->weakGame = self->game;
 
-		client->weakGame = game;
+			self->game->initEntities();
 
-		game->initEntities();
+			self->settings.withUnique([&](auto &) {
+				self->settings.hostname = hostname;
+				self->settings.port = port;
+			});
 
-		settings.withUnique([&](auto &) {
-			settings.hostname = hostname;
-			settings.port = port;
+			if (std::filesystem::exists("tokens.json")) {
+				client->readTokens("tokens.json");
+			} else {
+				client->saveTokens("tokens.json");
+			}
+
+			self->activateContext();
+			self->onGameLoaded();
+
+			if (self->settings.alertOnConnection) {
+				self->alert("Connected.");
+			}
+
+			resolve();
 		});
-
-		if (std::filesystem::exists("tokens.json")) {
-			client->readTokens("tokens.json");
-		} else {
-			client->saveTokens("tokens.json");
-		}
-
-		activateContext();
-		onGameLoaded();
-
-		if (settings.alertOnConnection) {
-			alert("Connected.");
-		}
-
-		return true;
 	}
 
 	void Window::autoConnect() {
@@ -911,24 +917,29 @@ namespace Game3 {
 			return;
 		}
 
-		if (!connect(settings.hostname, settings.port)) {
-			return;
-		}
+		connect(settings.hostname, settings.port)->then([self = shared_from_this()] {
+			LocalClientPtr client = self->game->getClient();
+			const std::string &hostname = client->getHostname();
+			if (std::optional<Token> token = client->getToken(hostname, self->settings.username)) {
+				self->queueBool([client, token, hostname, username = self->settings.username](Window &window) {
+					if (window.game && client && client->isReady()) {
+						client->send(make<LoginPacket>(username, *token));
+						return true;
+					}
 
-		LocalClientPtr client = game->getClient();
-		const std::string &hostname = client->getHostname();
-		if (std::optional<Token> token = client->getToken(hostname, settings.username)) {
-			queueBool([client, token, hostname, username = settings.username](Window &window) {
-				if (window.game && client && client->isReady()) {
-					client->send(make<LoginPacket>(username, *token));
-					return true;
-				}
-
-				return false;
-			});
-		} else {
-			error("Couldn't find token for user " + settings.username + " on host " + hostname);
-		}
+					return false;
+				});
+			} else {
+				self->error(std::format("Couldn't find token for user {} on host {}", self->settings.username, hostname));
+			}
+		})->oops([self = shared_from_this()](std::exception_ptr exception) {
+			try {
+				std::rethrow_exception(std::move(exception));
+			} catch (const std::exception &err) {
+				self->closeGame();
+				self->error(err.what(), true, false, [self] { self->goToTitle(); });
+			}
+		});
 	}
 
 	void Window::showWorldSelector() {
@@ -1016,37 +1027,40 @@ namespace Game3 {
 	void Window::continueLocalConnection() {
 		auto client = std::make_shared<DirectLocalClient>();
 
-		if (!connect("::1", serverWrapper.getPort(), client)) {
-			error("Failed to connect to local server.");
-			closeGame();
-			return;
-		}
+		connect("::1", serverWrapper.getPort(), client)->then([this, client] {
+			assert(game != nullptr);
+			connectedLocally = true;
 
-		assert(game != nullptr);
-		connectedLocally = true;
+			// Tie the loop. Or whatever the expression is.
+			// What I'm trying to say is that we're doing a funny thing where we make both Direct*Clients point at each other.
+			client->setRemote(serverWrapper.getDirectRemoteClient(client));
 
-		// Tie the loop. Or whatever the expression is.
-		// What I'm trying to say is that we're doing a funny thing where we make both Direct*Clients point at each other.
-		client->setRemote(serverWrapper.getDirectRemoteClient(client));
+			client->queueForConnect([this, weak = std::weak_ptr(client)] {
+				if (LocalClientPtr client = weak.lock()) {
+					queue([this, client](Window &) {
+						activateContext();
+						auto dialog = make<LoginDialog>(uiContext, 1);
 
-		client->queueForConnect([this, weak = std::weak_ptr(client)] {
-			if (LocalClientPtr client = weak.lock()) {
-				queue([this, client](Window &) {
-					activateContext();
-					auto dialog = make<LoginDialog>(uiContext, 1);
-
-					dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
-						client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
-					});
-
-					dialog->signalDismiss.connect([this] {
-						queue([this](Window &) {
-							closeGame();
+						dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
+							client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
 						});
-					});
 
-					uiContext.addDialog(std::move(dialog));
-				});
+						dialog->signalDismiss.connect([this] {
+							queue([this](Window &) {
+								closeGame();
+							});
+						});
+
+						uiContext.addDialog(std::move(dialog));
+					});
+				}
+			});
+		})->oops([self = shared_from_this()](std::exception_ptr exception) {
+			try {
+				std::rethrow_exception(std::move(exception));
+			} catch (const std::exception &err) {
+				self->error("Failed to connect to local server.");
+				self->closeGame();
 			}
 		});
 	}
@@ -1123,11 +1137,13 @@ namespace Game3 {
 	}
 
 	void Window::disconnect() {
-		if (isConnectedLocally()) {
-			serverWrapper.stop();
-		}
+		queue([](Window &window) {
+			if (window.isConnectedLocally()) {
+				window.serverWrapper.stop();
+			}
 
-		closeGame();
+			window.closeGame();
+		});
 	}
 
 	bool Window::isKeyHeld(int key) const {

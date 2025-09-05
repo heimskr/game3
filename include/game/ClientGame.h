@@ -1,21 +1,26 @@
 #pragma once
 
 #include "client/ClientSettings.h"
+#include "error/TimeoutError.h"
 #include "game/Game.h"
 #include "graphics/Omniatlas.h"
 #include "math/Rectangle.h"
 #include "threading/Atomic.h"
+#include "threading/Promise.h"
 #include "threading/Waiter.h"
 #include "types/UString.h"
 #include "ui/Modifiers.h"
 #include "ui/Sound.h"
+#include "util/Concepts.h"
 
 #include <sigc++/sigc++.h>
 
 #include <atomic>
 #include <condition_variable>
 #include <functional>
+#include <future>
 #include <memory>
+#include <optional>
 #include <thread>
 
 namespace Game3 {
@@ -92,7 +97,39 @@ namespace Game3 {
 
 			/** Returns whether the thread could be started. The thread can't be started if the thread is already running. */
 			bool startThread();
+
 			void stopThread();
+			bool stopThread(Duration auto duration) {
+				if (!tickThread.joinable()) {
+					if (tickThreadLaunchWaiter.waitFor(duration) == std::cv_status::timeout) {
+						tickThread.request_stop();
+					}
+				}
+
+				if (tickThread.joinable()) {
+					active = false;
+					tickThread.join();
+					return true;
+				}
+
+				WARN("Trying to stop an unjoinable ClientGame");
+				return false;
+			}
+
+			std::future<void> asyncStopThread();
+			auto asyncStopThread(Duration auto duration) {
+				return Promise<void>::now([self = getSelf(), duration](auto resolve) {
+					std::future<bool> future = self->pool.schedule([self, duration] {
+						return self->stopThread(duration);
+					});
+
+					if (!future.get()) {
+						throw TimeoutError("asyncStopThread timed out");
+					}
+
+					resolve();
+				});
+			}
 
 			std::shared_ptr<ClientGame> getSelf() { return std::static_pointer_cast<ClientGame>(shared_from_this()); }
 			std::shared_ptr<const ClientGame> getSelf() const { return std::static_pointer_cast<const ClientGame>(shared_from_this()); }
@@ -115,7 +152,7 @@ namespace Game3 {
 			std::shared_ptr<LocalClient> client;
 			RealmPtr activeRealm;
 			std::atomic_bool active{false};
-			std::thread tickThread;
+			std::jthread tickThread;
 			Waiter tickThreadLaunchWaiter;
 			std::optional<Position> lastDragPosition;
 			float lastGarbageCollection = 0;

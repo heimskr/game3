@@ -7,6 +7,7 @@
 #include "registry/Registries.h"
 #include "registry/Registry.h"
 #include "threading/Lockable.h"
+#include "threading/ThreadPool.h"
 #include "types/TickArgs.h"
 #include "types/Types.h"
 
@@ -138,6 +139,8 @@ namespace Game3 {
 			const ServerGame & toServer() const;
 			std::shared_ptr<ServerGame> toServerPointer();
 
+			inline auto & getPool() { return pool; }
+
 			template <typename T = Agent>
 			std::shared_ptr<T> getAgent(GlobalID gid) {
 				auto shared_lock = allAgents.sharedLock();
@@ -156,8 +159,10 @@ namespace Game3 {
 		protected:
 			std::chrono::system_clock::time_point lastTime = startTime;
 			Lockable<std::unordered_map<RealmID, RealmPtr>> realms;
+			ThreadPool pool;
 
 			Game();
+			Game(size_t pool_size);
 
 			void associateWithRealm(const VillagePtr &, RealmID) override;
 

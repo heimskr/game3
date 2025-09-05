@@ -57,10 +57,10 @@ namespace Game3 {
 		}
 	}
 
-	bool ThreadPool::add(const Function &function) {
+	bool ThreadPool::add(Function &&function) {
 		if (active) {
 			// TODO: race condition if active goes false during this block
-			workQueue.push(function);
+			workQueue.push(std::move(function));
 			newJobReady = true;
 			workCV.notify_one();
 			return true;

@@ -17,6 +17,7 @@
 #include "math/Rectangle.h"
 #include "threading/Lockable.h"
 #include "threading/MTQueue.h"
+#include "threading/Promise.h"
 #include "types/UString.h"
 #include "ui/UIContext.h"
 #include "util/Concepts.h"
@@ -24,6 +25,7 @@
 #include <any>
 #include <chrono>
 #include <functional>
+#include <future>
 #include <memory>
 #include <set>
 #include <string>
@@ -109,7 +111,7 @@ namespace Game3 {
 			void render(float delta);
 			void closeGame();
 			void goToTitle();
-			bool connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
+			Ref<Promise<void>> connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
 			void showWorldSelector();
 			void showWorldCreator();
 			/** Returns whether there was a last loaded world to load. */

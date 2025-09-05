@@ -353,9 +353,9 @@ namespace Game3 {
 
 		tickThreadLaunchWaiter.reset(1, true);
 
-		tickThread = std::thread([this] {
+		tickThread = std::jthread([this](std::stop_token token) {
 			threadContext.rename("ClientTick");
-			while (active) {
+			while (active && !token.stop_requested()) {
 				try {
 					if (!tick()) {
 						active = false;
@@ -391,6 +391,12 @@ namespace Game3 {
 		} else {
 			WARN("Trying to stop an unjoinable ClientGame");
 		}
+	}
+
+	std::future<void> ClientGame::asyncStopThread() {
+		return pool.schedule([this] {
+			stopThread();
+		});
 	}
 
 	std::shared_ptr<Window> ClientGame::getWindow() const {

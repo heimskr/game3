@@ -49,16 +49,17 @@ namespace Game3 {
 
 				thread = std::jthread([this](std::promise<T> promise, auto &&lambda) {
 					try {
-						if constexpr (typeid(T) == typeid(void)) {
+						if constexpr (std::same_as<T, void>) {
 							lambda([this, promise = std::move(promise), future = future] mutable {
 								promise.set_value();
 
 								if (thenFunction) {
 									thenFunction();
 									consumed = true;
-									conditionVariable.notify_all();
 								}
 
+								finished = true;
+								conditionVariable.notify_all();
 								done();
 							});
 						} else {
@@ -68,9 +69,10 @@ namespace Game3 {
 								if (thenFunction) {
 									thenFunction(future.get());
 									consumed = true;
-									conditionVariable.notify_all();
 								}
 
+								finished = true;
+								conditionVariable.notify_all();
 								done();
 							});
 						}
@@ -79,6 +81,13 @@ namespace Game3 {
 							oopsFunction(std::current_exception());
 							consumed = true;
 							rejected = true;
+							finished = true;
+							conditionVariable.notify_all();
+							done();
+						} else if (finallyFunction) {
+							consumed = true;
+							rejected = true;
+							finished = true;
 							conditionVariable.notify_all();
 							done();
 						} else {
@@ -110,7 +119,7 @@ namespace Game3 {
 			}
 
 			void wait() {
-				if (consumed) {
+				if (consumed || finished) {
 					return;
 				}
 
@@ -120,12 +129,10 @@ namespace Game3 {
 					go();
 				}
 
-				if (thenFunction || oopsFunction) {
-					std::unique_lock lock(mutex);
-					conditionVariable.wait(lock, [this] { return consumed.load() || rejected.load(); });
-				}
+				std::unique_lock lock(mutex);
+				conditionVariable.wait(lock, [this] { return consumed || rejected || finished; });
 
-				if (!rejected) {
+				if (!rejected && !finished) {
 					future.wait();
 				}
 			}
@@ -154,13 +161,14 @@ namespace Game3 {
 			std::atomic_bool launched = false;
 			std::atomic_bool consumed = false;
 			std::atomic_bool rejected = false;
+			std::atomic_bool finished = false;
 
 			template <typename U>
 			using Function = VoidFunction<U>::Type;
 
 			Function<T> thenFunction;
 			std::function<void(std::exception_ptr)> oopsFunction;
-			std::function<void()> finallyFunction;
+			std::function<void(std::exception_ptr)> finallyFunction; // the std::exception_ptr argument is null if no exception was thrown
 			std::move_only_function<void(Function<T> &&resolve)> deferred;
 
 			std::condition_variable conditionVariable;
@@ -170,7 +178,7 @@ namespace Game3 {
 
 			void done() {
 				if (finallyFunction) {
-					finallyFunction();
+					finallyFunction(std::exception_ptr{});
 				}
 
 				this->deref();

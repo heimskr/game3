@@ -81,22 +81,27 @@ namespace Game3 {
 	}
 
 	void BatchSpriteRenderer::drawOnMap(const std::shared_ptr<Texture> &texture, const RenderOptions &options) {
-		if (!initialized)
+		if (!initialized) {
 			return;
+		}
 
 		RenderOptions modified = options;
 
-		if (modified.sizeX < 0)
+		if (modified.sizeX < 0) {
 			modified.sizeX = texture->width;
-		if (modified.sizeY < 0)
+		}
+
+		if (modified.sizeY < 0) {
 			modified.sizeY = texture->height;
+		}
 
 		batchItems.emplace_back(texture, modified);
 	}
 
 	void BatchSpriteRenderer::renderNow() {
-		if (!initialized || batchItems.empty())
+		if (!initialized || batchItems.empty()) {
 			return;
+		}
 
 		std::shared_ptr<Texture> last_texture = batchItems.front().texture;
 
@@ -116,8 +121,9 @@ namespace Game3 {
 			buffer.push_back(&options);
 		}
 
-		if (!buffer.empty())
+		if (!buffer.empty()) {
 			flush(last_texture, buffer, tile_size);
+		}
 
 		batchItems.clear();
 	}
@@ -135,25 +141,23 @@ namespace Game3 {
 
 	void BatchSpriteRenderer::flush(std::shared_ptr<Texture> texture, const std::vector<const RenderOptions *> &options, size_t tile_size) {
 		assert(texture != nullptr);
-		Atlas *atlas_ptr = nullptr;
 
-		if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
-			atlas_ptr = &iter->second;
-			std::vector<float> data = generateData(atlas_ptr->texture, options);
-			if (atlas_ptr->lastDataCount < data.size()) {
-				atlas_ptr->lastDataCount = data.size();
-				atlas_ptr->vbo.update(data, false);
-			} else {
-				atlas_ptr->vbo.update(data, true);
+		Atlas &atlas = [&] -> Atlas & {
+			if (auto iter = atlases.find(texture->id); iter != atlases.end()) {
+				Atlas &atlas = iter->second;
+				std::vector<float> data = generateData(atlas.texture, options);
+				if (atlas.lastDataCount < data.size()) {
+					atlas.lastDataCount = data.size();
+					atlas.vbo.update(data, false);
+				} else {
+					atlas.vbo.update(data, true);
+				}
+				return atlas;
 			}
-		} else {
-			atlas_ptr = &(atlases[texture->id] = generateAtlas(texture, options));
-		}
 
-		if (!atlas_ptr)
-			throw std::runtime_error("Couldn't find or initialize Atlas in BatchSpriteRenderer::flush");
+			return atlases[texture->id] = generateAtlas(texture, options);
+		}();
 
-		Atlas &atlas = *atlas_ptr;
 		shader.bind();
 		shader.set("atlasSize", Vector2d(atlas.texture->width, atlas.texture->height));
 		shader.set("tileSize", float(tile_size));

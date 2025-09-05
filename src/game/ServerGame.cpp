@@ -36,10 +36,8 @@
 
 namespace Game3 {
 	ServerGame::ServerGame(const std::shared_ptr<Server> &server, size_t pool_size):
-		weakServer(server),
-		pool(pool_size) {
-		pool.start();
-	}
+		Game(pool_size),
+		weakServer(server) {}
 
 	ServerGame::~ServerGame() {
 		INFO(3, "\e[31m~ServerGame\e[39m({})", reinterpret_cast<void *>(this));

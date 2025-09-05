@@ -119,17 +119,19 @@ namespace Game3 {
 
 		std::string hostname = hostInput->getText().raw();
 
-		ui.window.queue([hostname](Window &window) {
-			if (window.isConnected()) {
-				window.showLoginAndRegisterDialogs(hostname);
+		ui.window.connect(hostname, port)->oops([&window = ui.window](std::exception_ptr exception) {
+			try {
+				std::rethrow_exception(exception);
+			} catch (const std::exception &err) {
+				window.error(err.what());
+			}
+		})->then([weak = ui.window.weak_from_this(), hostname] {
+			if (auto window = weak.lock(); window && window->isConnected()) {
+				window->queue([hostname](Window &window) {
+					window.showLoginAndRegisterDialogs(hostname);
+				});
 			}
 		});
-
-		try {
-			ui.window.connect(hostname, port);
-		} catch (const std::exception &err) {
-			ui.window.error(err.what());
-		}
 	}
 
 	void ConnectionDialog::loadWorld() {

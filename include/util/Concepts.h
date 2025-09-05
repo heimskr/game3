@@ -93,6 +93,15 @@ namespace Game3 {
 	template <typename T>
 	concept Duration = is_chrono_duration<T>::value;
 
+	template <typename>
+	struct is_chrono_time_point: std::false_type {};
+
+	template <typename Clock, typename Duration>
+	struct is_chrono_time_point<std::chrono::time_point<Clock, Duration>>: std::true_type {};
+
+	template <typename T>
+	concept TimePoint = is_chrono_time_point<T>::value;
+
 	template <typename T>
 	concept EnumClass = !std::is_convertible_v<T, int> && std::is_enum_v<T>;
 

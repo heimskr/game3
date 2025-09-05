@@ -27,7 +27,17 @@
 #include "util/Util.h"
 
 namespace Game3 {
-	Game::Game() = default;
+	namespace {
+		size_t DEFAULT_GAME_POOL_SIZE = 4;
+	}
+
+	Game::Game():
+		Game(DEFAULT_GAME_POOL_SIZE) {}
+
+	Game::Game(size_t pool_size):
+		pool(pool_size) {
+			pool.start();
+		}
 
 	Game::~Game() {
 		dying = true;
