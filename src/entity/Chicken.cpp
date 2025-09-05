@@ -1,4 +1,5 @@
 #include "entity/Chicken.h"
+#include "entity/ItemEntity.h"
 #include "game/Game.h"
 
 namespace {
@@ -23,6 +24,6 @@ namespace Game3 {
 
 	void Chicken::layEgg() {
 		RealmPtr realm = getRealm();
-		ItemStack::spawn(Place{position, realm}, realm->getGame(), "base:item/egg");
+		ItemStack::spawn(Place{position, realm}, realm->getGame(), "base:item/egg")->tryEnqueueTick();
 	}
 }

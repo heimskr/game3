@@ -16,6 +16,7 @@
 
 namespace Game3 {
 	class Game;
+	class ItemEntity;
 	class ItemStack;
 	class ItemTexture;
 	class Player;
@@ -102,10 +103,9 @@ namespace Game3 {
 			}
 
 			template <typename... Args>
-			static std::shared_ptr<ItemStack> spawn(const Place &place, Args &&...args) {
+			static std::shared_ptr<ItemEntity> spawn(const Place &place, Args &&...args) {
 				auto stack = ItemStack::create(std::forward<Args>(args)...);
-				stack->spawn(place);
-				return stack;
+				return stack->spawn(place);
 			}
 
 			TexturePtr getTexture() const;
@@ -144,7 +144,7 @@ namespace Game3 {
 
 			inline const auto & getID() const { return item->identifier; }
 
-			void spawn(const Place &) const;
+			std::shared_ptr<ItemEntity> spawn(const Place &) const;
 
 			std::shared_ptr<ItemTexture> getItemTexture(Game &) const;
 

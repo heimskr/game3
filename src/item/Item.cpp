@@ -256,9 +256,9 @@ namespace Game3 {
 		return item->getTooltip(shared_from_this());
 	}
 
-	void ItemStack::spawn(const Place &place) const {
-		assert(place.realm);
-		place.realm->spawn<ItemEntity>(place.position, copy());
+	std::shared_ptr<ItemEntity> ItemStack::spawn(const Place &place) const {
+		assert(place.realm != nullptr);
+		return place.realm->spawn<ItemEntity>(place.position, copy());
 	}
 
 	std::shared_ptr<ItemTexture> ItemStack::getItemTexture(Game &) const {
