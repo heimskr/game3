@@ -112,7 +112,7 @@ namespace Game3 {
 		add(std::make_shared<ComputerItem>("base:item/computer", "Computer", 999, 64)); // TODO: cost
 #endif
 
-		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64, 1)); // TODO: cost
+		add(std::make_shared<ContainmentOrb>("base:item/contorb", "Containment Orb", 64)); // TODO: cost
 
 		add(std::make_shared<Copier>("base:item/copier", "Copier", 0, 1));
 

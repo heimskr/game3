@@ -12,8 +12,8 @@
 namespace Game3 {
 	class ContainmentOrb: public Item {
 		public:
-			ContainmentOrb(ItemID id, std::string name, MoneyCount basePrice, ItemCount maxCount = 64):
-				Item(std::move(id), std::move(name), basePrice, maxCount) {}
+			ContainmentOrb(ItemID id, std::string name, MoneyCount basePrice):
+				Item(std::move(id), std::move(name), basePrice, 1) {}
 
 			bool use(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>) override;
 			bool drag(Slot, const ItemStackPtr &, const Place &, Modifiers, std::pair<float, float>, DragAction) override;
