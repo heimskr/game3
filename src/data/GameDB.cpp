@@ -89,7 +89,7 @@ namespace Game3 {
 			return std::nullopt;
 		}
 		status.assertOK();
-		return std::move(out);
+		return std::make_optional<std::string>(std::move(out));
 	}
 
 	int64_t GameDB::getCurrentFormatVersion() {

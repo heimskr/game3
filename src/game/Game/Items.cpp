@@ -247,7 +247,7 @@ namespace Game3 {
 		add(std::make_shared<Item>("base:item/vanadium_magnetite_ore", "Vanadium Magnetite Ore", 32, 64));
 		add(std::make_shared<Item>("base:item/niobium_bar",      "Niobium Bar",       128, 64));
 		add(std::make_shared<Item>("base:item/teleportation_focus", "Teleportation Focus", 999, 64)); // TODO: cost
-		add(std::make_shared<Item>("base:item/ticket",           "Ticket",              0, -1));
+		add(std::make_shared<Item>("base:item/ticket",           "Ticket",              0, SSIZE_MAX));
 		add(std::make_shared<Item>("base:item/pickle",           "Pickle",             10, 64));
 		add(std::make_shared<Item>("base:item/huo",  "Huǒ",  999, 64)); // TODO: cost
 		add(std::make_shared<Item>("base:item/bing", "Bīng", 999, 64)); // TODO: cost

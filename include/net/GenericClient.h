@@ -59,8 +59,8 @@ namespace Game3 {
 			inline std::shared_ptr<Server> getServer() { return weakServer.lock(); }
 
 			template <typename... Args>
-			void sendError(const char *format, Args &&...args) {
-				send(make<ErrorPacket>(std::vformat(format, std::make_format_args(std::forward<Args>(args)...))));
+			void sendError(std::format_string<Args...> format, Args &&...args) {
+				send(make<ErrorPacket>(std::format(format, std::forward<Args>(args)...)));
 			}
 
 		protected:

@@ -243,16 +243,16 @@ namespace Game3 {
 
 	double ItemStack::getDurabilityFraction() const {
 		if (!hasDurability()) {
-			return 1.;
+			return 1;
 		}
 
-		const auto &object = data.as_object();
-		const auto &array = object.at("durability").as_array();
+		const boost::json::object &object = data.as_object();
+		const boost::json::array &array = object.at("durability").as_array();
 		return getDouble(array[0]) / getDouble(array.at(1));
 	}
 
 	std::string ItemStack::getTooltip() const {
-		assert(item);
+		assert(item != nullptr);
 		return item->getTooltip(shared_from_this());
 	}
 
@@ -358,7 +358,7 @@ namespace Game3 {
 	template <>
 	ItemStackPtr popBuffer<ItemStackPtr>(BasicBuffer &buffer) {
 		auto context = buffer.context.lock();
-		assert(context);
+		assert(context != nullptr);
 		auto &game = dynamic_cast<Game &>(*context);
 		ItemStackPtr out = ItemStack::create(game.shared_from_this());
 		buffer >> out;
@@ -366,7 +366,7 @@ namespace Game3 {
 	}
 
 	Buffer & operator+=(Buffer &buffer, const ItemStackPtr &stack) {
-		assert(stack->item);
+		assert(stack->item != nullptr);
 		buffer.appendType(stack, false);
 		buffer << stack->item->identifier;
 		buffer << stack->count;
@@ -411,9 +411,9 @@ namespace Game3 {
 	template <>
 	ItemStackPtr makeForBuffer<ItemStackPtr>(Buffer &buffer) {
 		auto context = buffer.context.lock();
-		assert(context);
+		assert(context != nullptr);
 		auto game = std::dynamic_pointer_cast<Game>(context);
-		assert(game);
+		assert(game != nullptr);
 		return ItemStack::create(game);
 	}
 }
