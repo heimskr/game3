@@ -253,7 +253,7 @@ namespace Game3 {
 			throw std::runtime_error("Couldn't register SIGINT handler");
 		}
 
-		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(global_server, size_t(8))));
+		auto game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(global_server, 8uz)));
 
 		global_server->onStop = [] {
 			running = false;

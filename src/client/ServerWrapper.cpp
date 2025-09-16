@@ -144,7 +144,7 @@ namespace Game3 {
 				server->stop();
 			});
 
-			game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(server, size_t(8))));
+			game = std::dynamic_pointer_cast<ServerGame>(Game::create(Side::Server, std::make_pair(server, 8uz)));
 
 			server->onStop = [this] {
 				running = false;
@@ -165,7 +165,7 @@ namespace Game3 {
 			}
 			server->game = game;
 
-			if (overworld_seed == size_t(-1)) {
+			if (overworld_seed == -1uz) {
 				std::random_device rng;
 				overworld_seed = (uint64_t(rng()) << 32) | rng();
 			}
