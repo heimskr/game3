@@ -4,6 +4,8 @@
 #include "ui/dialog/Dialog.h"
 #include "ui/widget/Widget.h"
 #include "ui/Modifiers.h"
+#include "util/Demangle.h"
+#include "util/Log.h"
 #include "util/Reverse.h"
 
 #include <algorithm>
@@ -106,6 +108,7 @@ namespace Game3 {
 			template <typename T, typename... Args>
 			std::shared_ptr<T> emplaceDialog(Args &&...args) {
 				auto dialog = std::make_shared<T>(*this, std::forward<Args>(args)...);
+				INFO("Init dialog {} of type {}", (void *) dialog.get(), DEMANGLE(T));
 				dialog->init();
 				dialogs.emplace_back(dialog);
 				focusDialog(dialog);

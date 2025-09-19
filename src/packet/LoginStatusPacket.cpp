@@ -37,7 +37,7 @@ namespace Game3 {
 
 		if (!success) {
 			window->queue([](Window &window) {
-				window.closeGame();
+				window.closeGame()->wait();
 			});
 			throw AuthenticationError(message.empty()? "Login failed" : message);
 		}

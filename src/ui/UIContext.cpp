@@ -80,8 +80,8 @@ namespace Game3 {
 		}
 	}
 
-	std::shared_ptr<ClientGame> UIContext::getGame() const {
-		return window.game;
+	ClientGamePtr UIContext::getGame() const {
+		return window.getGame();
 	}
 
 	void UIContext::onResize(int x, int y) {
@@ -310,7 +310,7 @@ namespace Game3 {
 	}
 
 	std::shared_ptr<ClientPlayer> UIContext::getPlayer() const {
-		return window.game->getPlayer();
+		return window.getGame()->getPlayer();
 	}
 
 	RendererContext UIContext::getRenderers(float delta) const {

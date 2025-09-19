@@ -60,9 +60,10 @@ namespace Game3 {
 		auto y = options.y;
 
 		const auto [center_x, center_y] = window.center;
-		RealmPtr realm = window.game->getActiveRealm();
+		ClientGamePtr game = window.getGame();
+		RealmPtr realm = game->getActiveRealm();
 		TileProvider &provider = realm->tileProvider;
-		TilesetPtr tileset     = provider.getTileset(*window.game);
+		TilesetPtr tileset     = provider.getTileset(*game);
 		const auto tile_size   = tileset->getTileSize();
 		const auto map_length  = CHUNK_SIZE * REALM_DIAMETER;
 

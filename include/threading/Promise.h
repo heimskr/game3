@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mixin/RefCounted.h"
+#include "util/Concepts.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -12,14 +13,14 @@
 #include <vector>
 
 namespace Game3 {
-	template <typename U>
+	template <template <typename...> typename F, typename U>
 	struct VoidFunction {
-		using Type = std::move_only_function<void(U)>;
+		using Type = F<void(U)>;
 	};
 
-	template <>
-	struct VoidFunction<void> {
-		using Type = std::move_only_function<void()>;
+	template <template <typename...> typename F>
+	struct VoidFunction<F, void> {
+		using Type = F<void()>;
 	};
 
 	template <typename T>
@@ -27,14 +28,29 @@ namespace Game3 {
 		public:
 			template <typename F>
 			static Ref<Promise<T>> now(F &&lambda) {
-				return make(std::forward<F>(lambda))->go();
+				return make(std::move(lambda))->go();
 			}
 
 			template <typename F>
 			static Ref<Promise<T>> make(F &&lambda) {
 				auto *pointer = new Promise<T>;
-				pointer->deferred = std::forward<F>(lambda);
+				pointer->deferred = std::move(lambda);
 				return pointer->getRef();
+			}
+
+			static Ref<Promise<void>> resolved() {
+				static_assert(std::same_as<T, void>);
+				return Promise<void>::now([](auto &&resolve, auto &&) {
+					resolve();
+				});
+			}
+
+			template <typename U>
+			static Ref<Promise<T>> resolved(U &&value) {
+				static_assert(!std::same_as<T, void>);
+				return Promise<T>::now([value = std::forward<U>(value)](auto &&resolve, auto &&) mutable {
+					resolve(std::forward<U>(value));
+				});
 			}
 
 			Ref<Promise<T>> go() {
@@ -44,13 +60,20 @@ namespace Game3 {
 					return reference;
 				}
 
-				std::promise<T> promise;
 				future = promise.get_future();
 
-				thread = std::jthread([this](std::promise<T> promise, auto &&lambda) {
+				thread = std::jthread([this](auto &&lambda) {
 					try {
+						auto reject = Function<const std::exception &>([this](const std::exception &error) mutable {
+							try {
+								throw error;
+							} catch (...) {
+								throwException(std::current_exception());
+							}
+						});
+
 						if constexpr (std::same_as<T, void>) {
-							lambda([this, promise = std::move(promise), future = future] mutable {
+							auto resolve = [this] mutable {
 								promise.set_value();
 
 								if (thenFunction) {
@@ -61,9 +84,11 @@ namespace Game3 {
 								finished = true;
 								conditionVariable.notify_all();
 								done();
-							});
+							};
+
+							lambda(std::move(resolve), std::move(reject));
 						} else {
-							lambda([this, promise = std::move(promise), future = future](T &&resolution) mutable {
+							auto resolve = [this](T &&resolution) mutable {
 								promise.set_value(std::forward<T>(resolution));
 
 								if (thenFunction) {
@@ -74,28 +99,14 @@ namespace Game3 {
 								finished = true;
 								conditionVariable.notify_all();
 								done();
-							});
+							};
+
+							lambda(std::move(resolve), std::move(reject));
 						}
 					} catch (...) {
-						if (oopsFunction) {
-							oopsFunction(std::current_exception());
-							consumed = true;
-							rejected = true;
-							finished = true;
-							conditionVariable.notify_all();
-							done();
-						} else if (finallyFunction) {
-							consumed = true;
-							rejected = true;
-							finished = true;
-							conditionVariable.notify_all();
-							done();
-						} else {
-							done();
-							throw;
-						}
+						throwException(std::current_exception());
 					}
-				}, std::move(promise), std::move(deferred));
+				}, std::move(deferred));
 
 				thread.detach();
 
@@ -139,23 +150,52 @@ namespace Game3 {
 
 			template <typename F>
 			Ref<Promise<T>> then(F &&function) {
-				thenFunction = std::forward<F>(function);
+				thenFunction = std::move(function);
 				return this->getRef();
 			}
 
-			template <typename F>
+			template <typename FS, typename FE>
+			Ref<Promise<T>> then(FS &&on_resolve, FE &&on_reject) {
+				thenFunction = std::move(on_resolve);
+				return oops(std::move(on_reject));
+			}
+
+			template <std::invocable<const std::exception &> F>
 			Ref<Promise<T>> oops(F &&function) {
-				oopsFunction = std::forward<F>(function);
+				oopsFunction = [function = std::move(function)](std::exception_ptr ptr) mutable {
+					try {
+						std::rethrow_exception(std::move(ptr));
+					} catch (const std::exception &error) {
+						function(error);
+					}
+				};
+				return this->getRef();
+			}
+
+			template <std::invocable<std::exception_ptr> F>
+			Ref<Promise<T>> oops(F &&function) {
+				oopsFunction = std::move(function);
 				return this->getRef();
 			}
 
 			template <typename F>
+			requires Returns<F, void, std::exception_ptr>
 			Ref<Promise<T>> finally(F &&function) {
-				finallyFunction = std::forward<F>(function);
+				finallyFunction = std::move(function);
+				return this->getRef();
+			}
+
+			template <typename F>
+			requires Returns<F, void>
+			Ref<Promise<T>> finally(F &&function) {
+				finallyFunction = [function = std::move(function)](std::exception_ptr) mutable {
+					function();
+				};
 				return this->getRef();
 			}
 
 		private:
+			std::promise<T> promise;
 			std::shared_future<T> future;
 			std::jthread thread;
 			std::atomic_bool launched = false;
@@ -164,12 +204,15 @@ namespace Game3 {
 			std::atomic_bool finished = false;
 
 			template <typename U>
-			using Function = VoidFunction<U>::Type;
+			using MoveOnlyFunction = VoidFunction<std::move_only_function, U>::Type;
 
-			Function<T> thenFunction;
-			std::function<void(std::exception_ptr)> oopsFunction;
-			std::function<void(std::exception_ptr)> finallyFunction; // the std::exception_ptr argument is null if no exception was thrown
-			std::move_only_function<void(Function<T> &&resolve)> deferred;
+			template <typename U>
+			using Function = VoidFunction<std::function, U>::Type;
+
+			MoveOnlyFunction<T> thenFunction;
+			std::move_only_function<void(std::exception_ptr)> oopsFunction;
+			std::move_only_function<void(std::exception_ptr)> finallyFunction; // the std::exception_ptr argument is null if no exception was thrown
+			std::move_only_function<void(Function<T> &&resolve, Function<const std::exception &> &&reject)> deferred;
 
 			std::condition_variable conditionVariable;
 			std::mutex mutex;
@@ -177,11 +220,31 @@ namespace Game3 {
 			Promise() = default;
 
 			void done() {
-				if (finallyFunction) {
-					finallyFunction(std::exception_ptr{});
-				}
-
 				this->deref();
+			}
+
+			void throwException(const std::exception_ptr &exception) {
+				if (oopsFunction) {
+					oopsFunction(exception);
+					consumed = true;
+					rejected = true;
+					finished = true;
+					conditionVariable.notify_all();
+					if (finallyFunction) {
+						finallyFunction(exception);
+					}
+					done();
+				} else if (finallyFunction) {
+					consumed = true;
+					rejected = true;
+					finished = true;
+					conditionVariable.notify_all();
+					finallyFunction(exception);
+					done();
+				} else {
+					done();
+					std::rethrow_exception(exception);
+				}
 			}
 	};
 

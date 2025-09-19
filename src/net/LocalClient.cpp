@@ -232,7 +232,7 @@ namespace Game3 {
 #endif
 	}
 
-	void LocalClient::queueForConnect(std::function<void()> action) {
+	void LocalClient::queueForConnect(std::move_only_function<void()> action) {
 		if (isReady()) {
 			action();
 		} else {

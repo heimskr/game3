@@ -34,7 +34,7 @@ namespace Game3 {
 		const float y_factor = renderers.yFactor;
 		auto [width, height] = window.getDimensions();
 
-		ClientGamePtr game = window.game;
+		ClientGamePtr game = window.getGame();
 
 		if (!game) {
 			window.rectangleRenderer.drawOnScreen(Color{"#ff0000"}, Rectangle(0, 0, width, height));
@@ -210,7 +210,7 @@ namespace Game3 {
 	}
 
 	void GameUI::openModule(const Identifier &module_id, const std::any &argument) {
-		ClientGamePtr game = ui.window.game;
+		ClientGamePtr game = ui.window.getGame();
 		assert(game != nullptr);
 
 		auto &registry = game->registry<ModuleFactoryRegistry>();

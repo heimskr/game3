@@ -40,7 +40,8 @@ namespace Game3 {
 		InventoryModule(ui, selfScale, getInventoryArgument(argument)) {}
 
 	InventoryModule::InventoryModule(UIContext &ui, float selfScale, const std::shared_ptr<ClientInventory> &inventory):
-		Module(ui, selfScale), inventoryGetter(inventory? inventory->getGetter() : nullptr) {}
+		Module(ui, selfScale), inventoryGetter(inventory? inventory->getGetter() : nullptr),
+		topPadding(SLOT_PADDING) {}
 
 	void InventoryModule::init() {
 		assert(inventoryGetter);

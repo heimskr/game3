@@ -14,7 +14,7 @@
 #include "util/Defer.h"
 
 namespace {
-	constexpr int SEPARATION = 32;
+	constexpr int SEPARATION = 0;
 	constexpr int SEPARATOR_WIDTH = 8;
 }
 

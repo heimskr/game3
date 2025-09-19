@@ -76,7 +76,7 @@ link_with = [chemskr.get_variable('chemskr_lib'), namegen.get_variable('namegen_
 
 link_args = [
 	'-lbfd',
-	# '-lstdc++exp', # If using std::stacktrace
+	'-lstdc++exp', # If using std::stacktrace
 ]
 
 if get_option('enable_zip8')

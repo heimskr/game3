@@ -92,7 +92,7 @@ namespace Game3 {
 
 		if (texture == nullptr || needsTexture) {
 			if (needsTexture) {
-				setTexture(sprite_renderer.window->game);
+				setTexture(sprite_renderer.window->getGame());
 				needsTexture = false;
 			} else {
 				return;

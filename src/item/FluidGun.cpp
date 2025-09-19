@@ -226,7 +226,7 @@ namespace Game3 {
 	}
 
 	void FluidGun::renderEffects(Window &window, const RendererContext &renderers, const Position &, Modifiers, const ItemStackPtr &stack) const {
-		const auto [fluid, amount, last_slurp] = getFluidGunData(window.game, stack);
+		const auto [fluid, amount, last_slurp] = getFluidGunData(window.getGame(), stack);
 		UIContext &ui = window.uiContext;
 		if (auto game_ui = ui.getUI<GameUI>()) {
 			Rectangle rectangle = game_ui->getBottomDialog()->getHotbar()->getLastRectangle();

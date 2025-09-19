@@ -437,7 +437,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	window->closeGame();
+	window->closeGame()->wait();
 	window.reset();
 
 	glfwTerminate();

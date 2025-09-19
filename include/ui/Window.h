@@ -3,6 +3,7 @@
 #include "client/ClientSettings.h"
 #include "client/ServerWrapper.h"
 #include "data/Identifier.h"
+#include "game/Forward.h"
 #include "graphics/BatchSpriteRenderer.h"
 #include "graphics/CircleRenderer.h"
 #include "graphics/GL.h"
@@ -47,7 +48,6 @@ namespace Game3 {
 	class Window: public std::enable_shared_from_this<Window> {
 		public:
 			GLFWwindow *glfwWindow = nullptr;
-			std::shared_ptr<ClientGame> game;
 			Lockable<ClientSettings> settings;
 			std::pair<double, double> center{0, 0};
 			double scale{};
@@ -73,11 +73,12 @@ namespace Game3 {
 
 			Window(GLFWwindow &);
 
-			void queue(std::function<void(Window &)>);
+			void queue(std::move_only_function<void(Window &)>);
 			/* If the given function returns false, it won't be removed from the queue. */
-			void queueBool(std::function<bool(Window &)>);
-			void delay(std::function<void(Window &)>, uint32_t count = 1);
+			void queueBool(std::move_only_function<bool(Window &)>);
+			void delay(std::move_only_function<void(Window &)>, uint32_t count = 1);
 
+			ClientGamePtr getGame() const;
 			int getWidth() const;
 			int getHeight() const;
 			std::pair<int, int> getDimensions() const;
@@ -109,19 +110,19 @@ namespace Game3 {
 
 			void tick(float delta);
 			void render(float delta);
-			void closeGame();
+			[[nodiscard]] Ref<Promise<void>> closeGame();
 			void goToTitle();
-			Ref<Promise<void>> connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
+			[[nodiscard]] Ref<Promise<void>> connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> = nullptr);
 			void showWorldSelector();
 			void showWorldCreator();
-			/** Returns whether there was a last loaded world to load. */
-			bool loadLastWorld();
-			void playLocally(std::filesystem::path world_path, std::optional<size_t> seed = {});
+			/** Resolves to whether there was a last loaded world to load. */
+			Ref<Promise<bool>> loadLastWorld();
+			[[nodiscard]] Ref<Promise<void>> playLocally(std::filesystem::path world_path, std::optional<size_t> seed = {});
 			void feedFPS(double);
 			void showLoginAndRegisterDialogs(const std::string &hostname);
 			bool isConnectedLocally() const;
 			bool isConnected() const;
-			void disconnect();
+			Ref<Promise<void>> disconnect();
 			bool isKeyHeld(int key) const;
 
 			void setGame(std::shared_ptr<ClientGame>);
@@ -133,8 +134,9 @@ namespace Game3 {
 				std::chrono::system_clock::time_point lastProcessed;
 			};
 
-			MTQueue<std::function<void(Window &)>> functionQueue;
-			Lockable<std::list<std::function<bool(Window &)>>> boolFunctions;
+			std::shared_ptr<ClientGame> game;
+			MTQueue<std::move_only_function<void(Window &)>> functionQueue;
+			Lockable<std::list<std::move_only_function<bool(Window &)>>> boolFunctions;
 			ServerWrapper serverWrapper;
 			std::map<int, KeyInfo> keyTimes;
 			std::optional<Vector2i> lastWindowSize;
@@ -158,10 +160,11 @@ namespace Game3 {
 			void contentScaleCallback(float x_scale, float y_scale);
 			void onGameLoaded();
 			void autoConnect();
-			void continueLocalConnection();
+			/** Resolves to false if the user canceled the connection. */
+			[[nodiscard]] Ref<Promise<bool>> continueLocalConnection();
 			void handleKeys();
 			void renderFPSCounter();
-			void newWorld(const std::filesystem::path &, std::optional<size_t> seed);
+			Ref<Promise<void>> newWorld(const std::filesystem::path &, std::optional<size_t> seed);
 	};
 
 	using WindowPtr = std::shared_ptr<Window>;

@@ -32,7 +32,7 @@ namespace Game3 {
 		window.causticsShader.update(width, height);
 		window.colorDodgeShader.update(width, height);
 
-		ClientGamePtr game = window.game;
+		ClientGamePtr game = window.getGame();
 
 		realm->render(width, height, window.center, window.scale, renderers, game->getDivisor()); CHECKGL
 

@@ -54,7 +54,9 @@ namespace Game3 {
 			void init() final {
 				ClientGamePtr game = getGame();
 
-				for (Substance substance: {S...}) {
+				for (size_t module_index = 0; Substance substance: {S...}) {
+					++module_index;
+
 					switch (substance) {
 						case Substance::Item: {
 							auto inventoried = std::dynamic_pointer_cast<InventoriedTileEntity>(agent);
@@ -62,6 +64,9 @@ namespace Game3 {
 							for (size_t i = 0; i < inventoried->getInventoryCount(); ++i) {
 								auto inventory = safeDynamicCast<ClientInventory>(inventoried->getInventory(i));
 								auto inventory_module = std::make_shared<InventoryModule>(ui, selfScale, std::move(inventory));
+								if (module_index > 1) {
+									inventory_module->setTopPadding(0);
+								}
 								submodules.emplace_back(inventory_module);
 								if (firstInventoryModule == nullptr) {
 									firstInventoryModule = inventory_module;

@@ -157,8 +157,9 @@ namespace Game3 {
 
 		player->send(make<TileEntityPacket>(getSelf()));
 
-		if (!silent)
+		if (!silent) {
 			player->send(make<OpenModuleForAgentPacket>(InventoryModule::ID(), getGID()));
+		}
 
 		player->queueForMove([weak_self = getWeakSelf()](const EntityPtr &entity, bool) {
 			if (auto self = weak_self.lock())

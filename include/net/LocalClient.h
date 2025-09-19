@@ -58,7 +58,7 @@ namespace Game3 {
 			const std::string & getHostname() const;
 			void setBuffering(bool);
 			bool isReady() const;
-			void queueForConnect(std::function<void()>);
+			void queueForConnect(std::move_only_function<void()>);
 
 		private:
 			enum class State {Begin, Data};
@@ -73,7 +73,7 @@ namespace Game3 {
 			std::optional<std::filesystem::path> tokenDatabasePath;
 			std::mutex packetMutex;
 			std::atomic_bool reading = false;
-			MTQueue<std::function<void()>> connectionActions;
+			MTQueue<std::move_only_function<void()>> connectionActions;
 #ifdef USE_TLS
 			asio::io_context ioContext;
 			asio::ssl::context sslContext;

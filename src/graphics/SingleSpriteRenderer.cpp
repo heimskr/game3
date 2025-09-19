@@ -104,7 +104,7 @@ namespace Game3 {
 		}
 
 		assert(window != nullptr);
-		RealmPtr realm = window->game->getActiveRealm();
+		RealmPtr realm = window->getGame()->getActiveRealm();
 
 		const double multiplier_x = 2. / texture->width;
 		const double multiplier_y = 2. / texture->height;
@@ -144,7 +144,7 @@ namespace Game3 {
 		}
 
 		assert(window != nullptr);
-		RealmPtr realm = window->game->getActiveRealm();
+		RealmPtr realm = window->getGame()->getActiveRealm();
 
 		const double multiplier_x = 1. / texture_width;
 		const double multiplier_y = 1. / texture_height;

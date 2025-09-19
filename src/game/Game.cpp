@@ -40,6 +40,7 @@ namespace Game3 {
 		}
 
 	Game::~Game() {
+		ERR("Game({})::~Game()", (void *) this);
 		dying = true;
 	}
 
@@ -101,6 +102,7 @@ namespace Game3 {
 	}
 
 	void Game::initInteractionSets() {
+		INFO("Game({})::initInteractionSets()", (void *) this);
 		interactionSets.clear();
 		auto standard = std::make_shared<StandardInteractions>();
 		for (const auto &type: registry<RealmTypeRegistry>().items) {

@@ -118,13 +118,13 @@ namespace Game3 {
 
 			std::future<void> asyncStopThread();
 			auto asyncStopThread(Duration auto duration) {
-				return Promise<void>::now([self = getSelf(), duration](auto resolve) {
+				return Promise<void>::now([self = getSelf(), duration](auto &&resolve, auto &&reject) {
 					std::future<bool> future = self->pool.schedule([self, duration] {
 						return self->stopThread(duration);
 					});
 
 					if (!future.get()) {
-						throw TimeoutError("asyncStopThread timed out");
+						reject(TimeoutError("asyncStopThread timed out"));
 					}
 
 					resolve();

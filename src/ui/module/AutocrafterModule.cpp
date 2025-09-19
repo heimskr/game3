@@ -57,6 +57,9 @@ namespace Game3 {
 		identifierInput->setSuggestions(std::vector(std::move_iterator(item_names.begin()), std::move_iterator(item_names.end())));
 		identifierInput->insertAtEnd(vbox);
 
+		stationInventoryModule->setTopPadding(0);
+		inventoryModule->setTopPadding(0);
+
 		stationInventoryModule->insertAtEnd(vbox);
 		inventoryModule->insertAtEnd(vbox);
 		energyModule->insertAtEnd(vbox);
