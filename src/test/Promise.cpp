@@ -9,7 +9,7 @@ namespace Game3 {
 			PromiseTest() = default;
 
 			void operator()(TestContext &context) {
-				Promise<int>::make([](auto resolve) {
+				Promise<int>::make([](auto &&resolve, auto &&) {
 					resolve(42);
 				})->then([&](int result) {
 					context.expectEqual("resolve(42)", result, 42);
@@ -17,7 +17,7 @@ namespace Game3 {
 					context.fail("resolve(42)");
 				})->wait();
 
-				Promise<int>::make([](auto) {
+				Promise<int>::make([](auto &&, auto &&) {
 					throw 42;
 				})->then([&](int) {
 					context.fail("reject(42)");

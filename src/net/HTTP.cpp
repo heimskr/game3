@@ -19,7 +19,7 @@ namespace Game3 {
 	}
 
 	Ref<Promise<std::string>> HTTP::get(std::string url) {
-		return Promise<std::string>::now([url = std::move(url)](auto resolve) {
+		return Promise<std::string>::now([url = std::move(url)](auto &&resolve, auto &&) {
 			std::ostringstream stream;
 			get(url, stream)->wait();
 			resolve(std::move(stream).str());
@@ -27,7 +27,7 @@ namespace Game3 {
 	}
 
 	Ref<Promise<void>> HTTP::get(std::string url, std::ostream &stream) {
-		return Promise<void>::now([url = std::move(url), &stream](auto resolve) {
+		return Promise<void>::now([url = std::move(url), &stream](auto &&resolve, auto &&) {
 			maybeInitializeCurl();
 			curlpp::Easy request;
 			request.setOpt(curlpp::options::Url(url));

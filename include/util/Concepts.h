@@ -72,9 +72,9 @@ namespace Game3 {
 		t.reserve(static_cast<size_t>(UINT32_MAX));
 	};
 
-	template <typename T, typename R, typename... Args>
+	template <typename T, typename Result, typename... Args>
 	concept Returns = requires(T t, Args &&...args) {
-		requires std::is_same_v<std::invoke_result_t<T, Args...>, R>;
+		requires std::is_same_v<std::invoke_result_t<T, Args...>, Result>;
 	};
 
 	template <typename T, typename Base>

@@ -9,7 +9,7 @@
 namespace Game3 {
 	template <Duration D>
 	PromiseRef<void> sleepFor(D duration) {
-		return Promise<void>::now([duration](auto resolve) {
+		return Promise<void>::now([duration](auto &&resolve, auto &&) {
 			std::this_thread::sleep_for(duration);
 			resolve();
 		});
@@ -19,7 +19,7 @@ namespace Game3 {
 
 	template <typename T, Duration D>
 	PromiseRef<T> delayFor(T value, D duration) {
-		return Promise<T>::now([value = std::move(value), duration](auto resolve) mutable {
+		return Promise<T>::now([value = std::move(value), duration](auto &&resolve, auto &&) mutable {
 			std::this_thread::sleep_for(duration);
 			resolve(std::move(value));
 		});

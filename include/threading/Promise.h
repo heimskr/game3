@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mixin/RefCounted.h"
+#include "threading/SharedFunction.h"
 #include "util/Concepts.h"
 
 #include <atomic>
@@ -13,9 +14,9 @@
 #include <vector>
 
 namespace Game3 {
-	template <template <typename...> typename F, typename U>
+	template <template <typename...> typename F, typename... Ts>
 	struct VoidFunction {
-		using Type = F<void(U)>;
+		using Type = F<void(Ts...)>;
 	};
 
 	template <template <typename...> typename F>
@@ -26,13 +27,11 @@ namespace Game3 {
 	template <typename T>
 	class Promise: public RefCounted<Promise<T>> {
 		public:
-			template <typename F>
-			static Ref<Promise<T>> now(F &&lambda) {
+			static Ref<Promise<T>> now(auto &&lambda) {
 				return make(std::move(lambda))->go();
 			}
 
-			template <typename F>
-			static Ref<Promise<T>> make(F &&lambda) {
+			static Ref<Promise<T>> make(auto &&lambda) {
 				auto *pointer = new Promise<T>;
 				pointer->deferred = std::move(lambda);
 				return pointer->getRef();
@@ -64,7 +63,7 @@ namespace Game3 {
 
 				thread = std::jthread([this](auto &&lambda) {
 					try {
-						auto reject = Function<const std::exception &>([this](const std::exception &error) mutable {
+						auto reject = Shared<const std::exception &>([this](const std::exception &error) mutable {
 							try {
 								throw error;
 							} catch (...) {
@@ -73,7 +72,7 @@ namespace Game3 {
 						});
 
 						if constexpr (std::same_as<T, void>) {
-							auto resolve = [this] mutable {
+							auto resolve = Shared<T>([this] mutable {
 								promise.set_value();
 
 								if (thenFunction) {
@@ -84,11 +83,11 @@ namespace Game3 {
 								finished = true;
 								conditionVariable.notify_all();
 								done();
-							};
+							});
 
 							lambda(std::move(resolve), std::move(reject));
 						} else {
-							auto resolve = [this](T &&resolution) mutable {
+							auto resolve = Shared<T>([this](T &&resolution) mutable {
 								promise.set_value(std::forward<T>(resolution));
 
 								if (thenFunction) {
@@ -99,7 +98,7 @@ namespace Game3 {
 								finished = true;
 								conditionVariable.notify_all();
 								done();
-							};
+							});
 
 							lambda(std::move(resolve), std::move(reject));
 						}
@@ -160,21 +159,18 @@ namespace Game3 {
 				return oops(std::move(on_reject));
 			}
 
-			template <std::invocable<const std::exception &> F>
-			Ref<Promise<T>> oops(F &&function) {
-				oopsFunction = [function = std::move(function)](std::exception_ptr ptr) mutable {
-					try {
-						std::rethrow_exception(std::move(ptr));
-					} catch (const std::exception &error) {
-						function(error);
-					}
-				};
-				return this->getRef();
-			}
-
-			template <std::invocable<std::exception_ptr> F>
-			Ref<Promise<T>> oops(F &&function) {
-				oopsFunction = std::move(function);
+			Ref<Promise<T>> oops(auto &&function) {
+				if constexpr (std::invocable<decltype(function), std::exception_ptr>) {
+					oopsFunction = std::move(function);
+				} else {
+					oopsFunction = [function = std::move(function)](std::exception_ptr ptr) mutable {
+						try {
+							std::rethrow_exception(std::move(ptr));
+						} catch (const std::exception &error) {
+							function(error);
+						}
+					};
+				}
 				return this->getRef();
 			}
 
@@ -186,7 +182,7 @@ namespace Game3 {
 			}
 
 			template <typename F>
-			requires Returns<F, void>
+			requires (Returns<F, void> && !std::invocable<F, std::exception_ptr>)
 			Ref<Promise<T>> finally(F &&function) {
 				finallyFunction = [function = std::move(function)](std::exception_ptr) mutable {
 					function();
@@ -203,16 +199,19 @@ namespace Game3 {
 			std::atomic_bool rejected = false;
 			std::atomic_bool finished = false;
 
-			template <typename U>
-			using MoveOnlyFunction = VoidFunction<std::move_only_function, U>::Type;
+			template <typename... Ts>
+			using MoveOnlyFunction = VoidFunction<std::move_only_function, Ts...>::Type;
 
-			template <typename U>
-			using Function = VoidFunction<std::function, U>::Type;
+			template <typename... Ts>
+			using Function = VoidFunction<std::function, Ts...>::Type;
+
+			template <typename... Ts>
+			using Shared = VoidFunction<SharedFunction, Ts...>::Type;
 
 			MoveOnlyFunction<T> thenFunction;
-			std::move_only_function<void(std::exception_ptr)> oopsFunction;
-			std::move_only_function<void(std::exception_ptr)> finallyFunction; // the std::exception_ptr argument is null if no exception was thrown
-			std::move_only_function<void(Function<T> &&resolve, Function<const std::exception &> &&reject)> deferred;
+			MoveOnlyFunction<std::exception_ptr> oopsFunction;
+			MoveOnlyFunction<std::exception_ptr> finallyFunction; // the std::exception_ptr argument is null if no exception was thrown
+			Shared<Shared<T> &&, Shared<const std::exception &> &&> deferred;
 
 			std::condition_variable conditionVariable;
 			std::mutex mutex;

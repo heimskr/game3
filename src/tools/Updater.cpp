@@ -49,7 +49,7 @@ namespace Game3 {
 	}
 
 	PromiseRef<bool> Updater::updateFetch() {
-		return Promise<bool>::now([self = shared_from_this()](auto resolve) {
+		return Promise<bool>::now([self = shared_from_this()](auto &&resolve, auto &&) {
 			if (!self->checkHash()->get()) {
 				resolve(false);
 			} else {
@@ -168,7 +168,7 @@ namespace Game3 {
 	}
 
 	PromiseRef<bool> Updater::checkHash() {
-		return Promise<bool>::now([self = shared_from_this()](auto resolve) {
+		return Promise<bool>::now([self = shared_from_this()](auto &&resolve, auto &&) {
 			std::string local_hash = std::to_string(getLocalHash());
 			std::string remote_hash = HTTP::get(self->getURL("hash"))->get();
 

@@ -84,7 +84,7 @@ namespace Game3 {
 
 					sslReady = true;
 
-					for (std::function<void()> &action: connectionActions.steal()) {
+					for (std::move_only_function<void()> &action: connectionActions.steal()) {
 						action();
 					}
 

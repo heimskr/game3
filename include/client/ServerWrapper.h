@@ -24,8 +24,8 @@ namespace Game3 {
 	class ServerWrapper {
 		public:
 			std::filesystem::path worldPath;
-			std::function<void(std::string_view)> onLog;
-			std::function<void(const std::exception &)> onError;
+			std::move_only_function<void(std::string_view)> onLog;
+			std::move_only_function<void(const std::exception &)> onError;
 
 			ServerWrapper(std::filesystem::path worldPath = "localworld.game3");
 			~ServerWrapper();

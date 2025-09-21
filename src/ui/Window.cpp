@@ -989,7 +989,13 @@ namespace Game3 {
 		}
 
 		return Promise<bool>::now([this, last_path = std::move(last_path)](auto &&resolve, auto &&reject) {
-			playLocally(last_path)->then(std::bind_front(std::move(resolve), true))->oops(reject);
+			playLocally(last_path)->then(std::bind_front(std::move(resolve), true))->oops([reject = std::move(reject)](std::exception_ptr ptr) mutable {
+				try {
+					std::rethrow_exception(std::move(ptr));
+				} catch (const std::exception &error) {
+					reject(error);
+				}
+			});
 		});
 	}
 
@@ -1053,7 +1059,7 @@ namespace Game3 {
 
 				settings.setLastWorldPath(world_path);
 				serverWrapper.save();
-				continueLocalConnection()->then(resolve);
+				continueLocalConnection()->then([resolve = std::move(resolve)](bool) { resolve(); });
 			});
 		});
 	}
@@ -1071,17 +1077,17 @@ namespace Game3 {
 
 				client->queueForConnect([this, weak = std::weak_ptr(client), resolve = std::move(resolve)] {
 					if (LocalClientPtr client = weak.lock()) {
-						queue([this, client](Window &) {
+						queue([this, client, resolve = std::move(resolve)](Window &) {
 							activateContext();
 							auto dialog = make<LoginDialog>(uiContext, 1);
 
-							dialog->signalSubmit.connect([this, client](const UString &username, const UString &display_name) {
+							dialog->signalSubmit.connect([this, client, resolve](const UString &username, const UString &display_name) {
 								client->send(make<LoginPacket>(username.raw(), serverWrapper.getOmnitoken(), display_name.raw()));
 								resolve(true);
 							});
 
-							dialog->signalDismiss.connect([this] {
-								queue([this](Window &) {
+							dialog->signalDismiss.connect([this, resolve] {
+								queue([this, resolve](Window &) {
 									closeGame()->finally(std::bind(resolve, false));
 								});
 							});
@@ -1090,8 +1096,14 @@ namespace Game3 {
 						});
 					}
 				});
-			})->oops([self = shared_from_this(), reject = std::move(reject)](std::exception_ptr exception) {
-				self->closeGame()->then(std::bind(reject, std::move(exception)));
+			})->oops([self = shared_from_this(), reject = std::move(reject)](std::exception_ptr exception) mutable {
+				self->closeGame()->then([reject = std::move(reject), exception = std::move(exception)] {
+					try {
+						std::rethrow_exception(std::move(exception));
+					} catch (const std::exception &error) {
+						reject(error);
+					}
+				});
 			});
 		});
 	}
@@ -1169,13 +1181,15 @@ namespace Game3 {
 	}
 
 	Ref<Promise<void>> Window::disconnect() {
-		return Promise<void>::now([self = shared_from_this()](auto &&resolve) {
-			self->queue([resolve = std::move(resolve)](Window &window) {
+		return Promise<void>::now([self = shared_from_this()](auto &&resolve, auto &&) {
+			self->queue([resolve = std::move(resolve)](Window &window) mutable {
 				if (window.isConnectedLocally()) {
 					window.serverWrapper.stop();
 				}
 
-				window.closeGame()->finally(resolve);
+				window.closeGame()->finally([resolve = std::move(resolve)](auto) {
+					resolve();
+				});
 			});
 		});
 	}
@@ -1236,24 +1250,24 @@ namespace Game3 {
 
 		if (std::filesystem::exists(path)) {
 			if (std::filesystem::is_regular_file(path)) {
-				std::string message = std::format("Are you sure you want to overwrite {}?", path.string());
-				return Promise<void>::now([&, self = shared_from_this()](auto &&resolve, auto &&reject) {
+				return Promise<void>::now([self = shared_from_this(), path = std::move(path), go = std::move(go)](auto &&resolve, auto &&reject) {
+					std::string message = std::format("Are you sure you want to overwrite {}?", path.string());
 					self->queue([path, message = std::move(message), go = std::move(go), resolve = std::move(resolve), reject = std::move(reject)](Window &window) mutable {
 						auto dialog = MessageDialog::create(window.uiContext, 1, std::move(message), ButtonsType::NoYes);
 						dialog->setTitle("Overwrite?");
-						dialog->signalSubmit.connect([path = std::move(path), go = std::move(go), reject = std::move(reject)](bool response) mutable {
+						dialog->signalSubmit.connect([path = std::move(path), go = std::move(go), resolve = std::move(resolve), reject = std::move(reject)](bool response) mutable {
 							if (response) {
 								std::filesystem::remove(path);
-								go()->then(std::move(resolve), std::move(reject));
+								go()->then(resolve)->oops(*reject);
 							}
 						});
 						window.uiContext.addDialog(std::move(dialog));
 					});
 				});
 			} else {
-				return Promise<void>::now([path] {
+				return Promise<void>::now([path = std::move(path)](auto &&, auto &&reject) {
 					// TODO: custom exception class
-					throw std::runtime_error(std::format("Can't overwrite {}.", path.string()));
+					reject(std::runtime_error(std::format("Can't overwrite {}.", path.string())));
 				});
 			}
 		} else {
