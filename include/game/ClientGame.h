@@ -124,7 +124,7 @@ namespace Game3 {
 					});
 
 					if (!future.get()) {
-						reject(TimeoutError("asyncStopThread timed out"));
+						reject(std::make_exception_ptr(TimeoutError("asyncStopThread timed out")));
 					}
 
 					resolve();

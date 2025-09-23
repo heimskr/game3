@@ -62,20 +62,16 @@ namespace Game3 {
 
 				future = promise.get_future();
 
-				thread = std::jthread([this](auto &&lambda) {
+				thread = std::jthread([ref = this->getRef()](auto &&lambda) {
 					threadContext = {};
 					threadContext.rename("Promise");
 					try {
-						auto reject = Shared<const std::exception &>([ref = this->getRef()](const std::exception &error) mutable {
-							try {
-								throw error;
-							} catch (...) {
-								ref->throwException(std::current_exception());
-							}
+						auto reject = Shared<std::exception_ptr>([ref](std::exception_ptr error) mutable {
+							ref->throwException(std::move(error));
 						});
 
 						if constexpr (std::same_as<T, void>) {
-							auto resolve = Shared<T>([ref = this->getRef()] mutable {
+							auto resolve = Shared<T>([ref] mutable {
 								ref->promise.set_value();
 
 								if (ref->thenFunction) {
@@ -90,7 +86,7 @@ namespace Game3 {
 
 							lambda(std::move(resolve), std::move(reject));
 						} else {
-							auto resolve = Shared<T>([ref = this->getRef()](T &&resolution) mutable {
+							auto resolve = Shared<T>([ref](T &&resolution) mutable {
 								ref->promise.set_value(std::forward<T>(resolution));
 
 								if (ref->thenFunction) {
@@ -106,7 +102,7 @@ namespace Game3 {
 							lambda(std::move(resolve), std::move(reject));
 						}
 					} catch (...) {
-						throwException(std::current_exception());
+						ref->throwException(std::current_exception());
 					}
 				}, std::move(deferred));
 
@@ -214,12 +210,14 @@ namespace Game3 {
 			MoveOnlyFunction<T> thenFunction;
 			MoveOnlyFunction<std::exception_ptr> oopsFunction;
 			MoveOnlyFunction<std::exception_ptr> finallyFunction; // the std::exception_ptr argument is null if no exception was thrown
-			Shared<Shared<T> &&, Shared<const std::exception &> &&> deferred;
+			Shared<Shared<T> &&, Shared<std::exception_ptr> &&> deferred;
 
 			std::condition_variable conditionVariable;
 			std::mutex mutex;
 
-			Promise() = default;
+			Promise() {
+				this->ref();
+			}
 
 			void done() {
 				this->deref();

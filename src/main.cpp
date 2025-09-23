@@ -415,7 +415,15 @@ int main(int argc, char **argv) {
 
 	SystemTimePoint time = getTime();
 
+	std::recursive_mutex mutex;
+
 	auto tick_window = [&] {
+		std::unique_lock lock{mutex};
+
+		if (!window) {
+			return;
+		}
+
 		SystemTimePoint old_time = std::exchange(time, getTime());
 		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
 
@@ -442,6 +450,7 @@ int main(int argc, char **argv) {
 	}
 
 	Ref<Promise<void>> promise = window->closeGame()->then([&] {
+		std::unique_lock lock{mutex};
 		window.reset();
 		glfwTerminate();
 		Timer::summary();

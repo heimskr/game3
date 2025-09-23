@@ -144,6 +144,8 @@ namespace Game3 {
 			uiContext.setUI<TitleUI>();
 		}
 
+	Window::~Window() = default;
+
 	void Window::queue(std::move_only_function<void(Window &)> function) {
 		functionQueue.push(std::move(function));
 	}
@@ -736,7 +738,7 @@ namespace Game3 {
 
 		uiContext.removeDialogs<OmniDialog>();
 
-		return Promise<void>::now([self = shared_from_this()](std::move_only_function<void()> &&resolve, std::move_only_function<void(const std::exception &)> &&reject) mutable {
+		return Promise<void>::now([self = shared_from_this()](auto &&resolve, auto &&reject) mutable {
 			self->game->asyncStopThread(std::chrono::milliseconds(666))->then([self, resolve = std::move(resolve)] mutable {
 				self->queue([resolve = std::move(resolve)](Window &window) mutable {
 					window.setGame(nullptr);
@@ -748,11 +750,7 @@ namespace Game3 {
 				self->queue([reject = std::move(reject), ptr = std::move(ptr)](Window &window) mutable {
 					window.setGame(nullptr);
 					window.serverWrapper.stop();
-					try {
-						std::rethrow_exception(std::move(ptr));
-					} catch (const std::exception &error) {
-						reject(error);
-					}
+					reject(std::move(ptr));
 				});
 			});
 		});
@@ -890,7 +888,7 @@ namespace Game3 {
 						if (auto self = weak.lock()) {
 							self->queue([self, errc, reject](Window &) {
 								self->closeGame()->then([self, errc, reject] {
-									reject(std::runtime_error(std::format("{} ({})", errc.message(), errc.value())));
+									reject(std::make_exception_ptr(std::runtime_error(std::format("{} ({})", errc.message(), errc.value()))));
 								});
 							});
 						}
@@ -988,13 +986,7 @@ namespace Game3 {
 		}
 
 		return Promise<bool>::now([this, last_path = std::move(last_path)](auto &&resolve, auto &&reject) {
-			playLocally(last_path)->then(std::bind_front(std::move(resolve), true))->oops([reject = std::move(reject)](std::exception_ptr ptr) mutable {
-				try {
-					std::rethrow_exception(std::move(ptr));
-				} catch (const std::exception &error) {
-					reject(error);
-				}
-			});
+			playLocally(last_path)->then(std::bind_front(std::move(resolve), true))->oops(reject);
 		});
 	}
 
@@ -1029,11 +1021,7 @@ namespace Game3 {
 						throw exception;
 					} catch (...) {
 						return closeGame()->finally([exception = std::current_exception(), reject = std::move(reject)] mutable {
-							try {
-								std::rethrow_exception(std::move(exception));
-							} catch (const std::exception &error) {
-								reject(error);
-							}
+							reject(std::move(exception));
 						});
 					}
 				};
@@ -1097,11 +1085,7 @@ namespace Game3 {
 				});
 			})->oops([self = shared_from_this(), reject = std::move(reject)](std::exception_ptr exception) mutable {
 				self->closeGame()->then([reject = std::move(reject), exception = std::move(exception)] {
-					try {
-						std::rethrow_exception(std::move(exception));
-					} catch (const std::exception &error) {
-						reject(error);
-					}
+					reject(std::move(exception));
 				});
 			});
 		});
@@ -1262,7 +1246,7 @@ namespace Game3 {
 			} else {
 				return Promise<void>::now([path = std::move(path)](auto &&, auto &&reject) {
 					// TODO: custom exception class
-					reject(std::runtime_error(std::format("Can't overwrite {}.", path.string())));
+					reject(std::make_exception_ptr(std::runtime_error(std::format("Can't overwrite {}.", path.string()))));
 				});
 			}
 		} else {

@@ -72,6 +72,7 @@ namespace Game3 {
 			std::optional<std::chrono::system_clock::time_point> lastRenderTime;
 
 			Window(GLFWwindow &);
+			~Window();
 
 			void queue(std::move_only_function<void(Window &)>);
 			/* If the given function returns false, it won't be removed from the queue. */
