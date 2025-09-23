@@ -38,7 +38,6 @@
 #include "util/Util.h"
 
 #include <fstream>
-#include <stacktrace>
 
 namespace Game3 {
 	namespace {
@@ -780,8 +779,6 @@ namespace Game3 {
 		connected = true;
 		uiContext.reset();
 
-		INFO("Window({}): doing stuff with game {}", (void *) this, (void *) game.get());
-
 		game->initInteractionSets();
 		settings.apply(*game);
 
@@ -883,47 +880,52 @@ namespace Game3 {
 	}
 
 	Ref<Promise<void>> Window::connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> client) {
-		return closeGame()->then([this, hostname, port, client] mutable {
-			setGame(std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, shared_from_this())));
+		return Promise<void>::now([self = shared_from_this(), hostname, port, client](auto &&resolve, auto &&) {
+			self->closeGame()->then([self, hostname, port, client, resolve = std::move(resolve)] mutable {
+				self->queue([self, hostname, port, client, resolve = std::move(resolve)](Window &) mutable {
+					self->activateContext();
+					self->setGame(std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, self)));
 
-			if (client == nullptr) {
-				client = std::make_shared<LocalClient>();
-			}
+					if (client == nullptr) {
+						client = std::make_shared<LocalClient>();
+					}
 
-			client->onError = [this](const asio::error_code &errc) {
-				queue([errc](Window &window) {
-					window.error(std::format("{} ({})", errc.message(), errc.value()));
-					(void) window.closeGame();
+					client->onError = [weak = std::weak_ptr(self)](const asio::error_code &errc) {
+						if (auto self = weak.lock()) {
+							self->queue([errc](Window &window) {
+								window.error(std::format("{} ({})", errc.message(), errc.value()));
+								(void) window.closeGame();
+							});
+						}
+					};
+
+					self->game->setClient(client);
+
+					client->connect(hostname, port);
+					client->weakGame = self->game;
+
+					self->game->initEntities();
+
+					self->settings.withUnique([&](auto &) {
+						self->settings.hostname = hostname;
+						self->settings.port = port;
+					});
+
+					if (std::filesystem::exists("tokens.json")) {
+						client->readTokens("tokens.json");
+					} else {
+						client->saveTokens("tokens.json");
+					}
+
+					self->activateContext();
+					self->onGameLoaded();
+
+					if (self->settings.alertOnConnection) {
+						self->alert("Connected.");
+					}
+
+					resolve();
 				});
-			};
-
-			game->setClient(client);
-
-			return Promise<void>::now([self = shared_from_this(), hostname, port, client](auto &&resolve, auto &&) {
-				client->connect(hostname, port);
-				client->weakGame = self->game;
-
-				self->game->initEntities();
-
-				self->settings.withUnique([&](auto &) {
-					self->settings.hostname = hostname;
-					self->settings.port = port;
-				});
-
-				if (std::filesystem::exists("tokens.json")) {
-					client->readTokens("tokens.json");
-				} else {
-					client->saveTokens("tokens.json");
-				}
-
-				self->activateContext();
-				self->onGameLoaded();
-
-				if (self->settings.alertOnConnection) {
-					self->alert("Connected.");
-				}
-
-				resolve();
 			});
 		});
 	}
@@ -1199,10 +1201,6 @@ namespace Game3 {
 	}
 
 	void Window::setGame(std::shared_ptr<ClientGame> new_game) {
-		INFO("Setting Window({})::game from {} to {}", (void *) this, (void *) game.get(), (void *) new_game.get());
-		if (new_game == nullptr) {
-			INFO("what. {}", std::stacktrace::current());
-		}
 		game = std::move(new_game);
 	}
 

@@ -415,7 +415,7 @@ int main(int argc, char **argv) {
 
 	SystemTimePoint time = getTime();
 
-	while (!glfwWindowShouldClose(glfw_window)) {
+	auto tick_window = [&] {
 		SystemTimePoint old_time = std::exchange(time, getTime());
 		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(time - old_time).count();
 
@@ -435,15 +435,29 @@ int main(int argc, char **argv) {
 				INFO("{} FPS", 1e6 / diff);
 			}
 		}
+	};
+
+	while (!glfwWindowShouldClose(glfw_window)) {
+		tick_window();
 	}
 
-	window->closeGame()->wait();
-	window.reset();
+	Ref<Promise<void>> promise = window->closeGame()->then([&] {
+		window.reset();
+		glfwTerminate();
+		Timer::summary();
+		richPresence.reset();
+	});
 
-	glfwTerminate();
+	std::atomic_bool done = false;
+	std::jthread thread([&] {
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		done = true;
+	});
 
-	Timer::summary();
-	richPresence.reset();
+	while (!done && !glfwWindowShouldClose(glfw_window)) {
+		tick_window();
+	}
+
 #ifdef CATCH_MAIN
 	} catch (const std::exception &err) {
 		ERR("UNCAUGHT EXCEPTION ({}): {}", DEMANGLE(err), err.what());

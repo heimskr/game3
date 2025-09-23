@@ -2,6 +2,7 @@
 
 #include "mixin/RefCounted.h"
 #include "threading/SharedFunction.h"
+#include "threading/ThreadContext.h"
 #include "util/Concepts.h"
 
 #include <atomic>
@@ -62,6 +63,8 @@ namespace Game3 {
 				future = promise.get_future();
 
 				thread = std::jthread([this](auto &&lambda) {
+					threadContext = {};
+					threadContext.rename("Promise");
 					try {
 						auto reject = Shared<const std::exception &>([this](const std::exception &error) mutable {
 							try {

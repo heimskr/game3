@@ -16,6 +16,7 @@ namespace Game3 {
 			SharedFunction() = default;
 
 			template <typename F>
+			requires (!std::same_as<std::remove_cvref_t<F>, SharedFunction<Result(Args...)>>)
 			SharedFunction(F &&function):
 				function(std::make_shared<Function>(std::forward<F>(function))) {}
 
