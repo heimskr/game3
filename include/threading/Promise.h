@@ -66,41 +66,41 @@ namespace Game3 {
 					threadContext = {};
 					threadContext.rename("Promise");
 					try {
-						auto reject = Shared<const std::exception &>([this](const std::exception &error) mutable {
+						auto reject = Shared<const std::exception &>([ref = this->getRef()](const std::exception &error) mutable {
 							try {
 								throw error;
 							} catch (...) {
-								throwException(std::current_exception());
+								ref->throwException(std::current_exception());
 							}
 						});
 
 						if constexpr (std::same_as<T, void>) {
-							auto resolve = Shared<T>([this] mutable {
-								promise.set_value();
+							auto resolve = Shared<T>([ref = this->getRef()] mutable {
+								ref->promise.set_value();
 
-								if (thenFunction) {
-									thenFunction();
-									consumed = true;
+								if (ref->thenFunction) {
+									ref->thenFunction();
+									ref->consumed = true;
 								}
 
-								finished = true;
-								conditionVariable.notify_all();
-								done();
+								ref->finished = true;
+								ref->conditionVariable.notify_all();
+								ref->done();
 							});
 
 							lambda(std::move(resolve), std::move(reject));
 						} else {
-							auto resolve = Shared<T>([this](T &&resolution) mutable {
-								promise.set_value(std::forward<T>(resolution));
+							auto resolve = Shared<T>([ref = this->getRef()](T &&resolution) mutable {
+								ref->promise.set_value(std::forward<T>(resolution));
 
-								if (thenFunction) {
-									thenFunction(future.get());
-									consumed = true;
+								if (ref->thenFunction) {
+									ref->thenFunction(ref->future.get());
+									ref->consumed = true;
 								}
 
-								finished = true;
-								conditionVariable.notify_all();
-								done();
+								ref->finished = true;
+								ref->conditionVariable.notify_all();
+								ref->done();
 							});
 
 							lambda(std::move(resolve), std::move(reject));

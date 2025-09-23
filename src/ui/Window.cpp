@@ -15,7 +15,6 @@
 #include "threading/ThreadContext.h"
 #include "types/Position.h"
 #include "ui/dialog/ChatDialog.h"
-#include "ui/dialog/ConnectionDialog.h"
 #include "ui/dialog/DraggableDialog.h"
 #include "ui/dialog/LoginDialog.h"
 #include "ui/dialog/MessageDialog.h"
@@ -738,11 +737,12 @@ namespace Game3 {
 		uiContext.removeDialogs<OmniDialog>();
 
 		return Promise<void>::now([self = shared_from_this()](std::move_only_function<void()> &&resolve, std::move_only_function<void(const std::exception &)> &&reject) mutable {
-			self->game->asyncStopThread(std::chrono::milliseconds(666))->then([self] {
-				self->queue([](Window &window) {
+			self->game->asyncStopThread(std::chrono::milliseconds(666))->then([self, resolve = std::move(resolve)] mutable {
+				self->queue([resolve = std::move(resolve)](Window &window) mutable {
 					window.setGame(nullptr);
 					window.serverWrapper.stop();
 					window.goToTitle();
+					resolve();
 				});
 			})->oops([self, reject = std::move(reject)](std::exception_ptr ptr) mutable {
 				self->queue([reject = std::move(reject), ptr = std::move(ptr)](Window &window) mutable {
@@ -753,10 +753,6 @@ namespace Game3 {
 					} catch (const std::exception &error) {
 						reject(error);
 					}
-				});
-			})->finally([self, resolve = std::move(resolve)](auto) mutable {
-				self->queue([resolve = std::move(resolve)](Window &) mutable {
-					resolve();
 				});
 			});
 		});
@@ -880,9 +876,9 @@ namespace Game3 {
 	}
 
 	Ref<Promise<void>> Window::connect(const std::string &hostname, uint16_t port, std::shared_ptr<LocalClient> client) {
-		return Promise<void>::now([self = shared_from_this(), hostname, port, client](auto &&resolve, auto &&) {
-			self->closeGame()->then([self, hostname, port, client, resolve = std::move(resolve)] mutable {
-				self->queue([self, hostname, port, client, resolve = std::move(resolve)](Window &) mutable {
+		return Promise<void>::now([self = shared_from_this(), hostname, port, client](auto &&resolve, auto &&reject) {
+			self->closeGame()->then([self, hostname, port, client, resolve, reject] mutable {
+				self->queue([self, hostname, port, client, resolve, reject](Window &) mutable {
 					self->activateContext();
 					self->setGame(std::dynamic_pointer_cast<ClientGame>(Game::create(Side::Client, self)));
 
@@ -890,11 +886,12 @@ namespace Game3 {
 						client = std::make_shared<LocalClient>();
 					}
 
-					client->onError = [weak = std::weak_ptr(self)](const asio::error_code &errc) {
+					client->onError = [weak = std::weak_ptr(self), reject](const asio::error_code &errc) {
 						if (auto self = weak.lock()) {
-							self->queue([errc](Window &window) {
-								window.error(std::format("{} ({})", errc.message(), errc.value()));
-								(void) window.closeGame();
+							self->queue([self, errc, reject](Window &) {
+								self->closeGame()->then([self, errc, reject] {
+									reject(std::runtime_error(std::format("{} ({})", errc.message(), errc.value())));
+								});
 							});
 						}
 					};
