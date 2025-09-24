@@ -432,6 +432,10 @@ int main(int argc, char **argv) {
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
 
+		if (!window) {
+			return;
+		}
+
 		if (diff != 0) {
 			window->feedFPS(1e6 / diff);
 		}
@@ -449,21 +453,18 @@ int main(int argc, char **argv) {
 		tick_window();
 	}
 
+	std::atomic_bool done = false;
+
 	Ref<Promise<void>> promise = window->closeGame()->then([&] {
 		std::unique_lock lock{mutex};
 		window.reset();
 		glfwTerminate();
 		Timer::summary();
 		richPresence.reset();
-	});
-
-	std::atomic_bool done = false;
-	std::jthread thread([&] {
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		done = true;
 	});
 
-	while (!done && !glfwWindowShouldClose(glfw_window)) {
+	while (!done) {
 		tick_window();
 	}
 

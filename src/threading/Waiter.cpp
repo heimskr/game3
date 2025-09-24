@@ -3,8 +3,8 @@
 #include <stdexcept>
 
 namespace Game3 {
-	Waiter::Waiter(size_t remaining_) noexcept:
-		remaining(remaining_) {}
+	Waiter::Waiter(size_t remaining) noexcept:
+		remaining(remaining) {}
 
 	Waiter & Waiter::operator--() noexcept {
 		if (--remaining == 0) {
