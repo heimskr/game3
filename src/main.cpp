@@ -431,6 +431,7 @@ int main(int argc, char **argv) {
 
 		GL::clear(0, 0, 0);
 		window->tick(diff / 1e6);
+		lock.unlock();
 		if (glfw_terminating) {
 			glfwTerminate();
 			glfw_terminated = true;
@@ -438,6 +439,7 @@ int main(int argc, char **argv) {
 		}
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
+		lock.lock();
 
 		if (!window) {
 			return true;
