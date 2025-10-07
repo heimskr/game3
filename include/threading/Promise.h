@@ -144,6 +144,8 @@ namespace Game3 {
 				if (!rejected && !finished) {
 					future.wait();
 				}
+
+				done();
 			}
 
 			template <typename F>
@@ -197,6 +199,7 @@ namespace Game3 {
 			std::atomic_bool consumed = false;
 			std::atomic_bool rejected = false;
 			std::atomic_bool finished = false;
+			std::atomic_bool dereffed = false;
 
 			template <typename... Ts>
 			using MoveOnlyFunction = VoidFunction<std::move_only_function, Ts...>::Type;
@@ -215,12 +218,12 @@ namespace Game3 {
 			std::condition_variable conditionVariable;
 			std::mutex mutex;
 
-			Promise() {
-				this->ref();
-			}
+			Promise() = default;
 
 			void done() {
-				this->deref();
+				if (!dereffed.exchange(true)) {
+					this->deref();
+				}
 			}
 
 			void throwException(const std::exception_ptr &exception) {

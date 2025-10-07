@@ -29,6 +29,10 @@ namespace Game3 {
 	}
 
 	SoundEngineImpl::~SoundEngineImpl() {
+		auto lock = uniqueLock();
+		for (auto &[pair, sound]: sounds) {
+			ma_sound_uninit(&sound);
+		}
 		ma_engine_uninit(&engine);
 		ma_resource_manager_uninit(&resourceManager);
 	}

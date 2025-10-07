@@ -416,12 +416,14 @@ int main(int argc, char **argv) {
 	SystemTimePoint time = getTime();
 
 	std::recursive_mutex mutex;
+	std::atomic_bool glfw_terminating = false;
+	bool glfw_terminated = false;
 
 	auto tick_window = [&] {
 		std::unique_lock lock{mutex};
 
 		if (!window) {
-			return;
+			return true;
 		}
 
 		SystemTimePoint old_time = std::exchange(time, getTime());
@@ -429,11 +431,16 @@ int main(int argc, char **argv) {
 
 		GL::clear(0, 0, 0);
 		window->tick(diff / 1e6);
+		if (glfw_terminating) {
+			glfwTerminate();
+			glfw_terminated = true;
+			return true;
+		}
 		glfwSwapBuffers(glfw_window);
 		glfwPollEvents();
 
 		if (!window) {
-			return;
+			return true;
 		}
 
 		if (diff != 0) {
@@ -447,10 +454,14 @@ int main(int argc, char **argv) {
 				INFO("{} FPS", 1e6 / diff);
 			}
 		}
+
+		return false;
 	};
 
 	while (!glfwWindowShouldClose(glfw_window)) {
-		tick_window();
+		if (tick_window()) {
+			break;
+		}
 	}
 
 	std::atomic_bool done = false;
@@ -458,14 +469,20 @@ int main(int argc, char **argv) {
 	Ref<Promise<void>> promise = window->closeGame()->then([&] {
 		std::unique_lock lock{mutex};
 		window.reset();
-		glfwTerminate();
+		glfw_terminating = true;
 		Timer::summary();
 		richPresence.reset();
 		done = true;
 	});
 
 	while (!done) {
-		tick_window();
+		if (tick_window()) {
+			break;
+		}
+	}
+
+	if (!glfw_terminated) {
+		glfwTerminate();
 	}
 
 #ifdef CATCH_MAIN

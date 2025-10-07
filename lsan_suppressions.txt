@@ -1,0 +1,3 @@
+leak:glfwCreateWindow
+leak:FcFontSetMatch
+leak:glfwInit
