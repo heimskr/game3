@@ -99,11 +99,13 @@ namespace Game3 {
 			assert(server != nullptr);
 
 			if (payloadSize == receiveBuffer.size()) {
+				ServerGamePtr game = server->getGame();
+
 				if (receiveBuffer.context.expired()) {
-					receiveBuffer.context = server->game;
+					receiveBuffer.context = game;
 				}
 
-				auto factory = server->game->registry<PacketFactoryRegistry>().maybe(packetType);
+				auto factory = game->registry<PacketFactoryRegistry>().maybe(packetType);
 				if (!factory) {
 					ERR("Unknown packet type: {}", packetType);
 					mock();
@@ -113,7 +115,7 @@ namespace Game3 {
 				auto packet = (*factory)();
 
 				try {
-					packet->decode(*server->game, receiveBuffer);
+					packet->decode(*game, receiveBuffer);
 				} catch (const std::exception &err) {
 					ERR("Couldn't decode packet of type {}, size {}: {}", packetType, payloadSize, err.what());
 					mock();
@@ -129,7 +131,7 @@ namespace Game3 {
 					throw std::runtime_error("Client sent extra data");
 				}
 
-				server->game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
+				game->queuePacket(std::static_pointer_cast<RemoteClient>(shared_from_this()), packet);
 				state = State::Begin;
 			}
 		}
@@ -153,13 +155,15 @@ namespace Game3 {
 			return false;
 		}
 
-		if (server->game == nullptr) {
+		ServerGamePtr game = server->getGame();
+
+		if (game == nullptr) {
 			WARN("Dropping packet of type {}: game unavailable", DEMANGLE(packet));
 			return false;
 		}
 
 		Buffer send_buffer{Side::Client};
-		packet->encode(*server->game, send_buffer);
+		packet->encode(*game, send_buffer);
 		assert(send_buffer.size() < UINT32_MAX);
 		const auto size = toLittle(static_cast<uint32_t>(send_buffer.size()));
 		const auto packet_id = toLittle(packet->getID());
@@ -253,9 +257,9 @@ namespace Game3 {
 			return;
 		}
 
-		if (server->game != nullptr) {
+		if (ServerGamePtr game = server->getGame()) {
 			if (ServerPlayerPtr player = getPlayer()) {
-				server->game->queueRemoval(player);
+				game->queueRemoval(player);
 			}
 		}
 

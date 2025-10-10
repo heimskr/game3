@@ -22,7 +22,7 @@ namespace Game3 {
 
 			GameDB &database = game->getDatabase();
 
-			const bool was_omnitoken = server->game->compareToken(token);
+			const bool was_omnitoken = server->getGame()->compareToken(token);
 
 			if (!was_omnitoken && server->generateToken(username) != token) {
 				client.send(make<LoginStatusPacket>("Invalid token."));
@@ -66,7 +66,7 @@ namespace Game3 {
 					}
 
 					// Oopsie, we forgot to generate the overworld somehow.
-					if (!server->game->initialWorldgen(Overworld::getDefaultSeed())) {
+					if (!server->getGame()->initialWorldgen(Overworld::getDefaultSeed())) {
 						ERR("Realm 1 is missing but initial worldgen didn't occur.");
 						throw;
 					}

@@ -84,7 +84,7 @@ namespace Game3 {
 	void Woodcutter::tick(const TickArgs &args) {
 		Worker::tick(args);
 
-		const GamePtr &game = args.game;
+		GamePtr game = args.getGame();
 		const auto delta = args.delta;
 
 		if (getSide() == Side::Client || stillStuck(delta)) {
@@ -94,30 +94,38 @@ namespace Game3 {
 		const auto hour = game->getHour();
 
 		if (phase == 0 && WORK_START_HOUR <= hour) {
+
 			wakeUp();
 
 		} else if (phase == 1 && realmID == overworldRealm) {
+
 			goToResource();
 
 		} else if (phase == 2 && position == destination) {
+
 			startHarvesting();
 
 		} else if (phase == 3) {
+
 			harvest(delta);
 			if (WORK_END_HOUR <= hour) {
 				phase = 4;
 			}
 
 		} else if (phase == 4) {
+
 			goToKeep(5);
 
 		} else if (phase == 5 && position == destination) {
+
 			goToStockpile(6);
 
 		} else if (phase == 6 && position == destination) {
+
 			sellInventory();
 
 		} else if (phase == 7) {
+
 			sellTime += delta;
 			if (SELLING_TIME <= sellTime) {
 				sellTime = 0;
@@ -125,16 +133,21 @@ namespace Game3 {
 			}
 
 		} else if (phase == 8 && realmID == overworldRealm) {
+
 			goToHouse(9);
 
 		} else if (phase == 9 && position == destination) {
+
 			goToBed(10);
 
 		} else if (phase == 10 && position == destination) {
+
 			phase = 11;
 
 		} else if (phase == 11 && hour < WORK_END_HOUR) {
+
 			phase = 0;
+
 		}
 	}
 

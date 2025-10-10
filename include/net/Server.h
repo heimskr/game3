@@ -52,7 +52,7 @@ namespace Game3 {
 			asio::ip::tcp::acceptor acceptor;
 			asio::executor_work_guard<asio::io_context::executor_type> workGuard;
 			std::string id = "server";
-			std::shared_ptr<ServerGame> game;
+			std::weak_ptr<ServerGame> weakGame;
 			std::function<void()> onStop;
 
 			std::function<void(GenericClient &, std::string_view message)> onMessage;
@@ -106,6 +106,8 @@ namespace Game3 {
 
 			[[nodiscard]]
 			inline const auto & getClients() const { return allClients; }
+
+			inline auto getGame() const { return weakGame.lock(); }
 
 		private:
 			void send(GenericClient &, std::string, bool force);

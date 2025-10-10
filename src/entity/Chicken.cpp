@@ -8,11 +8,13 @@ namespace {
 
 namespace Game3 {
 	void Chicken::tick(const TickArgs &args) {
-		if (args.game->getSide() == Side::Server) {
-			const Tick current_tick = args.game->getCurrentTick();
+		GamePtr game = args.getGame();
+
+		if (game->getSide() == Side::Server) {
+			const Tick current_tick = game->getCurrentTick();
 			if (firstEgg) {
 				firstEgg = false;
-				eggTick = current_tick + args.game->getDelayTicks(EGG_PERIOD);
+				eggTick = current_tick + game->getDelayTicks(EGG_PERIOD);
 			} else if (eggTick <= current_tick) {
 				layEgg();
 				eggTick = enqueueTick(EGG_PERIOD);

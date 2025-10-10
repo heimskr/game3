@@ -90,6 +90,8 @@ namespace Game3 {
 	}
 
 	void Server::stop() {
+		ServerGamePtr game = getGame();
+
 		// Game already stopped.
 		if (!game) {
 			return;
@@ -123,6 +125,7 @@ namespace Game3 {
 	}
 
 	void Server::saveUserData() {
+		ServerGamePtr game = getGame();
 		auto lock = game->players.sharedLock();
 
 		GameDB &database = game->getDatabase();
@@ -137,6 +140,8 @@ namespace Game3 {
 		if (!validateUsername(username)) {
 			return nullptr;
 		}
+
+		ServerGamePtr game = getGame();
 
 		{
 			Buffer buffer{game, Side::Server};
@@ -184,6 +189,7 @@ namespace Game3 {
 		auto guard = client.bufferGuard();
 		client.send(make<EntityMoneyChangedPacket>(*player));
 		client.send(make<SelfTeleportedPacket>(realm->id, player->getPosition()));
+		ServerGamePtr game = getGame();
 		client.send(make<TimePacket>(game->time));
 		client.send(make<RecipeListPacket>(CraftingRecipeRegistry::ID(), game->registry<CraftingRecipeRegistry>(), game));
 		client.send(make<KnownItemsPacket>(*player));
@@ -268,7 +274,7 @@ namespace Game3 {
 
 		const bool database_existed = std::filesystem::exists(world_path);
 		game->openDatabase(world_path);
-		global_server->game = game;
+		global_server->weakGame = game;
 
 		size_t seed = 1621;
 		if (std::filesystem::exists(".seed")) {

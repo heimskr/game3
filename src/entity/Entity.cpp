@@ -216,8 +216,9 @@ namespace Game3 {
 
 	void Entity::tick(const TickArgs &args) {
 		if (!weakRealm.lock()) {
-			if (args.game->getSide() == Side::Server) {
-				teleport(Position{32, 32}, args.game->getRealm(-1));
+			GamePtr game = args.getGame();
+			if (game->getSide() == Side::Server) {
+				teleport(Position{32, 32}, game->getRealm(-1));
 			}
 			tryEnqueueTick();
 			return;
@@ -237,8 +238,8 @@ namespace Game3 {
 			}
 		}
 
-		if (path_drained && args.game->getSide() == Side::Server) {
-			args.game->toServer().entityTeleported(*this, MovementContext{.clearOffset = false});
+		if (GamePtr game = args.getGame(); path_drained && game->getSide() == Side::Server) {
+			game->toServer().entityTeleported(*this, MovementContext{.clearOffset = false});
 		}
 
 		const auto delta = args.delta;

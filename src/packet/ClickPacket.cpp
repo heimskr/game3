@@ -1,10 +1,9 @@
-#include "util/Log.h"
 #include "entity/ServerPlayer.h"
 #include "game/Inventory.h"
 #include "game/ServerGame.h"
-#include "net/Server.h"
-#include "net/RemoteClient.h"
+#include "net/GenericClient.h"
 #include "packet/ClickPacket.h"
+#include "util/Log.h"
 
 namespace Game3 {
 	void ClickPacket::handle(const std::shared_ptr<ServerGame> &, GenericClient &client) {

@@ -39,7 +39,7 @@ namespace Game3 {
 			return;
 
 		Ticker ticker{*this, args};
-		const GamePtr &game = args.game;
+		GamePtr game = args.getGame();
 
 		enqueueTick(PERIOD);
 

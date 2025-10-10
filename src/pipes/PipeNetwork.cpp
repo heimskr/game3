@@ -12,10 +12,11 @@
 #include <csignal>
 
 namespace Game3 {
-	PipeNetwork::PipeNetwork(size_t id_, const std::shared_ptr<Realm> &realm):
-		id(id_), weakRealm(realm) {}
+	PipeNetwork::PipeNetwork(size_t id, const RealmPtr &realm):
+		id(id),
+		weakRealm(realm) {}
 
-	std::unique_ptr<PipeNetwork> PipeNetwork::create(Substance type, size_t id, const std::shared_ptr<Realm> &realm) {
+	std::unique_ptr<PipeNetwork> PipeNetwork::create(Substance type, size_t id, const RealmPtr &realm) {
 		switch (type) {
 			case Substance::Item:
 				return std::make_unique<ItemNetwork>(id, realm);
@@ -31,11 +32,12 @@ namespace Game3 {
 	}
 
 	void PipeNetwork::add(std::weak_ptr<Pipe> pipe) {
-		if (std::shared_ptr<Pipe> locked = pipe.lock()) {
-			std::shared_ptr<PipeNetwork> shared = shared_from_this();
+		if (PipePtr locked = pipe.lock()) {
+			PipeNetworkPtr shared = shared_from_this();
 
-			if (locked->getNetwork(getType()) == shared)
+			if (locked->getNetwork(getType()) == shared) {
 				return;
+			}
 
 			locked->setNetwork(getType(), shared);
 			{
@@ -47,13 +49,15 @@ namespace Game3 {
 			locked->onNeighborUpdated(Position(-1,  0));
 			locked->onNeighborUpdated(Position( 0,  1));
 			locked->onNeighborUpdated(Position( 0, -1));
-		} else
+		} else {
 			throw std::runtime_error("Can't lock pipe in PipeNetwork::add");
+		}
 	}
 
-	void PipeNetwork::absorb(std::shared_ptr<PipeNetwork> other) {
-		if (this == other.get())
+	void PipeNetwork::absorb(PipeNetworkPtr other) {
+		if (this == other.get()) {
 			return;
+		}
 
 		// Absorbing while either network is ticking would be unadvisable.
 		auto this_lock = uniqueLock();
@@ -64,42 +68,46 @@ namespace Game3 {
 		const Substance type = getType();
 		assert(other->getType() == type);
 
-		const std::shared_ptr<PipeNetwork> shared = shared_from_this();
+		const PipeNetworkPtr shared = shared_from_this();
 
 		{
 			auto lock = other->members.uniqueLock();
-			for (const std::weak_ptr<Pipe> &member: other->members)
-				if (std::shared_ptr<Pipe> locked = member.lock())
+			for (const std::weak_ptr<Pipe> &member: other->members) {
+				if (PipePtr locked = member.lock()) {
 					add(locked);
+				}
+			}
 			other->members.clear();
 		}
 
 		{
 			auto lock = other->insertions.uniqueLock();
-			for (const auto &[position, direction]: other->insertions)
+			for (const auto &[position, direction]: other->insertions) {
 				addInsertion(position, direction);
+			}
 			other->insertions.clear();
 		}
 
 		{
 			auto lock = other->extractions.uniqueLock();
-			for (const auto &[position, direction]: other->extractions)
+			for (const auto &[position, direction]: other->extractions) {
 				addExtraction(position, direction);
+			}
 			other->extractions.clear();
 		}
 
 		reset();
 	}
 
-	std::shared_ptr<PipeNetwork> PipeNetwork::partition(const std::shared_ptr<Pipe> &start) {
-		auto realm = weakRealm.lock();
+	PipeNetworkPtr PipeNetwork::partition(const PipePtr &start) {
+		RealmPtr realm = weakRealm.lock();
 		assert(realm);
 
 		auto this_lock = uniqueLock();
 
 		const Substance type = getType();
 
-		std::shared_ptr<PipeNetwork> new_network = PipeNetwork::create(type, realm->pipeLoader.newID(), realm);
+		PipeNetworkPtr new_network = PipeNetwork::create(type, realm->pipeLoader.newID(), realm);
 
 		auto new_lock = new_network->uniqueLock();
 
@@ -107,14 +115,17 @@ namespace Game3 {
 		std::vector queue{start};
 
 		while (!queue.empty()) {
-			auto pipe = queue.back();
+			PipePtr pipe = queue.back();
 			queue.pop_back();
 			visited.insert(pipe);
 			new_network->add(pipe);
 
 			pipe->getDirections()[type].iterate([&](Direction direction) {
-				if (std::shared_ptr<Pipe> neighbor = pipe->getConnected(type, direction); neighbor && !neighbor->dying[type] && !visited.contains(neighbor))
-					queue.push_back(neighbor);
+				if (PipePtr neighbor = pipe->getConnected(type, direction)) {
+					if (!neighbor->dying[type] && !visited.contains(neighbor)) {
+						queue.push_back(neighbor);
+					}
+				}
 			});
 		}
 
@@ -199,7 +210,7 @@ namespace Game3 {
 		}
 	}
 
-	void PipeNetwork::removePipe(const std::shared_ptr<Pipe> &member) {
+	void PipeNetwork::removePipe(const PipePtr &member) {
 		const Substance type = getType();
 		member->dying[type] = true;
 
@@ -217,7 +228,7 @@ namespace Game3 {
 
 		std::vector<Direction> directions = member->getDirections()[type].toVector();
 		std::span remaining_directions(directions);
-		FriendSet<std::shared_ptr<Pipe>> friends;
+		FriendSet<PipePtr> friends;
 
 		const RealmPtr realm = member->getRealm();
 
@@ -225,13 +236,15 @@ namespace Game3 {
 			remaining_directions = remaining_directions.subspan(1);
 
 			const auto [first_pipe, first_network] = member->getNeighbor(type, first_direction);
-			if (!first_network)
+			if (!first_network) {
 				continue;
+			}
 
 			for (const Direction second_direction: remaining_directions) {
 				const auto [second_pipe, second_network] = member->getNeighbor(type, second_direction);
-				if (!second_network)
+				if (!second_network) {
 					continue;
+				}
 
 				if (first_pipe->reachable(type, second_pipe)) {
 					friends.insert(first_pipe, second_pipe);
@@ -243,7 +256,7 @@ namespace Game3 {
 		}
 
 		for (const auto &[index, set]: friends) {
-			std::shared_ptr<Pipe> pipe = *set.begin();
+			PipePtr pipe = *set.begin();
 			pipe->getNetwork(type)->partition(pipe);
 		}
 	}
@@ -251,8 +264,10 @@ namespace Game3 {
 	void PipeNetwork::tick(const GamePtr &game, Tick tick) {
 		lastTick = tick;
 		game->enqueue([weak = weak_from_this()](const TickArgs &args) {
-			if (auto network = weak.lock())
-				network->tick(args.game, args.game->getCurrentTick());
+			if (auto network = weak.lock()) {
+				GamePtr game = args.getGame();
+				network->tick(game, game->getCurrentTick());
+			}
 		});
 	}
 
@@ -260,9 +275,10 @@ namespace Game3 {
 		return lastTick < tick;
 	}
 
-	std::shared_ptr<PipeNetwork> PipeNetwork::findAt(const Place &place, Substance type) {
-		if (PipePtr pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity()))
+	PipeNetworkPtr PipeNetwork::findAt(const Place &place, Substance type) {
+		if (PipePtr pipe = std::dynamic_pointer_cast<Pipe>(place.getTileEntity())) {
 			return pipe->getNetwork(type);
+		}
 		return nullptr;
 	}
 }

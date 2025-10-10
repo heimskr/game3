@@ -20,7 +20,7 @@ namespace Game3 {
 	void GenericClient::sendChunk(Realm &realm, ChunkPosition chunk_position, bool can_request, uint64_t counter_threshold) {
 		auto server = getServer();
 		assert(server != nullptr);
-		assert(server->game != nullptr);
+		assert(server->getGame() != nullptr);
 
 		if (counter_threshold != 0 && realm.tileProvider.contains(chunk_position) && realm.tileProvider.getUpdateCounter(chunk_position) < counter_threshold) {
 			return;

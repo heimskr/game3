@@ -83,55 +83,73 @@ namespace Game3 {
 
 		const auto delta = args.delta;
 
-		if (args.game->getSide() == Side::Client || stillStuck(delta))
+		GamePtr game = args.getGame();
+
+		if (game->getSide() == Side::Client || stillStuck(delta)) {
 			return;
+		}
 
-		const auto hour = args.game->getHour();
+		const auto hour = game->getHour();
 
-		if (phase == 0 && WORK_START_HOUR <= hour)
+		if (phase == 0 && WORK_START_HOUR <= hour) {
+
 			wakeUp();
 
-		else if (phase == 1 && realmID == overworldRealm)
+		} else if (phase == 1 && realmID == overworldRealm) {
+
 			goToKeep(2);
 
-		else if (phase == 2 && position == destination)
+		} else if (phase == 2 && position == destination) {
+
 			goToStockpile(3);
 
-		else if (phase == 3 && position == destination)
+		} else if (phase == 3 && position == destination) {
+
 			buyResources();
 
-		else if (phase == 4) {
-			actionTime += delta;
-			if (BUYING_TIME <= actionTime)
-				leaveKeep(5);
-		}
+		} else if (phase == 4) {
 
-		else if (phase == 5 && realmID == overworldRealm)
+			actionTime += delta;
+			if (BUYING_TIME <= actionTime) {
+				leaveKeep(5);
+			}
+
+		} else if (phase == 5 && realmID == overworldRealm) {
+
 			goToHouse(6);
 
-		else if (phase == 6 && position == destination)
+		} else if (phase == 6 && position == destination) {
+
 			goToForge();
 
-		else if (phase == 7 && position == destination)
+		} else if (phase == 7 && position == destination) {
+
 			craftTools();
 
-		else if (phase == 8) {
-			actionTime += delta;
-			if (CRAFTING_TIME <= actionTime)
-				goToCounter();
-		}
+		} else if (phase == 8) {
 
-		else if (phase == 9 && position == destination)
+			actionTime += delta;
+			if (CRAFTING_TIME <= actionTime) {
+				goToCounter();
+			}
+
+		} else if (phase == 9 && position == destination) {
+
 			startSelling();
 
-		else if (phase == 10 && WORK_END_HOUR <= hour)
+		} else if (phase == 10 && WORK_END_HOUR <= hour) {
+
 			goToBed(11);
 
-		else if (phase == 11 && position == destination)
+		} else if (phase == 11 && position == destination) {
+
 			phase = 12;
 
-		else if (phase == 12 && hour < WORK_END_HOUR)
+		} else if (phase == 12 && hour < WORK_END_HOUR) {
+
 			phase = 0;
+
+		}
 	}
 
 	void Blacksmith::encode(Buffer &buffer) {
@@ -236,11 +254,15 @@ namespace Game3 {
 
 	void Blacksmith::goToForge() {
 		auto house = std::dynamic_pointer_cast<Building>(getRealm()->tileEntityAt(housePosition));
-		if (!house)
+
+		if (!house) {
 			throw std::runtime_error("Blacksmith couldn't find house");
+		}
+
 		house->teleport(getSelf());
 
-		auto realm = getRealm();
+		RealmPtr realm = getRealm();
+
 		if (realm->id != houseRealm) {
 			// throw std::runtime_error("Blacksmith couldn't teleport to house");
 			stuck = true;

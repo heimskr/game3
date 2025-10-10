@@ -1,16 +1,18 @@
 #pragma once
 
+#include "game/HasGame.h"
 #include "types/Types.h"
 
 namespace Game3 {
 	class Game;
 
-	struct TickArgs {
-		std::shared_ptr<Game> game;
+	struct TickArgs: HasGame {
 		Tick tick;
 		float delta;
 
-		TickArgs(std::shared_ptr<Game> game, Tick tick, float delta):
-			game(std::move(game)), tick(tick), delta(delta) {}
+		TickArgs(const GamePtr &game, Tick tick, float delta):
+			HasGame(game),
+			tick(tick),
+			delta(delta) {}
 	};
 }

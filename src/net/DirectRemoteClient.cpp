@@ -51,6 +51,6 @@ namespace Game3 {
 			return;
 		}
 
-		server->game->queuePacket(shared_from_this(), packet);
+		server->getGame()->queuePacket(shared_from_this(), packet);
 	}
 }

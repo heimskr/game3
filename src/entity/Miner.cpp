@@ -81,7 +81,7 @@ namespace Game3 {
 	void Miner::tick(const TickArgs &args) {
 		Worker::tick(args);
 
-		const GamePtr &game = args.game;
+		const GamePtr &game = args.getGame();
 		const auto delta = args.delta;
 
 		if (getSide() == Side::Client || stillStuck(delta)) {

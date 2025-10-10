@@ -89,8 +89,10 @@ namespace Game3 {
 			return;
 		}
 
+		GamePtr game = getGame();
+
 		if (!biomassID) {
-			biomassID = args.game->getFluid("base:fluid/liquid_biomass")->registryID;
+			biomassID = game->getFluid("base:fluid/liquid_biomass")->registryID;
 		}
 
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
@@ -100,7 +102,7 @@ namespace Game3 {
 			return;
 		}
 
-		LivingEntityPtr entity = makeEntity(args.game, *genes_value);
+		LivingEntityPtr entity = makeEntity(game, *genes_value);
 		if (!entity) {
 			ERR(3, "Couldn't make entity.");
 			return;

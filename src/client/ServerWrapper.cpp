@@ -163,7 +163,8 @@ namespace Game3 {
 				startCV.notify_all();
 				return;
 			}
-			server->game = game;
+
+			server->weakGame = game;
 
 			if (overworld_seed == -1uz) {
 				std::random_device rng;

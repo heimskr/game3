@@ -67,7 +67,7 @@ namespace Game3 {
 		}
 
 		auto fluids_lock = fluidContainer->levels.uniqueLock();
-		const auto fluid_id = args.game->getFluid(fluid_type)->registryID;
+		const auto fluid_id = args.getGame()->getFluid(fluid_type)->registryID;
 
 		FluidAmount max = getMaxLevel(fluid_id);
 		FluidAmount &level = fluidContainer->levels[fluid_id];

@@ -91,7 +91,7 @@ namespace Game3 {
 		if (getSide() == Side::Server) {
 			if (firstWander) {
 				firstWander = false;
-			} else if (wanderTick <= args.game->getCurrentTick()) {
+			} else if (wanderTick <= args.getGame()->getCurrentTick()) {
 				// The check here is to avoid spurious wanders if something else causes the animal to tick earlier than scheduled.
 				wander();
 				wanderTick = enqueueTick(std::chrono::milliseconds(int64_t(1000 * getWanderDistribution()(threadContext.rng))));

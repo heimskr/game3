@@ -19,29 +19,34 @@ namespace Game3 {
 	GeothermalGenerator::GeothermalGenerator():
 		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	GeothermalGenerator::GeothermalGenerator(Identifier tile_id, Position position_):
-		TileEntity(std::move(tile_id), ID(), position_, true), EnergeticTileEntity(ENERGY_CAPACITY) {}
+	GeothermalGenerator::GeothermalGenerator(Identifier tileID, Position position):
+		TileEntity(std::move(tileID), ID(), position, true),
+		EnergeticTileEntity(ENERGY_CAPACITY) {}
 
-	GeothermalGenerator::GeothermalGenerator(Position position_):
-		GeothermalGenerator("base:tile/geothermal_generator"_id, position_) {}
+	GeothermalGenerator::GeothermalGenerator(Position position):
+		GeothermalGenerator("base:tile/geothermal_generator"_id, position) {}
 
 	bool GeothermalGenerator::mayInsertItem(const ItemStackPtr &stack, Direction, Slot slot) {
-		if (slot != 0 && slot != Slot(-1))
+		if (slot != 0 && slot != Slot(-1)) {
 			return false;
+		}
 
 		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack->item);
-		if (!flask)
+		if (!flask) {
 			return false;
+		}
 
 		RealmPtr realm = weakRealm.lock();
-		if (!realm)
+		if (!realm) {
 			return false;
+		}
 
 		GamePtr game = realm->getGame();
 		auto &fluid_registry = game->registry<FluidRegistry>();
 		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
-		if (!fluid)
+		if (!fluid) {
 			return false;
+		}
 
 		auto &geothermal_registry = game->registry<GeothermalRecipeRegistry>();
 		return geothermal_registry.fluidIDs.contains(fluid->registryID);
@@ -52,16 +57,18 @@ namespace Game3 {
 	}
 
 	bool GeothermalGenerator::canInsertItem(const ItemStackPtr &stack, Direction direction, Slot slot) {
-		if (slot != 0 && slot != Slot(-1))
+		if (slot != 0 && slot != Slot(-1)) {
 			return false;
+		}
 
 		return mayInsertItem(stack, direction, 0) && getInventory(0)->canInsert(stack, 0);
 	}
 
 	FluidAmount GeothermalGenerator::getMaxLevel(FluidID id) {
 		auto shared_lock = supportedFluids.sharedLock();
-		if (supportedFluids)
+		if (supportedFluids) {
 			return supportedFluids->contains(id)? FLUID_CAPACITY : 0;
+		}
 		shared_lock.unlock();
 		// No data race please :)
 		auto unique_lock = supportedFluids.uniqueLock();
@@ -70,8 +77,9 @@ namespace Game3 {
 		GamePtr game = getGame();
 		for (const std::shared_ptr<GeothermalRecipe> &recipe: game->registry<GeothermalRecipeRegistry>().items) {
 			supportedFluids->emplace(recipe->input.id);
-			if (recipe->input.id == id)
+			if (recipe->input.id == id) {
 				out = FLUID_CAPACITY;
+			}
 		}
 		return out;
 	}
@@ -89,8 +97,9 @@ namespace Game3 {
 
 	void GeothermalGenerator::tick(const TickArgs &args) {
 		RealmPtr realm = weakRealm.lock();
-		if (!realm || realm->getSide() != Side::Server)
+		if (!realm || realm->getSide() != Side::Server) {
 			return;
+		}
 
 		Ticker ticker{*this, args};
 
@@ -104,17 +113,22 @@ namespace Game3 {
 		auto &levels = fluidContainer->levels;
 		auto fluid_lock = levels.uniqueLock();
 
-		if (levels.empty())
+		if (levels.empty()) {
 			return;
+		}
 
-		auto &registry = args.game->registry<GeothermalRecipeRegistry>();
+		GamePtr game = args.getGame();
+
+		auto &registry = game->registry<GeothermalRecipeRegistry>();
 
 		std::optional<EnergyAmount> leftovers;
 		auto energy_lock = energyContainer->uniqueLock();
 
-		for (const std::shared_ptr<GeothermalRecipe> &recipe: registry.items)
-			if (recipe->craft(args.game, fluidContainer, energyContainer, leftovers))
+		for (const std::shared_ptr<GeothermalRecipe> &recipe: registry.items) {
+			if (recipe->craft(game, fluidContainer, energyContainer, leftovers)) {
 				return;
+			}
+		}
 	}
 
 	void GeothermalGenerator::toJSON(boost::json::value &json) const {
@@ -145,8 +159,9 @@ namespace Game3 {
 				WARN(2, "No fluids.");
 			} else {
 				GamePtr game = realm->getGame();
-				for (const auto &[id, amount]: fluidContainer->levels)
+				for (const auto &[id, amount]: fluidContainer->levels) {
 					INFO(2, "{} = {}", game->getFluid(id)->identifier, amount);
+				}
 			}
 		}
 
@@ -189,7 +204,7 @@ namespace Game3 {
 		auto energetic_lock = EnergeticTileEntity::observers.uniqueLock();
 
 		std::erase_if(EnergeticTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
-			if (auto player = weak_player.lock()) {
+			if (PlayerPtr player = weak_player.lock()) {
 				player->send(packet);
 				return false;
 			}
@@ -200,9 +215,10 @@ namespace Game3 {
 		auto fluid_holding_lock = FluidHoldingTileEntity::observers.uniqueLock();
 
 		std::erase_if(FluidHoldingTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
-			if (auto player = weak_player.lock()) {
-				if (!EnergeticTileEntity::observers.contains(player))
+			if (PlayerPtr player = weak_player.lock()) {
+				if (!EnergeticTileEntity::observers.contains(player)) {
 					player->send(packet);
+				}
 				return false;
 			}
 
@@ -212,9 +228,10 @@ namespace Game3 {
 		auto inventoried_lock = InventoriedTileEntity::observers.uniqueLock();
 
 		std::erase_if(InventoriedTileEntity::observers, [&](const std::weak_ptr<Player> &weak_player) {
-			if (auto player = weak_player.lock()) {
-				if (!EnergeticTileEntity::observers.contains(player) && !FluidHoldingTileEntity::observers.contains(player))
+			if (PlayerPtr player = weak_player.lock()) {
+				if (!EnergeticTileEntity::observers.contains(player) && !FluidHoldingTileEntity::observers.contains(player)) {
 					player->send(packet);
+				}
 				return false;
 			}
 
@@ -232,31 +249,36 @@ namespace Game3 {
 		auto inventory_lock = inventory->uniqueLock();
 
 		ItemStackPtr stack = (*inventory)[0];
-		if (!stack)
+		if (!stack) {
 			return;
+		}
 
 		auto flask = std::dynamic_pointer_cast<FilledFlask>(stack->item);
-		if (!flask)
+		if (!flask) {
 			return;
+		}
 
 		GamePtr game = getGame();
 		auto &geothermal_registry = game->registry<GeothermalRecipeRegistry>();
 		auto &fluid_registry = game->registry<FluidRegistry>();
 		std::shared_ptr<Fluid> fluid = fluid_registry.at(flask->fluidName);
-		if (!fluid || !geothermal_registry.fluidIDs.contains(fluid->registryID))
+		if (!fluid || !geothermal_registry.fluidIDs.contains(fluid->registryID)) {
 			return;
+		}
 
 		const FluidStack fluid_stack = flask->getFluidStack(fluid_registry);
 		auto fluid_lock = fluidContainer->levels.uniqueLock();
 		const FluidAmount insertable = HasFluids::fluidInsertable(fluid_stack.id);
 		const size_t flasks_to_insert = std::min(insertable / fluid_stack.amount, stack->count);
 
-		if (flasks_to_insert == 0)
+		if (flasks_to_insert == 0) {
 			return;
+		}
 
 		stack->count -= flasks_to_insert;
-		if (stack->count == 0)
+		if (stack->count == 0) {
 			inventory->erase(0);
+		}
 
 		fluidContainer->levels[fluid_stack.id] += flasks_to_insert * fluid_stack.amount;
 

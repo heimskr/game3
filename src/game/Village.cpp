@@ -29,31 +29,31 @@ namespace Game3 {
 	Village::Village(Game &game, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
 		Village(game, game.getNewVillageID(), realm_id, chunk_position, position_, options_) {}
 
-	Village::Village(Game &game, VillageID id_, RealmID realm_id, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_):
+	Village::Village(Game &game, VillageID id, RealmID realmID, ChunkPosition chunkPosition, const Position &position, const VillageOptions &options):
 		HasGame(game.shared_from_this()),
-		id(id_),
+		id(id),
 		name(NameGen::makeRandomLanguage(threadContext.rng).makeName()),
-		realmID(realm_id),
-		chunkPosition(chunk_position),
-		position(position_),
-		options(options_),
+		realmID(realmID),
+		chunkPosition(chunkPosition),
+		position(position),
+		options(options),
 		richness(Richness::makeRandom(game)),
 		resources(getDefaultResources()),
 		randomValue(chooseRandomValue()),
 		greed(chooseGreed()) {}
 
-	Village::Village(VillageID id_, RealmID realm_id, std::string name_, ChunkPosition chunk_position, const Position &position_, const VillageOptions &options_, Richness richness_, Resources resources_, LaborAmount labor_, double random_value, double greed_):
-		id(id_),
-		name(std::move(name_)),
-		realmID(realm_id),
-		chunkPosition(chunk_position),
-		position(position_),
-		options(options_),
-		richness(std::move(richness_)),
-		resources(std::move(resources_)),
-		labor(labor_),
-		randomValue(random_value),
-		greed(greed_) {}
+	Village::Village(VillageID id, RealmID realmID, std::string name, ChunkPosition chunkPosition, const Position &position, const VillageOptions &options, Richness richness, Resources resources, LaborAmount labor, double randomValue, double greed):
+		id(id),
+		name(std::move(name)),
+		realmID(realmID),
+		chunkPosition(chunkPosition),
+		position(position),
+		options(options),
+		richness(std::move(richness)),
+		resources(std::move(resources)),
+		labor(labor),
+		randomValue(randomValue),
+		greed(greed) {}
 
 	std::optional<double> Village::getRichness(const Identifier &identifier) const {
 		return richness[identifier];
@@ -80,8 +80,7 @@ namespace Game3 {
 	}
 
 	Tick Village::enqueueTick() {
-		GamePtr game = getGame();
-		return game->enqueue(sigc::mem_fun(*this, &Village::tick));
+		return getGame()->enqueue(sigc::mem_fun(*this, &Village::tick));
 	}
 
 	void Village::produce(BiomeType biome, const ProductionRule &rule) {
@@ -93,8 +92,8 @@ namespace Game3 {
 
 		double multiplier = getMultiplier();
 
-		if (auto effect = rule.getRichnessEffect()) {
-			if (auto richness = getRichness(rule.getOutput()->getID())) {
+		if (std::optional<double> effect = rule.getRichnessEffect()) {
+			if (std::optional<double> richness = getRichness(rule.getOutput()->getID())) {
 				multiplier = *effect * *richness;
 				if (multiplier <= 0) {
 					return;
@@ -203,8 +202,9 @@ namespace Game3 {
 	}
 
 	void Village::tick(const TickArgs &args) {
-		const GamePtr &game = args.game;
+		GamePtr game = args.getGame();
 		BiomeType biome = Biome::VOID_REALM;
+
 		if (std::optional<BiomeType> found_biome = game->getRealm(realmID)->tileProvider.copyBiomeType(position)) {
 			biome = *found_biome;
 		}
