@@ -1,5 +1,3 @@
-# I can't believe I have to say this, but *do not open AI slop PRs*.
-
 [![wakatime](https://wakatime.com/badge/github/heimskr/game3.svg)](https://wakatime.com/badge/github/heimskr/game3)
 
 # Game3
@@ -37,5 +35,5 @@ If you'd like to contribute, here are some ideas, ordered roughly from easiest t
 	(see Game::initRegistries through Game::initialSetup in [Game.cpp](https://github.com/heimskr/game3/blob/master/src/game/Game.cpp)).
 	- You will need to implement dependency checking to make sure plugins are loaded in the right order and that there are no cycles;
 		[Graph::topoSort](https://github.com/heimskr/game3/blob/master/include/graph/Graph.h) may help with that.
-	- Bonus points if you can get interop with other languages (e.g., Rust or Zig) working. This will likely be difficult because plugins will typically need to extend classes like Entity, TileEntity or Realm that have virtual methods.
+	- Bonus points if you can get interop with other languages (e.g., Rust) working. This will likely be difficult because plugins will typically need to extend classes like Entity, TileEntity or Realm that have virtual methods.
 - Rewrite the "engine" to be based on Vulkan or SDL2 instead of OpenGL.
