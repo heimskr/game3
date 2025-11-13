@@ -178,7 +178,7 @@ namespace Game3 {
 		if (!raw) {
 			game->gameRules.clear();
 		} else {
-			game->gameRules.getBase() = boost::json::value_to<decltype(game->gameRules)::Base>(boost::json::parse(*raw));
+			boost::json::parse_into(game->gameRules.getBase(), *raw);
 		}
 	}
 
