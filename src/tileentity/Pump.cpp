@@ -43,14 +43,16 @@ namespace Game3 {
 			return;
 		}
 
-		std::optional<FluidTile> fluid = realm->tryFluid(position + tileDirection);
-		if (!fluid) {
+		std::optional<FluidTile> fluid_tile = realm->tryFluid(position + tileDirection);
+		if (!fluid_tile) {
 			return;
 		}
 
+		GamePtr game = realm->getGame();
+
 		auto energy_lock = energyContainer->uniqueLock();
 
-		FluidLevel to_remove = std::min<FluidLevel>(amount, fluid->level);
+		FluidLevel to_remove = std::min<FluidLevel>(amount, fluid_tile->level);
 
 		if (ENERGY_PER_UNIT > 0.) {
 			to_remove = std::min<FluidLevel>(energyContainer->energy / ENERGY_PER_UNIT, to_remove);
@@ -60,10 +62,17 @@ namespace Game3 {
 			return;
 		}
 
+		// Try to resolve the fluid. If resolution did something, update the fluid tile to match.
+		if (FluidPtr fluid = game->getFluid(fluid_tile->id)) {
+			if (FluidPtr resolution = fluid->resolve(Place{position + tileDirection, realm})) {
+				fluid_tile->id = resolution->registryID;
+			}
+		}
+
 		FluidAmount not_added{};
 		{
 			auto fluid_lock = fluidContainer->levels.uniqueLock();
-			not_added = addFluid(FluidStack(fluid->id, to_remove));
+			not_added = addFluid(FluidStack(fluid_tile->id, to_remove));
 		}
 		const FluidAmount removed = to_remove - not_added;
 
@@ -78,9 +87,9 @@ namespace Game3 {
 
 		assert(removed <= std::numeric_limits<FluidLevel>::max());
 
-		if (!fluid->isInfinite()) {
-			fluid->level -= FluidLevel(removed);
-			realm->setFluid(position + tileDirection, *fluid);
+		if (!fluid_tile->isInfinite()) {
+			fluid_tile->level -= FluidLevel(removed);
+			realm->setFluid(position + tileDirection, *fluid_tile);
 		}
 	}
 

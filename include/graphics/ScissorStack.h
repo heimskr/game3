@@ -14,7 +14,7 @@ namespace Game3 {
 			Rectangle rectangle;
 
 			ScissorSaver(ScissorStack &, SizeSaver &&);
-			ScissorSaver(ScissorSaver &) = delete;
+			ScissorSaver(const ScissorSaver &) = delete;
 			ScissorSaver(ScissorSaver &&) noexcept;
 			~ScissorSaver();
 			ScissorSaver & operator=(const ScissorSaver &) = delete;

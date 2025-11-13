@@ -69,8 +69,6 @@ namespace Game3 {
 
 				return self.operator[]((x + y * self.width) * self.channels + 3);
 			}
-
-
 	};
 
 	using ImageSpan = BaseImageSpan<false>;

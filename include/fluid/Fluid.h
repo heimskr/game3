@@ -29,6 +29,9 @@ namespace Game3 {
 			virtual ~Fluid();
 
 			virtual void onCollision(const std::shared_ptr<LivingEntity> &);
+
+			/** For certain fluids, converts their indeterminate variant to a determinate variant at a given location using a flood fill algorithm. */
+			virtual std::shared_ptr<Fluid> resolve(const Place &, size_t count = 0);
 	};
 
 	using FluidInt = uint64_t;

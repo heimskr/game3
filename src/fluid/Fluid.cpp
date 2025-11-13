@@ -20,6 +20,10 @@ namespace Game3 {
 
 	void Fluid::onCollision(const std::shared_ptr<LivingEntity> &) {}
 
+	FluidPtr Fluid::resolve(const Place &, size_t) {
+		return nullptr;
+	}
+
 // FluidTile
 
 	static_assert(sizeof(FluidTile::id)    == 2);

@@ -26,8 +26,14 @@ namespace Game3 {
 
 		if (std::optional<FluidTile> tile = realm->tryFluid(place.position); tile && (FluidTile::FULL <= tile->level || tile->isInfinite())) {
 			std::shared_ptr<Fluid> fluid = registry.maybe(tile->id);
-			if (!fluid || !fluid->flaskName)
+			if (!fluid || !fluid->flaskName) {
 				return false;
+			}
+
+			if (FluidPtr resolution = fluid->resolve(place)) {
+				fluid = resolution;
+				tile->id = fluid->registryID;
+			}
 
 			if (!tile->isInfinite()) {
 				tile->level = 0;

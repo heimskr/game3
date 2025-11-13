@@ -66,3 +66,4 @@ vgcore.*
 /subprojects/sqlite-amalgamation-*
 /subprojects/sqlite3.wrap
 /dlls
+/subprojects/.wraplock

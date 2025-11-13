@@ -33,6 +33,20 @@
 				"flask":    "base:item/water_flask",
 				"color":    "#44aaaa"
 			}],
+			["base:fluid/fresh_water", {
+				"name":     "Fresh Water",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/deeper_water",
+				"flask":    "base:item/water_flask",
+				"color":    "#44aaaa"
+			}],
+			["base:fluid/seawater", {
+				"name":     "Seawater",
+				"tileset":  "base:tileset/monomap",
+				"tilename": "base:tile/deeper_water",
+				"flask":    "base:item/seawater_flask",
+				"color":    "#44aa99"
+			}],
 			["base:fluid/brine", {
 				"name":     "Brine",
 				"tileset":  "base:tileset/monomap",

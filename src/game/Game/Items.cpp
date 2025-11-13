@@ -134,12 +134,13 @@ namespace Game3 {
 
 		add(std::make_shared<EternalFountainItem>("base:item/eternal_fountain", "Eternal Fountain", 999, 64)); // TODO: cost
 
-		add(std::make_shared<FilledFlask>("base:item/water_flask", "Water Flask", 3, "base:fluid/water"));
-		add(std::make_shared<FilledFlask>("base:item/lava_flask",  "Lava Flask",  4, "base:fluid/lava"));
-		add(std::make_shared<FilledFlask>("base:item/brine_flask", "Brine Flask", 4, "base:fluid/brine"));
-		add(std::make_shared<FilledFlask>("base:item/honey",       "Honey",       5, "base:fluid/honey"));
+		add(std::make_shared<FilledFlask>("base:item/water_flask",    "Water Flask",    3, "base:fluid/fresh_water"));
+		add(std::make_shared<FilledFlask>("base:item/seawater_flask", "Seawater Flask", 3, "base:fluid/seawater"));
+		add(std::make_shared<FilledFlask>("base:item/lava_flask",     "Lava Flask",     4, "base:fluid/lava"));
+		add(std::make_shared<FilledFlask>("base:item/brine_flask",    "Brine Flask",    4, "base:fluid/brine"));
+		add(std::make_shared<FilledFlask>("base:item/honey",          "Honey",          5, "base:fluid/honey"));
+		add(std::make_shared<FilledFlask>("base:item/mutagen_flask",  "Mutagen Flask", 32, "base:fluid/mutagen"));
 		add(std::make_shared<FilledFlask>("base:item/liquid_biomass_flask", "Liquid Biomass Flask", 32, "base:fluid/liquid_biomass"));
-		add(std::make_shared<FilledFlask>("base:item/mutagen_flask", "Mutagen Flask", 32, "base:fluid/mutagen"));
 
 		add(std::make_shared<FlaskFillerItem>("base:item/flask_filler", "Flask Filler", 999, 64)); // TODO: cost
 
