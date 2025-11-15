@@ -156,6 +156,11 @@ namespace Game3 {
 		}
 
 		if (fluid_tile) {
+			if (FluidPtr resolution = game->getFluid(fluid_tile->id)->resolve(place)) {
+				fluid = std::move(resolution);
+				fluid_tile->id = fluid->registryID;
+			}
+
 			if (fluid_tile->isInfinite()) {
 				const double to_slurp = std::min<double>(FluidTile::FULL, capacity - amount);
 				if (fluid && fluid->registryID == fluid_tile->id) {
