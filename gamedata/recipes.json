@@ -499,6 +499,12 @@
 				]
 			}],
 			["base:registry/centrifuge_recipe", {
+				"input":  ["base:fluid/seawater", 1000],
+				"output": [
+					[0.5, ["base:item/salt", 1]]
+				]
+			}],
+			["base:registry/centrifuge_recipe", {
 				"input":  ["base:fluid/milk", 1000],
 				"output": [
 					[0.2, ["base:item/chemical", 1, {"formula": "Ca"}]],
