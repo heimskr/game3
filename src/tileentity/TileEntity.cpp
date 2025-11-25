@@ -62,33 +62,13 @@ namespace Game3 {
 	}
 
 	void TileEntity::render(SpriteRenderer &sprite_renderer) {
-		if (!isVisible()) {
+		if (!isVisible() || !tryCacheTile()) {
 			return;
 		}
 
 		RealmPtr realm = getRealm();
-		Tileset &tileset = realm->getTileset();
-
-		if (cachedTile == TileID(-1) || tileLookupFailed) {
-			if (tileID.empty()) {
-				tileLookupFailed = true;
-				cachedTile = 0;
-				cachedUpperTile = 0;
-			} else {
-				tileLookupFailed = false;
-				cachedTile = tileset[tileID];
-				cachedUpperTile = tileset.getUpper(cachedTile);
-				if (cachedUpperTile == 0) {
-					cachedUpperTile = -1;
-				}
-			}
-		}
-
-		if (cachedTile == 0) {
-			return;
-		}
-
 		GamePtr game = realm->getGame();
+		Tileset &tileset = realm->getTileset();
 		const auto tilesize = tileset.getTileSize();
 		const auto texture = tileset.getTexture(*game);
 		const auto x = (cachedTile % (texture->width / tilesize)) * tilesize;
@@ -354,6 +334,27 @@ namespace Game3 {
 			globalID = boost::json::value_to<GlobalID>(iter->value());
 		}
 		increaseUpdateCounter();
+	}
+
+	bool TileEntity::tryCacheTile() {
+		if (cachedTile == TileID(-1) || tileLookupFailed) {
+			if (tileID.empty()) {
+				tileLookupFailed = true;
+				cachedTile = 0;
+				cachedUpperTile = 0;
+				return false;
+			}
+
+			tileLookupFailed = false;
+			Tileset &tileset = getRealm()->getTileset();
+			cachedTile = tileset[tileID];
+			cachedUpperTile = tileset.getUpper(cachedTile);
+			if (cachedUpperTile == 0) {
+				cachedUpperTile = -1;
+			}
+		}
+
+		return true;
 	}
 
 	void TileEntity::toJSON(boost::json::value &json) const {

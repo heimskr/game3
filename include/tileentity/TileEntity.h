@@ -149,6 +149,8 @@ namespace Game3 {
 
 			virtual void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &);
 
+			bool tryCacheTile();
+
 			friend void tag_invoke(boost::json::value_from_tag, boost::json::value &, const TileEntity &);
 
 		private:

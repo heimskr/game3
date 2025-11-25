@@ -17,6 +17,7 @@ namespace Game3 {
 
 			void init(Game &) override;
 			void tick(const TickArgs &) override;
+			void render(SpriteRenderer &sprite_renderer) override;
 			void toJSON(boost::json::value &) const override;
 			bool onInteractNextTo(const std::shared_ptr<Player> &, Modifiers, const ItemStackPtr &, Hand) override;
 			void absorbJSON(const std::shared_ptr<Game> &, const boost::json::value &) override;

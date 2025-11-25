@@ -4,6 +4,8 @@
 #include "game/EnergyContainer.h"
 #include "game/InventorySpan.h"
 #include "game/ServerInventory.h"
+#include "graphics/SpriteRenderer.h"
+#include "graphics/Tileset.h"
 #include "item/ChemicalItem.h"
 #include "packet/OpenModuleForAgentPacket.h"
 #include "packet/SetTileEntityEnergyPacket.h"
@@ -79,6 +81,19 @@ namespace Game3 {
 		}
 
 		react();
+	}
+
+	void Disruptor::render(SpriteRenderer &sprite_renderer) {
+		if (!isVisible() || !tryCacheTile()) {
+			return;
+		}
+
+		sprite_renderer(getGame()->registry<TextureRegistry>().at("base:texture/disruptor_full"), {
+			.x = float(position.column - 1),
+			.y = float(position.row - 1),
+			.sizeX = -1.f,
+			.sizeY = -1.f,
+		});
 	}
 
 	void Disruptor::toJSON(boost::json::value &json) const {
