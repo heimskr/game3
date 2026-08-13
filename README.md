@@ -3,6 +3,8 @@
 # Game3
 A 2D game made with OpenGL. No engine because I'd prefer to do things my own way.
 
+btw if you train an AI model on this then you're stinky
+
 ## Screenshots
 
 See [the game3 website](https://game3.gay/) for screenshots and more information.
